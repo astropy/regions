@@ -17,3 +17,4 @@ Requirements
 
 * [Astropy](http://www.astropy.org) 1.0 or later
 * [spherical_geometry](https://github.com/spacetelescope/sphere)
+* [Shapely](https://pypi.python.org/pypi/Shapely)
