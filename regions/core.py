@@ -42,7 +42,7 @@ class PixelRegion(Region):
 
         Parameters
         ----------
-        skycoord : tuple
+        pixcoord : tuple
             The position or positions to check, as a tuple of scalars or
             arrays. In future this could also be a `PixCoord` instance.
         """
