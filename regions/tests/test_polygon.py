@@ -1,10 +1,35 @@
+import numpy as np
 from astropy import units as u
 from astropy.coordinates import SkyCoord
 
-from ..polygon import SkyPolygonRegion
+from ..polygon import PolygonRegion, SkyPolygonRegion
 
 
 def test_basic():
+    """
+    Just make sure that things don't crash, but no test of numerical accuracy
+    """
+
+    poly1 = PolygonRegion(([10, 20, 20, 10, 10], [20, 20, 10, 10, 20]))
+
+    poly2 = PolygonRegion(([15, 25, 25, 15, 15], [23, 23, 13, 13, 23]))
+
+    poly3 = poly1.union(poly2)
+    poly4 = poly1.intersection(poly2)
+
+    np.testing.assert_allclose(poly1.area, 100)
+    np.testing.assert_allclose(poly2.area, 100)
+    np.testing.assert_allclose(poly3.area, 165)
+    np.testing.assert_allclose(poly4.area, 35)
+    
+    assert (13, 12) in poly1
+    assert not (13, 12) in poly2
+    
+    # TODO: it seems __contains__ has to return a scalar value?
+    # assert np.all(((np.array([13, 8]), np.array([15, 15])) in poly1) == np.array([False, True]))
+
+
+def test_sky_basic():
     """
     Just make sure that things don't crash, but no test of numerical accuracy
     """

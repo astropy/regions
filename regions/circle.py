@@ -20,7 +20,6 @@ class CircularRegion(object):
     """
 
     def __init__(self, pixcoord, radius):
-
         self.x, self.y = pixcoord
         self.radius = radius
 
@@ -37,3 +36,10 @@ class CircularRegion(object):
         # arrays
         x, y = pixcoord
         return np.hypot(x - self.x, y - self.y) < self.radius
+
+    def to_shapely(self):
+        if not self.isscalar:
+            raise TypeError("Can only convert single regions to shapely objects")
+        from shapely.geometry import Point
+        return Point(self.x, self.y).buffer(self.radius)
+
