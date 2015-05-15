@@ -20,6 +20,7 @@ class Region(object):
         Returns a region representing the area that is contained in exactly
         one region between this region and ``other``.
         """
+        raise NotImplementedError("")
 
     def union(self, other):
         """
@@ -115,7 +116,7 @@ class PixelRegion(Region):
             Slices for x and y which can be used on an array to extract the
             same region as the mask.
         """
-    raise NotImplementedError("")
+        raise NotImplementedError("")
 
 
 @six.add_metaclass(abc.ABCMeta)
