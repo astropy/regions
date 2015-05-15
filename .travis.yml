@@ -87,7 +87,7 @@ install:
 
     # OTHER DEPENDENCIES
     - if [[ $SETUP_CMD != egg_info ]]; then $CONDA_INSTALL numpy=$NUMPY_VERSION shapely ; fi
-    - if [[ $SETUP_CMD != egg_info ]]; then $PIP_INSTALL https://github.com/spacetelescope/sphere.git#egg=spherical_geometry; fi
+    - if [[ $SETUP_CMD != egg_info ]]; then $PIP_INSTALL git+http://github.com/spacetelescope/sphere.git#egg=spherical_geometry; fi
 
     # DOCUMENTATION DEPENDENCIES
     - if [[ $SETUP_CMD == build_sphinx* ]]; then $CONDA_INSTALL numpy=$NUMPY_VERSION Sphinx=1.2 matplotlib; fi
