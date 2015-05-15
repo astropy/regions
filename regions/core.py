@@ -17,8 +17,8 @@ class Region(object):
 
     def symmetric_difference(self, other):
         """
-        Returns a region representing the area that is contained in exactly
-        one region between this region and ``other``.
+        Returns the union of the two regions minus any areas contained in the
+        intersection of the two regions.
         """
         raise NotImplementedError("")
 

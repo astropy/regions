@@ -18,7 +18,7 @@ def _spherical_polygon_to_skycoord(polygon, frame):
 
 class SkyPolygonRegion(SkyRegion):
     """
-    A class to represent spherical polygons on the sky.
+    A spherical polygon on the sky.
 
     Parameters
     ----------

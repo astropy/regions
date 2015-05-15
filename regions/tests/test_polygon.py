@@ -1,7 +1,7 @@
 from astropy import units as u
 from astropy.coordinates import SkyCoord
 
-from .polygon import SkyPolygonRegion
+from ..polygon import SkyPolygonRegion
 
 
 def test_basic():
