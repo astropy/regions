@@ -114,6 +114,12 @@ class PixelRegion(Region):
         """
         raise NotImplementedError("")
 
+    def to_shapely(self):
+        """
+        Convert this region to a Shapely object.
+        """
+        raise NotImplementedError("")
+
 
 @six.add_metaclass(abc.ABCMeta)
 class SkyRegion(Region):
