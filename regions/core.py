@@ -35,7 +35,6 @@ class PixelRegion(Region):
     Base class for all regions defined in pixel coordinates
     """
 
-    @abc.abstractmethod
     def __contains__(self, pixcoord):
         """
         Checks whether a position or positions fall inside the region.
@@ -48,14 +47,12 @@ class PixelRegion(Region):
         """
         raise NotImplementedError("")
 
-    @abc.abstractproperty
     def area(self):
         """
         Returns the area of the region as a `~astropy.units.Quantity`.
         """
         raise NotImplementedError("")
 
-    @abc.abstractmethod
     def to_pixel(self, wcs, mode='local', tolerance=None):
         """
         Returns a region defined in sky coordinates.
@@ -90,7 +87,6 @@ class PixelRegion(Region):
         """
         raise NotImplementedError("")
 
-    @abc.abstractmethod
     def to_mask(self, mode='center'):
         """
         Returns a mask for the aperture.
@@ -125,7 +121,6 @@ class SkyRegion(Region):
     Base class for all regions defined in celestial coordinates
     """
 
-    @abc.abstractmethod
     def __contains__(self, skycoord):
         """
         Checks whether a position or positions fall inside the region.
@@ -137,14 +132,12 @@ class SkyRegion(Region):
         """
         raise NotImplementedError("")
 
-    @abc.abstractproperty
     def area(self):
         """
         Returns the area of the region as a `~astropy.units.Quantity`.
         """
         raise NotImplementedError("")
 
-    @abc.abstractmethod
     def to_pixel(self, wcs, mode='local', tolerance=None):
         """
         Returns a region defined in pixel coordinates.

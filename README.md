@@ -2,7 +2,7 @@
 [![Coverage Status](https://coveralls.io/repos/astropy/regions/badge.svg)](https://coveralls.io/r/astropy/regions)
 
 About
-=====
+-----
 
 This is an experimental package defining an API for representing regions
 (both on the sky and in pixel coordinates). Initial discussion related to
@@ -11,3 +11,9 @@ this happened as part of the
 current API is the result of discussions between Tom Robitaille and Perry
 Greenfield. If you are interested in contributing, please contact either of
 us!
+
+Requirements
+------------
+
+* [Astropy](http://www.astropy.org) 1.0 or later
+* [spherical_geometry](https://github.com/spacetelescope/sphere)
