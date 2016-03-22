@@ -1,3 +1,5 @@
+from astropy import units as u
+
 from ..core import PixelRegion, SkyRegion
 
 
@@ -18,8 +20,12 @@ class RectanglePixelRegion(PixelRegion):
         is lined up with the x axis.
     """
 
-    def __init__(self, vertices):
-        self.vertices = vertices
+    def __init__(self, center, height, width, angle=0 * u.deg):
+        # TODO: use quantity_input to check that angle is an angle
+        self.center = center
+        self.height = minor
+        self.width = width
+        self.angle = angle
 
     @property
     def area(self):
@@ -61,8 +67,12 @@ class RectangleSkyRegion(SkyRegion):
         is lined up with the longitude axis of the celestial coordinates.
     """
 
-    def __init__(self, vertices):
-        self.vertices = vertices
+    def __init__(self, center, height, width, angle=0 * u.deg):
+        # TODO: use quantity_input to check that height, width, and angle are angles
+        self.center = center
+        self.height = minor
+        self.width = width
+        self.angle = angle
 
     @property
     def area(self):

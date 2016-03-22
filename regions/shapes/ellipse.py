@@ -1,3 +1,5 @@
+from astropy import units as u
+
 from ..core import PixelRegion, SkyRegion
 
 
@@ -18,8 +20,12 @@ class EllipsePixelRegion(PixelRegion):
         axis is lined up with the x axis.
     """
 
-    def __init__(self, vertices):
-        self.vertices = vertices
+    def __init__(self, center, minor, major, angle=0. * u.deg):
+        # TODO: use quantity_input to check that angle is an angle
+        self.center = center
+        self.minor = minor
+        self.major = major
+        self.angle = angle
 
     @property
     def area(self):
@@ -61,8 +67,12 @@ class EllipseSkyRegion(SkyRegion):
         axis is lined up with the longitude axis of the celestial coordinates.
     """
 
-    def __init__(self, vertices):
-        self.vertices = vertices
+    def __init__(self, center, minor, major, angle=0. * u.deg):
+        # TODO: use quantity_input to check that height, width, and angle are angles
+        self.center = center
+        self.minor = minor
+        self.major = major
+        self.angle = angle
 
     @property
     def area(self):

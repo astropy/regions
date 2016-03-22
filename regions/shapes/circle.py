@@ -19,6 +19,7 @@ class CirclePixelRegion(PixelRegion):
     """
 
     def __init__(self, center, radius):
+        # TODO: test that center is a 0D PixCoord
         self.center = center
         self.radius = radius
 
@@ -55,6 +56,7 @@ class CircleSkyRegion(SkyRegion):
     """
 
     def __init__(self, center, radius):
+        # TODO: test that center is a 0D SkyCoord
         self.center = center
         self.radius = radius
 

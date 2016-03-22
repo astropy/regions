@@ -12,6 +12,7 @@ class PolygonPixelRegion(PixelRegion):
     """
 
     def __init__(self, vertices):
+        # TODO: test that vertices is a 1D PixCoord
         self.vertices = vertices
 
     @property
@@ -48,6 +49,7 @@ class PolygonSkyRegion(SkyRegion):
     """
 
     def __init__(self, vertices):
+        # TODO: test that vertices is a 1D SkyCoord
         self.vertices = vertices
 
     @property
