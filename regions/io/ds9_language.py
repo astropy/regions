@@ -90,9 +90,23 @@ def line_parser(line, coordsys=None):
     elif region_type in language_spec:
         if coordsys is None:
             raise ValueError("No coordinate system specified and a region has been found.")
-        coords_etc = strip_paren(line[region_type_search.span()[1]:line.find("#")].strip())
-        return region_type, type_parser(coords_etc, language_spec[region_type],
-                                        coordsys)
+        # end_of_region_name is the coordinate of the end of the region's name, e.g.:
+        # circle would be 6 because circle is 6 characters
+        end_of_region_name = region_type_search.span()[1]
+        # coordinate of the # symbol or end of the line (-1) if not found
+        hash_or_end = line.find("#")
+        coords_etc = strip_paren(line[end_of_region_name:hash_or_end].strip())
+        if coordsys in coordinates.frame_transform_graph.get_names():
+            parsed = type_parser(coords_etc, language_spec[region_type],
+                                 coordsys)
+            coords = coordinates.SkyCoord([(x, y)
+                                           for x, y in zip(parsed[:-1:2], parsed[1::2])
+                                           if isinstance(x, coordinates.Angle) and
+                                           isinstance(x, coordinates.Angle)], frame=coordsys)
+            return region_type, [coords] + parsed[len(coords)*2:]
+        else:
+            return region_type, type_parser(coords_etc, language_spec[region_type],
+                                            coordsys)
 
 def type_parser(string_rep, specification, coordsys):
     coord_list = []
