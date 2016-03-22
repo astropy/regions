@@ -6,18 +6,17 @@ from astropy import coordinates
 
 def coordinate(string_rep, unit):
     # Any ds9 coordinate representation (sexagesimal or degrees)
-    try:
+    if 'd' in string_rep or 'h' in string_rep:
         return coordinates.Angle(string_rep)
-    except u.UnitsError:
-        if unit == 'hour_or_deg':
-            if ':' in string_rep:
-                return coordinates.Angle(string_rep, unit=u.hour)
-            else:
-                return coordinates.Angle(string_rep, unit=u.deg)
-        elif unit.is_equivalent(u.deg):
-            return coordinates.Angle(string_rep, unit=unit)
+    elif unit is 'hour_or_deg':
+        if ':' in string_rep:
+            return coordinates.Angle(string_rep, unit=u.hour)
         else:
-            return u.Quantity(float(string_rep), unit)
+            return coordinates.Angle(string_rep, unit=u.deg)
+    elif unit.is_equivalent(u.deg):
+        return coordinates.Angle(string_rep, unit=unit)
+    else:
+        return u.Quantity(float(string_rep), unit)
 
 unit_mapping = {'"': u.arcsec,
                 "'": u.arcmin,
