@@ -1,7 +1,7 @@
 from .core import Region
 
 
-class CompoundPixelRegion(PixelRegion)
+class CompoundPixelRegion(PixelRegion):
     """
     Represents the logical combination of two regions in pixel coordinates.
     """
@@ -21,7 +21,7 @@ class CompoundPixelRegion(PixelRegion)
         raise NotImplementedError("")
 
 
-class CompoundSkyRegion(PixelRegion)
+class CompoundSkyRegion(PixelRegion):
     """
     Represents the logical combination of two regions in sky coordinates.
     """

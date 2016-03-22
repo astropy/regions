@@ -20,6 +20,14 @@ class EllipsePixelRegion(PixelRegion):
 
     def __init__(self, vertices):
         self.vertices = vertices
+        #assume vertices is a tuple of center, minor,major,angle?
+        if len(self.vertices)< 4:
+                return ValueError
+                
+        self.center=vertices[0]
+        self.minor=vertices[1]
+        self.major=vertices[2]
+        self.angle=vertices[3]
 
     @property
     def area(self):
