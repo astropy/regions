@@ -18,7 +18,7 @@ class CirclePixelRegion(PixelRegion):
         The radius of the circle
     """
 
-    def __init__(self, center, radius):
+    def __init__(self, center, radius,):
         self.center = center
         self.radius = radius
 
@@ -57,7 +57,7 @@ class CircleSkyRegion(SkyRegion):
     def __init__(self, center, radius):
         self.center = center
         self.radius = radius
-
+    
     @property
     def area(self):
         return math.pi * self.radius ** 2

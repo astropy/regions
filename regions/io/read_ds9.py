@@ -3,7 +3,7 @@ from regions.shapes.circle import CirclePixelRegion
 from regions.shapes.ellipse import EllipsePixelRegion
 
 
-def parse_ds9(filename=None):
+def parse_ds9(filename=None,save_comments=False):
     """
     parse a ds9 regions file and return a regions object
 
@@ -165,10 +165,10 @@ def parse_ds9(filename=None):
                                     if loc:
                                         loc2=spec.find(")")
                                         vertex=[float(num) for num in spec[loc+1:loc2].split(",")]
-                                        if region == "circle":
+                                        if region is "circle":
                                             x,y,radius=zip(vertex)
                                             this_region=CirclePixelRegion((x,y),radius)
-                                        if region == "ellipse":
+                                        if region is "ellipse":
                                             this_region=EllipsePixelRegion(vertex)
 
                 if this_region:
@@ -177,7 +177,8 @@ def parse_ds9(filename=None):
         elif tokens[0] in line[0]: #comment, save for later
             comments.append(line)
 
-    while comments:
+    if (save_comments):
+        while comments:
             all_regions.append(comments.pop())
 
     return all_regions
