@@ -38,6 +38,26 @@ class PixelRegion(Region):
     Base class for all regions defined in pixel coordinates
     """
 
+    def intersection(self, other):
+        """
+        Returns a region representing the intersection of this region with
+        ``other``.
+        """
+        return CompoundPixelRegion(self, other, operator.and_)
+
+    def symmetric_difference(self, other):
+        """
+        Returns the union of the two regions minus any areas contained in the
+        intersection of the two regions.
+        """
+        return CompoundPixelRegion(self, other, operator.xor)
+
+    def union(self, other):
+        """
+        Returns a region representing the union of this region with ``other``.
+        """
+        return CompoundPixelRegion(self, other, operator.or_)
+
     @abc.abstractmethod
     def __contains__(self, pixcoord):
         """
@@ -51,7 +71,7 @@ class PixelRegion(Region):
         """
         raise NotImplementedError("")
 
-    @abc.abstractmethod
+    @abc.abstractproperty
     def area(self):
         """
         Returns the area of the region as a `~astropy.units.Quantity`.
@@ -135,6 +155,26 @@ class SkyRegion(Region):
     Base class for all regions defined in celestial coordinates
     """
 
+    def intersection(self, other):
+        """
+        Returns a region representing the intersection of this region with
+        ``other``.
+        """
+        return CompoundSkyRegion(self, other, operator.and_)
+
+    def symmetric_difference(self, other):
+        """
+        Returns the union of the two regions minus any areas contained in the
+        intersection of the two regions.
+        """
+        return CompoundSkyRegion(self, other, operator.xor)
+
+    def union(self, other):
+        """
+        Returns a region representing the union of this region with ``other``.
+        """
+        return CompoundSkyRegion(self, other, operator.or_)
+
     @abc.abstractmethod
     def __contains__(self, skycoord):
         """
@@ -147,7 +187,7 @@ class SkyRegion(Region):
         """
         raise NotImplementedError("")
 
-    @abc.abstractmethod
+    @abc.abstractproperty
     def area(self):
         """
         Returns the area of the region as a `~astropy.units.Quantity`.
