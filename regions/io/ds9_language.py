@@ -1,4 +1,5 @@
 import string
+import itertools
 import re
 from astropy import units as u
 from astropy import coordinates
@@ -27,6 +28,7 @@ angle = angular_length_quantity
 language_spec = {'point': (coordinate, coordinate),
                  'circle': (coordinate, coordinate, radius),
                  'box': (coordinate, coordinate, width, height, angle),
+                 'polygon': itertools.cycle((coordinate, )),
                 }
 
 coordinate_systems = ['fk5', 'fk4', 'icrs', 'galactic', 'wcs', 'physical', 'image']
@@ -88,7 +90,7 @@ def line_parser(line, coordsys=None):
     elif region_type in language_spec:
         if coordsys is None:
             raise ValueError("No coordinate system specified and a region has been found.")
-        coords_etc = strip_paren(line[region_type_search.span()[1]:])
+        coords_etc = strip_paren(line[region_type_search.span()[1]:line.find("#")].strip())
         return region_type, type_parser(coords_etc, language_spec[region_type],
                                         coordsys)
 
@@ -97,7 +99,7 @@ def type_parser(string_rep, specification, coordsys):
     splitter = re.compile("[, ]")
     for ii, (element, element_parser) in enumerate(zip(splitter.split(string_rep), specification)):
         if element_parser is coordinate:
-            unit = coordinate_units[coordsys][ii]
+            unit = coordinate_units[coordsys][ii % 2]
             coord_list.append(element_parser(element, unit))
         else:
             coord_list.append(element_parser(element))
