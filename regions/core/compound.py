@@ -1,7 +1,7 @@
-from .core import Region
+from .core import PixelRegion, SkyRegion
 
 
-class CompoundPixelRegion(PixelRegion)
+class CompoundPixelRegion(PixelRegion):
     """
     Represents the logical combination of two regions in pixel coordinates.
     """
@@ -20,8 +20,11 @@ class CompoundPixelRegion(PixelRegion)
     def to_sky(self, wcs, mode='local', tolerance=None):
         raise NotImplementedError("")
 
+    def __repr__(self):
+        return "({0} {1} {2})".format(self.region1, self.operator, self.region2)
 
-class CompoundSkyRegion(PixelRegion)
+
+class CompoundSkyRegion(SkyRegion):
     """
     Represents the logical combination of two regions in sky coordinates.
     """
@@ -36,3 +39,6 @@ class CompoundSkyRegion(PixelRegion)
 
     def to_pixel(self, wcs, mode='local', tolerance=None):
         raise NotImplementedError("")
+
+    def __repr__(self):
+        return "({0} {1} {2})".format(self.region1, self.operator, self.region2)
