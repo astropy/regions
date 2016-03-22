@@ -53,17 +53,26 @@ def strip_paren(string_rep):
     return paren.sub("", string_rep)
 
 def ds9_parser(filename):
+    """
+    Parse a complete ds9 .reg file
+
+    Returns
+    -------
+    list of (region type, coord_list) tuples
+    """
     coordsys = None
     regions = []
 
     with open(filename,'r') as fh:
-        for line in fh:
-            parsed = line_parser(line, coordsys)
-            if parsed in coordinate_systems:
-                coordsys = parsed
-            elif parsed:
-                region_type, coordlist = parsed
-                regions.append((region_type, coordlist))
+        for line_ in fh:
+            # ds9 regions can be split on \n or ;
+            for line in line_.split(";"):
+                parsed = line_parser(line, coordsys)
+                if parsed in coordinate_systems:
+                    coordsys = parsed
+                elif parsed:
+                    region_type, coordlist = parsed
+                    regions.append((region_type, coordlist))
 
     return regions
 
@@ -79,8 +88,9 @@ def line_parser(line, coordsys=None):
     elif region_type in language_spec:
         if coordsys is None:
             raise ValueError("No coordinate system specified and a region has been found.")
-        return region_type, type_parser(strip_paren(line[region_type_search.span()[1]:]),
-                           language_spec[region_type], coordsys)
+        coords_etc = strip_paren(line[region_type_search.span()[1]:])
+        return region_type, type_parser(coords_etc, language_spec[region_type],
+                                        coordsys)
 
 def type_parser(string_rep, specification, coordsys):
     coord_list = []
