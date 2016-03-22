@@ -4,12 +4,13 @@ from astropy import units as u
 from astropy import coordinates
 
 def coordinate(string_rep, unit):
+    # Any ds9 coordinate representation (sexagesimal or degrees)
     return coordinates.Angle(string_rep, unit=unit)
 
 unit_mapping = {'"': u.arcsec,
                 "'": u.arcmin}
 
-def radius(string_rep):
+def angular_length_quantity(string_rep):
     has_unit = string_rep[-1] not in string.digits
     if has_unit:
         unit = unit_mapping[string_rep[-1]]
@@ -18,9 +19,10 @@ def radius(string_rep):
         return u.Quantity(float(string_rep), unit=u.deg)
 
 # these are the same function, just different names
-width = radius
-height = radius
-angle = radius
+radius = angular_length_quantity
+width = angular_length_quantity
+height = angular_length_quantity
+angle = angular_length_quantity
 
 language_spec = {'point': (coordinate, coordinate),
                  'circle': (coordinate, coordinate, radius),
