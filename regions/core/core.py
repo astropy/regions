@@ -8,6 +8,7 @@ class Region(object):
     Base class for all regions.
     """
 
+    @abc.abstractmethod
     def intersection(self, other):
         """
         Returns a region representing the intersection of this region with
@@ -15,6 +16,7 @@ class Region(object):
         """
         raise NotImplementedError("")
 
+    @abc.abstractmethod
     def symmetric_difference(self, other):
         """
         Returns the union of the two regions minus any areas contained in the
@@ -22,6 +24,7 @@ class Region(object):
         """
         raise NotImplementedError("")
 
+    @abc.abstractmethod
     def union(self, other):
         """
         Returns a region representing the union of this region with ``other``.
@@ -35,6 +38,27 @@ class PixelRegion(Region):
     Base class for all regions defined in pixel coordinates
     """
 
+    def intersection(self, other):
+        """
+        Returns a region representing the intersection of this region with
+        ``other``.
+        """
+        return CompoundPixelRegion(self, other, operator.and_)
+
+    def symmetric_difference(self, other):
+        """
+        Returns the union of the two regions minus any areas contained in the
+        intersection of the two regions.
+        """
+        return CompoundPixelRegion(self, other, operator.xor)
+
+    def union(self, other):
+        """
+        Returns a region representing the union of this region with ``other``.
+        """
+        return CompoundPixelRegion(self, other, operator.or_)
+
+    @abc.abstractmethod
     def __contains__(self, pixcoord):
         """
         Checks whether a position or positions fall inside the region.
@@ -47,13 +71,15 @@ class PixelRegion(Region):
         """
         raise NotImplementedError("")
 
+    @abc.abstractproperty
     def area(self):
         """
         Returns the area of the region as a `~astropy.units.Quantity`.
         """
         raise NotImplementedError("")
 
-    def to_pixel(self, wcs, mode='local', tolerance=None):
+    @abc.abstractmethod
+    def to_sky(self, wcs, mode='local', tolerance=None):
         """
         Returns a region defined in sky coordinates.
 
@@ -87,6 +113,7 @@ class PixelRegion(Region):
         """
         raise NotImplementedError("")
 
+    @abc.abstractmethod
     def to_mask(self, mode='center'):
         """
         Returns a mask for the aperture.
@@ -114,6 +141,7 @@ class PixelRegion(Region):
         """
         raise NotImplementedError("")
 
+    @abc.abstractmethod
     def to_shapely(self):
         """
         Convert this region to a Shapely object.
@@ -127,6 +155,27 @@ class SkyRegion(Region):
     Base class for all regions defined in celestial coordinates
     """
 
+    def intersection(self, other):
+        """
+        Returns a region representing the intersection of this region with
+        ``other``.
+        """
+        return CompoundSkyRegion(self, other, operator.and_)
+
+    def symmetric_difference(self, other):
+        """
+        Returns the union of the two regions minus any areas contained in the
+        intersection of the two regions.
+        """
+        return CompoundSkyRegion(self, other, operator.xor)
+
+    def union(self, other):
+        """
+        Returns a region representing the union of this region with ``other``.
+        """
+        return CompoundSkyRegion(self, other, operator.or_)
+
+    @abc.abstractmethod
     def __contains__(self, skycoord):
         """
         Checks whether a position or positions fall inside the region.
@@ -138,12 +187,14 @@ class SkyRegion(Region):
         """
         raise NotImplementedError("")
 
+    @abc.abstractproperty
     def area(self):
         """
         Returns the area of the region as a `~astropy.units.Quantity`.
         """
         raise NotImplementedError("")
 
+    @abc.abstractmethod
     def to_pixel(self, wcs, mode='local', tolerance=None):
         """
         Returns a region defined in pixel coordinates.
