@@ -1,7 +1,9 @@
 import re
 from ..shapes.circle import CirclePixelRegion
 from ..shapes.ellipse import EllipsePixelRegion
-
+from ..core.pixcoord import PixCoord
+from ..shapes.rectangle import RectanglePixelRegion
+import astropy.coordinates as coords
 
 def parse_ds9(filename=None,save_comments=False):
     """
@@ -19,8 +21,6 @@ def parse_ds9(filename=None,save_comments=False):
         circle(484,606,20)
         ellipse(267,601,55,24,0)
         ellipse(409,498,40,20,0) # color=magenta
-
-
 
     More specifically, region specifications consist of one or more lines containing:
       # comment until end of line
@@ -114,15 +114,14 @@ def parse_ds9(filename=None,save_comments=False):
         print("Please provide filename for ds9 region file")
         return ValueError
 
-    shapes=["circle","ellipse"]
+    shapes=["circle","ellipse","point","box"]
     special=["global"]
     wcs=["physical","fk5"]
+    quoted=["font"]
 
-    #seperation tokens
-    tokens=["#","(",")","="]
     newline=";"
-    comments=[]
-    sline=[]
+    comments=list()
+    sline=list()
 
     #match hex [0-9A-Fa-f]
     #match letters [a-zA-Z]
@@ -134,49 +133,73 @@ def parse_ds9(filename=None,save_comments=False):
     all_regions=list()
 
     #doesn't deal with quotes in parameter specs yet
+    #this looping needs some serious work, I think a
+    #combination of more regex and string expressions
+    #would be a decent compromise for speed and readability
     for line in lines:
-        this_region=None
-        vertex=None
-        param_list=list()
-        span=re.search("[a-zA-Z]",line)
-        if span.span()[0] == 0:#character found in first position
-            if newline in line:
-                sline=line.split(newline)
-                #sketchy growth of list
-                for newline in line:
-                        lines.append(newline)
-            else:
-                sline=line.split()
-
-                #find parameters
-                for spec in sline:
-                    region=None
-                    for key in special:
-                        if key in spec:
-                            region=key
-                    if not region:
-                        for shape in shapes:
-                            if shape in spec and "=" not in spec:
-                                region=shape
-                                loc=spec.find("(")
-                                if loc:
-                                    loc2=spec.find(")")
-                                    vertex=[float(num) for num in spec[loc+1:loc2].split(",")]
-                        if "=" in spec:
-                            param,val=spec.split("=")
-                            param_list.append((param,val))
-                    if vertex:
-                        if region is "circle":
-                            x,y,radius=zip(vertex)
-                            this_region=CirclePixelRegion((x,y),radius,params=param_list)
-                        if region is "ellipse":
-                            this_region=EllipsePixelRegion(vertex,params=param_list)
-
-            if this_region:
-                all_regions.append(this_region) #(region,vertex,param_list)
-
-        elif tokens[0] in line[0]: #comment, save for later
+        print(line)
+        if line and line[0] is "#": #comment, save for later
             comments.append(line)
+        else:
+            this_region=None
+            vertex=None
+            param_list=list()
+            if line:
+                span=re.search("[a-zA-Z]",line[0])
+            else:
+                break
+            if span:#character found in first position
+                if newline in line:
+                    morelines=line.split(newline)
+                    #sketchy growth of list
+                    for n in morelines:
+                        lines.append(n)
+                else:
+                    sline=line.split()
+
+                    #find parameters
+                    for spec in sline:
+                        region=None
+                        for key in special:
+                            if key in spec:
+                                region=key
+                        if not region:
+                            for shape in shapes:
+                                if shape in spec and "=" not in spec:
+                                    region=shape
+                                    loc=spec.find("(")
+                                    if loc:
+                                        loc2=spec.find(")")
+                                        if "," in spec:
+                                            splitter=","
+                                        else:
+                                            splitter=" "
+                                        contents=spec[loc+1:loc2].split(splitter)
+                                        if ":" in spec:
+                                            vertex=[coords.SkyCoord(contents[0],contents[1],unit="deg")]
+                                        else:
+                                            vertex=[float(num) for num in contents]
+                            if "=" in spec:
+                                param,val=spec.split("=")
+                                param_list.append((param,val))
+                        if vertex:
+                            if region is "circle":
+                                if len(vertex) < 2:
+                                    vertex.append(contents[-1])
+                                    this_region=CirclePixelRegion(vertex[0],vertex[1],params=param_list)
+                                else:
+                                    x,y,radius=zip(vertex)
+                                    this_region=CirclePixelRegion((x,y),radius,params=param_list)
+                            if region is "ellipse":
+                                this_region=EllipsePixelRegion(vertex,params=param_list)
+                            if region is "point":
+                                x,y=zip(vertex)
+                                this_region=PixCoord(x,y,params=param_list)
+                            if region is "box":
+                                this_region=RectanglePixelRegion(vertex,params=param_list)
+
+                if this_region:
+                    all_regions.append(this_region) #(region,vertex,param_list)
 
     if (save_comments):
         while comments:

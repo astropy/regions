@@ -18,8 +18,9 @@ class RectanglePixelRegion(PixelRegion):
         is lined up with the x axis.
     """
 
-    def __init__(self, vertices):
+    def __init__(self, vertices, params=None):
         self.vertices = vertices
+        self.params = params
 
     @property
     def area(self):
