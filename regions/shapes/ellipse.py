@@ -16,14 +16,17 @@ class EllipsePixelRegion(PixelRegion):
     angle : :class:`~astropy.units.Quantity`
         The rotation of the ellipse. If set to zero (the default), the major
         axis is lined up with the x axis.
+    params: list
+        A list of params for formatting the region
     """
 
-    def __init__(self, vertices):
+    def __init__(self, vertices, params=None):
         self.vertices = vertices
+        self.params = params
         #assume vertices is a tuple of center, minor,major,angle?
         if len(self.vertices)< 4:
                 return ValueError
-                
+
         self.center=vertices[0]
         self.minor=vertices[1]
         self.major=vertices[2]

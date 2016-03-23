@@ -1,6 +1,6 @@
 import re
-from regions.shapes.circle import CirclePixelRegion
-from regions.shapes.ellipse import EllipsePixelRegion
+from ..shapes.circle import CirclePixelRegion
+from ..shapes.ellipse import EllipsePixelRegion
 
 
 def parse_ds9(filename=None,save_comments=False):
@@ -116,6 +116,7 @@ def parse_ds9(filename=None,save_comments=False):
 
     shapes=["circle","ellipse"]
     special=["global"]
+    wcs=["physical","fk5"]
 
     #seperation tokens
     tokens=["#","(",")","="]
@@ -131,7 +132,6 @@ def parse_ds9(filename=None,save_comments=False):
 
     #list of region objects which are returned
     all_regions=list()
-    this_region=None
 
     #doesn't deal with quotes in parameter specs yet
     for line in lines:
@@ -150,29 +150,30 @@ def parse_ds9(filename=None,save_comments=False):
 
                 #find parameters
                 for spec in sline:
-                    if "=" in spec:
-                        param,val=spec.split("=")
-                        param_list.append((param,val))
-                    else:
-                        for key in special:
-                            if key in spec:
-                                region=key
-                        else:
-                            for shape in shapes:
-                                if shape in spec:
-                                    region=shape
-                                    loc=spec.find("(")
-                                    if loc:
-                                        loc2=spec.find(")")
-                                        vertex=[float(num) for num in spec[loc+1:loc2].split(",")]
-                                        if region is "circle":
-                                            x,y,radius=zip(vertex)
-                                            this_region=CirclePixelRegion((x,y),radius)
-                                        if region is "ellipse":
-                                            this_region=EllipsePixelRegion(vertex)
+                    region=None
+                    for key in special:
+                        if key in spec:
+                            region=key
+                    if not region:
+                        for shape in shapes:
+                            if shape in spec and "=" not in spec:
+                                region=shape
+                                loc=spec.find("(")
+                                if loc:
+                                    loc2=spec.find(")")
+                                    vertex=[float(num) for num in spec[loc+1:loc2].split(",")]
+                        if "=" in spec:
+                            param,val=spec.split("=")
+                            param_list.append((param,val))
+                    if vertex:
+                        if region is "circle":
+                            x,y,radius=zip(vertex)
+                            this_region=CirclePixelRegion((x,y),radius,params=param_list)
+                        if region is "ellipse":
+                            this_region=EllipsePixelRegion(vertex,params=param_list)
 
-                if this_region:
-                    all_regions.append(this_region) #(region,vertex,param_list)
+            if this_region:
+                all_regions.append(this_region) #(region,vertex,param_list)
 
         elif tokens[0] in line[0]: #comment, save for later
             comments.append(line)

@@ -16,11 +16,15 @@ class CirclePixelRegion(PixelRegion):
         The position of the center of the circle.
     radius : float
         The radius of the circle
+    params : list
+        A list of additional parameters for formatting the region
+
     """
 
-    def __init__(self, center, radius,):
+    def __init__(self, center, radius, params=None):
         self.center = center
         self.radius = radius
+        self.params = params
 
     @property
     def area(self):
@@ -52,12 +56,15 @@ class CircleSkyRegion(SkyRegion):
         The position of the center of the circle.
     radius : :class:`~astropy.units.Quantity`
         The radius of the circle in angular units
+    params : list
+        A list of additional parameters for formatting the region
     """
 
-    def __init__(self, center, radius):
+    def __init__(self, center, radius, params=None):
         self.center = center
         self.radius = radius
-    
+        self.params = params
+
     @property
     def area(self):
         return math.pi * self.radius ** 2
