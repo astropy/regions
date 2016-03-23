@@ -6,11 +6,13 @@ from astropy import coordinates
 from ..shapes import circle, rectangle, polygon, ellipse
 from ..core import PixCoord
 
+hour_or_deg = 'hour_or_deg'
+
 def coordinate(string_rep, unit):
     # Any ds9 coordinate representation (sexagesimal or degrees)
     if 'd' in string_rep or 'h' in string_rep:
         return coordinates.Angle(string_rep)
-    elif unit is 'hour_or_deg':
+    elif unit is hour_or_deg:
         if ':' in string_rep:
             return coordinates.Angle(string_rep, unit=u.hour)
         else:
@@ -54,7 +56,6 @@ coordsys_name_mapping = dict(zip(coordinates.frame_transform_graph.get_names(),
                                  coordinates.frame_transform_graph.get_names()))
 coordsys_name_mapping['ecliptic'] = 'geocentrictrueecliptic' # needs expert attention TODO
 
-hour_or_deg = 'hour_or_deg'
 coordinate_units = {'fk5': (hour_or_deg, u.deg),
                     'fk4': (hour_or_deg, u.deg),
                     'icrs': (hour_or_deg, u.deg),
