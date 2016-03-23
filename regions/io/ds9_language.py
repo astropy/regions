@@ -79,13 +79,37 @@ viz_keywords = ['color', 'dashed', 'width', 'point', 'font']
 def region_list_to_objects(region_list):
     output_list = []
     for region_type, coord_list, meta in region_list:
-        if region_type is circle:
+        #print("region_type, region_type is 'circle', type(region_type), type('circle'), id(region_type), id('circle'), id(str(region_type))")
+        #print(region_type, region_type is 'circle', type(region_type), type('circle'), id(region_type), id('circle'), id(str(region_type)))
+        if region_type == 'circle':
             if isinstance(coord_list[0], coordinates.SkyCoord):
-                output_list.append(circle.SkyCircleRegion(coord_list[0], coord_list[1]))
+                output_list.append(circle.CircleSkyRegion(coord_list[0], coord_list[1]))
             elif isinstance(coord_list[0], PixCoord):
-                output_list.append(circle.PixelCircleRegion(coord_list[0], coord_list[1]))
+                output_list.append(circle.CirclePixelRegion(coord_list[0], coord_list[1]))
             else:
                 raise ValueError("No central coordinate")
+        elif region_type == 'ellipse':
+            if isinstance(coord_list[0], coordinates.SkyCoord):
+                output_list.append(ellipse.EllipseSkyRegion(coord_list[0], coord_list[1], coord_list[2], coord_list[3]))
+            elif isinstance(coord_list[0], PixCoord):
+                output_list.append(ellipse.EllipsePixelRegion(coord_list[0], coord_list[1], coord_list[2], coord_list[3]))
+            else:
+                raise ValueError("No central coordinate")
+        elif region_type == 'polygon':
+            if isinstance(coord_list[0], coordinates.SkyCoord):
+                output_list.append(polygon.PolygonSkyRegion(coord_list[0]))
+            elif isinstance(coord_list[0], PixCoord):
+                output_list.append(polygon.PolygonPixelRegion(coord_list[0]))
+            else:
+                raise ValueError("No central coordinate")
+        elif region_type == 'rectangle':
+            if isinstance(coord_list[0], coordinates.SkyCoord):
+                output_list.append(rectangle.RectangleSkyRegion(coord_list[0], coord_list[1], coord_list[2], coord_list[3]))
+            elif isinstance(coord_list[0], PixCoord):
+                output_list.append(rectangle.RectanglePixelRegion(coord_list[0], coord_list[1], coord_list[2], coord_list[3]))
+            else:
+                raise ValueError("No central coordinate")
+    return output_list
 
 
 def ds9_parser(filename):
