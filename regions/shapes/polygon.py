@@ -11,9 +11,11 @@ class PolygonPixelRegion(PixelRegion):
         The vertices of the polygon
     """
 
-    def __init__(self, vertices):
+    def __init__(self, vertices, meta=None, visual=None):
         # TODO: test that vertices is a 1D PixCoord
         self.vertices = vertices
+        self.meta = meta or {}
+        self.visual = visual or {}
 
     @property
     def area(self):
@@ -48,9 +50,11 @@ class PolygonSkyRegion(SkyRegion):
         The vertices of the polygon
     """
 
-    def __init__(self, vertices):
+    def __init__(self, vertices, meta=None, visual=None):
         # TODO: test that vertices is a 1D SkyCoord
         self.vertices = vertices
+        self.meta = meta or {}
+        self.visual = visual or {}
 
     @property
     def area(self):

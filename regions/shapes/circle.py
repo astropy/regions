@@ -18,10 +18,12 @@ class CirclePixelRegion(PixelRegion):
         The radius of the circle
     """
 
-    def __init__(self, center, radius):
+    def __init__(self, center, radius, meta=None, visual=None):
         # TODO: test that center is a 0D PixCoord
         self.center = center
         self.radius = radius
+        self.meta = meta or {}
+        self.visual = visual or {}
 
     @property
     def area(self):
@@ -55,10 +57,12 @@ class CircleSkyRegion(SkyRegion):
         The radius of the circle in angular units
     """
 
-    def __init__(self, center, radius):
+    def __init__(self, center, radius, meta=None, visual=None):
         # TODO: test that center is a 0D SkyCoord
         self.center = center
         self.radius = radius
+        self.meta = meta or {}
+        self.visual = visual or {}
 
     @property
     def area(self):

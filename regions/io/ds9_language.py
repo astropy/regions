@@ -3,6 +3,8 @@ import itertools
 import re
 from astropy import units as u
 from astropy import coordinates
+from ..shapes import circle, rectangle, polygon, ellipse
+from ..core import PixCoord
 
 def coordinate(string_rep, unit):
     # Any ds9 coordinate representation (sexagesimal or degrees)
@@ -40,6 +42,7 @@ angle = angular_length_quantity
 
 language_spec = {'point': (coordinate, coordinate),
                  'circle': (coordinate, coordinate, radius),
+                 'ellipse': (coordinate, coordinate, width, height, angle),
                  'box': (coordinate, coordinate, width, height, angle),
                  'polygon': itertools.cycle((coordinate, )),
                 }
@@ -70,6 +73,20 @@ paren = re.compile("[()]")
 
 def strip_paren(string_rep):
     return paren.sub("", string_rep)
+
+
+viz_keywords = ['color', 'dashed', 'width', 'point', 'font']
+def region_list_to_objects(region_list):
+    output_list = []
+    for region_type, coord_list, meta in region_list:
+        if region_type is circle:
+            if isinstance(coord_list[0], coordinates.SkyCoord):
+                output_list.append(circle.SkyCircleRegion(coord_list[0], coord_list[1]))
+            elif isinstance(coord_list[0], PixCoord):
+                output_list.append(circle.PixelCircleRegion(coord_list[0], coord_list[1]))
+            else:
+                raise ValueError("No central coordinate")
+
 
 def ds9_parser(filename):
     """
@@ -142,8 +159,15 @@ def line_parser(line, coordsys=None):
                                            isinstance(x, coordinates.Angle)], frame=coordsys_name_mapping[coordsys])
             return region_type, [coords] + parsed[len(coords)*2:], parsed_meta, composite
         else:
-            return region_type, type_parser(coords_etc, language_spec[region_type],
-                                            coordsys), parsed_meta, composite
+            parsed = type_parser(coords_etc, language_spec[region_type],
+                                 coordsys)
+            if region_type == 'polygon':
+                coord = PixCoord(parsed[0::2], parsed[1::2])
+                parsed_return = [coord]
+            else:
+                coord = PixCoord(parsed[0], parsed[1])
+                parsed_return = [coord]+parsed[2:]
+            return region_type, parsed_return, parsed_meta, composite
 
 def type_parser(string_rep, specification, coordsys):
     coord_list = []

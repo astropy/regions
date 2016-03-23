@@ -20,12 +20,14 @@ class RectanglePixelRegion(PixelRegion):
         is lined up with the x axis.
     """
 
-    def __init__(self, center, height, width, angle=0 * u.deg):
+    def __init__(self, center, height, width, angle=0 * u.deg, meta=None, visual=None):
         # TODO: use quantity_input to check that angle is an angle
         self.center = center
-        self.height = minor
+        self.height = height
         self.width = width
         self.angle = angle
+        self.meta = meta or {}
+        self.visual = visual or {}
 
     @property
     def area(self):
@@ -67,12 +69,14 @@ class RectangleSkyRegion(SkyRegion):
         is lined up with the longitude axis of the celestial coordinates.
     """
 
-    def __init__(self, center, height, width, angle=0 * u.deg):
+    def __init__(self, center, height, width, angle=0 * u.deg, meta=None, visual=None):
         # TODO: use quantity_input to check that height, width, and angle are angles
         self.center = center
         self.height = minor
         self.width = width
         self.angle = angle
+        self.meta = meta or {}
+        self.visual = visual or {}
 
     @property
     def area(self):
