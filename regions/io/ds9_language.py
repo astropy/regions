@@ -79,8 +79,6 @@ viz_keywords = ['color', 'dashed', 'width', 'point', 'font']
 def region_list_to_objects(region_list):
     output_list = []
     for region_type, coord_list, meta in region_list:
-        #print("region_type, region_type is 'circle', type(region_type), type('circle'), id(region_type), id('circle'), id(str(region_type))")
-        #print(region_type, region_type is 'circle', type(region_type), type('circle'), id(region_type), id('circle'), id(str(region_type)))
         if region_type == 'circle':
             if isinstance(coord_list[0], coordinates.SkyCoord):
                 output_list.append(circle.CircleSkyRegion(coord_list[0], coord_list[1]))
