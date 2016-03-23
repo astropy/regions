@@ -22,7 +22,6 @@ unit_mapping = {'"': u.arcsec,
                 "'": u.arcmin,
                 'r': u.rad,
                 'i': u.dimensionless_unscaled,
-
                }
 
 def angular_length_quantity(string_rep):
@@ -65,8 +64,6 @@ coordinate_units = {'fk5': (hour_or_deg, u.deg),
 for letter in string.ascii_lowercase:
     coordinate_units['wcs{0}'.format(letter)] = (u.dimensionless_unscaled, u.dimensionless_unscaled)
 
-# circle(1.5, 3.6, 1.2)
-
 region_type_or_coordsys_re = re.compile("#? *([a-zA-Z0-9]+)")
 
 paren = re.compile("[()]")
@@ -94,7 +91,7 @@ def ds9_parser(filename):
                 if parsed in coordinate_systems:
                     coordsys = parsed
                 elif parsed:
-                    region_type, coordlist, composite = parsed
+                    region_type, coordlist, meta, composite = parsed
                     if composite and composite_region is None:
                         composite_region = [(region_type, coordlist)]
                     elif composite:
@@ -104,7 +101,7 @@ def ds9_parser(filename):
                         regions.append(composite_region)
                         composite_region = None
                     else:
-                        regions.append((region_type, coordlist))
+                        regions.append((region_type, coordlist, meta))
 
     return regions
 
@@ -132,6 +129,10 @@ def line_parser(line, coordsys=None):
         # coordinate of the # symbol or end of the line (-1) if not found
         hash_or_end = line.find("#")
         coords_etc = strip_paren(line[end_of_region_name:hash_or_end].strip(" |"))
+        meta_str = line[hash_or_end:]
+
+        parsed_meta = meta_parser(meta_str)
+
         if coordsys in coordsys_name_mapping:
             parsed = type_parser(coords_etc, language_spec[region_type],
                                  coordsys_name_mapping[coordsys])
@@ -139,10 +140,10 @@ def line_parser(line, coordsys=None):
                                            for x, y in zip(parsed[:-1:2], parsed[1::2])
                                            if isinstance(x, coordinates.Angle) and
                                            isinstance(x, coordinates.Angle)], frame=coordsys_name_mapping[coordsys])
-            return region_type, [coords] + parsed[len(coords)*2:], composite
+            return region_type, [coords] + parsed[len(coords)*2:], parsed_meta, composite
         else:
             return region_type, type_parser(coords_etc, language_spec[region_type],
-                                            coordsys), composite
+                                            coordsys), parsed_meta, composite
 
 def type_parser(string_rep, specification, coordsys):
     coord_list = []
@@ -156,9 +157,31 @@ def type_parser(string_rep, specification, coordsys):
 
     return coord_list
 
+
+# match an x=y pair (where y can be any set of characters) that may or may not
+# be followed by another one
+meta_token = re.compile("([a-zA-Z]+)(=)([^= ]+) ?")
+
+#meta_spec = {'color': color,
+#            }
+# global color=green dashlist=8 3 width=1 font="helvetica 10 normal roman" select=1 highlite=1 dash=0 fixed=0 edit=1 move=1 delete=1 include=1 source=1
+# ruler(+175:07:14.900,+50:56:21.236,+175:06:52.643,+50:56:11.190) ruler=physical physical color=white font="helvetica 12 normal roman" text={Ruler}
+    
+
+
+def meta_parser(meta_str):
+    meta_token_split = [x for x in meta_token.split(meta_str.strip()) if x]
+    equals_inds = [i for i, x in enumerate(meta_token_split) if x is '=']
+    result = {meta_token_split[ii-1]:
+              " ".join(meta_token_split[ii+1:jj-1 if jj is not None else None])
+              for ii,jj in zip(equals_inds, equals_inds[1:]+[None])}
+
+    return result
+
 if __name__ == "__main__":
     # simple tests for now...
     import glob
+    results = {}
     for fn in glob.glob('/Users/adam/Downloads/tests/regions/*.reg'):
         print(fn)
-        ds9_parser(fn)
+        results[fn] = ds9_parser(fn)
