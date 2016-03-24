@@ -1,8 +1,7 @@
 from __future__ import absolute_import, division, print_function, \
     unicode_literals
-from numpy.testing import assert_allclose
-from ..ds9_language import ds9_parser, region_list_to_objects, \
-    objects_to_ds9_string
+from ..read_ds9 import read_ds9
+from ..write_ds9 import objects_to_ds9_string
 from astropy.utils.data import get_pkg_data_filename
 from astropy.tests.helper import pytest
 
@@ -14,8 +13,7 @@ from astropy.tests.helper import pytest
                           'data/ds9.fk5.strip.reg'])
 def test_fk5(filename):
     filename = get_pkg_data_filename(filename)
-    temp = ds9_parser(filename)
-    regs = region_list_to_objects(temp)
+    regs = read_ds9(filename)
 
     actual = objects_to_ds9_string(regs, coordsys='fk5', fmt='.2f', radunit='arcsec')
 
@@ -37,8 +35,7 @@ def test_fk5(filename):
                           'data/ds9.galactic.strip.reg'])
 def test_galactic(filename):
     filename = get_pkg_data_filename(filename)
-    temp = ds9_parser(filename)
-    regs = region_list_to_objects(temp)
+    regs = read_ds9(filename)
 
     actual = objects_to_ds9_string(regs, coordsys='galactic', fmt='.2f', radunit='arcsec')
 
@@ -60,8 +57,7 @@ def test_galactic(filename):
 
 def test_physical(filename):
     filename = get_pkg_data_filename(filename)
-    temp = ds9_parser(filename)
-    regs = region_list_to_objects(temp)
+    regs = read_ds9(filename)
 
     actual = objects_to_ds9_string(regs, coordsys='physical', fmt='.2f')
 
