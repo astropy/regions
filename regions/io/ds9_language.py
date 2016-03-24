@@ -112,15 +112,15 @@ def region_list_to_objects(region_list):
     return output_list
 
 
-def objects_to_ds9_string(obj_list, coordsys='fk5'):
+def objects_to_ds9_string(obj_list, coordsys='fk5', fmt='.4f', radunit='arcsec'):
     """Take a list of regions and generate ds9 region strings"""
 
     ids = {"<class 'regions.shapes.circle.CircleSkyRegion'>": 'circle',
            "<class 'regions.shapes.ellipse.EllipseSkyRegion'>": 'ellipse',
            "<class 'regions.shapes.polygon.PolygonSkyRegion'>": 'polygone'}
 
-    ds9_strings = {'circle': 'circle({x:.4f},{y:.4f},{r:.4f})\n',
-                   'ellipse': 'ellipse({x:.4f},{y:.4f},{r1:.4f},{r2:.4f},{ang:.4f})\n',
+    ds9_strings = {'circle': 'circle({x:'+fmt+'},{y:'+fmt+'},{r:'+fmt+'}")\n',
+                   'ellipse': 'ellipse({x:'+fmt+'},{y:'+fmt+'},{r1:'+fmt+'}",{r2:'+fmt+'}",{ang:'+fmt+'})\n',
                    'polygone': 'polygon({c})\n'}
 
     output = '# Region file format: DS9 astropy/regions\n'
@@ -134,17 +134,18 @@ def objects_to_ds9_string(obj_list, coordsys='fk5'):
                 # TODO: Why is circle.center a list of SkyCoords?
                 x = reg.center.ra.to('deg').value[0]
                 y = reg.center.dec.to('deg').value[0]
-                r = reg.radius.to('deg').value
+                r = reg.radius.to(radunit).value
             elif t == 'ellipse':
                 x = reg.center.ra.to('deg').value[0]
                 y = reg.center.dec.to('deg').value[0]
-                r1 = reg.major.to('deg').value
-                r2 = reg.minor.to('deg').value
+                r1 = reg.major.to(radunit).value
+                r2 = reg.minor.to(radunit).value
                 ang = reg.angle.to('deg').value
             elif t == 'polygone':
                 v = reg.vertices
-                coords = [(x.to('deg').value, y.to('deg').value) for x in v.ra for y in v.dec]
-                temp = ["{:.4f}".format(x) for _ in coords for x in _]
+                coords = [(x.to('deg').value, y.to('deg').value) for x,y in zip(v.ra, v.dec)]
+                val = "{:"+fmt+"}"
+                temp = [val.format(x) for _ in coords for x in _]
                 c = ", ".join(temp)
 
             output += ds9_strings[t].format(**locals())
