@@ -67,7 +67,7 @@ coordinate_units = {'fk5': (hour_or_deg, u.deg),
 for letter in string.ascii_lowercase:
     coordinate_units['wcs{0}'.format(letter)] = (u.dimensionless_unscaled, u.dimensionless_unscaled)
 
-region_type_or_coordsys_re = re.compile("#? *([a-zA-Z0-9]+)")
+region_type_or_coordsys_re = re.compile("^#? *(-?)([a-zA-Z0-9]+)")
 
 paren = re.compile("[()]")
 
@@ -112,13 +112,60 @@ def region_list_to_objects(region_list):
     return output_list
 
 
+def objects_to_ds9_string(obj_list, coordsys='fk5'):
+    """Take a list of regions and generate ds9 region strings"""
+
+    ids = {"<class 'regions.shapes.circle.CircleSkyRegion'>": 'circle',
+           "<class 'regions.shapes.ellipse.EllipseSkyRegion'>": 'ellipse',
+           "<class 'regions.shapes.polygon.PolygonSkyRegion'>": 'polygone'}
+
+    ds9_strings = {'circle': 'circle ({x:.4f},{y:.4f},{r:.4f})\n',
+                   'ellipse': 'ellipse ({x:.4f},{y:.4f},{r1:.4f},{r2:.4f},{ang:.4f})\n',
+                   'polygone': 'polygon ({c})\n'}
+
+    output = '# Region file format: DS9 astropy/regions\n'
+    output += '{}\n'.format(coordsys)
+
+    for reg in obj_list:
+        temp = str(reg.__class__)
+        if temp in ids.keys():
+            t = ids[temp]
+            if t == 'circle':
+                # TODO: Why is circle.center a list of SkyCoords?
+                x = reg.center.ra.to('deg').value[0]
+                y = reg.center.dec.to('deg').value[0]
+                r = reg.radius.to('deg').value
+            elif t == 'ellipse':
+                x = reg.center.ra.to('deg').value[0]
+                y = reg.center.dec.to('deg').value[0]
+                r1 = reg.major.to('deg').value
+                r2 = reg.minor.to('deg').value
+                ang = reg.angle.to('deg').value
+            elif t == 'polygone':
+                v = reg.vertices
+                coords = [(x.to('deg').value, y.to('deg').value) for x in v.ra for y in v.dec]
+                temp = ["{:.4f}".format(x) for _ in coords for x in _]
+                c = ", ".join(temp)
+
+            output += ds9_strings[t].format(**locals())
+
+    return output
+
+
+def write_ds9(obj_list, filename='ds9.reg', coordsys='fk5'):
+    """Write ds9 region file"""
+    output = objects_to_ds9_string(obj_list, coordsys)
+    with open(filename, 'w') as fh:
+        fh.write(output)
+
+
 def ds9_parser(filename):
     """
     Parse a complete ds9 .reg file
 
     Returns
     -------
-    list of (region type, coord_list) tuples
+    list of (region type, coord_list, meta) tuples
     """
     coordsys = None
     regions = []
@@ -146,10 +193,12 @@ def ds9_parser(filename):
 
     return regions
 
+
 def line_parser(line, coordsys=None):
     region_type_search = region_type_or_coordsys_re.search(line)
     if region_type_search:
-        region_type = region_type_search.groups()[0]
+        include = region_type_search.groups()[0]
+        region_type = region_type_search.groups()[1]
     else:
         return
 
@@ -192,6 +241,7 @@ def line_parser(line, coordsys=None):
                 coord = PixCoord(parsed[0], parsed[1])
                 parsed_return = [coord]+parsed[2:]
             return region_type, parsed_return, parsed_meta, composite
+
 
 def type_parser(string_rep, specification, coordsys):
     coord_list = []
