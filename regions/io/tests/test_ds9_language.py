@@ -17,7 +17,7 @@ def test_fk5(filename):
     temp = ds9_parser(filename)
     regs = region_list_to_objects(temp)
 
-    actual = objects_to_ds9_string(regs, coordsys='fk5', fmt='.2f')
+    actual = objects_to_ds9_string(regs, coordsys='fk5', fmt='.2f', radunit='arcsec')
 
     # Use this to produce reference file for now
     #print(actual)
@@ -40,7 +40,7 @@ def test_galactic(filename):
     temp = ds9_parser(filename)
     regs = region_list_to_objects(temp)
 
-    actual = objects_to_ds9_string(regs, coordsys='galactic', fmt='.2f')
+    actual = objects_to_ds9_string(regs, coordsys='galactic', fmt='.2f', radunit='arcsec')
 
     # Use this to produce reference file for now
     #print(actual)
@@ -51,3 +51,27 @@ def test_galactic(filename):
         desired = fh.read()
 
     assert actual == desired
+
+
+# Todo : data/ds9.physical.windows.reg contains different values -> Why?
+@pytest.mark.parametrize('filename',
+                         ['data/ds9.physical.reg',
+                          'data/ds9.physical.strip.reg'])
+
+def test_physical(filename):
+    filename = get_pkg_data_filename(filename)
+    temp = ds9_parser(filename)
+    regs = region_list_to_objects(temp)
+
+    actual = objects_to_ds9_string(regs, coordsys='physical', fmt='.2f')
+
+    # Use this to produce reference file for now
+    # print(actual)
+    # 1 / 0
+
+    reference_file = get_pkg_data_filename('data/physical_reference.reg')
+    with open(reference_file, 'r') as fh:
+        desired = fh.read()
+
+    assert actual == desired
+

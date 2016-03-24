@@ -11,6 +11,10 @@ def get_package_data():
                    os.path.join('data', 'ds9.galactic.strip.reg'),
                    os.path.join('data', 'ds9.galactic.hms.reg'),
                    os.path.join('data', 'ds9.galactic.hms.strip.reg'),
-                   os.path.join('data', 'galactic_reference.reg')]
+                   os.path.join('data', 'galactic_reference.reg'),
+                   os.path.join('data', 'ds9.physical.reg'),
+                   os.path.join('data', 'ds9.physical.strip.reg'),
+                   os.path.join('data', 'ds9.physical.windows.reg'),
+                   os.path.join('data', 'physical_reference.reg')]
 
     return {'regions.io.tests': parser_test}
