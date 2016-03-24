@@ -42,7 +42,8 @@ angle = angular_length_quantity
 
 language_spec = {'point': (coordinate, coordinate),
                  'circle': (coordinate, coordinate, radius),
-                 'ellipse': (coordinate, coordinate, width, height, angle),
+                 # This is a special case to deal with n elliptical annuli
+                 'ellipse': itertools.chain((coordinate, coordinate), itertools.cycle((radius, ))),
                  'box': (coordinate, coordinate, width, height, angle),
                  'polygon': itertools.cycle((coordinate, )),
                 }
@@ -90,6 +91,9 @@ def region_list_to_objects(region_list):
                 raise ValueError("No central coordinate")
         elif region_type == 'ellipse':
             if isinstance(coord_list[0], coordinates.SkyCoord):
+                # Do not read elliptical annuli for now
+                if len(coord_list) > 4:
+                    continue
                 output_list.append(ellipse.EllipseSkyRegion(coord_list[0], coord_list[1], coord_list[2], coord_list[3]))
             elif isinstance(coord_list[0], PixCoord):
                 output_list.append(ellipse.EllipsePixelRegion(coord_list[0], coord_list[1], coord_list[2], coord_list[3]))
@@ -132,18 +136,19 @@ def objects_to_ds9_string(obj_list, coordsys='fk5', fmt='.4f', radunit='arcsec')
             t = ids[temp]
             if t == 'circle':
                 # TODO: Why is circle.center a list of SkyCoords?
-                x = reg.center.ra.to('deg').value[0]
-                y = reg.center.dec.to('deg').value[0]
+                x = reg.center.transform_to(coordsys).spherical.lon.to('deg').value[0]
+                y = reg.center.transform_to(coordsys).spherical.lat.to('deg').value[0]
                 r = reg.radius.to(radunit).value
             elif t == 'ellipse':
-                x = reg.center.ra.to('deg').value[0]
-                y = reg.center.dec.to('deg').value[0]
-                r1 = reg.major.to(radunit).value
-                r2 = reg.minor.to(radunit).value
+                x = reg.center.transform_to(coordsys).spherical.lon.to('deg').value[0]
+                y = reg.center.transform_to(coordsys).spherical.lat.to('deg').value[0]
+                r2 = reg.major.to(radunit).value
+                r1 = reg.minor.to(radunit).value
                 ang = reg.angle.to('deg').value
             elif t == 'polygone':
-                v = reg.vertices
-                coords = [(x.to('deg').value, y.to('deg').value) for x,y in zip(v.ra, v.dec)]
+                v = reg.vertices.transform_to(coordsys)
+                coords = [(x.to('deg').value, y.to('deg').value) for x, y in
+                          zip(v.spherical.lon, v.spherical.lat)]
                 val = "{:"+fmt+"}"
                 temp = [val.format(x) for _ in coords for x in _]
                 c = ", ".join(temp)
@@ -227,10 +232,16 @@ def line_parser(line, coordsys=None):
         if coordsys in coordsys_name_mapping:
             parsed = type_parser(coords_etc, language_spec[region_type],
                                  coordsys_name_mapping[coordsys])
+
+            # Reset iterator for ellipse annulus
+            if region_type == 'ellipse':
+                language_spec[region_type] = itertools.chain((coordinate, coordinate), itertools.cycle((radius, )))
+
             coords = coordinates.SkyCoord([(x, y)
                                            for x, y in zip(parsed[:-1:2], parsed[1::2])
                                            if isinstance(x, coordinates.Angle) and
                                            isinstance(x, coordinates.Angle)], frame=coordsys_name_mapping[coordsys])
+
             return region_type, [coords] + parsed[len(coords)*2:], parsed_meta, composite
         else:
             parsed = type_parser(coords_etc, language_spec[region_type],
@@ -277,10 +288,3 @@ def meta_parser(meta_str):
 
     return result
 
-if __name__ == "__main__":
-    # simple tests for now...
-    import glob
-    results = {}
-    for fn in glob.glob('/Users/adam/Downloads/tests/regions/*.reg'):
-        print(fn)
-        results[fn] = ds9_parser(fn)
