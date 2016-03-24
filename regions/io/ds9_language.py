@@ -266,6 +266,7 @@ def line_parser(line, coordsys=None):
                                  coordsys_name_mapping[coordsys])
 
             # Reset iterator for ellipse annulus
+            # (not needed for physical regions b/c coordinate = radius in that case)
             if region_type == 'ellipse':
                 language_spec[region_type] = itertools.chain((coordinate, coordinate), itertools.cycle((radius, )))
 
@@ -279,6 +280,7 @@ def line_parser(line, coordsys=None):
             parsed = type_parser(coords_etc, language_spec[region_type],
                                  coordsys)
             if region_type == 'polygon':
+                # have to special-case polygon in the phys coord case b/c can't typecheck when iterating as in sky coord case
                 coord = PixCoord(parsed[0::2], parsed[1::2])
                 parsed_return = [coord]
             else:
