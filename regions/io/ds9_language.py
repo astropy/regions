@@ -119,9 +119,9 @@ def objects_to_ds9_string(obj_list, coordsys='fk5'):
            "<class 'regions.shapes.ellipse.EllipseSkyRegion'>": 'ellipse',
            "<class 'regions.shapes.polygon.PolygonSkyRegion'>": 'polygone'}
 
-    ds9_strings = {'circle': 'circle ({x:.4f},{y:.4f},{r:.4f})\n',
-                   'ellipse': 'ellipse ({x:.4f},{y:.4f},{r1:.4f},{r2:.4f},{ang:.4f})\n',
-                   'polygone': 'polygon ({c})\n'}
+    ds9_strings = {'circle': 'circle({x:.4f},{y:.4f},{r:.4f})\n',
+                   'ellipse': 'ellipse({x:.4f},{y:.4f},{r1:.4f},{r2:.4f},{ang:.4f})\n',
+                   'polygone': 'polygon({c})\n'}
 
     output = '# Region file format: DS9 astropy/regions\n'
     output += '{}\n'.format(coordsys)

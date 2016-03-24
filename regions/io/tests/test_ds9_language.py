@@ -11,7 +11,9 @@ def test_fk5(tmpdir):
     temp = ds9_parser(filename)
     regs = region_list_to_objects(temp)
 
-    output = objects_to_ds9_string(regs, coordsys='fk5')
-    print(output)
-    
+    actual = objects_to_ds9_string(regs, coordsys='fk5')
+    reference_file = get_pkg_data_filename('data/fk5_reference.reg')
+    with open(reference_file, 'r') as fh:
+        desired = fh.read()
 
+    assert actual == desired
