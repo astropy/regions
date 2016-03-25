@@ -1,5 +1,6 @@
 from astropy import units as u
 from astropy.coordinates import SkyCoord
+from astropy.tests.helper import pytest
 from astropy.utils.data import get_pkg_data_filename
 from astropy.io.fits import getheader
 from astropy.wcs import WCS
@@ -7,6 +8,12 @@ from numpy.testing import assert_allclose
 
 from ..circle import CirclePixelRegion, CircleSkyRegion
 from ...core import PixCoord
+
+try:
+    import matplotlib
+    HAS_MATPLOTLIB = True
+except:
+    HAS_MATPLOTLIB = False
 
 
 def test_init_pixel():
@@ -19,6 +26,7 @@ def test_init_sky():
 
 
 # Todo : restructure test to use same circle everywhere
+@pytest.mark.skipif('not HAS_MATPLOTLIB')
 def test_plot():
     import matplotlib.pyplot as plt
 
