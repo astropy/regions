@@ -123,7 +123,8 @@ def region_list_to_objects(region_list):
                 reg = rectangle.RectanglePixelRegion(coord_list[0], coord_list[1], coord_list[2], coord_list[3])
             else:
                 raise ValueError("No central coordinate")
-
+        else:
+            continue
         reg.vizmeta = {key: meta[key] for key in meta.keys() if key in viz_keywords}
         reg.meta = {key: meta[key] for key in meta.keys() if key not in viz_keywords}
         output_list.append(reg)
