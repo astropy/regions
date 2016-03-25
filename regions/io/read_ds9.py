@@ -125,8 +125,6 @@ def region_list_to_objects(region_list):
     return output_list
 
 
-
-
 def ds9_parser(filename):
     """
     Parse a complete ds9 .reg file
@@ -196,7 +194,6 @@ def line_parser(line, coordsys=None):
                                  coordsys_name_mapping[coordsys])
 
             # Reset iterator for ellipse annulus
-            # (not needed for physical regions b/c coordinate = radius in that case)
             if region_type == 'ellipse':
                 language_spec[region_type] = itertools.chain((coordinate, coordinate), itertools.cycle((radius, )))
 
@@ -217,6 +214,11 @@ def line_parser(line, coordsys=None):
                 parsed = [_.value for _ in parsed]
                 coord = PixCoord(parsed[0], parsed[1])
                 parsed_return = [coord]+parsed[2:]
+
+            # Reset iterator for ellipse annulus
+            if region_type == 'ellipse':
+                language_spec[region_type] = itertools.chain((coordinate, coordinate), itertools.cycle((radius, )))
+
             return region_type, parsed_return, parsed_meta, composite
 
 

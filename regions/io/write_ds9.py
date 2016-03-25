@@ -68,14 +68,14 @@ def objects_to_ds9_string(obj_list, coordsys='fk5', fmt='.4f', radunit='deg'):
                           zip(v.spherical.lon, v.spherical.lat)]
                 val = "{:"+fmt+"}"
                 temp = [val.format(x) for _ in coords for x in _]
-                c = ", ".join(temp)
+                c = ",".join(temp)
                 output += ds9_strings['polygon'].format(**locals())
             elif t == 'pixpolygon':
                 v = reg.vertices
                 coords = [(x, y) for x, y in zip(v.x, v.y)]
                 val = "{:"+fmt+"}"
                 temp = [val.format(x) for _ in coords for x in _]
-                c = ", ".join(temp)
+                c = ",".join(temp)
                 output += ds9_strings['polygon'].format(**locals())
 
     return output
