@@ -2,8 +2,14 @@ from __future__ import absolute_import, division, print_function, \
     unicode_literals
 from ..read_ds9 import read_ds9
 from ..write_ds9 import objects_to_ds9_string
-from astropy.utils.data import get_pkg_data_filename
+from astropy.utils.data import get_pkg_data_filename, get_pkg_data_filenames
 from astropy.tests.helper import pytest
+
+def test_read():
+    #Check that all test files including reference files are readable
+    files = get_pkg_data_filenames('data')
+    for f in files:
+        read_ds9(f)
 
 
 @pytest.mark.parametrize('filename',
