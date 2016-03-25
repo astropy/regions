@@ -4,7 +4,14 @@ from ..read_ds9 import read_ds9
 from ..write_ds9 import objects_to_ds9_string
 from astropy.utils.data import get_pkg_data_filename, get_pkg_data_filenames
 from astropy.tests.helper import pytest
+import distutils.version as v
+import astropy.version as astrov
 
+_ASTROPY_MINVERSION = v.StrictVersion('1.1')
+_ASTROPY_VERSION = v.StrictVersion(astrov.version)
+
+@pytest.mark.xfail(_ASTROPY_VERSION < _ASTROPY_MINVERSION,
+                   reason='Some coordinates systems not available in older version of astropy')
 def test_read():
     #Check that all test files including reference files are readable
     files = get_pkg_data_filenames('data')
