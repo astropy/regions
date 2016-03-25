@@ -1,0 +1,5 @@
+# Region file format: DS9 astropy/regions
+physical
+circle(331.00,1091.00,40.00)
+ellipse(495.00,1057.00,80.00,40.00,45.00)
+polygon(813.49,1075.00,889.00,1150.51,964.51,1075.00,889.00,999.49)
