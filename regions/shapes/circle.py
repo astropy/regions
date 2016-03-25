@@ -89,8 +89,8 @@ class CircleSkyRegion(SkyRegion):
         # TOOD: needs to be implemented
         raise NotImplementedError("")
 
-    def to_mpl_artist(self, ax, **kwargs):
-        """Convert to mpl patch using a given wcs transformation
+    def to_mpl_patch(self, ax, **kwargs):
+        """Convert to mpl patch using a given wcs axis
 
         Parameters
         ----------
@@ -108,13 +108,13 @@ class CircleSkyRegion(SkyRegion):
         import matplotlib.patches as mpatches
 
         val = self.center.icrs
-        center = (val.l.value, val.b.value)
+        center = (val.ra.to('deg').value, val.dec.to('deg').value)
 
         temp = dict(transform=ax.get_transform('icrs'),
                     radius=self.radius.to('deg').value)
         kwargs.update(temp)
-        for key, value in self.vizmeta.items():
-            kwargs.setdefaults(key, value)
+        for key, value in self.visual.items():
+            kwargs.setdefault(key, value)
         patch = mpatches.Circle(center, **kwargs)
 
         return patch
