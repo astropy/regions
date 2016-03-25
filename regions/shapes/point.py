@@ -42,7 +42,7 @@ class PointPixelRegion(PixelRegion):
 
 
 
-class PixelSkyRegion(SkyRegion):
+class PointSkyRegion(SkyRegion):
     """
     A pixel region in sky coordinates.
 

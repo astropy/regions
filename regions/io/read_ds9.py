@@ -5,6 +5,7 @@ import itertools
 import re
 from astropy import units as u
 from astropy import coordinates
+from astropy import log
 from ..shapes import circle, rectangle, polygon, ellipse, point
 from ..core import PixCoord
 
@@ -126,9 +127,9 @@ def region_list_to_objects(region_list):
                 raise ValueError("No central coordinate")
         elif region_type == 'point':
             if isinstance(coord_list[0], coordinates.SkyCoord):
-                reg = point.PointSkyRegion(coord_list[0], coord_list[1])
+                reg = point.PointSkyRegion(coord_list[0])
             elif isinstance(coord_list[0], PixCoord):
-                reg = point.PointPixelRegion(coord_list[0], coord_list[1])
+                reg = point.PointPixelRegion(coord_list[0])
             else:
                 raise ValueError("No central coordinate")
         else:
@@ -159,7 +160,8 @@ def ds9_parser(filename):
                 if parsed in coordinate_systems:
                     coordsys = parsed
                 elif parsed:
-                    region_type, coordlist, meta, composite = parsed
+                    region_type, coordlist, meta, composite, include = parsed
+                    log.debug("Region type = {0}".format(region_type))
                     if composite and composite_region is None:
                         composite_region = [(region_type, coordlist)]
                     elif composite:
@@ -216,7 +218,7 @@ def line_parser(line, coordsys=None):
                                            if isinstance(x, coordinates.Angle) and
                                            isinstance(x, coordinates.Angle)], frame=coordsys_name_mapping[coordsys])
 
-            return region_type, [coords] + parsed[len(coords)*2:], parsed_meta, composite
+            return region_type, [coords] + parsed[len(coords)*2:], parsed_meta, composite, include
         else:
             parsed = type_parser(coords_etc, language_spec[region_type],
                                  coordsys)
@@ -233,7 +235,7 @@ def line_parser(line, coordsys=None):
             if region_type == 'ellipse':
                 language_spec[region_type] = itertools.chain((coordinate, coordinate), itertools.cycle((radius, )))
 
-            return region_type, parsed_return, parsed_meta, composite
+            return region_type, parsed_return, parsed_meta, composite, include
 
 
 def type_parser(string_rep, specification, coordsys):
