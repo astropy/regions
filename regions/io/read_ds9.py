@@ -5,7 +5,7 @@ import itertools
 import re
 from astropy import units as u
 from astropy import coordinates
-from ..shapes import circle, rectangle, polygon, ellipse
+from ..shapes import circle, rectangle, polygon, ellipse, point
 from ..core import PixCoord
 
 
@@ -90,8 +90,9 @@ def region_list_to_objects(region_list):
 
     output_list = []
     for region_type, coord_list, meta in region_list:
-        #print("region_type, region_type is 'circle', type(region_type), type('circle'), id(region_type), id('circle'), id(str(region_type))")
-        #print(region_type, region_type is 'circle', type(region_type), type('circle'), id(region_type), id('circle'), id(str(region_type)))
+
+        # TODO: refactor, possible on the basis of # of parameters + sometimes handle corner cases
+
         if region_type == 'circle':
             if isinstance(coord_list[0], coordinates.SkyCoord):
                 reg = circle.CircleSkyRegion(coord_list[0], coord_list[1])
@@ -121,6 +122,13 @@ def region_list_to_objects(region_list):
                 reg = rectangle.RectangleSkyRegion(coord_list[0], coord_list[1], coord_list[2], coord_list[3])
             elif isinstance(coord_list[0], PixCoord):
                 reg = rectangle.RectanglePixelRegion(coord_list[0], coord_list[1], coord_list[2], coord_list[3])
+            else:
+                raise ValueError("No central coordinate")
+        elif region_type == 'point':
+            if isinstance(coord_list[0], coordinates.SkyCoord):
+                reg = point.PointSkyRegion(coord_list[0], coord_list[1])
+            elif isinstance(coord_list[0], PixCoord):
+                reg = point.PointPixelRegion(coord_list[0], coord_list[1])
             else:
                 raise ValueError("No central coordinate")
         else:
