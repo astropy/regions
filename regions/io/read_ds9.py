@@ -85,17 +85,18 @@ def strip_paren(string_rep):
     return paren.sub("", string_rep)
 
 
-viz_keywords = ['color', 'dashed', 'width', 'point', 'font']
 def region_list_to_objects(region_list):
+    viz_keywords = ['color', 'dashed', 'width', 'point', 'font', 'text']
+
     output_list = []
     for region_type, coord_list, meta in region_list:
         #print("region_type, region_type is 'circle', type(region_type), type('circle'), id(region_type), id('circle'), id(str(region_type))")
         #print(region_type, region_type is 'circle', type(region_type), type('circle'), id(region_type), id('circle'), id(str(region_type)))
         if region_type == 'circle':
             if isinstance(coord_list[0], coordinates.SkyCoord):
-                output_list.append(circle.CircleSkyRegion(coord_list[0], coord_list[1]))
+                reg = circle.CircleSkyRegion(coord_list[0], coord_list[1])
             elif isinstance(coord_list[0], PixCoord):
-                output_list.append(circle.CirclePixelRegion(coord_list[0], coord_list[1]))
+                reg = circle.CirclePixelRegion(coord_list[0], coord_list[1])
             else:
                 raise ValueError("No central coordinate")
         elif region_type == 'ellipse':
@@ -103,25 +104,29 @@ def region_list_to_objects(region_list):
             if len(coord_list) > 4:
                 continue
             if isinstance(coord_list[0], coordinates.SkyCoord):
-                output_list.append(ellipse.EllipseSkyRegion(coord_list[0], coord_list[1], coord_list[2], coord_list[3]))
+                reg = ellipse.EllipseSkyRegion(coord_list[0], coord_list[1], coord_list[2], coord_list[3])
             elif isinstance(coord_list[0], PixCoord):
-                output_list.append(ellipse.EllipsePixelRegion(coord_list[0], coord_list[1], coord_list[2], coord_list[3]))
+                reg = ellipse.EllipsePixelRegion(coord_list[0], coord_list[1], coord_list[2], coord_list[3])
             else:
                 raise ValueError("No central coordinate")
         elif region_type == 'polygon':
             if isinstance(coord_list[0], coordinates.SkyCoord):
-                output_list.append(polygon.PolygonSkyRegion(coord_list[0]))
+                reg = polygon.PolygonSkyRegion(coord_list[0])
             elif isinstance(coord_list[0], PixCoord):
-                output_list.append(polygon.PolygonPixelRegion(coord_list[0]))
+                reg = polygon.PolygonPixelRegion(coord_list[0])
             else:
                 raise ValueError("No central coordinate")
         elif region_type == 'rectangle':
             if isinstance(coord_list[0], coordinates.SkyCoord):
-                output_list.append(rectangle.RectangleSkyRegion(coord_list[0], coord_list[1], coord_list[2], coord_list[3]))
+                reg = rectangle.RectangleSkyRegion(coord_list[0], coord_list[1], coord_list[2], coord_list[3])
             elif isinstance(coord_list[0], PixCoord):
-                output_list.append(rectangle.RectanglePixelRegion(coord_list[0], coord_list[1], coord_list[2], coord_list[3]))
+                reg = rectangle.RectanglePixelRegion(coord_list[0], coord_list[1], coord_list[2], coord_list[3])
             else:
                 raise ValueError("No central coordinate")
+
+        reg.vizmeta = {key: meta[key] for key in meta.keys() if key in viz_keywords}
+        reg.meta = {key: meta[key] for key in meta.keys() if key not in viz_keywords}
+        output_list.append(reg)
     return output_list
 
 
