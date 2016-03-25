@@ -7,8 +7,8 @@ from astropy.tests.helper import pytest
 import distutils.version as v
 import astropy.version as astrov
 
-_ASTROPY_MINVERSION = v.StrictVersion('1.1')
-_ASTROPY_VERSION = v.StrictVersion(astrov.version)
+_ASTROPY_MINVERSION = v.LooseVersion('1.1')
+_ASTROPY_VERSION = v.LooseVersion(astrov.version)
 
 @pytest.mark.xfail(_ASTROPY_VERSION < _ASTROPY_MINVERSION,
                    reason='Some coordinates systems not available in older version of astropy')
