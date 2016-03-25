@@ -1,3 +1,5 @@
+# Licensed under a 3-clause BSD style license - see LICENSE.rst
+
 import math
 
 import numpy as np
@@ -43,6 +45,18 @@ class CirclePixelRegion(PixelRegion):
         # TOOD: needs to be implemented
         raise NotImplementedError("")
 
+    def to_mpl_patch(self, **kwargs):
+        """Convert to mpl patch.
+
+        Returns
+        -------
+        patch : `~matplotlib.mpatches.Circle`
+            Matplotlib patch
+        """
+        import matplotlib.patches as mpatches
+
+        patch = mpatches.Circle(self.center, self.radius, **kwargs)
+        return patch
 
 
 class CircleSkyRegion(SkyRegion):
@@ -74,3 +88,33 @@ class CircleSkyRegion(SkyRegion):
     def to_pixel(self, wcs, mode='local', tolerance=None):
         # TOOD: needs to be implemented
         raise NotImplementedError("")
+
+    def to_mpl_artist(self, ax, **kwargs):
+        """Convert to mpl patch using a given wcs transformation
+
+        Parameters
+        ----------
+        ax : `~astropy.wcsaxes.WCSAxes`
+            WCS axis object
+        kwargs : dict
+            kwargs are forwarded to mpatches.Circle
+
+        Returns
+        -------
+        patch : `~matplotlib.mpatches.Circle`
+            Matplotlib patch
+        """
+
+        import matplotlib.patches as mpatches
+
+        val = self.center.icrs
+        center = (val.l.value, val.b.value)
+
+        temp = dict(transform=ax.get_transform('icrs'),
+                    radius=self.radius.to('deg').value)
+        kwargs.update(temp)
+        for key, value in self.vizmeta.items():
+            kwargs.setdefaults(key, value)
+        patch = mpatches.Circle(center, **kwargs)
+
+        return patch
