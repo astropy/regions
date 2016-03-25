@@ -161,6 +161,7 @@ def ds9_parser(filename):
                     coordsys = parsed
                 elif parsed:
                     region_type, coordlist, meta, composite, include = parsed
+                    meta['include'] = include
                     log.debug("Region type = {0}".format(region_type))
                     if composite and composite_region is None:
                         composite_region = [(region_type, coordlist)]
