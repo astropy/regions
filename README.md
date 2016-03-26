@@ -4,17 +4,8 @@
 About
 -----
 
-This is an experimental package for representing regions
-(both on the sky and in pixel coordinates). Initial discussion related to
-this happened as part of the
-[Python in Astronomy](python-in-astronomy.github.io) workshop, and the
-current API is the result of discussions between Tom Robitaille and Perry
-Greenfield. If you are interested in contributing, please contact either of
-us!
+This is an astropy-affiliated package for region handling.
 
-Requirements
-------------
+* Code : https://github.com/astropy/regions
+* Docs : http://astropy-regions.readthedocs.org
 
-* [Astropy](http://www.astropy.org) 1.0 or later
-* [spherical_geometry](https://github.com/spacetelescope/sphere)
-* [Shapely](https://pypi.python.org/pypi/Shapely)
