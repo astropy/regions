@@ -30,7 +30,7 @@ def test_init_sky():
 def test_plot():
     import matplotlib.pyplot as plt
 
-    skycoord = SkyCoord(1 * u.deg, 2 * u.deg, frame='galactic')
+    skycoord = SkyCoord(1.983333 * u.deg, -1.99 * u.deg, frame='galactic')
     c = CircleSkyRegion(skycoord, 20 * u.arcsec)
     c.visual.update(color='red')
     headerfile = get_pkg_data_filename('data/example_header.fits')
@@ -39,6 +39,7 @@ def test_plot():
     fig = plt.figure()
     ax = fig.add_axes([0.1, 0.1, 0.8, 0.8], projection=wcs)
     p = c.to_mpl_patch(ax, alpha=0.6)
+    ax.add_patch(p)
 
     assert_allclose(p.center[0], skycoord.icrs.ra.value)
     assert_allclose(p.center[1], skycoord.icrs.dec.value)
