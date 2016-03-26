@@ -1,0 +1,5 @@
+name: regions-rtd
+#channels:
+#    - astropy
+dependencies:
+- astropy
