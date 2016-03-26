@@ -22,11 +22,31 @@ def coordinate(string_rep, unit):
         return coordinates.Angle(string_rep)
     elif unit is 'hour_or_deg':
         if ':' in string_rep:
-            return coordinates.Angle(string_rep, unit=u.hour)
+            spl = string_rep.split(":")
+            if len(spl) == 2:
+                ang = float(spl[0]) + float(spl[1])/60.
+            elif len(spl) == 3:
+                ang = float(spl[0]) + float(spl[1])/60. + float(spl[2])/3600.
+            else:
+                raise ValueError("Incorrect string representation of an angle.")
+            return coordinates.Angle(ang, u.hour)
         else:
-            return coordinates.Angle(string_rep, unit=u.deg)
+            ang = float(string_rep)
+            return coordinates.Angle(ang, u.deg)
     elif unit.is_equivalent(u.deg):
-        return coordinates.Angle(string_rep, unit=unit)
+        #return coordinates.Angle(string_rep, unit=unit)
+        if ':' in string_rep:
+            spl = string_rep.split(":")
+            if len(spl) == 2:
+                ang = float(spl[0]) + float(spl[1])/60.
+            elif len(spl) == 3:
+                ang = float(spl[0]) + float(spl[1])/60. + float(spl[2])/3600.
+            else:
+                raise ValueError("Incorrect string representation of an angle.")
+            return coordinates.Angle(ang, u.deg)
+        else:
+            ang = float(string_rep)
+            return coordinates.Angle(ang, u.deg)
     else:
         return u.Quantity(float(string_rep), unit)
 
