@@ -5,6 +5,7 @@ import itertools
 import re
 from astropy import units as u
 from astropy import coordinates
+from astropy.coordinates import BaseCoordinateFrame
 from astropy import log
 from ..shapes import circle, rectangle, polygon, ellipse, point
 from ..core import PixCoord
@@ -95,7 +96,7 @@ def region_list_to_objects(region_list):
         # TODO: refactor, possible on the basis of # of parameters + sometimes handle corner cases
 
         if region_type == 'circle':
-            if isinstance(coord_list[0], coordinates.SkyCoord):
+            if isinstance(coord_list[0], BaseCoordinateFrame):
                 reg = circle.CircleSkyRegion(coord_list[0], coord_list[1])
             elif isinstance(coord_list[0], PixCoord):
                 reg = circle.CirclePixelRegion(coord_list[0], coord_list[1])
@@ -105,28 +106,28 @@ def region_list_to_objects(region_list):
             # Do not read elliptical annuli for now
             if len(coord_list) > 4:
                 continue
-            if isinstance(coord_list[0], coordinates.SkyCoord):
+            if isinstance(coord_list[0], BaseCoordinateFrame):
                 reg = ellipse.EllipseSkyRegion(coord_list[0], coord_list[1], coord_list[2], coord_list[3])
             elif isinstance(coord_list[0], PixCoord):
                 reg = ellipse.EllipsePixelRegion(coord_list[0], coord_list[1], coord_list[2], coord_list[3])
             else:
                 raise ValueError("No central coordinate")
         elif region_type == 'polygon':
-            if isinstance(coord_list[0], coordinates.SkyCoord):
+            if isinstance(coord_list[0], BaseCoordinateFrame):
                 reg = polygon.PolygonSkyRegion(coord_list[0])
             elif isinstance(coord_list[0], PixCoord):
                 reg = polygon.PolygonPixelRegion(coord_list[0])
             else:
                 raise ValueError("No central coordinate")
         elif region_type == 'rectangle':
-            if isinstance(coord_list[0], coordinates.SkyCoord):
+            if isinstance(coord_list[0], BaseCoordinateFrame):
                 reg = rectangle.RectangleSkyRegion(coord_list[0], coord_list[1], coord_list[2], coord_list[3])
             elif isinstance(coord_list[0], PixCoord):
                 reg = rectangle.RectanglePixelRegion(coord_list[0], coord_list[1], coord_list[2], coord_list[3])
             else:
                 raise ValueError("No central coordinate")
         elif region_type == 'point':
-            if isinstance(coord_list[0], coordinates.SkyCoord):
+            if isinstance(coord_list[0], BaseCoordinateFrame):
                 reg = point.PointSkyRegion(coord_list[0])
             elif isinstance(coord_list[0], PixCoord):
                 reg = point.PointPixelRegion(coord_list[0])
@@ -214,10 +215,16 @@ def line_parser(line, coordsys=None):
             if region_type == 'ellipse':
                 language_spec[region_type] = itertools.chain((coordinate, coordinate), itertools.cycle((radius, )))
 
-            coords = coordinates.SkyCoord([(x, y)
-                                           for x, y in zip(parsed[:-1:2], parsed[1::2])
-                                           if isinstance(x, coordinates.Angle) and
-                                           isinstance(x, coordinates.Angle)], frame=coordsys_name_mapping[coordsys])
+            parsed_angles = [(x, y) for x, y in zip(parsed[:-1:2],
+                                                    parsed[1::2])
+                             if isinstance(x, coordinates.Angle) and
+                             isinstance(x, coordinates.Angle)]
+            frame = coordinates.frame_transform_graph.lookup_name(coordsys_name_mapping[coordsys])
+
+            lon,lat = zip(*parsed_angles)
+            lon, lat = u.Quantity(lon), u.Quantity(lat)
+            sphcoords = coordinates.UnitSphericalRepresentation(lon, lat)
+            coords = frame(sphcoords)
 
             return region_type, [coords] + parsed[len(coords)*2:], parsed_meta, composite, include
         else:
