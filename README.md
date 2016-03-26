@@ -4,7 +4,7 @@
 About
 -----
 
-This is an experimental package defining an API for representing regions
+This is an experimental package for representing regions
 (both on the sky and in pixel coordinates). Initial discussion related to
 this happened as part of the
 [Python in Astronomy](python-in-astronomy.github.io) workshop, and the
