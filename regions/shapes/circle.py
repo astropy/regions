@@ -9,7 +9,7 @@ from astropy import coordinates
 from astropy import units as u
 
 from ..core import PixelRegion, SkyRegion
-from ..utils import skycoord_to_pixel_scale_angle
+from ..utils.wcs_helpers import skycoord_to_pixel_scale_angle
 
 
 class CirclePixelRegion(PixelRegion):
