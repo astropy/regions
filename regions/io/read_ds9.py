@@ -74,6 +74,13 @@ unit_mapping = {'"': u.arcsec,
 
 
 def parse_angular_length_quantity(string_rep):
+    """
+    Given a string that is either a number or a number and a unit, return a
+    Quantity of that string.  e.g.:
+
+        23.9 -> 23.9*u.deg
+        50" -> 50*u.arcsec
+    """
     has_unit = string_rep[-1] not in string.digits
     if has_unit:
         unit = unit_mapping[string_rep[-1]]
@@ -126,6 +133,9 @@ def strip_paren(string_rep):
 
 
 def region_list_to_objects(region_list):
+    """
+    Given a list of parsed region tuples, product a list of astropy objects
+    """
     viz_keywords = ['color', 'dashed', 'width', 'point', 'font', 'text']
 
     output_list = []
@@ -185,7 +195,14 @@ def ds9_parser(filename):
 
     Returns
     -------
-    list of (region type, coord_list, meta) tuples
+    list of (region type, coord_list, meta, composite, include) tuples
+    region_type : str
+    coord_list : list of coordinate objects
+    meta : metadata dict
+    composite : bool
+        indicates whether region is a composite region
+    include : bool
+        Whether the region is included (False -> excluded)
     """
     coordsys = None
     regions = []
@@ -217,6 +234,27 @@ def ds9_parser(filename):
 
 
 def line_parser(line, coordsys=None):
+    """
+    Parse a single ds9 region line into a string
+
+    Parameters
+    ----------
+    line : str
+        A single ds9 region contained in a string
+    coordsys : str
+        The global coordinate system name declared at the top of the ds9 file
+
+    Returns
+    -------
+    (region_type, parsed_return, parsed_meta, composite, include)
+    region_type : str
+    coord_list : list of coordinate objects
+    meta : metadata dict
+    composite : bool
+        indicates whether region is a composite region
+    include : bool
+        Whether the region is included (False -> excluded)
+    """
     region_type_search = region_type_or_coordsys_re.search(line)
     if region_type_search:
         include = region_type_search.groups()[0]
@@ -285,6 +323,30 @@ def line_parser(line, coordsys=None):
 
 
 def type_parser(string_rep, specification, coordsys):
+    """
+    For a given region line in which the type has already been determined,
+    parse the coordinate definition
+
+    Parameters
+    ----------
+    string_rep : str
+        The string containing the coordinates.  For example, if your region is
+        `circle(1,2,3)` this string would be `(1,2,3)`
+    specification : iterable
+        An iterable of coordinate specifications.  For example, for a circle,
+        this would be a list of (coordinate, coordinate, radius).  Each
+        individual specification should be a function that takes a string and
+        returns the appropriate astropy object.  See ``language_spec`` for the
+        definition of the grammar used here.
+    coordsys : str
+        The string name of the global coordinate system
+
+    Returns
+    -------
+    coord_list : list
+        The list of astropy coordinates and/or quantities representing radius,
+        width, etc. for the region
+    """
     coord_list = []
     splitter = re.compile("[, ]")
     for ii, (element, element_parser) in enumerate(zip(splitter.split(string_rep), specification)):
@@ -309,6 +371,12 @@ meta_token = re.compile("([a-zA-Z]+)(=)([^= ]+) ?")
 
 
 def meta_parser(meta_str):
+    """
+    Parse the metadata for a single ds9 region string.  The metadata is
+    everything after the close-paren of the region coordinate specification.
+    All metadata is specified as key=value pairs separated by whitespace, but
+    sometimes the values can also be whitespace separated.
+    """
     meta_token_split = [x for x in meta_token.split(meta_str.strip()) if x]
     equals_inds = [i for i, x in enumerate(meta_token_split) if x is '=']
     result = {meta_token_split[ii-1]:
@@ -316,4 +384,3 @@ def meta_parser(meta_str):
               for ii,jj in zip(equals_inds, equals_inds[1:]+[None])}
 
     return result
-
