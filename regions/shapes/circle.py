@@ -4,6 +4,8 @@ import math
 import numpy as np
 from astropy.wcs.utils import pixel_to_skycoord
 from ..core import PixelRegion, SkyRegion
+from ..utils import skycoord_to_pixel_scale_angle
+from ..utils.positions_to_extents import get_phot_extents
 from ..utils.wcs_helpers import skycoord_to_pixel_scale_angle
 
 __all__ = ['CirclePixelRegion', 'CircleSkyRegion']
@@ -51,9 +53,45 @@ class CirclePixelRegion(PixelRegion):
         radius_sky = self.radius / scale
         return CircleSkyRegion(skypos, radius_sky)
 
-    def to_mask(self, mode='center'):
+    def to_mask(self, shape, mode='center'):
         # TODO: needs to be implemented
-        raise NotImplementedError
+
+        positions = self.center
+        radius = self.radius
+
+        extents = np.zeros((len(positions), 4), dtype=int)
+
+        extents[:, 0] = positions[:, 0] - radius + 0.5
+        extents[:, 1] = positions[:, 0] + radius + 1.5
+        extents[:, 2] = positions[:, 1] - radius + 0.5
+        extents[:, 3] = positions[:, 1] + radius + 1.5
+
+        ood_filter, extent, phot_extent = get_phot_extents(shape, positions,
+                                                           extents)
+
+        x_min, x_max, y_min, y_max = extent
+        x_pmin, x_pmax, y_pmin, y_pmax = phot_extent
+
+        if mode == 'center':
+            use_exact = 0
+            subpixels = 1
+        elif mode == 'subpixel':
+            use_exact = 0
+        else:
+            use_exact = 1
+            subpixels = 1
+
+        from .geometry import circular_overlap_grid
+
+        for ind in range(len(positions)):
+            fraction = circular_overlap_grid(x_pmin[ind], x_pmax[ind],
+                                             y_pmin[ind], y_pmax[ind],
+                                             x_max[ind] - x_min[ind],
+                                             y_max[ind] - y_min[ind],
+                                             radius, use_exact, subpixels)
+
+        return fraction
+
 
     def as_patch(self, **kwargs):
         import matplotlib.patches as mpatches
