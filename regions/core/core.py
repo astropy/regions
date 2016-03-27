@@ -2,7 +2,7 @@ import abc
 from astropy.extern import six
 import operator
 
-from ..compound import CompoundSkyRegion, CompoundPixelRegion
+from .compound import CompoundSkyRegion, CompoundPixelRegion
 
 
 @six.add_metaclass(abc.ABCMeta)
