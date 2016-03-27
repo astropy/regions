@@ -38,28 +38,16 @@ def parse_coordinate(string_rep, unit):
         return coordinates.Angle(string_rep)
     elif unit is 'hour_or_deg':
         if ':' in string_rep:
-            spl = string_rep.split(":")
-            if len(spl) == 2:
-                ang = float(spl[0]) + float(spl[1])/60.
-            elif len(spl) == 3:
-                ang = float(spl[0]) + float(spl[1])/60. + float(spl[2])/3600.
-            else:
-                raise ValueError("Incorrect string representation of an angle.")
-            return coordinates.Angle(ang, u.hour)
+            spl = [float(x) for x in string_rep.split(":")]
+            return coordinates.Angle(spl, u.hourangle)
         else:
             ang = float(string_rep)
             return coordinates.Angle(ang, u.deg)
     elif unit.is_equivalent(u.deg):
         #return coordinates.Angle(string_rep, unit=unit)
         if ':' in string_rep:
-            spl = string_rep.split(":")
-            if len(spl) == 2:
-                ang = float(spl[0]) + float(spl[1])/60.
-            elif len(spl) == 3:
-                ang = float(spl[0]) + float(spl[1])/60. + float(spl[2])/3600.
-            else:
-                raise ValueError("Incorrect string representation of an angle.")
-            return coordinates.Angle(ang, u.deg)
+            spl = [float(x) for x in string_rep.split(":")]
+            return coordinates.Angle(spl, u.deg)
         else:
             ang = float(string_rep)
             return coordinates.Angle(ang, u.deg)
