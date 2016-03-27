@@ -9,7 +9,7 @@ from astropy import units as u
 from astropy.coordinates import ICRS
 from astropy.wcs import WCS
 
-from ...core.core import SkyRegion, PixelRegion
+from ...core.core import Region, SkyRegion, PixelRegion
 from ...core.pixcoord import PixCoord
 
 from ..circle import CirclePixelRegion, CircleSkyRegion
@@ -35,49 +35,55 @@ SKYPIX_MODES = ['local', 'affine', 'full']
 MASK_MODES = ['center', 'any', 'all', 'exact']
 
 
-@pytest.mark.parametrize('region', PIXEL_REGIONS)
+def ids_func(arg):
+    if isinstance(arg, Region):
+        return arg.__class__.__name__
+    else:
+        return str(arg)
+
+@pytest.mark.parametrize('region', PIXEL_REGIONS, ids=ids_func)
 def test_pix_in(region):
     PixCoord(1,1) in region
 
 
-@pytest.mark.parametrize('region', PIXEL_REGIONS)
+@pytest.mark.parametrize('region', PIXEL_REGIONS, ids=ids_func)
 def test_pix_area(region):
     area = region.area
     assert not isinstance(area, u.Quantity)
 
 
-@pytest.mark.parametrize(('region', 'mode'), itertools.product(PIXEL_REGIONS, SKYPIX_MODES))
+@pytest.mark.parametrize(('region', 'mode'), itertools.product(PIXEL_REGIONS, SKYPIX_MODES), ids=ids_func)
 def test_pix_to_sky(region, mode):
     sky_region = region.to_sky(mode=mode)
     assert isinstance(sky_region, SkyRegion)
 
 
-@pytest.mark.parametrize('region', PIXEL_REGIONS)
+@pytest.mark.parametrize('region', PIXEL_REGIONS, ids=ids_func)
 def test_pix_to_shapely(region):
     from shapely.geometry import BaseGeometry
     shape = region.to_shapely()
     assert isinstance(shape, BaseGeometry)
 
 
-@pytest.mark.parametrize(('region', 'mode'), itertools.product(PIXEL_REGIONS, MASK_MODES))
+@pytest.mark.parametrize(('region', 'mode'), itertools.product(PIXEL_REGIONS, MASK_MODES), ids=ids_func)
 def test_pix_to_mask(region, mode):
     mask = region.to_mask(mode=mode)
     assert isinstance(mask, np.ndarray)
     assert mask.ndim == 2
 
 
-@pytest.mark.parametrize('region', SKY_REGIONS)
+@pytest.mark.parametrize('region', SKY_REGIONS, ids=ids_func)
 def test_sky_in(region):
     ICRS(1 * u.deg,1 * u.deg) in region
 
 
-@pytest.mark.parametrize('region', SKY_REGIONS)
+@pytest.mark.parametrize('region', SKY_REGIONS, ids=ids_func)
 def test_sky_area(region):
     area = region.area
     assert isinstance(area, u.Quantity)
 
 
-@pytest.mark.parametrize(('region', 'mode'), itertools.product(SKY_REGIONS, SKYPIX_MODES))
+@pytest.mark.parametrize(('region', 'mode'), itertools.product(SKY_REGIONS, SKYPIX_MODES), ids=ids_func)
 def test_sky_to_pix(region, mode):
     wcs = WCS(naxis=2)
     pix_region = region.to_pixel(mode=mode, wcs=wcs)
