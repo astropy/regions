@@ -4,7 +4,12 @@ import math
 
 import numpy as np
 
+from astropy import wcs
+from astropy import coordinates
+from astropy import units as u
+
 from ..core import PixelRegion, SkyRegion
+from ..utils import skycoord_to_pixel_scale_angle
 
 
 class CirclePixelRegion(PixelRegion):
@@ -37,7 +42,7 @@ class CirclePixelRegion(PixelRegion):
     def to_shapely(self):
         return self.center.to_shapely().buffer(self.radius)
 
-    def to_sky(self, wcs, mode='local', tolerance=None):
+    def to_sky(self, mywcs, mode='local', tolerance=None):
         # TOOD: needs to be implemented
         raise NotImplementedError("")
 
@@ -85,9 +90,49 @@ class CircleSkyRegion(SkyRegion):
     def __contains__(self, skycoord):
         return self.center.separation(skycoord)
 
-    def to_pixel(self, wcs, mode='local', tolerance=None):
-        # TOOD: needs to be implemented
-        raise NotImplementedError("")
+    def to_pixel(self, mywcs, mode='local', tolerance=None):
+        """
+        Given a WCS, convert the circle to a best-approximation circle in pixel
+        dimensions.
+
+        Parameters
+        ----------
+        mywcs : `~astropy.wcs.WCS`
+            A world coordinate system
+        mode : 'local' or not
+            not implemented
+        tolerance : None
+            not implemented
+
+        Returns
+        -------
+        CirclePixelRegion
+        """
+
+        if mode != 'local':
+            raise NotImplementedError()
+        if tolerance is not None:
+            raise NotImplementedError()
+
+        wcsframe = wcs.utils._wcs_to_celestial_frame_builtin(mywcs)
+        center_in_wcsframe = self.center.transform_to(wcsframe)
+
+        xpix, ypix = mywcs.wcs_world2pix(center_in_wcsframe.spherical.lon,
+                                         center_in_wcsframe.spherical.lat, 0)
+
+        if self.radius.unit.physical_type == 'angle':
+            central_pos = coordinates.SkyCoord([mywcs.celestialwcs.crval],
+                                               frame=self.center.name,
+                                               unit=wcs.wcs.cunit)
+            xc, yc, scale, angle = skycoord_to_pixel_scale_angle(central_pos,
+                                                                 wcs)
+            radius_pix = (scale * self.radius).to(u.pixel).value
+        else:  # pixel: this should not be possible.
+            radius_pix = self.radius.value
+
+        pixel_positions = np.array([xc, yc]).transpose()
+
+        return CirclePixelRegion(pixel_positions, radius_pix)
 
     def to_mpl_patch(self, ax, **kwargs):
         """Convert to mpl patch using a given wcs axis
