@@ -10,13 +10,29 @@ from astropy import log
 from ..shapes import circle, rectangle, polygon, ellipse, point
 from ..core import PixCoord
 
+__all__ = ['read_ds9']
 
 def read_ds9(filename):
+    """
+    Read a ds9 region file in as a list of astropy region objects
+
+    Parameters
+    ----------
+    filename : str
+        The file path
+
+    Returns
+    -------
+    A list of region objects
+    """
     region_list = ds9_parser(filename)
     return region_list_to_objects(region_list)
 
 
-def coordinate(string_rep, unit):
+def parse_coordinate(string_rep, unit):
+    """
+    Parse a single coordinate
+    """
     # Any ds9 coordinate representation (sexagesimal or degrees)
     if 'd' in string_rep or 'h' in string_rep:
         return coordinates.Angle(string_rep)
@@ -57,7 +73,7 @@ unit_mapping = {'"': u.arcsec,
                }
 
 
-def angular_length_quantity(string_rep):
+def parse_angular_length_quantity(string_rep):
     has_unit = string_rep[-1] not in string.digits
     if has_unit:
         unit = unit_mapping[string_rep[-1]]
@@ -66,11 +82,13 @@ def angular_length_quantity(string_rep):
         return u.Quantity(float(string_rep), unit=u.deg)
 
 # these are the same function, just different names
-radius = angular_length_quantity
-width = angular_length_quantity
-height = angular_length_quantity
-angle = angular_length_quantity
+radius = parse_angular_length_quantity
+width = parse_angular_length_quantity
+height = parse_angular_length_quantity
+angle = parse_angular_length_quantity
 
+# For the sake of readability in describing the spec, parse_coordinate etc. are renamed here
+coordinate = parse_coordinate
 language_spec = {'point': (coordinate, coordinate),
                  'circle': (coordinate, coordinate, radius),
                  # This is a special case to deal with n elliptical annuli
