@@ -1,5 +1,6 @@
 import abc
 from astropy.extern import six
+import operator
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -31,6 +32,15 @@ class Region(object):
         """
         raise NotImplementedError("")
 
+    def __and__(self, other):
+        return self.intersection(other)
+
+    def __or__(self, other):
+        return self.union(other)
+
+    def __xor__(self, other):
+        return self.symmetric_difference(other)
+
 
 @six.add_metaclass(abc.ABCMeta)
 class PixelRegion(Region):
@@ -43,6 +53,7 @@ class PixelRegion(Region):
         Returns a region representing the intersection of this region with
         ``other``.
         """
+        from .compound import CompoundPixelRegion
         return CompoundPixelRegion(self, other, operator.and_)
 
     def symmetric_difference(self, other):
@@ -50,12 +61,14 @@ class PixelRegion(Region):
         Returns the union of the two regions minus any areas contained in the
         intersection of the two regions.
         """
+        from .compound import CompoundPixelRegion
         return CompoundPixelRegion(self, other, operator.xor)
 
     def union(self, other):
         """
         Returns a region representing the union of this region with ``other``.
         """
+        from .compound import CompoundPixelRegion
         return CompoundPixelRegion(self, other, operator.or_)
 
     @abc.abstractmethod
@@ -160,6 +173,7 @@ class SkyRegion(Region):
         Returns a region representing the intersection of this region with
         ``other``.
         """
+        from .compound import CompoundSkyRegion
         return CompoundSkyRegion(self, other, operator.and_)
 
     def symmetric_difference(self, other):
@@ -167,12 +181,14 @@ class SkyRegion(Region):
         Returns the union of the two regions minus any areas contained in the
         intersection of the two regions.
         """
+        from .compound import CompoundSkyRegion
         return CompoundSkyRegion(self, other, operator.xor)
 
     def union(self, other):
         """
         Returns a region representing the union of this region with ``other``.
         """
+        from .compound import CompoundSkyRegion
         return CompoundSkyRegion(self, other, operator.or_)
 
     @abc.abstractmethod

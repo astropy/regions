@@ -5,26 +5,51 @@ import itertools
 import re
 from astropy import units as u
 from astropy import coordinates
-from ..shapes import circle, rectangle, polygon, ellipse
+from astropy.coordinates import BaseCoordinateFrame
+from astropy import log
+from ..shapes import circle, rectangle, polygon, ellipse, point
 from ..core import PixCoord
 
+__all__ = ['read_ds9']
 
 def read_ds9(filename):
+    """
+    Read a ds9 region file in as a list of astropy region objects
+
+    Parameters
+    ----------
+    filename : str
+        The file path
+
+    Returns
+    -------
+    A list of region objects
+    """
     region_list = ds9_parser(filename)
     return region_list_to_objects(region_list)
 
 
-def coordinate(string_rep, unit):
+def parse_coordinate(string_rep, unit):
+    """
+    Parse a single coordinate
+    """
     # Any ds9 coordinate representation (sexagesimal or degrees)
     if 'd' in string_rep or 'h' in string_rep:
         return coordinates.Angle(string_rep)
     elif unit is 'hour_or_deg':
         if ':' in string_rep:
-            return coordinates.Angle(string_rep, unit=u.hour)
+            spl = tuple([float(x) for x in string_rep.split(":")])
+            return coordinates.Angle(spl, u.hourangle)
         else:
-            return coordinates.Angle(string_rep, unit=u.deg)
+            ang = float(string_rep)
+            return coordinates.Angle(ang, u.deg)
     elif unit.is_equivalent(u.deg):
-        return coordinates.Angle(string_rep, unit=unit)
+        #return coordinates.Angle(string_rep, unit=unit)
+        if ':' in string_rep:
+            ang = tuple([float(x) for x in string_rep.split(":")])
+        else:
+            ang = float(string_rep)
+        return coordinates.Angle(ang, u.deg)
     else:
         return u.Quantity(float(string_rep), unit)
 
@@ -35,7 +60,14 @@ unit_mapping = {'"': u.arcsec,
                }
 
 
-def angular_length_quantity(string_rep):
+def parse_angular_length_quantity(string_rep):
+    """
+    Given a string that is either a number or a number and a unit, return a
+    Quantity of that string.  e.g.:
+
+        23.9 -> 23.9*u.deg
+        50" -> 50*u.arcsec
+    """
     has_unit = string_rep[-1] not in string.digits
     if has_unit:
         unit = unit_mapping[string_rep[-1]]
@@ -44,11 +76,13 @@ def angular_length_quantity(string_rep):
         return u.Quantity(float(string_rep), unit=u.deg)
 
 # these are the same function, just different names
-radius = angular_length_quantity
-width = angular_length_quantity
-height = angular_length_quantity
-angle = angular_length_quantity
+radius = parse_angular_length_quantity
+width = parse_angular_length_quantity
+height = parse_angular_length_quantity
+angle = parse_angular_length_quantity
 
+# For the sake of readability in describing the spec, parse_coordinate etc. are renamed here
+coordinate = parse_coordinate
 language_spec = {'point': (coordinate, coordinate),
                  'circle': (coordinate, coordinate, radius),
                  # This is a special case to deal with n elliptical annuli
@@ -86,14 +120,18 @@ def strip_paren(string_rep):
 
 
 def region_list_to_objects(region_list):
+    """
+    Given a list of parsed region tuples, product a list of astropy objects
+    """
     viz_keywords = ['color', 'dashed', 'width', 'point', 'font', 'text']
 
     output_list = []
     for region_type, coord_list, meta in region_list:
-        #print("region_type, region_type is 'circle', type(region_type), type('circle'), id(region_type), id('circle'), id(str(region_type))")
-        #print(region_type, region_type is 'circle', type(region_type), type('circle'), id(region_type), id('circle'), id(str(region_type)))
+
+        # TODO: refactor, possible on the basis of # of parameters + sometimes handle corner cases
+
         if region_type == 'circle':
-            if isinstance(coord_list[0], coordinates.SkyCoord):
+            if isinstance(coord_list[0], BaseCoordinateFrame):
                 reg = circle.CircleSkyRegion(coord_list[0], coord_list[1])
             elif isinstance(coord_list[0], PixCoord):
                 reg = circle.CirclePixelRegion(coord_list[0], coord_list[1])
@@ -103,24 +141,31 @@ def region_list_to_objects(region_list):
             # Do not read elliptical annuli for now
             if len(coord_list) > 4:
                 continue
-            if isinstance(coord_list[0], coordinates.SkyCoord):
+            if isinstance(coord_list[0], BaseCoordinateFrame):
                 reg = ellipse.EllipseSkyRegion(coord_list[0], coord_list[1], coord_list[2], coord_list[3])
             elif isinstance(coord_list[0], PixCoord):
                 reg = ellipse.EllipsePixelRegion(coord_list[0], coord_list[1], coord_list[2], coord_list[3])
             else:
                 raise ValueError("No central coordinate")
         elif region_type == 'polygon':
-            if isinstance(coord_list[0], coordinates.SkyCoord):
+            if isinstance(coord_list[0], BaseCoordinateFrame):
                 reg = polygon.PolygonSkyRegion(coord_list[0])
             elif isinstance(coord_list[0], PixCoord):
                 reg = polygon.PolygonPixelRegion(coord_list[0])
             else:
                 raise ValueError("No central coordinate")
         elif region_type == 'rectangle':
-            if isinstance(coord_list[0], coordinates.SkyCoord):
+            if isinstance(coord_list[0], BaseCoordinateFrame):
                 reg = rectangle.RectangleSkyRegion(coord_list[0], coord_list[1], coord_list[2], coord_list[3])
             elif isinstance(coord_list[0], PixCoord):
                 reg = rectangle.RectanglePixelRegion(coord_list[0], coord_list[1], coord_list[2], coord_list[3])
+            else:
+                raise ValueError("No central coordinate")
+        elif region_type == 'point':
+            if isinstance(coord_list[0], BaseCoordinateFrame):
+                reg = point.PointSkyRegion(coord_list[0])
+            elif isinstance(coord_list[0], PixCoord):
+                reg = point.PointPixelRegion(coord_list[0])
             else:
                 raise ValueError("No central coordinate")
         else:
@@ -137,7 +182,14 @@ def ds9_parser(filename):
 
     Returns
     -------
-    list of (region type, coord_list, meta) tuples
+    list of (region type, coord_list, meta, composite, include) tuples
+    region_type : str
+    coord_list : list of coordinate objects
+    meta : metadata dict
+    composite : bool
+        indicates whether region is a composite region
+    include : bool
+        Whether the region is included (False -> excluded)
     """
     coordsys = None
     regions = []
@@ -151,7 +203,9 @@ def ds9_parser(filename):
                 if parsed in coordinate_systems:
                     coordsys = parsed
                 elif parsed:
-                    region_type, coordlist, meta, composite = parsed
+                    region_type, coordlist, meta, composite, include = parsed
+                    meta['include'] = include
+                    log.debug("Region type = {0}".format(region_type))
                     if composite and composite_region is None:
                         composite_region = [(region_type, coordlist)]
                     elif composite:
@@ -167,6 +221,27 @@ def ds9_parser(filename):
 
 
 def line_parser(line, coordsys=None):
+    """
+    Parse a single ds9 region line into a string
+
+    Parameters
+    ----------
+    line : str
+        A single ds9 region contained in a string
+    coordsys : str
+        The global coordinate system name declared at the top of the ds9 file
+
+    Returns
+    -------
+    (region_type, parsed_return, parsed_meta, composite, include)
+    region_type : str
+    coord_list : list of coordinate objects
+    meta : metadata dict
+    composite : bool
+        indicates whether region is a composite region
+    include : bool
+        Whether the region is included (False -> excluded)
+    """
     region_type_search = region_type_or_coordsys_re.search(line)
     if region_type_search:
         include = region_type_search.groups()[0]
@@ -203,12 +278,18 @@ def line_parser(line, coordsys=None):
             if region_type == 'ellipse':
                 language_spec[region_type] = itertools.chain((coordinate, coordinate), itertools.cycle((radius, )))
 
-            coords = coordinates.SkyCoord([(x, y)
-                                           for x, y in zip(parsed[:-1:2], parsed[1::2])
-                                           if isinstance(x, coordinates.Angle) and
-                                           isinstance(x, coordinates.Angle)], frame=coordsys_name_mapping[coordsys])
+            parsed_angles = [(x, y) for x, y in zip(parsed[:-1:2],
+                                                    parsed[1::2])
+                             if isinstance(x, coordinates.Angle) and
+                             isinstance(x, coordinates.Angle)]
+            frame = coordinates.frame_transform_graph.lookup_name(coordsys_name_mapping[coordsys])
 
-            return region_type, [coords] + parsed[len(coords)*2:], parsed_meta, composite
+            lon,lat = zip(*parsed_angles)
+            lon, lat = u.Quantity(lon), u.Quantity(lat)
+            sphcoords = coordinates.UnitSphericalRepresentation(lon, lat)
+            coords = frame(sphcoords)
+
+            return region_type, [coords] + parsed[len(coords)*2:], parsed_meta, composite, include
         else:
             parsed = type_parser(coords_etc, language_spec[region_type],
                                  coordsys)
@@ -225,10 +306,34 @@ def line_parser(line, coordsys=None):
             if region_type == 'ellipse':
                 language_spec[region_type] = itertools.chain((coordinate, coordinate), itertools.cycle((radius, )))
 
-            return region_type, parsed_return, parsed_meta, composite
+            return region_type, parsed_return, parsed_meta, composite, include
 
 
 def type_parser(string_rep, specification, coordsys):
+    """
+    For a given region line in which the type has already been determined,
+    parse the coordinate definition
+
+    Parameters
+    ----------
+    string_rep : str
+        The string containing the coordinates.  For example, if your region is
+        `circle(1,2,3)` this string would be `(1,2,3)`
+    specification : iterable
+        An iterable of coordinate specifications.  For example, for a circle,
+        this would be a list of (coordinate, coordinate, radius).  Each
+        individual specification should be a function that takes a string and
+        returns the appropriate astropy object.  See ``language_spec`` for the
+        definition of the grammar used here.
+    coordsys : str
+        The string name of the global coordinate system
+
+    Returns
+    -------
+    coord_list : list
+        The list of astropy coordinates and/or quantities representing radius,
+        width, etc. for the region
+    """
     coord_list = []
     splitter = re.compile("[, ]")
     for ii, (element, element_parser) in enumerate(zip(splitter.split(string_rep), specification)):
@@ -253,6 +358,12 @@ meta_token = re.compile("([a-zA-Z]+)(=)([^= ]+) ?")
 
 
 def meta_parser(meta_str):
+    """
+    Parse the metadata for a single ds9 region string.  The metadata is
+    everything after the close-paren of the region coordinate specification.
+    All metadata is specified as key=value pairs separated by whitespace, but
+    sometimes the values can also be whitespace separated.
+    """
     meta_token_split = [x for x in meta_token.split(meta_str.strip()) if x]
     equals_inds = [i for i, x in enumerate(meta_token_split) if x is '=']
     result = {meta_token_split[ii-1]:
@@ -260,4 +371,3 @@ def meta_parser(meta_str):
               for ii,jj in zip(equals_inds, equals_inds[1:]+[None])}
 
     return result
-
