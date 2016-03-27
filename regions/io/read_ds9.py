@@ -46,11 +46,10 @@ def parse_coordinate(string_rep, unit):
     elif unit.is_equivalent(u.deg):
         #return coordinates.Angle(string_rep, unit=unit)
         if ':' in string_rep:
-            spl = tuple([float(x) for x in string_rep.split(":")])
-            return coordinates.Angle(spl, u.deg)
+            ang = tuple([float(x) for x in string_rep.split(":")])
         else:
             ang = float(string_rep)
-            return coordinates.Angle(ang, u.deg)
+        return coordinates.Angle(ang, u.deg)
     else:
         return u.Quantity(float(string_rep), unit)
 
