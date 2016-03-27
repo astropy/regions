@@ -3,7 +3,6 @@
 import math
 
 import numpy as np
-from astropy import units as u
 
 from ..core import PixelRegion, SkyRegion
 
@@ -32,7 +31,8 @@ class CirclePixelRegion(PixelRegion):
         return math.pi * self.radius ** 2
 
     def __contains__(self, pixcoord):
-        return np.hypot(x - self.center.x, y - self.center.y) < self.radius
+        return np.hypot(pixcoord.x - self.center.x,
+                        pixcoord.y - self.center.y) < self.radius
 
     def to_shapely(self):
         return self.center.to_shapely().buffer(self.radius)

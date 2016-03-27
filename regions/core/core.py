@@ -1,5 +1,8 @@
 import abc
 from astropy.extern import six
+import operator
+
+from ..compound import CompoundSkyRegion, CompoundPixelRegion
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -30,6 +33,15 @@ class Region(object):
         Returns a region representing the union of this region with ``other``.
         """
         raise NotImplementedError("")
+
+    def __and__(self, other):
+        return self.intersection(other)
+
+    def __or__(self, other):
+        return self.union(other)
+
+    def __xor__(self, other):
+        return self.symmetric_difference(other)
 
 
 @six.add_metaclass(abc.ABCMeta)
