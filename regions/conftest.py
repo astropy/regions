@@ -14,6 +14,8 @@ enable_deprecations_as_exceptions()
 try:
     PYTEST_HEADER_MODULES['Astropy'] = 'astropy'
     del PYTEST_HEADER_MODULES['h5py']
+    del PYTEST_HEADER_MODULES['Scipy']
+    del PYTEST_HEADER_MODULES['Pandas']
 except KeyError:
     pass
 
