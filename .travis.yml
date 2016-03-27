@@ -8,6 +8,11 @@ python:
 # Setting sudo to false opts in to Travis-CI container-based builds.
 sudo: false
 
+# The apt packages below are needed for sphinx builds. A full list of packages
+# that can be included can be found here:
+#
+# https://github.com/travis-ci/apt-package-whitelist/blob/master/ubuntu-precise
+
 addons:
     apt:
         packages:
@@ -20,18 +25,18 @@ env:
         # The following versions are the 'default' for tests, unless
         # overidden underneath. They are defined here in order to save having
         # to repeat them for all configurations.
-        - NUMPY_VERSION=1.10
+        - NUMPY_VERSION=1.9
         - ASTROPY_VERSION=stable
         - SETUP_CMD='test'
         - PIP_DEPENDENCIES=''
-        - TIMEOUT=3600
+
         # For this package-template, we include examples of Cython modules,
         # so Cython is required for testing. If your package does not include
         # Cython code, you can set CONDA_DEPENDENCIES=''
         - CONDA_DEPENDENCIES='Cython'
     matrix:
         # Make sure that egg_info works without dependencies
-        - SETUP_CMD='egg_info' TIMEOUT=30
+        - SETUP_CMD='egg_info'
         # Try all python versions with the latest numpy
         - SETUP_CMD='test'
 
@@ -55,8 +60,6 @@ matrix:
 
         # Try older numpy versions
         - python: 2.7
-          env: NUMPY_VERSION=1.9
-        - python: 2.7
           env: NUMPY_VERSION=1.8
         - python: 2.7
           env: NUMPY_VERSION=1.7
@@ -71,12 +74,35 @@ before_install:
     # - sh -e /etc/init.d/xvfb start
 
 install:
+    # We now use the ci-helpers package to set up our testing environment.
+    # This is done by using Miniconda and then using conda and pip to install
+    # dependencies. Which dependencies are installed using conda and pip is
+    # determined by the CONDA_DEPDENDENCIES and PIP_DEPENDENCIES variables,
+    # which should be space-delimited lists of package names. See the README
+    # in https://github.com/astropy/ci-helpers for information about the full
+    # list of environment variables that can be used to customize your
+    # environment. In some cases, ci-helpers may not offer enough flexibility
+    # in how to install a package, in which case you can have additional
+    # commands in the install: section below.
+
     - git clone git://github.com/astropy/ci-helpers.git
     - source ci-helpers/travis/setup_conda_$TRAVIS_OS_NAME.sh
 
+    # As described above, using ci-helpers, you should be able to set up an
+    # environment with dependencies installed using conda and pip, but in some
+    # cases this may not provide enough flexibility in how to install a
+    # specific dependency (and it will not be able to install non-Python 
+    # dependencies). Therefore, you can also include commands below (as
+    # well as at the start of the install section or in the before_install
+    # section if they are needed before setting up conda) to install any
+    # other dependencies.
 
 script:
-   - timeout $TIMEOUT python setup.py $SETUP_CMD;
+   - python setup.py $SETUP_CMD
 
 after_success:
-    - if [[ $SETUP_CMD == 'test --coverage' ]]; then coveralls --rcfile='regions/tests/coveragerc'; fi
+    # If coveralls.io is set up for this package, uncomment the line
+    # below and replace "packagename" with the name of your package.
+    # The coveragerc file may be customized as needed for your package.
+    # - if [[ $SETUP_CMD == 'test --coverage' ]]; then coveralls --rcfile='packagename/tests/coveragerc'; fi
+

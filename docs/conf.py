@@ -156,7 +156,6 @@ if eval(setup_cfg.get('edit_on_github')):
     edit_on_github_source_root = ""
     edit_on_github_doc_root = "docs"
 
-
 # on_rtd is whether we are on readthedocs.org
 import os
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
