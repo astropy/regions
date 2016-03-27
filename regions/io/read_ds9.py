@@ -38,7 +38,7 @@ def parse_coordinate(string_rep, unit):
         return coordinates.Angle(string_rep)
     elif unit is 'hour_or_deg':
         if ':' in string_rep:
-            spl = [float(x) for x in string_rep.split(":")]
+            spl = tuple([float(x) for x in string_rep.split(":")])
             return coordinates.Angle(spl, u.hourangle)
         else:
             ang = float(string_rep)
@@ -46,7 +46,7 @@ def parse_coordinate(string_rep, unit):
     elif unit.is_equivalent(u.deg):
         #return coordinates.Angle(string_rep, unit=unit)
         if ':' in string_rep:
-            spl = [float(x) for x in string_rep.split(":")]
+            spl = tuple([float(x) for x in string_rep.split(":")])
             return coordinates.Angle(spl, u.deg)
         else:
             ang = float(string_rep)
