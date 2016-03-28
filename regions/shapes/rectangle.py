@@ -31,23 +31,23 @@ class RectanglePixelRegion(PixelRegion):
 
     @property
     def area(self):
-        # TOOD: needs to be implemented
+        # TODO: needs to be implemented
         raise NotImplementedError("")
 
     def __contains__(self, pixcoord):
-        # TOOD: needs to be implemented
+        # TODO: needs to be implemented
         raise NotImplementedError("")
 
     def to_shapely(self):
-        # TOOD: needs to be implemented
+        # TODO: needs to be implemented
         raise NotImplementedError("")
 
     def to_sky(self, wcs, mode='local', tolerance=None):
-        # TOOD: needs to be implemented
+        # TODO: needs to be implemented
         raise NotImplementedError("")
 
     def to_mask(self, mode='center'):
-        # TOOD: needs to be implemented
+        # TODO: needs to be implemented
         raise NotImplementedError("")
 
 
@@ -80,13 +80,13 @@ class RectangleSkyRegion(SkyRegion):
 
     @property
     def area(self):
-        # TOOD: needs to be implemented
+        # TODO: needs to be implemented
         raise NotImplementedError("")
 
     def __contains__(self, skycoord):
-        # TOOD: needs to be implemented
+        # TODO: needs to be implemented
         raise NotImplementedError("")
 
     def to_pixel(self, wcs, mode='local', tolerance=None):
-        # TOOD: needs to be implemented
+        # TODO: needs to be implemented
         raise NotImplementedError("")

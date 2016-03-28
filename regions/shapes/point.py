@@ -33,11 +33,11 @@ class PointPixelRegion(PixelRegion):
         return self.center.to_shapely()
 
     def to_sky(self, wcs, mode='local', tolerance=None):
-        # TOOD: needs to be implemented
+        # TODO: needs to be implemented
         raise NotImplementedError("")
 
     def to_mask(self, mode='center'):
-        # TOOD: needs to be implemented
+        # TODO: needs to be implemented
         raise NotImplementedError("")
 
 
@@ -66,5 +66,5 @@ class PointSkyRegion(SkyRegion):
         return False
 
     def to_pixel(self, wcs, mode='local', tolerance=None):
-        # TOOD: needs to be implemented
+        # TODO: needs to be implemented
         raise NotImplementedError("")

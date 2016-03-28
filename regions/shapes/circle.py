@@ -43,11 +43,11 @@ class CirclePixelRegion(PixelRegion):
         return self.center.to_shapely().buffer(self.radius)
 
     def to_sky(self, mywcs, mode='local', tolerance=None):
-        # TOOD: needs to be implemented
+        # TODO: needs to be implemented
         raise NotImplementedError("")
 
     def to_mask(self, mode='center'):
-        # TOOD: needs to be implemented
+        # TODO: needs to be implemented
         raise NotImplementedError("")
 
     def to_mpl_patch(self, **kwargs):
