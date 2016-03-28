@@ -1,3 +1,5 @@
+import math
+
 from astropy import units as u
 
 from ..core import PixelRegion, SkyRegion
@@ -32,8 +34,7 @@ class EllipsePixelRegion(PixelRegion):
 
     @property
     def area(self):
-        # TODO: needs to be implemented
-        raise NotImplementedError("")
+        return math.pi * self.minor * self.major
 
     def __contains__(self, pixcoord):
         # TODO: needs to be implemented
