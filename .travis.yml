@@ -24,7 +24,7 @@ env:
         - ASTROPY_VERSION=stable
         - SETUP_CMD='test'
         - PIP_DEPENDENCIES=''
-        - CONDA_DEPENDENCIES=''
+        - CONDA_DEPENDENCIES='cython'
     matrix:
         # Make sure that egg_info works without dependencies
         - SETUP_CMD='egg_info'
