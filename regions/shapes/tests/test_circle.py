@@ -39,9 +39,10 @@ def test_plot():
     wcs = WCS(h)
     fig = plt.figure()
     ax = fig.add_axes([0.1, 0.1, 0.8, 0.8], projection=wcs)
-    p = c.to_mpl_patch(ax, alpha=0.6)
-    ax.add_patch(p)
+    p = c.make_patch(ax, alpha=0.6)
 
     assert_allclose(p.center[0], skycoord.icrs.ra.value)
     assert_allclose(p.center[1], skycoord.icrs.dec.value)
     assert p.get_facecolor() == (1, 0, 0, 0.6)
+
+    c.plot(ax, alpha=0.6)

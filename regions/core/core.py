@@ -248,3 +248,18 @@ class SkyRegion(Region):
             The tolerance for the ``'full'`` mode described above.
         """
         raise NotImplementedError("")
+
+    def plot(self, ax=None, **kwargs):
+        """
+        Calls make_patch method forwarding all kwargs and adds patch
+        to given wcs axis.
+
+        Parameters
+        ----------
+        ax : `~astropy.wcsaxes.WCSAxes`
+            WCS axis object
+        """
+        patch = self.make_patch(ax, **kwargs)
+        ax.add_patch(patch)
+
+        return ax

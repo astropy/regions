@@ -50,7 +50,7 @@ class CirclePixelRegion(PixelRegion):
         # TODO: needs to be implemented
         raise NotImplementedError("")
 
-    def to_mpl_patch(self, **kwargs):
+    def make_patch(self, **kwargs):
         """Convert to mpl patch.
 
         Returns
@@ -140,7 +140,7 @@ class CircleSkyRegion(SkyRegion):
 
         return CirclePixelRegion(pixel_positions, radius_pix)
 
-    def to_mpl_patch(self, ax, **kwargs):
+    def make_patch(self, ax, **kwargs):
         """Convert to mpl patch using a given wcs axis
 
         Parameters
