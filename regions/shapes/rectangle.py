@@ -71,7 +71,7 @@ class RectangleSkyRegion(SkyRegion):
     def __init__(self, center, height, width, angle=0 * u.deg, meta=None, visual=None):
         # TODO: use quantity_input to check that height, width, and angle are angles
         self.center = center
-        self.height = minor
+        self.height = height
         self.width = width
         self.angle = angle
         self.meta = meta or {}

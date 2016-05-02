@@ -165,6 +165,32 @@ class PixelRegion(Region):
         """
         raise NotImplementedError("")
 
+    @abc.abstractmethod
+    def make_patch(self, **kwargs):
+        """Convert to mpl patch
+
+        Returns
+        -------
+        patch : `~matplotlib.patches.Patch`
+            Matplotlib patch
+        """
+        raise NotImplementedError
+
+    def plot(self, ax=None, **kwargs):
+        """
+        Calls make_patch method forwarding all kwargs and adds patch
+        to given axis.
+
+        Parameters
+        ----------
+        ax : `~matplolib.axes`, optional
+            Axis
+        """
+        patch = self.make_patch(ax, **kwargs)
+        ax.add_patch(patch)
+
+        return ax
+
 
 @six.add_metaclass(abc.ABCMeta)
 class SkyRegion(Region):
@@ -248,6 +274,22 @@ class SkyRegion(Region):
             The tolerance for the ``'full'`` mode described above.
         """
         raise NotImplementedError("")
+
+    @abc.abstractmethod
+    def make_patch(self, wcs, **kwargs):
+        """Convert to mpl patch using a given wcs axis
+
+        Parameters
+        ----------
+        ax : `~astropy.wcsaxes.WCSAxes`
+            WCS axis object
+
+        Returns
+        -------
+        patch : `~matplotlib.patches.Patch`
+            Matplotlib patch
+        """
+        raise NotImplementedError
 
     def plot(self, ax=None, **kwargs):
         """

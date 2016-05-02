@@ -141,21 +141,6 @@ class CircleSkyRegion(SkyRegion):
         return CirclePixelRegion(pixel_positions, radius_pix)
 
     def make_patch(self, ax, **kwargs):
-        """Convert to mpl patch using a given wcs axis
-
-        Parameters
-        ----------
-        ax : `~astropy.wcsaxes.WCSAxes`
-            WCS axis object
-        kwargs : dict
-            kwargs are forwarded to mpatches.Circle
-
-        Returns
-        -------
-        patch : `~matplotlib.mpatches.Circle`
-            Matplotlib patch
-        """
-
         import matplotlib.patches as mpatches
 
         val = self.center.icrs
