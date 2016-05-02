@@ -51,13 +51,6 @@ class CirclePixelRegion(PixelRegion):
         raise NotImplementedError("")
 
     def make_patch(self, **kwargs):
-        """Convert to mpl patch.
-
-        Returns
-        -------
-        patch : `~matplotlib.mpatches.Circle`
-            Matplotlib patch
-        """
         import matplotlib.patches as mpatches
 
         patch = mpatches.Circle(self.center, self.radius, **kwargs)
