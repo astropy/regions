@@ -35,7 +35,7 @@ class CirclePixelRegion(PixelRegion):
     def area(self):
         return math.pi * self.radius ** 2
 
-    def __contains__(self, pixcoord):
+    def contains(self, pixcoord):
         return np.hypot(pixcoord.x - self.center.x,
                         pixcoord.y - self.center.y) < self.radius
 
@@ -87,8 +87,14 @@ class CircleSkyRegion(SkyRegion):
     def area(self):
         return math.pi * self.radius ** 2
 
-    def __contains__(self, skycoord):
-        return self.center.separation(skycoord)
+    def contains(self, skycoord):
+        return self.center.separation(skycoord) < self.radius
+
+    def __repr__(self):
+        clsnm = self.__class__.__name__
+        coord = self.center
+        rad = self.radius
+        return '{clsnm}\nCenter:{coord}\nRadius:{rad}'.format(**locals())
 
     def to_pixel(self, mywcs, mode='local', tolerance=None):
         """

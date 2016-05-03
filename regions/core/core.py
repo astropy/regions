@@ -41,6 +41,10 @@ class Region(object):
     def __xor__(self, other):
         return self.symmetric_difference(other)
 
+    def __contains__(self, coord):
+        # Todo: only works for scalar cases, test for this?
+        return self.contains(coord)
+
 
 @six.add_metaclass(abc.ABCMeta)
 class PixelRegion(Region):
@@ -72,7 +76,7 @@ class PixelRegion(Region):
         return CompoundPixelRegion(self, other, operator.or_)
 
     @abc.abstractmethod
-    def __contains__(self, pixcoord):
+    def contains(self, pixcoord):
         """
         Checks whether a position or positions fall inside the region.
 
@@ -192,7 +196,7 @@ class SkyRegion(Region):
         return CompoundSkyRegion(self, other, operator.or_)
 
     @abc.abstractmethod
-    def __contains__(self, skycoord):
+    def contains(self, skycoord):
         """
         Checks whether a position or positions fall inside the region.
 
