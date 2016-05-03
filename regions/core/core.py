@@ -183,10 +183,14 @@ class PixelRegion(Region):
 
         Parameters
         ----------
-        ax : `~matplolib.axes`, optional
+        ax : `~matplotlib.axes`, optional
             Axis
         """
-        patch = self.make_patch(ax, **kwargs)
+        import matplotlib.pyplot as plt
+
+        ax = plt.gca() if ax is None else ax
+
+        patch = self.make_patch(**kwargs)
         ax.add_patch(patch)
 
         return ax
@@ -276,7 +280,7 @@ class SkyRegion(Region):
         raise NotImplementedError("")
 
     @abc.abstractmethod
-    def make_patch(self, wcs, **kwargs):
+    def make_patch(self, ax, **kwargs):
         """Convert to mpl patch using a given wcs axis
 
         Parameters

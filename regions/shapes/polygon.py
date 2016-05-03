@@ -38,6 +38,9 @@ class PolygonPixelRegion(PixelRegion):
         # TODO: needs to be implemented
         raise NotImplementedError("")
 
+    def make_patch(self, **kwargs):
+        # TODO: needs to be implemented
+        raise NotImplementedError("")
 
 class PolygonSkyRegion(SkyRegion):
     """
@@ -65,5 +68,9 @@ class PolygonSkyRegion(SkyRegion):
         raise NotImplementedError("")
 
     def to_pixel(self, wcs, mode='local', tolerance=None):
+        # TODO: needs to be implemented
+        raise NotImplementedError("")
+
+    def make_patch(self, **kwargs):
         # TODO: needs to be implemented
         raise NotImplementedError("")
