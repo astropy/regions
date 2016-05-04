@@ -36,7 +36,7 @@ class EllipsePixelRegion(PixelRegion):
     def area(self):
         return math.pi * self.minor * self.major
 
-    def __contains__(self, pixcoord):
+    def contains(self, pixcoord):
         # TODO: needs to be implemented
         raise NotImplementedError("")
 
@@ -85,7 +85,7 @@ class EllipseSkyRegion(SkyRegion):
         # TODO: needs to be implemented
         raise NotImplementedError("")
 
-    def __contains__(self, skycoord):
+    def contains(self, skycoord):
         # TODO: needs to be implemented
         raise NotImplementedError("")
 

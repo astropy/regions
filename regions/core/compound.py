@@ -29,16 +29,21 @@ class CompoundSkyRegion(SkyRegion):
     Represents the logical combination of two regions in sky coordinates.
     """
 
-    def __init__(self, region1, operator, region2):
+    def __init__(self, region1, region2, operator):
         self.region1 = region1
         self.region2 = region2
         self.operator = operator
 
-    def __contains__(self, skycoord):
-        raise NotImplementedError("")
+    def contains(self, skycoord):
+        return self.operator(self.region1.contains(skycoord),
+                             self.region2.contains(skycoord))
 
     def to_pixel(self, wcs, mode='local', tolerance=None):
         raise NotImplementedError("")
 
     def __repr__(self):
-        return "({0} {1} {2})".format(self.region1, self.operator, self.region2)
+        return "({0}\n{1}\n{2})".format(self.region1, self.operator, self.region2)
+
+    @property
+    def area(self):
+        raise NotImplementedError("")

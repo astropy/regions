@@ -26,6 +26,7 @@ def test_init_sky():
 
 
 # Todo : restructure test to use same circle everywhere
+# see https://github.com/astropy/regions/pull/20
 @pytest.mark.skipif('not HAS_MATPLOTLIB')
 def test_plot():
     import matplotlib.pyplot as plt

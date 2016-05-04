@@ -26,7 +26,7 @@ class PointPixelRegion(PixelRegion):
     def area(self):
         return 0
 
-    def __contains__(self, pixcoord):
+    def contains(self, pixcoord):
         return False
 
     def to_shapely(self):
@@ -62,7 +62,7 @@ class PointSkyRegion(SkyRegion):
     def area(self):
         return 0
 
-    def __contains__(self, skycoord):
+    def contains(self, skycoord):
         return False
 
     def to_pixel(self, wcs, mode='local', tolerance=None):

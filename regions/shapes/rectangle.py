@@ -33,7 +33,7 @@ class RectanglePixelRegion(PixelRegion):
     def area(self):
         return self.width * self.height
 
-    def __contains__(self, pixcoord):
+    def contains(self, pixcoord):
         # TODO: needs to be implemented
         raise NotImplementedError("")
 
@@ -81,7 +81,7 @@ class RectangleSkyRegion(SkyRegion):
     def area(self):
         return self.width * self.height
 
-    def __contains__(self, skycoord):
+    def contains(self, skycoord):
         # TODO: needs to be implemented
         raise NotImplementedError("")
 
