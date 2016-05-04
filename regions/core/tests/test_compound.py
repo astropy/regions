@@ -32,3 +32,15 @@ def test_compound():
 
     diff = c1 ^ c2
     assert (diff.contains(coords) == [True, True, False, False]).all()
+
+
+    c3 = CircleSkyRegion(test_coord4, 0.1 * u.deg)
+    
+    union = c1 | c2 | c3
+    assert (union.contains(coords) == [True, True, True, True]).all()
+
+    intersection = c1 & c2 & c3
+    assert (intersection.contains(coords) == [False, False, False, False]).all()
+
+    diff = c1 ^ c2 ^ c3
+    assert (diff.contains(coords) == [True, True, False, True]).all()
