@@ -40,7 +40,7 @@ class PointPixelRegion(PixelRegion):
         # TODO: needs to be implemented
         raise NotImplementedError("")
 
-    def make_patch(self, **kwargs):
+    def as_patch(self, **kwargs):
         # TODO: needs to be implemented
         raise NotImplementedError("")
 
@@ -73,7 +73,7 @@ class PointSkyRegion(SkyRegion):
         # TODO: needs to be implemented
         raise NotImplementedError("")
 
-    def make_patch(self, **kwargs):
+    def as_patch(self, **kwargs):
         # TODO: needs to be implemented
         raise NotImplementedError("")
 

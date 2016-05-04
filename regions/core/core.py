@@ -166,7 +166,7 @@ class PixelRegion(Region):
         raise NotImplementedError("")
 
     @abc.abstractmethod
-    def make_patch(self, **kwargs):
+    def as_patch(self, **kwargs):
         """Convert to mpl patch
 
         Returns
@@ -178,7 +178,7 @@ class PixelRegion(Region):
 
     def plot(self, ax=None, **kwargs):
         """
-        Calls make_patch method forwarding all kwargs and adds patch
+        Calls as_patch method forwarding all kwargs and adds patch
         to given axis.
 
         Parameters
@@ -190,7 +190,7 @@ class PixelRegion(Region):
 
         ax = plt.gca() if ax is None else ax
 
-        patch = self.make_patch(**kwargs)
+        patch = self.as_patch(**kwargs)
         ax.add_patch(patch)
 
         return ax
@@ -280,7 +280,7 @@ class SkyRegion(Region):
         raise NotImplementedError("")
 
     @abc.abstractmethod
-    def make_patch(self, ax, **kwargs):
+    def as_patch(self, ax, **kwargs):
         """Convert to mpl patch using a given wcs axis
 
         Parameters
@@ -297,7 +297,7 @@ class SkyRegion(Region):
 
     def plot(self, ax=None, **kwargs):
         """
-        Calls make_patch method forwarding all kwargs and adds patch
+        Calls as_patch method forwarding all kwargs and adds patch
         to given wcs axis.
 
         Parameters
@@ -305,7 +305,7 @@ class SkyRegion(Region):
         ax : `~astropy.wcsaxes.WCSAxes`
             WCS axis object
         """
-        patch = self.make_patch(ax, **kwargs)
+        patch = self.as_patch(ax, **kwargs)
         ax.add_patch(patch)
 
         return ax

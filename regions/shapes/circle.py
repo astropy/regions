@@ -50,7 +50,7 @@ class CirclePixelRegion(PixelRegion):
         # TODO: needs to be implemented
         raise NotImplementedError("")
 
-    def make_patch(self, **kwargs):
+    def as_patch(self, **kwargs):
         import matplotlib.patches as mpatches
 
         patch = mpatches.Circle(self.center, self.radius, **kwargs)
@@ -133,7 +133,7 @@ class CircleSkyRegion(SkyRegion):
 
         return CirclePixelRegion(pixel_positions, radius_pix)
 
-    def make_patch(self, ax, **kwargs):
+    def as_patch(self, ax, **kwargs):
         import matplotlib.patches as mpatches
 
         val = self.center.icrs
