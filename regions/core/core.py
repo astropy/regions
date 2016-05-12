@@ -188,7 +188,8 @@ class PixelRegion(Region):
         """
         import matplotlib.pyplot as plt
 
-        ax = plt.gca() if ax is None else ax
+        if ax is None:
+            ax = plt.gca()
 
         patch = self.as_patch(**kwargs)
         ax.add_patch(patch)
