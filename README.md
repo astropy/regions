@@ -7,5 +7,5 @@ About
 This is an astropy-affiliated package for region handling.
 
 * Code : https://github.com/astropy/regions
-* Docs : http://astropy-regions.readthedocs.org
+* Docs : http://astropy-regions.readthedocs.io
 

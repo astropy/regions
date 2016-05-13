@@ -1,5 +1,5 @@
-.. _pyregion: http://pyregion.readthedocs.org/en/latest/
-.. _photutils: http://photutils.readthedocs.org/en/latest/photutils/aperture.html
+.. _pyregion: http://pyregion.readthedocs.io/en/latest/
+.. _photutils: http://photutils.readthedocs.io/en/latest/photutils/aperture.html
 .. _Github repository: https://github.com/astropy/regions
 .. _PyAstro16 doc: https://docs.google.com/document/d/17owovjcpNFirz-f8qCWWxvcHHPGGpO5JJic5WbtD9JY/edit?pref=2&pli=1
-.. _Region documentation: http://astropy-regions.readthedocs.org/en/latest/
+.. _Region documentation: http://astropy-regions.readthedocs.io/en/latest/
