@@ -42,7 +42,8 @@ class Region(object):
         return self.symmetric_difference(other)
 
     def __contains__(self, coord):
-        # Todo: only works for scalar cases, test for this?
+        if not coord.isscalar:
+            raise ValueError('{} must be scalar'.format(coord))
         return self.contains(coord)
 
 
@@ -165,6 +166,37 @@ class PixelRegion(Region):
         """
         raise NotImplementedError("")
 
+    @abc.abstractmethod
+    def as_patch(self, **kwargs):
+        """Convert to mpl patch
+
+        Returns
+        -------
+        patch : `~matplotlib.patches.Patch`
+            Matplotlib patch
+        """
+        raise NotImplementedError
+
+    def plot(self, ax=None, **kwargs):
+        """
+        Calls as_patch method forwarding all kwargs and adds patch
+        to given axis.
+
+        Parameters
+        ----------
+        ax : `~matplotlib.axes`, optional
+            Axis
+        """
+        import matplotlib.pyplot as plt
+
+        if ax is None:
+            ax = plt.gca()
+
+        patch = self.as_patch(**kwargs)
+        ax.add_patch(patch)
+
+        return ax
+
 
 @six.add_metaclass(abc.ABCMeta)
 class SkyRegion(Region):
@@ -248,3 +280,34 @@ class SkyRegion(Region):
             The tolerance for the ``'full'`` mode described above.
         """
         raise NotImplementedError("")
+
+    @abc.abstractmethod
+    def as_patch(self, ax, **kwargs):
+        """Convert to mpl patch using a given wcs axis
+
+        Parameters
+        ----------
+        ax : `~astropy.wcsaxes.WCSAxes`
+            WCS axis object
+
+        Returns
+        -------
+        patch : `~matplotlib.patches.Patch`
+            Matplotlib patch
+        """
+        raise NotImplementedError
+
+    def plot(self, ax=None, **kwargs):
+        """
+        Calls as_patch method forwarding all kwargs and adds patch
+        to given wcs axis.
+
+        Parameters
+        ----------
+        ax : `~astropy.wcsaxes.WCSAxes`
+            WCS axis object
+        """
+        patch = self.as_patch(ax, **kwargs)
+        ax.add_patch(patch)
+
+        return ax

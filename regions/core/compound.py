@@ -20,6 +20,9 @@ class CompoundPixelRegion(PixelRegion):
     def to_sky(self, wcs, mode='local', tolerance=None):
         raise NotImplementedError("")
 
+    def as_patch(self, **kwargs):
+        raise NotImplementedError("")
+
     def __repr__(self):
         return "({0} {1} {2})".format(self.region1, self.operator, self.region2)
 
@@ -39,6 +42,9 @@ class CompoundSkyRegion(SkyRegion):
                              self.region2.contains(skycoord))
 
     def to_pixel(self, wcs, mode='local', tolerance=None):
+        raise NotImplementedError("")
+
+    def as_patch(self, ax, **kwargs):
         raise NotImplementedError("")
 
     def __repr__(self):

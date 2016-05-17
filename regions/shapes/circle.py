@@ -50,14 +50,7 @@ class CirclePixelRegion(PixelRegion):
         # TODO: needs to be implemented
         raise NotImplementedError("")
 
-    def to_mpl_patch(self, **kwargs):
-        """Convert to mpl patch.
-
-        Returns
-        -------
-        patch : `~matplotlib.mpatches.Circle`
-            Matplotlib patch
-        """
+    def as_patch(self, **kwargs):
         import matplotlib.patches as mpatches
 
         patch = mpatches.Circle(self.center, self.radius, **kwargs)
@@ -140,22 +133,7 @@ class CircleSkyRegion(SkyRegion):
 
         return CirclePixelRegion(pixel_positions, radius_pix)
 
-    def to_mpl_patch(self, ax, **kwargs):
-        """Convert to mpl patch using a given wcs axis
-
-        Parameters
-        ----------
-        ax : `~astropy.wcsaxes.WCSAxes`
-            WCS axis object
-        kwargs : dict
-            kwargs are forwarded to mpatches.Circle
-
-        Returns
-        -------
-        patch : `~matplotlib.mpatches.Circle`
-            Matplotlib patch
-        """
-
+    def as_patch(self, ax, **kwargs):
         import matplotlib.patches as mpatches
 
         val = self.center.icrs
