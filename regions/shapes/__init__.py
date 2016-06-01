@@ -2,6 +2,7 @@
 """Region shapes
 """
 from .circle import *
+from .annulus import *
 from .ellipse import *
 from .polygon import *
 from .rectangle import *
