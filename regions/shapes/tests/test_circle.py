@@ -49,10 +49,15 @@ def test_plot():
 
 def test_transformation():
     
-    skycoord = SkyCoord(3 * u.deg, 4 * u.deg)
+    skycoord = SkyCoord(3 * u.deg, 4 * u.deg, frame='galactic')
     skycircle = CircleSkyRegion(skycoord, 2 * u.arcsec)
     
     headerfile = get_pkg_data_filename('data/example_header.fits')
     h = getheader(headerfile)
     wcs = WCS(h)
     pixcircle = skycircle.to_pixel(wcs)
+    assert (pixcircle.center == (-50.5, 299.5)).all()
+
+
+    skycircle2 = pixcircle.to_sky(wcs)
+    assert skycircle2.radius == skycircle.radius

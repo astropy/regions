@@ -7,6 +7,7 @@ import numpy as np
 from astropy import wcs
 from astropy import coordinates
 from astropy import units as u
+from astropy.wcs.utils import pixel_to_skycoord
 
 from ..core import PixelRegion, SkyRegion
 from ..utils.wcs_helpers import skycoord_to_pixel_scale_angle
@@ -43,8 +44,16 @@ class CirclePixelRegion(PixelRegion):
         return self.center.to_shapely().buffer(self.radius)
 
     def to_sky(self, mywcs, mode='local', tolerance=None):
-        # TODO: needs to be implemented
-        raise NotImplementedError("")
+        if mode != 'local':
+            raise NotImplementedError()
+        if tolerance is not None:
+            raise NotImplementedError()
+
+        skypos = pixel_to_skycoord(self.center[0], self.center[1], mywcs)
+        xc, yc, scale, angle = skycoord_to_pixel_scale_angle(skypos, mywcs)
+
+        radius_sky = (self.radius / scale)
+        return CircleSkyRegion(skypos, radius_sky)
 
     def to_mask(self, mode='center'):
         # TODO: needs to be implemented
@@ -114,7 +123,7 @@ class CircleSkyRegion(SkyRegion):
             raise NotImplementedError()
 
         xc, yc, scale, angle = skycoord_to_pixel_scale_angle(self.center, mywcs)
-        radius_pix = (self.radius * scale).to(u.pixel).value
+        radius_pix = (self.radius * scale)
 
         pixel_positions = np.array([xc, yc]).transpose()
 
