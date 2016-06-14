@@ -87,7 +87,6 @@ release = package.__version__
 
 
 # -- Options for HTML output ---------------------------------------------------
-import sphinx_rtd_theme
 
 # A NOTE ON HTML THEMES
 # The global astropy configuration uses a custom theme, 'bootstrap-astropy',
@@ -98,12 +97,12 @@ import sphinx_rtd_theme
 
 # Add any paths that contain custom themes here, relative to this directory.
 # To use a different custom theme, add the directory containing the theme.
-html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+# html_theme_path = []
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes. To override the custom theme, set this to the
 # name of a builtin theme or the name of a custom theme in html_theme_path.
-html_theme = 'sphinx_rtd_theme'
+#html_theme = None
 
 # Custom sidebar templates, maps document names to template names.
 #html_sidebars = {}
@@ -155,14 +154,3 @@ if eval(setup_cfg.get('edit_on_github')):
 
     edit_on_github_source_root = ""
     edit_on_github_doc_root = "docs"
-
-# on_rtd is whether we are on readthedocs.org
-import os
-on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
-
-if not on_rtd:  # only import and set the theme if we're building docs locally
-
-    html_theme = 'sphinx_rtd_theme'
-    html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
-
-# otherwise, readthedocs.org uses their theme by default, so no need to specify it
