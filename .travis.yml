@@ -8,6 +8,11 @@ python:
 # Setting sudo to false opts in to Travis-CI container-based builds.
 sudo: false
 
+# The apt packages below are needed for sphinx builds. A full list of packages
+# that can be included can be found here:
+#
+# https://github.com/travis-ci/apt-package-whitelist/blob/master/ubuntu-precise
+
 addons:
     apt:
         packages:
@@ -17,14 +22,20 @@ addons:
 
 env:
     global:
+
         # The following versions are the 'default' for tests, unless
-        # overidden underneath. They are defined here in order to save having
+        # overridden underneath. They are defined here in order to save having
         # to repeat them for all configurations.
         - NUMPY_VERSION=stable
         - ASTROPY_VERSION=stable
         - SETUP_CMD='test'
         - PIP_DEPENDENCIES=''
-        - CONDA_DEPENDENCIES='cython'
+        - CONDA_DEPENDENCIES='Cython'
+
+        # If there are matplotlib or other GUI tests, uncomment the following
+        # line to use the X virtual framebuffer.
+        # - SETUP_XVFB=True
+
     matrix:
         # Make sure that egg_info works without dependencies
         - SETUP_CMD='egg_info'
@@ -48,8 +59,23 @@ matrix:
           env: ASTROPY_VERSION=development
         - python: 3.5
           env: ASTROPY_VERSION=development
+        - python: 2.7
+          env: ASTROPY_VERSION=lts
+        - python: 3.5
+          env: ASTROPY_VERSION=lts
+
+        # Python 3.3 doesn't have numpy 1.10 in conda, but it can be put
+        # back into the main matrix once the numpy build is available in the
+        # astropy-ci-extras channel (or in the one provided in the
+        # CONDA_CHANNELS environmental variable).
+        - python: 3.3
+          env: SETUP_CMD='egg_info'
+        - python: 3.3
+          env: SETUP_CMD='test' NUMPY_VERSION=1.9
 
         # Try older numpy versions
+        - python: 2.7
+          env: NUMPY_VERSION=1.10
         - python: 2.7
           env: NUMPY_VERSION=1.9
         - python: 2.7
@@ -57,14 +83,41 @@ matrix:
         - python: 2.7
           env: NUMPY_VERSION=1.7
 
+        # Try numpy pre-release
+        - python: 3.5
+          env: NUMPY_VERSION=prerelease
+
+    allow_failures:
+        - python: 3.5
+          env: NUMPY_VERSION=prerelease
+
 install:
+
+    # We now use the ci-helpers package to set up our testing environment.
+    # This is done by using Miniconda and then using conda and pip to install
+    # dependencies. Which dependencies are installed using conda and pip is
+    # determined by the CONDA_DEPDENDENCIES and PIP_DEPENDENCIES variables,
+    # which should be space-delimited lists of package names. See the README
+    # in https://github.com/astropy/ci-helpers for information about the full
+    # list of environment variables that can be used to customize your
+    # environment. In some cases, ci-helpers may not offer enough flexibility
+    # in how to install a package, in which case you can have additional
+    # commands in the install: section below.
 
     - git clone git://github.com/astropy/ci-helpers.git
     - source ci-helpers/travis/setup_conda_$TRAVIS_OS_NAME.sh
+
+    # As described above, using ci-helpers, you should be able to set up an
+    # environment with dependencies installed using conda and pip, but in some
+    # cases this may not provide enough flexibility in how to install a
+    # specific dependency (and it will not be able to install non-Python
+    # dependencies). Therefore, you can also include commands below (as
+    # well as at the start of the install section or in the before_install
+    # section if they are needed before setting up conda) to install any
+    # other dependencies.
 
 script:
    - python setup.py $SETUP_CMD
 
 after_success:
     - if [[ $SETUP_CMD == 'test --coverage' ]]; then coveralls --rcfile='regions/tests/coveragerc'; fi
-
