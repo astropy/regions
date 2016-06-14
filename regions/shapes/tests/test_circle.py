@@ -15,6 +15,12 @@ try:
 except:
     HAS_MATPLOTLIB = False
 
+try:
+    import wcsaxes
+    HAS_WCSAXES = True
+except:
+    HAS_WCSAXES = False
+
 
 def test_init_pixel():
     pixcoord = PixCoord(3, 4)
@@ -28,6 +34,7 @@ def test_init_sky():
 # Todo : restructure test to use same circle everywhere
 # see https://github.com/astropy/regions/pull/20
 @pytest.mark.skipif('not HAS_MATPLOTLIB')
+@pytest.mark.skipif('not HAS_WCSAXES')
 def test_plot():
     import matplotlib.pyplot as plt
 
