@@ -1,13 +1,14 @@
+# Licensed under a 3-clause BSD style license - see LICENSE.rst
+from __future__ import absolute_import, division, print_function, unicode_literals
+from numpy.testing import assert_allclose
 from astropy import units as u
 from astropy.coordinates import SkyCoord
 from astropy.tests.helper import pytest
 from astropy.utils.data import get_pkg_data_filename
 from astropy.io.fits import getheader
 from astropy.wcs import WCS
-from numpy.testing import assert_allclose
-
-from ..circle import CirclePixelRegion, CircleSkyRegion
 from ...core import PixCoord
+from ..circle import CirclePixelRegion, CircleSkyRegion
 
 try:
     import matplotlib

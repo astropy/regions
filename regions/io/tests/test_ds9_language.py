@@ -1,3 +1,4 @@
+# Licensed under a 3-clause BSD style license - see LICENSE.rst
 from __future__ import absolute_import, division, print_function, unicode_literals
 from ..read_ds9 import read_ds9
 from ..write_ds9 import objects_to_ds9_string

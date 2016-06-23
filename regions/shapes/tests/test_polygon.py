@@ -1,9 +1,7 @@
-import math
-import numpy as np
-
+# Licensed under a 3-clause BSD style license - see LICENSE.rst
+from __future__ import absolute_import, division, print_function, unicode_literals
 from astropy import units as u
 from astropy.coordinates import SkyCoord
-
 from ...core import PixCoord
 from ..polygon import PolygonPixelRegion, PolygonSkyRegion
 
