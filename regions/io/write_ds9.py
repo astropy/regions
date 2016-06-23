@@ -3,6 +3,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from astropy import coordinates
 from .. import shapes
 
+__all__ = ['objects_to_ds9_string', 'write_ds9']
+
 coordsys_name_mapping = dict(zip(coordinates.frame_transform_graph.get_names(),
                                  coordinates.frame_transform_graph.get_names()))
 coordsys_name_mapping['ecliptic'] = 'geocentrictrueecliptic'  # needs expert attention TODO

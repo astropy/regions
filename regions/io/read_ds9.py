@@ -10,7 +10,7 @@ from astropy import log
 from ..shapes import circle, rectangle, polygon, ellipse, point
 from ..core import PixCoord
 
-__all__ = ['read_ds9']
+__all__ = ['read_ds9', 'region_list_to_objects']
 
 
 def read_ds9(filename):

@@ -4,6 +4,8 @@ import abc
 from astropy.extern import six
 import operator
 
+__all__ = ['Region', 'PixelRegion', 'SkyRegion']
+
 
 @six.add_metaclass(abc.ABCMeta)
 class Region(object):
