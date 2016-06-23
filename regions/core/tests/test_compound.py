@@ -5,7 +5,6 @@ from regions.shapes import CircleSkyRegion
 
 
 def test_compound():
-
     skycoord1 = SkyCoord(0 * u.deg, 0 * u.deg, frame='galactic')
     c1 = CircleSkyRegion(skycoord1, 1 * u.deg)
 
@@ -33,9 +32,8 @@ def test_compound():
     diff = c1 ^ c2
     assert (diff.contains(coords) == [True, True, False, False]).all()
 
-
     c3 = CircleSkyRegion(test_coord4, 0.1 * u.deg)
-    
+
     union = c1 | c2 | c3
     assert (union.contains(coords) == [True, True, True, True]).all()
 

@@ -1,10 +1,4 @@
-import math
-
-import numpy as np
-from astropy import units as u
-
 from ..core import PixelRegion, SkyRegion
-
 
 __all__ = ['PointPixelRegion', 'PointSkyRegion']
 
@@ -48,7 +42,6 @@ class PointPixelRegion(PixelRegion):
         raise NotImplementedError("")
 
 
-
 class PointSkyRegion(SkyRegion):
     """
     A pixel region in sky coordinates.
@@ -79,4 +72,3 @@ class PointSkyRegion(SkyRegion):
     def as_patch(self, **kwargs):
         # TODO: needs to be implemented
         raise NotImplementedError("")
-

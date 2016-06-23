@@ -1,9 +1,6 @@
 import math
-
 from astropy import units as u
-
 from ..core import PixelRegion, SkyRegion
-
 
 __all__ = ['EllipsePixelRegion', 'EllipseSkyRegion']
 

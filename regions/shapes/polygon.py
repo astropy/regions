@@ -1,6 +1,5 @@
 from ..core import PixelRegion, SkyRegion
 
-
 __all__ = ['PolygonPixelRegion', 'PolygonSkyRegion']
 
 
@@ -44,6 +43,7 @@ class PolygonPixelRegion(PixelRegion):
     def as_patch(self, **kwargs):
         # TODO: needs to be implemented
         raise NotImplementedError("")
+
 
 class PolygonSkyRegion(SkyRegion):
     """

@@ -1,7 +1,5 @@
 from astropy import units as u
-
 from ..core import PixelRegion, SkyRegion
-
 
 __all__ = ['RectanglePixelRegion', 'RectangleSkyRegion']
 
@@ -51,7 +49,6 @@ class RectanglePixelRegion(PixelRegion):
     def to_mask(self, mode='center'):
         # TODO: needs to be implemented
         raise NotImplementedError("")
-
 
 
 class RectangleSkyRegion(SkyRegion):

@@ -11,12 +11,14 @@ from ...core import PixCoord
 
 try:
     import matplotlib
+
     HAS_MATPLOTLIB = True
 except:
     HAS_MATPLOTLIB = False
 
 try:
     import wcsaxes
+
     HAS_WCSAXES = True
 except:
     HAS_WCSAXES = False
@@ -25,6 +27,7 @@ except:
 def test_init_pixel():
     pixcoord = PixCoord(3, 4)
     c = CirclePixelRegion(pixcoord, 2)
+
 
 def test_init_sky():
     skycoord = SkyCoord(3 * u.deg, 4 * u.deg)
@@ -54,18 +57,17 @@ def test_plot():
 
     c.plot(ax, alpha=0.6)
 
+
 def test_transformation():
-    
     skycoord = SkyCoord(3 * u.deg, 4 * u.deg, frame='galactic')
     skycircle = CircleSkyRegion(skycoord, 2 * u.arcsec)
-    
+
     headerfile = get_pkg_data_filename('data/example_header.fits')
     h = getheader(headerfile)
     wcs = WCS(h)
     pixcircle = skycircle.to_pixel(wcs)
-    assert_allclose(pixcircle.center[0],-50.5)
+    assert_allclose(pixcircle.center[0], -50.5)
     assert_allclose(pixcircle.center[1], 299.5)
-
 
     skycircle2 = pixcircle.to_sky(wcs)
     assert_allclose(skycircle2.radius, skycircle.radius)

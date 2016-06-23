@@ -5,7 +5,7 @@ from .. import shapes
 
 coordsys_name_mapping = dict(zip(coordinates.frame_transform_graph.get_names(),
                                  coordinates.frame_transform_graph.get_names()))
-coordsys_name_mapping['ecliptic'] = 'geocentrictrueecliptic' # needs expert attention TODO
+coordsys_name_mapping['ecliptic'] = 'geocentrictrueecliptic'  # needs expert attention TODO
 
 
 def objects_to_ds9_string(obj_list, coordsys='fk5', fmt='.4f', radunit='deg'):
@@ -26,8 +26,8 @@ def objects_to_ds9_string(obj_list, coordsys='fk5', fmt='.4f', radunit='deg'):
     else:
         radunitstr = ''
 
-    ds9_strings = {'circle': 'circle({x:'+fmt+'},{y:'+fmt+'},{r:'+fmt+'}'+radunitstr+')\n',
-                   'ellipse': 'ellipse({x:'+fmt+'},{y:'+fmt+'},{r1:'+fmt+'}'+radunitstr+',{r2:'+fmt+'}'+radunitstr+',{ang:'+fmt+'})\n',
+    ds9_strings = {'circle': 'circle({x:' + fmt + '},{y:' + fmt + '},{r:' + fmt + '}' + radunitstr + ')\n',
+                   'ellipse': 'ellipse({x:' + fmt + '},{y:' + fmt + '},{r1:' + fmt + '}' + radunitstr + ',{r2:' + fmt + '}' + radunitstr + ',{ang:' + fmt + '})\n',
                    'polygon': 'polygon({c})\n'}
 
     output = '# Region file format: DS9 astropy/regions\n'
@@ -71,14 +71,14 @@ def objects_to_ds9_string(obj_list, coordsys='fk5', fmt='.4f', radunit='deg'):
             v = reg.vertices.transform_to(frame)
             coords = [(x.to('deg').value, y.to('deg').value) for x, y in
                       zip(v.spherical.lon, v.spherical.lat)]
-            val = "{:"+fmt+"}"
+            val = "{:" + fmt + "}"
             temp = [val.format(x) for _ in coords for x in _]
             c = ",".join(temp)
             output += ds9_strings['polygon'].format(**locals())
         elif isinstance(reg, shapes.polygon.PolygonPixelRegion):
             v = reg.vertices
             coords = [(x, y) for x, y in zip(v.x, v.y)]
-            val = "{:"+fmt+"}"
+            val = "{:" + fmt + "}"
             temp = [val.format(x) for _ in coords for x in _]
             c = ",".join(temp)
             output += ds9_strings['polygon'].format(**locals())
