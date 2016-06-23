@@ -13,6 +13,9 @@ from ..core import PixelRegion, SkyRegion
 from ..utils.wcs_helpers import skycoord_to_pixel_scale_angle
 
 
+__all__ = ['CirclePixelRegion', 'CircleSkyRegion']
+
+
 class CirclePixelRegion(PixelRegion):
     """
     A circle in pixel coordinates.

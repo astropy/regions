@@ -5,6 +5,9 @@ from astropy import units as u
 from ..core import PixelRegion, SkyRegion
 
 
+__all__ = ['EllipsePixelRegion', 'EllipseSkyRegion']
+
+
 class EllipsePixelRegion(PixelRegion):
     """
     An ellipse in pixel coordinates.

@@ -6,6 +6,9 @@ from astropy import units as u
 from ..core import PixelRegion, SkyRegion
 
 
+__all__ = ['PointPixelRegion', 'PointSkyRegion']
+
+
 class PointPixelRegion(PixelRegion):
     """
     A point position in pixel coordinates.
