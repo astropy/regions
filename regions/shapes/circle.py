@@ -1,17 +1,10 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-
+from __future__ import absolute_import, division, print_function, unicode_literals
 import math
-
 import numpy as np
-
-from astropy import wcs
-from astropy import coordinates
-from astropy import units as u
 from astropy.wcs.utils import pixel_to_skycoord
-
 from ..core import PixelRegion, SkyRegion
 from ..utils.wcs_helpers import skycoord_to_pixel_scale_angle
-
 
 __all__ = ['CirclePixelRegion', 'CircleSkyRegion']
 

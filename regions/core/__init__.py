@@ -3,3 +3,4 @@
 """
 from .core import *
 from .pixcoord import *
+from .compound import *

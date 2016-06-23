@@ -1,5 +1,6 @@
+# Licensed under a 3-clause BSD style license - see LICENSE.rst
+from __future__ import absolute_import, division, print_function, unicode_literals
 from ..core import PixelRegion, SkyRegion
-
 
 __all__ = ['PolygonPixelRegion', 'PolygonSkyRegion']
 
@@ -44,6 +45,7 @@ class PolygonPixelRegion(PixelRegion):
     def as_patch(self, **kwargs):
         # TODO: needs to be implemented
         raise NotImplementedError("")
+
 
 class PolygonSkyRegion(SkyRegion):
     """

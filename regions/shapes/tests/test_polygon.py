@@ -1,22 +1,19 @@
-import math
-import numpy as np
-
+# Licensed under a 3-clause BSD style license - see LICENSE.rst
+from __future__ import absolute_import, division, print_function, unicode_literals
 from astropy import units as u
 from astropy.coordinates import SkyCoord
-
 from ...core import PixCoord
 from ..polygon import PolygonPixelRegion, PolygonSkyRegion
 
 
 def test_init_pixel():
-    vertices = PixCoord([3,4,3], [3,4,4])
+    vertices = PixCoord([3, 4, 3], [3, 4, 4])
     c = PolygonPixelRegion(vertices)
 
 
 def test_init_sky():
-    vertices = SkyCoord([3,4,3] * u.deg, [3,4,4] * u.deg)
+    vertices = SkyCoord([3, 4, 3] * u.deg, [3, 4, 4] * u.deg)
     c = PolygonSkyRegion(vertices)
-
 
 # def test_basic():
 #     """

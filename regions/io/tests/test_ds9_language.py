@@ -1,5 +1,5 @@
-from __future__ import absolute_import, division, print_function, \
-    unicode_literals
+# Licensed under a 3-clause BSD style license - see LICENSE.rst
+from __future__ import absolute_import, division, print_function, unicode_literals
 from ..read_ds9 import read_ds9
 from ..write_ds9 import objects_to_ds9_string
 from astropy.utils.data import get_pkg_data_filename, get_pkg_data_filenames
@@ -10,10 +10,11 @@ import astropy.version as astrov
 _ASTROPY_MINVERSION = v.LooseVersion('1.1')
 _ASTROPY_VERSION = v.LooseVersion(astrov.version)
 
+
 @pytest.mark.xfail(_ASTROPY_VERSION < _ASTROPY_MINVERSION,
                    reason='Some coordinates systems not available in older version of astropy')
 def test_read():
-    #Check that all test files including reference files are readable
+    # Check that all test files including reference files are readable
     files = get_pkg_data_filenames('data')
     for f in files:
         read_ds9(f)
@@ -31,8 +32,8 @@ def test_fk5(filename):
     actual = objects_to_ds9_string(regs, coordsys='fk5', fmt='.2f', radunit='arcsec')
 
     # Use this to produce reference file for now
-    #print(actual)
-    #1/0
+    # print(actual)
+    # 1/0
 
     reference_file = get_pkg_data_filename('data/fk5_reference.reg')
     with open(reference_file, 'r') as fh:
@@ -53,8 +54,8 @@ def test_galactic(filename):
     actual = objects_to_ds9_string(regs, coordsys='galactic', fmt='.2f', radunit='arcsec')
 
     # Use this to produce reference file for now
-    #print(actual)
-    #1 / 0
+    # print(actual)
+    # 1 / 0
 
     reference_file = get_pkg_data_filename('data/galactic_reference.reg')
     with open(reference_file, 'r') as fh:
@@ -67,7 +68,6 @@ def test_galactic(filename):
 @pytest.mark.parametrize('filename',
                          ['data/ds9.physical.reg',
                           'data/ds9.physical.strip.reg'])
-
 def test_physical(filename):
     filename = get_pkg_data_filename(filename)
     regs = read_ds9(filename)
@@ -83,4 +83,3 @@ def test_physical(filename):
         desired = fh.read()
 
     assert actual == desired
-
