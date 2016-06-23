@@ -4,9 +4,9 @@
 Astropy Regions Documentation
 #############################
 
-This is an astropy-affiliated package for region handling. The goal is to merge
-the functionality in astropy/`pyregion`_ and astropy/`photutils`_/aperture.
-After a test phase of a few week this package should be moved to astropy core. 
+This is an in-development package for region handling based on Astropy.
+The goal is to merge the functionality from `pyregion`_ and `photutils`_ apertures
+and then after some time propose this package for inclusion in the Astropy core.
 
 * Code : `Github repository`_
 * Docs : `Region documentation`_
