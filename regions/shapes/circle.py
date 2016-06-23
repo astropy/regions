@@ -43,21 +43,21 @@ class CirclePixelRegion(PixelRegion):
     def to_shapely(self):
         return self.center.to_shapely().buffer(self.radius)
 
-    def to_sky(self, mywcs, mode='local', tolerance=None):
+    def to_sky(self, wcs, mode='local', tolerance=None):
         if mode != 'local':
-            raise NotImplementedError()
+            raise NotImplementedError
         if tolerance is not None:
-            raise NotImplementedError()
+            raise NotImplementedError
 
-        skypos = pixel_to_skycoord(self.center[0], self.center[1], mywcs)
-        xc, yc, scale, angle = skycoord_to_pixel_scale_angle(skypos, mywcs)
+        skypos = pixel_to_skycoord(self.center[0], self.center[1], wcs)
+        xc, yc, scale, angle = skycoord_to_pixel_scale_angle(skypos, wcs)
 
-        radius_sky = (self.radius / scale)
+        radius_sky = self.radius / scale
         return CircleSkyRegion(skypos, radius_sky)
 
     def to_mask(self, mode='center'):
         # TODO: needs to be implemented
-        raise NotImplementedError("")
+        raise NotImplementedError
 
     def as_patch(self, **kwargs):
         import matplotlib.patches as mpatches
@@ -98,14 +98,14 @@ class CircleSkyRegion(SkyRegion):
         rad = self.radius
         return '{clsnm}\nCenter:{coord}\nRadius:{rad}'.format(**locals())
 
-    def to_pixel(self, mywcs, mode='local', tolerance=None):
+    def to_pixel(self, wcs, mode='local', tolerance=None):
         """
         Given a WCS, convert the circle to a best-approximation circle in pixel
         dimensions.
 
         Parameters
         ----------
-        mywcs : `~astropy.wcs.WCS`
+        wcs : `~astropy.wcs.WCS`
             A world coordinate system
         mode : 'local' or not
             not implemented
@@ -118,11 +118,11 @@ class CircleSkyRegion(SkyRegion):
         """
 
         if mode != 'local':
-            raise NotImplementedError()
+            raise NotImplementedError
         if tolerance is not None:
-            raise NotImplementedError()
+            raise NotImplementedError
 
-        xc, yc, scale, angle = skycoord_to_pixel_scale_angle(self.center, mywcs)
+        xc, yc, scale, angle = skycoord_to_pixel_scale_angle(self.center, wcs)
         radius_pix = (self.radius * scale)
 
         pixel_positions = np.array([xc, yc]).transpose()

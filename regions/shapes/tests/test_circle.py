@@ -56,8 +56,9 @@ def test_transformation():
     h = getheader(headerfile)
     wcs = WCS(h)
     pixcircle = skycircle.to_pixel(wcs)
-    assert (pixcircle.center == (-50.5, 299.5)).all()
+    assert_allclose(pixcircle.center[0],-50.5)
+    assert_allclose(pixcircle.center[1], 299.5)
 
 
     skycircle2 = pixcircle.to_sky(wcs)
-    assert skycircle2.radius == skycircle.radius
+    assert_allclose(skycircle2.radius, skycircle.radius)
