@@ -53,3 +53,19 @@ def test_plot():
     assert p.get_facecolor() == (1, 0, 0, 0.6)
 
     c.plot(ax, alpha=0.6)
+
+def test_transformation():
+    
+    skycoord = SkyCoord(3 * u.deg, 4 * u.deg, frame='galactic')
+    skycircle = CircleSkyRegion(skycoord, 2 * u.arcsec)
+    
+    headerfile = get_pkg_data_filename('data/example_header.fits')
+    h = getheader(headerfile)
+    wcs = WCS(h)
+    pixcircle = skycircle.to_pixel(wcs)
+    assert_allclose(pixcircle.center[0],-50.5)
+    assert_allclose(pixcircle.center[1], 299.5)
+
+
+    skycircle2 = pixcircle.to_sky(wcs)
+    assert_allclose(skycircle2.radius, skycircle.radius)
