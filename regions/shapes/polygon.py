@@ -1,6 +1,9 @@
 from ..core import PixelRegion, SkyRegion
 
 
+__all__ = ['PolygonPixelRegion', 'PolygonSkyRegion']
+
+
 class PolygonPixelRegion(PixelRegion):
     """
     A polygon in pixel coordinates.
