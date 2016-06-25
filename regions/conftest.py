@@ -8,9 +8,15 @@ from astropy.tests.pytest_plugins import *
 ## exceptions
 enable_deprecations_as_exceptions()
 
-PYTEST_HEADER_MODULES['Astropy'] = 'astropy'
-del PYTEST_HEADER_MODULES['h5py']
-del PYTEST_HEADER_MODULES['Pandas']
+# The KeyError below is essential in some cases when the package uses other
+# astropy affiliated packages.
+try:
+    PYTEST_HEADER_MODULES['Astropy'] = 'astropy'
+    PYTEST_HEADER_MODULES['wcsaxes'] = 'wcsaxes'
+    del PYTEST_HEADER_MODULES['h5py']
+    del PYTEST_HEADER_MODULES['Pandas']
+except KeyError:
+    pass
 
 ## Uncomment the following lines to display the version number of the
 ## package rather than the version number of Astropy in the top line when
