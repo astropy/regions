@@ -24,6 +24,7 @@ env:
         - NUMPY_VERSION=stable
         - ASTROPY_VERSION=stable
         - SETUP_CMD='test'
+        - MAIN_CMD='python setup.py'
         - PIP_DEPENDENCIES=''
         - CONDA_DEPENDENCIES='Cython'
 
@@ -92,7 +93,7 @@ install:
     - source ci-helpers/travis/setup_conda_$TRAVIS_OS_NAME.sh
 
 script:
-   - python setup.py $SETUP_CMD
+   - $MAIN_CMD $SETUP_CMD
 
 after_success:
     - if [[ $SETUP_CMD == 'test --coverage' ]]; then coveralls --rcfile='regions/tests/coveragerc'; fi
