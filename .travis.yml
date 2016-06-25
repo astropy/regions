@@ -78,6 +78,10 @@ matrix:
         - python: 3.5
           env: NUMPY_VERSION=prerelease
 
+        # Do a PEP8 test with pycodestyle
+        - os: linux
+          env: PYTHON_VERSION=2.7 MAIN_CMD='pycodestyle regions --count' SETUP_CMD=''
+
     allow_failures:
         - python: 3.5
           env: NUMPY_VERSION=prerelease
