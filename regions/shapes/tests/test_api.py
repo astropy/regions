@@ -33,6 +33,8 @@ SKY_REGIONS = [
 
 SKYPIX_MODES = ['local', 'affine', 'full']
 MASK_MODES = ['center', 'any', 'all', 'exact']
+COMMON_WCS = WCS(naxis=2)
+COMMON_WCS.wcs.ctype = 'RA---TAN', 'DEC--TAN'
 
 
 def ids_func(arg):
@@ -40,6 +42,7 @@ def ids_func(arg):
         return arg.__class__.__name__
     else:
         return str(arg)
+
 
 @pytest.mark.parametrize('region', PIXEL_REGIONS, ids=ids_func)
 def test_pix_in(region):
@@ -54,7 +57,7 @@ def test_pix_area(region):
 
 @pytest.mark.parametrize(('region', 'mode'), itertools.product(PIXEL_REGIONS, SKYPIX_MODES), ids=ids_func)
 def test_pix_to_sky(region, mode):
-    sky_region = region.to_sky(mode=mode)
+    sky_region = region.to_sky(COMMON_WCS, mode=mode)
     assert isinstance(sky_region, SkyRegion)
 
 
@@ -86,5 +89,5 @@ def test_sky_area(region):
 @pytest.mark.parametrize(('region', 'mode'), itertools.product(SKY_REGIONS, SKYPIX_MODES), ids=ids_func)
 def test_sky_to_pix(region, mode):
     wcs = WCS(naxis=2)
-    pix_region = region.to_pixel(mode=mode, wcs=wcs)
+    pix_region = region.to_pixel(mode=mode, wcs=COMMON_WCS)
     assert isinstance(pix_region, PixelRegion)
