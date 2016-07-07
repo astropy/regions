@@ -46,48 +46,71 @@ def ids_func(arg):
 
 @pytest.mark.parametrize('region', PIXEL_REGIONS, ids=ids_func)
 def test_pix_in(region):
-    PixCoord(1,1) in region
+    try:
+        PixCoord(1,1) in region
+    except NotImplementedError:
+        pytest.xfail()
 
 
 @pytest.mark.parametrize('region', PIXEL_REGIONS, ids=ids_func)
 def test_pix_area(region):
-    area = region.area
-    assert not isinstance(area, u.Quantity)
+    try:
+        area = region.area
+        assert not isinstance(area, u.Quantity)
+    except NotImplementedError:
+        pytest.xfail()
 
 
 @pytest.mark.parametrize(('region', 'mode'), itertools.product(PIXEL_REGIONS, SKYPIX_MODES), ids=ids_func)
 def test_pix_to_sky(region, mode):
-    sky_region = region.to_sky(COMMON_WCS, mode=mode)
-    assert isinstance(sky_region, SkyRegion)
+    try:
+        sky_region = region.to_sky(COMMON_WCS, mode=mode)
+        assert isinstance(sky_region, SkyRegion)
+    except NotImplementedError:
+        pytest.xfail()
 
 
 @pytest.mark.parametrize('region', PIXEL_REGIONS, ids=ids_func)
 def test_pix_to_shapely(region):
-    from shapely.geometry import BaseGeometry
-    shape = region.to_shapely()
-    assert isinstance(shape, BaseGeometry)
+    try:
+        from shapely.geometry import BaseGeometry
+        shape = region.to_shapely()
+        assert isinstance(shape, BaseGeometry)
+    except NotImplementedError:
+        pytest.xfail()
 
 
 @pytest.mark.parametrize(('region', 'mode'), itertools.product(PIXEL_REGIONS, MASK_MODES), ids=ids_func)
 def test_pix_to_mask(region, mode):
-    mask = region.to_mask(mode=mode)
-    assert isinstance(mask, np.ndarray)
-    assert mask.ndim == 2
+    try:
+        mask = region.to_mask(mode=mode)
+        assert isinstance(mask, np.ndarray)
+        assert mask.ndim == 2
+    except NotImplementedError:
+        pytest.xfail()
 
 
 @pytest.mark.parametrize('region', SKY_REGIONS, ids=ids_func)
 def test_sky_in(region):
-    ICRS(1 * u.deg,1 * u.deg) in region
+    try:
+        ICRS(1 * u.deg,1 * u.deg) in region
+    except NotImplementedError:
+        pytest.xfail()
 
 
 @pytest.mark.parametrize('region', SKY_REGIONS, ids=ids_func)
 def test_sky_area(region):
-    area = region.area
-    assert isinstance(area, u.Quantity)
+    try:
+        area = region.area
+        assert isinstance(area, u.Quantity)
+    except NotImplementedError:
+        pytest.xfail()
 
 
 @pytest.mark.parametrize(('region', 'mode'), itertools.product(SKY_REGIONS, SKYPIX_MODES), ids=ids_func)
 def test_sky_to_pix(region, mode):
-    wcs = WCS(naxis=2)
-    pix_region = region.to_pixel(mode=mode, wcs=COMMON_WCS)
-    assert isinstance(pix_region, PixelRegion)
+    try:
+        pix_region = region.to_pixel(mode=mode, wcs=COMMON_WCS)
+        assert isinstance(pix_region, PixelRegion)
+    except NotImplementedError:
+        pytest.xfail()
