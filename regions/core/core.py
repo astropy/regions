@@ -46,8 +46,8 @@ class Region(object):
         return self.symmetric_difference(other)
 
     def __contains__(self, coord):
-        if not coord.isscalar:
-            raise ValueError('{} must be scalar'.format(coord))
+        # if not coord.isscalar:
+        #     raise ValueError('{} must be scalar'.format(coord))
         return self.contains(coord)
 
 
