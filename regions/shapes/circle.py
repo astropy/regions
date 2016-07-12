@@ -3,7 +3,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import math
 import numpy as np
 from astropy.wcs.utils import pixel_to_skycoord
-from ..core import PixelRegion, SkyRegion
+from ..core import PixCoord, PixelRegion, SkyRegion
 from ..utils.wcs_helpers import skycoord_to_pixel_scale_angle
 
 __all__ = ['CirclePixelRegion', 'CircleSkyRegion']
@@ -15,7 +15,7 @@ class CirclePixelRegion(PixelRegion):
 
     Parameters
     ----------
-    center : :class:`~regions.core.pixcoord.PixCoord`
+    center : `~regions.PixCoord`
         The position of the center of the circle.
     radius : float
         The radius of the circle
@@ -45,7 +45,7 @@ class CirclePixelRegion(PixelRegion):
         if tolerance is not None:
             raise NotImplementedError
 
-        skypos = pixel_to_skycoord(self.center[0], self.center[1], wcs)
+        skypos = pixel_to_skycoord(self.center.x, self.center.y, wcs)
         xc, yc, scale, angle = skycoord_to_pixel_scale_angle(skypos, wcs)
 
         radius_sky = self.radius / scale
@@ -119,11 +119,11 @@ class CircleSkyRegion(SkyRegion):
             raise NotImplementedError
 
         xc, yc, scale, angle = skycoord_to_pixel_scale_angle(self.center, wcs)
-        radius_pix = (self.radius * scale)
+        # pixel_positions = np.array([xc, yc]).transpose()
+        radius = (self.radius * scale)
+        center = PixCoord(xc, yc)
 
-        pixel_positions = np.array([xc, yc]).transpose()
-
-        return CirclePixelRegion(pixel_positions, radius_pix)
+        return CirclePixelRegion(center, radius)
 
     def as_patch(self, ax, **kwargs):
         import matplotlib.patches as mpatches
