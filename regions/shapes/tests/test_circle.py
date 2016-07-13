@@ -25,6 +25,7 @@ except:
     HAS_WCSAXES = False
 
 
+
 def test_init_pixel():
     pixcoord = PixCoord(3, 4)
     c = CirclePixelRegion(pixcoord, 2)
@@ -67,8 +68,8 @@ def test_transformation():
     h = getheader(headerfile)
     wcs = WCS(h)
     pixcircle = skycircle.to_pixel(wcs)
-    assert_allclose(pixcircle.center[0], -50.5)
-    assert_allclose(pixcircle.center[1], 299.5)
+    assert_allclose(pixcircle.center.x, -50.5)
+    assert_allclose(pixcircle.center.y, 299.5)
 
     skycircle2 = pixcircle.to_sky(wcs)
     assert_allclose(skycircle2.radius, skycircle.radius)

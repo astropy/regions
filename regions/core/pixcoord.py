@@ -9,6 +9,10 @@ class PixCoord(object):
     Class representing a collection of pixel coordinates
     """
 
+    # TODO: clarify if `PixCoord` is just for a single point,
+    # or whether it can represent an array of points.
+    # Add tests to make sure error messages are good.
+
     def __init__(self, x, y):
         self.x = x
         self.y = y
