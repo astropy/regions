@@ -6,6 +6,19 @@ import operator
 
 __all__ = ['Region', 'PixelRegion', 'SkyRegion']
 
+"""
+Here we define global variables for the default `origin` and `mode` used
+for WCS transformations throughout the `regions` package.
+
+Their purpose is to simplify achieving uniformity across the codebase.
+They are mainly used as default arguments for methods that do WCS transformations.
+
+They are private (with an underscore), not part of the public API,
+users should not touch them.
+"""
+_DEFAULT_WCS_ORIGIN = 0
+_DEFAULT_WCS_MODE = 'all'
+
 
 @six.add_metaclass(abc.ABCMeta)
 class Region(object):

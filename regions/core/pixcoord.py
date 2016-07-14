@@ -3,6 +3,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import numbers
 import numpy as np
 from astropy.coordinates import SkyCoord
+from .core import _DEFAULT_WCS_ORIGIN, _DEFAULT_WCS_MODE
 
 __all__ = ['PixCoord']
 
@@ -30,11 +31,6 @@ class PixCoord(object):
         Pixel coordinate x value
     y : float or array-like
         Pixel coordinate y value
-    origin : int
-        Origin of pixel coordinates (usually 0 or 1)
-    mode : {'all', 'wcs'}
-        Whether to do the transformation including distortions ('all')
-        or only including only the core WCS transformation ('wcs').
 
     Examples
     --------
@@ -56,21 +52,10 @@ class PixCoord(object):
     x : [1 2]
     y : [11 12]
     """
-    # We define defaults origin and mode here for WCS transforms.
-    # These defaults are used in a few places as default keyword arguments to methods.
-    # The purpose is to ensure consistency across the codebase.
-    # They should not be modified by users, it's an implementation detail.
-    # TODO: is this the best place to put those defaults?
-    # Should we put them somewhere else?
-    # Or remove them and try to achieve consistency manually?
-    _DEFAULT_ORIGIN = 0
-    _DEFAULT_MODE = 'all'
 
-    def __init__(self, x, y, origin=_DEFAULT_ORIGIN, mode=_DEFAULT_MODE):
+    def __init__(self, x, y):
         self.x = self._standardize_coordinate(x)
         self.y = self._standardize_coordinate(y)
-        self.origin = origin
-        self.mode = mode
 
     @staticmethod
     def _standardize_coordinate(val):
@@ -114,39 +99,43 @@ class PixCoord(object):
         if self.isscalar:
             raise IndexError('Scalar PixCoord cannot be indexed or sliced.')
 
-        # Let Numpy do the slicing 
+        # Let Numpy do the slicing
         x = self.x[key]
         y = self.y[key]
         return PixCoord(x=x, y=y)
 
-    def to_sky(self, wcs):
+    def to_sky(self, wcs, origin=_DEFAULT_WCS_ORIGIN, mode=_DEFAULT_WCS_MODE):
         """Convert this `PixCoord` to `~astropy.coordinates.SkyCoord`.
 
         Calls :meth:`astropy.coordinates.SkyCoord.from_pixel`.
+        See parameter description there.
         """
         return SkyCoord.from_pixel(
             xp=self.x, yp=self.y, wcs=wcs,
-            origin=self.origin, mode=self.mode,
+            origin=origin, mode=mode,
         )
 
     @classmethod
-    def from_sky(cls, skycoord, wcs, origin=_DEFAULT_ORIGIN, mode=_DEFAULT_MODE):
+    def from_sky(cls, skycoord, wcs, origin=_DEFAULT_WCS_ORIGIN, mode=_DEFAULT_WCS_MODE):
         """Create `PixCoord` from `~astropy.coordinates.SkyCoord`.
 
         Calls :meth:`astropy.coordinates.SkyCoord.to_pixel`.
+        See parameter description there.
         """
         x, y = skycoord.to_pixel(wcs=wcs, origin=origin, mode=mode)
-        return cls(x=x, y=y, origin=origin, mode=mode)
+        return cls(x=x, y=y)
 
     def to_shapely(self):
         """Convert this coord object to a `shapely.geometry.Point` object.
-
-        The ``origin`` and ``mode`` attributes are discarded,
-        i.e. this is a lossy conversion.
         """
+        if not self.isscalar:
+            raise TypeError('Scalar PixCoord cannot be converted to Shapely.')
+
         from shapely.geometry import Point
         return Point(self.x, self.y)
 
     @classmethod
-    def from_shapely(cls, point, origin=_DEFAULT_ORIGIN, mode=_DEFAULT_MODE):
-        return cls(x=point.x, y=point.y, origin=origin, mode=mode)
+    def from_shapely(cls, point):
+        """Create `PixCoord` from `shapely.geometry.Point` object.
+        """
+        return cls(x=point.x, y=point.y)
