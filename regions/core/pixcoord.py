@@ -139,3 +139,25 @@ class PixCoord(object):
         """Create `PixCoord` from `shapely.geometry.Point` object.
         """
         return cls(x=point.x, y=point.y)
+
+    def separation(self, other):
+        r"""Separation to another pixel coordinate.
+
+        This is the two-dimensional cartesian separation :math:`d` with
+
+        .. math::
+            d = \sqrt{(x_1 - x_2) ^ 2 + (y_1 - y_2) ^ 2}
+
+        Parameters
+        ----------
+        other : `PixCoord`
+            Other pixel coordinate
+
+        Returns
+        -------
+        separation : `numpy.array`
+            Separation in pixels
+        """
+        dx = other.x - self.x
+        dy = other.y - self.y
+        return np.hypot(dx, dy)

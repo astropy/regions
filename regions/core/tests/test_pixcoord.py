@@ -107,6 +107,20 @@ def test_pixcoord_array_sky():
     assert_allclose(p2.y, [8, 9])
 
 
+def test_pixcoord_separation():
+    # check scalar
+    p1 = PixCoord(x=1, y=2)
+    p2 = PixCoord(x=4, y=6)
+    sep = p1.separation(p2)
+    assert_allclose(sep, 5)
+
+    # check array
+    p1 = PixCoord(x=[1, 1], y=[2, 2])
+    p2 = PixCoord(x=[4, 4], y=[6, 6])
+    sep = p1.separation(p2)
+    assert_allclose(sep, [5, 5])
+
+
 @pytest.mark.skipif('not HAS_SHAPELY')
 def test_pixcoord_shapely():
     from shapely.geometry.point import Point
