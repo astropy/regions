@@ -361,7 +361,6 @@ meta_token = re.compile("([a-zA-Z]+)(=)([^= ]+) ?")
 # ruler(+175:07:14.900,+50:56:21.236,+175:06:52.643,+50:56:11.190) ruler=physical physical color=white font="helvetica 12 normal roman" text={Ruler}
 
 
-
 def meta_parser(meta_str):
     """
     Parse the metadata for a single ds9 region string.  The metadata is

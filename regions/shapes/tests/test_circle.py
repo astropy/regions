@@ -25,7 +25,6 @@ except:
     HAS_WCSAXES = False
 
 
-
 def test_init_pixel():
     pixcoord = PixCoord(3, 4)
     c = CirclePixelRegion(pixcoord, 2)

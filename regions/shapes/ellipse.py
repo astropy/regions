@@ -13,13 +13,13 @@ class EllipsePixelRegion(PixelRegion):
 
     Parameters
     ----------
-    center : :class:`~regions.core.pixcoord.PixCoord`
+    center : `~regions.PixCoord`
         The position of the center of the ellipse.
     minor : float
         The minor radius of the ellipse
     major : float
         The major radius of the ellipse
-    angle : :class:`~astropy.units.Quantity`
+    angle : `~astropy.units.Quantity`
         The rotation of the ellipse. If set to zero (the default), the major
         axis is lined up with the x axis.
     """
@@ -40,23 +40,23 @@ class EllipsePixelRegion(PixelRegion):
 
     def contains(self, pixcoord):
         # TODO: needs to be implemented
-        raise NotImplementedError("")
+        raise NotImplementedError
 
     def to_shapely(self):
         # TODO: needs to be implemented
-        raise NotImplementedError("")
+        raise NotImplementedError
 
     def to_sky(self, wcs, mode='local', tolerance=None):
         # TODO: needs to be implemented
-        raise NotImplementedError("")
+        raise NotImplementedError
 
     def to_mask(self, mode='center'):
         # TODO: needs to be implemented
-        raise NotImplementedError("")
+        raise NotImplementedError
 
     def as_patch(self, **kwargs):
         # TODO: needs to be implemented
-        raise NotImplementedError("")
+        raise NotImplementedError
 
 
 class EllipseSkyRegion(SkyRegion):
@@ -65,13 +65,13 @@ class EllipseSkyRegion(SkyRegion):
 
     Parameters
     ----------
-    center : :class:`~regions.core.pixcoord.PixCoord`
+    center : `~regions.PixCoord`
         The position of the center of the ellipse.
-    minor : :class:`~astropy.units.Quantity`
+    minor : `~astropy.units.Quantity`
         The minor radius of the ellipse
-    major : :class:`~astropy.units.Quantity`
+    major : `~astropy.units.Quantity`
         The major radius of the ellipse
-    angle : :class:`~astropy.units.Quantity`
+    angle : `~astropy.units.Quantity`
         The rotation of the ellipse. If set to zero (the default), the major
         axis is lined up with the longitude axis of the celestial coordinates.
     """
@@ -88,16 +88,16 @@ class EllipseSkyRegion(SkyRegion):
     @property
     def area(self):
         # TODO: needs to be implemented
-        raise NotImplementedError("")
+        raise NotImplementedError
 
     def contains(self, skycoord):
         # TODO: needs to be implemented
-        raise NotImplementedError("")
+        raise NotImplementedError
 
     def to_pixel(self, wcs, mode='local', tolerance=None):
         # TODO: needs to be implemented
-        raise NotImplementedError("")
+        raise NotImplementedError
 
     def as_patch(self, **kwargs):
         # TODO: needs to be implemented
-        raise NotImplementedError("")
+        raise NotImplementedError

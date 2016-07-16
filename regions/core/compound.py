@@ -16,16 +16,16 @@ class CompoundPixelRegion(PixelRegion):
         self.operator = operator
 
     def __contains__(self, pixcoord):
-        raise NotImplementedError("")
+        raise NotImplementedError
 
     def to_mask(self, mode='center'):
-        raise NotImplementedError("")
+        raise NotImplementedError
 
     def to_sky(self, wcs, mode='local', tolerance=None):
-        raise NotImplementedError("")
+        raise NotImplementedError
 
     def as_patch(self, **kwargs):
-        raise NotImplementedError("")
+        raise NotImplementedError
 
     def __repr__(self):
         return "({0} {1} {2})".format(self.region1, self.operator, self.region2)
@@ -46,14 +46,14 @@ class CompoundSkyRegion(SkyRegion):
                              self.region2.contains(skycoord))
 
     def to_pixel(self, wcs, mode='local', tolerance=None):
-        raise NotImplementedError("")
+        raise NotImplementedError
 
     def as_patch(self, ax, **kwargs):
-        raise NotImplementedError("")
+        raise NotImplementedError
 
     def __repr__(self):
         return "({0}\n{1}\n{2})".format(self.region1, self.operator, self.region2)
 
     @property
     def area(self):
-        raise NotImplementedError("")
+        raise NotImplementedError

@@ -49,7 +49,7 @@ def ids_func(arg):
 @pytest.mark.parametrize('region', PIXEL_REGIONS, ids=ids_func)
 def test_pix_in(region):
     try:
-        PixCoord(1,1) in region
+        PixCoord(1, 1) in region
     except NotImplementedError:
         pytest.xfail()
 

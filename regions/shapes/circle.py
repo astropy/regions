@@ -28,6 +28,12 @@ class CirclePixelRegion(PixelRegion):
         self.meta = meta or {}
         self.visual = visual or {}
 
+    def __repr__(self):
+        name = self.__class__.__name__
+        center = self.center
+        radius = self.radius
+        return '{name}\nCenter: {center}\nRadius: {radius}'.format(**locals())
+
     @property
     def area(self):
         return math.pi * self.radius ** 2
@@ -68,9 +74,9 @@ class CircleSkyRegion(SkyRegion):
 
     Parameters
     ----------
-    center : :class:`~astropy.coordinates.SkyCoord`
+    center : `~astropy.coordinates.SkyCoord`
         The position of the center of the circle.
-    radius : :class:`~astropy.units.Quantity`
+    radius : `~astropy.units.Quantity`
         The radius of the circle in angular units
     """
 
@@ -89,10 +95,10 @@ class CircleSkyRegion(SkyRegion):
         return self.center.separation(skycoord) < self.radius
 
     def __repr__(self):
-        clsnm = self.__class__.__name__
-        coord = self.center
-        rad = self.radius
-        return '{clsnm}\nCenter:{coord}\nRadius:{rad}'.format(**locals())
+        name = self.__class__.__name__
+        center = self.center
+        radius = self.radius
+        return '{name}\nCenter: {center}\nRadius: {radius}'.format(**locals())
 
     def to_pixel(self, wcs, mode='local', tolerance=None):
         """
@@ -119,7 +125,6 @@ class CircleSkyRegion(SkyRegion):
             raise NotImplementedError
 
         xc, yc, scale, angle = skycoord_to_pixel_scale_angle(self.center, wcs)
-        # pixel_positions = np.array([xc, yc]).transpose()
         radius = (self.radius * scale)
         center = PixCoord(xc, yc)
 

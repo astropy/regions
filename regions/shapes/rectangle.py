@@ -12,13 +12,13 @@ class RectanglePixelRegion(PixelRegion):
 
     Parameters
     ----------
-    center : :class:`~regions.core.pixcoord.PixCoord`
+    center : `~regions.PixCoord`
         The position of the center of the rectangle.
     height : float
         The height of the rectangle
     width : float
         The width of the rectangle
-    angle : :class:`~astropy.units.Quantity`
+    angle : `~astropy.units.Quantity`
         The rotation of the rectangle. If set to zero (the default), the width
         is lined up with the x axis.
     """
@@ -38,23 +38,23 @@ class RectanglePixelRegion(PixelRegion):
 
     def contains(self, pixcoord):
         # TODO: needs to be implemented
-        raise NotImplementedError("")
+        raise NotImplementedError
 
     def to_shapely(self):
         # TODO: needs to be implemented
-        raise NotImplementedError("")
+        raise NotImplementedError
 
     def to_sky(self, wcs, mode='local', tolerance=None):
         # TODO: needs to be implemented
-        raise NotImplementedError("")
+        raise NotImplementedError
 
     def to_mask(self, mode='center'):
         # TODO: needs to be implemented
-        raise NotImplementedError("")
+        raise NotImplementedError
 
     def as_patch(self, **kwargs):
         # TODO: needs to be implemented
-        raise NotImplementedError("")
+        raise NotImplementedError
 
 
 class RectangleSkyRegion(SkyRegion):
@@ -63,13 +63,13 @@ class RectangleSkyRegion(SkyRegion):
 
     Parameters
     ----------
-    center : :class:`~regions.core.pixcoord.PixCoord`
+    center : `~regions.PixCoord`
         The position of the center of the rectangle.
-    height : :class:`~astropy.units.Quantity`
+    height : `~astropy.units.Quantity`
         The height radius of the rectangle
-    width : :class:`~astropy.units.Quantity`
+    width : `~astropy.units.Quantity`
         The width radius of the rectangle
-    angle : :class:`~astropy.units.Quantity`
+    angle : `~astropy.units.Quantity`
         The rotation of the rectangle. If set to zero (the default), the width
         is lined up with the longitude axis of the celestial coordinates.
     """
@@ -89,12 +89,12 @@ class RectangleSkyRegion(SkyRegion):
 
     def contains(self, skycoord):
         # TODO: needs to be implemented
-        raise NotImplementedError("")
+        raise NotImplementedError
 
     def to_pixel(self, wcs, mode='local', tolerance=None):
         # TODO: needs to be implemented
-        raise NotImplementedError("")
+        raise NotImplementedError
 
     def as_patch(self, **kwargs):
         # TODO: needs to be implemented
-        raise NotImplementedError("")
+        raise NotImplementedError
