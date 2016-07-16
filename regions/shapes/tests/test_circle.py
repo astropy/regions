@@ -3,7 +3,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from numpy.testing import assert_allclose
 from astropy import units as u
 from astropy.coordinates import SkyCoord
-from astropy.tests.helper import pytest
+from astropy.tests.helper import pytest, assert_quantity_allclose
 from astropy.utils.data import get_pkg_data_filename
 from astropy.io.fits import getheader
 from astropy.wcs import WCS
@@ -23,7 +23,6 @@ try:
     HAS_WCSAXES = True
 except:
     HAS_WCSAXES = False
-
 
 
 def test_init_pixel():
@@ -67,9 +66,15 @@ def test_transformation():
     headerfile = get_pkg_data_filename('data/example_header.fits')
     h = getheader(headerfile)
     wcs = WCS(h)
+
     pixcircle = skycircle.to_pixel(wcs)
+
     assert_allclose(pixcircle.center.x, -50.5)
     assert_allclose(pixcircle.center.y, 299.5)
+    assert_allclose(pixcircle.radius, 0.027777777777828305)
 
     skycircle2 = pixcircle.to_sky(wcs)
-    assert_allclose(skycircle2.radius, skycircle.radius)
+
+    assert_quantity_allclose(skycircle.center.data.lon, skycircle2.center.data.lon)
+    assert_quantity_allclose(skycircle.center.data.lat, skycircle2.center.data.lat)
+    assert_quantity_allclose(skycircle2.radius, skycircle.radius)

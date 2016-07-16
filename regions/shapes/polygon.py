@@ -11,7 +11,7 @@ class PolygonPixelRegion(PixelRegion):
 
     Parameters
     ----------
-    vertices : :class:`~regions.core.pixcoord.PixCoord`
+    vertices : `~regions.PixCoord`
         The vertices of the polygon
     """
 
@@ -24,27 +24,27 @@ class PolygonPixelRegion(PixelRegion):
     @property
     def area(self):
         # TODO: needs to be implemented
-        raise NotImplementedError("")
+        raise NotImplementedError
 
     def contains(self, pixcoord):
         # TODO: needs to be implemented
-        raise NotImplementedError("")
+        raise NotImplementedError
 
     def to_shapely(self):
         # TODO: needs to be implemented
-        raise NotImplementedError("")
+        raise NotImplementedError
 
     def to_sky(self, wcs, mode='local', tolerance=None):
         # TODO: needs to be implemented
-        raise NotImplementedError("")
+        raise NotImplementedError
 
     def to_mask(self, mode='center'):
         # TODO: needs to be implemented
-        raise NotImplementedError("")
+        raise NotImplementedError
 
     def as_patch(self, **kwargs):
         # TODO: needs to be implemented
-        raise NotImplementedError("")
+        raise NotImplementedError
 
 
 class PolygonSkyRegion(SkyRegion):
@@ -53,7 +53,7 @@ class PolygonSkyRegion(SkyRegion):
 
     Parameters
     ----------
-    vertices : :class:`~regions.core.pixcoord.PixCoord`
+    vertices : `~regions.PixCoord`
         The vertices of the polygon
     """
 
@@ -66,16 +66,16 @@ class PolygonSkyRegion(SkyRegion):
     @property
     def area(self):
         # TODO: needs to be implemented
-        raise NotImplementedError("")
+        raise NotImplementedError
 
     def contains(self, skycoord):
         # TODO: needs to be implemented
-        raise NotImplementedError("")
+        raise NotImplementedError
 
     def to_pixel(self, wcs, mode='local', tolerance=None):
         # TODO: needs to be implemented
-        raise NotImplementedError("")
+        raise NotImplementedError
 
     def as_patch(self, **kwargs):
         # TODO: needs to be implemented
-        raise NotImplementedError("")
+        raise NotImplementedError

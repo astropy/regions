@@ -1,8 +1,8 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 from __future__ import absolute_import, division, print_function, unicode_literals
 import abc
-from astropy.extern import six
 import operator
+from astropy.extern import six
 
 __all__ = ['Region', 'PixelRegion', 'SkyRegion']
 
@@ -32,7 +32,7 @@ class Region(object):
         Returns a region representing the intersection of this region with
         ``other``.
         """
-        raise NotImplementedError("")
+        raise NotImplementedError
 
     @abc.abstractmethod
     def symmetric_difference(self, other):
@@ -40,14 +40,14 @@ class Region(object):
         Returns the union of the two regions minus any areas contained in the
         intersection of the two regions.
         """
-        raise NotImplementedError("")
+        raise NotImplementedError
 
     @abc.abstractmethod
     def union(self, other):
         """
         Returns a region representing the union of this region with ``other``.
         """
-        raise NotImplementedError("")
+        raise NotImplementedError
 
     def __and__(self, other):
         return self.intersection(other)
@@ -100,18 +100,16 @@ class PixelRegion(Region):
 
         Parameters
         ----------
-        pixcoord : tuple
+        pixcoord : `~regions.PixCoord`
             The position or positions to check, as a tuple of scalars or
             arrays. In future this could also be a `PixCoord` instance.
         """
-        raise NotImplementedError("")
 
     @abc.abstractproperty
     def area(self):
         """
         Returns the area of the region as a `~astropy.units.Quantity`.
         """
-        raise NotImplementedError("")
 
     @abc.abstractmethod
     def to_sky(self, wcs, mode='local', tolerance=None):
@@ -125,7 +123,7 @@ class PixelRegion(Region):
             The world coordinate system transformation to assume
 
         mode : str
-            Convering to sky coordinates can be done with various degrees of
+            Converting to sky coordinates can be done with various degrees of
             approximation, which can be set with this option. Possible values
             are:
 
@@ -146,7 +144,6 @@ class PixelRegion(Region):
         tolerance : `~astropy.units.Quantity`
             The tolerance for the ``'full'`` mode described above.
         """
-        raise NotImplementedError("")
 
     @abc.abstractmethod
     def to_mask(self, mode='center'):
@@ -174,14 +171,12 @@ class PixelRegion(Region):
             Slices for x and y which can be used on an array to extract the
             same region as the mask.
         """
-        raise NotImplementedError("")
 
     @abc.abstractmethod
     def to_shapely(self):
         """
         Convert this region to a Shapely object.
         """
-        raise NotImplementedError("")
 
     @abc.abstractmethod
     def as_patch(self, **kwargs):
@@ -192,7 +187,6 @@ class PixelRegion(Region):
         patch : `~matplotlib.patches.Patch`
             Matplotlib patch
         """
-        raise NotImplementedError
 
     def plot(self, ax=None, **kwargs):
         """
@@ -254,14 +248,12 @@ class SkyRegion(Region):
         skycoord : `~astropy.coordinates.SkyCoord`
             The position or positions to check
         """
-        raise NotImplementedError("")
 
     @abc.abstractproperty
     def area(self):
         """
         Returns the area of the region as a `~astropy.units.Quantity`.
         """
-        raise NotImplementedError("")
 
     @abc.abstractmethod
     def to_pixel(self, wcs, mode='local', tolerance=None):
@@ -275,7 +267,7 @@ class SkyRegion(Region):
             The world coordinate system transformation to assume
 
         mode : str
-            Convering to pixel coordinates can be done with various degrees
+            Converting to pixel coordinates can be done with various degrees
             of approximation, which can be set with this option. Possible
             values are:
 
@@ -296,7 +288,6 @@ class SkyRegion(Region):
         tolerance : `~astropy.units.Quantity`
             The tolerance for the ``'full'`` mode described above.
         """
-        raise NotImplementedError("")
 
     @abc.abstractmethod
     def as_patch(self, ax, **kwargs):
@@ -312,7 +303,6 @@ class SkyRegion(Region):
         patch : `~matplotlib.patches.Patch`
             Matplotlib patch
         """
-        raise NotImplementedError
 
     def plot(self, ax=None, **kwargs):
         """

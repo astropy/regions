@@ -11,7 +11,7 @@ class PointPixelRegion(PixelRegion):
 
     Parameters
     ----------
-    center : :class:`~regions.core.pixcoord.PixCoord`
+    center : `~regions.PixCoord`
         The position of the point
     """
 
@@ -33,15 +33,15 @@ class PointPixelRegion(PixelRegion):
 
     def to_sky(self, wcs, mode='local', tolerance=None):
         # TODO: needs to be implemented
-        raise NotImplementedError("")
+        raise NotImplementedError
 
     def to_mask(self, mode='center'):
         # TODO: needs to be implemented
-        raise NotImplementedError("")
+        raise NotImplementedError
 
     def as_patch(self, **kwargs):
         # TODO: needs to be implemented
-        raise NotImplementedError("")
+        raise NotImplementedError
 
 
 class PointSkyRegion(SkyRegion):
@@ -50,7 +50,7 @@ class PointSkyRegion(SkyRegion):
 
     Parameters
     ----------
-    center : :class:`~astropy.coordinates.SkyCoord`
+    center : `~astropy.coordinates.SkyCoord`
         The position of the point
     """
 
@@ -69,8 +69,8 @@ class PointSkyRegion(SkyRegion):
 
     def to_pixel(self, wcs, mode='local', tolerance=None):
         # TODO: needs to be implemented
-        raise NotImplementedError("")
+        raise NotImplementedError
 
     def as_patch(self, **kwargs):
         # TODO: needs to be implemented
-        raise NotImplementedError("")
+        raise NotImplementedError
