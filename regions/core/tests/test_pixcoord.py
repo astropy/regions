@@ -2,6 +2,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 from numpy.testing import assert_equal, assert_allclose
 from astropy.tests.helper import pytest
+from ...utils.examples import make_example_wcs
 from ..pixcoord import PixCoord
 
 try:
@@ -10,25 +11,6 @@ try:
     HAS_SHAPELY = True
 except:
     HAS_SHAPELY = False
-
-
-def make_test_wcs():
-    """Make a WCS object for tests and documentation examples.
-
-    TODO: make this part of the public API, so that it can be used
-    for documentation examples
-    """
-    from astropy.wcs import WCS
-
-    wcs = WCS(naxis=2)
-    wcs.wcs.crval = 0, 0
-    wcs.wcs.crpix = 18, 9
-    wcs.wcs.cdelt = 10, 10
-    wcs.wcs.ctype = 'GLON-AIT', 'GLAT-AIT'
-
-    # shape = (36, 18) would give an image that covers the whole sky.
-
-    return wcs
 
 
 def test_pixcoord_scalar_basics():
@@ -80,7 +62,7 @@ def test_pixcoord_array_basics():
 
 
 def test_pixcoord_scalar_sky():
-    wcs = make_test_wcs()
+    wcs = make_example_wcs()
     p = PixCoord(x=18, y=9)
 
     s = p.to_sky(wcs=wcs)
@@ -94,7 +76,7 @@ def test_pixcoord_scalar_sky():
 
 
 def test_pixcoord_array_sky():
-    wcs = make_test_wcs()
+    wcs = make_example_wcs()
     p = PixCoord(x=[17, 18], y=[8, 9])
 
     s = p.to_sky(wcs=wcs)
