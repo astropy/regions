@@ -1,9 +1,9 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 from __future__ import absolute_import, division, print_function, unicode_literals
 import math
-import numpy as np
+from astropy.coordinates import Angle
 from astropy.wcs.utils import pixel_to_skycoord
-from ..core import PixCoord, PixelRegion, SkyRegion
+from ..core import PixelRegion, SkyRegion
 from ..utils.wcs_helpers import skycoord_to_pixel_scale_angle
 
 __all__ = ['CirclePixelRegion', 'CircleSkyRegion']
@@ -39,8 +39,8 @@ class CirclePixelRegion(PixelRegion):
         return math.pi * self.radius ** 2
 
     def contains(self, pixcoord):
-        return np.hypot(pixcoord.x - self.center.x,
-                        pixcoord.y - self.center.y) < self.radius
+        return self.center.separation(pixcoord) < self.radius
+
 
     def to_shapely(self):
         return self.center.to_shapely().buffer(self.radius)
@@ -51,11 +51,13 @@ class CirclePixelRegion(PixelRegion):
         if tolerance is not None:
             raise NotImplementedError
 
-        skypos = pixel_to_skycoord(self.center.x, self.center.y, wcs)
-        xc, yc, scale, angle = skycoord_to_pixel_scale_angle(skypos, wcs)
+        center = pixel_to_skycoord(self.center.x, self.center.y, wcs)
+        # TODO: this is just called to compute `scale`
+        # This is inefficient ... we should have that as a separate function.
+        _, scale, _ = skycoord_to_pixel_scale_angle(center, wcs)
 
-        radius_sky = self.radius / scale
-        return CircleSkyRegion(skypos, radius_sky)
+        radius = Angle(self.radius / scale, 'deg')
+        return CircleSkyRegion(center, radius)
 
     def to_mask(self, mode='center'):
         # TODO: needs to be implemented
@@ -87,18 +89,18 @@ class CircleSkyRegion(SkyRegion):
         self.meta = meta or {}
         self.visual = visual or {}
 
+    def __repr__(self):
+        name = self.__class__.__name__
+        center = self.center
+        radius = self.radius
+        return '{name}\nCenter: {center}\nRadius: {radius}'.format(**locals())
+
     @property
     def area(self):
         return math.pi * self.radius ** 2
 
     def contains(self, skycoord):
         return self.center.separation(skycoord) < self.radius
-
-    def __repr__(self):
-        name = self.__class__.__name__
-        center = self.center
-        radius = self.radius
-        return '{name}\nCenter: {center}\nRadius: {radius}'.format(**locals())
 
     def to_pixel(self, wcs, mode='local', tolerance=None):
         """
@@ -124,9 +126,8 @@ class CircleSkyRegion(SkyRegion):
         if tolerance is not None:
             raise NotImplementedError
 
-        xc, yc, scale, angle = skycoord_to_pixel_scale_angle(self.center, wcs)
-        radius = (self.radius * scale)
-        center = PixCoord(xc, yc)
+        center, scale, _ = skycoord_to_pixel_scale_angle(self.center, wcs)
+        radius = self.radius.to('deg').value * scale
 
         return CirclePixelRegion(center, radius)
 
