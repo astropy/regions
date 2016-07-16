@@ -17,8 +17,18 @@ Getting started
 Introduction
 ============
 
-The `regions` package ...
+The `regions` package provides classes representing sky regions,
+for example `~regions.CircleSkyRegion`, as well as "pixel regions",
+for example `~regions.CirclePixelRegion`.
 
+Sky regions are independent of an image. Pixel regions are connected to an image.
+To transform between sky and pixel regions, a word coordinate system
+(represented by a `~astropy.wcs.WCS` object) is used.
+
+The `astropy.coordinates` package provides the `~astropy.coordinates.Angle`
+and `~astropy.coordinates.SkyCoord` classes, put no class to represent pixel coordinates.
+So we will start by introducing the `regions.PixCoord` class in the next section,
+and then move on and show how to work with sky and pixel regions.
 
 .. _gs-pixcoord:
 
@@ -31,12 +41,6 @@ TODO: write me
 
 Sky regions
 ===========
-
-The `astropy.coordinates` package provides the `~astropy.coordinates.Angle`
-and `~astropy.coordinates.SkyCoord` classes.
-
-The `regions` package provides classes representing sky regions,
-for example `~regions.CircleSkyRegion`.
 
 This is how to create a sky region:
 
@@ -317,3 +321,18 @@ and `regions.region_list_to_objects`.
     # TypeError: 'float' object is not subscriptable
     >>> regions.write_ds9([sky_reg], filename='test.reg')
     # TypeError: 'float' object is not subscriptable
+
+What next?
+==========
+
+Congratulations, you have made it to the end of the tutorial getting started guide of the
+``regions`` package.
+
+For detailed information on some specific functionality, see the API documentation here: `regions`.
+Be warned though that a lot of methods haven't been implemented yet.
+If you try them, they will raise a ``NotImplementedError``.
+
+If you have the skills and time, please head over to
+https://github.com/astropy/regions
+and help out with ``regions`` development.
+Of course, feature requests are also welcome ... they help us prioritize development efforts.
