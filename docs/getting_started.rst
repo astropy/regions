@@ -2,19 +2,35 @@
 
 .. _gs:
 
-===============
+***************
 Getting started
-===============
+***************
 
-The `regions` package is in a very early stage of development.
-It is not feature complete or API stable.
-Feedback and contributions welcome!
-That said, here's a short tutorial showing the main features.
+.. warning::
+    This ``regions`` package is in a very early stage of development.
+    It is not feature complete or API stable!
+    That said, please have a look and try to use it for your applications.
+    Feedback and contributions welcome!
+
+.. _gs-intro:
+
+Introduction
+============
+
+The `regions` package ...
+
+
+.. _gs-pixcoord:
+
+Pixel coordinates
+=================
+
+TODO: write me
 
 .. _gs-sky:
 
 Sky regions
------------
+===========
 
 The `astropy.coordinates` package provides the `~astropy.coordinates.Angle`
 and `~astropy.coordinates.SkyCoord` classes.
@@ -54,7 +70,7 @@ or in IPython print the list like this:
 .. _gs-pix:
 
 Pixel regions
--------------
+=============
 
 In the previous section we introduced sky regions, which represent (surprise) regions on the sky sphere,
 and are independent of an image or projection of the sky.
@@ -77,8 +93,11 @@ You can print the regions to get some info about its properties:
 .. code-block:: python
 
     >>> print(region)
-    <regions.shapes.circle.CirclePixelRegion object at 0x110038cc0>
-    # TODO: implement `str` and update this example
+    CirclePixelRegion
+    Center: PixCoord
+    x : 42
+    y : 43
+    Radius: 4.2
 
 To see a list of all available sky regions, you can go to the API docs
 or in IPython print the list like this:
@@ -91,7 +110,7 @@ or in IPython print the list like this:
 .. _gs-wcs:
 
 Region transformations
-----------------------
+======================
 
 In the last two sections, we talked about how for every region shape (e.g. circle),
 there's two classes, one representing "sky regions" and another representing "pixel regions"
@@ -139,18 +158,18 @@ To convert it to a pixel region, call the :meth:`~regions.SkyRegion.to_pixel` me
 
     >>> pix_reg = sky_reg.to_pixel(wcs)
     >>> pix_reg.center
-    array([ 29.36479429,   3.10958314])
-    # TODO: center should be a PixCoord object
-    >>> pix_reg.radius
-    <Quantity 0.0010259141133922682 deg pix / arcsec>
-    # TODO: radius should be a float or quantity with unit pix
-    >>> pix_reg.radius.to('pix')
-    <Quantity 3.6932908082121654 pix>
+    CirclePixelRegion
+    Center: PixCoord
+    x : 29.364794288785394
+    y : 3.10958313892697
+    Radius: 3.6932908082121654
+
+TODO: show example using arrays.
 
 .. _gs-contain:
 
 Containment
------------
+===========
 
 Let's continue with the ``sky_reg`` and ``pix_reg`` objects defined in the previous section:
 
@@ -162,7 +181,12 @@ Let's continue with the ``sky_reg`` and ``pix_reg`` objects defined in the previ
         (50.0, 10.0)>
     Radius:30.0 deg
     >>> print(pix_reg)
-    # TODO: str isn't defined yet.
+    CirclePixelRegion
+    Center: PixCoord
+    x : 29.364794288785394
+    y : 3.10958313892697
+    Radius: 3.6932908082121654
+
 
 To test if a given point is inside or outside the regions, the Python ``in`` operator
 can be called, which calls the special ``__contains__`` method defined on the region classes:
@@ -175,30 +199,29 @@ can be called, which calls the special ``__contains__`` method defined on the re
     True
     >>> SkyCoord(50, 60, unit='deg') in sky_reg
     False
-    # TODO: PixCoord containment test currently doesn't work
-    # AttributeError: 'PixCoord' object has no attribute 'isscalar'
     >>> PixCoord(29, 3) in pix_reg
-    # Should be True
+    True
     >>> PixCoord(29, 10) in pix_reg
-    # Should be False
-    >>> pix_reg.contains(PixCoord(29, 3))
-    # TODO: AttributeError: 'numpy.ndarray' object has no attribute 'x'
+    False
 
-TODO: Example how to test many points, e.g. an event list or source catalog
+The ``in`` operator only works for scalar coordinates (Python requires the return value
+to be a scalar bool). If you have arrays of coordinates, use the
+`regions.SkyRegion.contains` or `regions.PixelRegion.contains` methods:
 
-It's not clear to me if the in operator can be used on sequence arrays, returning a bool array.
-This description sounds like it should work:
-https://docs.python.org/3/reference/datamodel.html#object.__contains__
-Do we want to always use / recommend ``in``, or should we just use the
-`regions.SkyRegion.contains` and `regions.PixelRegion.contains` methods?
-
-Current behaviour:
 
 .. code-block:: python
 
-    >>> SkyCoord([50, 50], [10, 60], unit='deg') in sky_reg
+    >>> skycoords = SkyCoord([50, 50], [10, 60], unit='deg')
+    >>> sky_reg.contains(skycoords)
+    array([ True, False], dtype=bool)
+
+    >>> pixcoords = skycoords.to_pixel(wcs)
+
+    >>> skycoords in sky_reg
     ValueError: <SkyCoord (ICRS): (ra, dec) in deg
     [(50.0, 10.0), (50.0, 60.0)]> must be scalar
+    >>> pix_reg.contains(PixCoord(29, 3))
+    True
     >>> sky_reg.contains(SkyCoord([50, 50], [10, 60], unit='deg'))
     array([ True, False], dtype=bool)
 
@@ -208,7 +231,7 @@ TODO: add pixel coordinate example
 .. _gs-spatial:
 
 Spatial filtering
------------------
+=================
 
 For aperture photometry, a common operation is to compute, for a given image and region,
 a boolean mask or array of pixel indices defining which pixels (in the whole image or a
@@ -225,7 +248,7 @@ For now, please use `photutils`_ or `pyregion`_.
 .. _gs-compound:
 
 Compound regions
-----------------
+================
 
 There's a few ways to combine any two `~regions.Region` objects into a compound region,
 i.e. a `~regions.CompoundPixelRegion` or `~regions.CompoundSkyRegion` object.
@@ -246,7 +269,7 @@ TODO:
 .. _gs-shapely:
 
 Shapely
--------
+=======
 
 The `shapely`_ Python package is a generic package for the manipulation and analysis of geometric objects in the
 Cartesian plane. Concerning regions in the cartesian plane, it is more feature-complete, powerful and optimized
@@ -281,7 +304,7 @@ namely to buffer a rectangle, resulting in a polygon.
 .. _gs-ds9:
 
 ds9 region strings
-------------------
+==================
 
 TODO: add examples for `regions.write_ds9`, `regions.read_ds9`, `regions.objects_to_ds9_string`
 and `regions.region_list_to_objects`.
