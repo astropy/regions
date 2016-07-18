@@ -25,17 +25,112 @@ Sky regions are independent of an image. Pixel regions are connected to an image
 To transform between sky and pixel regions, a word coordinate system
 (represented by a `~astropy.wcs.WCS` object) is used.
 
-The `astropy.coordinates` package provides the `~astropy.coordinates.Angle`
-and `~astropy.coordinates.SkyCoord` classes, put no class to represent pixel coordinates.
-So we will start by introducing the `regions.PixCoord` class in the next section,
-and then move on and show how to work with sky and pixel regions.
+Some functions for region-based calculations (e.g. filtering a table of sky or
+pixel positions) as well as functions for region serialisation (e.g. to and from
+ds9 region string format) are available.
 
-.. _gs-pixcoord:
+Example dataset
+===============
 
-Pixel coordinates
-=================
+Throughout this tutorial, we will be working with the same `~regions.ExampleSimulatedDataset`
+and assume that you have executed this code to create example ``dataset`` and ``wcs`` objects:
 
-TODO: write me
+.. code-block:: python
+
+    >>> from regions import make_example_dataset
+    >>> dataset = make_example_dataset(data='simulated')
+    >>> wcs = dataset.wcs
+
+For image examples, we will use the ``wcs`` and ``image`` attributes.
+For example positions, we will use the ``source_table`` and ``event_table`` attributes.
+
+In your own analyses, you will usually load image data and WCS objects from file or
+compute them with a Python script. We don't do this here, because we wanted to make
+this tutorial independent of any example data files, to help you get started quickly.
+
+Also, this example image was created to illustrate some of the key issues when working with
+regions. It represents an all-sky image in Aitoff (``AIT``) projection, which means that
+there are pixels at the edge of the iamge that don't correspond to positions on the sky.
+And the pixels are huge, roughly 10 deg time 10 deg, which means that there are well-visible
+differences between sky and pixel regions, caused by the WCS projection.
+
+Before we start diving into coding with regions, here's an image that illustrates our
+example counts image, with source positions and a few regions overplotted:
+
+.. plot:: plot_example.py
+   :include-source: false
+
+.. _gs-coord:
+
+Sky and pixel coordinates
+=========================
+
+This regions package uses `astropy.coordinates.SkyCoord` objects to represent sky
+coordinates.
+
+.. code-block:: python
+
+    >>> from astropy.coordinates import SkyCoord
+    >>> skycoord = SkyCoord(42, 43, unit='deg', frame='galactic')
+    >>> skycoord
+    <SkyCoord (Galactic): (l, b) in deg
+    (42.0, 43.0)>
+
+To represent pixel coordinates, `regions.PixCoord` objects are used.
+
+.. code-block:: python
+
+    >>> from regions import PixCoord
+    >>> pixcoord = PixCoord(x=42, y=43)
+    >>> pixcoord
+    PixCoord
+    x : 42
+    y : 43
+    >>> pixcoord.x
+    42
+    >>> pixcoord.y
+    43
+
+`~astropy.coordinates.SkyCoord` is a very powerful and complex class (different representations,
+a coordinate transformation tree) that is documented extensively in the `astropy.coordinates` docs.
+
+In contrast, `regions.PixCoord` is a small and simple helper class. The pixel coordinate is always
+represented as cartesian coordinate data members ``x`` and ``y``. A pixel coordinate doesn't have a
+frame and is not connected to the `astropy.coordinates` transformation tree.
+
+For a given image, represented by a `~astropy.wcs.WCS` object, it's easy to transform back and
+forth between sky and pixel coordinates:
+
+.. code-block:: python
+
+    >>> skycoord = SkyCoord(42, 43, unit='deg', frame='galactic')
+    >>> pixcoord = PixCoord.from_sky(skycoord=skycoord, wcs=wcs)
+    >>> pixcoord
+    PixCoord
+    x : 20.27424296606442
+    y : 12.259980510825843
+    >>> pixcoord.to_sky(wcs=wcs)
+    <SkyCoord (Galactic): (l, b) in deg
+        (42.0, 43.0)>
+
+This is an object-oriented thin wrapper around the functionality provided by `~astropy.wcs.WCS`
+and `astropy.wcs.utils`.
+
+Just like for `~astropy.coordinates.SkyCoord`, it is possible to use `~regions.PixCoord` objects
+to represent arrays of pixel coordinates:
+
+.. code-block:: python
+
+    >>> pixcoord = PixCoord(x=[0, 1], y=[2, 3])
+    >>> pixcoord
+    PixCoord
+    x : [0 1]
+    y : [2 3]
+    >>> pixcoord.isscalar
+    False
+
+To represent angles both on the sky and in an image, `~astropy.coordinates.Angle` objects
+or `~astropy.units.Quantity` objects with angular units can be used.
 
 .. _gs-sky:
 
@@ -124,24 +219,6 @@ A key feature of the regions package is that, for a given image, more precisely 
 `~astropy.wcs.WCS` object, it is possible to convert back and forth between sky and image
 regions.
 
-Usually you create the WCS object from the information in a FITS file.
-For this tutorial, let's create an example ``WCS`` from scratch corresponding to an
-image that is in Galactic coordinates and Aitoff projection (``ctype``)
-has the reference point at the Galactic center on the sky (``crval = 0, 0``)
-and at pixel coordinate ``crpix = 18, 9`` in the image, and has huge pixels
-of roughly 10 deg x 10 deg (``cdelt = 10, 10``).
-
-.. code-block:: python
-
-    from astropy.wcs import WCS
-
-    wcs = WCS(naxis=2)
-    wcs.wcs.crval = 0, 0
-    wcs.wcs.crpix = 18, 9
-    wcs.wcs.cdelt = 10, 10
-    wcs.wcs.ctype = 'GLON-AIT', 'GLAT-AIT'
-
-    # shape = (36, 18) would give an image that covers the whole sky.
 
 
 With this `wcs` object, it's possible to transform back and forth between sky and pixel regions.
@@ -168,7 +245,8 @@ To convert it to a pixel region, call the :meth:`~regions.SkyRegion.to_pixel` me
     y : 3.10958313892697
     Radius: 3.6932908082121654
 
-TODO: show example using arrays.
+TODO: show example using lists of regions and mention that a single region object can't represent
+an array of regions.
 
 .. _gs-contain:
 
@@ -321,6 +399,12 @@ and `regions.region_list_to_objects`.
     # TypeError: 'float' object is not subscriptable
     >>> regions.write_ds9([sky_reg], filename='test.reg')
     # TypeError: 'float' object is not subscriptable
+
+
+Plotting regions
+================
+
+TODO
 
 What next?
 ==========
