@@ -1,5 +1,7 @@
 name: regions-rtd
-#channels:
-#    - astropy
+channels:
+    - astropy
 dependencies:
+- matplotlib
 - astropy
+- wcsaxes

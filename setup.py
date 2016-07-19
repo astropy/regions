@@ -107,6 +107,15 @@ setup(name=PACKAGENAME,
       description=DESCRIPTION,
       scripts=scripts,
       install_requires=['astropy'],
+      extras_require=dict(
+          plot=[
+              'matplotlib',
+              'wcsaxes',
+          ],
+          test=[
+              'pytest-mpl',
+          ],
+      ),
       author=AUTHOR,
       author_email=AUTHOR_EMAIL,
       license=LICENSE,
