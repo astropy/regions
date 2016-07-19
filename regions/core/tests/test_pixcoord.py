@@ -2,7 +2,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 from numpy.testing import assert_equal, assert_allclose
 from astropy.tests.helper import pytest
-from ...utils.examples import make_example_wcs
+from ...utils.examples import make_example_dataset
 from ..pixcoord import PixCoord
 
 try:
@@ -11,6 +11,13 @@ try:
     HAS_SHAPELY = True
 except:
     HAS_SHAPELY = False
+
+
+@pytest.fixture(scope='session')
+def wcs():
+    config = dict(crpix=(18, 9), cdelt=(-10, 10), shape=(18, 36))
+    dataset = make_example_dataset(config=config)
+    return dataset.wcs
 
 
 def test_pixcoord_scalar_basics():
@@ -61,13 +68,12 @@ def test_pixcoord_array_basics():
     assert_equal(p4.y, [22, 33])
 
 
-def test_pixcoord_scalar_sky():
-    wcs = make_example_wcs()
+def test_pixcoord_scalar_sky(wcs):
     p = PixCoord(x=18, y=9)
 
     s = p.to_sky(wcs=wcs)
     assert s.name == 'galactic'
-    assert_allclose(s.data.lon.deg, 10.119060045643662)
+    assert_allclose(s.data.lon.deg, 349.88093995435634)
     assert_allclose(s.data.lat.deg, 10.003028030623508)
 
     p2 = PixCoord.from_sky(skycoord=s, wcs=wcs)
@@ -75,13 +81,12 @@ def test_pixcoord_scalar_sky():
     assert_allclose(p2.y, 9)
 
 
-def test_pixcoord_array_sky():
-    wcs = make_example_wcs()
+def test_pixcoord_array_sky(wcs):
     p = PixCoord(x=[17, 18], y=[8, 9])
 
     s = p.to_sky(wcs=wcs)
     assert s.name == 'galactic'
-    assert_allclose(s.data.lon.deg, [0, 10.11906])
+    assert_allclose(s.data.lon.deg, [0, 349.88094])
     assert_allclose(s.data.lat.deg, [0, 10.003028])
 
     p2 = PixCoord.from_sky(skycoord=s, wcs=wcs)

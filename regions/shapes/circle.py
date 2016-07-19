@@ -41,7 +41,6 @@ class CirclePixelRegion(PixelRegion):
     def contains(self, pixcoord):
         return self.center.separation(pixcoord) < self.radius
 
-
     def to_shapely(self):
         return self.center.to_shapely().buffer(self.radius)
 
@@ -66,7 +65,9 @@ class CirclePixelRegion(PixelRegion):
     def as_patch(self, **kwargs):
         import matplotlib.patches as mpatches
 
-        patch = mpatches.Circle(self.center, self.radius, **kwargs)
+        xy = self.center.x, self.center.y
+        radius = self.radius
+        patch = mpatches.Circle(xy=xy, radius=radius, **kwargs)
         return patch
 
 
