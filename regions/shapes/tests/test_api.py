@@ -10,14 +10,19 @@ from astropy.tests.helper import pytest
 from astropy import units as u
 from astropy.coordinates import ICRS
 from astropy.wcs import WCS
-
 from ...core.core import Region, SkyRegion, PixelRegion
 from ...core.pixcoord import PixCoord
-
 from ..circle import CirclePixelRegion, CircleSkyRegion
 from ..ellipse import EllipsePixelRegion, EllipseSkyRegion
 from ..polygon import PolygonPixelRegion, PolygonSkyRegion
 from ..rectangle import RectanglePixelRegion, RectangleSkyRegion
+
+try:
+    import shapely
+    HAS_SHAPELY = True
+except:
+    HAS_SHAPELY = False
+
 
 PIXEL_REGIONS = [
     CirclePixelRegion(PixCoord(3, 4), radius=5),
@@ -72,6 +77,7 @@ def test_pix_to_sky(region, mode):
         pytest.xfail()
 
 
+@pytest.mark.skipif('not HAS_SHAPELY')
 @pytest.mark.parametrize('region', PIXEL_REGIONS, ids=ids_func)
 def test_pix_to_shapely(region):
     try:
