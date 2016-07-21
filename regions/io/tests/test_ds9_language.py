@@ -1,11 +1,13 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 from __future__ import absolute_import, division, print_function, unicode_literals
-from ..read_ds9 import read_ds9
-from ..write_ds9 import objects_to_ds9_string
+import distutils.version as v
 from astropy.utils.data import get_pkg_data_filename, get_pkg_data_filenames
 from astropy.tests.helper import pytest
-import distutils.version as v
 import astropy.version as astrov
+from astropy.coordinates import Angle, SkyCoord
+from ...shapes.circle import CircleSkyRegion
+from ..read_ds9 import read_ds9
+from ..write_ds9 import objects_to_ds9_string
 
 _ASTROPY_MINVERSION = v.LooseVersion('1.1')
 _ASTROPY_VERSION = v.LooseVersion(astrov.version)
@@ -83,3 +85,16 @@ def test_physical(filename):
         desired = fh.read()
 
     assert actual == desired
+
+
+def test_ds9_circle():
+    """Test that circle to ds9 string works.
+
+    Regression test for https://github.com/astropy/regions/issues/41
+    """
+    center = SkyCoord(42, 43, unit='deg')
+    radius = Angle(3, 'deg')
+    region = CircleSkyRegion(center, radius)
+    expected = '# Region file format: DS9 astropy/regions\nfk5\ncircle(42.0000,43.0000,3.0000)\n'
+    actual = objects_to_ds9_string([region])
+    assert actual == expected

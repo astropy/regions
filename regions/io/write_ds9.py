@@ -44,23 +44,21 @@ def objects_to_ds9_string(obj_list, coordsys='fk5', fmt='.4f', radunit='deg'):
 
     for reg in obj_list:
         if isinstance(reg, shapes.circle.CircleSkyRegion):
-            # TODO: Why is circle.center a list of SkyCoords?
-            x = reg.center.transform_to(frame).spherical.lon.to('deg').value[0]
-            y = reg.center.transform_to(frame).spherical.lat.to('deg').value[0]
-            r = reg.radius.to(radunit).value
+            x = float(reg.center.transform_to(frame).spherical.lon.to('deg').value)
+            y = float(reg.center.transform_to(frame).spherical.lat.to('deg').value)
+            r = float(reg.radius.to(radunit).value)
             output += ds9_strings['circle'].format(**locals())
         elif isinstance(reg, shapes.circle.CirclePixelRegion):
-            # TODO: Why is circle.center a list of SkyCoords?
             x = reg.center.x
             y = reg.center.y
             r = reg.radius
             output += ds9_strings['circle'].format(**locals())
         elif isinstance(reg, shapes.ellipse.EllipseSkyRegion):
-            x = reg.center.transform_to(frame).spherical.lon.to('deg').value[0]
-            y = reg.center.transform_to(frame).spherical.lat.to('deg').value[0]
-            r2 = reg.major.to(radunit).value
-            r1 = reg.minor.to(radunit).value
-            ang = reg.angle.to('deg').value
+            x = float(reg.center.transform_to(frame).spherical.lon.to('deg').value)
+            y = float(reg.center.transform_to(frame).spherical.lat.to('deg').value)
+            r2 = float(reg.major.to(radunit).value)
+            r1 = float(reg.minor.to(radunit).value)
+            ang = float(reg.angle.to('deg').value)
             output += ds9_strings['ellipse'].format(**locals())
         elif isinstance(reg, shapes.ellipse.EllipsePixelRegion):
             x = reg.center.x
