@@ -10,12 +10,16 @@ from astropy import log
 from ..shapes import circle, rectangle, polygon, ellipse, point
 from ..core import PixCoord
 
-__all__ = ['read_ds9', 'region_list_to_objects']
+__all__ = [
+    'read_ds9',
+    'ds9_string_to_objects',
+    'ds9_string_to_region_list',
+    'ds9_region_list_to_objects',
+]
 
 
 def read_ds9(filename):
-    """
-    Read a ds9 region file in as a list of astropy region objects
+    """Read a ds9 region file in as a list of region objects.
 
     Parameters
     ----------
@@ -24,10 +28,13 @@ def read_ds9(filename):
 
     Returns
     -------
-    A list of region objects
+    regions : list
+        Python list of `regions.Region` objects.
     """
-    region_list = ds9_parser(filename)
-    return region_list_to_objects(region_list)
+    with open(filename) as fh:
+        region_string = fh.read()
+
+    return ds9_string_to_objects(region_string)
 
 
 def parse_coordinate(string_rep, unit):
@@ -55,11 +62,12 @@ def parse_coordinate(string_rep, unit):
         return u.Quantity(float(string_rep), unit)
 
 
-unit_mapping = {'"': u.arcsec,
-                "'": u.arcmin,
-                'r': u.rad,
-                'i': u.dimensionless_unscaled,
-                }
+unit_mapping = {
+    '"': u.arcsec,
+    "'": u.arcmin,
+    'r': u.rad,
+    'i': u.dimensionless_unscaled,
+}
 
 
 def parse_angular_length_quantity(string_rep):
@@ -123,9 +131,20 @@ def strip_paren(string_rep):
     return paren.sub("", string_rep)
 
 
-def region_list_to_objects(region_list):
-    """
-    Given a list of parsed region tuples, product a list of astropy objects
+def ds9_region_list_to_objects(region_list):
+    """Given a list of parsed region tuples, product a list of astropy objects.
+
+    TODO: show example what a "region list" is.
+
+    Parameters
+    ----------
+    region_list : list
+        List of TODO???
+
+    Returns
+    -------
+    regions : list
+        List of `regions.Region` objects
     """
     viz_keywords = ['color', 'dashed', 'width', 'point', 'font', 'text']
 
@@ -180,9 +199,35 @@ def region_list_to_objects(region_list):
     return output_list
 
 
-def ds9_parser(filename):
+def ds9_string_to_objects(region_string):
+    """Parse ds9 region string to region objects
+
+    Parameters
+    ----------
+    region_string : str
+        DS9 region string
+
+    Returns
+    -------
+    regions : list
+        List of `~regions.Region` objects
+
+    Examples
+    --------
+    TODO
     """
-    Parse a complete ds9 .reg file
+    region_list = ds9_string_to_region_list(region_string)
+    regions = ds9_region_list_to_objects(region_list)
+    return regions
+
+
+def ds9_string_to_region_list(region_string):
+    """Parse a DS9 region string.
+
+    Parameters
+    ----------
+    region_string : str
+        DS9 region string
 
     Returns
     -------
@@ -199,27 +244,28 @@ def ds9_parser(filename):
     regions = []
     composite_region = None
 
-    with open(filename, 'r') as fh:
-        for line_ in fh:
-            # ds9 regions can be split on \n or ;
-            for line in line_.split(";"):
-                parsed = line_parser(line, coordsys)
-                if parsed in coordinate_systems:
-                    coordsys = parsed
-                elif parsed:
-                    region_type, coordlist, meta, composite, include = parsed
-                    meta['include'] = include
-                    log.debug("Region type = {0}".format(region_type))
-                    if composite and composite_region is None:
-                        composite_region = [(region_type, coordlist)]
-                    elif composite:
-                        composite_region.append((region_type, coordlist))
-                    elif composite_region is not None:
-                        composite_region.append((region_type, coordlist))
-                        regions.append(composite_region)
-                        composite_region = None
-                    else:
-                        regions.append((region_type, coordlist, meta))
+    # ds9 regions can be split on \n or ;
+    lines = []
+    for line_ in region_string.split('\n'):
+        for line in line_.split(";"):
+            lines.append(line)
+            parsed = line_parser(line, coordsys)
+            if parsed in coordinate_systems:
+                coordsys = parsed
+            elif parsed:
+                region_type, coordlist, meta, composite, include = parsed
+                meta['include'] = include
+                log.debug("Region type = {0}".format(region_type))
+                if composite and composite_region is None:
+                    composite_region = [(region_type, coordlist)]
+                elif composite:
+                    composite_region.append((region_type, coordlist))
+                elif composite_region is not None:
+                    composite_region.append((region_type, coordlist))
+                    regions.append(composite_region)
+                    composite_region = None
+                else:
+                    regions.append((region_type, coordlist, meta))
 
     return regions
 
@@ -282,10 +328,10 @@ def line_parser(line, coordsys=None):
             if region_type == 'ellipse':
                 language_spec[region_type] = itertools.chain((coordinate, coordinate), itertools.cycle((radius,)))
 
-            parsed_angles = [(x, y) for x, y in zip(parsed[:-1:2],
-                                                    parsed[1::2])
-                             if isinstance(x, coordinates.Angle) and
-                             isinstance(x, coordinates.Angle)]
+            parsed_angles = [
+                (x, y) for x, y in zip(parsed[:-1:2], parsed[1::2])
+                if isinstance(x, coordinates.Angle) and isinstance(x, coordinates.Angle)
+                ]
             frame = coordinates.frame_transform_graph.lookup_name(coordsys_name_mapping[coordsys])
 
             lon, lat = zip(*parsed_angles)
@@ -362,9 +408,9 @@ meta_token = re.compile("([a-zA-Z]+)(=)([^= ]+) ?")
 
 
 def meta_parser(meta_str):
-    """
-    Parse the metadata for a single ds9 region string.  The metadata is
-    everything after the close-paren of the region coordinate specification.
+    """Parse the metadata for a single ds9 region string.
+
+    The metadata is everything after the close-paren of the region coordinate specification.
     All metadata is specified as key=value pairs separated by whitespace, but
     sometimes the values can also be whitespace separated.
     """
