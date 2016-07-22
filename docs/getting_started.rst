@@ -388,18 +388,73 @@ namely to buffer a rectangle, resulting in a polygon.
 ds9 region strings
 ==================
 
-TODO: add examples for `regions.write_ds9`, `regions.read_ds9`, `regions.objects_to_ds9_string`
-and `regions.region_list_to_objects`.
+The regions package provides functions to serialise and de-serialise Python lists of
+`regions.Region` objects to DS9 region strings: `~regions.ds9_objects_to_string`
+and `~regions.ds9_string_to_objects`.
 
 .. code-block:: python
 
-    # Currently it doesn't work
-    >>> from regions import objects_to_ds9_string
-    >>> objects_to_ds9_string([sky_reg])
-    # TypeError: 'float' object is not subscriptable
-    >>> regions.write_ds9([sky_reg], filename='test.reg')
-    # TypeError: 'float' object is not subscriptable
+    >>> from regions import ds9_objects_to_string, ds9_string_to_objects
+    >>> reg_string = 'galactic\ncircle(42,43,3)'
+    >>> regions = ds9_string_to_objects(reg_string)
+    >>> regions[0]
+    CircleSkyRegion
+    Center: <Galactic Coordinate: (l, b) in deg
+        (42.0, 43.0)>
+    Radius: 3.0 deg
+    >>> ds9_objects_to_string(regions, coordsys='galactic')
+    '# Region file format: DS9 astropy/regions\ngalactic\ncircle(42.0000,43.0000,3.0000)\n'
 
+There's also `~regions.write_ds9` and `~regions.read_ds9` with write to and read from
+a file in addition to doing the region serialisation and parsing.
+
+.. code-block:: python
+
+    >>> from regions import read_ds9, write_ds9
+    >>> filename = 'ds9.reg'
+    >>> write_ds9(regions, filename)
+    >>> regions = read_ds9(filename)
+    >>> regions
+
+Often DS9 region files contain extra information about colors or other attributes.
+This information is lost when converting to `~region.Region` objects.
+
+To make it available, the following two functions are made available:
+`~regions.ds9_string_to_region_list`, `~regions.ds9_region_list_to_objects`.
+Together they make up the `~regions.ds9_string_to_objects` function, but they
+expose the intermediate "region list", which contains the extra attributes.
+
+.. code-block:: python
+
+    >>> from regions import ds9_string_to_region_list, ds9_region_list_to_objects
+    >>> reg_string = """
+    ... # Region file format: DS9 version 4.1
+    ... global color=green dashlist=8 3
+    ... galactic
+    ... circle(42,43,3) # color=pink width=3 A comment
+    ... circle(99,33,1) # width=2
+    ... """
+    >>> region_list = ds9_string_to_region_list(reg_string)
+    >>> region_list
+    [('circle', [<Galactic Coordinate: (l, b) in deg
+           (42.0, 43.0)>, <Quantity 3.0 deg>], {'color': 'pink',
+       'include': '',
+       'width': '3 A comment'}),
+     ('circle', [<Galactic Coordinate: (l, b) in deg
+           (99.0, 33.0)>, <Quantity 1.0 deg>], {'include': '', 'width': '2'})]
+    >>> regions = ds9_region_list_to_objects(region_list)
+    >>> regions
+    [CircleSkyRegion
+     Center: <Galactic Coordinate: (l, b) in deg
+         (42.0, 43.0)>
+     Radius: 3.0 deg, CircleSkyRegion
+     Center: <Galactic Coordinate: (l, b) in deg
+         (99.0, 33.0)>
+     Radius: 1.0 deg]
+
+TODO: this is very confusing, because there are two "region lists", one with tuples
+and one with `region.Region` objects as input. Need to find better names, maybe even
+a better API?
 
 Plotting regions
 ================

@@ -3,22 +3,43 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from astropy import coordinates
 from .. import shapes
 
-__all__ = ['objects_to_ds9_string', 'write_ds9']
+__all__ = [
+    'write_ds9',
+    'ds9_objects_to_string',
+]
 
 coordsys_name_mapping = dict(zip(coordinates.frame_transform_graph.get_names(),
                                  coordinates.frame_transform_graph.get_names()))
 coordsys_name_mapping['ecliptic'] = 'geocentrictrueecliptic'  # needs expert attention TODO
 
 
-def objects_to_ds9_string(obj_list, coordsys='fk5', fmt='.4f', radunit='deg'):
-    """Take a list of regions and generate ds9 region strings"""
+def ds9_objects_to_string(regions, coordsys='fk5', fmt='.4f', radunit='deg'):
+    """Convert list of regions ato ds9 region strings.
 
-    ids = {shapes.circle.CircleSkyRegion: 'skycircle',
-           shapes.circle.CirclePixelRegion: 'pixcircle',
-           shapes.ellipse.EllipseSkyRegion: 'skyellipse',
-           shapes.ellipse.EllipsePixelRegion: 'pixellipse',
-           shapes.polygon.PolygonSkyRegion: 'skypolygon',
-           shapes.polygon.PolygonPixelRegion: 'pixpolygon'}
+    Parameters
+    ----------
+    regions : list
+        List of `regions.Region` objects
+
+    Returns
+    -------
+    region_string : str
+        ds9 region string
+
+
+    Examples
+    --------
+    TODO
+    """
+
+    ids = {
+        shapes.circle.CircleSkyRegion: 'skycircle',
+        shapes.circle.CirclePixelRegion: 'pixcircle',
+        shapes.ellipse.EllipseSkyRegion: 'skyellipse',
+        shapes.ellipse.EllipsePixelRegion: 'pixellipse',
+        shapes.polygon.PolygonSkyRegion: 'skypolygon',
+        shapes.polygon.PolygonPixelRegion: 'pixpolygon',
+    }
 
     if radunit == 'arcsec':
         if coordsys in coordsys_name_mapping.keys():
@@ -28,9 +49,11 @@ def objects_to_ds9_string(obj_list, coordsys='fk5', fmt='.4f', radunit='deg'):
     else:
         radunitstr = ''
 
-    ds9_strings = {'circle': 'circle({x:' + fmt + '},{y:' + fmt + '},{r:' + fmt + '}' + radunitstr + ')\n',
-                   'ellipse': 'ellipse({x:' + fmt + '},{y:' + fmt + '},{r1:' + fmt + '}' + radunitstr + ',{r2:' + fmt + '}' + radunitstr + ',{ang:' + fmt + '})\n',
-                   'polygon': 'polygon({c})\n'}
+    ds9_strings = {
+        'circle': 'circle({x:' + fmt + '},{y:' + fmt + '},{r:' + fmt + '}' + radunitstr + ')\n',
+        'ellipse': 'ellipse({x:' + fmt + '},{y:' + fmt + '},{r1:' + fmt + '}' + radunitstr + ',{r2:' + fmt + '}' + radunitstr + ',{ang:' + fmt + '})\n',
+        'polygon': 'polygon({c})\n',
+    }
 
     output = '# Region file format: DS9 astropy/regions\n'
     output += '{}\n'.format(coordsys)
@@ -42,7 +65,7 @@ def objects_to_ds9_string(obj_list, coordsys='fk5', fmt='.4f', radunit='deg'):
         # for pixel/image/physical frames
         frame = None
 
-    for reg in obj_list:
+    for reg in regions:
         if isinstance(reg, shapes.circle.CircleSkyRegion):
             x = float(reg.center.transform_to(frame).spherical.lon.to('deg').value)
             y = float(reg.center.transform_to(frame).spherical.lat.to('deg').value)
@@ -86,8 +109,18 @@ def objects_to_ds9_string(obj_list, coordsys='fk5', fmt='.4f', radunit='deg'):
     return output
 
 
-def write_ds9(obj_list, filename='ds9.reg', coordsys='fk5'):
-    """Write ds9 region file"""
-    output = objects_to_ds9_string(obj_list, coordsys)
+def write_ds9(regions, filename='ds9.reg', coordsys='fk5'):
+    """Convert list of regions to ds9 string and write to file.
+
+    Parameters
+    ----------
+    regions : list
+        List of `regions.Region` objects
+    filename : str
+        Filename
+    coordsys : {TODO}
+        Coordinate system
+    """
+    output = ds9_objects_to_string(regions, coordsys)
     with open(filename, 'w') as fh:
         fh.write(output)
