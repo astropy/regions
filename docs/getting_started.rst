@@ -29,8 +29,8 @@ Some functions for region-based calculations (e.g. filtering a table of sky or
 pixel positions) as well as functions for region serialisation (e.g. to and from
 ds9 region string format) are available.
 
-Example dataset
-===============
+Dataset
+=======
 
 Throughout this tutorial, we will be working with the same `~regions.ExampleSimulatedDataset`
 and assume that you have executed this code to create example ``dataset`` and ``wcs`` objects:
@@ -58,12 +58,12 @@ Before we start diving into coding with regions, here's an image that illustrate
 example counts image, with source positions and a few regions overplotted:
 
 .. plot:: plot_example.py
-   :include-source: false
+:include-source: false
 
 .. _gs-coord:
 
-Sky and pixel coordinates
-=========================
+Coordinates
+===========
 
 This regions package uses `astropy.coordinates.SkyCoord` objects to represent sky
 coordinates.
@@ -206,10 +206,102 @@ or in IPython print the list like this:
     In [1]: import regions
     In [2]: regions.*PixelRegion?
 
+.. _gs-shapes:
+
+Shapes
+======
+
+This section shows one example how to construct a region for each shape that's currently supported.
+
+* `~regions.CircleSkyRegion` and `~regions.CirclePixelRegion`
+
+.. code-block:: python
+
+    from astropy.coordinates import Angle, SkyCoord
+    from regions import PixCoord, CircleSkyRegion, CirclePixelRegion
+
+    circle_sky = CircleSkyRegion(
+        center=SkyCoord(42, 43, unit='deg'),
+        radius=Angle(3, 'deg'),
+    )
+    circle_pix = CirclePixelRegion(
+        center=PixCoord(x=42, y=43),
+        radius=4.2,
+    )
+
+* `~regions.EllipseSkyRegion` and `~regions.EllipsePixelRegion`
+
+.. code-block:: python
+
+    from astropy.coordinates import Angle, SkyCoord
+    from regions import PixCoord, EllipseSkyRegion, EllipsePixelRegion
+
+    ellipse_sky = EllipseSkyRegion(
+        center=SkyCoord(42, 43, unit='deg'),
+        minor=Angle(3, 'deg'),
+        major=Angle(4, 'deg'),
+        angle=Angle(5, 'deg'),
+    )
+    ellipse_pix = EllipsePixelRegion(
+        center=PixCoord(x=42, y=43),
+        minor=3,
+        major=4,
+        angle=Angle(5, 'deg'),
+    )
+
+* `~regions.PointSkyRegion` and `~regions.PointPixelRegion`
+
+.. code-block:: python
+
+    from astropy.coordinates import SkyCoord
+    from regions import PixCoord, PointSkyRegion, PointPixelRegion
+
+    point_sky = PointSkyRegion(
+        center=SkyCoord(42, 43, unit='deg'),
+    )
+    point_pix = PointPixelRegion(
+        center=PixCoord(x=42, y=43),
+    )
+
+* `~regions.PolygonSkyRegion` and `~regions.PolygonPixelRegion`
+
+.. code-block:: python
+
+    from astropy.coordinates import SkyCoord
+    from regions import PixCoord, PolygonSkyRegion, PolygonPixelRegion
+
+    polygon_sky = PolygonSkyRegion(
+        vertices=SkyCoord([1, 2, 2], [1, 1, 2], unit='deg'),
+    )
+    polygon_pix = PolygonPixelRegion(
+        vertices=PixCoord(x=[1, 2, 2], y=[1, 1, 2]),
+    )
+
+* `~regions.RectangleSkyRegion` and `~regions.RectanglePixelRegion`
+
+.. code-block:: python
+
+    from astropy.coordinates import Angle, SkyCoord
+    from regions import PixCoord, RectangleSkyRegion, RectanglePixelRegion
+
+    rectangle_sky = RectangleSkyRegion(
+        center=SkyCoord(42, 43, unit='deg'),
+        width=Angle(3, 'deg'),
+        height=Angle(4, 'deg'),
+        angle=Angle(5, 'deg'),
+    )
+    rectangle_pix = RectanglePixelRegion(
+        center=PixCoord(x=42, y=43),
+        width=3,
+        height=4,
+        angle=Angle(5, 'deg'),
+    )
+
+
 .. _gs-wcs:
 
-Region transformations
-======================
+Transformations
+===============
 
 In the last two sections, we talked about how for every region shape (e.g. circle),
 there's two classes, one representing "sky regions" and another representing "pixel regions"
@@ -310,10 +402,10 @@ to be a scalar bool). If you have arrays of coordinates, use the
 TODO: add pixel coordinate example
 
 
-.. _gs-spatial:
+.. _gs-masks:
 
-Spatial filtering
-=================
+Masks
+=====
 
 For aperture photometry, a common operation is to compute, for a given image and region,
 a boolean mask or array of pixel indices defining which pixels (in the whole image or a
@@ -329,8 +421,8 @@ For now, please use `photutils`_ or `pyregion`_.
 
 .. _gs-compound:
 
-Compound regions
-================
+Compounds
+=========
 
 There's a few ways to combine any two `~regions.Region` objects into a compound region,
 i.e. a `~regions.CompoundPixelRegion` or `~regions.CompoundSkyRegion` object.
@@ -385,8 +477,8 @@ namely to buffer a rectangle, resulting in a polygon.
 
 .. _gs-ds9:
 
-ds9 region strings
-==================
+DS9
+===
 
 The regions package provides functions to serialise and de-serialise Python lists of
 `regions.Region` objects to DS9 region strings: `~regions.ds9_objects_to_string`
@@ -456,8 +548,8 @@ TODO: this is very confusing, because there are two "region lists", one with tup
 and one with `region.Region` objects as input. Need to find better names, maybe even
 a better API?
 
-Plotting regions
-================
+Plotting
+========
 
 TODO
 
