@@ -28,8 +28,8 @@ def test_pixcoord_scalar_basics():
 
     assert p.isscalar is True
 
-    assert str(p) == 'PixCoord\nx : 1\ny : 2'
-    assert repr(p) == 'PixCoord\nx : 1\ny : 2'
+    assert str(p) == 'PixCoord(x=1, y=2)'
+    assert repr(p) == 'PixCoord(x=1, y=2)'
 
     with pytest.raises(TypeError):
         len(p)
@@ -46,8 +46,8 @@ def test_pixcoord_array_basics():
 
     assert p.isscalar is False
 
-    assert str(p) == 'PixCoord\nx : [1 2 3]\ny : [11 22 33]'
-    assert repr(p) == 'PixCoord\nx : [1 2 3]\ny : [11 22 33]'
+    assert str(p) == 'PixCoord(x=[1 2 3], y=[11 22 33])'
+    assert repr(p) == 'PixCoord(x=[1 2 3], y=[11 22 33])'
 
     assert len(p) == 3
 

@@ -14,13 +14,14 @@ class EllipsePixelRegion(PixelRegion):
     Parameters
     ----------
     center : `~regions.PixCoord`
-        The position of the center of the ellipse.
+        Center position
     minor : float
-        The minor radius of the ellipse
+        Minor radius
     major : float
-        The major radius of the ellipse
+        Major radius
     angle : `~astropy.units.Quantity`
-        The rotation of the ellipse. If set to zero (the default), the major
+        The rotation angle of the ellipse.
+        If set to zero (the default), the major
         axis is lined up with the x axis.
     """
 
@@ -33,6 +34,17 @@ class EllipsePixelRegion(PixelRegion):
         self.angle = angle
         self.meta = meta or {}
         self.visual = visual or {}
+
+    def __repr__(self):
+        data = dict(
+            name=self.__class__.__name__,
+            center=self.center,
+            minor=self.minor,
+            major=self.major,
+            angle=self.angle,
+        )
+        fmt = '{name}\ncenter: {center}\nminor: {minor}\nmajor: {major}\nangle: {angle}'
+        return fmt.format(**data)
 
     @property
     def area(self):
@@ -65,14 +77,15 @@ class EllipseSkyRegion(SkyRegion):
 
     Parameters
     ----------
-    center : `~regions.PixCoord`
-        The position of the center of the ellipse.
+    center : `~astropy.coordinates.SkyCoord`
+        Center position
     minor : `~astropy.units.Quantity`
-        The minor radius of the ellipse
+        Minor radius
     major : `~astropy.units.Quantity`
-        The major radius of the ellipse
+        Major radius
     angle : `~astropy.units.Quantity`
-        The rotation of the ellipse. If set to zero (the default), the major
+        The rotation angle of the ellipse.
+        If set to zero (the default), the major
         axis is lined up with the longitude axis of the celestial coordinates.
     """
 
@@ -84,6 +97,17 @@ class EllipseSkyRegion(SkyRegion):
         self.angle = angle
         self.meta = meta or {}
         self.visual = visual or {}
+
+    def __repr__(self):
+        data = dict(
+            name=self.__class__.__name__,
+            center=self.center,
+            minor=self.minor,
+            major=self.major,
+            angle=self.angle,
+        )
+        fmt = '{name}\ncenter: {center}\nminor: {minor}\nmajor: {major}\nangle: {angle}'
+        return fmt.format(**data)
 
     @property
     def area(self):

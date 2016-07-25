@@ -16,9 +16,9 @@ class CirclePixelRegion(PixelRegion):
     Parameters
     ----------
     center : `~regions.PixCoord`
-        The position of the center of the circle.
+        Center position
     radius : float
-        The radius of the circle
+        Radius
     """
 
     def __init__(self, center, radius, meta=None, visual=None):
@@ -29,10 +29,13 @@ class CirclePixelRegion(PixelRegion):
         self.visual = visual or {}
 
     def __repr__(self):
-        name = self.__class__.__name__
-        center = self.center
-        radius = self.radius
-        return '{name}\nCenter: {center}\nRadius: {radius}'.format(**locals())
+        data = dict(
+            name=self.__class__.__name__,
+            center=self.center,
+            radius=self.radius,
+        )
+        fmt = '{name}\ncenter: {center}\nradius: {radius}'
+        return fmt.format(**data)
 
     @property
     def area(self):
@@ -78,9 +81,9 @@ class CircleSkyRegion(SkyRegion):
     Parameters
     ----------
     center : `~astropy.coordinates.SkyCoord`
-        The position of the center of the circle.
+        Center position
     radius : `~astropy.units.Quantity`
-        The radius of the circle in angular units
+        Radius in angular units
     """
 
     def __init__(self, center, radius, meta=None, visual=None):
@@ -91,10 +94,13 @@ class CircleSkyRegion(SkyRegion):
         self.visual = visual or {}
 
     def __repr__(self):
-        name = self.__class__.__name__
-        center = self.center
-        radius = self.radius
-        return '{name}\nCenter: {center}\nRadius: {radius}'.format(**locals())
+        data = dict(
+            name=self.__class__.__name__,
+            center=self.center,
+            radius=self.radius,
+        )
+        fmt = '{name}\ncenter: {center}\nradius: {radius}'
+        return fmt.format(**data)
 
     @property
     def area(self):

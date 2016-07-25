@@ -78,9 +78,9 @@ class PixCoord(object):
         return np.isscalar(self.x)
 
     def __repr__(self):
-        d = dict(name=self.__class__.__name__, x=self.x, y=self.y)
-        s = '{name}\nx : {x}\ny : {y}'
-        return s.format(**d)
+        data = dict(name=self.__class__.__name__, x=self.x, y=self.y)
+        fmt = '{name}(x={x}, y={y})'
+        return fmt.format(**data)
 
     def __len__(self):
         """Define len(pixcoord) for array-valued pixcoord"""
