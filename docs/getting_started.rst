@@ -92,7 +92,7 @@ To represent pixel coordinates, `regions.PixCoord` objects are used.
 `~astropy.coordinates.SkyCoord` is a very powerful and complex class (different representations,
 a coordinate transformation tree) that is documented extensively in the `astropy.coordinates` docs.
 
-In contrast, `regions.PixCoord` is a small and simple helper class. The pixel coordinate is always
+In contrast, `~regions.PixCoord` is a small and simple helper class. The pixel coordinate is always
 represented as cartesian coordinate data members ``x`` and ``y``. A pixel coordinate doesn't have a
 frame and is not connected to the `astropy.coordinates` transformation tree.
 
@@ -288,6 +288,19 @@ This section shows one example how to construct a region for each shape that's c
         height=4,
         angle=Angle(5, 'deg'),
     )
+
+
+.. _gs-poly:
+
+Polygons
+========
+
+Polygons are the most versatile region. Any region can be approximated as a polygon.
+
+TODO: explain how polygons are implemented and special polygon methods, e.g. how to
+obtain a polygon approximation for any shape.
+This is not available yet, for now see `spherical_geometry`_ for spherical polygons
+and `shapely`_ for pixel polygons.
 
 
 .. _gs-wcs:
