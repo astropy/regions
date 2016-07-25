@@ -6,14 +6,20 @@ from ...core import PixCoord
 from ..polygon import PolygonPixelRegion, PolygonSkyRegion
 
 
-def test_init_pixel():
+def test_polygon_pixel():
     vertices = PixCoord([3, 4, 3], [3, 4, 4])
-    c = PolygonPixelRegion(vertices)
+    reg = PolygonPixelRegion(vertices)
+
+    print(reg)
+    assert str(reg) == 'PolygonPixelRegion\nvertices: PixCoord(x=[3 4 3], y=[3 4 4])'
 
 
-def test_init_sky():
+def test_polygon_sky():
     vertices = SkyCoord([3, 4, 3] * u.deg, [3, 4, 4] * u.deg)
-    c = PolygonSkyRegion(vertices)
+    reg = PolygonSkyRegion(vertices)
+
+    print(reg)
+    assert str(reg) == 'PolygonSkyRegion\nvertices: <SkyCoord (ICRS): (ra, dec) in deg\n    [(3.0, 3.0), (4.0, 4.0), (3.0, 4.0)]>'
 
 # def test_basic():
 #     """
