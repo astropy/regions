@@ -17,5 +17,4 @@ def test_ellipse_sky():
     center = SkyCoord(3, 4, unit='deg')
     reg = EllipseSkyRegion(center, 3 * u.deg, 4 * u.deg, 5 * u.deg)
 
-    print(reg)
     assert str(reg) == 'EllipseSkyRegion\ncenter: <SkyCoord (ICRS): (ra, dec) in deg\n    (3.0, 4.0)>\nminor: 3.0 deg\nmajor: 4.0 deg\nangle: 5.0 deg'
