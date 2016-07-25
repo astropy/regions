@@ -8,7 +8,7 @@ __all__ = ['RectanglePixelRegion', 'RectangleSkyRegion']
 
 class RectanglePixelRegion(PixelRegion):
     """
-    An rectangle in pixel coordinates.
+    A rectangle in pixel coordinates.
 
     Parameters
     ----------
@@ -59,11 +59,11 @@ class RectanglePixelRegion(PixelRegion):
 
 class RectangleSkyRegion(SkyRegion):
     """
-    An rectangle in sky coordinates.
+    A rectangle in sky coordinates.
 
     Parameters
     ----------
-    center : `~regions.PixCoord`
+    center : `~astropy.coordinates.SkyCoord`
         The position of the center of the rectangle.
     height : `~astropy.units.Quantity`
         The height radius of the rectangle

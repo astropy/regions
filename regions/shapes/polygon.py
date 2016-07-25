@@ -53,7 +53,7 @@ class PolygonSkyRegion(SkyRegion):
 
     Parameters
     ----------
-    vertices : `~regions.PixCoord`
+    vertices : `~astropy.coordinates.SkyCoord`
         The vertices of the polygon
     """
 
