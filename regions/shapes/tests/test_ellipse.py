@@ -8,13 +8,15 @@ from ..ellipse import EllipsePixelRegion, EllipseSkyRegion
 
 def test_ellipse_pixel():
     center = PixCoord(3, 4)
-    reg = EllipsePixelRegion(center, 3, 4, 5)
+    reg = EllipsePixelRegion(center, 3, 4, 5 * u.deg)
 
-    assert str(reg) == 'EllipsePixelRegion\ncenter: PixCoord(x=3, y=4)\nminor: 3\nmajor: 4\nangle: 5'
+    assert str(reg) == 'EllipsePixelRegion\ncenter: PixCoord(x=3, y=4)\nminor: 3\nmajor: 4\nangle: 5.0 deg'
 
 
 def test_ellipse_sky():
     center = SkyCoord(3, 4, unit='deg')
     reg = EllipseSkyRegion(center, 3 * u.deg, 4 * u.deg, 5 * u.deg)
 
-    assert str(reg) == 'EllipseSkyRegion\ncenter: <SkyCoord (ICRS): (ra, dec) in deg\n    (3.0, 4.0)>\nminor: 3.0 deg\nmajor: 4.0 deg\nangle: 5.0 deg'
+    expected = ('EllipseSkyRegion\ncenter: <SkyCoord (ICRS): (ra, dec) in deg\n'
+                '    (3.0, 4.0)>\nminor: 3.0 deg\nmajor: 4.0 deg\nangle: 5.0 deg')
+    assert str(reg) == expected

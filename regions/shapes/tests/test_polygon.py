@@ -10,7 +10,6 @@ def test_polygon_pixel():
     vertices = PixCoord([3, 4, 3], [3, 4, 4])
     reg = PolygonPixelRegion(vertices)
 
-    print(reg)
     assert str(reg) == 'PolygonPixelRegion\nvertices: PixCoord(x=[3 4 3], y=[3 4 4])'
 
 
@@ -18,8 +17,9 @@ def test_polygon_sky():
     vertices = SkyCoord([3, 4, 3] * u.deg, [3, 4, 4] * u.deg)
     reg = PolygonSkyRegion(vertices)
 
-    print(reg)
-    assert str(reg) == 'PolygonSkyRegion\nvertices: <SkyCoord (ICRS): (ra, dec) in deg\n    [(3.0, 3.0), (4.0, 4.0), (3.0, 4.0)]>'
+    expected = ('PolygonSkyRegion\nvertices: <SkyCoord (ICRS): (ra, dec) in deg\n'
+                '    [(3.0, 3.0), (4.0, 4.0), (3.0, 4.0)]>')
+    assert str(reg) == expected
 
 # def test_basic():
 #     """
