@@ -317,7 +317,6 @@ A key feature of the regions package is that, for a given image, more precisely 
 regions.
 
 
-
 With this `wcs` object, it's possible to transform back and forth between sky and pixel regions.
 As an example, let's use this sky circle:
 
@@ -340,8 +339,6 @@ To convert it to a pixel region, call the :meth:`~regions.SkyRegion.to_pixel` me
     center: PixCoord(x=55.35205711214607, y=40.0958313892697)
     radius: 36.93290808340659
 
-TODO: show example using lists of regions and mention that a single region object can't represent
-an array of regions.
 
 .. _gs-contain:
 
@@ -441,6 +438,46 @@ TODO:
 * A code example
 * Add image illustrating the compound regions
 
+.. _gs-lists:
+
+Lists
+=====
+
+A `~regions.Region` object can only represent one region, not an array (a.k.a. vector or list) of regions.
+
+This is in contrast to the aperture classes in `photutils` like `photutils.CircularAperture` that
+do allow the ``positions`` (but usually not the other parameters) to be arrays:
+
+.. code-block:: python
+
+    from photutils import CircularAperture
+    positions = [(1, 2), (3, 4)]
+    apertures = CircularAperture(positions, r=4.2)
+
+To represent lists of `~regions.Region` objects, you can store them in Python lists
+(or other containers, but lists are the most common).
+To create many similar regions or process many regions you can use for loops or list comprehensions.
+
+.. code-block:: python
+
+    >>> from regions import PixCoord, CirclePixelRegion
+    >>> regions = [
+    ...    CirclePixelRegion(center=PixCoord(x, y), radius=4.2)
+    ...    for x, y in [(1, 2), (3, 4)]
+    ... ]
+    >>> regions
+    [CirclePixelRegion
+     center: PixCoord(x=1, y=2)
+     radius: 4.2, CirclePixelRegion
+     center: PixCoord(x=3, y=4)
+     radius: 4.2]
+    >>> for region in regions:
+    ...    print(region.center)
+    PixCoord(x=1, y=2)
+    PixCoord(x=3, y=4)
+    >>> [region.area for region in regions]
+    [55.41769440932395, 55.41769440932395]
+
 .. _gs-shapely:
 
 Shapely
@@ -482,7 +519,7 @@ DS9
 ===
 
 The regions package provides functions to serialise and de-serialise Python lists of
-`regions.Region` objects to DS9 region strings: `~regions.ds9_objects_to_string`
+`~regions.Region` objects to DS9 region strings: `~regions.ds9_objects_to_string`
 and `~regions.ds9_string_to_objects`.
 
 .. code-block:: python
@@ -515,7 +552,7 @@ a file in addition to doing the region serialisation and parsing.
 
 
 Often DS9 region files contain extra information about colors or other attributes.
-This information is lost when converting to `~region.Region` objects.
+This information is lost when converting to `~regions.Region` objects.
 
 To make it available, the following two functions are made available:
 `~regions.ds9_string_to_region_list`, `~regions.ds9_region_list_to_objects`.
@@ -551,7 +588,7 @@ expose the intermediate "region list", which contains the extra attributes.
      radius: 1.0 deg]
 
 TODO: this is very confusing, because there are two "region lists", one with tuples
-and one with `region.Region` objects as input. Need to find better names, maybe even
+and one with `~regions.Region` objects as input. Need to find better names, maybe even
 a better API?
 
 Plotting
