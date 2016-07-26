@@ -16,13 +16,32 @@ effort into writing up installation instructions for this separate package.
 Stable version
 ==============
 
-Install latest stable version from https://pypi.python.org/pypi/regions :
+Installing the latest stable version is possible either using pip or conda.
 
-.. code-block:: bash
+Using pip
+---------
 
-    pip install regions
+To install regions with `pip <http://www.pip-installer.org/en/latest/>`_,
+simply run::
 
-(conda package coming soon, not available yet.)
+    pip install --no-deps regions
+
+.. note::
+
+    The ``--no-deps`` flag is optional, but highly recommended if you already
+    have Numpy installed, since otherwise pip will sometimes try to "help" you
+    by upgrading your Numpy installation, which may not always be desired.
+
+Using conda
+-----------
+
+To install regions with `anaconda <http://continuum.io/>`_, simply run::
+
+    conda install -c astropy regions
+
+
+Testing installation
+--------------------
 
 To check if your install is OK, run the tests:
 
