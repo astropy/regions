@@ -1,4 +1,4 @@
-"""Make an example plot for regions.
+"""Example how to plot sky regions on a sky image.
 """
 from astropy.coordinates import SkyCoord, Angle
 from regions import (

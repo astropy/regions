@@ -289,7 +289,6 @@ This section shows one example how to construct a region for each shape that's c
         angle=Angle(5, 'deg'),
     )
 
-
 .. _gs-poly:
 
 Polygons
@@ -339,7 +338,6 @@ To convert it to a pixel region, call the :meth:`~regions.SkyRegion.to_pixel` me
     center: PixCoord(x=55.35205711214607, y=40.0958313892697)
     radius: 36.93290808340659
 
-
 .. _gs-contain:
 
 Containment
@@ -376,29 +374,28 @@ can be called, which calls the special ``__contains__`` method defined on the re
     >>> PixCoord(29, 10) in pix_reg
     False
 
-The ``in`` operator only works for scalar coordinates (Python requires the return value
-to be a scalar bool). If you have arrays of coordinates, use the
-`regions.SkyRegion.contains` or `regions.PixelRegion.contains` methods:
+The ``in`` operator only works for scalar coordinates,
+because Python requires the return value to be a scalar bool.
+If you try to use ``in`` for non-scalar coordinates, you'll get a ``ValueError``:
 
+.. code-block:: python
+
+    >>> skycoords = SkyCoord([50, 50], [10, 60], unit='deg')
+    >>> skycoords in sky_reg
+    ValueError: coord must be scalar. coord=<SkyCoord (ICRS): (ra, dec) in deg
+        [(50.0, 10.0), (50.0, 60.0)]>
+
+If you have arrays of coordinates, use the `regions.SkyRegion.contains`
+or `regions.PixelRegion.contains` methods:
 
 .. code-block:: python
 
     >>> skycoords = SkyCoord([50, 50], [10, 60], unit='deg')
     >>> sky_reg.contains(skycoords)
     array([ True, False], dtype=bool)
-
-    >>> pixcoords = skycoords.to_pixel(wcs)
-
-    >>> skycoords in sky_reg
-    ValueError: <SkyCoord (ICRS): (ra, dec) in deg
-    [(50.0, 10.0), (50.0, 60.0)]> must be scalar
-    >>> pix_reg.contains(PixCoord(29, 3))
-    True
-    >>> sky_reg.contains(SkyCoord([50, 50], [10, 60], unit='deg'))
+    >>> pixcoords = PixCoord.from_sky(skycoords, wcs)
+    >>> pix_reg.contains(pixcoords)
     array([ True, False], dtype=bool)
-
-TODO: add pixel coordinate example
-
 
 .. _gs-masks:
 
@@ -550,7 +547,6 @@ a file in addition to doing the region serialisation and parsing.
          (245.3477, 24.4291)>
      radius: 3.0 deg]
 
-
 Often DS9 region files contain extra information about colors or other attributes.
 This information is lost when converting to `~regions.Region` objects.
 
@@ -587,14 +583,33 @@ expose the intermediate "region list", which contains the extra attributes.
          (99.0, 33.0)>
      radius: 1.0 deg]
 
-TODO: this is very confusing, because there are two "region lists", one with tuples
-and one with `~regions.Region` objects as input. Need to find better names, maybe even
-a better API?
+.. warning::
+
+    This is very confusing, because there are two "region lists", one with tuples
+    and one with `~regions.Region` objects as input. Need to find a better API
+    or at least better names.
+
+    Also, all regions currently have ``meta`` and ``visual`` arguments for ``__init__``
+    and stored as region data members. These need to be documented and tests added,
+    or removed.
 
 Plotting
 ========
 
-TODO
+Some `~regions.Region` objects have an ``as_patch()`` and ``plot()`` method that allows
+plotting them with `matplotlib` and `wcsaxes` for sky regions and sky images.
+This is not the case for compound regions.
+
+Here's how to plot a `~regions.CirclePixelRegion` on an image.
+
+.. plot:: plot_example_pix.py
+   :include-source:
+
+Calling :meth:`~regions.CirclePixelRegion.as_patch` on the ``region`` object would
+return a `matplotlib.patches.Circle` object.
+
+An example of how to plot sky regions on a sky image is shown above.
+
 
 What next?
 ==========
