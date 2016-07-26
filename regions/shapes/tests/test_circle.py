@@ -25,14 +25,39 @@ except:
     HAS_WCSAXES = False
 
 
-def test_init_pixel():
-    pixcoord = PixCoord(3, 4)
-    c = CirclePixelRegion(pixcoord, 2)
+def test_circle_pixel():
+    center = PixCoord(3, 4)
+    reg = CirclePixelRegion(center, 2)
+
+    assert str(reg) == 'CirclePixelRegion\ncenter: PixCoord(x=3, y=4)\nradius: 2'
 
 
-def test_init_sky():
-    skycoord = SkyCoord(3 * u.deg, 4 * u.deg)
-    c = CircleSkyRegion(skycoord, 2 * u.arcsec)
+def test_circle_sky():
+    center = SkyCoord(3 * u.deg, 4 * u.deg)
+    reg = CircleSkyRegion(center, 2 * u.arcsec)
+
+    assert str(reg) == 'CircleSkyRegion\ncenter: <SkyCoord (ICRS): (ra, dec) in deg\n    (3.0, 4.0)>\nradius: 2.0 arcsec'
+
+
+def test_transformation():
+    skycoord = SkyCoord(3 * u.deg, 4 * u.deg, frame='galactic')
+    skycircle = CircleSkyRegion(skycoord, 2 * u.arcsec)
+
+    headerfile = get_pkg_data_filename('data/example_header.fits')
+    h = getheader(headerfile)
+    wcs = WCS(h)
+
+    pixcircle = skycircle.to_pixel(wcs)
+
+    assert_allclose(pixcircle.center.x, -50.5)
+    assert_allclose(pixcircle.center.y, 299.5)
+    assert_allclose(pixcircle.radius, 0.027777777777828305)
+
+    skycircle2 = pixcircle.to_sky(wcs)
+
+    assert_quantity_allclose(skycircle.center.data.lon, skycircle2.center.data.lon)
+    assert_quantity_allclose(skycircle.center.data.lat, skycircle2.center.data.lat)
+    assert_quantity_allclose(skycircle2.radius, skycircle.radius)
 
 
 # Todo : restructure test to use same circle everywhere
@@ -57,24 +82,3 @@ def test_plot():
     assert p.get_facecolor() == (1, 0, 0, 0.6)
 
     c.plot(ax, alpha=0.6)
-
-
-def test_transformation():
-    skycoord = SkyCoord(3 * u.deg, 4 * u.deg, frame='galactic')
-    skycircle = CircleSkyRegion(skycoord, 2 * u.arcsec)
-
-    headerfile = get_pkg_data_filename('data/example_header.fits')
-    h = getheader(headerfile)
-    wcs = WCS(h)
-
-    pixcircle = skycircle.to_pixel(wcs)
-
-    assert_allclose(pixcircle.center.x, -50.5)
-    assert_allclose(pixcircle.center.y, 299.5)
-    assert_allclose(pixcircle.radius, 0.027777777777828305)
-
-    skycircle2 = pixcircle.to_sky(wcs)
-
-    assert_quantity_allclose(skycircle.center.data.lon, skycircle2.center.data.lon)
-    assert_quantity_allclose(skycircle.center.data.lat, skycircle2.center.data.lat)
-    assert_quantity_allclose(skycircle2.radius, skycircle.radius)

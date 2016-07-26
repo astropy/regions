@@ -1,3 +1,5 @@
+.. include:: references.txt
+
 .. _install:
 
 ************
@@ -31,7 +33,7 @@ To check if your install is OK, run the tests:
 Development version
 ===================
 
-Install the latest development version:
+Install the latest development version from https://github.com/astropy/regions :
 
 .. code-block:: bash
 
@@ -46,6 +48,6 @@ Optional dependencies
 
 The following packages are optional dependencies, install if needed:
 
-* Shapely for advanced pixel region operations
-* matplotlib and wcsaxes for plotting regions
-* maybe https://github.com/spacetelescope/sphere
+* `shapely`_ for advanced pixel region operations
+* `matplotlib`_ and `wcsaxes`_ for plotting regions
+* maybe `spherical_geometry`_ for polygons.

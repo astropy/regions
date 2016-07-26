@@ -29,11 +29,11 @@ Some functions for region-based calculations (e.g. filtering a table of sky or
 pixel positions) as well as functions for region serialisation (e.g. to and from
 ds9 region string format) are available.
 
-Example dataset
-===============
+Dataset
+=======
 
-Throughout this tutorial, we will be working with the same `~regions.ExampleSimulatedDataset`
-and assume that you have executed this code to create example ``dataset`` and ``wcs`` objects:
+Throughout this tutorial, we will be working with the same example dataset and assume that
+you have run `~regions.make_example_dataset` to create example ``dataset`` and ``wcs`` objects like this:
 
 .. code-block:: python
 
@@ -58,12 +58,12 @@ Before we start diving into coding with regions, here's an image that illustrate
 example counts image, with source positions and a few regions overplotted:
 
 .. plot:: plot_example.py
-   :include-source: false
+    :include-source: false
 
 .. _gs-coord:
 
-Sky and pixel coordinates
-=========================
+Coordinates
+===========
 
 This regions package uses `astropy.coordinates.SkyCoord` objects to represent sky
 coordinates.
@@ -83,9 +83,7 @@ To represent pixel coordinates, `regions.PixCoord` objects are used.
     >>> from regions import PixCoord
     >>> pixcoord = PixCoord(x=42, y=43)
     >>> pixcoord
-    PixCoord
-    x : 42
-    y : 43
+    PixCoord(x=42, y=43)
     >>> pixcoord.x
     42
     >>> pixcoord.y
@@ -94,7 +92,7 @@ To represent pixel coordinates, `regions.PixCoord` objects are used.
 `~astropy.coordinates.SkyCoord` is a very powerful and complex class (different representations,
 a coordinate transformation tree) that is documented extensively in the `astropy.coordinates` docs.
 
-In contrast, `regions.PixCoord` is a small and simple helper class. The pixel coordinate is always
+In contrast, `~regions.PixCoord` is a small and simple helper class. The pixel coordinate is always
 represented as cartesian coordinate data members ``x`` and ``y``. A pixel coordinate doesn't have a
 frame and is not connected to the `astropy.coordinates` transformation tree.
 
@@ -106,9 +104,7 @@ forth between sky and pixel coordinates:
     >>> skycoord = SkyCoord(42, 43, unit='deg', frame='galactic')
     >>> pixcoord = PixCoord.from_sky(skycoord=skycoord, wcs=wcs)
     >>> pixcoord
-    PixCoord
-    x : 20.27424296606442
-    y : 12.259980510825843
+    PixCoord(x=146.2575703393558, y=131.5998051082584)
     >>> pixcoord.to_sky(wcs=wcs)
     <SkyCoord (Galactic): (l, b) in deg
         (42.0, 43.0)>
@@ -123,9 +119,7 @@ to represent arrays of pixel coordinates:
 
     >>> pixcoord = PixCoord(x=[0, 1], y=[2, 3])
     >>> pixcoord
-    PixCoord
-    x : [0 1]
-    y : [2 3]
+    PixCoord(x=[0 1], y=[2 3])
     >>> pixcoord.isscalar
     False
 
@@ -154,9 +148,9 @@ You can print the regions to get some info about its properties:
 
     >>> print(region)
     CircleSkyRegion
-    Center:<SkyCoord (ICRS): (ra, dec) in deg
+    center:<SkyCoord (ICRS): (ra, dec) in deg
         (42.0, 43.0)>
-    Radius:3.0 deg
+    radius:3.0 deg
 
 To see a list of all available sky regions, you can go to the API docs
 or in IPython print the list like this:
@@ -193,10 +187,8 @@ You can print the regions to get some info about its properties:
 
     >>> print(region)
     CirclePixelRegion
-    Center: PixCoord
-    x : 42
-    y : 43
-    Radius: 4.2
+    center: PixCoord(x=42, y=43)
+    radius: 4.2
 
 To see a list of all available sky regions, you can go to the API docs
 or in IPython print the list like this:
@@ -206,10 +198,115 @@ or in IPython print the list like this:
     In [1]: import regions
     In [2]: regions.*PixelRegion?
 
+.. _gs-shapes:
+
+Shapes
+======
+
+This section shows one example how to construct a region for each shape that's currently supported.
+
+* `~regions.CircleSkyRegion` and `~regions.CirclePixelRegion`
+
+.. code-block:: python
+
+    from astropy.coordinates import Angle, SkyCoord
+    from regions import PixCoord, CircleSkyRegion, CirclePixelRegion
+
+    circle_sky = CircleSkyRegion(
+        center=SkyCoord(42, 43, unit='deg'),
+        radius=Angle(3, 'deg'),
+    )
+    circle_pix = CirclePixelRegion(
+        center=PixCoord(x=42, y=43),
+        radius=4.2,
+    )
+
+* `~regions.EllipseSkyRegion` and `~regions.EllipsePixelRegion`
+
+.. code-block:: python
+
+    from astropy.coordinates import Angle, SkyCoord
+    from regions import PixCoord, EllipseSkyRegion, EllipsePixelRegion
+
+    ellipse_sky = EllipseSkyRegion(
+        center=SkyCoord(42, 43, unit='deg'),
+        minor=Angle(3, 'deg'),
+        major=Angle(4, 'deg'),
+        angle=Angle(5, 'deg'),
+    )
+    ellipse_pix = EllipsePixelRegion(
+        center=PixCoord(x=42, y=43),
+        minor=3,
+        major=4,
+        angle=Angle(5, 'deg'),
+    )
+
+* `~regions.PointSkyRegion` and `~regions.PointPixelRegion`
+
+.. code-block:: python
+
+    from astropy.coordinates import SkyCoord
+    from regions import PixCoord, PointSkyRegion, PointPixelRegion
+
+    point_sky = PointSkyRegion(
+        center=SkyCoord(42, 43, unit='deg'),
+    )
+    point_pix = PointPixelRegion(
+        center=PixCoord(x=42, y=43),
+    )
+
+* `~regions.PolygonSkyRegion` and `~regions.PolygonPixelRegion`
+
+.. code-block:: python
+
+    from astropy.coordinates import SkyCoord
+    from regions import PixCoord, PolygonSkyRegion, PolygonPixelRegion
+
+    polygon_sky = PolygonSkyRegion(
+        vertices=SkyCoord([1, 2, 2], [1, 1, 2], unit='deg'),
+    )
+    polygon_pix = PolygonPixelRegion(
+        vertices=PixCoord(x=[1, 2, 2], y=[1, 1, 2]),
+    )
+
+* `~regions.RectangleSkyRegion` and `~regions.RectanglePixelRegion`
+
+.. code-block:: python
+
+    from astropy.coordinates import Angle, SkyCoord
+    from regions import PixCoord, RectangleSkyRegion, RectanglePixelRegion
+
+    rectangle_sky = RectangleSkyRegion(
+        center=SkyCoord(42, 43, unit='deg'),
+        width=Angle(3, 'deg'),
+        height=Angle(4, 'deg'),
+        angle=Angle(5, 'deg'),
+    )
+    rectangle_pix = RectanglePixelRegion(
+        center=PixCoord(x=42, y=43),
+        width=3,
+        height=4,
+        angle=Angle(5, 'deg'),
+    )
+
+
+.. _gs-poly:
+
+Polygons
+========
+
+Polygons are the most versatile region. Any region can be approximated as a polygon.
+
+TODO: explain how polygons are implemented and special polygon methods, e.g. how to
+obtain a polygon approximation for any shape.
+This is not available yet, for now see `spherical_geometry`_ for spherical polygons
+and `shapely`_ for pixel polygons.
+
+
 .. _gs-wcs:
 
-Region transformations
-======================
+Transformations
+===============
 
 In the last two sections, we talked about how for every region shape (e.g. circle),
 there's two classes, one representing "sky regions" and another representing "pixel regions"
@@ -238,12 +335,10 @@ To convert it to a pixel region, call the :meth:`~regions.SkyRegion.to_pixel` me
 .. code-block:: python
 
     >>> pix_reg = sky_reg.to_pixel(wcs)
-    >>> pix_reg.center
+    >>> pix_reg
     CirclePixelRegion
-    Center: PixCoord
-    x : 29.364794288785394
-    y : 3.10958313892697
-    Radius: 3.6932908082121654
+    center: PixCoord(x=55.35205711214607, y=40.0958313892697)
+    radius: 36.93290808340659
 
 TODO: show example using lists of regions and mention that a single region object can't represent
 an array of regions.
@@ -259,15 +354,13 @@ Let's continue with the ``sky_reg`` and ``pix_reg`` objects defined in the previ
 
     >>> print(sky_reg)
     CircleSkyRegion
-    Center:<SkyCoord (ICRS): (ra, dec) in deg
+    center:<SkyCoord (ICRS): (ra, dec) in deg
         (50.0, 10.0)>
-    Radius:30.0 deg
+    radius:30.0 deg
     >>> print(pix_reg)
     CirclePixelRegion
-    Center: PixCoord
-    x : 29.364794288785394
-    y : 3.10958313892697
-    Radius: 3.6932908082121654
+    center: PixCoord(x=55.35205711214607, y=40.0958313892697)
+    radius: 36.93290808340659
 
 
 To test if a given point is inside or outside the regions, the Python ``in`` operator
@@ -310,10 +403,10 @@ to be a scalar bool). If you have arrays of coordinates, use the
 TODO: add pixel coordinate example
 
 
-.. _gs-spatial:
+.. _gs-masks:
 
-Spatial filtering
-=================
+Masks
+=====
 
 For aperture photometry, a common operation is to compute, for a given image and region,
 a boolean mask or array of pixel indices defining which pixels (in the whole image or a
@@ -329,8 +422,8 @@ For now, please use `photutils`_ or `pyregion`_.
 
 .. _gs-compound:
 
-Compound regions
-================
+Compounds
+=========
 
 There's a few ways to combine any two `~regions.Region` objects into a compound region,
 i.e. a `~regions.CompoundPixelRegion` or `~regions.CompoundSkyRegion` object.
@@ -385,8 +478,8 @@ namely to buffer a rectangle, resulting in a polygon.
 
 .. _gs-ds9:
 
-ds9 region strings
-==================
+DS9
+===
 
 The regions package provides functions to serialise and de-serialise Python lists of
 `regions.Region` objects to DS9 region strings: `~regions.ds9_objects_to_string`
@@ -399,9 +492,9 @@ and `~regions.ds9_string_to_objects`.
     >>> regions = ds9_string_to_objects(reg_string)
     >>> regions[0]
     CircleSkyRegion
-    Center: <Galactic Coordinate: (l, b) in deg
+    center: <Galactic Coordinate: (l, b) in deg
         (42.0, 43.0)>
-    Radius: 3.0 deg
+    radius: 3.0 deg
     >>> ds9_objects_to_string(regions, coordsys='galactic')
     '# Region file format: DS9 astropy/regions\ngalactic\ncircle(42.0000,43.0000,3.0000)\n'
 
@@ -415,6 +508,11 @@ a file in addition to doing the region serialisation and parsing.
     >>> write_ds9(regions, filename)
     >>> regions = read_ds9(filename)
     >>> regions
+    [CircleSkyRegion
+     center: <FK5 Coordinate (equinox=J2000.000): (ra, dec) in deg
+         (245.3477, 24.4291)>
+     radius: 3.0 deg]
+
 
 Often DS9 region files contain extra information about colors or other attributes.
 This information is lost when converting to `~region.Region` objects.
@@ -445,19 +543,19 @@ expose the intermediate "region list", which contains the extra attributes.
     >>> regions = ds9_region_list_to_objects(region_list)
     >>> regions
     [CircleSkyRegion
-     Center: <Galactic Coordinate: (l, b) in deg
+     center: <Galactic Coordinate: (l, b) in deg
          (42.0, 43.0)>
-     Radius: 3.0 deg, CircleSkyRegion
-     Center: <Galactic Coordinate: (l, b) in deg
+     radius: 3.0 deg, CircleSkyRegion
+     center: <Galactic Coordinate: (l, b) in deg
          (99.0, 33.0)>
-     Radius: 1.0 deg]
+     radius: 1.0 deg]
 
 TODO: this is very confusing, because there are two "region lists", one with tuples
 and one with `region.Region` objects as input. Need to find better names, maybe even
 a better API?
 
-Plotting regions
-================
+Plotting
+========
 
 TODO
 

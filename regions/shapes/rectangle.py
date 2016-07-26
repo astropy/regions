@@ -8,7 +8,7 @@ __all__ = ['RectanglePixelRegion', 'RectangleSkyRegion']
 
 class RectanglePixelRegion(PixelRegion):
     """
-    An rectangle in pixel coordinates.
+    A rectangle in pixel coordinates.
 
     Parameters
     ----------
@@ -31,6 +31,17 @@ class RectanglePixelRegion(PixelRegion):
         self.angle = angle
         self.meta = meta or {}
         self.visual = visual or {}
+
+    def __repr__(self):
+        data = dict(
+            name=self.__class__.__name__,
+            center=self.center,
+            height=self.height,
+            width=self.width,
+            angle=self.angle,
+        )
+        fmt = '{name}\ncenter: {center}\nheight: {height}\nwidth: {width}\nangle: {angle}'
+        return fmt.format(**data)
 
     @property
     def area(self):
@@ -59,11 +70,11 @@ class RectanglePixelRegion(PixelRegion):
 
 class RectangleSkyRegion(SkyRegion):
     """
-    An rectangle in sky coordinates.
+    A rectangle in sky coordinates.
 
     Parameters
     ----------
-    center : `~regions.PixCoord`
+    center : `~astropy.coordinates.SkyCoord`
         The position of the center of the rectangle.
     height : `~astropy.units.Quantity`
         The height radius of the rectangle
@@ -82,6 +93,17 @@ class RectangleSkyRegion(SkyRegion):
         self.angle = angle
         self.meta = meta or {}
         self.visual = visual or {}
+
+    def __repr__(self):
+        data = dict(
+            name=self.__class__.__name__,
+            center=self.center,
+            height=self.height,
+            width=self.width,
+            angle=self.angle,
+        )
+        fmt = '{name}\ncenter: {center}\nheight: {height}\nwidth: {width}\nangle: {angle}'
+        return fmt.format(**data)
 
     @property
     def area(self):
