@@ -21,7 +21,8 @@ Installing the latest stable version is possible either using pip or conda.
 Using pip
 ---------
 
-To install regions with `pip <http://www.pip-installer.org/en/latest/>`_,
+To install regions with `pip <http://www.pip-installer.org/en/latest/>`_
+from `PyPI <https://pypi.python.org/pypi/regions>`_
 simply run::
 
     pip install --no-deps regions
@@ -35,7 +36,9 @@ simply run::
 Using conda
 -----------
 
-To install regions with `anaconda <http://continuum.io/>`_, simply run::
+To install regions with `Anaconda <https://www.continuum.io/downloads>`_
+from the `astropy channel on anaconda.org <https://anaconda.org/astropy/regions>`__
+simply run::
 
     conda install -c astropy regions
 
@@ -69,4 +72,4 @@ The following packages are optional dependencies, install if needed:
 
 * `shapely`_ for advanced pixel region operations
 * `matplotlib`_ and `wcsaxes`_ for plotting regions
-* maybe `spherical_geometry`_ for polygons.
+* maybe `spherical_geometry`_ for polygons (not used yet)

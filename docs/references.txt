@@ -5,5 +5,4 @@
 .. _shapely: http://toblerity.org/shapely/manual.html
 .. _wcsaxes: http://wcsaxes.readthedocs.io/en/latest/
 .. _Github repository: https://github.com/astropy/regions
-.. _PyAstro16 doc: https://docs.google.com/document/d/17owovjcpNFirz-f8qCWWxvcHHPGGpO5JJic5WbtD9JY/edit?pref=2&pli=1
 .. _Region documentation: http://astropy-regions.readthedocs.io/en/latest/
