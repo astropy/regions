@@ -27,9 +27,7 @@ env:
         - MAIN_CMD='python setup.py'
         - PIP_DEPENDENCIES=''
         - CONDA_DEPENDENCIES='Cython shapely wcsaxes'
-
-        # If there are matplotlib or other GUI tests, uncomment the following
-        # line to use the X virtual framebuffer.
+        - CONDA_CHANNELS='astropy'
         - SETUP_XVFB=True
 
     matrix:
