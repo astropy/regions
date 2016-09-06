@@ -63,7 +63,7 @@ Install the latest development version from https://github.com/astropy/regions :
     cd regions
     python setup.py install
     python setup.py test
-    python setup.py build_sphinx
+    python setup.py build_docs
 
 Optional dependencies
 =====================
