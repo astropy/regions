@@ -1,6 +1,9 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 from __future__ import absolute_import, division, print_function, unicode_literals
+
+import numpy as np
 from numpy.testing import assert_allclose
+
 from astropy import units as u
 from astropy.coordinates import SkyCoord
 from astropy.tests.helper import pytest, assert_quantity_allclose
@@ -82,3 +85,10 @@ def test_plot():
     assert p.get_facecolor() == (1, 0, 0, 0.6)
 
     c.plot(ax, alpha=0.6)
+
+
+def test_to_mask():
+    center = PixCoord(3, 4)
+    reg = CirclePixelRegion(center, 2)
+    mask = reg.to_mask((10, 10), mode='exact')
+    assert np.sum(mask) == np.pi * 2**2

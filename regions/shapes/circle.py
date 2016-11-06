@@ -1,12 +1,17 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 from __future__ import absolute_import, division, print_function, unicode_literals
+
 import math
+
+import numpy as np
 from astropy.coordinates import Angle
 from astropy.wcs.utils import pixel_to_skycoord
+
 from ..core import PixelRegion, SkyRegion
 from ..utils import skycoord_to_pixel_scale_angle
 from ..utils.positions_to_extents import get_phot_extents
 from ..utils.wcs_helpers import skycoord_to_pixel_scale_angle
+from .._geometry import circular_overlap_grid
 
 __all__ = ['CirclePixelRegion', 'CircleSkyRegion']
 
@@ -64,44 +69,47 @@ class CirclePixelRegion(PixelRegion):
         return CircleSkyRegion(center, radius)
 
     def to_mask(self, shape, mode='center'):
-        # TODO: needs to be implemented
 
-        positions = self.center
-        radius = self.radius
+        # For now we assume that this class represents a single circle
 
-        extents = np.zeros((len(positions), 4), dtype=int)
+        # Find exact bounds
+        xmin = self.center.x - self.radius
+        xmax = self.center.x + self.radius
+        ymin = self.center.y - self.radius
+        ymax = self.center.y + self.radius
 
-        extents[:, 0] = positions[:, 0] - radius + 0.5
-        extents[:, 1] = positions[:, 0] + radius + 1.5
-        extents[:, 2] = positions[:, 1] - radius + 0.5
-        extents[:, 3] = positions[:, 1] + radius + 1.5
+        # Find range of pixels
+        imin = max(0, int(xmin))
+        imax = min(shape[1] - 1, int(xmax) + 1)
+        jmin = max(0, int(ymin))
+        jmax = min(shape[0] - 1, int(ymax) + 1)
 
-        ood_filter, extent, phot_extent = get_phot_extents(shape, positions,
-                                                           extents)
+        # Find mask size
+        nx = imax - imin + 1
+        ny = jmax - jmin + 1
 
-        x_min, x_max, y_min, y_max = extent
-        x_pmin, x_pmax, y_pmin, y_pmax = phot_extent
+        # Find position of pixel edges and recenter so that circle is at origin
+        xmin = float(imin) - 0.5 - self.center.x
+        xmax = float(imax) + 0.5 - self.center.x
+        ymin = float(jmin) - 0.5 - self.center.y
+        ymax = float(jmax) + 0.5 - self.center.y
 
         if mode == 'center':
             use_exact = 0
-            subpixels = 1
-        elif mode == 'subpixel':
-            use_exact = 0
         else:
             use_exact = 1
-            subpixels = 1
 
-        from .geometry import circular_overlap_grid
+        print(xmin, xmax, ymin, ymax, nx, ny, self.radius, use_exact)
 
-        for ind in range(len(positions)):
-            fraction = circular_overlap_grid(x_pmin[ind], x_pmax[ind],
-                                             y_pmin[ind], y_pmax[ind],
-                                             x_max[ind] - x_min[ind],
-                                             y_max[ind] - y_min[ind],
-                                             radius, use_exact, subpixels)
+        fraction = circular_overlap_grid(xmin, xmax, ymin, ymax, nx, ny,
+                                         self.radius, use_exact, 1)
 
-        return fraction
-
+        if mode == 'all':
+            return fraction == 1
+        elif mode == 'any':
+            return fraction > 0
+        else:
+            return fraction
 
     def as_patch(self, **kwargs):
         import matplotlib.patches as mpatches
