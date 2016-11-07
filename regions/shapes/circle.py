@@ -67,7 +67,7 @@ class CirclePixelRegion(PixelRegion):
         radius = Angle(self.radius / scale, 'deg')
         return CircleSkyRegion(center, radius)
 
-    def to_mask(self, mode='center'):
+    def to_mask(self, mode='center', subpixels=5):
 
         # For now we assume that this class represents a single circle
 
@@ -93,13 +93,13 @@ class CirclePixelRegion(PixelRegion):
         ymin = float(jmin) - 0.5 - self.center.y
         ymax = float(jmax) + 0.5 - self.center.y
 
-        if mode == 'center':
+        if mode in ('center', 'subpixels'):
             use_exact = 0
         else:
             use_exact = 1
 
         fraction = circular_overlap_grid(xmin, xmax, ymin, ymax, nx, ny,
-                                         self.radius, use_exact, 1)
+                                         self.radius, use_exact, subpixels)
 
         if mode == 'all':
             mask = fraction == 1
