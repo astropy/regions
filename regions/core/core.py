@@ -146,13 +146,13 @@ class PixelRegion(Region):
         """
 
     @abc.abstractmethod
-    def to_mask(self, mode='center'):
+    def to_mask(self, mode='center', subpixels=5):
         """
         Returns a mask for the aperture.
 
         Parameters
         ----------
-        mode : { 'center' | 'any' | 'all' | 'exact' }
+        mode : { 'center' | 'any' | 'all' | 'exact' | 'subpixels'}
             The following modes are available:
                 * ``'center'``: returns 1 for pixels where the center is in
                   the region, and 0 otherwise.
@@ -162,6 +162,17 @@ class PixelRegion(Region):
                   the region, 0 otherwise.
                 * ``'exact'``: returns a value between 0 and 1 giving the
                   fractional level of overlap of the pixel with the region.
+                * ``'subpixels'``: A pixel is divided into subpixels and
+                  the center of each subpixel is tested (a subpixel is
+                  either completely in or out of the region).  Returns a
+                  value between 0 and 1 giving the fractional level of
+                  overlap of the subpixels with the region.  With
+                  ``subpixels`` set to 1, this method is equivalent to
+                  ``'center'``.
+        subpixels : int, optional
+            For the ``'subpixel'`` mode, resample pixels by this factor
+            in each dimension. That is, each pixel is divided into
+            ``subpixels ** 2`` subpixels.
 
         Returns
         -------
