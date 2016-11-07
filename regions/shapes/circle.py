@@ -7,9 +7,8 @@ import numpy as np
 from astropy.coordinates import Angle
 from astropy.wcs.utils import pixel_to_skycoord
 
-from ..core import PixelRegion, SkyRegion
+from ..core import PixelRegion, SkyRegion, Mask
 from ..utils import skycoord_to_pixel_scale_angle
-from ..utils.positions_to_extents import get_phot_extents
 from ..utils.wcs_helpers import skycoord_to_pixel_scale_angle
 from .._geometry import circular_overlap_grid
 
@@ -68,7 +67,7 @@ class CirclePixelRegion(PixelRegion):
         radius = Angle(self.radius / scale, 'deg')
         return CircleSkyRegion(center, radius)
 
-    def to_mask(self, shape, mode='center'):
+    def to_mask(self, mode='center'):
 
         # For now we assume that this class represents a single circle
 
@@ -79,10 +78,10 @@ class CirclePixelRegion(PixelRegion):
         ymax = self.center.y + self.radius
 
         # Find range of pixels
-        imin = max(0, int(xmin))
-        imax = min(shape[1] - 1, int(xmax) + 1)
-        jmin = max(0, int(ymin))
-        jmax = min(shape[0] - 1, int(ymax) + 1)
+        imin = int(xmin)
+        imax = int(xmax) + 1
+        jmin = int(ymin)
+        jmax = int(ymax) + 1
 
         # Find mask size
         nx = imax - imin + 1
@@ -99,17 +98,17 @@ class CirclePixelRegion(PixelRegion):
         else:
             use_exact = 1
 
-        print(xmin, xmax, ymin, ymax, nx, ny, self.radius, use_exact)
-
         fraction = circular_overlap_grid(xmin, xmax, ymin, ymax, nx, ny,
                                          self.radius, use_exact, 1)
 
         if mode == 'all':
-            return fraction == 1
+            mask = fraction == 1
         elif mode == 'any':
-            return fraction > 0
+            mask = fraction > 0
         else:
-            return fraction
+            mask = fraction
+
+        return Mask(mask, origin=(jmin, imin))
 
     def as_patch(self, **kwargs):
         import matplotlib.patches as mpatches

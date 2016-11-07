@@ -87,6 +87,7 @@ def test_plot():
     c.plot(ax, alpha=0.6)
 
 
+
 def test_to_mask():
     center = PixCoord(3, 4)
     reg = CirclePixelRegion(center, 2)
