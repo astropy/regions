@@ -92,4 +92,4 @@ def test_to_mask():
     center = PixCoord(3, 4)
     reg = CirclePixelRegion(center, 2)
     mask = reg.to_mask(mode='exact')
-    assert_allclose(np.sum(mask.mask), 4 * np.pi)
+    assert_allclose(np.sum(mask.data), 4 * np.pi)

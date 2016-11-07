@@ -1,3 +1,5 @@
+import numpy as np
+
 __all__ = ['Mask']
 
 
@@ -18,15 +20,12 @@ class Mask(object):
         minimal bounding box.
     """
 
-    def __init__(self, mask, bbox_slice):
+    def __init__(self, mask, origin):
+
         self.data = np.asanyarray(mask)
         self.shape = mask.shape
-        self.slices = bbox_slice
-
-        dy = bbox_slice[0].stop - bbox_slice[0].start
-        dx = bbox_slice[1].stop - bbox_slice[1].start
-        if self.data.shape != (dy, dx):
-            raise ValueError('mask shape and bbox_slice do not agree.')
+        self.slices = (slice(origin[0], origin[0] + self.shape[0]),
+                       slice(origin[1], origin[1] + self.shape[1]))
 
     @property
     def array(self):
