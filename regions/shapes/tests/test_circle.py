@@ -91,5 +91,5 @@ def test_plot():
 def test_to_mask():
     center = PixCoord(3, 4)
     reg = CirclePixelRegion(center, 2)
-    mask = reg.to_mask((10, 10), mode='exact')
-    assert np.sum(mask) == np.pi * 2**2
+    mask = reg.to_mask(mode='exact')
+    assert np.sum(mask.mask) == np.pi * 2**2

@@ -10,6 +10,8 @@ from astropy.tests.helper import pytest
 from astropy import units as u
 from astropy.coordinates import ICRS
 from astropy.wcs import WCS
+
+from ...core.mask import Mask
 from ...core.core import Region, SkyRegion, PixelRegion
 from ...core.pixcoord import PixCoord
 from ..circle import CirclePixelRegion, CircleSkyRegion
@@ -92,8 +94,7 @@ def test_pix_to_shapely(region):
 def test_pix_to_mask(region, mode):
     try:
         mask = region.to_mask(mode=mode)
-        assert isinstance(mask, np.ndarray)
-        assert mask.ndim == 2
+        assert isinstance(mask, Mask)
     except NotImplementedError:
         pytest.xfail()
 
