@@ -6,6 +6,7 @@ from astropy import units as u
 from astropy.coordinates import SkyCoord
 from ...core import PixCoord
 from ..polygon import PolygonPixelRegion, PolygonSkyRegion
+from .utils import ASTROPY_LT_13
 
 
 @pytest.fixture
@@ -26,8 +27,12 @@ def test_polygon_pixel(pix_poly):
 
 
 def test_polygon_sky(sky_poly):
-    expected = ('PolygonSkyRegion\nvertices: <SkyCoord (ICRS): (ra, dec) in deg\n'
-                '    [(3.0, 3.0), (4.0, 4.0), (3.0, 4.0)]>')
+    if ASTROPY_LT_13:
+        expected = ('PolygonSkyRegion\nvertices: <SkyCoord (ICRS): (ra, dec) in deg\n'
+                    '    [(3.0, 3.0), (4.0, 4.0), (3.0, 4.0)]>')
+    else:
+        expected = ('PolygonSkyRegion\nvertices: <SkyCoord (ICRS): (ra, dec) in deg\n'
+                    '    [( 3.,  3.), ( 4.,  4.), ( 3.,  4.)]>')
     assert str(sky_poly) == expected
 
 

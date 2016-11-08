@@ -12,6 +12,7 @@ from astropy.io.fits import getheader
 from astropy.wcs import WCS
 from ...core import PixCoord
 from ..circle import CirclePixelRegion, CircleSkyRegion
+from .utils import ASTROPY_LT_13
 
 try:
     import matplotlib
@@ -39,7 +40,10 @@ def test_circle_sky():
     center = SkyCoord(3 * u.deg, 4 * u.deg)
     reg = CircleSkyRegion(center, 2 * u.arcsec)
 
-    assert str(reg) == 'CircleSkyRegion\ncenter: <SkyCoord (ICRS): (ra, dec) in deg\n    (3.0, 4.0)>\nradius: 2.0 arcsec'
+    if ASTROPY_LT_13:
+        assert str(reg) == 'CircleSkyRegion\ncenter: <SkyCoord (ICRS): (ra, dec) in deg\n    (3.0, 4.0)>\nradius: 2.0 arcsec'
+    else:
+        assert str(reg) == 'CircleSkyRegion\ncenter: <SkyCoord (ICRS): (ra, dec) in deg\n    ( 3.,  4.)>\nradius: 2.0 arcsec'
 
 
 def test_transformation():
