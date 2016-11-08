@@ -163,7 +163,7 @@ class Mask(object):
 
         return cutout
 
-    def apply(self, data, fill_value=0.):
+    def multiply(self, data, fill_value=0.):
         """
         Apply the region mask to the input data, taking any edge effects
         into account.
