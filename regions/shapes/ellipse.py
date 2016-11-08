@@ -67,12 +67,16 @@ class EllipsePixelRegion(PixelRegion):
 
         # NOTE: assumes this class represents a single circle
 
+        if mode == 'center':
+            mode = 'subpixels'
+            subpixels = 1
+
         # Find exact bounds
         # FIXME: this is not the minimal bounding box, and can be optimized
-        xmin = self.center.x - self.major
-        xmax = self.center.x + self.major
-        ymin = self.center.y - self.major
-        ymax = self.center.y + self.major
+        xmin = self.center.x - max(self.major, self.minor)
+        xmax = self.center.x + max(self.major, self.minor)
+        ymin = self.center.y - max(self.major, self.minor)
+        ymax = self.center.y + max(self.major, self.minor)
 
         # Find range of pixels
         imin = int(xmin)
@@ -90,7 +94,7 @@ class EllipsePixelRegion(PixelRegion):
         ymin = float(jmin) - 0.5 - self.center.y
         ymax = float(jmax) + 0.5 - self.center.y
 
-        if mode in ('center', 'subpixels'):
+        if mode == 'subpixels':
             use_exact = 0
         else:
             use_exact = 1
@@ -100,14 +104,7 @@ class EllipsePixelRegion(PixelRegion):
                                            self.angle.to(u.deg).value,
                                            use_exact, subpixels)
 
-        if mode == 'all':
-            mask = fraction == 1
-        elif mode == 'any':
-            mask = fraction > 0
-        else:
-            mask = fraction
-
-        return Mask(mask, origin=(jmin, imin))
+        return Mask(fraction, origin=(jmin, imin))
 
     def as_patch(self, **kwargs):
         # TODO: needs to be implemented

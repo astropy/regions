@@ -67,9 +67,13 @@ class CirclePixelRegion(PixelRegion):
         radius = Angle(self.radius / scale, 'deg')
         return CircleSkyRegion(center, radius)
 
-    def to_mask(self, mode='center', subpixels=5):
+    def to_mask(self, mode='center', subpixels=1):
 
         # NOTE: assumes this class represents a single circle
+
+        if mode == 'center':
+            mode = 'subpixels'
+            subpixels = 1
 
         # Find exact bounds
         xmin = self.center.x - self.radius
@@ -93,7 +97,7 @@ class CirclePixelRegion(PixelRegion):
         ymin = float(jmin) - 0.5 - self.center.y
         ymax = float(jmax) + 0.5 - self.center.y
 
-        if mode in ('center', 'subpixels'):
+        if mode == 'subpixels':
             use_exact = 0
         else:
             use_exact = 1
@@ -101,14 +105,7 @@ class CirclePixelRegion(PixelRegion):
         fraction = circular_overlap_grid(xmin, xmax, ymin, ymax, nx, ny,
                                          self.radius, use_exact, subpixels)
 
-        if mode == 'all':
-            mask = fraction == 1
-        elif mode == 'any':
-            mask = fraction > 0
-        else:
-            mask = fraction
-
-        return Mask(mask, origin=(jmin, imin))
+        return Mask(fraction, origin=(jmin, imin))
 
     def as_patch(self, **kwargs):
         import matplotlib.patches as mpatches

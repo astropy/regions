@@ -41,7 +41,7 @@ SKY_REGIONS = [
 ]
 
 SKYPIX_MODES = ['local', 'affine', 'full']
-MASK_MODES = ['center', 'any', 'all', 'exact']
+MASK_MODES = ['center', 'exact', 'subpixels']
 COMMON_WCS = WCS(naxis=2)
 COMMON_WCS.wcs.ctype = 'RA---TAN', 'DEC--TAN'
 
