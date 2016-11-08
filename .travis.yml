@@ -25,7 +25,7 @@ env:
         - ASTROPY_VERSION=stable
         - SETUP_CMD='test'
         - MAIN_CMD='python setup.py'
-        - PIP_DEPENDENCIES=''
+        - PIP_DEPENDENCIES='https://github.com/astrofrog/pytest-arraydiff/archive/master.zip'
         - CONDA_DEPENDENCIES='Cython shapely wcsaxes'
         - CONDA_CHANNELS='astropy'
         - SETUP_XVFB=True
