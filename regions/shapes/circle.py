@@ -69,7 +69,7 @@ class CirclePixelRegion(PixelRegion):
 
     def to_mask(self, mode='center', subpixels=5):
 
-        # For now we assume that this class represents a single circle
+        # NOTE: assumes this class represents a single circle
 
         # Find exact bounds
         xmin = self.center.x - self.radius

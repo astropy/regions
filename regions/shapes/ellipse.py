@@ -2,7 +2,8 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import math
 from astropy import units as u
-from ..core import PixelRegion, SkyRegion
+from ..core import PixelRegion, SkyRegion, Mask
+from .._geometry import elliptical_overlap_grid
 
 __all__ = ['EllipsePixelRegion', 'EllipseSkyRegion']
 
@@ -62,9 +63,51 @@ class EllipsePixelRegion(PixelRegion):
         # TODO: needs to be implemented
         raise NotImplementedError
 
-    def to_mask(self, mode='center'):
-        # TODO: needs to be implemented
-        raise NotImplementedError
+    def to_mask(self, mode='center', subpixels=5):
+
+        # NOTE: assumes this class represents a single circle
+
+        # Find exact bounds
+        # FIXME: this is not the minimal bounding box, and can be optimized
+        xmin = self.center.x - self.major
+        xmax = self.center.x + self.major
+        ymin = self.center.y - self.major
+        ymax = self.center.y + self.major
+
+        # Find range of pixels
+        imin = int(xmin)
+        imax = int(xmax) + 1
+        jmin = int(ymin)
+        jmax = int(ymax) + 1
+
+        # Find mask size
+        nx = imax - imin + 1
+        ny = jmax - jmin + 1
+
+        # Find position of pixel edges and recenter so that circle is at origin
+        xmin = float(imin) - 0.5 - self.center.x
+        xmax = float(imax) + 0.5 - self.center.x
+        ymin = float(jmin) - 0.5 - self.center.y
+        ymax = float(jmax) + 0.5 - self.center.y
+
+        if mode in ('center', 'subpixels'):
+            use_exact = 0
+        else:
+            use_exact = 1
+
+        fraction = elliptical_overlap_grid(xmin, xmax, ymin, ymax, nx, ny,
+                                           self.major, self.minor,
+                                           self.angle.to(u.deg).value,
+                                           use_exact, subpixels)
+
+        if mode == 'all':
+            mask = fraction == 1
+        elif mode == 'any':
+            mask = fraction > 0
+        else:
+            mask = fraction
+
+        return Mask(mask, origin=(jmin, imin))
 
     def as_patch(self, **kwargs):
         # TODO: needs to be implemented
