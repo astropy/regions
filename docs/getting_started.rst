@@ -402,17 +402,124 @@ or `regions.PixelRegion.contains` methods:
 Masks
 =====
 
-For aperture photometry, a common operation is to compute, for a given image and region,
-a boolean mask or array of pixel indices defining which pixels (in the whole image or a
-minimal rectangular bounding box) are inside and outside the region.
+For aperture photometry, a common operation is to compute, for a given image and
+region, a mask or array of pixel indices defining which pixels (in the whole
+image or a minimal rectangular bounding box) are inside and outside the region.
 
-To a certain degree, such spatial filtering can be done using the methods described in the previous :ref:`gs-contain`
-section. Apart from that, no high-level functionality for spatial filtering, bounding boxes or aperture photometry
-is available yet.
+All :class:`~regions.PixelRegion` objects have a
+:meth:`~regions.PixelRegion.to_mask` method that returns a
+:class:`~regions.Mask` object that contains information about whether
+pixels are inside the region, and can be used to mask data arrays:
 
-For now, please use `photutils`_ or `pyregion`_.
+    >>> from regions.core import PixCoord
+    >>> from regions.shapes.circle import CirclePixelRegion
+    >>> center = PixCoord(4., 5.)
+    >>> reg = CirclePixelRegion(center, 2.3411)
+    >>> mask = reg.to_mask()
+    >>> mask
+    <regions.mask.Mask object at 0x10900b5c0>
+    >>> mask.data
+    array([[ 0.,  0.,  0.,  0.,  0.,  0.,  0.],
+           [ 0.,  0.,  1.,  1.,  1.,  0.,  0.],
+           [ 0.,  1.,  1.,  1.,  1.,  1.,  0.],
+           [ 0.,  1.,  1.,  1.,  1.,  1.,  0.],
+           [ 0.,  1.,  1.,  1.,  1.,  1.,  0.],
+           [ 0.,  0.,  1.,  1.,  1.,  0.,  0.],
+           [ 0.,  0.,  0.,  0.,  0.,  0.,  0.]])
 
-(We plan to merge that functionality from ``photutils`` or ``pyregion`` into this ``regions`` package, or re-implement it.)
+The mask data contains floating point that are between 0 (no overlap) and 1
+(overlap). By default, this is determined by looking only at the central position
+in each pixel, and::
+
+    >>> reg.to_mask()
+
+is equivalent to::
+
+    >>> reg.to_mask(mode='center')
+
+but other modes are available:
+
+* ``mode='exact'``: the overlap is determined using the exact geometrical
+  overlap between pixels and the region. This is slower than using the central
+  position, but allows partial overlap to be treated correctly.
+
+* ``mode='subpixels'``: the overlap is determined by sub-sampling the pixel
+  using a grid of sub-pixels. The number of sub-pixels to use in this mode
+  should be given using the ``subpixels`` argument.
+
+Here are what the different modes look like:
+
+.. plot::
+   :include-source:
+
+    import matplotlib.pyplot as plt
+    from regions.core import PixCoord
+    from regions.shapes.circle import CirclePixelRegion
+
+    center = PixCoord(6.6, 7.2)
+    reg = CirclePixelRegion(center, 5.2)
+
+    plt.figure(figsize=(6, 6))
+
+    mask1 = reg.to_mask(mode='center')
+    plt.subplot(2, 2, 1)
+    plt.title("mode='center'", size=9)
+    plt.imshow(mask1.data, cmap=plt.cm.viridis,
+               interpolation='nearest', origin='lower')
+
+    mask2 = reg.to_mask(mode='exact')
+    plt.subplot(2, 2, 2)
+    plt.title("mode='exact'", size=9)
+    plt.imshow(mask2.data, cmap=plt.cm.viridis,
+               interpolation='nearest', origin='lower')
+
+    mask3 = reg.to_mask(mode='subpixels', subpixels=3)
+    plt.subplot(2, 2, 3)
+    plt.title("mode='subpixels', subpixels=3", size=9)
+    plt.imshow(mask3.data, cmap=plt.cm.viridis,
+               interpolation='nearest', origin='lower')
+
+    mask4 = reg.to_mask(mode='subpixels', subpixels=20)
+    plt.subplot(2, 2, 4)
+    plt.title("mode='subpixels', subpixels=20", size=9)
+    plt.imshow(mask4.data, cmap=plt.cm.viridis,
+               interpolation='nearest', origin='lower')
+
+As we've seen above, the :class:`~regions.Mask` objects have a ``data``
+attribute that contains a Numpy array with the mask values. However, if you
+have for example a circular region with a radius of 3 pixels at a pixel position
+of (1000, 1000), it would be inefficient to store a mask that has a size larger
+than this, so instead we store the mask using the minimal array that contains
+the mask, and the :class:`~regions.Mask` objects also include an ``origin``
+attribute that is used to indicate where the mask should be applied in an image.
+
+:class:`~regions.Mask` objects also have a number of methods to make it
+easy to use the masks with data. The :meth:`~regions.Mask.to_image` method
+can be used to obtain an image of the mask in a 2D array of the given shape.
+This places the mask in the correct place in the image and deals properly with
+boundary effects:
+
+.. plot::
+   :include-source:
+
+    import matplotlib.pyplot as plt
+    from regions.core import PixCoord
+    from regions.shapes.circle import CirclePixelRegion
+
+    center = PixCoord(6.6, 7.2)
+    reg = CirclePixelRegion(center, 5.2)
+
+    mask = reg.to_mask(mode='exact')
+    plt.figure(figsize=(4, 4))
+    plt.imshow(mask.to_image((10, 10)), cmap=plt.cm.viridis,
+               interpolation='nearest', origin='lower')
+
+The :meth:`~regions.Mask.cutout` method can be used to create a cutout from
+the input data over the mask bounding box, and the
+:meth:`~regions.Mask.multiply` method can be used to multiply the aperture
+mask with the input data to create a mask-weighted data cutout. All of these
+methods properly handle the cases of partial or no overlap of the aperture mask
+with the data.
 
 .. _gs-compound:
 

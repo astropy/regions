@@ -24,8 +24,12 @@ class Mask(object):
 
         self.data = np.asanyarray(mask)
         self.shape = mask.shape
-        self.slices = (slice(origin[0], origin[0] + self.shape[0]),
-                       slice(origin[1], origin[1] + self.shape[1]))
+        self.origin = origin
+
+    @property
+    def slices(self):
+        return (slice(self.origin[0], self.origin[0] + self.shape[0]),
+                slice(self.origin[1], self.origin[1] + self.shape[1]))
 
     @property
     def array(self):
