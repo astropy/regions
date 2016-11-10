@@ -18,24 +18,23 @@ class Mask(object):
     origin : tuple of int
         A tuple of ``(y, x)`` defining the origin of the lower left pixel
         of the mask in pixel coordinates.
+
+    Examples
+    --------
+
+    Usage examples are provided in the :ref:`gs-masks` section of the docs.
     """
 
     def __init__(self, mask, origin):
-
         self.data = np.asanyarray(mask)
-        self.shape = mask.shape
         self.origin = origin
 
     @property
-    def slices(self):
-        return (slice(self.origin[0], self.origin[0] + self.shape[0]),
-                slice(self.origin[1], self.origin[1] + self.shape[1]))
-
-    @property
-    def array(self):
-        """The 2D mask array."""
-
-        return self.data
+    def shape(self):
+        """
+        The shape of the mask array.
+        """
+        return self.data.shape
 
     def __array__(self):
         """
@@ -44,9 +43,19 @@ class Mask(object):
 
         return self.data
 
+    @property
+    def _slices(self):
+        """
+        Slices that correspond to those that would extract data for the same
+        bounding box as the mask assuming the mask fulls fully inside
+        the data array.
+        """
+        return (slice(self.origin[0], self.origin[0] + self.shape[0]),
+                slice(self.origin[1], self.origin[1] + self.shape[1]))
+
     def _overlap_slices(self, shape):
         """
-        Calculate the slices for the overlapping part of ``self.slices``
+        Calculate the slices for the overlapping part of ``self._slices``
         and an array of the given shape.
 
         Parameters
@@ -71,10 +80,10 @@ class Mask(object):
         if len(shape) != 2:
             raise ValueError('input shape must have 2 elements.')
 
-        ymin = self.slices[0].start
-        ymax = self.slices[0].stop
-        xmin = self.slices[1].start
-        xmax = self.slices[1].stop
+        ymin = self._slices[0].start
+        ymax = self._slices[0].stop
+        xmin = self._slices[1].start
+        xmax = self._slices[1].stop
 
         if (xmin >= shape[1] or ymin >= shape[0] or xmax <= 0 or ymax <= 0):
             # no overlap of the region with the data
@@ -112,7 +121,7 @@ class Mask(object):
         mask = np.zeros(shape)
 
         try:
-            mask[self.slices] = self.data
+            mask[self._slices] = self.data
         except ValueError:    # partial or no overlap
             slices_large, slices_small = self._overlap_slices(shape)
 
@@ -150,7 +159,7 @@ class Mask(object):
         """
 
         data = np.asanyarray(data)
-        cutout = data[self.slices]
+        cutout = data[self._slices]
 
         if cutout.shape != self.shape:
             slices_large, slices_small = self._overlap_slices(data.shape)

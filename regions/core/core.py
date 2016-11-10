@@ -24,6 +24,8 @@ users should not touch them.
 _DEFAULT_WCS_ORIGIN = 0
 _DEFAULT_WCS_MODE = 'all'
 
+VALID_MASK_MODES = set(['center', 'exact', 'subpixels'])
+
 
 @six.add_metaclass(abc.ABCMeta)
 class Region(object):
@@ -157,14 +159,10 @@ class PixelRegion(Region):
 
         Parameters
         ----------
-        mode : { 'center' | 'any' | 'all' | 'exact' | 'subpixels'}
+        mode : { 'center' | 'exact' | 'subpixels'}
             The following modes are available:
                 * ``'center'``: returns 1 for pixels where the center is in
                   the region, and 0 otherwise.
-                * ``'any'``: returns 1 for pixels where any of the pixel is
-                  in the region, and 0 otherwise.
-                * ``'all'``: returns 1 for pixels that are completely inside
-                  the region, 0 otherwise.
                 * ``'exact'``: returns a value between 0 and 1 giving the
                   fractional level of overlap of the pixel with the region.
                 * ``'subpixels'``: A pixel is divided into subpixels and
@@ -184,6 +182,16 @@ class PixelRegion(Region):
         mask : `~regions.Mask`
             A region mask object.
         """
+
+    @staticmethod
+    def _validate_mode(mode, subpixels):
+        if mode not in VALID_MASK_MODES:
+            raise ValueError("Invalid mask mode: {0} (should be one "
+                             "of {1})".format(mode, '/'.join(VALID_MASK_MODES)))
+        if mode == 'subpixels':
+            if not isinstance(subpixels, int) or subpixels <= 0:
+                raise ValueError("Invalid subpixels value: {0} (should be"
+                                 " a strictly positive integer)".format(subpixels))
 
     @abc.abstractmethod
     def to_shapely(self):

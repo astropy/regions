@@ -71,6 +71,8 @@ class CirclePixelRegion(PixelRegion):
 
         # NOTE: assumes this class represents a single circle
 
+        self._validate_mode(mode, subpixels)
+
         if mode == 'center':
             mode = 'subpixels'
             subpixels = 1
