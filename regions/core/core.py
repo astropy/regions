@@ -1,17 +1,22 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
 import abc
 import operator
+
 from astropy.extern import six
 
+
 __all__ = ['Region', 'PixelRegion', 'SkyRegion']
+
 
 """
 Here we define global variables for the default `origin` and `mode` used
 for WCS transformations throughout the `regions` package.
 
 Their purpose is to simplify achieving uniformity across the codebase.
-They are mainly used as default arguments for methods that do WCS transformations.
+They are mainly used as default arguments for methods that do WCS
+transformations.
 
 They are private (with an underscore), not part of the public API,
 users should not touch them.
