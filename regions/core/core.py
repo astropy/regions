@@ -176,11 +176,8 @@ class PixelRegion(Region):
 
         Returns
         -------
-        mask : `~numpy.ndarray`
-            A mask indicating whether each pixel is contained in the region.
-        slice_x, slice_y : `slice`
-            Slices for x and y which can be used on an array to extract the
-            same region as the mask.
+        mask : `~regions.Mask`
+            A region mask object.
         """
 
     @abc.abstractmethod
