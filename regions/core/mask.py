@@ -15,9 +15,9 @@ class Mask(object):
         (i.e. not truncated) array that is the direct output of one of
         the low-level "geometry" functions.
 
-    bbox_slice : tuple of slice objects
-        A tuple of ``(y, x)`` numpy slice objects defining the region
-        minimal bounding box.
+    origin : tuple of int
+        A tuple of ``(y, x)`` defining the origin of the lower left pixel
+        of the mask in pixel coordinates.
     """
 
     def __init__(self, mask, origin):
