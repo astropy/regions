@@ -442,17 +442,17 @@ i.e. a `~regions.CompoundPixelRegion` or `~regions.CompoundSkyRegion` object.
     ...    radius=Angle('3 deg'),
     ...    )
     >>> type(circle1 & circle2)
-    ... regions.core.compound.CompoundSkyRegion
+    regions.core.compound.CompoundSkyRegion
     >>> print(circle1 ^ circle2)
-    ... (CircleSkyRegion
-    ... center: <SkyCoord (Galactic): (l, b) in deg
-    ... (1.0, 2.0)>
-    ... radius: 5.0 deg
-    ... <built-in function xor>
-    ... CircleSkyRegion
-    ... center: <SkyCoord (Galactic): (l, b) in deg
-    ... (356.0, 3.0)>
-    ... radius: 3.0 deg)
+    (CircleSkyRegion
+    center: <SkyCoord (Galactic): (l, b) in deg
+    (1.0, 2.0)>
+    radius: 5.0 deg
+    <built-in function xor>
+    CircleSkyRegion
+    center: <SkyCoord (Galactic): (l, b) in deg
+    (356.0, 3.0)>
+    radius: 3.0 deg)
 
 .. plot:: plot_compound.py
     :include-source: false

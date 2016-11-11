@@ -1,3 +1,6 @@
+"""
+Example script illustrating compound regions.
+"""
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -27,13 +30,11 @@ circle2 = CircleSkyRegion(
     radius=Angle('3 deg'),
 )
 
-
 # define skycoords
 lon = np.concatenate([np.arange(352, 360), np.arange(0,8)])
 lat = np.arange(-7,7)
 coords = np.array(np.meshgrid(lon, lat)).T.reshape(-1,2)
 skycoords = SkyCoord(coords, unit='deg', frame='galactic')
-
 
 # get events in AND and XOR
 compound_and = circle1 & circle2
