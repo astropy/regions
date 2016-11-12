@@ -521,6 +521,80 @@ mask with the input data to create a mask-weighted data cutout. All of these
 methods properly handle the cases of partial or no overlap of the aperture mask
 with the data.
 
+These masks can be used as the building blocks for photometry, which we
+demonstrate with a simple example. We start off by getting an example image:
+
+.. plot::
+   :context: reset
+   :include-source:
+   :align: center
+   :nofigs:
+
+    >>> from photutils import datasets
+    >>> hdu = datasets.load_star_image()
+
+We then define the aperture:
+
+.. plot::
+   :context:
+   :include-source:
+   :align: center
+   :nofigs:
+
+    >>> from regions.core import PixCoord
+    >>> from regions.shapes.circle import CirclePixelRegion
+    >>> center = PixCoord(158.5, 1053.5)
+    >>> aperture = CirclePixelRegion(center, 4.)
+
+We convert the aperture to a mask and extract a cutout from the data, as well
+as a cutout with the data multipled by the mask:
+
+.. plot::
+   :context:
+   :include-source:
+   :align: center
+   :nofigs:
+
+    >>> mask = aperture.to_mask(mode='exact')
+    >>> data = mask.cutout(hdu.data)
+    >>> weighted_data = mask.multiply(hdu.data)
+
+We can take a look at the results to make sure the source overlaps with the
+aperture:
+
+.. plot::
+   :context:
+   :include-source:
+   :align: center
+
+    >>> import matplotlib.pyplot as plt
+    >>> plt.subplot(1,3,1)
+    >>> plt.title("Mask", size=9)
+    >>> plt.imshow(mask.data, cmap=plt.cm.viridis,
+    ...            interpolation='nearest', origin='lower',
+    ...            extent=mask.bbox.extent)
+    >>> plt.subplot(1,3,2)
+    >>> plt.title("Data cutout", size=9)
+    >>> plt.imshow(data, cmap=plt.cm.viridis,
+    ...            interpolation='nearest', origin='lower',
+    ...            extent=mask.bbox.extent)
+    >>> plt.subplot(1,3,3)
+    >>> plt.title("Data cutout multiplied by mask", size=9)
+    >>> plt.imshow(weighted_data, cmap=plt.cm.viridis,
+    ...            interpolation='nearest', origin='lower',
+    ...            extent=mask.bbox.extent)
+
+Finally, we can use the mask and data values to compute weighted statistics:
+
+.. plot::
+   :context:
+   :include-source:
+   :align: center
+   :nofigs:
+
+    >>> np.average(data, weights=mask)
+    9364.0126748880211
+
 .. _gs-compound:
 
 Compounds
