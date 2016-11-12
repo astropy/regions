@@ -43,6 +43,11 @@ class PointPixelRegion(PixelRegion):
         # TODO: needs to be implemented
         raise NotImplementedError
 
+    @property
+    def bounding_box(self, mode='center'):
+        # TODO: needs to be implemented
+        raise NotImplementedError
+
     def to_mask(self, mode='center'):
         # TODO: needs to be implemented
         raise NotImplementedError

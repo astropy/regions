@@ -4,7 +4,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import numpy as np
 from astropy import units as u
 
-from ..core import PixelRegion, SkyRegion, Mask
+from ..core import PixelRegion, SkyRegion, Mask, BoundingBox
 from .._geometry import rectangular_overlap_grid
 
 __all__ = ['RectanglePixelRegion', 'RectangleSkyRegion']
@@ -63,6 +63,28 @@ class RectanglePixelRegion(PixelRegion):
         # TODO: needs to be implemented
         raise NotImplementedError
 
+    @property
+    def bounding_box(self):
+
+        # Find exact bounds
+        # FIXME: this is not the minimal bounding box, and can be optimized
+        radius = np.hypot(self.width / 2, self.height / 2)
+        xmin = self.center.x - radius
+        xmax = self.center.x + radius
+        ymin = self.center.y - radius
+        ymax = self.center.y + radius
+
+        # Find range of pixels. We use round here because if the region extends
+        # to e.g. -0.4, it's enough to set the bounding box lower value to 0
+        # because the 0-th pixel goes from -0.5 to 0.5. At the upper end we add
+        # 1 because the upper limits need to be exlcusive.
+        imin = round(xmin)
+        imax = round(xmax) + 1
+        jmin = round(ymin)
+        jmax = round(ymax) + 1
+
+        return BoundingBox(jmin, jmax, imin, imax)
+
     def to_mask(self, mode='center', subpixels=5):
 
         # NOTE: assumes this class represents a single circle
@@ -73,29 +95,15 @@ class RectanglePixelRegion(PixelRegion):
             mode = 'subpixels'
             subpixels = 1
 
-        # Find exact bounds
-        # FIXME: this is not the minimal bounding box, and can be optimized
-        radius = np.hypot(self.width / 2, self.height / 2)
-        xmin = self.center.x - radius
-        xmax = self.center.x + radius
-        ymin = self.center.y - radius
-        ymax = self.center.y + radius
-
-        # Find range of pixels
-        imin = int(xmin)
-        imax = int(xmax) + 1
-        jmin = int(ymin)
-        jmax = int(ymax) + 1
-
-        # Find mask size
-        nx = imax - imin + 1
-        ny = jmax - jmin + 1
+        # Find bounding box and mask size
+        bbox = self.bounding_box
+        ny, nx = bbox.shape
 
         # Find position of pixel edges and recenter so that circle is at origin
-        xmin = float(imin) - 0.5 - self.center.x
-        xmax = float(imax) + 0.5 - self.center.x
-        ymin = float(jmin) - 0.5 - self.center.y
-        ymax = float(jmax) + 0.5 - self.center.y
+        xmin = float(bbox.imin) - 0.5 - self.center.x
+        xmax = float(bbox.imax) - 0.5 - self.center.x
+        ymin = float(bbox.jmin) - 0.5 - self.center.y
+        ymax = float(bbox.jmax) - 0.5 - self.center.y
 
         if mode == 'subpixels':
             use_exact = 0
@@ -107,7 +115,7 @@ class RectanglePixelRegion(PixelRegion):
                                             self.angle.to(u.deg).value,
                                             use_exact, subpixels)
 
-        return Mask(fraction, origin=(jmin, imin))
+        return Mask(fraction, bbox=bbox)
 
     def as_patch(self, **kwargs):
         # TODO: needs to be implemented

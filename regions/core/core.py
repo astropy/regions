@@ -152,6 +152,14 @@ class PixelRegion(Region):
             The tolerance for the ``'full'`` mode described above.
         """
 
+    @abc.abstractproperty
+    def bounding_box(self):
+        """
+        The minimal bounding box (in integer pixel coordinates) that contains
+        the region.
+        """
+        pass
+
     @abc.abstractmethod
     def to_mask(self, mode='center', subpixels=5):
         """
