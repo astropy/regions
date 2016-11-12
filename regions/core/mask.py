@@ -26,6 +26,8 @@ class Mask(object):
     """
 
     def __init__(self, mask, bbox):
+        if mask.shape != bbox.shape:
+            raise ValueError("shape of mask and bounding box should match")
         self.data = np.asanyarray(mask)
         self.bbox = bbox
 
