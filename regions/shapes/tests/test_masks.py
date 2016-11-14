@@ -11,9 +11,9 @@ from astropy.io import fits
 from astropy import units as u
 
 
-REGIONS = [CirclePixelRegion(PixCoord(3.981987, 4.131378), 2.3411),
-           EllipsePixelRegion(PixCoord(3.981987, 4.131378), 6.3411, 3.2233, angle=32 * u.deg),
-           RectanglePixelRegion(PixCoord(3.981987, 4.131378), 6.3411, 3.2233, angle=32 * u.deg)]
+REGIONS = [CirclePixelRegion(PixCoord(3.981987, 4.131378), 3.3411),
+           EllipsePixelRegion(PixCoord(3.981987, 4.131378), 3.3411, 2.2233, angle=32 * u.deg),
+           RectanglePixelRegion(PixCoord(3.981987, 4.131378), 4.3411, 5.2233, angle=32 * u.deg)]
 
 MODES = [{'mode': 'center'},
          {'mode': 'exact'},
