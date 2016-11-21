@@ -3,6 +3,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import math
 from astropy.coordinates import Angle
 from astropy.wcs.utils import pixel_to_skycoord
+from astropy import units as u
 from ..core import PixelRegion, SkyRegion
 from ..utils.wcs_helpers import skycoord_to_pixel_scale_angle
 
@@ -66,6 +67,7 @@ class CirclePixelRegion(PixelRegion):
         raise NotImplementedError
 
     def as_patch(self, **kwargs):
+
         import matplotlib.patches as mpatches
 
         xy = self.center.x, self.center.y
@@ -139,16 +141,16 @@ class CircleSkyRegion(SkyRegion):
         return CirclePixelRegion(center, radius)
 
     def as_patch(self, ax, **kwargs):
-        import matplotlib.patches as mpatches
 
-        val = self.center.icrs
-        center = (val.ra.to('deg').value, val.dec.to('deg').value)
+        from wcsaxes.patches import SphericalCircle
 
-        temp = dict(transform=ax.get_transform('icrs'),
-                    radius=self.radius.to('deg').value)
-        kwargs.update(temp)
+        c_icrs = self.center.icrs
+
         for key, value in self.visual.items():
             kwargs.setdefault(key, value)
-        patch = mpatches.Circle(center, **kwargs)
+
+        patch = SphericalCircle((c_icrs.ra, c_icrs.dec), self.radius,
+                                vertex_unit=u.degree,
+                                transform=ax.get_transform('icrs'), **kwargs)
 
         return patch
