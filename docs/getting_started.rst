@@ -490,8 +490,9 @@ attribute that contains a Numpy array with the mask values. However, if you
 have for example a circular region with a radius of 3 pixels at a pixel position
 of (1000, 1000), it would be inefficient to store a mask that has a size larger
 than this, so instead we store the mask using the minimal array that contains
-the mask, and the :class:`~regions.Mask` objects also include an ``origin``
-attribute that is used to indicate where the mask should be applied in an image.
+the mask, and the :class:`~regions.Mask` objects also include a ``bbox``
+attribute that is a :class:`~regions.BoundingBox` object used to indicate where
+the mask should be applied in an image.
 
 :class:`~regions.Mask` objects also have a number of methods to make it
 easy to use the masks with data. The :meth:`~regions.Mask.to_image` method

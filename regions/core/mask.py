@@ -72,10 +72,10 @@ class Mask(object):
         if len(shape) != 2:
             raise ValueError('input shape must have 2 elements.')
 
-        ymin = self.bbox.jmin
-        ymax = self.bbox.jmax
-        xmin = self.bbox.imin
-        xmax = self.bbox.imax
+        xmin = self.bbox.ixmin
+        xmax = self.bbox.ixmax
+        ymin = self.bbox.iymin
+        ymax = self.bbox.iymax
 
         if (xmin >= shape[1] or ymin >= shape[0] or xmax <= 0 or ymax <= 0):
             # no overlap of the region with the data

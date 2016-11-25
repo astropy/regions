@@ -77,12 +77,12 @@ class EllipsePixelRegion(PixelRegion):
         # to e.g. -0.4, it's enough to set the bounding box lower value to 0
         # because the 0-th pixel goes from -0.5 to 0.5. At the upper end we add
         # 1 because the upper limits need to be exlcusive.
-        imin = round(xmin)
-        imax = round(xmax) + 1
-        jmin = round(ymin)
-        jmax = round(ymax) + 1
+        ixmin = round(xmin)
+        ixmax = round(xmax) + 1
+        iymin = round(ymin)
+        iymax = round(ymax) + 1
 
-        return BoundingBox(jmin, jmax, imin, imax)
+        return BoundingBox(ixmin, ixmax, iymin, iymax)
 
     def to_mask(self, mode='center', subpixels=5):
 
@@ -99,10 +99,10 @@ class EllipsePixelRegion(PixelRegion):
         ny, nx = bbox.shape
 
         # Find position of pixel edges and recenter so that ellipse is at origin
-        xmin = float(bbox.imin) - 0.5 - self.center.x
-        xmax = float(bbox.imax) - 0.5 - self.center.x
-        ymin = float(bbox.jmin) - 0.5 - self.center.y
-        ymax = float(bbox.jmax) - 0.5 - self.center.y
+        xmin = float(bbox.ixmin) - 0.5 - self.center.x
+        xmax = float(bbox.ixmax) - 0.5 - self.center.x
+        ymin = float(bbox.iymin) - 0.5 - self.center.y
+        ymax = float(bbox.iymax) - 0.5 - self.center.y
 
         if mode == 'subpixels':
             use_exact = 0
