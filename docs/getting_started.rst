@@ -531,8 +531,10 @@ demonstrate with a simple example. We start off by getting an example image:
    :align: center
    :nofigs:
 
-    >>> from photutils import datasets
-    >>> hdu = datasets.load_star_image()
+    >>> from astropy.io import fits
+    >>> from astropy.utils.data import get_pkg_data_filename
+    >>> filename = get_pkg_data_filename('photometry/M6707HH.fits')
+    >>> hdu = fits.open(filename)[0]
 
 We then define the aperture:
 
@@ -584,6 +586,22 @@ aperture:
     >>> plt.imshow(weighted_data, cmap=plt.cm.viridis,
     ...            interpolation='nearest', origin='lower',
     ...            extent=mask.bbox.extent)
+
+We can also use the ``Mask.bbox`` attribute to look at the extent
+of the mask in the image:
+
+.. plot::
+   :context:
+   :include-source:
+   :align: center
+
+    >>> ax = plt.subplot(1, 1, 1)
+    >>> ax.imshow(hdu.data, cmap=plt.cm.viridis,
+    ...            interpolation='nearest', origin='lower')
+    >>> ax.add_patch(mask.bbox.as_patch(facecolor='none', edgecolor='white'))
+    >>> ax.add_patch(aperture.as_patch(facecolor='none', edgecolor='orange'))
+    >>> ax.set_xlim(120, 180)
+    >>> ax.set_ylim(1020, 1080)
 
 Finally, we can use the mask and data values to compute weighted statistics:
 
