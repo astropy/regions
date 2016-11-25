@@ -43,6 +43,10 @@ cdef double floor_sqrt(double x):
     and we know that the number should be >= 0. However, in some cases the
     value is e.g. -1e-10, but we want to treat it as zero, which is what
     this function does.
+
+    Note that this does **not** check whether negative values are close or not
+    to zero, so this should be used only in cases where the value is expected
+    to be positive on paper.
     """
     if x > 0:
         return sqrt(x)
