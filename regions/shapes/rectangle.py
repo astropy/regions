@@ -1,7 +1,11 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 from __future__ import absolute_import, division, print_function, unicode_literals
+
+import numpy as np
 from astropy import units as u
-from ..core import PixelRegion, SkyRegion
+
+from ..core import PixelRegion, SkyRegion, Mask, BoundingBox
+from .._geometry import rectangular_overlap_grid
 
 __all__ = ['RectanglePixelRegion', 'RectangleSkyRegion']
 
@@ -59,9 +63,59 @@ class RectanglePixelRegion(PixelRegion):
         # TODO: needs to be implemented
         raise NotImplementedError
 
-    def to_mask(self, mode='center'):
-        # TODO: needs to be implemented
-        raise NotImplementedError
+    @property
+    def bounding_box(self):
+
+        # Find exact bounds
+        # FIXME: this is not the minimal bounding box, and can be optimized
+        radius = np.hypot(self.width / 2, self.height / 2)
+        xmin = self.center.x - radius
+        xmax = self.center.x + radius
+        ymin = self.center.y - radius
+        ymax = self.center.y + radius
+
+        # Find range of pixels. We use round here because if the region extends
+        # to e.g. -0.4, it's enough to set the bounding box lower value to 0
+        # because the 0-th pixel goes from -0.5 to 0.5. At the upper end we add
+        # 1 because the upper limits need to be exlcusive.
+        ixmin = round(xmin)
+        ixmax = round(xmax) + 1
+        iymin = round(ymin)
+        iymax = round(ymax) + 1
+
+        return BoundingBox(ixmin, ixmax, iymin, iymax)
+
+    def to_mask(self, mode='center', subpixels=5):
+
+        # NOTE: assumes this class represents a single circle
+
+        self._validate_mode(mode, subpixels)
+
+        if mode == 'center':
+            mode = 'subpixels'
+            subpixels = 1
+
+        # Find bounding box and mask size
+        bbox = self.bounding_box
+        ny, nx = bbox.shape
+
+        # Find position of pixel edges and recenter so that circle is at origin
+        xmin = float(bbox.ixmin) - 0.5 - self.center.x
+        xmax = float(bbox.ixmax) - 0.5 - self.center.x
+        ymin = float(bbox.iymin) - 0.5 - self.center.y
+        ymax = float(bbox.iymax) - 0.5 - self.center.y
+
+        if mode == 'subpixels':
+            use_exact = 0
+        else:
+            use_exact = 1
+
+        fraction = rectangular_overlap_grid(xmin, xmax, ymin, ymax, nx, ny,
+                                            self.width, self.height,
+                                            self.angle.to(u.deg).value,
+                                            use_exact, subpixels)
+
+        return Mask(fraction, bbox=bbox)
 
     def as_patch(self, **kwargs):
         # TODO: needs to be implemented

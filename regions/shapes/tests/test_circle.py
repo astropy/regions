@@ -1,6 +1,9 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 from __future__ import absolute_import, division, print_function, unicode_literals
+
+import numpy as np
 from numpy.testing import assert_allclose
+
 from astropy import units as u
 from astropy.coordinates import SkyCoord
 from astropy.tests.helper import pytest, assert_quantity_allclose
@@ -9,6 +12,7 @@ from astropy.io.fits import getheader
 from astropy.wcs import WCS
 from ...core import PixCoord
 from ..circle import CirclePixelRegion, CircleSkyRegion
+from .utils import ASTROPY_LT_13
 
 try:
     import matplotlib
@@ -36,7 +40,10 @@ def test_circle_sky():
     center = SkyCoord(3 * u.deg, 4 * u.deg)
     reg = CircleSkyRegion(center, 2 * u.arcsec)
 
-    assert str(reg) == 'CircleSkyRegion\ncenter: <SkyCoord (ICRS): (ra, dec) in deg\n    (3.0, 4.0)>\nradius: 2.0 arcsec'
+    if ASTROPY_LT_13:
+        assert str(reg) == 'CircleSkyRegion\ncenter: <SkyCoord (ICRS): (ra, dec) in deg\n    (3.0, 4.0)>\nradius: 2.0 arcsec'
+    else:
+        assert str(reg) == 'CircleSkyRegion\ncenter: <SkyCoord (ICRS): (ra, dec) in deg\n    ( 3.,  4.)>\nradius: 2.0 arcsec'
 
 
 def test_transformation():
@@ -82,3 +89,11 @@ def test_plot():
     assert p.get_facecolor() == (1, 0, 0, 0.6)
 
     c.plot(ax, alpha=0.6)
+
+
+
+def test_to_mask():
+    center = PixCoord(3, 4)
+    reg = CirclePixelRegion(center, 2)
+    mask = reg.to_mask(mode='exact')
+    assert_allclose(np.sum(mask.data), 4 * np.pi)

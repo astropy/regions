@@ -1,10 +1,16 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 from __future__ import absolute_import, division, print_function, unicode_literals
+
 import math
+
+import numpy as np
 from astropy.coordinates import Angle
 from astropy.wcs.utils import pixel_to_skycoord
-from ..core import PixelRegion, SkyRegion
+
+from ..core import PixelRegion, SkyRegion, Mask, BoundingBox
+from ..utils import skycoord_to_pixel_scale_angle
 from ..utils.wcs_helpers import skycoord_to_pixel_scale_angle
+from .._geometry import circular_overlap_grid
 
 __all__ = ['CirclePixelRegion', 'CircleSkyRegion']
 
@@ -61,9 +67,55 @@ class CirclePixelRegion(PixelRegion):
         radius = Angle(self.radius / scale, 'deg')
         return CircleSkyRegion(center, radius)
 
-    def to_mask(self, mode='center'):
-        # TODO: needs to be implemented
-        raise NotImplementedError
+    @property
+    def bounding_box(self):
+
+        # Find exact bounds
+        xmin = self.center.x - self.radius
+        xmax = self.center.x + self.radius
+        ymin = self.center.y - self.radius
+        ymax = self.center.y + self.radius
+
+        # Find range of pixels. We use round here because if the region extends
+        # to e.g. -0.4, it's enough to set the bounding box lower value to 0
+        # because the 0-th pixel goes from -0.5 to 0.5. At the upper end we add
+        # 1 because the upper limits need to be exlcusive.
+        ixmin = round(xmin)
+        ixmax = round(xmax) + 1
+        iymin = round(ymin)
+        iymax = round(ymax) + 1
+
+        return BoundingBox(ixmin, ixmax, iymin, iymax)
+
+    def to_mask(self, mode='center', subpixels=1):
+
+        # NOTE: assumes this class represents a single circle
+
+        self._validate_mode(mode, subpixels)
+
+        if mode == 'center':
+            mode = 'subpixels'
+            subpixels = 1
+
+        # Find bounding box and mask size
+        bbox = self.bounding_box
+        ny, nx = bbox.shape
+
+        # Find position of pixel edges and recenter so that circle is at origin
+        xmin = float(bbox.ixmin) - 0.5 - self.center.x
+        xmax = float(bbox.ixmax) - 0.5 - self.center.x
+        ymin = float(bbox.iymin) - 0.5 - self.center.y
+        ymax = float(bbox.iymax) - 0.5 - self.center.y
+
+        if mode == 'subpixels':
+            use_exact = 0
+        else:
+            use_exact = 1
+
+        fraction = circular_overlap_grid(xmin, xmax, ymin, ymax, nx, ny,
+                                         self.radius, use_exact, subpixels)
+
+        return Mask(fraction, bbox=bbox)
 
     def as_patch(self, **kwargs):
         import matplotlib.patches as mpatches

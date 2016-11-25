@@ -163,3 +163,15 @@ if eval(setup_cfg.get('edit_on_github')):
 
     edit_on_github_source_root = ""
     edit_on_github_doc_root = "docs"
+
+plot_rcparams = {'savefig.bbox': 'tight',
+                 'savefig.facecolor':'none',
+                 'axes.formatter.useoffset': False,
+                 'xtick.labelsize': 9,
+                 'ytick.labelsize': 9,
+                 'axes.labelsize': 11,
+                 'figure.titlesize': 11,
+                 'figure.subplot.wspace': 0.23,
+                 'figure.subplot.hspace': 0.23}
+
+plot_apply_rcparams = True

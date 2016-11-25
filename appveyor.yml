@@ -15,6 +15,7 @@ environment:
       # Cython code, you can set CONDA_DEPENDENCIES=''
       CONDA_CHANNELS: "defaults conda-forge"
       CONDA_DEPENDENCIES: "Cython shapely"
+      PIP_DEPENDENCIES: "https://github.com/astrofrog/pytest-arraydiff/archive/master.zip"
 
   matrix:
 

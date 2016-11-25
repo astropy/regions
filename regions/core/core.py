@@ -1,23 +1,30 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
 import abc
 import operator
+
 from astropy.extern import six
 
+
 __all__ = ['Region', 'PixelRegion', 'SkyRegion']
+
 
 """
 Here we define global variables for the default `origin` and `mode` used
 for WCS transformations throughout the `regions` package.
 
 Their purpose is to simplify achieving uniformity across the codebase.
-They are mainly used as default arguments for methods that do WCS transformations.
+They are mainly used as default arguments for methods that do WCS
+transformations.
 
 They are private (with an underscore), not part of the public API,
 users should not touch them.
 """
 _DEFAULT_WCS_ORIGIN = 0
 _DEFAULT_WCS_MODE = 'all'
+
+VALID_MASK_MODES = set(['center', 'exact', 'subpixels'])
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -145,6 +152,14 @@ class PixelRegion(Region):
             The tolerance for the ``'full'`` mode described above.
         """
 
+    @abc.abstractproperty
+    def bounding_box(self):
+        """
+        The minimal bounding box (in integer pixel coordinates) that contains
+        the region.
+        """
+        pass
+
     @abc.abstractmethod
     def to_mask(self, mode='center', subpixels=5):
         """
@@ -152,14 +167,10 @@ class PixelRegion(Region):
 
         Parameters
         ----------
-        mode : { 'center' | 'any' | 'all' | 'exact' | 'subpixels'}
+        mode : { 'center' | 'exact' | 'subpixels'}
             The following modes are available:
                 * ``'center'``: returns 1 for pixels where the center is in
                   the region, and 0 otherwise.
-                * ``'any'``: returns 1 for pixels where any of the pixel is
-                  in the region, and 0 otherwise.
-                * ``'all'``: returns 1 for pixels that are completely inside
-                  the region, 0 otherwise.
                 * ``'exact'``: returns a value between 0 and 1 giving the
                   fractional level of overlap of the pixel with the region.
                 * ``'subpixels'``: A pixel is divided into subpixels and
@@ -176,12 +187,19 @@ class PixelRegion(Region):
 
         Returns
         -------
-        mask : `~numpy.ndarray`
-            A mask indicating whether each pixel is contained in the region.
-        slice_x, slice_y : `slice`
-            Slices for x and y which can be used on an array to extract the
-            same region as the mask.
+        mask : `~regions.Mask`
+            A region mask object.
         """
+
+    @staticmethod
+    def _validate_mode(mode, subpixels):
+        if mode not in VALID_MASK_MODES:
+            raise ValueError("Invalid mask mode: {0} (should be one "
+                             "of {1})".format(mode, '/'.join(VALID_MASK_MODES)))
+        if mode == 'subpixels':
+            if not isinstance(subpixels, int) or subpixels <= 0:
+                raise ValueError("Invalid subpixels value: {0} (should be"
+                                 " a strictly positive integer)".format(subpixels))
 
     @abc.abstractmethod
     def to_shapely(self):
