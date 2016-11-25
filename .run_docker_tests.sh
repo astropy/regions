@@ -16,6 +16,8 @@ uname -m
 echo "Output of sys.maxsize in Python:"
 python -c 'import sys; print(sys.maxsize)'
 
+pip install https://github.com/astrofrog/pytest-arraydiff/archive/master.zip
+
 python setup.py test -V -a "-s"
 
 EOF
