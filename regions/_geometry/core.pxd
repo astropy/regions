@@ -4,3 +4,4 @@ cdef double area_triangle(double x1, double y1, double x2, double y2, double x3,
 cdef double area_arc_unit(double x1, double y1, double x2, double y2)
 cdef int in_triangle(double x, double y, double x1, double y1, double x2, double y2, double x3, double y3)
 cdef double overlap_area_triangle_unit_circle(double x1, double y1, double x2, double y2, double x3, double y3)
+cdef double floor_sqrt(double x)
