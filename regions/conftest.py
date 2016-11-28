@@ -8,6 +8,9 @@ except ImportError:
     raise ImportError("The pytest-arraydiff package is required for the tests. "
                       "You can install it with: pip install pytest-arraydiff")
 else:
+    # We need to remove pytest_arraydiff from the namespace otherwise pytest
+    # gets confused, because it tries to interpret pytest_* as a special
+    # function name.
     del pytest_arraydiff
 
 from astropy.tests.pytest_plugins import *
