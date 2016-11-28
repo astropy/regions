@@ -114,6 +114,7 @@ setup(name=PACKAGENAME,
           ],
           test=[
               'pytest-mpl',
+              'pytest-arraydiff'
           ],
       ),
       author=AUTHOR,
