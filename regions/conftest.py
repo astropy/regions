@@ -2,6 +2,14 @@
 # by importing them here in conftest.py they are discoverable by py.test
 # no matter how it is invoked within the source tree.
 
+try:
+    import pytest_arraydiff
+except ImportError:
+    raise ImportError("The pytest-arraydiff package is required for the tests. "
+                      "You can install it with: pip install pytest-arraydiff")
+else:
+    del pytest_arraydiff
+
 from astropy.tests.pytest_plugins import *
 
 ## Uncomment the following line to treat all DeprecationWarnings as

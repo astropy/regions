@@ -113,7 +113,7 @@ setup(name=PACKAGENAME,
               'wcsaxes',
           ],
           test=[
-              'pytest-mpl',
+              'pytest-arraydiff'
           ],
       ),
       author=AUTHOR,

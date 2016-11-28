@@ -62,7 +62,19 @@ Install the latest development version from https://github.com/astropy/regions :
     git clone https://github.com/astropy/regions
     cd regions
     python setup.py install
+
+To run the tests, you will need to make sure the `pytest-arraydiff
+<https://pypi.python.org/pypi/pytest-arraydiff>`_ package is installed. Then,
+run the tests with:
+
+.. code-block:: bash
+
     python setup.py test
+
+To build the documentation, do:
+
+.. code-block:: bash
+
     python setup.py build_docs
 
 Optional dependencies
