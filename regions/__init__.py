@@ -18,7 +18,7 @@ from ._astropy_init import *
 
 # For egg_info test builds to pass, put package imports here.
 if not _ASTROPY_SETUP_:
-    from .utils.examples import *
+    from ._utils.examples import *
     from .core import *
     from .io import *
     from .shapes import *

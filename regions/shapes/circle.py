@@ -3,13 +3,11 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import math
 
-import numpy as np
 from astropy.coordinates import Angle
 from astropy.wcs.utils import pixel_to_skycoord
 
 from ..core import PixelRegion, SkyRegion, Mask, BoundingBox
-from ..utils import skycoord_to_pixel_scale_angle
-from ..utils.wcs_helpers import skycoord_to_pixel_scale_angle
+from .._utils.wcs_helpers import skycoord_to_pixel_scale_angle
 from .._geometry import circular_overlap_grid
 
 __all__ = ['CirclePixelRegion', 'CircleSkyRegion']
