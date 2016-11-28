@@ -1,5 +1,9 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
+
+import numpy as np
+
 
 __all__ = ['BoundingBox']
 
@@ -50,43 +54,50 @@ class BoundingBox(object):
 
     @classmethod
     def _from_float(cls, xmin, xmax, ymin, ymax):
-        """Smallest BoundingBox that fully contains a given float rectangle.
+        """
+        Return the smallest bounding box that fully contains a given
+        rectangle defined by float coordinate values.
 
-        Following the pixel convention, the pixel edges correspond to these
-        pixel coordinates for example for three pixels:
+        Following the pixel index convention, an integer index
+        corresponds to the center of of a pixel and the pixel edges span
+        from (index - 0.5) to (index + 0.5).  For example, the pixels
+        edges of these three pixels are:
 
-        - pixel 0 from -0.5 to 0.5
-        - pixel 1 from 0.5 to 1.5
-        - pixel 2 from 1.5 to 2.5
+        - pixel 0: from -0.5 to 0.5
+        - pixel 1: from 0.5 to 1.5
+        - pixel 2: from 1.5 to 2.5
 
-        Therefore we call the Python built-in ``round`` function, which implements
-        these ranges. At the upper end we add 1, because by definition,
-        `BoundingBox` upper limits are exclusive. See examples below.
+        At the upper end we add 1, because by definition `BoundingBox`
+        upper limits are exclusive.  See examples below.
 
         Parameters
         ----------
         xmin, xmax, ymin, ymax : float
-            Rectangle with arbitrary float coordinates
+            Rectangle with arbitrary float coordinates.
 
         Returns
         -------
         bbox : `BoundingBox`
-            Smallest bounding box fully containing the rectangle
+            Smallest bounding box fully containing the rectangle.
 
         Examples
         --------
-
         >>> from regions import BoundingBox
         >>> BoundingBox._from_float(xmin=1.0, xmax=10.0, ymin=2.0, ymax=20.0)
         BoundingBox(ixmin=1, ixmax=11, iymin=2, iymax=21)
+
         >>> BoundingBox._from_float(xmin=1.4, xmax=10.4, ymin=1.6, ymax=10.6)
         BoundingBox(ixmin=1, ixmax=11, iymin=2, iymax=12)
+
+        >>> BoundingBox._from_float(xmin=0.5, xmax=10.4, ymin=1.6, ymax=10.6)
+        BoundingBox(ixmin=1, ixmax=11, iymin=2, iymax=12)
         """
-        # Note: we call `int` explicitly, because `round` returns float on Python 2
-        ixmin = int(round(xmin))
-        ixmax = int(round(xmax)) + 1
-        iymin = int(round(ymin))
-        iymax = int(round(ymax)) + 1
+
+        ixmin = np.floor(xmin + 0.5).astype(int)
+        ixmax = np.floor(xmax + 1.5).astype(int)
+        iymin = np.floor(ymin + 0.5).astype(int)
+        iymax = np.floor(ymax + 1.5).astype(int)
+
         return cls(ixmin, ixmax, iymin, iymax)
 
     def __eq__(self, other):
