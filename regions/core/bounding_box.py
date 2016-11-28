@@ -26,7 +26,7 @@ class BoundingBox(object):
     >>> bbox  # nice repr, useful for interactive work
     BoundingBox(ixmin=1, ixmax=10, iymin=2, iymax=20)
     # sometimes it's useful to check if two bboxes are the same
-    >>> bbox == bbox
+    >>> bbox == BoundingBox(ixmin=1, ixmax=10, iymin=2, iymax=20)
     True
     >>> bbox == BoundingBox(ixmin=99, ixmax=10, iymin=2, iymax=20)
     False
@@ -37,6 +37,9 @@ class BoundingBox(object):
     (slice(2, 20, None), slice(1, 10, None))
     # Extent is useful when plotting bbox with matplotlib
     >>> bbox.extent  # matplotlib order: (x, y)
+    (0.5, 9.5, 1.5, 19.5)
+    >>> print(bbox.as_patch())
+    Rectangle(0.5,1.5;9x18)
     """
 
     def __init__(self, ixmin, ixmax, iymin, iymax):
