@@ -67,6 +67,9 @@ class CirclePixelRegion(PixelRegion):
 
     @property
     def bounding_box(self):
+        """
+        Bounding box (`~regions.BoundingBox`).
+        """
 
         # Find exact bounds
         xmin = self.center.x - self.radius
@@ -74,16 +77,7 @@ class CirclePixelRegion(PixelRegion):
         ymin = self.center.y - self.radius
         ymax = self.center.y + self.radius
 
-        # Find range of pixels. We use round here because if the region extends
-        # to e.g. -0.4, it's enough to set the bounding box lower value to 0
-        # because the 0-th pixel goes from -0.5 to 0.5. At the upper end we add
-        # 1 because the upper limits need to be exlcusive.
-        ixmin = round(xmin)
-        ixmax = round(xmax) + 1
-        iymin = round(ymin)
-        iymax = round(ymax) + 1
-
-        return BoundingBox(ixmin, ixmax, iymin, iymax)
+        return BoundingBox._from_float(xmin, xmax, ymin, ymax)
 
     def to_mask(self, mode='center', subpixels=1):
 
