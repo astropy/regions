@@ -1,5 +1,9 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
+
+import numpy as np
+
 
 __all__ = ['BoundingBox']
 
@@ -82,11 +86,12 @@ class BoundingBox(object):
         >>> BoundingBox._from_float(xmin=1.4, xmax=10.4, ymin=1.6, ymax=10.6)
         BoundingBox(ixmin=1, ixmax=11, iymin=2, iymax=12)
         """
-        # Note: we call `int` explicitly, because `round` returns float on Python 2
-        ixmin = int(round(xmin))
-        ixmax = int(round(xmax)) + 1
-        iymin = int(round(ymin))
-        iymax = int(round(ymax)) + 1
+
+        ixmin = np.floor(xmin + 0.5).astype(int)
+        ixmax = np.floor(xmax + 1.5).astype(int)
+        iymin = np.floor(ymin + 0.5).astype(int)
+        iymax = np.floor(ymax + 1.5).astype(int)
+
         return cls(ixmin, ixmax, iymin, iymax)
 
     def __eq__(self, other):
