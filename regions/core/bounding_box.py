@@ -48,6 +48,47 @@ class BoundingBox(object):
         self.iymin = iymin
         self.iymax = iymax
 
+    @classmethod
+    def _from_float(cls, xmin, xmax, ymin, ymax):
+        """Smallest BoundingBox that fully contains a given float rectangle.
+
+        Following the pixel convention, the pixel edges correspond to these
+        pixel coordinates for example for three pixels:
+
+        - pixel 0 from -0.5 to 0.5
+        - pixel 1 from 0.5 to 1.5
+        - pixel 2 from 1.5 to 2.5
+
+        Therefore we call the Python built-in ``round`` function, which implements
+        these ranges. At the upper end we add 1, because by definition,
+        `BoundingBox` upper limits are exclusive. See examples below.
+
+        Parameters
+        ----------
+        xmin, xmax, ymin, ymax : float
+            Rectangle with arbitrary float coordinates
+
+        Returns
+        -------
+        bbox : `BoundingBox`
+            Smallest bounding box fully containing the rectangle
+
+        Examples
+        --------
+
+        >>> from regions import BoundingBox
+        >>> BoundingBox._from_float(xmin=1.0, xmax=10.0, ymin=2.0, ymax=20.0)
+        BoundingBox(ixmin=1, ixmax=11, iymin=2, iymax=21)
+        >>> BoundingBox._from_float(xmin=1.4, xmax=10.4, ymin=1.6, ymax=10.6)
+        BoundingBox(ixmin=1, ixmax=11, iymin=2, iymax=12)
+        """
+        # Note: we call `int` explicitly, because `round` returns float on Python 2
+        ixmin = int(round(xmin))
+        ixmax = int(round(xmax)) + 1
+        iymin = int(round(ymin))
+        iymax = int(round(ymax)) + 1
+        return cls(ixmin, ixmax, iymin, iymax)
+
     def __eq__(self, other):
         if not isinstance(other, BoundingBox):
             raise TypeError('Can only compare BoundingBox to other BoundingBox')
