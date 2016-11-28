@@ -164,7 +164,3 @@ class RectangleSkyRegion(SkyRegion):
     def to_pixel(self, wcs, mode='local', tolerance=None):
         # TODO: needs to be implemented
         raise NotImplementedError
-
-    def as_patch(self, **kwargs):
-        # TODO: needs to be implemented
-        raise NotImplementedError
