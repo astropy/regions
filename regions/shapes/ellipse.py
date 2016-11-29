@@ -133,21 +133,21 @@ class EllipseSkyRegion(SkyRegion):
     ----------
     center : `~astropy.coordinates.SkyCoord`
         Center position
-    minor : `~astropy.units.Quantity`
-        Minor radius
     major : `~astropy.units.Quantity`
         Major radius
+    minor : `~astropy.units.Quantity`
+        Minor radius
     angle : `~astropy.units.Quantity`
         The rotation angle of the ellipse.
         If set to zero (the default), the major
         axis is lined up with the longitude axis of the celestial coordinates.
     """
 
-    def __init__(self, center, minor, major, angle=0. * u.deg, meta=None, visual=None):
+    def __init__(self, center, major, minor, angle=0. * u.deg, meta=None, visual=None):
         # TODO: use quantity_input to check that height, width, and angle are angles
         self.center = center
-        self.minor = minor
         self.major = major
+        self.minor = minor
         self.angle = angle
         self.meta = meta or {}
         self.visual = visual or {}
@@ -156,11 +156,11 @@ class EllipseSkyRegion(SkyRegion):
         data = dict(
             name=self.__class__.__name__,
             center=self.center,
-            minor=self.minor,
             major=self.major,
+            minor=self.minor,
             angle=self.angle,
         )
-        fmt = '{name}\ncenter: {center}\nminor: {minor}\nmajor: {major}\nangle: {angle}'
+        fmt = '{name}\ncenter: {center}\nmajor: {major}\nminor: {minor}\nangle: {angle}'
         return fmt.format(**data)
 
     @property

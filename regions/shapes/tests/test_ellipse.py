@@ -6,14 +6,7 @@ import astropy.units as u
 from astropy.coordinates import SkyCoord
 from ...core import PixCoord
 from ..ellipse import EllipsePixelRegion, EllipseSkyRegion
-from .utils import ASTROPY_LT_13
-
-try:
-    import matplotlib
-
-    HAS_MATPLOTLIB = True
-except:
-    HAS_MATPLOTLIB = False
+from .utils import ASTROPY_LT_13, HAS_MATPLOTLIB
 
 
 class TestEllipsePixelRegion:
@@ -40,15 +33,22 @@ class TestEllipsePixelRegion:
 
 
 class TestEllipseSkyRegion:
-    def test_str(self):
+    def setup(self):
         center = SkyCoord(3, 4, unit='deg')
-        reg = EllipseSkyRegion(center, 3 * u.deg, 4 * u.deg, 5 * u.deg)
+        self.reg = EllipseSkyRegion(
+            center=center,
+            major=4 * u.deg,
+            minor=3 * u.deg,
+            angle=5 * u.deg,
+        )
+
+    def test_str(self):
 
         if ASTROPY_LT_13:
             expected = ('EllipseSkyRegion\ncenter: <SkyCoord (ICRS): (ra, dec) in deg\n'
-                        '    (3.0, 4.0)>\nminor: 3.0 deg\nmajor: 4.0 deg\nangle: 5.0 deg')
+                        '    (3.0, 4.0)>\nmajor: 4.0 deg\nminor: 3.0 deg\nangle: 5.0 deg')
         else:
             expected = ('EllipseSkyRegion\ncenter: <SkyCoord (ICRS): (ra, dec) in deg\n'
-                        '    ( 3.,  4.)>\nminor: 3.0 deg\nmajor: 4.0 deg\nangle: 5.0 deg')
+                        '    ( 3.,  4.)>\nmajor: 4.0 deg\nminor: 3.0 deg\nangle: 5.0 deg')
 
-        assert str(reg) == expected
+        assert str(self.reg) == expected

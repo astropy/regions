@@ -7,19 +7,25 @@ from .utils import ASTROPY_LT_13
 
 
 class TestPointPixelRegion:
-    def test_str(self):
+    def setup(self):
         center = PixCoord(3, 4)
-        reg = PointPixelRegion(center)
+        self.reg = PointPixelRegion(center)
 
-        assert str(reg) == 'PointPixelRegion\ncenter: PixCoord(x=3, y=4)'
+    def test_str(self):
+        expected = 'PointPixelRegion\ncenter: PixCoord(x=3, y=4)'
+        assert str(self.reg) == expected
 
 
 class TestPointSkyRegion:
-    def test_str(self):
+    def setup(self):
         center = SkyCoord(3, 4, unit='deg')
-        reg = PointSkyRegion(center)
+        self.reg = PointSkyRegion(center)
+
+    def test_str(self):
 
         if ASTROPY_LT_13:
-            assert str(reg) == 'PointSkyRegion\ncenter: <SkyCoord (ICRS): (ra, dec) in deg\n    (3.0, 4.0)>'
+            expected = 'PointSkyRegion\ncenter: <SkyCoord (ICRS): (ra, dec) in deg\n    (3.0, 4.0)>'
         else:
-            assert str(reg) == 'PointSkyRegion\ncenter: <SkyCoord (ICRS): (ra, dec) in deg\n    ( 3.,  4.)>'
+            expected = 'PointSkyRegion\ncenter: <SkyCoord (ICRS): (ra, dec) in deg\n    ( 3.,  4.)>'
+
+        assert str(self.reg) == expected

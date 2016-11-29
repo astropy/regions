@@ -12,9 +12,9 @@ from ...shapes.ellipse import EllipsePixelRegion
 from ...shapes.rectangle import RectanglePixelRegion
 
 REGIONS = [
-    CirclePixelRegion(PixCoord(3.981987, 4.131378), 3.3411),
-    EllipsePixelRegion(PixCoord(3.981987, 4.131378), 3.3411, 2.2233, angle=32 * u.deg),
-    RectanglePixelRegion(PixCoord(3.981987, 4.131378), 4.3411, 5.2233, angle=32 * u.deg),
+    CirclePixelRegion(PixCoord(3.981987, 4.131378), radius=3.3411),
+    EllipsePixelRegion(PixCoord(3.981987, 4.131378), major=2.2233, minor=3.3411, angle=32 * u.deg),
+    RectanglePixelRegion(PixCoord(3.981987, 4.131378), width=5.2233, height=4.3411, angle=32 * u.deg),
 ]
 
 MODES = [

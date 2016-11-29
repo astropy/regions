@@ -10,14 +10,7 @@ from astropy.io.fits import getheader
 from astropy.wcs import WCS
 from ...core import PixCoord
 from ..circle import CirclePixelRegion, CircleSkyRegion
-from .utils import ASTROPY_LT_13
-
-try:
-    import matplotlib
-
-    HAS_MATPLOTLIB = True
-except:
-    HAS_MATPLOTLIB = False
+from .utils import ASTROPY_LT_13, HAS_MATPLOTLIB
 
 
 class TestCirclePixelRegion:
@@ -41,16 +34,17 @@ class TestCirclePixelRegion:
 
 
 class TestCircleSkyRegion:
-    def test_str(self):
+    def setup(self):
         center = SkyCoord(3 * u.deg, 4 * u.deg)
-        reg = CircleSkyRegion(center, 2 * u.arcsec)
+        self.reg = CircleSkyRegion(center, 2 * u.arcsec)
 
+    def test_str(self):
         if ASTROPY_LT_13:
-            assert str(
-                reg) == 'CircleSkyRegion\ncenter: <SkyCoord (ICRS): (ra, dec) in deg\n    (3.0, 4.0)>\nradius: 2.0 arcsec'
+            expected = 'CircleSkyRegion\ncenter: <SkyCoord (ICRS): (ra, dec) in deg\n    (3.0, 4.0)>\nradius: 2.0 arcsec'
         else:
-            assert str(
-                reg) == 'CircleSkyRegion\ncenter: <SkyCoord (ICRS): (ra, dec) in deg\n    ( 3.,  4.)>\nradius: 2.0 arcsec'
+            expected = 'CircleSkyRegion\ncenter: <SkyCoord (ICRS): (ra, dec) in deg\n    ( 3.,  4.)>\nradius: 2.0 arcsec'
+
+        assert str(self.reg) == expected
 
     def test_transformation(self):
         skycoord = SkyCoord(3 * u.deg, 4 * u.deg, frame='galactic')

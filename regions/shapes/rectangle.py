@@ -18,20 +18,20 @@ class RectanglePixelRegion(PixelRegion):
     ----------
     center : `~regions.PixCoord`
         The position of the center of the rectangle.
-    height : float
-        The height of the rectangle
     width : float
         The width of the rectangle
+    height : float
+        The height of the rectangle
     angle : `~astropy.units.Quantity`
         The rotation of the rectangle. If set to zero (the default), the width
         is lined up with the x axis.
     """
 
-    def __init__(self, center, height, width, angle=0 * u.deg, meta=None, visual=None):
+    def __init__(self, center, width, height, angle=0 * u.deg, meta=None, visual=None):
         # TODO: use quantity_input to check that angle is an angle
         self.center = center
-        self.height = height
         self.width = width
+        self.height = height
         self.angle = angle
         self.meta = meta or {}
         self.visual = visual or {}
@@ -40,11 +40,11 @@ class RectanglePixelRegion(PixelRegion):
         data = dict(
             name=self.__class__.__name__,
             center=self.center,
-            height=self.height,
             width=self.width,
+            height=self.height,
             angle=self.angle,
         )
-        fmt = '{name}\ncenter: {center}\nheight: {height}\nwidth: {width}\nangle: {angle}'
+        fmt = '{name}\ncenter: {center}\nwidth: {width}\nheight: {height}\nangle: {angle}'
         return fmt.format(**data)
 
     @property
@@ -104,16 +104,27 @@ class RectanglePixelRegion(PixelRegion):
         else:
             use_exact = 1
 
-        fraction = rectangular_overlap_grid(xmin, xmax, ymin, ymax, nx, ny,
-                                            self.width, self.height,
-                                            self.angle.to(u.deg).value,
-                                            use_exact, subpixels)
+        fraction = rectangular_overlap_grid(
+            xmin, xmax, ymin, ymax, nx, ny,
+            self.width, self.height,
+            self.angle.to(u.deg).value,
+            use_exact, subpixels,
+        )
 
         return Mask(fraction, bbox=bbox)
 
     def as_patch(self, **kwargs):
-        # TODO: needs to be implemented
-        raise NotImplementedError
+        """Matplotlib patch object for this region (`matplotlib.patches.Rectangle`).
+        """
+        from matplotlib.patches import Rectangle
+        xy = self.center.x, self.center.y
+        width = self.width
+        height = self.height
+        # TODO: think about how to map major / minor / angle to MPL parameters.
+        # MPL expects this:
+        # "rotation in degrees (anti-clockwise)"
+        angle = self.angle.to('deg').value
+        return Rectangle(xy=xy, width=width, height=height, angle=angle, **kwargs)
 
 
 class RectangleSkyRegion(SkyRegion):
@@ -124,20 +135,20 @@ class RectangleSkyRegion(SkyRegion):
     ----------
     center : `~astropy.coordinates.SkyCoord`
         The position of the center of the rectangle.
-    height : `~astropy.units.Quantity`
-        The height radius of the rectangle
     width : `~astropy.units.Quantity`
         The width radius of the rectangle
+    height : `~astropy.units.Quantity`
+        The height radius of the rectangle
     angle : `~astropy.units.Quantity`
         The rotation of the rectangle. If set to zero (the default), the width
         is lined up with the longitude axis of the celestial coordinates.
     """
 
-    def __init__(self, center, height, width, angle=0 * u.deg, meta=None, visual=None):
+    def __init__(self, center, width, height, angle=0 * u.deg, meta=None, visual=None):
         # TODO: use quantity_input to check that height, width, and angle are angles
         self.center = center
-        self.height = height
         self.width = width
+        self.height = height
         self.angle = angle
         self.meta = meta or {}
         self.visual = visual or {}
@@ -146,11 +157,11 @@ class RectangleSkyRegion(SkyRegion):
         data = dict(
             name=self.__class__.__name__,
             center=self.center,
-            height=self.height,
             width=self.width,
+            height=self.height,
             angle=self.angle,
         )
-        fmt = '{name}\ncenter: {center}\nheight: {height}\nwidth: {width}\nangle: {angle}'
+        fmt = '{name}\ncenter: {center}\nwidth: {width}\nheight: {height}\nangle: {angle}'
         return fmt.format(**data)
 
     @property
