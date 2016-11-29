@@ -16,9 +16,9 @@ class EllipsePixelRegion(PixelRegion):
     ----------
     center : `~regions.PixCoord`
         Center position
-    minor : float
-        Minor radius
     major : float
+        Minor radius
+    minor : float
         Major radius
     angle : `~astropy.units.Quantity`
         The rotation angle of the ellipse.
@@ -26,12 +26,12 @@ class EllipsePixelRegion(PixelRegion):
         axis is lined up with the x axis.
     """
 
-    def __init__(self, center, minor, major, angle=0. * u.deg, meta=None,
+    def __init__(self, center, major, minor, angle=0. * u.deg, meta=None,
                  visual=None):
         # TODO: use quantity_input to check that angle is an angle
         self.center = center
-        self.minor = minor
         self.major = major
+        self.minor = minor
         self.angle = angle
         self.meta = meta or {}
         self.visual = visual or {}
@@ -40,16 +40,16 @@ class EllipsePixelRegion(PixelRegion):
         data = dict(
             name=self.__class__.__name__,
             center=self.center,
-            minor=self.minor,
             major=self.major,
+            minor=self.minor,
             angle=self.angle,
         )
-        fmt = '{name}\ncenter: {center}\nminor: {minor}\nmajor: {major}\nangle: {angle}'
+        fmt = '{name}\ncenter: {center}\nmajor: {major}\nminor: {minor}\nangle: {angle}'
         return fmt.format(**data)
 
     @property
     def area(self):
-        return math.pi * self.minor * self.major
+        return math.pi * self.major * self.minor
 
     def contains(self, pixcoord):
         # TODO: needs to be implemented
@@ -102,16 +102,27 @@ class EllipsePixelRegion(PixelRegion):
         else:
             use_exact = 1
 
-        fraction = elliptical_overlap_grid(xmin, xmax, ymin, ymax, nx, ny,
-                                           self.major, self.minor,
-                                           self.angle.to(u.deg).value,
-                                           use_exact, subpixels)
+        fraction = elliptical_overlap_grid(
+            xmin, xmax, ymin, ymax, nx, ny,
+            self.major, self.minor,
+            self.angle.to(u.deg).value,
+            use_exact, subpixels,
+        )
 
         return Mask(fraction, bbox=bbox)
 
     def as_patch(self, **kwargs):
-        # TODO: needs to be implemented
-        raise NotImplementedError
+        """Matplotlib patch object for this region (`matplotlib.patches.Ellipse`).
+        """
+        from matplotlib.patches import Ellipse
+        xy = self.center.x, self.center.y
+        width = 2 * self.major
+        height = 2 * self.minor
+        # TODO: think about how to map major / minor / angle to MPL parameters.
+        # MPL expects this:
+        # "rotation in degrees (anti-clockwise)"
+        angle = self.angle.to('deg').value
+        return Ellipse(xy=xy, width=width, height=height, angle=angle, **kwargs)
 
 
 class EllipseSkyRegion(SkyRegion):
