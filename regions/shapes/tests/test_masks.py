@@ -1,25 +1,29 @@
-# This file sets up detailed tests for computing masks with reference images
-
+# Licensed under a 3-clause BSD style license - see LICENSE.rst
+"""
+This file sets up detailed tests for computing masks with reference images.
+"""
+from __future__ import absolute_import, division, print_function, unicode_literals
 import itertools
-import pytest
-
-from regions.core import PixCoord
-from regions.shapes.circle import CirclePixelRegion
-from regions.shapes.ellipse import EllipsePixelRegion
-from regions.shapes.rectangle import RectanglePixelRegion
-from astropy.io import fits
+from astropy.tests.helper import pytest
 from astropy import units as u
+from ...core import PixCoord
+from ...shapes.circle import CirclePixelRegion
+from ...shapes.ellipse import EllipsePixelRegion
+from ...shapes.rectangle import RectanglePixelRegion
 
+REGIONS = [
+    CirclePixelRegion(PixCoord(3.981987, 4.131378), 3.3411),
+    EllipsePixelRegion(PixCoord(3.981987, 4.131378), 3.3411, 2.2233, angle=32 * u.deg),
+    RectanglePixelRegion(PixCoord(3.981987, 4.131378), 4.3411, 5.2233, angle=32 * u.deg),
+]
 
-REGIONS = [CirclePixelRegion(PixCoord(3.981987, 4.131378), 3.3411),
-           EllipsePixelRegion(PixCoord(3.981987, 4.131378), 3.3411, 2.2233, angle=32 * u.deg),
-           RectanglePixelRegion(PixCoord(3.981987, 4.131378), 4.3411, 5.2233, angle=32 * u.deg)]
-
-MODES = [{'mode': 'center'},
-         {'mode': 'exact'},
-         {'mode': 'subpixels', 'subpixels': 1},
-         {'mode': 'subpixels', 'subpixels': 5},
-         {'mode': 'subpixels', 'subpixels': 18}]
+MODES = [
+    {'mode': 'center'},
+    {'mode': 'exact'},
+    {'mode': 'subpixels', 'subpixels': 1},
+    {'mode': 'subpixels', 'subpixels': 5},
+    {'mode': 'subpixels', 'subpixels': 18},
+]
 
 
 def label(value):

@@ -5,12 +5,10 @@ implemented and doesn't check anything about correctness.
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 import itertools
-import numpy as np
 from astropy.tests.helper import pytest
 from astropy import units as u
 from astropy.coordinates import ICRS
 from astropy.wcs import WCS
-
 from ...core.mask import Mask
 from ...core.core import Region, SkyRegion, PixelRegion
 from ...core.pixcoord import PixCoord
