@@ -4,7 +4,7 @@ import numpy as np
 from numpy.testing import assert_allclose
 from astropy import units as u
 from astropy.coordinates import SkyCoord
-from astropy.tests.helper import assert_quantity_allclose
+from astropy.tests.helper import pytest, assert_quantity_allclose
 from astropy.utils.data import get_pkg_data_filename
 from astropy.io.fits import getheader
 from astropy.wcs import WCS
@@ -21,17 +21,23 @@ except:
 
 
 class TestCirclePixelRegion:
-    def test_str(self):
+    def setup(self):
         center = PixCoord(3, 4)
-        reg = CirclePixelRegion(center, 2)
+        self.reg = CirclePixelRegion(center, 2)
 
-        assert str(reg) == 'CirclePixelRegion\ncenter: PixCoord(x=3, y=4)\nradius: 2'
+    def test_str(self):
+        expected = 'CirclePixelRegion\ncenter: PixCoord(x=3, y=4)\nradius: 2'
+        assert str(self.reg) == expected
 
     def test_to_mask(self):
-        center = PixCoord(3, 4)
-        reg = CirclePixelRegion(center, 2)
-        mask = reg.to_mask(mode='exact')
+        mask = self.reg.to_mask(mode='exact')
         assert_allclose(np.sum(mask.data), 4 * np.pi)
+
+    @pytest.mark.skipif('not HAS_MATPLOTLIB')
+    def test_as_patch(self):
+        patch = self.reg.as_patch()
+        assert_allclose(patch.center, (3, 4))
+        assert_allclose(patch.radius, 2)
 
 
 class TestCircleSkyRegion:
@@ -40,9 +46,11 @@ class TestCircleSkyRegion:
         reg = CircleSkyRegion(center, 2 * u.arcsec)
 
         if ASTROPY_LT_13:
-            assert str(reg) == 'CircleSkyRegion\ncenter: <SkyCoord (ICRS): (ra, dec) in deg\n    (3.0, 4.0)>\nradius: 2.0 arcsec'
+            assert str(
+                reg) == 'CircleSkyRegion\ncenter: <SkyCoord (ICRS): (ra, dec) in deg\n    (3.0, 4.0)>\nradius: 2.0 arcsec'
         else:
-            assert str(reg) == 'CircleSkyRegion\ncenter: <SkyCoord (ICRS): (ra, dec) in deg\n    ( 3.,  4.)>\nradius: 2.0 arcsec'
+            assert str(
+                reg) == 'CircleSkyRegion\ncenter: <SkyCoord (ICRS): (ra, dec) in deg\n    ( 3.,  4.)>\nradius: 2.0 arcsec'
 
     def test_transformation(self):
         skycoord = SkyCoord(3 * u.deg, 4 * u.deg, frame='galactic')
