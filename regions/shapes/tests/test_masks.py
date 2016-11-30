@@ -36,9 +36,18 @@ def label(value):
     else:
         return '-'.join('{0}_{1}'.format(key, value) for key, value in sorted(value.items()))
 
-
-@pytest.mark.array_compare(fmt='text', write_kwargs={'fmt': '%12.8e'})
-@pytest.mark.parametrize(('region', 'mode'), itertools.product(REGIONS, MODES), ids=label)
+# There's a bug in numpy: `numpy.savetxt` doesn't accept unicode
+# on Python 2. Bytes works on Python 2 and 3, so we're using that here.
+# https://github.com/numpy/numpy/pull/4053#issuecomment-263808221
+@pytest.mark.array_compare(
+    fmt='text',
+    write_kwargs={'fmt': b'%12.8e'},
+)
+@pytest.mark.parametrize(
+    ('region', 'mode'),
+    itertools.product(REGIONS, MODES),
+    ids=label,
+)
 def test_to_mask(region, mode):
     try:
         mask = region.to_mask(**mode)
