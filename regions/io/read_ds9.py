@@ -7,6 +7,8 @@ from astropy import units as u
 from astropy import coordinates
 from astropy.coordinates import BaseCoordinateFrame
 from astropy import log
+from astropy.utils.exceptions import AstropyUserWarning
+from warnings import warn
 from ..shapes import circle, rectangle, polygon, ellipse, point
 from ..core import PixCoord
 
@@ -192,9 +194,11 @@ def ds9_region_list_to_objects(region_list):
             else:
                 raise ValueError("No central coordinate")
         else:
-            log.warn("Skipping region with coords {0} because its type '{1}'"
-                     " is not recognized."
-                     .format(str(coord_list), region_type))
+            warn("Skipping region with coords {0} because its type '{1}'"
+                 " is not recognized."
+                 .format(str(coord_list), region_type),
+                 AstropyUserWarning
+                )
             continue
         reg.vizmeta = {key: meta[key] for key in meta.keys() if key in viz_keywords}
         reg.meta = {key: meta[key] for key in meta.keys() if key not in viz_keywords}
