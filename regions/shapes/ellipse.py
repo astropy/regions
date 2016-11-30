@@ -24,6 +24,32 @@ class EllipsePixelRegion(PixelRegion):
         The rotation angle of the ellipse.
         If set to zero (the default), the major
         axis is lined up with the x axis.
+
+    Examples
+    --------
+
+    .. plot::
+        :include-source:
+
+        import numpy as np
+        from astropy.modeling.models import Ellipse2D
+        from astropy.coordinates import Angle
+        from regions import PixCoord, EllipsePixelRegion
+        import matplotlib.pyplot as plt
+        x0, y0 = 15, 10
+        a, b = 8, 5
+        theta = Angle(30, 'deg')
+        e = Ellipse2D(amplitude=100., x_0=x0, y_0=y0, a=a, b=b, theta=theta.radian)
+        y, x = np.mgrid[0:20, 0:30]
+        fig, ax = plt.subplots(1, 1)
+        ax.imshow(e(x, y), origin='lower', interpolation='none', cmap='Greys_r')
+
+        center = PixCoord(x=x0, y=y0)
+        reg = EllipsePixelRegion(center=center, major=a, minor=b, angle=theta)
+        patch = reg.as_patch(facecolor='none', edgecolor='red', lw=2)
+        ax.add_patch(patch)
+
+        plt.show()
     """
 
     def __init__(self, center, major, minor, angle=0. * u.deg, meta=None,
@@ -118,9 +144,7 @@ class EllipsePixelRegion(PixelRegion):
         xy = self.center.x, self.center.y
         width = 2 * self.major
         height = 2 * self.minor
-        # TODO: think about how to map major / minor / angle to MPL parameters.
-        # MPL expects this:
-        # "rotation in degrees (anti-clockwise)"
+        # From the docstring: MPL expects "rotation in degrees (anti-clockwise)"
         angle = self.angle.to('deg').value
         return Ellipse(xy=xy, width=width, height=height, angle=angle, **kwargs)
 
