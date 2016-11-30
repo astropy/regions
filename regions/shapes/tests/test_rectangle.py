@@ -26,7 +26,9 @@ class TestRectanglePixelRegion:
     @pytest.mark.skipif('not HAS_MATPLOTLIB')
     def test_as_patch(self):
         patch = self.reg.as_patch()
-        assert_allclose(patch.xy, (3, 4))
+        # Note: `reg.center` is the center, `patch.xy` is the lower-left corner
+        assert_allclose(patch.xy, (1.138344, 2.331396), atol=1e-3)
+
         assert_allclose(patch.get_width(), 4)
         assert_allclose(patch.get_height(), 3)
         # `matplotlib.patches.Rectangle` currently doesn't expose `angle`.
