@@ -10,11 +10,13 @@ from ...core import PixCoord
 from ...shapes.circle import CirclePixelRegion
 from ...shapes.ellipse import EllipsePixelRegion
 from ...shapes.rectangle import RectanglePixelRegion
+from ...shapes.polygon import PolygonPixelRegion
 
 REGIONS = [
     CirclePixelRegion(PixCoord(3.981987, 4.131378), radius=3.3411),
     EllipsePixelRegion(PixCoord(3.981987, 4.131378), major=2.2233, minor=3.3411, angle=32 * u.deg),
     RectanglePixelRegion(PixCoord(3.981987, 4.131378), width=5.2233, height=4.3411, angle=32 * u.deg),
+    PolygonPixelRegion(PixCoord([-2.334, 3.631, 1.122, -1.341], [-3.121, -2.118, 2.987, 1.759])),
 ]
 
 MODES = [
@@ -33,6 +35,8 @@ def label(value):
         return 'elli'
     elif isinstance(value, RectanglePixelRegion):
         return 'rect'
+    elif isinstance(value, PolygonPixelRegion):
+        return 'poly'
     else:
         return '-'.join('{0}_{1}'.format(key, value) for key, value in sorted(value.items()))
 
