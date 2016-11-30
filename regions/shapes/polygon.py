@@ -1,6 +1,10 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 from __future__ import absolute_import, division, print_function, unicode_literals
-from ..core import PixelRegion, SkyRegion
+
+import numpy as np
+
+from ..core import PixelRegion, SkyRegion, Mask, BoundingBox
+from .._geometry import polygonal_overlap_grid
 
 __all__ = ['PolygonPixelRegion', 'PolygonSkyRegion']
 
@@ -48,16 +52,49 @@ class PolygonPixelRegion(PixelRegion):
 
     @property
     def bounding_box(self, mode='center'):
-        # TODO: needs to be implemented
-        raise NotImplementedError
+        xmin = self.vertices.x.min()
+        xmax = self.vertices.x.max()
+        ymin = self.vertices.y.min()
+        ymax = self.vertices.y.max()
+        return BoundingBox._from_float(xmin, xmax, ymin, ymax)
 
-    def to_mask(self, mode='center'):
-        # TODO: needs to be implemented
-        raise NotImplementedError
+    def to_mask(self, mode='center', subpixels=5):
+
+        self._validate_mode(mode, subpixels)
+
+        if mode == 'center':
+            mode = 'subpixels'
+            subpixels = 1
+
+        # Find bounding box and mask size
+        bbox = self.bounding_box
+        ny, nx = bbox.shape
+
+        # Find position of pixel edges and recenter so that circle is at origin
+        xmin = float(bbox.ixmin) - 0.5
+        xmax = float(bbox.ixmax) - 0.5
+        ymin = float(bbox.iymin) - 0.5
+        ymax = float(bbox.iymax) - 0.5
+
+        if mode == 'subpixels':
+            use_exact = 0
+        else:
+            use_exact = 1
+
+        fraction = polygonal_overlap_grid(
+            xmin, xmax, ymin, ymax, nx, ny,
+            self.vertices.x, self.vertices.y,
+            use_exact, subpixels)
+
+        return Mask(fraction, bbox=bbox)
 
     def as_patch(self, **kwargs):
-        # TODO: needs to be implemented
-        raise NotImplementedError
+        """
+        Matplotlib patch object for this region (`matplotlib.patches.Polygon`).
+        """
+        from matplotlib.patches import Polygon
+        xy = np.vstack([self.vertices.x, self.vertices.y]).transpose()
+        return Polygon(xy=xy, **kwargs)
 
 
 class PolygonSkyRegion(SkyRegion):
