@@ -6,18 +6,26 @@ from ..point import PointPixelRegion, PointSkyRegion
 from .utils import ASTROPY_LT_13
 
 
-def test_ellipse_pixel():
-    center = PixCoord(3, 4)
-    reg = PointPixelRegion(center)
+class TestPointPixelRegion:
+    def setup(self):
+        center = PixCoord(3, 4)
+        self.reg = PointPixelRegion(center)
 
-    assert str(reg) == 'PointPixelRegion\ncenter: PixCoord(x=3, y=4)'
+    def test_str(self):
+        expected = 'PointPixelRegion\ncenter: PixCoord(x=3, y=4)'
+        assert str(self.reg) == expected
 
 
-def test_ellipse_sky():
-    center = SkyCoord(3, 4, unit='deg')
-    reg = PointSkyRegion(center)
+class TestPointSkyRegion:
+    def setup(self):
+        center = SkyCoord(3, 4, unit='deg')
+        self.reg = PointSkyRegion(center)
 
-    if ASTROPY_LT_13:
-        assert str(reg) == 'PointSkyRegion\ncenter: <SkyCoord (ICRS): (ra, dec) in deg\n    (3.0, 4.0)>'
-    else:
-        assert str(reg) == 'PointSkyRegion\ncenter: <SkyCoord (ICRS): (ra, dec) in deg\n    ( 3.,  4.)>'
+    def test_str(self):
+
+        if ASTROPY_LT_13:
+            expected = 'PointSkyRegion\ncenter: <SkyCoord (ICRS): (ra, dec) in deg\n    (3.0, 4.0)>'
+        else:
+            expected = 'PointSkyRegion\ncenter: <SkyCoord (ICRS): (ra, dec) in deg\n    ( 3.,  4.)>'
+
+        assert str(self.reg) == expected

@@ -110,12 +110,12 @@ class CirclePixelRegion(PixelRegion):
         return Mask(fraction, bbox=bbox)
 
     def as_patch(self, **kwargs):
-        import matplotlib.patches as mpatches
-
+        """Matplotlib patch object for this region (`matplotlib.patches.Circle`).
+        """
+        from matplotlib.patches import Circle
         xy = self.center.x, self.center.y
         radius = self.radius
-        patch = mpatches.Circle(xy=xy, radius=radius, **kwargs)
-        return patch
+        return Circle(xy=xy, radius=radius, **kwargs)
 
 
 class CircleSkyRegion(SkyRegion):
@@ -181,18 +181,3 @@ class CircleSkyRegion(SkyRegion):
         radius = self.radius.to('deg').value * scale
 
         return CirclePixelRegion(center, radius)
-
-    def as_patch(self, ax, **kwargs):
-        import matplotlib.patches as mpatches
-
-        val = self.center.icrs
-        center = (val.ra.to('deg').value, val.dec.to('deg').value)
-
-        temp = dict(transform=ax.get_transform('icrs'),
-                    radius=self.radius.to('deg').value)
-        kwargs.update(temp)
-        for key, value in self.visual.items():
-            kwargs.setdefault(key, value)
-        patch = mpatches.Circle(center, **kwargs)
-
-        return patch

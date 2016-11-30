@@ -18,20 +18,47 @@ class RectanglePixelRegion(PixelRegion):
     ----------
     center : `~regions.PixCoord`
         The position of the center of the rectangle.
-    height : float
-        The height of the rectangle
     width : float
         The width of the rectangle
+    height : float
+        The height of the rectangle
     angle : `~astropy.units.Quantity`
         The rotation of the rectangle. If set to zero (the default), the width
         is lined up with the x axis.
+
+    Examples
+    --------
+
+    .. plot::
+        :include-source:
+
+        import numpy as np
+        from astropy.coordinates import Angle
+        from regions import PixCoord, RectanglePixelRegion
+        import matplotlib.pyplot as plt
+
+        x, y = 15, 10
+        width, height = 8, 5
+        angle = Angle(30, 'deg')
+
+        fig, ax = plt.subplots(1, 1)
+
+        center = PixCoord(x=x, y=y)
+        reg = RectanglePixelRegion(center=center, width=width, height=height, angle=angle)
+        patch = reg.as_patch(facecolor='none', edgecolor='red', lw=2)
+        ax.add_patch(patch)
+
+        plt.xlim(0, 30)
+        plt.ylim(0, 20)
+        ax.set_aspect('equal')
+        plt.show()
     """
 
-    def __init__(self, center, height, width, angle=0 * u.deg, meta=None, visual=None):
+    def __init__(self, center, width, height, angle=0 * u.deg, meta=None, visual=None):
         # TODO: use quantity_input to check that angle is an angle
         self.center = center
-        self.height = height
         self.width = width
+        self.height = height
         self.angle = angle
         self.meta = meta or {}
         self.visual = visual or {}
@@ -40,11 +67,11 @@ class RectanglePixelRegion(PixelRegion):
         data = dict(
             name=self.__class__.__name__,
             center=self.center,
-            height=self.height,
             width=self.width,
+            height=self.height,
             angle=self.angle,
         )
-        fmt = '{name}\ncenter: {center}\nheight: {height}\nwidth: {width}\nangle: {angle}'
+        fmt = '{name}\ncenter: {center}\nwidth: {width}\nheight: {height}\nangle: {angle}'
         return fmt.format(**data)
 
     @property
@@ -104,16 +131,43 @@ class RectanglePixelRegion(PixelRegion):
         else:
             use_exact = 1
 
-        fraction = rectangular_overlap_grid(xmin, xmax, ymin, ymax, nx, ny,
-                                            self.width, self.height,
-                                            self.angle.to(u.deg).value,
-                                            use_exact, subpixels)
+        fraction = rectangular_overlap_grid(
+            xmin, xmax, ymin, ymax, nx, ny,
+            self.width, self.height,
+            self.angle.to(u.deg).value,
+            use_exact, subpixels,
+        )
 
         return Mask(fraction, bbox=bbox)
 
     def as_patch(self, **kwargs):
-        # TODO: needs to be implemented
-        raise NotImplementedError
+        """Matplotlib patch object for this region (`matplotlib.patches.Rectangle`).
+        """
+        from matplotlib.patches import Rectangle
+        xy = self._lower_left_xy()
+        width = self.width
+        height = self.height
+        # From the docstring: MPL expects "rotation in degrees (anti-clockwise)"
+        angle = self.angle.to('deg').value
+        return Rectangle(xy=xy, width=width, height=height, angle=angle, **kwargs)
+
+    def _lower_left_xy(self):
+        """
+        Compute lower left `xy` position.
+
+        This is used for the conversion to matplotlib in ``as_patch``
+
+        Taken from http://photutils.readthedocs.io/en/latest/_modules/photutils/aperture/rectangle.html#RectangularAperture.plot
+        """
+        hw = self.width / 2.
+        hh = self.height / 2.
+        sint = np.sin(self.angle)
+        cost = np.cos(self.angle)
+        dx = (hh * sint) - (hw * cost)
+        dy = -(hh * cost) - (hw * sint)
+        x = self.center.x + dx
+        y = self.center.y + dy
+        return x, y
 
 
 class RectangleSkyRegion(SkyRegion):
@@ -124,20 +178,20 @@ class RectangleSkyRegion(SkyRegion):
     ----------
     center : `~astropy.coordinates.SkyCoord`
         The position of the center of the rectangle.
-    height : `~astropy.units.Quantity`
-        The height radius of the rectangle
     width : `~astropy.units.Quantity`
         The width radius of the rectangle
+    height : `~astropy.units.Quantity`
+        The height radius of the rectangle
     angle : `~astropy.units.Quantity`
         The rotation of the rectangle. If set to zero (the default), the width
         is lined up with the longitude axis of the celestial coordinates.
     """
 
-    def __init__(self, center, height, width, angle=0 * u.deg, meta=None, visual=None):
+    def __init__(self, center, width, height, angle=0 * u.deg, meta=None, visual=None):
         # TODO: use quantity_input to check that height, width, and angle are angles
         self.center = center
-        self.height = height
         self.width = width
+        self.height = height
         self.angle = angle
         self.meta = meta or {}
         self.visual = visual or {}
@@ -146,11 +200,11 @@ class RectangleSkyRegion(SkyRegion):
         data = dict(
             name=self.__class__.__name__,
             center=self.center,
-            height=self.height,
             width=self.width,
+            height=self.height,
             angle=self.angle,
         )
-        fmt = '{name}\ncenter: {center}\nheight: {height}\nwidth: {width}\nangle: {angle}'
+        fmt = '{name}\ncenter: {center}\nwidth: {width}\nheight: {height}\nangle: {angle}'
         return fmt.format(**data)
 
     @property
@@ -162,9 +216,5 @@ class RectangleSkyRegion(SkyRegion):
         raise NotImplementedError
 
     def to_pixel(self, wcs, mode='local', tolerance=None):
-        # TODO: needs to be implemented
-        raise NotImplementedError
-
-    def as_patch(self, **kwargs):
         # TODO: needs to be implemented
         raise NotImplementedError

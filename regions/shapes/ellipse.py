@@ -16,22 +16,48 @@ class EllipsePixelRegion(PixelRegion):
     ----------
     center : `~regions.PixCoord`
         Center position
-    minor : float
-        Minor radius
     major : float
+        Minor radius
+    minor : float
         Major radius
     angle : `~astropy.units.Quantity`
         The rotation angle of the ellipse.
         If set to zero (the default), the major
         axis is lined up with the x axis.
+
+    Examples
+    --------
+
+    .. plot::
+        :include-source:
+
+        import numpy as np
+        from astropy.modeling.models import Ellipse2D
+        from astropy.coordinates import Angle
+        from regions import PixCoord, EllipsePixelRegion
+        import matplotlib.pyplot as plt
+        x0, y0 = 15, 10
+        a, b = 8, 5
+        theta = Angle(30, 'deg')
+        e = Ellipse2D(amplitude=100., x_0=x0, y_0=y0, a=a, b=b, theta=theta.radian)
+        y, x = np.mgrid[0:20, 0:30]
+        fig, ax = plt.subplots(1, 1)
+        ax.imshow(e(x, y), origin='lower', interpolation='none', cmap='Greys_r')
+
+        center = PixCoord(x=x0, y=y0)
+        reg = EllipsePixelRegion(center=center, major=a, minor=b, angle=theta)
+        patch = reg.as_patch(facecolor='none', edgecolor='red', lw=2)
+        ax.add_patch(patch)
+
+        plt.show()
     """
 
-    def __init__(self, center, minor, major, angle=0. * u.deg, meta=None,
+    def __init__(self, center, major, minor, angle=0. * u.deg, meta=None,
                  visual=None):
         # TODO: use quantity_input to check that angle is an angle
         self.center = center
-        self.minor = minor
         self.major = major
+        self.minor = minor
         self.angle = angle
         self.meta = meta or {}
         self.visual = visual or {}
@@ -40,16 +66,16 @@ class EllipsePixelRegion(PixelRegion):
         data = dict(
             name=self.__class__.__name__,
             center=self.center,
-            minor=self.minor,
             major=self.major,
+            minor=self.minor,
             angle=self.angle,
         )
-        fmt = '{name}\ncenter: {center}\nminor: {minor}\nmajor: {major}\nangle: {angle}'
+        fmt = '{name}\ncenter: {center}\nmajor: {major}\nminor: {minor}\nangle: {angle}'
         return fmt.format(**data)
 
     @property
     def area(self):
-        return math.pi * self.minor * self.major
+        return math.pi * self.major * self.minor
 
     def contains(self, pixcoord):
         # TODO: needs to be implemented
@@ -102,16 +128,25 @@ class EllipsePixelRegion(PixelRegion):
         else:
             use_exact = 1
 
-        fraction = elliptical_overlap_grid(xmin, xmax, ymin, ymax, nx, ny,
-                                           self.major, self.minor,
-                                           self.angle.to(u.deg).value,
-                                           use_exact, subpixels)
+        fraction = elliptical_overlap_grid(
+            xmin, xmax, ymin, ymax, nx, ny,
+            self.major, self.minor,
+            self.angle.to(u.deg).value,
+            use_exact, subpixels,
+        )
 
         return Mask(fraction, bbox=bbox)
 
     def as_patch(self, **kwargs):
-        # TODO: needs to be implemented
-        raise NotImplementedError
+        """Matplotlib patch object for this region (`matplotlib.patches.Ellipse`).
+        """
+        from matplotlib.patches import Ellipse
+        xy = self.center.x, self.center.y
+        width = 2 * self.major
+        height = 2 * self.minor
+        # From the docstring: MPL expects "rotation in degrees (anti-clockwise)"
+        angle = self.angle.to('deg').value
+        return Ellipse(xy=xy, width=width, height=height, angle=angle, **kwargs)
 
 
 class EllipseSkyRegion(SkyRegion):
@@ -122,21 +157,21 @@ class EllipseSkyRegion(SkyRegion):
     ----------
     center : `~astropy.coordinates.SkyCoord`
         Center position
-    minor : `~astropy.units.Quantity`
-        Minor radius
     major : `~astropy.units.Quantity`
         Major radius
+    minor : `~astropy.units.Quantity`
+        Minor radius
     angle : `~astropy.units.Quantity`
         The rotation angle of the ellipse.
         If set to zero (the default), the major
         axis is lined up with the longitude axis of the celestial coordinates.
     """
 
-    def __init__(self, center, minor, major, angle=0. * u.deg, meta=None, visual=None):
+    def __init__(self, center, major, minor, angle=0. * u.deg, meta=None, visual=None):
         # TODO: use quantity_input to check that height, width, and angle are angles
         self.center = center
-        self.minor = minor
         self.major = major
+        self.minor = minor
         self.angle = angle
         self.meta = meta or {}
         self.visual = visual or {}
@@ -145,11 +180,11 @@ class EllipseSkyRegion(SkyRegion):
         data = dict(
             name=self.__class__.__name__,
             center=self.center,
-            minor=self.minor,
             major=self.major,
+            minor=self.minor,
             angle=self.angle,
         )
-        fmt = '{name}\ncenter: {center}\nminor: {minor}\nmajor: {major}\nangle: {angle}'
+        fmt = '{name}\ncenter: {center}\nmajor: {major}\nminor: {minor}\nangle: {angle}'
         return fmt.format(**data)
 
     @property
@@ -162,9 +197,5 @@ class EllipseSkyRegion(SkyRegion):
         raise NotImplementedError
 
     def to_pixel(self, wcs, mode='local', tolerance=None):
-        # TODO: needs to be implemented
-        raise NotImplementedError
-
-    def as_patch(self, **kwargs):
         # TODO: needs to be implemented
         raise NotImplementedError

@@ -317,33 +317,3 @@ class SkyRegion(Region):
         tolerance : `~astropy.units.Quantity`
             The tolerance for the ``'full'`` mode described above.
         """
-
-    @abc.abstractmethod
-    def as_patch(self, ax, **kwargs):
-        """Convert to mpl patch using a given wcs axis
-
-        Parameters
-        ----------
-        ax : `~astropy.wcsaxes.WCSAxes`
-            WCS axis object
-
-        Returns
-        -------
-        patch : `~matplotlib.patches.Patch`
-            Matplotlib patch
-        """
-
-    def plot(self, ax=None, **kwargs):
-        """
-        Calls as_patch method forwarding all kwargs and adds patch
-        to given wcs axis.
-
-        Parameters
-        ----------
-        ax : `~astropy.wcsaxes.WCSAxes`
-            WCS axis object
-        """
-        patch = self.as_patch(ax, **kwargs)
-        ax.add_patch(patch)
-
-        return ax

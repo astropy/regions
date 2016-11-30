@@ -1,25 +1,29 @@
-# This file sets up detailed tests for computing masks with reference images
-
+# Licensed under a 3-clause BSD style license - see LICENSE.rst
+"""
+This file sets up detailed tests for computing masks with reference images.
+"""
+from __future__ import absolute_import, division, print_function, unicode_literals
 import itertools
-import pytest
-
-from regions.core import PixCoord
-from regions.shapes.circle import CirclePixelRegion
-from regions.shapes.ellipse import EllipsePixelRegion
-from regions.shapes.rectangle import RectanglePixelRegion
-from astropy.io import fits
+from astropy.tests.helper import pytest
 from astropy import units as u
+from ...core import PixCoord
+from ...shapes.circle import CirclePixelRegion
+from ...shapes.ellipse import EllipsePixelRegion
+from ...shapes.rectangle import RectanglePixelRegion
 
+REGIONS = [
+    CirclePixelRegion(PixCoord(3.981987, 4.131378), radius=3.3411),
+    EllipsePixelRegion(PixCoord(3.981987, 4.131378), major=2.2233, minor=3.3411, angle=32 * u.deg),
+    RectanglePixelRegion(PixCoord(3.981987, 4.131378), width=5.2233, height=4.3411, angle=32 * u.deg),
+]
 
-REGIONS = [CirclePixelRegion(PixCoord(3.981987, 4.131378), 3.3411),
-           EllipsePixelRegion(PixCoord(3.981987, 4.131378), 3.3411, 2.2233, angle=32 * u.deg),
-           RectanglePixelRegion(PixCoord(3.981987, 4.131378), 4.3411, 5.2233, angle=32 * u.deg)]
-
-MODES = [{'mode': 'center'},
-         {'mode': 'exact'},
-         {'mode': 'subpixels', 'subpixels': 1},
-         {'mode': 'subpixels', 'subpixels': 5},
-         {'mode': 'subpixels', 'subpixels': 18}]
+MODES = [
+    {'mode': 'center'},
+    {'mode': 'exact'},
+    {'mode': 'subpixels', 'subpixels': 1},
+    {'mode': 'subpixels', 'subpixels': 5},
+    {'mode': 'subpixels', 'subpixels': 18},
+]
 
 
 def label(value):
@@ -32,9 +36,18 @@ def label(value):
     else:
         return '-'.join('{0}_{1}'.format(key, value) for key, value in sorted(value.items()))
 
-
-@pytest.mark.array_compare(fmt='text', write_kwargs={'fmt': '%12.8e'})
-@pytest.mark.parametrize(('region', 'mode'), itertools.product(REGIONS, MODES), ids=label)
+# There's a bug in numpy: `numpy.savetxt` doesn't accept unicode
+# on Python 2. Bytes works on Python 2 and 3, so we're using that here.
+# https://github.com/numpy/numpy/pull/4053#issuecomment-263808221
+@pytest.mark.array_compare(
+    fmt='text',
+    write_kwargs={'fmt': b'%12.8e'},
+)
+@pytest.mark.parametrize(
+    ('region', 'mode'),
+    itertools.product(REGIONS, MODES),
+    ids=label,
+)
 def test_to_mask(region, mode):
     try:
         mask = region.to_mask(**mode)

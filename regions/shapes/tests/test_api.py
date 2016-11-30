@@ -5,12 +5,10 @@ implemented and doesn't check anything about correctness.
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
 import itertools
-import numpy as np
 from astropy.tests.helper import pytest
 from astropy import units as u
 from astropy.coordinates import ICRS
 from astropy.wcs import WCS
-
 from ...core.mask import Mask
 from ...core.core import Region, SkyRegion, PixelRegion
 from ...core.pixcoord import PixCoord
@@ -18,24 +16,18 @@ from ..circle import CirclePixelRegion, CircleSkyRegion
 from ..ellipse import EllipsePixelRegion, EllipseSkyRegion
 from ..polygon import PolygonPixelRegion, PolygonSkyRegion
 from ..rectangle import RectanglePixelRegion, RectangleSkyRegion
-
-try:
-    import shapely
-    HAS_SHAPELY = True
-except:
-    HAS_SHAPELY = False
-
+from .utils import HAS_SHAPELY
 
 PIXEL_REGIONS = [
     CirclePixelRegion(PixCoord(3, 4), radius=5),
-    EllipsePixelRegion(PixCoord(3, 4), minor=5, major=7, angle=3 * u.deg),
+    EllipsePixelRegion(PixCoord(3, 4), major=7, minor=5, angle=3 * u.deg),
     PolygonPixelRegion(PixCoord([1, 4, 3], [2, 4, 4])),
     RectanglePixelRegion(PixCoord(6, 5), width=3, height=5)
 ]
 
 SKY_REGIONS = [
     CircleSkyRegion(ICRS(3 * u.deg, 4 * u.deg), radius=5 * u.deg),
-    EllipseSkyRegion(ICRS(3 * u.deg, 4 * u.deg), minor=5, major=7, angle=3 * u.deg),
+    EllipseSkyRegion(ICRS(3 * u.deg, 4 * u.deg), major=7, minor=5, angle=3 * u.deg),
     PolygonSkyRegion(ICRS([1, 4, 3] * u.deg, [2, 4, 4] * u.deg)),
     RectangleSkyRegion(ICRS(6 * u.deg, 5 * u.deg), width=3 * u.deg, height=5 * u.deg)
 ]
@@ -116,7 +108,11 @@ def test_sky_area(region):
         pytest.xfail()
 
 
-@pytest.mark.parametrize(('region', 'mode'), itertools.product(SKY_REGIONS, SKYPIX_MODES), ids=ids_func)
+@pytest.mark.parametrize(
+    ('region', 'mode'),
+    itertools.product(SKY_REGIONS, SKYPIX_MODES),
+    ids=ids_func,
+)
 def test_sky_to_pix(region, mode):
     try:
         pix_region = region.to_pixel(mode=mode, wcs=COMMON_WCS)

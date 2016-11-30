@@ -79,15 +79,15 @@ def ds9_objects_to_string(regions, coordsys='fk5', fmt='.4f', radunit='deg'):
         elif isinstance(reg, shapes.ellipse.EllipseSkyRegion):
             x = float(reg.center.transform_to(frame).spherical.lon.to('deg').value)
             y = float(reg.center.transform_to(frame).spherical.lat.to('deg').value)
-            r2 = float(reg.major.to(radunit).value)
-            r1 = float(reg.minor.to(radunit).value)
+            r1 = float(reg.major.to(radunit).value)
+            r2 = float(reg.minor.to(radunit).value)
             ang = float(reg.angle.to('deg').value)
             output += ds9_strings['ellipse'].format(**locals())
         elif isinstance(reg, shapes.ellipse.EllipsePixelRegion):
             x = reg.center.x
             y = reg.center.y
-            r2 = reg.major
-            r1 = reg.minor
+            r1 = reg.major
+            r2 = reg.minor
             ang = reg.angle
             output += ds9_strings['ellipse'].format(**locals())
         elif isinstance(reg, shapes.polygon.PolygonSkyRegion):
