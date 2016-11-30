@@ -177,7 +177,7 @@ def ds9_region_list_to_objects(region_list):
                 reg = polygon.PolygonPixelRegion(coord_list[0])
             else:
                 raise ValueError("No central coordinate")
-        elif region_type == 'rectangle':
+        elif region_type in ('rectangle', 'box'):
             if isinstance(coord_list[0], BaseCoordinateFrame):
                 reg = rectangle.RectangleSkyRegion(coord_list[0], coord_list[1], coord_list[2], coord_list[3])
             elif isinstance(coord_list[0], PixCoord):
@@ -192,6 +192,9 @@ def ds9_region_list_to_objects(region_list):
             else:
                 raise ValueError("No central coordinate")
         else:
+            log.warn("Skipping region with coords {0} because its type '{1}'"
+                     " is not recognized."
+                     .format(str(coord_list), region_type))
             continue
         reg.vizmeta = {key: meta[key] for key in meta.keys() if key in viz_keywords}
         reg.meta = {key: meta[key] for key in meta.keys() if key not in viz_keywords}
@@ -255,7 +258,8 @@ def ds9_string_to_region_list(region_string):
             elif parsed:
                 region_type, coordlist, meta, composite, include = parsed
                 meta['include'] = include
-                log.debug("Region type = {0}".format(region_type))
+                log.debug("Region type = {0}.  Composite={1}"
+                          .format(region_type, composite))
                 if composite and composite_region is None:
                     composite_region = [(region_type, coordlist)]
                 elif composite:
@@ -386,7 +390,10 @@ def type_parser(string_rep, specification, coordsys):
     """
     coord_list = []
     splitter = re.compile("[, ]")
-    for ii, (element, element_parser) in enumerate(zip(splitter.split(string_rep), specification)):
+    # strip out "null" elements, i.e. ''.  It might be possible to eliminate
+    # these some other way, i.e. with regex directly, but I don't know how.
+    elements = [x for x in splitter.split(string_rep) if x]
+    for ii, (element, element_parser) in enumerate(zip(elements, specification)):
         if element_parser is coordinate:
             unit = coordinate_units[coordsys][ii % 2]
             coord_list.append(element_parser(element, unit))
