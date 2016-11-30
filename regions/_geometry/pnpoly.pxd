@@ -1,5 +1,7 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
+# This file is needed in order to be able to cimport functions into other Cython files
+
 cimport numpy as np
 
 ctypedef np.float64_t DTYPE_t
