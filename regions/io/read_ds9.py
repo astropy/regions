@@ -319,8 +319,12 @@ def line_parser(line, coordsys=None, warn_skipped=False):
         include = region_type_search.groups()[0]
         region_type = region_type_search.groups()[1]
     else:
-        warn("No region type found for {0}".format(line),
-             AstropyUserWarning)
+        # if there's no line, it's just blank, so don't warn
+        if line:
+            # but otherwise, this should probably always raise a warning?
+            # at least until we identify common cases for it
+            warn("No region type found for line '{0}'.".format(line),
+                 AstropyUserWarning)
         return
 
     if region_type in coordinate_systems:
