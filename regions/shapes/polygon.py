@@ -83,7 +83,8 @@ class PolygonPixelRegion(PixelRegion):
 
         fraction = polygonal_overlap_grid(
             xmin, xmax, ymin, ymax, nx, ny,
-            self.vertices.x, self.vertices.y,
+            self.vertices.x.astype(float),
+            self.vertices.y.astype(float),
             use_exact, subpixels)
 
         return Mask(fraction, bbox=bbox)
