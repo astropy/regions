@@ -148,7 +148,7 @@ def ds9_region_list_to_objects(region_list):
     regions : list
         List of `regions.Region` objects
     """
-    viz_keywords = ['color', 'dashed', 'width', 'point', 'font', 'text']
+    viz_keywords = ['color', 'dashed', 'width', 'point', 'font']
 
     output_list = []
     for region_type, coord_list, meta in region_list:
@@ -200,7 +200,7 @@ def ds9_region_list_to_objects(region_list):
                  AstropyUserWarning
                 )
             continue
-        reg.vizmeta = {key: meta[key] for key in meta.keys() if key in viz_keywords}
+        reg.visual = {key: meta[key] for key in meta.keys() if key in viz_keywords}
         reg.meta = {key: meta[key] for key in meta.keys() if key not in viz_keywords}
         output_list.append(reg)
     return output_list
