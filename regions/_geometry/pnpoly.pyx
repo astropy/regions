@@ -105,10 +105,9 @@ cdef int point_in_polygon(double x, double y,
     result = 0
 
     for i in range(n):
-        j = (i+n-1) % n
-        if(((vy[i] > y) != (vy[j] > y)) and \
-            (x < (vx[j]-vx[i]) * (y-vy[i])/ \
-            (vy[j]-vy[i]) + vx[i]) ):
+        j = (i + n - 1) % n
+        if(((vy[i] > y) != (vy[j] > y)) and
+            (x < (vx[j] - vx[i]) * (y - vy[i]) / (vy[j] - vy[i]) + vx[i])):
             result += 1
 
     return result % 2
