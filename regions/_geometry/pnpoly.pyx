@@ -63,7 +63,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cimport cython
 import numpy as np
 cimport numpy as np
 
