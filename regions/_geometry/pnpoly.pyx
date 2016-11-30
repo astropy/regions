@@ -59,10 +59,31 @@ cimport cython
 import numpy as np
 cimport numpy as np
 
+DTYPE_BOOL = np.bool
+ctypedef np.uint8_t DTYPE_BOOL_t
+
+
+def points_in_polygon(np.ndarray[DTYPE_t, ndim=1] x,
+                      np.ndarray[DTYPE_t, ndim=1] y,
+                      np.ndarray[DTYPE_t, ndim=1] vx,
+                      np.ndarray[DTYPE_t, ndim=1] vy):
+
+    cdef int i, n
+    cdef np.ndarray[np.uint8_t, ndim=1, cast=True] result
+
+    n = x.shape[0]
+
+    result = np.zeros(n, DTYPE_BOOL)
+
+    for i in range(n):
+        result[i] = point_in_polygon(x[i], y[i], vx, vy)
+
+    return result
+
 
 cdef int point_in_polygon(double x, double y,
-                     np.ndarray[DTYPE_t, ndim=1] vx,
-                     np.ndarray[DTYPE_t, ndim=1] vy):
+                          np.ndarray[DTYPE_t, ndim=1] vx,
+                          np.ndarray[DTYPE_t, ndim=1] vy):
     """
     Determine whether a test point (x, y) is within a polygon defined by a set
     of vertices (vx, vy)

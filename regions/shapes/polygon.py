@@ -5,6 +5,7 @@ import numpy as np
 
 from ..core import PixelRegion, SkyRegion, Mask, BoundingBox
 from .._geometry import polygonal_overlap_grid
+from .._geometry.pnpoly import points_in_polygon
 
 __all__ = ['PolygonPixelRegion', 'PolygonSkyRegion']
 
@@ -39,8 +40,10 @@ class PolygonPixelRegion(PixelRegion):
         raise NotImplementedError
 
     def contains(self, pixcoord):
-        # TODO: needs to be implemented
-        raise NotImplementedError
+        return points_in_polygon(pixcoord.x.astype(float),
+                                 pixcoord.y.astype(float),
+                                 self.vertices.x.astype(float),
+                                 self.vertices.y.astype(float)).astype(bool)
 
     def to_shapely(self):
         # TODO: needs to be implemented
