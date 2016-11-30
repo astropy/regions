@@ -211,13 +211,16 @@ def ds9_region_list_to_objects(region_list):
     return output_list
 
 
-def ds9_string_to_objects(region_string):
+def ds9_string_to_objects(region_string, warn_skipped=False):
     """Parse ds9 region string to region objects
 
     Parameters
     ----------
     region_string : str
         DS9 region string
+    warn_skipped : bool
+        Print a warning if there is a skipped (commented) line?
+        Can set to ``False`` or ``'raise'`` if you want an exception instead.
 
     Returns
     -------
@@ -228,7 +231,7 @@ def ds9_string_to_objects(region_string):
     --------
     TODO
     """
-    region_list = ds9_string_to_region_list(region_string)
+    region_list = ds9_string_to_region_list(region_string, warn_skipped=warn_skipped)
     regions = ds9_region_list_to_objects(region_list)
     return regions
 
