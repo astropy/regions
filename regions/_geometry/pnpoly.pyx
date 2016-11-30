@@ -93,7 +93,11 @@ cdef int point_in_polygon(double x, double y,
                           np.ndarray[DTYPE_t, ndim=1] vy):
     """
     Determine whether a test point (x, y) is within a polygon defined by a set
-    of vertices (vx, vy)
+    of vertices (vx, vy).
+
+    This uses the even-odd rule, as described here:
+
+        https://en.wikipedia.org/wiki/Even–odd_rule
     """
 
     cdef int i, j, k, m, n
