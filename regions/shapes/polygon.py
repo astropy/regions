@@ -40,8 +40,13 @@ class PolygonPixelRegion(PixelRegion):
         raise NotImplementedError
 
     def contains(self, pixcoord):
-        return points_in_polygon(pixcoord.x.astype(float),
-                                 pixcoord.y.astype(float),
+        if pixcoord.isscalar:
+            x = np.array([pixcoord.x], dtype=float)
+            y = np.array([pixcoord.y], dtype=float)
+        else:
+            x = pixcoord.x.astype(float)
+            y = pixcoord.y.astype(float)
+        return points_in_polygon(x, y,
                                  self.vertices.x.astype(float),
                                  self.vertices.y.astype(float)).astype(bool)
 
