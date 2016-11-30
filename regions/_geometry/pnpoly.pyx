@@ -1,5 +1,8 @@
-# The code in this file was adapted from code written by Greg von Winckel and
-# which was released under the following license:
+# The code in this file was adapted from code written by Greg von Winckel:
+#
+# https://github.com/gregvw/pnpoly
+#
+# and which was released under the following license:
 #
 # ----------------------------------------------------------------------------
 #
@@ -26,8 +29,11 @@
 #
 # ----------------------------------------------------------------------------
 #
-# This code was itself adapted from code written by W. Randolph Franklin and
-# released under the following license:
+# This code was itself adapted from code written by W. Randolph Franklin:
+#
+# http://www.ecse.rpi.edu/~wrf/Research/Short_Notes/pnpoly.html
+#
+# and released under the following license:
 #
 # Copyright (c) 1970-2003, Wm. Randolph Franklin
 #
