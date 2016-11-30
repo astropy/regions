@@ -388,7 +388,7 @@ def line_parser(line, coordsys=None, warn_skipped=False):
         # rectfangle(1,2,3,4)
         # probably should!
         if warn_skipped:
-            message = ("Region type {0} was identified, but it is not one of "
+            message = ("Region type '{0}' was identified, but it is not one of "
                        "the known region types.".format(region_type))
             if warn_skipped == 'raise':
                 raise ValueError(message)

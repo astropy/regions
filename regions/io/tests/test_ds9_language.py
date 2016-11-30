@@ -129,7 +129,7 @@ def test_ds9_io(tmpdir):
     assert_allclose(reg.radius.value, 3)
 
 def test_missing_region_warns():
-    ds9_str = '# Region file format: DS9 astropy/regions\nfk5\ncircle(42.0000,43.0000,3.0000)\nnot_a_region_type(blah)'
+    ds9_str = '# Region file format: DS9 astropy/regions\nfk5\ncircle(42.0000,43.0000,3.0000)\nnotaregiontype(blah)'
 
     # this will warn on both the commented first line and the not_a_region line
     with catch_warnings(AstropyUserWarning) as ASWarn:
@@ -137,4 +137,4 @@ def test_missing_region_warns():
 
     assert len(regions) == 1
     assert len(ASWarn) == 2
-    assert "Skipping region" in str(ASWarn[1].message)
+    assert "Region type 'notaregiontype'" in str(ASWarn[1].message)
