@@ -158,7 +158,7 @@ class CircleSkyRegion(SkyRegion):
     def contains(self, skycoord):
         return self.center.separation(skycoord) < self.radius
 
-    def to_pixel(self, wcs, mode='local', tolerance=None):
+    def to_pixel(self, wcs, mode='local', tolerance=100):
         """
         Given a WCS, convert the circle to a best-approximation circle in pixel
         dimensions.
@@ -169,7 +169,7 @@ class CircleSkyRegion(SkyRegion):
             A world coordinate system
         mode : 'local' or not
             not implemented
-        tolerance : None
+        tolerance : int
             not implemented
 
         Returns
@@ -203,7 +203,7 @@ class CircleSkyRegion(SkyRegion):
             lon, lat = rotate_polygon(lon, lat, longitude, latitude)
 
             # Make a new SkyCoord
-            vertices_sky = SkyCoord(lon, lat, frame=self.center.frame)
+            vertices_sky = SkyCoord(lon, lat, frame=self.center)
 
             # Convert to PixCoord
             x, y = skycoord_to_pixel(vertices_sky, wcs)
