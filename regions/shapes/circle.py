@@ -3,12 +3,17 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import math
 
-from astropy.coordinates import Angle
-from astropy.wcs.utils import pixel_to_skycoord
+import numpy as np
 
-from ..core import PixelRegion, SkyRegion, Mask, BoundingBox
+from astropy import units as u
+from astropy.coordinates import Angle, SkyCoord
+from astropy.wcs.utils import pixel_to_skycoord, skycoord_to_pixel
+
+from .polygon import PolygonPixelRegion
+
+from ..core import PixelRegion, SkyRegion, Mask, BoundingBox, PixCoord
 from .._utils.wcs_helpers import skycoord_to_pixel_scale_angle
-from .._geometry import circular_overlap_grid
+from .._geometry import circular_overlap_grid, rotate_polygon
 
 __all__ = ['CirclePixelRegion', 'CircleSkyRegion']
 
@@ -172,12 +177,40 @@ class CircleSkyRegion(SkyRegion):
         CirclePixelRegion
         """
 
-        if mode != 'local':
-            raise NotImplementedError
-        if tolerance is not None:
-            raise NotImplementedError
+        if mode == 'local':
+            center, scale, _ = skycoord_to_pixel_scale_angle(self.center, wcs)
+            radius = self.radius.to('deg').value * scale
+            return CirclePixelRegion(center, radius)
 
-        center, scale, _ = skycoord_to_pixel_scale_angle(self.center, wcs)
-        radius = self.radius.to('deg').value * scale
+        elif mode == 'affine':
+            raise NotImplementedError()
 
-        return CirclePixelRegion(center, radius)
+        elif mode == 'full':
+
+            # TODO: avoid converting to unit spherical or spherical if already
+            #       using a spherical representation
+
+            # Extract longitude/latitude, either from a tuple of two quantities, or
+            # a single 2-element Quantity.
+            rep = self.center.represent_as('unitspherical')
+            longitude, latitude = rep.lon, rep.lat
+
+            # Start off by generating the circle around the North pole
+            lon = np.linspace(0., 2 * np.pi, tolerance + 1)[:-1] * u.radian
+            lat = np.repeat(0.5 * np.pi - self.radius.to(u.radian).value, tolerance) * u.radian
+
+            # Now rotate it to the correct longitude/latitude
+            lon, lat = rotate_polygon(lon, lat, longitude, latitude)
+
+            # Make a new SkyCoord
+            vertices_sky = SkyCoord(lon, lat, frame=self.center.frame)
+
+            # Convert to PixCoord
+            x, y = skycoord_to_pixel(vertices_sky, wcs)
+            vertices_pix = PixCoord(x, y)
+
+            # Make polygon
+            return PolygonPixelRegion(vertices_pix)
+
+        else:
+            raise ValueError('mode should be one of local/affine/full')
