@@ -1,3 +1,5 @@
+# Licensed under a 3-clause BSD style license - see LICENSE.rst
+
 cimport numpy as np
 
 ctypedef np.float64_t DTYPE_t
