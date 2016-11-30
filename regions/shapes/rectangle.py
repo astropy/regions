@@ -25,6 +25,33 @@ class RectanglePixelRegion(PixelRegion):
     angle : `~astropy.units.Quantity`
         The rotation of the rectangle. If set to zero (the default), the width
         is lined up with the x axis.
+
+    Examples
+    --------
+
+    .. plot::
+        :include-source:
+
+        import numpy as np
+        from astropy.coordinates import Angle
+        from regions import PixCoord, RectanglePixelRegion
+        import matplotlib.pyplot as plt
+
+        x, y = 15, 10
+        width, height = 8, 5
+        angle = Angle(30, 'deg')
+
+        fig, ax = plt.subplots(1, 1)
+
+        center = PixCoord(x=x, y=y)
+        reg = RectanglePixelRegion(center=center, width=width, height=height, angle=angle)
+        patch = reg.as_patch(facecolor='none', edgecolor='red', lw=2)
+        ax.add_patch(patch)
+
+        plt.xlim(0, 30)
+        plt.ylim(0, 20)
+        ax.set_aspect('equal')
+        plt.show()
     """
 
     def __init__(self, center, width, height, angle=0 * u.deg, meta=None, visual=None):
@@ -117,14 +144,30 @@ class RectanglePixelRegion(PixelRegion):
         """Matplotlib patch object for this region (`matplotlib.patches.Rectangle`).
         """
         from matplotlib.patches import Rectangle
-        xy = self.center.x, self.center.y
+        xy = self._lower_left_xy()
         width = self.width
         height = self.height
-        # TODO: think about how to map major / minor / angle to MPL parameters.
-        # MPL expects this:
-        # "rotation in degrees (anti-clockwise)"
+        # From the docstring: MPL expects "rotation in degrees (anti-clockwise)"
         angle = self.angle.to('deg').value
         return Rectangle(xy=xy, width=width, height=height, angle=angle, **kwargs)
+
+    def _lower_left_xy(self):
+        """
+        Compute lower left `xy` position.
+
+        This is used for the conversion to matplotlib in ``as_patch``
+
+        Taken from http://photutils.readthedocs.io/en/latest/_modules/photutils/aperture/rectangle.html#RectangularAperture.plot
+        """
+        hw = self.width / 2.
+        hh = self.height / 2.
+        sint = np.sin(self.angle)
+        cost = np.cos(self.angle)
+        dx = (hh * sint) - (hw * cost)
+        dy = -(hh * cost) - (hw * sint)
+        x = self.center.x + dx
+        y = self.center.y + dy
+        return x, y
 
 
 class RectangleSkyRegion(SkyRegion):
