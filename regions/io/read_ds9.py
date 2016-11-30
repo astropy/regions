@@ -194,6 +194,11 @@ def ds9_region_list_to_objects(region_list):
             else:
                 raise ValueError("No central coordinate")
         else:
+            # Note: this should effectively never happen, because it would
+            # imply that the line_parser found a region that didn't match the
+            # above region types.  However, this can help with development,
+            # since we could in theory implement more region types in the line
+            # parser and forget to add them here.
             warn("Skipping region with coords {0} because its type '{1}'"
                  " is not recognized."
                  .format(str(coord_list), region_type),
@@ -228,13 +233,16 @@ def ds9_string_to_objects(region_string):
     return regions
 
 
-def ds9_string_to_region_list(region_string):
+def ds9_string_to_region_list(region_string, warn_skipped=False):
     """Parse a DS9 region string.
 
     Parameters
     ----------
     region_string : str
         DS9 region string
+    warn_skipped : bool
+        Print a warning if there is a skipped (commented) line?
+        Can set to ``False`` or ``'raise'`` if you want an exception instead.
 
     Returns
     -------
@@ -256,7 +264,7 @@ def ds9_string_to_region_list(region_string):
     for line_ in region_string.split('\n'):
         for line in line_.split(";"):
             lines.append(line)
-            parsed = line_parser(line, coordsys)
+            parsed = line_parser(line, coordsys, warn_skipped=warn_skipped)
             if parsed in coordinate_systems:
                 coordsys = parsed
             elif parsed:
@@ -278,7 +286,7 @@ def ds9_string_to_region_list(region_string):
     return regions
 
 
-def line_parser(line, coordsys=None):
+def line_parser(line, coordsys=None, warn_skipped=False):
     """
     Parse a single ds9 region line into a string
 
@@ -288,6 +296,9 @@ def line_parser(line, coordsys=None):
         A single ds9 region contained in a string
     coordsys : str
         The global coordinate system name declared at the top of the ds9 file
+    warn_skipped : bool
+        Print a warning if there is a skipped (commented) line?
+        Can set to ``False`` or ``'raise'`` if you want an exception instead.
 
     Returns
     -------
@@ -305,6 +316,8 @@ def line_parser(line, coordsys=None):
         include = region_type_search.groups()[0]
         region_type = region_type_search.groups()[1]
     else:
+        warn("No region type found for {0}".format(line),
+             AstropyUserWarning)
         return
 
     if region_type in coordinate_systems:
@@ -365,6 +378,19 @@ def line_parser(line, coordsys=None):
                 language_spec[region_type] = itertools.chain((coordinate, coordinate), itertools.cycle((radius,)))
 
             return region_type, parsed_return, parsed_meta, composite, include
+    else:
+        # it is not clear when it is OK to warn
+        # This: # Region file format: DS9 astropy/regions
+        # should not result in a warning, but this
+        # rectfangle(1,2,3,4)
+        # probably should!
+        if warn_skipped:
+            message = ("Region type {0} was identified, but it is not one of "
+                       "the known region types.".format(region_type))
+            if warn_skipped == 'raise':
+                raise ValueError(message)
+            else:
+                warn(message, AstropyUserWarning)
 
 
 def type_parser(string_rep, specification, coordsys):

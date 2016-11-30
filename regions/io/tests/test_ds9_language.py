@@ -6,6 +6,8 @@ from astropy.utils.data import get_pkg_data_filename, get_pkg_data_filenames
 from astropy.tests.helper import pytest
 import astropy.version as astrov
 from astropy.coordinates import Angle, SkyCoord
+from astropy.tests.helper import catch_warnings
+from astropy.utils.exceptions import AstropyUserWarning
 from ...shapes.circle import CircleSkyRegion
 from ..read_ds9 import read_ds9, ds9_string_to_objects
 from ..write_ds9 import write_ds9, ds9_objects_to_string
@@ -125,3 +127,14 @@ def test_ds9_io(tmpdir):
     assert_allclose(reg.center.ra.deg, 42)
     assert_allclose(reg.center.dec.deg, 43)
     assert_allclose(reg.radius.value, 3)
+
+def test_missing_region_warns():
+    ds9_str = '# Region file format: DS9 astropy/regions\nfk5\ncircle(42.0000,43.0000,3.0000)\nnot_a_region_type(blah)'
+
+    # this will warn on both the commented first line and the not_a_region line
+    with catch_warnings(AstropyUserWarning) as ASWarn:
+        regions = ds9_string_to_objects(ds9_str, warn_skipped=True)
+
+    assert len(regions) == 1
+    assert len(ASWarn) == 2
+    assert "Skipping region" in str(ASWarn[1].message)
