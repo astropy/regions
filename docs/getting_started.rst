@@ -819,7 +819,7 @@ Matplotlib plotting
 ===================
 
 Some `~regions.PixelRegion` objects have an ``as_patch()`` method that returns an
-equivalent `matplotlib.patches` object. For example :meth:`~regions.CirclePixelRegion.as_patch`
+equivalent `matplotlib.patches` object. For example :meth:`regions.CirclePixelRegion.as_patch`
 returns a `matplotlib.patches.Circle` object.
 
 To draw a matplotlib patch object, add it to an `matplotlib.axes.Axes` object.
@@ -851,6 +851,9 @@ Here's a full example how to plot a `~regions.CirclePixelRegion` on an image.
 
 .. plot:: plot_example_pix.py
    :include-source:
+
+The `~regions.RectanglePixelRegion` and `~regions.EllipsePixelRegion` docstrings also
+contain plot examples.
 
 `~regions.SkyRegion` objects currently don't have an ``as_patch()`` or ``plot()``
 method. To plot them, convert them to a pixel region first:
