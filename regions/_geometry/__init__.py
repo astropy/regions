@@ -3,6 +3,7 @@
 Geometry subpackage for low-level geometry functions.
 """
 
+from .rotate_polygon import *
 from .circular_overlap import *
 from .elliptical_overlap import *
 from .rectangular_overlap import *

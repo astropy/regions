@@ -3,12 +3,17 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import math
 
-from astropy.coordinates import Angle
+import numpy as np
+
+from astropy import units as u
+from astropy.coordinates import Angle, SkyCoord
 from astropy.wcs.utils import pixel_to_skycoord
+
+from .polygon import PolygonSkyRegion
 
 from ..core import PixelRegion, SkyRegion, Mask, BoundingBox
 from .._utils.wcs_helpers import skycoord_to_pixel_scale_angle
-from .._geometry import circular_overlap_grid
+from .._geometry import circular_overlap_grid, rotate_polygon
 
 __all__ = ['CirclePixelRegion', 'CircleSkyRegion']
 
@@ -153,7 +158,37 @@ class CircleSkyRegion(SkyRegion):
     def contains(self, skycoord):
         return self.center.separation(skycoord) < self.radius
 
-    def to_pixel(self, wcs, mode='local', tolerance=None):
+    def to_polygon(self, points=100):
+        """
+        Convert the circle to a polygon.
+
+        Parameters
+        ----------
+        points : int, optional
+            Number of points in the final polygon.
+        """
+
+        # TODO: avoid converting to unit spherical or spherical if already
+        #       using a spherical representation
+
+        # Extract longitude/latitude, either from a tuple of two quantities, or
+        # a single 2-element Quantity.
+        rep = self.center.represent_as('unitspherical')
+        longitude, latitude = rep.lon, rep.lat
+
+        # Start off by generating the circle around the North pole
+        lon = np.linspace(0., 2 * np.pi, points + 1)[:-1] * u.radian
+        lat = np.repeat(0.5 * np.pi - self.radius.to(u.radian).value, points) * u.radian
+
+        # Now rotate it to the correct longitude/latitude
+        lon, lat = rotate_polygon(lon, lat, longitude, latitude)
+
+        # Make a new SkyCoord
+        vertices_sky = SkyCoord(lon, lat, frame=self.center)
+
+        return PolygonSkyRegion(vertices_sky)
+
+    def to_pixel(self, wcs, mode='local', tolerance=100):
         """
         Given a WCS, convert the circle to a best-approximation circle in pixel
         dimensions.
@@ -164,7 +199,7 @@ class CircleSkyRegion(SkyRegion):
             A world coordinate system
         mode : 'local' or not
             not implemented
-        tolerance : None
+        tolerance : int
             not implemented
 
         Returns
@@ -172,12 +207,17 @@ class CircleSkyRegion(SkyRegion):
         CirclePixelRegion
         """
 
-        if mode != 'local':
-            raise NotImplementedError
-        if tolerance is not None:
-            raise NotImplementedError
+        if mode == 'local':
+            center, scale, _ = skycoord_to_pixel_scale_angle(self.center, wcs)
+            radius = self.radius.to('deg').value * scale
+            return CirclePixelRegion(center, radius)
 
-        center, scale, _ = skycoord_to_pixel_scale_angle(self.center, wcs)
-        radius = self.radius.to('deg').value * scale
+        elif mode == 'affine':
+            raise NotImplementedError()
 
-        return CirclePixelRegion(center, radius)
+        elif mode == 'full':
+
+            return self.to_polygon(points=tolerance).to_pixel(wcs)
+
+        else:
+            raise ValueError('mode should be one of local/affine/full')
