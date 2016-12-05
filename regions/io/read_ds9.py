@@ -20,6 +20,12 @@ __all__ = [
 ]
 
 
+class DS9RegionParserWarning(AstropyUserWarning):
+    """
+    A generic warning class for DS9 region parsing inherited from astropy's
+    warnings
+    """
+
 def read_ds9(filename):
     """Read a ds9 region file in as a list of region objects.
 
@@ -202,7 +208,7 @@ def ds9_region_list_to_objects(region_list):
             warn("Skipping region with coords {0} because its type '{1}'"
                  " is not recognized."
                  .format(str(coord_list), region_type),
-                 AstropyUserWarning
+                 DS9RegionParserWarning
                 )
             continue
         reg.visual = {key: meta[key] for key in meta.keys() if key in viz_keywords}
@@ -335,7 +341,7 @@ def line_parser(line, coordsys=None, errors='strict'):
             # but otherwise, this should probably always raise a warning?
             # at least until we identify common cases for it
             warn("No region type found for line '{0}'.".format(line),
-                 AstropyUserWarning)
+                 DS9RegionParserWarning)
         return
 
     if region_type in coordinate_systems:
@@ -397,18 +403,18 @@ def line_parser(line, coordsys=None, errors='strict'):
 
             return region_type, parsed_return, parsed_meta, composite, include
     else:
-        # it is not clear when it is OK to warn
-        # This: # Region file format: DS9 astropy/regions
-        # should not result in a warning, but this
-        # rectfangle(1,2,3,4)
-        # probably should!
+        # This will raise warnings even if the first line is acceptable,
+        # e.g. something like:
+        # # Region file format: DS9 version 4.1
+        # That behavior is unfortunate, but there's not a great workaround
+        # except to let the user set `errors='ignore'`
         if errors in ('warn','strict'):
             message = ("Region type '{0}' was identified, but it is not one of "
                        "the known region types.".format(region_type))
             if errors == 'strict':
                 raise ValueError(message)
             else:
-                warn(message, AstropyUserWarning)
+                warn(message, DS9RegionParserWarning)
 
 
 def type_parser(string_rep, specification, coordsys):
