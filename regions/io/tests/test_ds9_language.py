@@ -133,7 +133,7 @@ def test_missing_region_warns():
 
     # this will warn on both the commented first line and the not_a_region line
     with catch_warnings(AstropyUserWarning) as ASWarn:
-        regions = ds9_string_to_objects(ds9_str, warn_skipped=True)
+        regions = ds9_string_to_objects(ds9_str, errors='warn')
 
     assert len(regions) == 1
     assert len(ASWarn) == 2

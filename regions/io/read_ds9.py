@@ -211,16 +211,18 @@ def ds9_region_list_to_objects(region_list):
     return output_list
 
 
-def ds9_string_to_objects(region_string, warn_skipped=False):
+def ds9_string_to_objects(region_string, errors='strict'):
     """Parse ds9 region string to region objects
 
     Parameters
     ----------
     region_string : str
         DS9 region string
-    warn_skipped : bool
-        Print a warning if there is a skipped (commented) line?
-        Can set to ``False`` or ``'raise'`` if you want an exception instead.
+    errors : ``warn``, ``ignore``, ``strict``
+      The error handling scheme to use for handling parsing errors.
+      The default is 'strict', which will raise a ``ValueError``.
+      ``warn`` will raise a warning, and ``ignore`` will do nothing
+      (i.e., be silent).
 
     Returns
     -------
@@ -231,21 +233,24 @@ def ds9_string_to_objects(region_string, warn_skipped=False):
     --------
     TODO
     """
-    region_list = ds9_string_to_region_list(region_string, warn_skipped=warn_skipped)
+    region_list = ds9_string_to_region_list(region_string, errors=errors)
     regions = ds9_region_list_to_objects(region_list)
     return regions
 
 
-def ds9_string_to_region_list(region_string, warn_skipped=False):
+def ds9_string_to_region_list(region_string, errors='strict'):
     """Parse a DS9 region string.
 
     Parameters
     ----------
     region_string : str
         DS9 region string
-    warn_skipped : bool
-        Print a warning if there is a skipped (commented) line?
-        Can set to ``False`` or ``'raise'`` if you want an exception instead.
+    errors : ``warn``, ``ignore``, ``strict``
+      The error handling scheme to use for handling skipped entries
+      in a region file that were not parseable.
+      The default is 'strict', which will raise a ``ValueError``.
+      ``warn`` will raise a warning, and ``ignore`` will do nothing
+      (i.e., be silent).
 
     Returns
     -------
@@ -267,7 +272,7 @@ def ds9_string_to_region_list(region_string, warn_skipped=False):
     for line_ in region_string.split('\n'):
         for line in line_.split(";"):
             lines.append(line)
-            parsed = line_parser(line, coordsys, warn_skipped=warn_skipped)
+            parsed = line_parser(line, coordsys, errors=errors)
             if parsed in coordinate_systems:
                 coordsys = parsed
             elif parsed:
@@ -289,7 +294,7 @@ def ds9_string_to_region_list(region_string, warn_skipped=False):
     return regions
 
 
-def line_parser(line, coordsys=None, warn_skipped=False):
+def line_parser(line, coordsys=None, errors='strict'):
     """
     Parse a single ds9 region line into a string
 
@@ -299,9 +304,12 @@ def line_parser(line, coordsys=None, warn_skipped=False):
         A single ds9 region contained in a string
     coordsys : str
         The global coordinate system name declared at the top of the ds9 file
-    warn_skipped : bool
-        Print a warning if there is a skipped (commented) line?
-        Can set to ``False`` or ``'raise'`` if you want an exception instead.
+    errors : ``warn``, ``ignore``, ``strict``
+      The error handling scheme to use for handling skipped entries
+      in a region file that were not parseable.
+      The default is 'strict', which will raise a ``ValueError``.
+      ``warn`` will raise a warning, and ``ignore`` will do nothing
+      (i.e., be silent).
 
     Returns
     -------
@@ -314,6 +322,9 @@ def line_parser(line, coordsys=None, warn_skipped=False):
     include : bool
         Whether the region is included (False -> excluded)
     """
+    if errors not in ('strict','ignore','warn'):
+        raise ValueError("``errors`` must be one of strict, ignore, or warn")
+
     region_type_search = region_type_or_coordsys_re.search(line)
     if region_type_search:
         include = region_type_search.groups()[0]
@@ -391,10 +402,10 @@ def line_parser(line, coordsys=None, warn_skipped=False):
         # should not result in a warning, but this
         # rectfangle(1,2,3,4)
         # probably should!
-        if warn_skipped:
+        if errors in ('warn','strict'):
             message = ("Region type '{0}' was identified, but it is not one of "
                        "the known region types.".format(region_type))
-            if warn_skipped == 'raise':
+            if errors == 'strict':
                 raise ValueError(message)
             else:
                 warn(message, AstropyUserWarning)
