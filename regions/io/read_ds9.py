@@ -26,13 +26,18 @@ class DS9RegionParserWarning(AstropyUserWarning):
     warnings
     """
 
-def read_ds9(filename):
+def read_ds9(filename, errors='strict'):
     """Read a ds9 region file in as a list of region objects.
 
     Parameters
     ----------
     filename : str
         The file path
+    errors : ``warn``, ``ignore``, ``strict``
+      The error handling scheme to use for handling parsing errors.
+      The default is 'strict', which will raise a ``ValueError``.
+      ``warn`` will raise a warning, and ``ignore`` will do nothing
+      (i.e., be silent).
 
     Returns
     -------
@@ -42,7 +47,7 @@ def read_ds9(filename):
     with open(filename) as fh:
         region_string = fh.read()
 
-    return ds9_string_to_objects(region_string)
+    return ds9_string_to_objects(region_string, errors=errors)
 
 
 def parse_coordinate(string_rep, unit):
@@ -273,6 +278,8 @@ def ds9_string_to_region_list(region_string, errors='strict'):
     regions = []
     composite_region = None
 
+    global_meta = {}
+
     # ds9 regions can be split on \n or ;
     lines = []
     for line_ in region_string.split('\n'):
@@ -281,8 +288,12 @@ def ds9_string_to_region_list(region_string, errors='strict'):
             parsed = line_parser(line, coordsys, errors=errors)
             if parsed in coordinate_systems:
                 coordsys = parsed
+            elif parsed and (parsed[0] == 'global'):
+                # set some global metadata from the 'global' header
+                _, global_meta = parsed
             elif parsed:
                 region_type, coordlist, meta, composite, include = parsed
+                meta.update(global_meta)
                 meta['include'] = include
                 log.debug("Region type = {0}.  Composite={1}"
                           .format(region_type, composite))
@@ -330,6 +341,14 @@ def line_parser(line, coordsys=None, errors='strict'):
     """
     if errors not in ('strict','ignore','warn'):
         raise ValueError("``errors`` must be one of strict, ignore, or warn")
+
+    if '# Region file format' in line and line[0] == '#':
+        # This is just a file format line, we can safely skip it
+        return
+
+    # special case / header: parse global parameters into metadata
+    if line.lstrip()[:6] == 'global':
+        return global_parser(line)
 
     region_type_search = region_type_or_coordsys_re.search(line)
     if region_type_search:
@@ -482,3 +501,6 @@ def meta_parser(meta_str):
               for ii, jj in zip(equals_inds, equals_inds[1:] + [None])}
 
     return result
+
+def global_parser(line):
+    return "global", meta_parser(line)

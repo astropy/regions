@@ -1,19 +1,24 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 from __future__ import absolute_import, division, print_function, unicode_literals
-import distutils.version as v
+
+import os
+import distutils.version as vers
+
 from numpy.testing import assert_allclose
+
 from astropy.utils.data import get_pkg_data_filename, get_pkg_data_filenames
 from astropy.tests.helper import pytest
 import astropy.version as astrov
 from astropy.coordinates import Angle, SkyCoord
 from astropy.tests.helper import catch_warnings
 from astropy.utils.exceptions import AstropyUserWarning
+
 from ...shapes.circle import CircleSkyRegion
-from ..read_ds9 import read_ds9, ds9_string_to_objects
+from ..read_ds9 import read_ds9, ds9_string_to_objects, global_parser
 from ..write_ds9 import write_ds9, ds9_objects_to_string
 
-_ASTROPY_MINVERSION = v.LooseVersion('1.1')
-_ASTROPY_VERSION = v.LooseVersion(astrov.version)
+_ASTROPY_MINVERSION = vers.LooseVersion('1.1')
+_ASTROPY_VERSION = vers.LooseVersion(astrov.version)
 
 
 @pytest.mark.xfail(_ASTROPY_VERSION < _ASTROPY_MINVERSION,
@@ -22,7 +27,7 @@ def test_read():
     # Check that all test files including reference files are readable
     files = get_pkg_data_filenames('data')
     for f in files:
-        read_ds9(f)
+        read_ds9(f, errors='warn')
 
 
 @pytest.mark.parametrize('filename',
@@ -32,7 +37,7 @@ def test_read():
                           'data/ds9.fk5.strip.reg'])
 def test_fk5(filename):
     filename = get_pkg_data_filename(filename)
-    regs = read_ds9(filename)
+    regs = read_ds9(filename, errors='warn')
 
     actual = ds9_objects_to_string(regs, coordsys='fk5', fmt='.2f', radunit='arcsec')
 
@@ -54,7 +59,7 @@ def test_fk5(filename):
                           'data/ds9.galactic.strip.reg'])
 def test_galactic(filename):
     filename = get_pkg_data_filename(filename)
-    regs = read_ds9(filename)
+    regs = read_ds9(filename, errors='warn')
 
     actual = ds9_objects_to_string(regs, coordsys='galactic', fmt='.2f', radunit='arcsec')
 
@@ -75,7 +80,7 @@ def test_galactic(filename):
                           'data/ds9.physical.strip.reg'])
 def test_physical(filename):
     filename = get_pkg_data_filename(filename)
-    regs = read_ds9(filename)
+    regs = read_ds9(filename, errors='warn')
 
     actual = ds9_objects_to_string(regs, coordsys='physical', fmt='.2f')
 
@@ -120,7 +125,7 @@ def test_ds9_io(tmpdir):
     radius = Angle(3, 'deg')
     reg = CircleSkyRegion(center, radius)
 
-    filename = str(tmpdir / 'ds9.reg')
+    filename = os.path.join(str(tmpdir), 'ds9.reg')
     write_ds9([reg], filename)
     reg = read_ds9(filename)[0]
 
@@ -136,5 +141,21 @@ def test_missing_region_warns():
         regions = ds9_string_to_objects(ds9_str, errors='warn')
 
     assert len(regions) == 1
-    assert len(ASWarn) == 2
-    assert "Region type 'notaregiontype'" in str(ASWarn[1].message)
+    assert len(ASWarn) == 1
+    assert "Region type 'notaregiontype'" in str(ASWarn[0].message)
+
+def test_global_parser():
+    """ Check that the global_parser does what's expected """
+    global_test_str = ('global color=green dashlist=8 3 width=1'
+                       ' font="helvetica 10 normal roman" select=1'
+                       ' highlite=1 dash=0 fixed=0 edit=1 move=1'
+                       ' delete=1 include=1 source=1')
+    global_parsed = global_parser(global_test_str)
+    assert global_parsed[0] == 'global'
+    assert global_parsed[1] == {'dash': '0', 'source': '1', 'move': '1',
+                                'font': '"helvetica 10 normal roman" ',
+                                'dashlist': '8 3 ', 'include': '1',
+                                'highlite': '1', 'color': 'green',
+                                'select': '1',
+                                'fixed': '0', 'width': '1', 'edit': '1',
+                                'delete': '1'}
