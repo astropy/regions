@@ -146,10 +146,13 @@ def test_missing_region_warns():
 
 def test_global_parser():
     """ Check that the global_parser does what's expected """
-    global_test_str = ('global color=green dashlist=8 3 width=1'
-                       ' font="helvetica 10 normal roman" select=1'
-                       ' highlite=1 dash=0 fixed=0 edit=1 move=1'
-                       ' delete=1 include=1 source=1')
+    # have to force "str" here because unicode_literals makes this string a
+    # unicode string, even though in python2.7 we don't want it to be.  But in
+    # py3, we don't want it to be bytes.
+    global_test_str = str('global color=green dashlist=8 3 width=1'
+                          ' font="helvetica 10 normal roman" select=1'
+                          ' highlite=1 dash=0 fixed=0 edit=1 move=1'
+                          ' delete=1 include=1 source=1')
     global_parsed = global_parser(global_test_str)
     assert global_parsed[0] == 'global'
     assert global_parsed[1] == {'dash': '0', 'source': '1', 'move': '1',
