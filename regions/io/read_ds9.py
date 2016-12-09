@@ -17,6 +17,7 @@ __all__ = [
     'ds9_string_to_objects',
     'ds9_string_to_region_list',
     'ds9_region_list_to_objects',
+    'DS9RegionParserWarning',
 ]
 
 
