@@ -27,6 +27,11 @@ class DS9RegionParserWarning(AstropyUserWarning):
     warnings
     """
 
+class DS9RegionParserError(ValueError):
+    """
+    A generic error class for DS9 region parsing
+    """
+
 def read_ds9(filename, errors='strict'):
     """Read a ds9 region file in as a list of region objects.
 
@@ -36,7 +41,7 @@ def read_ds9(filename, errors='strict'):
         The file path
     errors : ``warn``, ``ignore``, ``strict``
       The error handling scheme to use for handling parsing errors.
-      The default is 'strict', which will raise a ``ValueError``.
+      The default is 'strict', which will raise a ``DS9RegionParserError``.
       ``warn`` will raise a warning, and ``ignore`` will do nothing
       (i.e., be silent).
 
@@ -173,7 +178,7 @@ def ds9_region_list_to_objects(region_list):
             elif isinstance(coord_list[0], PixCoord):
                 reg = circle.CirclePixelRegion(coord_list[0], coord_list[1])
             else:
-                raise ValueError("No central coordinate")
+                raise DS9RegionParserError("No central coordinate")
         elif region_type == 'ellipse':
             # Do not read elliptical annuli for now
             if len(coord_list) > 4:
@@ -183,28 +188,28 @@ def ds9_region_list_to_objects(region_list):
             elif isinstance(coord_list[0], PixCoord):
                 reg = ellipse.EllipsePixelRegion(coord_list[0], coord_list[1], coord_list[2], coord_list[3])
             else:
-                raise ValueError("No central coordinate")
+                raise DS9RegionParserError("No central coordinate")
         elif region_type == 'polygon':
             if isinstance(coord_list[0], BaseCoordinateFrame):
                 reg = polygon.PolygonSkyRegion(coord_list[0])
             elif isinstance(coord_list[0], PixCoord):
                 reg = polygon.PolygonPixelRegion(coord_list[0])
             else:
-                raise ValueError("No central coordinate")
+                raise DS9RegionParserError("No central coordinate")
         elif region_type in ('rectangle', 'box'):
             if isinstance(coord_list[0], BaseCoordinateFrame):
                 reg = rectangle.RectangleSkyRegion(coord_list[0], coord_list[1], coord_list[2], coord_list[3])
             elif isinstance(coord_list[0], PixCoord):
                 reg = rectangle.RectanglePixelRegion(coord_list[0], coord_list[1], coord_list[2], coord_list[3])
             else:
-                raise ValueError("No central coordinate")
+                raise DS9RegionParserError("No central coordinate")
         elif region_type == 'point':
             if isinstance(coord_list[0], BaseCoordinateFrame):
                 reg = point.PointSkyRegion(coord_list[0])
             elif isinstance(coord_list[0], PixCoord):
                 reg = point.PointPixelRegion(coord_list[0])
             else:
-                raise ValueError("No central coordinate")
+                raise DS9RegionParserError("No central coordinate")
         else:
             # Note: this should effectively never happen, because it would
             # imply that the line_parser found a region that didn't match the
@@ -325,7 +330,7 @@ def line_parser(line, coordsys=None, errors='strict'):
     errors : ``warn``, ``ignore``, ``strict``
       The error handling scheme to use for handling skipped entries
       in a region file that were not parseable.
-      The default is 'strict', which will raise a ``ValueError``.
+      The default is 'strict', which will raise a ``DS9RegionParserError``.
       ``warn`` will raise a warning, and ``ignore`` will do nothing
       (i.e., be silent).
 
@@ -368,7 +373,8 @@ def line_parser(line, coordsys=None, errors='strict'):
         return region_type  # outer loop has to do something with the coordinate system information
     elif region_type in language_spec:
         if coordsys is None:
-            raise ValueError("No coordinate system specified and a region has been found.")
+            raise DS9RegionParserError("No coordinate system specified and a"
+                                       " region has been found.")
 
         if "||" in line:
             composite = True
@@ -432,7 +438,7 @@ def line_parser(line, coordsys=None, errors='strict'):
             message = ("Region type '{0}' was identified, but it is not one of "
                        "the known region types.".format(region_type))
             if errors == 'strict':
-                raise ValueError(message)
+                raise DS9RegionParserError(message)
             else:
                 warn(message, DS9RegionParserWarning)
 
