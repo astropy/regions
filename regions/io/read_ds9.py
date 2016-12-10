@@ -7,6 +7,8 @@ from astropy import units as u
 from astropy import coordinates
 from astropy.coordinates import BaseCoordinateFrame
 from astropy import log
+from astropy.utils.exceptions import AstropyUserWarning
+from warnings import warn
 from ..shapes import circle, rectangle, polygon, ellipse, point
 from ..core import PixCoord
 
@@ -15,16 +17,33 @@ __all__ = [
     'ds9_string_to_objects',
     'ds9_string_to_region_list',
     'ds9_region_list_to_objects',
+    'DS9RegionParserWarning',
 ]
 
 
-def read_ds9(filename):
+class DS9RegionParserWarning(AstropyUserWarning):
+    """
+    A generic warning class for DS9 region parsing inherited from astropy's
+    warnings
+    """
+
+class DS9RegionParserError(ValueError):
+    """
+    A generic error class for DS9 region parsing
+    """
+
+def read_ds9(filename, errors='strict'):
     """Read a ds9 region file in as a list of region objects.
 
     Parameters
     ----------
     filename : str
         The file path
+    errors : ``warn``, ``ignore``, ``strict``
+      The error handling scheme to use for handling parsing errors.
+      The default is 'strict', which will raise a ``DS9RegionParserError``.
+      ``warn`` will raise a warning, and ``ignore`` will do nothing
+      (i.e., be silent).
 
     Returns
     -------
@@ -34,7 +53,7 @@ def read_ds9(filename):
     with open(filename) as fh:
         region_string = fh.read()
 
-    return ds9_string_to_objects(region_string)
+    return ds9_string_to_objects(region_string, errors=errors)
 
 
 def parse_coordinate(string_rep, unit):
@@ -146,7 +165,7 @@ def ds9_region_list_to_objects(region_list):
     regions : list
         List of `regions.Region` objects
     """
-    viz_keywords = ['color', 'dashed', 'width', 'point', 'font', 'text']
+    viz_keywords = ['color', 'dashed', 'width', 'point', 'font']
 
     output_list = []
     for region_type, coord_list, meta in region_list:
@@ -159,7 +178,7 @@ def ds9_region_list_to_objects(region_list):
             elif isinstance(coord_list[0], PixCoord):
                 reg = circle.CirclePixelRegion(coord_list[0], coord_list[1])
             else:
-                raise ValueError("No central coordinate")
+                raise DS9RegionParserError("No central coordinate")
         elif region_type == 'ellipse':
             # Do not read elliptical annuli for now
             if len(coord_list) > 4:
@@ -169,43 +188,58 @@ def ds9_region_list_to_objects(region_list):
             elif isinstance(coord_list[0], PixCoord):
                 reg = ellipse.EllipsePixelRegion(coord_list[0], coord_list[1], coord_list[2], coord_list[3])
             else:
-                raise ValueError("No central coordinate")
+                raise DS9RegionParserError("No central coordinate")
         elif region_type == 'polygon':
             if isinstance(coord_list[0], BaseCoordinateFrame):
                 reg = polygon.PolygonSkyRegion(coord_list[0])
             elif isinstance(coord_list[0], PixCoord):
                 reg = polygon.PolygonPixelRegion(coord_list[0])
             else:
-                raise ValueError("No central coordinate")
-        elif region_type == 'rectangle':
+                raise DS9RegionParserError("No central coordinate")
+        elif region_type in ('rectangle', 'box'):
             if isinstance(coord_list[0], BaseCoordinateFrame):
                 reg = rectangle.RectangleSkyRegion(coord_list[0], coord_list[1], coord_list[2], coord_list[3])
             elif isinstance(coord_list[0], PixCoord):
                 reg = rectangle.RectanglePixelRegion(coord_list[0], coord_list[1], coord_list[2], coord_list[3])
             else:
-                raise ValueError("No central coordinate")
+                raise DS9RegionParserError("No central coordinate")
         elif region_type == 'point':
             if isinstance(coord_list[0], BaseCoordinateFrame):
                 reg = point.PointSkyRegion(coord_list[0])
             elif isinstance(coord_list[0], PixCoord):
                 reg = point.PointPixelRegion(coord_list[0])
             else:
-                raise ValueError("No central coordinate")
+                raise DS9RegionParserError("No central coordinate")
         else:
+            # Note: this should effectively never happen, because it would
+            # imply that the line_parser found a region that didn't match the
+            # above region types.  However, this can help with development,
+            # since we could in theory implement more region types in the line
+            # parser and forget to add them here.
+            warn("Skipping region with coords {0} because its type '{1}'"
+                 " is not recognized."
+                 .format(str(coord_list), region_type),
+                 DS9RegionParserWarning
+                )
             continue
-        reg.vizmeta = {key: meta[key] for key in meta.keys() if key in viz_keywords}
+        reg.visual = {key: meta[key] for key in meta.keys() if key in viz_keywords}
         reg.meta = {key: meta[key] for key in meta.keys() if key not in viz_keywords}
         output_list.append(reg)
     return output_list
 
 
-def ds9_string_to_objects(region_string):
+def ds9_string_to_objects(region_string, errors='strict'):
     """Parse ds9 region string to region objects
 
     Parameters
     ----------
     region_string : str
         DS9 region string
+    errors : ``warn``, ``ignore``, ``strict``
+      The error handling scheme to use for handling parsing errors.
+      The default is 'strict', which will raise a ``ValueError``.
+      ``warn`` will raise a warning, and ``ignore`` will do nothing
+      (i.e., be silent).
 
     Returns
     -------
@@ -216,18 +250,24 @@ def ds9_string_to_objects(region_string):
     --------
     TODO
     """
-    region_list = ds9_string_to_region_list(region_string)
+    region_list = ds9_string_to_region_list(region_string, errors=errors)
     regions = ds9_region_list_to_objects(region_list)
     return regions
 
 
-def ds9_string_to_region_list(region_string):
+def ds9_string_to_region_list(region_string, errors='strict'):
     """Parse a DS9 region string.
 
     Parameters
     ----------
     region_string : str
         DS9 region string
+    errors : ``warn``, ``ignore``, ``strict``
+      The error handling scheme to use for handling skipped entries
+      in a region file that were not parseable.
+      The default is 'strict', which will raise a ``ValueError``.
+      ``warn`` will raise a warning, and ``ignore`` will do nothing
+      (i.e., be silent).
 
     Returns
     -------
@@ -244,18 +284,25 @@ def ds9_string_to_region_list(region_string):
     regions = []
     composite_region = None
 
+    global_meta = {}
+
     # ds9 regions can be split on \n or ;
     lines = []
     for line_ in region_string.split('\n'):
         for line in line_.split(";"):
             lines.append(line)
-            parsed = line_parser(line, coordsys)
+            parsed = line_parser(line, coordsys, errors=errors)
             if parsed in coordinate_systems:
                 coordsys = parsed
+            elif parsed and (parsed[0] == 'global'):
+                # set some global metadata from the 'global' header
+                _, global_meta = parsed
             elif parsed:
                 region_type, coordlist, meta, composite, include = parsed
+                meta.update(global_meta)
                 meta['include'] = include
-                log.debug("Region type = {0}".format(region_type))
+                log.debug("Region type = {0}.  Composite={1}"
+                          .format(region_type, composite))
                 if composite and composite_region is None:
                     composite_region = [(region_type, coordlist)]
                 elif composite:
@@ -270,7 +317,7 @@ def ds9_string_to_region_list(region_string):
     return regions
 
 
-def line_parser(line, coordsys=None):
+def line_parser(line, coordsys=None, errors='strict'):
     """
     Parse a single ds9 region line into a string
 
@@ -280,6 +327,12 @@ def line_parser(line, coordsys=None):
         A single ds9 region contained in a string
     coordsys : str
         The global coordinate system name declared at the top of the ds9 file
+    errors : ``warn``, ``ignore``, ``strict``
+      The error handling scheme to use for handling skipped entries
+      in a region file that were not parseable.
+      The default is 'strict', which will raise a ``DS9RegionParserError``.
+      ``warn`` will raise a warning, and ``ignore`` will do nothing
+      (i.e., be silent).
 
     Returns
     -------
@@ -292,18 +345,36 @@ def line_parser(line, coordsys=None):
     include : bool
         Whether the region is included (False -> excluded)
     """
+    if errors not in ('strict','ignore','warn'):
+        raise ValueError("``errors`` must be one of strict, ignore, or warn")
+
+    if '# Region file format' in line and line[0] == '#':
+        # This is just a file format line, we can safely skip it
+        return
+
+    # special case / header: parse global parameters into metadata
+    if line.lstrip()[:6] == 'global':
+        return global_parser(line)
+
     region_type_search = region_type_or_coordsys_re.search(line)
     if region_type_search:
         include = region_type_search.groups()[0]
         region_type = region_type_search.groups()[1]
     else:
+        # if there's no line, it's just blank, so don't warn
+        if line:
+            # but otherwise, this should probably always raise a warning?
+            # at least until we identify common cases for it
+            warn("No region type found for line '{0}'.".format(line),
+                 DS9RegionParserWarning)
         return
 
     if region_type in coordinate_systems:
         return region_type  # outer loop has to do something with the coordinate system information
     elif region_type in language_spec:
         if coordsys is None:
-            raise ValueError("No coordinate system specified and a region has been found.")
+            raise DS9RegionParserError("No coordinate system specified and a"
+                                       " region has been found.")
 
         if "||" in line:
             composite = True
@@ -357,6 +428,19 @@ def line_parser(line, coordsys=None):
                 language_spec[region_type] = itertools.chain((coordinate, coordinate), itertools.cycle((radius,)))
 
             return region_type, parsed_return, parsed_meta, composite, include
+    else:
+        # This will raise warnings even if the first line is acceptable,
+        # e.g. something like:
+        # # Region file format: DS9 version 4.1
+        # That behavior is unfortunate, but there's not a great workaround
+        # except to let the user set `errors='ignore'`
+        if errors in ('warn','strict'):
+            message = ("Region type '{0}' was identified, but it is not one of "
+                       "the known region types.".format(region_type))
+            if errors == 'strict':
+                raise DS9RegionParserError(message)
+            else:
+                warn(message, DS9RegionParserWarning)
 
 
 def type_parser(string_rep, specification, coordsys):
@@ -386,7 +470,10 @@ def type_parser(string_rep, specification, coordsys):
     """
     coord_list = []
     splitter = re.compile("[, ]")
-    for ii, (element, element_parser) in enumerate(zip(splitter.split(string_rep), specification)):
+    # strip out "null" elements, i.e. ''.  It might be possible to eliminate
+    # these some other way, i.e. with regex directly, but I don't know how.
+    elements = [x for x in splitter.split(string_rep) if x]
+    for ii, (element, element_parser) in enumerate(zip(elements, specification)):
         if element_parser is coordinate:
             unit = coordinate_units[coordsys][ii % 2]
             coord_list.append(element_parser(element, unit))
@@ -417,7 +504,10 @@ def meta_parser(meta_str):
     meta_token_split = [x for x in meta_token.split(meta_str.strip()) if x]
     equals_inds = [i for i, x in enumerate(meta_token_split) if x is '=']
     result = {meta_token_split[ii - 1]:
-                  " ".join(meta_token_split[ii + 1:jj - 1 if jj is not None else None])
+              " ".join(meta_token_split[ii + 1:jj - 1 if jj is not None else None])
               for ii, jj in zip(equals_inds, equals_inds[1:] + [None])}
 
     return result
+
+def global_parser(line):
+    return "global", meta_parser(line)
