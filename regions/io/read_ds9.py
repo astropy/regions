@@ -18,6 +18,7 @@ __all__ = [
     'ds9_string_to_region_list',
     'ds9_region_list_to_objects',
     'DS9RegionParserWarning',
+    'DS9RegionParserError',
 ]
 
 
@@ -27,10 +28,12 @@ class DS9RegionParserWarning(AstropyUserWarning):
     warnings
     """
 
+
 class DS9RegionParserError(ValueError):
     """
     A generic error class for DS9 region parsing
     """
+
 
 def read_ds9(filename, errors='strict'):
     """Read a ds9 region file in as a list of region objects.
@@ -220,7 +223,7 @@ def ds9_region_list_to_objects(region_list):
                  " is not recognized."
                  .format(str(coord_list), region_type),
                  DS9RegionParserWarning
-                )
+                 )
             continue
         reg.visual = {key: meta[key] for key in meta.keys() if key in viz_keywords}
         reg.meta = {key: meta[key] for key in meta.keys() if key not in viz_keywords}
@@ -345,7 +348,7 @@ def line_parser(line, coordsys=None, errors='strict'):
     include : bool
         Whether the region is included (False -> excluded)
     """
-    if errors not in ('strict','ignore','warn'):
+    if errors not in ('strict', 'ignore', 'warn'):
         raise ValueError("``errors`` must be one of strict, ignore, or warn")
 
     if '# Region file format' in line and line[0] == '#':
@@ -415,7 +418,8 @@ def line_parser(line, coordsys=None, errors='strict'):
             parsed = type_parser(coords_etc, language_spec[region_type],
                                  coordsys)
             if region_type == 'polygon':
-                # have to special-case polygon in the phys coord case b/c can't typecheck when iterating as in sky coord case
+                # have to special-case polygon in the phys coord case
+                # b/c can't typecheck when iterating as in sky coord case
                 coord = PixCoord(parsed[0::2], parsed[1::2])
                 parsed_return = [coord]
             else:
@@ -434,7 +438,7 @@ def line_parser(line, coordsys=None, errors='strict'):
         # # Region file format: DS9 version 4.1
         # That behavior is unfortunate, but there's not a great workaround
         # except to let the user set `errors='ignore'`
-        if errors in ('warn','strict'):
+        if errors in ('warn', 'strict'):
             message = ("Region type '{0}' was identified, but it is not one of "
                        "the known region types.".format(region_type))
             if errors == 'strict':
@@ -504,10 +508,11 @@ def meta_parser(meta_str):
     meta_token_split = [x for x in meta_token.split(meta_str.strip()) if x]
     equals_inds = [i for i, x in enumerate(meta_token_split) if x is '=']
     result = {meta_token_split[ii - 1]:
-              " ".join(meta_token_split[ii + 1:jj - 1 if jj is not None else None])
+                  " ".join(meta_token_split[ii + 1:jj - 1 if jj is not None else None])
               for ii, jj in zip(equals_inds, equals_inds[1:] + [None])}
 
     return result
+
 
 def global_parser(line):
     return "global", meta_parser(line)

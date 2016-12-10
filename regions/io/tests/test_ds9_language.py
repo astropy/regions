@@ -133,6 +133,7 @@ def test_ds9_io(tmpdir):
     assert_allclose(reg.center.dec.deg, 43)
     assert_allclose(reg.radius.value, 3)
 
+
 def test_missing_region_warns():
     ds9_str = '# Region file format: DS9 astropy/regions\nfk5\ncircle(42.0000,43.0000,3.0000)\nnotaregiontype(blah)'
 
@@ -143,6 +144,7 @@ def test_missing_region_warns():
     assert len(regions) == 1
     assert len(ASWarn) == 1
     assert "Region type 'notaregiontype'" in str(ASWarn[0].message)
+
 
 def test_global_parser():
     """ Check that the global_parser does what's expected """
