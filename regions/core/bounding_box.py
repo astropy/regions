@@ -10,36 +10,34 @@ __all__ = ['BoundingBox']
 
 class BoundingBox(object):
     """
-    Rectangular bounding box in integer pixel indices (not floats).
+    A rectangular bounding box in integer (not float) pixel indices.
 
     Parameters
     ----------
     ixmin, ixmax, iymin, iymax : int
-        The bounding indices.
-        Note that the upper values (iymax and ixmax) are
-        exclusive as for normal slices in Python.
+        The bounding indices.  Note that the upper values (``iymax`` and
+        ``ixmax``) are exclusive as for normal slices in Python.
 
     Examples
     --------
-
     >>> from regions import BoundingBox
-    # Constructing a BoundingBox like this is cryptic:
+    # constructing a BoundingBox like this is cryptic:
     >>> bbox = BoundingBox(1, 10, 2, 20)
-    # Better use keyword arguments for readability:
+    # it's better to use keyword arguments for readability:
     >>> bbox = BoundingBox(ixmin=1, ixmax=10, iymin=2, iymax=20)
     >>> bbox  # nice repr, useful for interactive work
     BoundingBox(ixmin=1, ixmax=10, iymin=2, iymax=20)
-    # sometimes it's useful to check if two bboxes are the same
+    # sometimes it's useful to check if two bounding boxes are the same
     >>> bbox == BoundingBox(ixmin=1, ixmax=10, iymin=2, iymax=20)
     True
     >>> bbox == BoundingBox(ixmin=99, ixmax=10, iymin=2, iymax=20)
     False
-    # Shape and slices can be useful when working with cutout numpy arrays
+    # "shape" and "slices" can be useful when working with numpy arrays
     >>> bbox.shape  # numpy order: (y, x)
     (18, 9)
     >>> bbox.slices  # numpy order: (y, x)
     (slice(2, 20, None), slice(1, 10, None))
-    # Extent is useful when plotting bbox with matplotlib
+    # "extent" is useful when plotting the BoundingBox with matplotlib
     >>> bbox.extent  # matplotlib order: (x, y)
     (0.5, 9.5, 1.5, 19.5)
     >>> print(bbox.as_patch())
@@ -59,26 +57,30 @@ class BoundingBox(object):
         rectangle defined by float coordinate values.
 
         Following the pixel index convention, an integer index
-        corresponds to the center of of a pixel and the pixel edges span
-        from (index - 0.5) to (index + 0.5).  For example, the pixels
-        edges of these three pixels are:
+        corresponds to the center of a pixel and the pixel edges span
+        from (index - 0.5) to (index + 0.5).  For example, the pixel
+        edge spans of the following pixels are:
 
         - pixel 0: from -0.5 to 0.5
         - pixel 1: from 0.5 to 1.5
         - pixel 2: from 1.5 to 2.5
 
-        At the upper end we add 1, because by definition `BoundingBox`
-        upper limits are exclusive.  See examples below.
+        In addition, because `BoundingBox` upper limits are exclusive
+        (by definition), 1 is added to the upper pixel edges.  See
+        examples below.
 
         Parameters
         ----------
         xmin, xmax, ymin, ymax : float
-            Rectangle with arbitrary float coordinates.
+            Float coordinates defining a rectangle.  ``xmax`` must be
+            larger than ``xmin`` and ``ymax`` must be larger than
+            ``ymin``.
 
         Returns
         -------
-        bbox : `BoundingBox`
-            Smallest bounding box fully containing the rectangle.
+        bbox : `BoundingBox` object
+            The minimal ``BoundingBox`` object fully containing the
+            input rectangle coordinates.
 
         Examples
         --------
@@ -99,7 +101,8 @@ class BoundingBox(object):
 
     def __eq__(self, other):
         if not isinstance(other, BoundingBox):
-            raise TypeError('Can only compare BoundingBox to other BoundingBox')
+            raise TypeError('Can compare BoundingBox only to another '
+                            'BoundingBox.')
 
         return (
             (self.ixmin == other.ixmin) and
@@ -111,39 +114,39 @@ class BoundingBox(object):
     def __repr__(self):
         data = self.__dict__
         data['name'] = self.__class__.__name__
-        fmt = '{name}(ixmin={ixmin}, ixmax={ixmax}, iymin={iymin}, iymax={iymax})'
+        fmt = ('{name}(ixmin={ixmin}, ixmax={ixmax}, iymin={iymin}, '
+               'iymax={iymax})')
         return fmt.format(**data)
 
     @property
     def shape(self):
         """
-        The shape of the bounding box.
-
-        Numpy axis order `(y, x)`.
+        The ``(ny, nx)`` shape of the bounding box.
         """
+
         return self.iymax - self.iymin, self.ixmax - self.ixmin
 
     @property
     def slices(self):
         """
-        The bounding box as a pair of `slice` objects.
+        The bounding box as a tuple of `slice` objects.
 
-        Numpy axis order `(y, x)`. Can be used to index into Numpy arrays.
+        The slice tuple is in numpy axis order (i.e. ``(y, x)``) and
+        therefore can be used to slice numpy arrays.
         """
-        return (
-            slice(self.iymin, self.iymax),
-            slice(self.ixmin, self.ixmax),
-        )
+
+        return (slice(self.iymin, self.iymax), slice(self.ixmin, self.ixmax))
 
     @property
     def extent(self):
         """
-        The 'extent' of the mask, i.e the bounding box from the bottom left
-        corner of the lower left pixel to the upper right corner of the upper
-        right pixel.
+        The extent of the mask, defined as the bounding box from the
+        bottom-left corner of the lower-left pixel to the upper-right
+        corner of the upper-right pixel.
 
         This can be used for example when plotting using Matplotlib.
         """
+
         return (
             self.ixmin - 0.5,
             self.ixmax - 0.5,
@@ -153,14 +156,13 @@ class BoundingBox(object):
 
     def as_patch(self, **kwargs):
         """
-        Return a Matplotlib patch that represents the bounding box.
+        Return a `matplotlib.patches.Patch` that represents the bounding
+        box.
 
         TODO: show full code example how to add it to a plot
         """
+
         from matplotlib.patches import Rectangle
-        return Rectangle(
-            xy=(self.ixmin - 0.5, self.iymin - 0.5),
-            width=self.ixmax - self.ixmin,
-            height=self.iymax - self.iymin,
-            **kwargs
-        )
+
+        return Rectangle(xy=(self.extent[0], self.extent[2]),
+                         width=self.shape[1], height=self.shape[0], **kwargs)
