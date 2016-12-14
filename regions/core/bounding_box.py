@@ -81,7 +81,7 @@ class BoundingBox(object):
         ----------
         xmin, xmax, ymin, ymax : float
             Float coordinates defining a rectangle.  The lower values
-            (``min`` and ``min``) must not be greater than the
+            (``xmin`` and ``ymin``) must not be greater than the
             respective upper values (``xmax`` and ``ymax``).
 
         Returns
@@ -164,14 +164,19 @@ class BoundingBox(object):
 
     def as_patch(self, **kwargs):
         """
-        Return a `matplotlib.patches.Patch` that represents the bounding
-        box.
+        Return a `matplotlib.patches.Rectangle` that represents the
+        bounding box.
 
         Parameters
         ----------
         kwargs
             Any keyword arguments accepted by
             `matplotlib.patches.Patch`.
+
+        Returns
+        -------
+        result : `matplotlib.patches.Rectangle`
+            A matplotlib rectangular patch.
 
         Examples
         --------
