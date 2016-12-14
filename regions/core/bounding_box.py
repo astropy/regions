@@ -15,8 +15,11 @@ class BoundingBox(object):
     Parameters
     ----------
     ixmin, ixmax, iymin, iymax : int
-        The bounding indices.  Note that the upper values (``iymax`` and
-        ``ixmax``) are exclusive as for normal slices in Python.
+        The bounding box pixel indices.  Note that the upper values
+        (``iymax`` and ``ixmax``) are exclusive as for normal slices in
+        Python.  The lower values (``ixmin`` and ``iymin``) must not be
+        greater than the respective upper values (``ixmax`` and
+        ``iymax``).
 
     Examples
     --------
@@ -45,6 +48,11 @@ class BoundingBox(object):
     """
 
     def __init__(self, ixmin, ixmax, iymin, iymax):
+        if ixmin > ixmax:
+            raise ValueError('ixmin must be <= ixmax')
+        if iymin > iymax:
+            raise ValueError('iymin must be <= iymax')
+
         self.ixmin = ixmin
         self.ixmax = ixmax
         self.iymin = iymin
@@ -72,9 +80,9 @@ class BoundingBox(object):
         Parameters
         ----------
         xmin, xmax, ymin, ymax : float
-            Float coordinates defining a rectangle.  ``xmax`` must be
-            larger than ``xmin`` and ``ymax`` must be larger than
-            ``ymin``.
+            Float coordinates defining a rectangle.  The lower values
+            (``min`` and ``min``) must not be greater than the
+            respective upper values (``xmax`` and ``ymax``).
 
         Returns
         -------
