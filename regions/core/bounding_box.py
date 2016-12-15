@@ -148,11 +148,15 @@ class BoundingBox(object):
     @property
     def extent(self):
         """
-        The extent of the mask, defined as the bounding box from the
-        bottom-left corner of the lower-left pixel to the upper-right
-        corner of the upper-right pixel.
+        The extent of the mask, defined as the ``(xmin, xmax, ymin,
+        ymax)`` bounding box from the bottom-left corner of the
+        lower-left pixel to the upper-right corner of the upper-right
+        pixel.
 
-        This can be used for example when plotting using Matplotlib.
+        The upper edges here are the actual pixel positions of the
+        edges, i.e. they are not "exclusive" indices used for python
+        indexing.  This is useful for plotting the bounding box using
+        Matplotlib.
         """
 
         return (
