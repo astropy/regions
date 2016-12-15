@@ -36,7 +36,7 @@ class BoundingBox(object):
     >>> # sometimes it's useful to check if two bounding boxes are the same
     >>> bbox == BoundingBox(ixmin=1, ixmax=10, iymin=2, iymax=20)
     True
-    >>> bbox == BoundingBox(ixmin=99, ixmax=10, iymin=2, iymax=20)
+    >>> bbox == BoundingBox(ixmin=7, ixmax=10, iymin=2, iymax=20)
     False
 
     >>> # "shape" and "slices" can be useful when working with numpy arrays
