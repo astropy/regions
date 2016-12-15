@@ -24,23 +24,28 @@ class BoundingBox(object):
     Examples
     --------
     >>> from regions import BoundingBox
-    # constructing a BoundingBox like this is cryptic:
+
+    >>> # constructing a BoundingBox like this is cryptic:
     >>> bbox = BoundingBox(1, 10, 2, 20)
-    # it's better to use keyword arguments for readability:
+
+    >>> # it's better to use keyword arguments for readability:
     >>> bbox = BoundingBox(ixmin=1, ixmax=10, iymin=2, iymax=20)
     >>> bbox  # nice repr, useful for interactive work
     BoundingBox(ixmin=1, ixmax=10, iymin=2, iymax=20)
-    # sometimes it's useful to check if two bounding boxes are the same
+
+    >>> # sometimes it's useful to check if two bounding boxes are the same
     >>> bbox == BoundingBox(ixmin=1, ixmax=10, iymin=2, iymax=20)
     True
-    >>> bbox == BoundingBox(ixmin=99, ixmax=10, iymin=2, iymax=20)
+    >>> bbox == BoundingBox(ixmin=7, ixmax=10, iymin=2, iymax=20)
     False
-    # "shape" and "slices" can be useful when working with numpy arrays
+
+    >>> # "shape" and "slices" can be useful when working with numpy arrays
     >>> bbox.shape  # numpy order: (y, x)
     (18, 9)
     >>> bbox.slices  # numpy order: (y, x)
     (slice(2, 20, None), slice(1, 10, None))
-    # "extent" is useful when plotting the BoundingBox with matplotlib
+
+    >>> # "extent" is useful when plotting the BoundingBox with matplotlib
     >>> bbox.extent  # matplotlib order: (x, y)
     (0.5, 9.5, 1.5, 19.5)
     >>> print(bbox.as_patch())
