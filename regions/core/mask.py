@@ -170,15 +170,15 @@ class Mask(object):
 
     def multiply(self, data, fill_value=0.):
         """
-        Apply the region mask to the input data, taking any edge effects
-        into account.
+        Multiply the region mask with the input data, taking any edge
+        effects into account.
 
         The result is a mask-weighted cutout from the data.
 
         Parameters
         ----------
         data : array_like or `~astropy.units.Quantity`
-            A 2D array on which to apply the region mask.
+            The 2D array to multiply with the region mask.
 
         fill_value : float, optional
             The value is used to fill pixels where the region mask does
