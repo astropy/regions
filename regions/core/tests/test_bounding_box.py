@@ -23,6 +23,13 @@ def test_bounding_box_init():
     assert bbox.iymax == 20
 
 
+def test_bounding_box_init_minmax():
+    with pytest.raises(ValueError):
+        BoundingBox(100, 1, 1, 100)
+    with pytest.raises(ValueError):
+        BoundingBox(1, 100, 100, 1)
+
+
 def test_bounding_box_from_float():
     # This is the example from the method docstring
     bbox = BoundingBox._from_float(xmin=1.0, xmax=10.0, ymin=2.0, ymax=20.0)
@@ -36,9 +43,9 @@ def test_bounding_box_eq():
     bbox = BoundingBox(1, 10, 2, 20)
     assert bbox == bbox
 
-    assert bbox != BoundingBox(99, 10, 2, 20)
+    assert bbox != BoundingBox(9, 10, 2, 20)
     assert bbox != BoundingBox(1, 99, 2, 20)
-    assert bbox != BoundingBox(1, 10, 99, 20)
+    assert bbox != BoundingBox(1, 10, 9, 20)
     assert bbox != BoundingBox(1, 10, 2, 99)
 
 
