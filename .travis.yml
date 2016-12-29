@@ -2,8 +2,10 @@ language: python
 
 python:
     - 2.7
+    - 3.3
     - 3.4
     - 3.5
+    - 3.6
 
 # Setting sudo to false opts in to Travis-CI container-based builds.
 sudo: false
@@ -33,25 +35,23 @@ env:
     matrix:
         # Make sure that egg_info works without dependencies
         - SETUP_CMD='egg_info'
-        # Try all python versions with the latest numpy
-        - SETUP_CMD='test'
 
 matrix:
     include:
 
         # Do a coverage test in Python 3.
-        - python: 3.5
+        - python: 3.6
           env: SETUP_CMD='test --coverage'
 
         # Check for sphinx doc build warnings - we do this first because it
         # may run for a long time
         - python: 2.7
           env: SETUP_CMD='build_docs -w'
-        - python: 3.5
+        - python: 3.6
           env: SETUP_CMD='build_docs -w'
 
         # Do a test without the optional dependencies
-        - python: 3.5
+        - python: 3.6
           env: SETUP_CMD='test'
                CONDA_DEPENDENCIES='Cython'
 
@@ -59,40 +59,30 @@ matrix:
         # Try Astropy development version
         - python: 2.7
           env: ASTROPY_VERSION=development
-        - python: 3.5
+        - python: 3.6
           env: ASTROPY_VERSION=development
 
-        # Python 3.3 doesn't have numpy 1.10 in conda, but it can be put
-        # back into the main matrix once the numpy build is available in the
-        # astropy-ci-extras channel (or in the one provided in the
-        # CONDA_CHANNELS environmental variable).
-        - python: 3.3
-          env: SETUP_CMD='egg_info'
-               CONDA_DEPENDENCIES='Cython'
-        - python: 3.3
-          env: SETUP_CMD='test' NUMPY_VERSION=1.9
-               CONDA_DEPENDENCIES='Cython'
 
         # Try older numpy versions
-        - python: 2.7
+        - python: 3.5
           env: NUMPY_VERSION=1.10
-        - python: 2.7
+        - python: 3.4
           env: NUMPY_VERSION=1.9
-        - python: 2.7
+        - python: 3.3
           env: NUMPY_VERSION=1.8
         - python: 2.7
           env: NUMPY_VERSION=1.7
 
         # Try numpy pre-release
-        - python: 3.5
+        - python: 3.6
           env: NUMPY_VERSION=prerelease
 
         # Do a PEP8 test with pycodestyle
-        - python: 3.5
+        - python: 3.6
           env: MAIN_CMD='pycodestyle regions --count' SETUP_CMD=''
 
     allow_failures:
-        - python: 3.5
+        - python: 3.6
           env: NUMPY_VERSION=prerelease
 
 install:
