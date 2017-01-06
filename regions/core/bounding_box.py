@@ -105,10 +105,10 @@ class BoundingBox(object):
         BoundingBox(ixmin=1, ixmax=11, iymin=2, iymax=12)
         """
 
-        ixmin = np.floor(xmin + 0.5).astype(int)
-        ixmax = np.floor(xmax + 1.5).astype(int)
-        iymin = np.floor(ymin + 0.5).astype(int)
-        iymax = np.floor(ymax + 1.5).astype(int)
+        ixmin = int(np.floor(xmin + 0.5))
+        ixmax = int(np.floor(xmax + 1.5))
+        iymin = int(np.floor(ymin + 0.5))
+        iymax = int(np.floor(ymax + 1.5))
 
         return cls(ixmin, ixmax, iymin, iymax)
 
