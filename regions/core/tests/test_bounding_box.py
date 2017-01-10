@@ -30,6 +30,23 @@ def test_bounding_box_init_minmax():
         BoundingBox(1, 100, 100, 1)
 
 
+def test_bounding_box_inputs():
+    with pytest.raises(TypeError):
+        BoundingBox([1], [10], [2], [9])
+    with pytest.raises(TypeError):
+        BoundingBox([1, 2], 10, 2, 9)
+    with pytest.raises(TypeError):
+        BoundingBox(1.0, 10.0, 2.0, 9.0)
+    with pytest.raises(TypeError):
+        BoundingBox(1.3, 10, 2, 9)
+    with pytest.raises(TypeError):
+        BoundingBox(1, 10.3, 2, 9)
+    with pytest.raises(TypeError):
+        BoundingBox(1, 10, 2.3, 9)
+    with pytest.raises(TypeError):
+        BoundingBox(1, 10, 2, 9.3)
+
+
 def test_bounding_box_from_float():
     # This is the example from the method docstring
     bbox = BoundingBox._from_float(xmin=1.0, xmax=10.0, ymin=2.0, ymax=20.0)

@@ -3,6 +3,7 @@ from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
 import numpy as np
+from astropy.io.fits.util import _is_int
 
 
 __all__ = ['BoundingBox']
@@ -53,6 +54,15 @@ class BoundingBox(object):
     """
 
     def __init__(self, ixmin, ixmax, iymin, iymax):
+        if not _is_int(ixmin):
+            raise TypeError('ixmin must be an integer')
+        if not _is_int(ixmax):
+            raise TypeError('ixmax must be an integer')
+        if not _is_int(iymin):
+            raise TypeError('iymin must be an integer')
+        if not _is_int(iymax):
+            raise TypeError('iymax must be an integer')
+
         if ixmin > ixmax:
             raise ValueError('ixmin must be <= ixmax')
         if iymin > iymax:
