@@ -50,9 +50,9 @@ def ds9_objects_to_string(regions, coordsys='fk5', fmt='.4f', radunit='deg'):
         radunitstr = ''
 
     ds9_strings = {
-        'circle': 'circle({x:' + fmt + '},{y:' + fmt + '},{r:' + fmt + '}' + radunitstr + ')\n',
-        'ellipse': 'ellipse({x:' + fmt + '},{y:' + fmt + '},{r1:' + fmt + '}' + radunitstr + ',{r2:' + fmt + '}' + radunitstr + ',{ang:' + fmt + '})\n',
-        'polygon': 'polygon({c})\n',
+        'circle': 'circle({x:' + fmt + '},{y:' + fmt + '},{r:' + fmt + '}' + radunitstr + ')',
+        'ellipse': 'ellipse({x:' + fmt + '},{y:' + fmt + '},{r1:' + fmt + '}' + radunitstr + ',{r2:' + fmt + '}' + radunitstr + ',{ang:' + fmt + '})',
+        'polygon': 'polygon({c})',
     }
 
     output = '# Region file format: DS9 astropy/regions\n'
@@ -66,30 +66,41 @@ def ds9_objects_to_string(regions, coordsys='fk5', fmt='.4f', radunit='deg'):
         frame = None
 
     for reg in regions:
+
+        meta_str = " ".join("{0}={1}" for key,val in reg.items())
+
         if isinstance(reg, shapes.circle.CircleSkyRegion):
             x = float(reg.center.transform_to(frame).spherical.lon.to('deg').value)
             y = float(reg.center.transform_to(frame).spherical.lat.to('deg').value)
             r = float(reg.radius.to(radunit).value)
-            output += ds9_strings['circle'].format(**locals())
+            line = ds9_strings['circle'].format(**locals())
         elif isinstance(reg, shapes.circle.CirclePixelRegion):
             x = reg.center.x
             y = reg.center.y
             r = reg.radius
-            output += ds9_strings['circle'].format(**locals())
+            line = ds9_strings['circle'].format(**locals())
+        elif isinstance(reg, shapes.point.PointSkyRegion):
+            x = float(reg.center.transform_to(frame).spherical.lon.to('deg').value)
+            y = float(reg.center.transform_to(frame).spherical.lat.to('deg').value)
+            line = ds9_strings['point'].format(**locals())
+        elif isinstance(reg, shapes.point.PointPixelRegion):
+            x = reg.center.x
+            y = reg.center.y
+            line = ds9_strings['point'].format(**locals())
         elif isinstance(reg, shapes.ellipse.EllipseSkyRegion):
             x = float(reg.center.transform_to(frame).spherical.lon.to('deg').value)
             y = float(reg.center.transform_to(frame).spherical.lat.to('deg').value)
             r1 = float(reg.width.to(radunit).value)
             r2 = float(reg.height.to(radunit).value)
             ang = float(reg.angle.to('deg').value)
-            output += ds9_strings['ellipse'].format(**locals())
+            line = ds9_strings['ellipse'].format(**locals())
         elif isinstance(reg, shapes.ellipse.EllipsePixelRegion):
             x = reg.center.x
             y = reg.center.y
             r1 = reg.width
             r2 = reg.height
             ang = reg.angle
-            output += ds9_strings['ellipse'].format(**locals())
+            line = ds9_strings['ellipse'].format(**locals())
         elif isinstance(reg, shapes.polygon.PolygonSkyRegion):
             v = reg.vertices.transform_to(frame)
             coords = [(x.to('deg').value, y.to('deg').value) for x, y in
@@ -97,14 +108,16 @@ def ds9_objects_to_string(regions, coordsys='fk5', fmt='.4f', radunit='deg'):
             val = "{:" + fmt + "}"
             temp = [val.format(x) for _ in coords for x in _]
             c = ",".join(temp)
-            output += ds9_strings['polygon'].format(**locals())
+            line = ds9_strings['polygon'].format(**locals())
         elif isinstance(reg, shapes.polygon.PolygonPixelRegion):
             v = reg.vertices
             coords = [(x, y) for x, y in zip(v.x, v.y)]
             val = "{:" + fmt + "}"
             temp = [val.format(x) for _ in coords for x in _]
             c = ",".join(temp)
-            output += ds9_strings['polygon'].format(**locals())
+            line = ds9_strings['polygon'].format(**locals())
+
+        output += "{0} # {1} \n".format(line, meta_str)
 
     return output
 
