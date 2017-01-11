@@ -132,6 +132,7 @@ def test_ds9_io(tmpdir):
     center = SkyCoord(42, 43, unit='deg')
     radius = Angle(3, 'deg')
     reg = CircleSkyRegion(center, radius)
+    reg.meta['name'] = 'MyName'
 
     filename = os.path.join(str(tmpdir), 'ds9.reg')
     write_ds9([reg], filename)
@@ -140,6 +141,8 @@ def test_ds9_io(tmpdir):
     assert_allclose(reg.center.ra.deg, 42)
     assert_allclose(reg.center.dec.deg, 43)
     assert_allclose(reg.radius.value, 3)
+    assert 'name' in reg.meta
+    assert reg.meta['name'] == 'MyName'
 
 
 def test_missing_region_warns():
