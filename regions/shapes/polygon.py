@@ -28,14 +28,7 @@ class PolygonPixelRegion(PixelRegion):
         self.vertices = vertices
         self.meta = meta or {}
         self.visual = visual or {}
-
-    def __repr__(self):
-        data = dict(
-            name=self.__class__.__name__,
-            vertices=self.vertices,
-        )
-        fmt = '{name}\nvertices: {vertices}'
-        return fmt.format(**data)
+        self._repr_params = [('vertices', self.vertices)]
 
     @property
     def area(self):
@@ -124,14 +117,7 @@ class PolygonSkyRegion(SkyRegion):
         self.vertices = vertices
         self.meta = meta or {}
         self.visual = visual or {}
-
-    def __repr__(self):
-        data = dict(
-            name=self.__class__.__name__,
-            vertices=self.vertices,
-        )
-        fmt = '{name}\nvertices: {vertices}'
-        return fmt.format(**data)
+        self._repr_params = [('vertices', self.vertices)]
 
     @property
     def area(self):
