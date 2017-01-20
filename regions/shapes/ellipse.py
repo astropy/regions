@@ -61,17 +61,8 @@ class EllipsePixelRegion(PixelRegion):
         self.angle = angle
         self.meta = meta or {}
         self.visual = visual or {}
-
-    def __repr__(self):
-        data = dict(
-            name=self.__class__.__name__,
-            center=self.center,
-            major=self.major,
-            minor=self.minor,
-            angle=self.angle,
-        )
-        fmt = '{name}\ncenter: {center}\nmajor: {major}\nminor: {minor}\nangle: {angle}'
-        return fmt.format(**data)
+        self._repr_params = [('major', self.major), ('minor', self.minor),
+                             ('angle', self.angle)]
 
     @property
     def area(self):
@@ -175,17 +166,8 @@ class EllipseSkyRegion(SkyRegion):
         self.angle = angle
         self.meta = meta or {}
         self.visual = visual or {}
-
-    def __repr__(self):
-        data = dict(
-            name=self.__class__.__name__,
-            center=self.center,
-            major=self.major,
-            minor=self.minor,
-            angle=self.angle,
-        )
-        fmt = '{name}\ncenter: {center}\nmajor: {major}\nminor: {minor}\nangle: {angle}'
-        return fmt.format(**data)
+        self._repr_params = [('major', self.major), ('minor', self.minor),
+                             ('angle', self.angle)]
 
     @property
     def area(self):
