@@ -14,9 +14,14 @@ class TestPolygonPixelRegion:
         vertices = PixCoord([3, 4, 3], [3, 4, 4])
         self.poly = PolygonPixelRegion(vertices)
 
-    def test_str(self):
-        expected = 'PolygonPixelRegion\nvertices: PixCoord(x=[3 4 3], y=[3 4 4])'
-        assert str(self.poly) == expected
+    def test_repr_str(self):
+        reg_repr = ('<PolygonPixelRegion(vertices=PixCoord(x=[3 4 3], '
+                    'y=[3 4 4]))>')
+        assert repr(self.poly) == reg_repr
+
+        reg_str = ('Region: PolygonPixelRegion\nvertices: PixCoord(x=[3 4 3],'
+                   ' y=[3 4 4])')
+        assert str(self.poly) == reg_str
 
     def _test_basic(self):
         """
@@ -49,14 +54,24 @@ class TestPolygonSkyRegion:
         vertices = SkyCoord([3, 4, 3] * u.deg, [3, 4, 4] * u.deg)
         self.poly = PolygonSkyRegion(vertices)
 
-    def test_str(self):
+    def test_repr_str(self):
         if ASTROPY_LT_13:
-            expected = ('PolygonSkyRegion\nvertices: <SkyCoord (ICRS): (ra, dec) in deg\n'
-                        '    [(3.0, 3.0), (4.0, 4.0), (3.0, 4.0)]>')
+            reg_repr = ('<PolygonSkyRegion(vertices=<SkyCoord (ICRS): (ra, '
+                        'dec) in deg\n    [(3.0, 3.0), (4.0, 4.0), (3.0, '
+                        '4.0)]>)>')
+            reg_str = ('Region: PolygonSkyRegion\nvertices: <SkyCoord (ICRS):'
+                       ' (ra, dec) in deg\n    [(3.0, 3.0), (4.0, 4.0), (3.0,'
+                       ' 4.0)]>')
         else:
-            expected = ('PolygonSkyRegion\nvertices: <SkyCoord (ICRS): (ra, dec) in deg\n'
-                        '    [( 3.,  3.), ( 4.,  4.), ( 3.,  4.)]>')
-        assert str(self.poly) == expected
+            reg_repr = ('<PolygonSkyRegion(vertices=<SkyCoord (ICRS): (ra, '
+                        'dec) in deg\n    [( 3.,  3.), ( 4.,  4.), ( 3.,  '
+                        '4.)]>)>')
+            reg_str = ('Region: PolygonSkyRegion\nvertices: <SkyCoord (ICRS):'
+                       ' (ra, dec) in deg\n    [( 3.,  3.), ( 4.,  4.), ( 3.,'
+                       '  4.)]>')
+
+        assert repr(self.poly) == reg_repr
+        assert str(self.poly) == reg_str
 
     def _test_basic(self):
         """
