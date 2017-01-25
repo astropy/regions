@@ -19,9 +19,14 @@ class TestRectanglePixelRegion:
             angle=5 * u.deg,
         )
 
-    def test_str(self):
-        expected = 'RectanglePixelRegion\ncenter: PixCoord(x=3, y=4)\nwidth: 4\nheight: 3\nangle: 5.0 deg'
-        assert str(self.reg) == expected
+    def test_repr_str(self):
+        reg_repr = ('<RectanglePixelRegion(PixCoord(x=3, y=4), width=4, '
+                    'height=3, angle=5.0 deg)>')
+        assert repr(self.reg) == reg_repr
+
+        reg_str = ('Region: RectanglePixelRegion\ncenter: PixCoord(x=3, '
+                   'y=4)\nwidth: 4\nheight: 3\nangle: 5.0 deg')
+        assert str(self.reg) == reg_str
 
     @pytest.mark.skipif('not HAS_MATPLOTLIB')
     def test_as_patch(self):
@@ -50,11 +55,21 @@ class TestRectangleSkyRegion:
             angle=5 * u.deg,
         )
 
-    def test_str(self):
+    def test_repr_str(self):
         if ASTROPY_LT_13:
-            expected = ('RectangleSkyRegion\ncenter: <SkyCoord (ICRS): (ra, dec) in deg\n'
-                        '    (3.0, 4.0)>\nwidth: 4.0 deg\nheight: 3.0 deg\nangle: 5.0 deg')
+            reg_repr = ('<RectangleSkyRegion(<SkyCoord (ICRS): (ra, dec) in '
+                        'deg\n    (3.0, 4.0)>, width=4.0 deg, height=3.0 '
+                        'deg, angle=5.0 deg)>')
+            reg_str = ('Region: RectangleSkyRegion\ncenter: <SkyCoord '
+                       '(ICRS): (ra, dec) in deg\n    (3.0, 4.0)>\nwidth: '
+                       '4.0 deg\nheight: 3.0 deg\nangle: 5.0 deg')
         else:
-            expected = ('RectangleSkyRegion\ncenter: <SkyCoord (ICRS): (ra, dec) in deg\n'
-                        '    ( 3.,  4.)>\nwidth: 4.0 deg\nheight: 3.0 deg\nangle: 5.0 deg')
-        assert str(self.reg) == expected
+            reg_repr = ('<RectangleSkyRegion(<SkyCoord (ICRS): (ra, dec) in '
+                        'deg\n    ( 3.,  4.)>, width=4.0 deg, height=3.0 '
+                        'deg, angle=5.0 deg)>')
+            reg_str = ('Region: RectangleSkyRegion\ncenter: <SkyCoord '
+                       '(ICRS): (ra, dec) in deg\n    ( 3.,  4.)>\nwidth: '
+                       '4.0 deg\nheight: 3.0 deg\nangle: 5.0 deg')
+
+        assert repr(self.reg) == reg_repr
+        assert str(self.reg) == reg_str

@@ -20,14 +20,7 @@ class PointPixelRegion(PixelRegion):
         self.center = center
         self.meta = meta or {}
         self.visual = visual or {}
-
-    def __repr__(self):
-        data = dict(
-            name=self.__class__.__name__,
-            center=self.center,
-        )
-        fmt = '{name}\ncenter: {center}'
-        return fmt.format(**data)
+        self._repr_params = None
 
     @property
     def area(self):
@@ -72,14 +65,7 @@ class PointSkyRegion(SkyRegion):
         self.center = center
         self.meta = meta or {}
         self.visual = visual or {}
-
-    def __repr__(self):
-        data = dict(
-            name=self.__class__.__name__,
-            center=self.center,
-        )
-        fmt = '{name}\ncenter: {center}'
-        return fmt.format(**data)
+        self._repr_params = None
 
     @property
     def area(self):

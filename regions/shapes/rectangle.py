@@ -62,17 +62,8 @@ class RectanglePixelRegion(PixelRegion):
         self.angle = angle
         self.meta = meta or {}
         self.visual = visual or {}
-
-    def __repr__(self):
-        data = dict(
-            name=self.__class__.__name__,
-            center=self.center,
-            width=self.width,
-            height=self.height,
-            angle=self.angle,
-        )
-        fmt = '{name}\ncenter: {center}\nwidth: {width}\nheight: {height}\nangle: {angle}'
-        return fmt.format(**data)
+        self._repr_params = [('width', self.width), ('height', self.height),
+                             ('angle', self.angle)]
 
     @property
     def area(self):
@@ -195,17 +186,8 @@ class RectangleSkyRegion(SkyRegion):
         self.angle = angle
         self.meta = meta or {}
         self.visual = visual or {}
-
-    def __repr__(self):
-        data = dict(
-            name=self.__class__.__name__,
-            center=self.center,
-            width=self.width,
-            height=self.height,
-            angle=self.angle,
-        )
-        fmt = '{name}\ncenter: {center}\nwidth: {width}\nheight: {height}\nangle: {angle}'
-        return fmt.format(**data)
+        self._repr_params = [('width', self.width), ('height', self.height),
+                             ('angle', self.angle)]
 
     @property
     def area(self):

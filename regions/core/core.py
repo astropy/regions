@@ -33,6 +33,28 @@ class Region(object):
     Base class for all regions.
     """
 
+    def __repr__(self):
+        if hasattr(self, 'center'):
+            params = [repr(self.center)]
+        else:
+            params = []
+        if self._repr_params is not None:
+            for key, val in self._repr_params:
+                params.append('{0}={1}'.format(key, val))
+        params = ', '.join(params)
+
+        return '<{0}({1})>'.format(self.__class__.__name__, params)
+
+    def __str__(self):
+        cls_info = [('Region', self.__class__.__name__)]
+        if hasattr(self, 'center'):
+            cls_info.append(('center', self.center))
+        if self._repr_params is not None:
+            cls_info += self._repr_params
+        fmt = ['{0}: {1}'.format(key, val) for key, val in cls_info]
+
+        return '\n'.join(fmt)
+
     @abc.abstractmethod
     def intersection(self, other):
         """

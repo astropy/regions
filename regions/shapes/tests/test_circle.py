@@ -18,9 +18,13 @@ class TestCirclePixelRegion:
         center = PixCoord(3, 4)
         self.reg = CirclePixelRegion(center, 2)
 
-    def test_str(self):
-        expected = 'CirclePixelRegion\ncenter: PixCoord(x=3, y=4)\nradius: 2'
-        assert str(self.reg) == expected
+    def test_repr_str(self):
+        reg_repr = '<CirclePixelRegion(PixCoord(x=3, y=4), radius=2)>'
+        assert repr(self.reg) == reg_repr
+
+        reg_str = ('Region: CirclePixelRegion\ncenter: PixCoord(x=3, y=4)\n'
+                   'radius: 2')
+        assert str(self.reg) == reg_str
 
     def test_to_mask(self):
         mask = self.reg.to_mask(mode='exact')
@@ -38,13 +42,22 @@ class TestCircleSkyRegion:
         center = SkyCoord(3 * u.deg, 4 * u.deg)
         self.reg = CircleSkyRegion(center, 2 * u.arcsec)
 
-    def test_str(self):
+    def test_repr_str(self):
         if ASTROPY_LT_13:
-            expected = 'CircleSkyRegion\ncenter: <SkyCoord (ICRS): (ra, dec) in deg\n    (3.0, 4.0)>\nradius: 2.0 arcsec'
+            reg_repr = ('<CircleSkyRegion(<SkyCoord (ICRS): (ra, dec) in '
+                        'deg\n    (3.0, 4.0)>, radius=2.0 arcsec)>')
+            reg_str = ('Region: CircleSkyRegion\ncenter: <SkyCoord (ICRS): '
+                       '(ra, dec) in deg\n    (3.0, 4.0)>\nradius: 2.0 '
+                       'arcsec')
         else:
-            expected = 'CircleSkyRegion\ncenter: <SkyCoord (ICRS): (ra, dec) in deg\n    ( 3.,  4.)>\nradius: 2.0 arcsec'
+            reg_repr = ('<CircleSkyRegion(<SkyCoord (ICRS): (ra, dec) in '
+                        'deg\n    ( 3.,  4.)>, radius=2.0 arcsec)>')
+            reg_str = ('Region: CircleSkyRegion\ncenter: <SkyCoord (ICRS): '
+                       '(ra, dec) in deg\n    ( 3.,  4.)>\nradius: 2.0 '
+                       'arcsec')
 
-        assert str(self.reg) == expected
+        assert repr(self.reg) == reg_repr
+        assert str(self.reg) == reg_str
 
     def test_transformation(self):
         skycoord = SkyCoord(3 * u.deg, 4 * u.deg, frame='galactic')

@@ -36,15 +36,7 @@ class CirclePixelRegion(PixelRegion):
         self.radius = radius
         self.meta = meta or {}
         self.visual = visual or {}
-
-    def __repr__(self):
-        data = dict(
-            name=self.__class__.__name__,
-            center=self.center,
-            radius=self.radius,
-        )
-        fmt = '{name}\ncenter: {center}\nradius: {radius}'
-        return fmt.format(**data)
+        self._repr_params = [('radius', self.radius)]
 
     @property
     def area(self):
@@ -141,15 +133,7 @@ class CircleSkyRegion(SkyRegion):
         self.radius = radius
         self.meta = meta or {}
         self.visual = visual or {}
-
-    def __repr__(self):
-        data = dict(
-            name=self.__class__.__name__,
-            center=self.center,
-            radius=self.radius,
-        )
-        fmt = '{name}\ncenter: {center}\nradius: {radius}'
-        return fmt.format(**data)
+        self._repr_params = [('radius', self.radius)]
 
     @property
     def area(self):
