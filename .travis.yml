@@ -27,8 +27,8 @@ env:
         - ASTROPY_VERSION=stable
         - SETUP_CMD='test'
         - MAIN_CMD='python setup.py'
-        - PIP_DEPENDENCIES='https://github.com/astrofrog/pytest-arraydiff/archive/master.zip'
-        - CONDA_DEPENDENCIES='Cython shapely wcsaxes'
+        - PIP_DEPENDENCIES=''
+        - CONDA_DEPENDENCIES='Cython shapely wcsaxes pytest-arraydiff'
         - CONDA_CHANNELS='astropy'
         - SETUP_XVFB=True
 
@@ -53,7 +53,7 @@ matrix:
         # Do a test without the optional dependencies
         - python: 3.6
           env: SETUP_CMD='test'
-               CONDA_DEPENDENCIES='Cython'
+               CONDA_DEPENDENCIES='Cython pytest-arraydiff'
 
 
         # Try Astropy development version
@@ -80,10 +80,6 @@ matrix:
         # Do a PEP8 test with pycodestyle
         - python: 3.6
           env: MAIN_CMD='pycodestyle regions --count' SETUP_CMD=''
-
-    allow_failures:
-        - python: 3.6
-          env: NUMPY_VERSION=prerelease
 
 install:
 
