@@ -30,6 +30,7 @@ env:
         - CONDA_DEPENDENCIES='Cython shapely pytest-arraydiff'
         - CONDA_CHANNELS='astropy'
         - SETUP_XVFB=True
+        - ASTROPY_USE_SYSTEM_PYTEST=1
 
     matrix:
         # Make sure that egg_info works without dependencies

@@ -7,8 +7,8 @@ implemented and doesn't check anything about correctness.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import itertools
+import pytest
 
-from astropy.tests.helper import pytest
 from astropy import units as u
 from astropy.coordinates import SkyCoord
 from astropy.wcs import WCS

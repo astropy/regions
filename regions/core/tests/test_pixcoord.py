@@ -2,7 +2,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import numpy as np
 from numpy.testing import assert_equal, assert_allclose
-from astropy.tests.helper import pytest
+import pytest
 from ..._utils.examples import make_example_dataset
 from ..pixcoord import PixCoord
 

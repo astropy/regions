@@ -5,8 +5,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import numpy as np
 from numpy.testing import assert_equal, assert_allclose
-
-from astropy.tests.helper import pytest
+import pytest
 
 from ...core import PixCoord, BoundingBox
 from .utils import ASTROPY_LT_13, HAS_SHAPELY  # noqa
