@@ -53,6 +53,7 @@ def ds9_objects_to_string(regions, coordsys='fk5', fmt='.4f', radunit='deg'):
         'circle': 'circle({x:' + fmt + '},{y:' + fmt + '},{r:' + fmt + '}' + radunitstr + ')',
         'ellipse': 'ellipse({x:' + fmt + '},{y:' + fmt + '},{r1:' + fmt + '}' + radunitstr + ',{r2:' + fmt + '}' + radunitstr + ',{ang:' + fmt + '})',
         'polygon': 'polygon({c})',
+        'point': 'point({{x:{fmt}}}, {{y:{fmt}}})'.format(fmt=fmt),
     }
 
     output = '# Region file format: DS9 astropy/regions\n'
@@ -67,7 +68,7 @@ def ds9_objects_to_string(regions, coordsys='fk5', fmt='.4f', radunit='deg'):
 
     for reg in regions:
 
-        meta_str = " ".join("{0}={1}" for key,val in reg.items())
+        meta_str = " ".join("{0}={1}".format(key,val) for key,val in reg.meta.items())
 
         if isinstance(reg, shapes.circle.CircleSkyRegion):
             x = float(reg.center.transform_to(frame).spherical.lon.to('deg').value)
