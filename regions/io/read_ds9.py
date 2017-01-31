@@ -509,7 +509,7 @@ def meta_parser(meta_str):
     sometimes the values can also be whitespace separated.
     """
     meta_token_split = [x for x in meta_token.split(meta_str.strip()) if x]
-    equals_inds = [i for i, x in enumerate(meta_token_split) if x is '=']
+    equals_inds = [i for i, x in enumerate(meta_token_split) if x == '=']
     result = {meta_token_split[ii - 1]:
               " ".join(meta_token_split[ii + 1:jj - 1 if jj is not None else None])
               for ii, jj in zip(equals_inds, equals_inds[1:] + [None])}
