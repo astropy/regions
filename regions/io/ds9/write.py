@@ -13,8 +13,8 @@ coordsys_name_mapping = dict(zip(coordinates.frame_transform_graph.get_names(),
 coordsys_name_mapping['ecliptic'] = 'geocentrictrueecliptic'  # needs expert attention TODO
 
 
-def ds9_objects_to_string(regions, coordsys='fk5', fmt='.4f', radunit='deg'):
-    """Convert list of regions ato ds9 region strings.
+def ds9_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
+    """Convert list of regions to ds9 region strings.
 
     Parameters
     ----------
@@ -25,6 +25,9 @@ def ds9_objects_to_string(regions, coordsys='fk5', fmt='.4f', radunit='deg'):
     -------
     region_string : str
         ds9 region string
+    fmt : str
+        A python string format defining the output precision.  Default is .6f,
+        which is accurate to 0.0036 arcseconds.
 
 
     Examples
@@ -55,6 +58,9 @@ def ds9_objects_to_string(regions, coordsys='fk5', fmt='.4f', radunit='deg'):
         'polygon': 'polygon({c})',
         'point': 'point({{x:{fmt}}}, {{y:{fmt}}})'.format(fmt=fmt),
     }
+    for key in ds9_strings:
+        # include must be a prefix "-" or ""
+        ds9_strings[key] = "{include}" + ds9_strings[key]
 
     output = '# Region file format: DS9 astropy/regions\n'
     output += '{}\n'.format(coordsys)
@@ -68,7 +74,10 @@ def ds9_objects_to_string(regions, coordsys='fk5', fmt='.4f', radunit='deg'):
 
     for reg in regions:
 
-        meta_str = " ".join("{0}={1}".format(key,val) for key,val in reg.meta.items())
+        include = reg.meta['include']
+
+        meta_str = " ".join("{0}={1}".format(key,val) for key,val in
+                            reg.meta.items() if key not in ('include',))
 
         if isinstance(reg, shapes.circle.CircleSkyRegion):
             x = float(reg.center.transform_to(frame).spherical.lon.to('deg').value)
@@ -117,6 +126,8 @@ def ds9_objects_to_string(regions, coordsys='fk5', fmt='.4f', radunit='deg'):
             temp = [val.format(x) for _ in coords for x in _]
             c = ",".join(temp)
             line = ds9_strings['polygon'].format(**locals())
+        else:
+            raise ValueError("Cannot write {0}".format(reg))
 
         output += "{0} # {1} \n".format(line, meta_str)
 

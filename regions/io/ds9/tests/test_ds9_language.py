@@ -44,11 +44,20 @@ def test_fk5(filename):
     # print(actual)
     # 1/0
 
-    reference_file = get_pkg_data_filename('data/fk5_reference.reg')
+    if 'strip' in filename:
+        reference_file = get_pkg_data_filename('data/fk5_strip_reference.reg')
+    else:
+        # preserves metadata
+        reference_file = get_pkg_data_filename('data/fk5_reference.reg')
+
     with open(reference_file, 'r') as fh:
         desired = fh.read()
 
-    assert actual == desired
+    # since metadata is not required to preserve order, we have to do a more
+    # complex comparison
+    desired_lines = [set(line.split()) for line in desired.split("\n")]
+    for line in actual.split("\n"):
+        assert set(line.split()) in desired_lines
 
 
 @pytest.mark.parametrize('filename',
