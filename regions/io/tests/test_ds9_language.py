@@ -164,3 +164,11 @@ def test_global_parser():
                                 'select': '1',
                                 'fixed': '0', 'width': '1', 'edit': '1',
                                 'delete': '1'}
+
+def test_ds9_color():
+    """Color parsing test"""
+    ds9_str = '# Region file format: DS9 astropy/regions\nfk5\ncircle(42.0000,43.0000,3.0000) # color=green\ncircle(43.0000,43.0000,3.0000) # color=orange\n'
+    regions = ds9_string_to_objects(ds9_str)
+
+    assert regions[0].visual['color'] == 'green'
+    assert regions[1].visual['color'] == 'orange'
