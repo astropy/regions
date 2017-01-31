@@ -172,3 +172,21 @@ def test_ds9_color():
 
     assert regions[0].visual['color'] == 'green'
     assert regions[1].visual['color'] == 'orange'
+
+def test_ds9_color_override_global():
+    """Color parsing test in the presence of a global"""
+    global_test_str = str('global color=blue dashlist=8 3 width=1'
+                          ' font="helvetica 10 normal roman" select=1'
+                          ' highlite=1 dash=0 fixed=0 edit=1 move=1'
+                          ' delete=1 include=1 source=1')
+
+    ds9_str = '# Region file format: DS9 astropy/regions\n{global_str}\nfk5\n'
+    reg1str = "circle(42.0000,43.0000,3.0000) # color=green"
+    reg2str = "circle(43.0000,43.0000,3.0000) # color=orange"
+    reg3str = "circle(43.0000,43.0000,3.0000)"
+    ds9_str = ds9_str.format(global_str=global_test_str) + "\n".join([reg1str, reg2str, reg3str])
+    regions = ds9_string_to_objects(ds9_str)
+
+    assert regions[0].visual['color'] == 'green'
+    assert regions[1].visual['color'] == 'orange'
+    assert regions[2].visual['color'] == 'blue'
