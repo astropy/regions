@@ -3,6 +3,7 @@ from __future__ import absolute_import, division, print_function
 import string
 import itertools
 import re
+import copy
 from astropy import units as u
 from astropy import coordinates
 from astropy.coordinates import BaseCoordinateFrame
@@ -301,8 +302,10 @@ def ds9_string_to_region_list(region_string, errors='strict'):
                 # set some global metadata from the 'global' header
                 _, global_meta = parsed
             elif parsed:
-                region_type, coordlist, meta, composite, include = parsed
-                meta.update(global_meta)
+                # local meta must override global meta
+                meta = copy.copy(global_meta)
+                region_type, coordlist, meta_, composite, include = parsed
+                meta.update(meta_)
                 meta['include'] = include
                 log.debug("Region type = {0}.  Composite={1}"
                           .format(region_type, composite))
@@ -506,9 +509,9 @@ def meta_parser(meta_str):
     sometimes the values can also be whitespace separated.
     """
     meta_token_split = [x for x in meta_token.split(meta_str.strip()) if x]
-    equals_inds = [i for i, x in enumerate(meta_token_split) if x is '=']
+    equals_inds = [i for i, x in enumerate(meta_token_split) if x == '=']
     result = {meta_token_split[ii - 1]:
-                  " ".join(meta_token_split[ii + 1:jj - 1 if jj is not None else None])
+              " ".join(meta_token_split[ii + 1:jj - 1 if jj is not None else None])
               for ii, jj in zip(equals_inds, equals_inds[1:] + [None])}
 
     return result
