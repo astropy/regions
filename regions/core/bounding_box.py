@@ -74,7 +74,7 @@ class BoundingBox(object):
         self.iymax = iymax
 
     @classmethod
-    def _from_float(cls, xmin, xmax, ymin, ymax):
+    def from_float(cls, xmin, xmax, ymin, ymax):
         """
         Return the smallest bounding box that fully contains a given
         rectangle defined by float coordinate values.
@@ -108,17 +108,17 @@ class BoundingBox(object):
         Examples
         --------
         >>> from regions import BoundingBox
-        >>> BoundingBox._from_float(xmin=1.0, xmax=10.0, ymin=2.0, ymax=20.0)
+        >>> BoundingBox.from_float(xmin=1.0, xmax=10.0, ymin=2.0, ymax=20.0)
         BoundingBox(ixmin=1, ixmax=11, iymin=2, iymax=21)
 
-        >>> BoundingBox._from_float(xmin=1.4, xmax=10.4, ymin=1.6, ymax=10.6)
+        >>> BoundingBox.from_float(xmin=1.4, xmax=10.4, ymin=1.6, ymax=10.6)
         BoundingBox(ixmin=1, ixmax=11, iymin=2, iymax=12)
         """
 
         ixmin = int(np.floor(xmin + 0.5))
-        ixmax = int(np.floor(xmax + 1.5))
+        ixmax = int(np.ceil(xmax + 0.5))
         iymin = int(np.floor(ymin + 0.5))
-        iymax = int(np.floor(ymax + 1.5))
+        iymax = int(np.ceil(ymax + 0.5))
 
         return cls(ixmin, ixmax, iymin, iymax)
 
