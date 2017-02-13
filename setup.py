@@ -110,7 +110,6 @@ setup(name=PACKAGENAME,
       extras_require=dict(
           plot=[
               'matplotlib',
-              'wcsaxes',
           ],
           test=[
               'pytest-mpl',

@@ -23,7 +23,6 @@ enable_deprecations_as_exceptions()
 # astropy affiliated packages.
 try:
     PYTEST_HEADER_MODULES['Astropy'] = 'astropy'
-    PYTEST_HEADER_MODULES['wcsaxes'] = 'wcsaxes'
     del PYTEST_HEADER_MODULES['h5py']
     del PYTEST_HEADER_MODULES['Pandas']
 except KeyError:

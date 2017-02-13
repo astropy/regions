@@ -83,5 +83,5 @@ Optional dependencies
 The following packages are optional dependencies, install if needed:
 
 * `shapely`_ for advanced pixel region operations
-* `matplotlib`_ and `wcsaxes`_ for plotting regions
+* `matplotlib`_ for plotting regions
 * maybe `spherical_geometry`_ for polygons (not used yet)

@@ -3,6 +3,5 @@
 .. _photutils: http://photutils.readthedocs.io/en/latest/photutils/aperture.html
 .. _matplotlib: http://matplotlib.org/
 .. _shapely: http://toblerity.org/shapely/manual.html
-.. _wcsaxes: http://wcsaxes.readthedocs.io/en/latest/
 .. _Github repository: https://github.com/astropy/regions
 .. _Region documentation: http://astropy-regions.readthedocs.io/en/latest/

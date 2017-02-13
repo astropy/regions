@@ -56,7 +56,6 @@ setup_cfg = dict(conf.items('metadata'))
 del intersphinx_mapping['scipy']
 del intersphinx_mapping['h5py']
 intersphinx_mapping['photutils'] = ('http://photutils.readthedocs.io/en/latest/', None)
-intersphinx_mapping['wcsaxes'] = ('http://wcsaxes.readthedocs.io/en/latest/', None)
 
 # If your documentation needs a minimal Sphinx version, state it here.
 #needs_sphinx = '1.2'

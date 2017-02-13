@@ -4,5 +4,4 @@ channels:
 dependencies:
 - matplotlib
 - astropy
-- wcsaxes
 - cython

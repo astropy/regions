@@ -867,8 +867,7 @@ method. To plot them, convert them to a pixel region first:
 We do plan to add extensive documentation on sky region plotting, or to
 add methods on sky region to do it directly in the future
 (see https://github.com/astropy/regions/issues/76 ),
-after the polygon region classes are developed and ``wcsaxes`` is merged
-in the Astropy core package.
+after the polygon region classes are developed.
 
 An example of how to plot sky regions on a sky image is shown above.
 
