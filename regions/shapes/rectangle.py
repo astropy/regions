@@ -95,7 +95,7 @@ class RectanglePixelRegion(PixelRegion):
         ymin = self.center.y - radius
         ymax = self.center.y + radius
 
-        return BoundingBox._from_float(xmin, xmax, ymin, ymax)
+        return BoundingBox.from_float(xmin, xmax, ymin, ymax)
 
     def to_mask(self, mode='center', subpixels=5):
 

@@ -92,7 +92,7 @@ class EllipsePixelRegion(PixelRegion):
         ymin = self.center.y - max(self.major, self.minor)
         ymax = self.center.y + max(self.major, self.minor)
 
-        return BoundingBox._from_float(xmin, xmax, ymin, ymax)
+        return BoundingBox.from_float(xmin, xmax, ymin, ymax)
 
     def to_mask(self, mode='center', subpixels=5):
 

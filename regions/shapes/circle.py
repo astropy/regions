@@ -74,7 +74,7 @@ class CirclePixelRegion(PixelRegion):
         ymin = self.center.y - self.radius
         ymax = self.center.y + self.radius
 
-        return BoundingBox._from_float(xmin, xmax, ymin, ymax)
+        return BoundingBox.from_float(xmin, xmax, ymin, ymax)
 
     def to_mask(self, mode='center', subpixels=1):
 

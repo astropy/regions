@@ -60,7 +60,7 @@ class PolygonPixelRegion(PixelRegion):
         xmax = self.vertices.x.max()
         ymin = self.vertices.y.min()
         ymax = self.vertices.y.max()
-        return BoundingBox._from_float(xmin, xmax, ymin, ymax)
+        return BoundingBox.from_float(xmin, xmax, ymin, ymax)
 
     def to_mask(self, mode='center', subpixels=5):
 
