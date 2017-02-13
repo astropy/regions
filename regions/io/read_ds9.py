@@ -405,14 +405,20 @@ def line_parser(line, coordsys=None, errors='strict'):
             if region_type == 'ellipse':
                 language_spec[region_type] = itertools.chain((coordinate, coordinate), itertools.cycle((radius,)))
 
-            parsed_angles = [
-                (x, y) for x, y in zip(parsed[:-1:2], parsed[1::2])
-                if isinstance(x, coordinates.Angle) and isinstance(x, coordinates.Angle)
-                ]
+            parsed_angles = [(x, y)
+                             for x, y in zip(parsed[:-1:2], parsed[1::2])
+                             if (isinstance(x, coordinates.Angle) and
+                                 isinstance(y, coordinates.Angle))
+                            ]
             frame = coordinates.frame_transform_graph.lookup_name(coordsys_name_mapping[coordsys])
 
             lon, lat = zip(*parsed_angles)
-            lon, lat = u.Quantity(lon), u.Quantity(lat)
+            if hasattr(lon, '__len__') and hasattr(lon, '__lat__') and len(lon) == 1 and len(lat==1):
+                # force entries to be scalar if they are length-1
+                lon, lat = u.Quantity(lon[0]), u.Quantity(lat[0])
+            else:
+                # otherwise, they are vector quantitites
+                lon, lat = u.Quantity(lon), u.Quantity(lat)
             sphcoords = coordinates.UnitSphericalRepresentation(lon, lat)
             coords = frame(sphcoords)
 
@@ -459,7 +465,7 @@ def type_parser(string_rep, specification, coordsys):
     ----------
     string_rep : str
         The string containing the coordinates.  For example, if your region is
-        `circle(1,2,3)` this string would be `(1,2,3)`
+        `circle(1,2,3)` this string would be `1,2,3`
     specification : iterable
         An iterable of coordinate specifications.  For example, for a circle,
         this would be a list of (coordinate, coordinate, radius).  Each
