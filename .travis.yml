@@ -28,7 +28,7 @@ env:
         - SETUP_CMD='test'
         - MAIN_CMD='python setup.py'
         - PIP_DEPENDENCIES=''
-        - CONDA_DEPENDENCIES='Cython shapely wcsaxes pytest-arraydiff'
+        - CONDA_DEPENDENCIES='Cython shapely pytest-arraydiff'
         - CONDA_CHANNELS='astropy'
         - SETUP_XVFB=True
 
@@ -69,7 +69,7 @@ matrix:
         - python: 3.4
           env: NUMPY_VERSION=1.9
         - python: 3.3
-          env: NUMPY_VERSION=1.8 PIP_DEPENDENCIES='wcsaxes pytest-arraydiff'
+          env: NUMPY_VERSION=1.8 PIP_DEPENDENCIES='pytest-arraydiff'
                CONDA_DEPENDENCIES='Cython shapely'
         - python: 2.7
           env: NUMPY_VERSION=1.7
