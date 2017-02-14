@@ -4,7 +4,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import numpy as np
 
-from astropy.wcs.utils import skycoord_to_pixel
+from astropy.wcs.utils import skycoord_to_pixel, pixel_to_skycoord
 
 from ..core import PixelRegion, SkyRegion, Mask, BoundingBox, PixCoord
 from .._geometry import polygonal_overlap_grid
@@ -50,8 +50,13 @@ class PolygonPixelRegion(PixelRegion):
         raise NotImplementedError
 
     def to_sky(self, wcs, mode='local', tolerance=None):
-        # TODO: needs to be implemented
-        raise NotImplementedError
+        if mode != 'local':
+            raise NotImplementedError
+        if tolerance is not None:
+            raise NotImplementedError
+
+        vertices_sky = pixel_to_skycoord(self.vertices.x, self.vertices.y, wcs)
+        return PolygonSkyRegion(vertices=vertices_sky)
 
     @property
     def bounding_box(self):
@@ -130,11 +135,11 @@ class PolygonSkyRegion(SkyRegion):
         raise NotImplementedError
 
     def to_pixel(self, wcs, mode='local', tolerance=None):
+        if mode != 'local':
+            raise NotImplementedError
+        if tolerance is not None:
+            raise NotImplementedError
 
-        if mode == 'local':
-            x, y = skycoord_to_pixel(self.vertices, wcs)
-            vertices_pix = PixCoord(x, y)
-            return PolygonPixelRegion(vertices_pix)
-        else:
-
-            raise NotImplementedError()
+        x, y = skycoord_to_pixel(self.vertices, wcs)
+        vertices_pix = PixCoord(x, y)
+        return PolygonPixelRegion(vertices_pix)

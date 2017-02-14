@@ -6,11 +6,18 @@ from astropy import units as u
 from astropy.coordinates import SkyCoord
 from astropy.tests.helper import pytest, assert_quantity_allclose
 from astropy.utils.data import get_pkg_data_filename
-from astropy.io.fits import getheader
+from astropy.io import fits
 from astropy.wcs import WCS
 from ...core import PixCoord
 from ..circle import CirclePixelRegion, CircleSkyRegion
 from .utils import ASTROPY_LT_13, HAS_MATPLOTLIB
+
+
+@pytest.fixture(scope='session')
+def wcs():
+    filename = get_pkg_data_filename('data/example_header.fits')
+    header = fits.getheader(filename)
+    return WCS(header)
 
 
 class TestCirclePixelRegion:
@@ -87,13 +94,9 @@ class TestCircleSkyRegion:
         assert repr(self.reg) == reg_repr
         assert str(self.reg) == reg_str
 
-    def test_transformation(self):
+    def test_transformation(self, wcs):
         skycoord = SkyCoord(3 * u.deg, 4 * u.deg, frame='galactic')
         skycircle = CircleSkyRegion(skycoord, 2 * u.arcsec)
-
-        headerfile = get_pkg_data_filename('data/example_header.fits')
-        h = getheader(headerfile)
-        wcs = WCS(h)
 
         pixcircle = skycircle.to_pixel(wcs)
 

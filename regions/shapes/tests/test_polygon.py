@@ -2,12 +2,20 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import numpy as np
 from numpy.testing import assert_allclose, assert_equal
-from astropy.tests.helper import pytest
+from astropy.tests.helper import pytest, assert_quantity_allclose
 from astropy import units as u
 from astropy.coordinates import SkyCoord
+from ..._utils.examples import make_example_dataset
 from ...core import PixCoord, BoundingBox
 from ..polygon import PolygonPixelRegion, PolygonSkyRegion
 from .utils import ASTROPY_LT_13, HAS_MATPLOTLIB
+
+
+@pytest.fixture(scope='session')
+def wcs():
+    config = dict(crpix=(18, 9), cdelt=(-10, 10), shape=(18, 36))
+    dataset = make_example_dataset(config=config)
+    return dataset.wcs
 
 
 class TestPolygonPixelRegion:
@@ -121,3 +129,19 @@ class TestPolygonSkyRegion:
 
         assert repr(self.poly) == reg_repr
         assert str(self.poly) == reg_str
+
+    def test_transformation(self, wcs):
+
+        pixpoly = self.poly.to_pixel(wcs)
+
+        assert_allclose(pixpoly.vertices.x, [11.187992, 10.976332, 11.024032], atol=1e-5)
+        assert_allclose(pixpoly.vertices.y, [1.999486, 2.039001, 2.077076], atol=1e-5)
+
+        poly = pixpoly.to_sky(wcs)
+
+        # TODO: we should probably assert something about frame attributes,
+        # or generally some better way to check if two SkyCoord are the same?
+        # For now, we use the folloing line to transform back to ICRS (`poly` is in Galactic, same as WCS)
+        poly = PolygonSkyRegion(vertices=poly.vertices.transform_to(self.poly.vertices))
+        assert_quantity_allclose(poly.vertices.data.lon, self.poly.vertices.data.lon, atol=1e-3 * u.deg)
+        assert_quantity_allclose(poly.vertices.data.lat, self.poly.vertices.data.lat, atol=1e-3 * u.deg)
