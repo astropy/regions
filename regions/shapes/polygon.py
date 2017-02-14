@@ -24,8 +24,7 @@ class PolygonPixelRegion(PixelRegion):
     """
 
     def __init__(self, vertices, meta=None, visual=None):
-        # TODO: test that vertices is a 1D PixCoord
-        self.vertices = vertices
+        self.vertices = PixCoord._validate(vertices, name='vertices', expected='not scalar')
         self.meta = meta or {}
         self.visual = visual or {}
         self._repr_params = [('vertices', self.vertices)]
@@ -36,15 +35,12 @@ class PolygonPixelRegion(PixelRegion):
         raise NotImplementedError
 
     def contains(self, pixcoord):
-        if pixcoord.isscalar:
-            x = np.array([pixcoord.x], dtype=float)
-            y = np.array([pixcoord.y], dtype=float)
-        else:
-            x = pixcoord.x.astype(float)
-            y = pixcoord.y.astype(float)
-        return points_in_polygon(x, y,
-                                 self.vertices.x.astype(float),
-                                 self.vertices.y.astype(float)).astype(bool)
+        pixcoord = PixCoord._validate(pixcoord, 'pixcoord')
+        x = np.atleast_1d(np.asarray(pixcoord.x, dtype=float))
+        y = np.atleast_1d(np.asarray(pixcoord.y, dtype=float))
+        vx = np.asarray(self.vertices.x, dtype=float)
+        vy = np.asarray(self.vertices.y, dtype=float)
+        return points_in_polygon(x, y, vx, vy).astype(bool)
 
     def to_shapely(self):
         # TODO: needs to be implemented
