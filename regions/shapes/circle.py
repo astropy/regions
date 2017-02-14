@@ -11,7 +11,7 @@ from astropy.wcs.utils import pixel_to_skycoord
 
 from .polygon import PolygonSkyRegion
 
-from ..core import PixelRegion, SkyRegion, Mask, BoundingBox
+from ..core import PixCoord, PixelRegion, SkyRegion, Mask, BoundingBox
 from .._utils.wcs_helpers import skycoord_to_pixel_scale_angle
 from .._geometry import circular_overlap_grid, rotate_polygon
 
@@ -31,8 +31,7 @@ class CirclePixelRegion(PixelRegion):
     """
 
     def __init__(self, center, radius, meta=None, visual=None):
-        # TODO: test that center is a 0D PixCoord
-        self.center = center
+        self.center = PixCoord._validate(center, name='center', expected='scalar')
         self.radius = radius
         self.meta = meta or {}
         self.visual = visual or {}
@@ -43,6 +42,7 @@ class CirclePixelRegion(PixelRegion):
         return math.pi * self.radius ** 2
 
     def contains(self, pixcoord):
+        pixcoord = PixCoord._validate(pixcoord, name='pixcoord')
         return self.center.separation(pixcoord) < self.radius
 
     def to_shapely(self):
@@ -67,8 +67,6 @@ class CirclePixelRegion(PixelRegion):
         """
         Bounding box (`~regions.BoundingBox`).
         """
-
-        # Find exact bounds
         xmin = self.center.x - self.radius
         xmax = self.center.x + self.radius
         ymin = self.center.y - self.radius
@@ -77,9 +75,6 @@ class CirclePixelRegion(PixelRegion):
         return BoundingBox.from_float(xmin, xmax, ymin, ymax)
 
     def to_mask(self, mode='center', subpixels=1):
-
-        # NOTE: assumes this class represents a single circle
-
         self._validate_mode(mode, subpixels)
 
         if mode == 'center':
@@ -193,6 +188,8 @@ class CircleSkyRegion(SkyRegion):
 
         if mode == 'local':
             center, scale, _ = skycoord_to_pixel_scale_angle(self.center, wcs)
+            # The following line is needed to get a scalar PixCoord
+            center = PixCoord(float(center.x), float(center.y))
             radius = self.radius.to('deg').value * scale
             return CirclePixelRegion(center, radius)
 

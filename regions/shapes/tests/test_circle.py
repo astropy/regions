@@ -1,7 +1,7 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 from __future__ import absolute_import, division, print_function, unicode_literals
 import numpy as np
-from numpy.testing import assert_allclose
+from numpy.testing import assert_allclose, assert_equal
 from astropy import units as u
 from astropy.coordinates import SkyCoord
 from astropy.tests.helper import pytest, assert_quantity_allclose
@@ -17,6 +17,8 @@ class TestCirclePixelRegion:
     def setup(self):
         center = PixCoord(3, 4)
         self.reg = CirclePixelRegion(center, 2)
+        self.pixcoord_inside = PixCoord(3, 4)
+        self.pixcoord_outside = PixCoord(3, 0)
 
     def test_repr_str(self):
         reg_repr = '<CirclePixelRegion(PixCoord(x=3, y=4), radius=2)>'
@@ -25,6 +27,32 @@ class TestCirclePixelRegion:
         reg_str = ('Region: CirclePixelRegion\ncenter: PixCoord(x=3, y=4)\n'
                    'radius: 2')
         assert str(self.reg) == reg_str
+
+    def test_contains_scalar(self):
+        assert self.reg.contains(self.pixcoord_inside)
+        assert self.pixcoord_inside in self.reg
+
+        assert not self.reg.contains(self.pixcoord_outside)
+        assert self.pixcoord_outside not in self.reg
+
+    def test_contains_array_1d(self):
+        pixcoord = PixCoord([3, 3], [4, 0])
+        actual = self.reg.contains(pixcoord)
+        expected = [True, False]
+        assert_equal(actual, expected)
+
+        with pytest.raises(ValueError) as exc:
+            pixcoord in self.reg
+        assert 'coord must be scalar' in str(exc)
+
+    def test_contains_array_2d(self):
+        pixcoord = PixCoord(
+            [[3, 3, 3], [4, 4, 4]],
+            [[3, 3, 3], [0, 0, 0]],
+        )
+        actual = self.reg.contains(pixcoord)
+        expected = [[True, True, True], [False, False, False]]
+        assert_equal(actual, expected)
 
     def test_to_mask(self):
         mask = self.reg.to_mask(mode='exact')
