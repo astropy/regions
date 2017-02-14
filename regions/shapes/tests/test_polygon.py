@@ -1,12 +1,13 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 from __future__ import absolute_import, division, print_function, unicode_literals
+import numpy as np
 from numpy.testing import assert_allclose, assert_equal
-from astropy.tests.helper import pytest, assert_quantity_allclose
+from astropy.tests.helper import pytest
 from astropy import units as u
 from astropy.coordinates import SkyCoord
-from ...core import PixCoord
+from ...core import PixCoord, BoundingBox
 from ..polygon import PolygonPixelRegion, PolygonSkyRegion
-from .utils import ASTROPY_LT_13
+from .utils import ASTROPY_LT_13, HAS_MATPLOTLIB
 
 
 class TestPolygonPixelRegion:
@@ -58,6 +59,43 @@ class TestPolygonPixelRegion:
         actual = self.reg.contains(pixcoord)
         expected = [[True, True, True], [False, False, False]]
         assert_equal(actual, expected)
+
+    def test_bounding_box(self):
+        bbox = self.reg.bounding_box
+        assert bbox == BoundingBox(ixmin=0, ixmax=3, iymin=0, iymax=4)
+
+    def test_to_mask(self):
+        # The true area of this polygon is 3
+
+        mask = self.reg.to_mask(mode='center', subpixels=1)
+        assert_allclose(np.sum(mask.data), 5)
+
+        # Bounding box and output shape is independent of subpixels,
+        # so we only assert on it once here, not in the other cases below
+        assert mask.bbox == BoundingBox(ixmin=0, ixmax=3, iymin=0, iymax=4)
+        assert mask.data.shape == (4, 3)
+
+        # This example is with the default: subpixels=5
+        mask = self.reg.to_mask(mode='subpixels')
+        assert_allclose(np.sum(mask.data), 3.48)
+
+        mask = self.reg.to_mask(mode='subpixels', subpixels=8)
+        assert_allclose(np.sum(mask.data), 3.0)
+
+        mask = self.reg.to_mask(mode='subpixels', subpixels=9)
+        assert_allclose(np.sum(mask.data), 2.6790123456790127)
+
+        mask = self.reg.to_mask(mode='subpixels', subpixels=10)
+        assert_allclose(np.sum(mask.data), 3.0)
+
+        with pytest.raises(NotImplementedError):
+            self.reg.to_mask(mode='exact')
+
+    @pytest.mark.skipif('not HAS_MATPLOTLIB')
+    def test_as_patch(self):
+        patch = self.reg.as_patch()
+        expected = [[0, 0], [2, 0], [0, 3], [0, 0]]
+        assert_allclose(patch.xy, expected)
 
 
 class TestPolygonSkyRegion:

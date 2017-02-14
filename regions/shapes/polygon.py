@@ -69,6 +69,11 @@ class PolygonPixelRegion(PixelRegion):
             mode = 'subpixels'
             subpixels = 1
 
+        if mode == 'subpixels':
+            use_exact = 0
+        else:
+            use_exact = 1
+
         # Find bounding box and mask size
         bbox = self.bounding_box
         ny, nx = bbox.shape
@@ -79,16 +84,13 @@ class PolygonPixelRegion(PixelRegion):
         ymin = float(bbox.iymin) - 0.5
         ymax = float(bbox.iymax) - 0.5
 
-        if mode == 'subpixels':
-            use_exact = 0
-        else:
-            use_exact = 1
+        vx = np.asarray(self.vertices.x, dtype=float)
+        vy = np.asarray(self.vertices.y, dtype=float)
 
         fraction = polygonal_overlap_grid(
-            xmin, xmax, ymin, ymax, nx, ny,
-            self.vertices.x.astype(float),
-            self.vertices.y.astype(float),
-            use_exact, subpixels)
+            xmin, xmax, ymin, ymax,
+            nx, ny, vx, vy, use_exact, subpixels,
+        )
 
         return Mask(fraction, bbox=bbox)
 
