@@ -44,7 +44,7 @@ class TestPolygonPixelRegion:
         pixcoord = PixCoord([1, 1], [1, 2])
         actual = self.reg.contains(pixcoord)
         expected = [True, False]
-        assert_equal(result, )
+        assert_equal(actual, expected)
 
         with pytest.raises(ValueError) as exc:
             pixcoord in self.reg
@@ -58,25 +58,6 @@ class TestPolygonPixelRegion:
         actual = self.reg.contains(pixcoord)
         expected = [[True, True, True], [False, False, False]]
         assert_equal(actual, expected)
-
-    def _test_basic(self):
-        poly1 = PolygonPixelRegion(([10, 20, 20, 10, 10], [20, 20, 10, 10, 20]))
-
-        poly2 = PolygonPixelRegion(([15, 25, 25, 15, 15], [23, 23, 13, 13, 23]))
-
-        # assert_allclose(poly1.area, 100)
-        # assert_allclose(poly2.area, 100)
-
-        assert PixCoord(13, 12) in poly1
-        assert not PixCoord(13, 12) in poly2
-
-        coords = PixCoord([13, 8], [15, 15])
-        assert_equal(poly1.contains(coords), [False, True])
-
-        # poly3 = poly1.union(poly2)
-        # poly4 = poly1.intersection(poly2)
-        # assert_allclose(poly3.area, 165)
-        # assert_allclose(poly4.area, 35)
 
 
 class TestPolygonSkyRegion:
@@ -102,27 +83,3 @@ class TestPolygonSkyRegion:
 
         assert repr(self.poly) == reg_repr
         assert str(self.poly) == reg_str
-
-    def _test_basic(self):
-        """
-        TODO: implement these tests!
-
-        Just make sure that things don't crash, but no test of numerical accuracy
-        """
-
-        coords1 = SkyCoord([10, 20, 20, 10, 10] * u.deg, [20, 20, 10, 10, 20] * u.deg)
-        poly1 = PolygonSkyRegion(coords1)
-
-        coords1 = SkyCoord([15, 25, 25, 15, 15] * u.deg, [23, 23, 13, 13, 23] * u.deg)
-        poly2 = PolygonSkyRegion(coords1)
-
-        assert_quantity_allclose(poly1.area, 42 * u.sr)
-        assert_quantity_allclose(poly2.area, 42 * u.sr)
-
-        # TODO: test contains
-
-        poly3 = poly1.union(poly2)
-        poly4 = poly1.intersection(poly2)
-
-        assert_quantity_allclose(poly3.area, 42 * u.sr)
-        assert_quantity_allclose(poly4.area, 42 * u.sr)
