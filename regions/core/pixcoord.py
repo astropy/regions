@@ -72,10 +72,47 @@ class PixCoord(object):
         else:
             return np.array(val)
 
+    @staticmethod
+    def _validate(val, name, expected='any'):
+        """Validate that a given object is an appropriate `PixCoord`.
+
+        This is used for input validation throughout the regions package,
+        especially in the `__init__` method of pixel region classes.
+
+        Parameters
+        ----------
+        val : `PixCoord`
+            The object to check
+        name : str
+            Parameter name (used for error messages)
+        expected : {'any', 'scalar', 'not scalar'}
+            What kind of PixCoord to check for
+
+        Returns
+        -------
+        val : `PixCoord`
+            The input object (at the moment unmodified, might do fix-ups here later)
+        """
+        if not isinstance(val, PixCoord):
+            raise TypeError('{} must be a PixCoord'.format(name))
+
+        if expected == 'any':
+            pass
+        elif expected == 'scalar':
+            if not val.isscalar:
+                raise ValueError('{} must be a scalar PixCoord'.format(name))
+        elif expected == 'not scalar':
+            if val.isscalar:
+                raise ValueError('{} must be a non-scalar PixCoord'.format(name))
+        else:
+            raise ValueError('Invalid argument for `expected`: {}'.format(expected))
+
+        return val
+
     @property
     def isscalar(self):
         """Is this pixcoord a scalar? (a bool property)"""
-        return np.isscalar(self.x)
+        return np.isscalar(self.x) and np.isscalar(self.y)
 
     def __repr__(self):
         data = dict(name=self.__class__.__name__, x=self.x, y=self.y)
