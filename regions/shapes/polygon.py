@@ -54,7 +54,7 @@ class PolygonPixelRegion(PixelRegion):
         raise NotImplementedError
 
     @property
-    def bounding_box(self, mode='center'):
+    def bounding_box(self):
         xmin = self.vertices.x.min()
         xmax = self.vertices.x.max()
         ymin = self.vertices.y.min()

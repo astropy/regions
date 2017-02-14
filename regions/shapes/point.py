@@ -37,7 +37,7 @@ class PointPixelRegion(PixelRegion):
         raise NotImplementedError
 
     @property
-    def bounding_box(self, mode='center'):
+    def bounding_box(self):
         # TODO: needs to be implemented
         raise NotImplementedError
 
