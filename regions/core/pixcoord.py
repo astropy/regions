@@ -13,17 +13,11 @@ class PixCoord(object):
 
     This class can represent scalar or array pixel coordinates.
 
-    TODO: see examples below and / or in high-level docs section.
-
     The data members are either numbers or Numpy arrays
     (not `~astropy.units.Quantity` objects with unit "pixel").
 
     Given a `astropy.wcs.WCS` object, it can be transformed to and from a
     `~astropy.coordinates.SkyCoord` object.
-
-    TODO: 2-dim or n-dim arrays of pixel coordinates are not supported yet.
-    Having those would be very useful, e.g. for arrays of pixel coordinates in
-    a 2-dim image.
 
     Parameters
     ----------
@@ -34,23 +28,8 @@ class PixCoord(object):
 
     Examples
     --------
-    >>> from regions import PixCoord
 
-    Scalar pixel coordinate:
-
-    >>> pixcoord = PixCoord(x=1, y=11)
-    >>> print(pixcoord)
-    PixCoord
-    x : 1
-    y : 11
-
-    Array pixel coordinates:
-
-    >>> pixcoord = PixCoord(x=[1, 2], y=[11, 12])
-    >>> print(pixcoord)
-    PixCoord
-    x : [1 2]
-    y : [11 12]
+    Usage examples are provided in the :ref:`gs-coord` section of the docs.
     """
 
     def __init__(self, x, y):
@@ -166,7 +145,7 @@ class PixCoord(object):
         """Convert this coord object to a `shapely.geometry.Point` object.
         """
         if not self.isscalar:
-            raise TypeError('Scalar PixCoord cannot be converted to Shapely.')
+            raise TypeError('Non-scalar PixCoord cannot be converted to Shapely.')
 
         from shapely.geometry import Point
         return Point(self.x, self.y)

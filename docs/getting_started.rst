@@ -29,6 +29,8 @@ Some functions for region-based calculations (e.g. filtering a table of sky or
 pixel positions) as well as functions for region serialisation (e.g. to and from
 ds9 region string format) are available.
 
+.. _gs-ds:
+
 Dataset
 =======
 
@@ -112,16 +114,28 @@ forth between sky and pixel coordinates:
 This is an object-oriented thin wrapper around the functionality provided by `~astropy.wcs.WCS`
 and `astropy.wcs.utils`.
 
-Just like for `~astropy.coordinates.SkyCoord`, it is possible to use `~regions.PixCoord` objects
-to represent arrays of pixel coordinates:
+It is possible to create `~astropy.coordinates.SkyCoord` and `~regions.PixCoord` objects
+that represent arrays of pixel coordinates, and operations like transforming between sky-
+and pixel or region containment checks work as expected (i.e. return arrays of the same
+shape as the inputs, and perform operations on array entries independently.
 
 .. code-block:: python
 
+    # One-dimensional array of pixel coordinates
     >>> pixcoord = PixCoord(x=[0, 1], y=[2, 3])
     >>> pixcoord
     PixCoord(x=[0 1], y=[2 3])
-    >>> pixcoord.isscalar
-    False
+
+    # Two-dimensional array pixel coordinates:
+    >>> pixcoord = PixCoord(
+    ...     x=[[1, 2, 3], [4, 5, 6]],
+    ...     y=[[11, 12, 13], [14, 15, 16]]
+    ... )
+    >>> print(pixcoord)
+    PixCoord(x=[[1 2 3]
+     [4 5 6]], y=[[11 12 13]
+     [14 15 16]])
+
 
 To represent angles both on the sky and in an image, `~astropy.coordinates.Angle` objects
 or `~astropy.units.Quantity` objects with angular units can be used.
@@ -815,6 +829,8 @@ expose the intermediate "region list", which contains the extra attributes.
     and stored as region data members. These need to be documented and tests added,
     or removed.
 
+.. _gs-mpl:
+
 Matplotlib plotting
 ===================
 
@@ -871,6 +887,7 @@ after the polygon region classes are developed.
 
 An example of how to plot sky regions on a sky image is shown above.
 
+.. _gs-what-next:
 
 What next?
 ==========
