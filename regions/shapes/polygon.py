@@ -40,7 +40,10 @@ class PolygonPixelRegion(PixelRegion):
         y = np.atleast_1d(np.asarray(pixcoord.y, dtype=float))
         vx = np.asarray(self.vertices.x, dtype=float)
         vy = np.asarray(self.vertices.y, dtype=float)
-        return points_in_polygon(x, y, vx, vy).astype(bool)
+
+        shape = x.shape
+        mask = points_in_polygon(x.flatten(), y.flatten(), vx, vy).astype(bool)
+        return mask.reshape(shape)
 
     def to_shapely(self):
         # TODO: needs to be implemented

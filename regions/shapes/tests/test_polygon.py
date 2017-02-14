@@ -44,14 +44,12 @@ class TestPolygonPixelRegion:
         pixcoord = PixCoord([1, 1], [1, 2])
         actual = self.reg.contains(pixcoord)
         expected = [True, False]
-        assert_equal(actual, expected)
+        assert_equal(result, )
 
         with pytest.raises(ValueError) as exc:
             pixcoord in self.reg
         assert 'coord must be scalar' in str(exc)
 
-    # TODO: fix implementation to work with 2D arrays
-    @pytest.mark.xfail
     def test_contains_array_2d(self):
         pixcoord = PixCoord(
             [[1, 1, 1], [1, 1, 1]],
