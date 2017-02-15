@@ -101,14 +101,10 @@ def test_pixcoord_to_sky_scalar(wcs):
     assert_allclose(s.data.lat.deg, 10.003028030623508)
 
     p2 = PixCoord.from_sky(skycoord=s, wcs=wcs)
-    # This is what comes out for `x` and `y` at the moment:
-    # a 0-dim Numpy array with one number.
-    # As explained here, `np.isscalar(np.array(42))` is `False`:
-    # http://stackoverflow.com/questions/773030/why-are-0d-arrays-in-numpy-not-considered-scalar
     assert isinstance(p2.x, np.ndarray)
     assert p2.x.shape == tuple()
     assert p2.x.ndim == 0
-    assert not p2.isscalar
+    assert p2.isscalar
     assert_allclose(p2.x, p.x)
     assert_allclose(p2.y, p.y)
 

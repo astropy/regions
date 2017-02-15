@@ -91,7 +91,12 @@ class PixCoord(object):
     @property
     def isscalar(self):
         """Is this pixcoord a scalar? (a bool property)"""
-        return np.isscalar(self.x) and np.isscalar(self.y)
+        # TODO: what's the best solution to implement this?
+        # Maybe we should sub-class ShapedLikeNDArray?
+        # See https://github.com/astropy/regions/issues/108
+        # This is a temp solution that matches the bahaviour of SkyCoord
+        return np.asanyarray(self.x).shape == ()
+        # return np.isscalar(self.x) and np.isscalar(self.y)
 
     def __repr__(self):
         data = dict(name=self.__class__.__name__, x=self.x, y=self.y)
