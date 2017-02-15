@@ -27,7 +27,7 @@ PIXEL_REGIONS = [
 
 SKY_REGIONS = [
     CircleSkyRegion(ICRS(3 * u.deg, 4 * u.deg), radius=5 * u.deg),
-    EllipseSkyRegion(ICRS(3 * u.deg, 4 * u.deg), major=7, minor=5, angle=3 * u.deg),
+    EllipseSkyRegion(ICRS(3 * u.deg, 4 * u.deg), major=7 * u.deg, minor=5 * u.deg, angle=3 * u.deg),
     PolygonSkyRegion(ICRS([1, 4, 3] * u.deg, [2, 4, 4] * u.deg)),
     RectangleSkyRegion(ICRS(6 * u.deg, 5 * u.deg), width=3 * u.deg, height=5 * u.deg)
 ]
