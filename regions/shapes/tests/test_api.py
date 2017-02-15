@@ -58,7 +58,7 @@ def test_pix_area(region):
     try:
         area = region.area
         assert not isinstance(area, u.Quantity)
-    except NotImplementedError:
+    except AttributeError:
         pytest.xfail()
 
 
@@ -104,7 +104,7 @@ def test_sky_area(region):
     try:
         area = region.area
         assert isinstance(area, u.Quantity)
-    except NotImplementedError:
+    except AttributeError:
         pytest.xfail()
 
 

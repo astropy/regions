@@ -67,6 +67,7 @@ class RectanglePixelRegion(PixelRegion):
 
     @property
     def area(self):
+        """Region area (float)"""
         return self.width * self.height
 
     def contains(self, pixcoord):
@@ -191,6 +192,7 @@ class RectangleSkyRegion(SkyRegion):
 
     @property
     def area(self):
+        """Region area (`~astropy.units.Quantity`)"""
         return self.width * self.height
 
     def contains(self, skycoord):

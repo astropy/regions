@@ -22,10 +22,6 @@ class PointPixelRegion(PixelRegion):
         self.visual = visual or {}
         self._repr_params = None
 
-    @property
-    def area(self):
-        return 0
-
     def contains(self, pixcoord):
         return False
 
@@ -66,10 +62,6 @@ class PointSkyRegion(SkyRegion):
         self.meta = meta or {}
         self.visual = visual or {}
         self._repr_params = None
-
-    @property
-    def area(self):
-        return 0
 
     def contains(self, skycoord):
         return False

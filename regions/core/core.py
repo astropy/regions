@@ -134,12 +134,6 @@ class PixelRegion(Region):
             arrays. In future this could also be a `PixCoord` instance.
         """
 
-    @abc.abstractproperty
-    def area(self):
-        """
-        Returns the area of the region as a `~astropy.units.Quantity`.
-        """
-
     @abc.abstractmethod
     def to_sky(self, wcs, mode='local', tolerance=None):
         """
@@ -298,12 +292,6 @@ class SkyRegion(Region):
         ----------
         skycoord : `~astropy.coordinates.SkyCoord`
             The position or positions to check
-        """
-
-    @abc.abstractproperty
-    def area(self):
-        """
-        Returns the area of the region as a `~astropy.units.Quantity`.
         """
 
     @abc.abstractmethod
