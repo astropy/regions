@@ -1,5 +1,4 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import numpy as np
@@ -29,10 +28,11 @@ class PolygonPixelRegion(PixelRegion):
         self.visual = visual or {}
         self._repr_params = [('vertices', self.vertices)]
 
-    @property
-    def area(self):
-        # TODO: needs to be implemented
-        raise NotImplementedError
+    # # TODO: needs to be implemented
+    # @property
+    # def area(self):
+    #     """Region area (float)."""
+    #     raise NotImplementedError
 
     def contains(self, pixcoord):
         pixcoord = PixCoord._validate(pixcoord, 'pixcoord')
@@ -124,11 +124,6 @@ class PolygonSkyRegion(SkyRegion):
         self.meta = meta or {}
         self.visual = visual or {}
         self._repr_params = [('vertices', self.vertices)]
-
-    @property
-    def area(self):
-        # TODO: needs to be implemented
-        raise NotImplementedError
 
     def contains(self, skycoord):
         # TODO: needs to be implemented

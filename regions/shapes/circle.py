@@ -39,6 +39,7 @@ class CirclePixelRegion(PixelRegion):
 
     @property
     def area(self):
+        """Region area (float)."""
         return math.pi * self.radius ** 2
 
     def contains(self, pixcoord):
@@ -132,6 +133,7 @@ class CircleSkyRegion(SkyRegion):
 
     @property
     def area(self):
+        """Region area (`~astropy.units.Quantity`)"""
         return math.pi * self.radius ** 2
 
     def contains(self, skycoord):

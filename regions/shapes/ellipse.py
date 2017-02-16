@@ -66,6 +66,7 @@ class EllipsePixelRegion(PixelRegion):
 
     @property
     def area(self):
+        """Region area (float)"""
         return math.pi * self.major * self.minor
 
     def contains(self, pixcoord):
@@ -171,8 +172,8 @@ class EllipseSkyRegion(SkyRegion):
 
     @property
     def area(self):
-        # TODO: needs to be implemented
-        raise NotImplementedError
+        """Region sky area approximation (`~astropy.units.Quantity`)"""
+        return math.pi * self.major * self.minor
 
     def contains(self, skycoord):
         # TODO: needs to be implemented
