@@ -1,7 +1,13 @@
 name: regions-rtd
+
 channels:
-    - astropy
+  - conda-forge
+  - astropy
+
 dependencies:
-- matplotlib
-- astropy
-- cython
+  - python=3
+  - numpy
+  - cython
+  - matplotlib
+  - sphinx
+  - astropy
