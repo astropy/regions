@@ -85,16 +85,25 @@ class RectanglePixelRegion(PixelRegion):
     @property
     def bounding_box(self):
         """
-        Bounding box (`~regions.BoundingBox`).
+        The minimal bounding box (`~regions.BoundingBox`) enclosing the
+        rectangular region for the "exact" case.
         """
 
-        # Find exact bounds
-        # FIXME: this is not the minimal bounding box, and can be optimized
-        radius = np.hypot(self.width / 2, self.height / 2)
-        xmin = self.center.x - radius
-        xmax = self.center.x + radius
-        ymin = self.center.y - radius
-        ymax = self.center.y + radius
+        w2 = self.width / 2.
+        h2 = self.height / 2.
+        cos_angle = np.cos(self.angle)    # self.angle is a Quantity
+        sin_angle = np.sin(self.angle)    # self.angle is a Quantity
+        dx1 = abs(w2 * cos_angle - h2 * sin_angle)
+        dy1 = abs(w2 * sin_angle + h2 * cos_angle)
+        dx2 = abs(w2 * cos_angle + h2 * sin_angle)
+        dy2 = abs(w2 * sin_angle - h2 * cos_angle)
+        dx = max(dx1, dx2)
+        dy = max(dy1, dy2)
+
+        xmin = self.center.x - dx
+        xmax = self.center.x + dx
+        ymin = self.center.y - dy
+        ymax = self.center.y + dy
 
         return BoundingBox.from_float(xmin, xmax, ymin, ymax)
 
