@@ -1,9 +1,14 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 from __future__ import absolute_import, division, print_function, unicode_literals
+
 import math
+
+import numpy as np
 from astropy import units as u
+
 from ..core import PixelRegion, SkyRegion, Mask, BoundingBox
 from .._geometry import elliptical_overlap_grid
+
 
 __all__ = ['EllipsePixelRegion', 'EllipseSkyRegion']
 
@@ -84,14 +89,23 @@ class EllipsePixelRegion(PixelRegion):
     @property
     def bounding_box(self):
         """
-        Bounding box (`~regions.BoundingBox`).
+        The minimal bounding box (`~regions.BoundingBox`) enclosing the
+        exact elliptical region.
         """
-        # Find exact bounds
-        # FIXME: this is not the minimal bounding box, and can be optimized
-        xmin = self.center.x - max(self.major, self.minor)
-        xmax = self.center.x + max(self.major, self.minor)
-        ymin = self.center.y - max(self.major, self.minor)
-        ymax = self.center.y + max(self.major, self.minor)
+
+        cos_angle = np.cos(self.angle)    # self.angle is a Quantity
+        sin_angle = np.sin(self.angle)    # self.angle is a Quantity
+        ax = self.major * cos_angle
+        ay = self.major * sin_angle
+        bx = self.minor * -sin_angle
+        by = self.minor * cos_angle
+        dx = np.sqrt(ax*ax + bx*bx)
+        dy = np.sqrt(ay*ay + by*by)
+
+        xmin = self.center.x - dx
+        xmax = self.center.x + dx
+        ymin = self.center.y - dy
+        ymax = self.center.y + dy
 
         return BoundingBox.from_float(xmin, xmax, ymin, ymax)
 
