@@ -39,10 +39,43 @@ class TestRectanglePixelRegion:
         # `matplotlib.patches.Rectangle` currently doesn't expose `angle`.
         # See https://github.com/matplotlib/matplotlib/issues/7536
         # In the far future, when it's available in the matplotlib versions
-        # we support, we could re-activate a tests here.
+        # we support, we could re-activate a test here.
         # For now, we could also add an assert on `patch.get_verts()` if
-        # it's considered important to test that the rotation was done correctly.
+        # it's considered important to test that the rotation was done
+        # correctly.
         # assert_allclose(patch._angle, 5)
+
+
+def test_rectangular_pixel_region_bbox():
+    # odd sizes
+    width = 7
+    height = 3
+    a = RectanglePixelRegion(PixCoord(50, 50), width=width, height=height,
+                             angle=0.*u.deg)
+    assert a.bounding_box.shape == (height, width)
+
+    a = RectanglePixelRegion(PixCoord(50.5, 50.5), width=width, height=height,
+                             angle=0.*u.deg)
+    assert a.bounding_box.shape == (height + 1, width + 1)
+
+    a = RectanglePixelRegion(PixCoord(50, 50), width=width, height=height,
+                             angle=90.*u.deg)
+    assert a.bounding_box.shape == (width, height)
+
+    # even sizes
+    width = 8
+    height = 4
+    a = RectanglePixelRegion(PixCoord(50, 50), width=width, height=height,
+                             angle=0.*u.deg)
+    assert a.bounding_box.shape == (height + 1, width + 1)
+
+    a = RectanglePixelRegion(PixCoord(50.5, 50.5), width=width, height=height,
+                             angle=0.*u.deg)
+    assert a.bounding_box.shape == (height, width)
+
+    a = RectanglePixelRegion(PixCoord(50.5, 50.5), width=width, height=height,
+                             angle=90.*u.deg)
+    assert a.bounding_box.shape == (width, height)
 
 
 class TestRectangleSkyRegion:
