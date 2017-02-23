@@ -123,7 +123,7 @@ class EllipsePixelRegion(PixelRegion):
         fraction = elliptical_overlap_grid(
             xmin, xmax, ymin, ymax, nx, ny,
             self.major, self.minor,
-            self.angle.to(u.deg).value,
+            self.angle.to(u.rad).value,
             use_exact, subpixels,
         )
 

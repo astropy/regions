@@ -13,9 +13,9 @@ environment:
       # For this package-template, we include examples of Cython modules,
       # so Cython is required for testing. If your package does not include
       # Cython code, you can set CONDA_DEPENDENCIES=''
-      CONDA_CHANNELS: "defaults conda-forge"
-      CONDA_DEPENDENCIES: "Cython shapely"
-      PIP_DEPENDENCIES: "https://github.com/astrofrog/pytest-arraydiff/archive/master.zip"
+      CONDA_CHANNELS: "defaults conda-forge astropy"
+      CONDA_DEPENDENCIES: "Cython pytest-arraydiff"
+      PIP_DEPENDENCIES: "shapely"
 
   matrix:
 

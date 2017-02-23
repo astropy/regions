@@ -126,7 +126,7 @@ class RectanglePixelRegion(PixelRegion):
         fraction = rectangular_overlap_grid(
             xmin, xmax, ymin, ymax, nx, ny,
             self.width, self.height,
-            self.angle.to(u.deg).value,
+            self.angle.to(u.rad).value,
             use_exact, subpixels,
         )
 
