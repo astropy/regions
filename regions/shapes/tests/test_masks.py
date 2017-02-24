@@ -14,7 +14,7 @@ from ...shapes.polygon import PolygonPixelRegion
 
 REGIONS = [
     CirclePixelRegion(PixCoord(3.981987, 4.131378), radius=3.3411),
-    EllipsePixelRegion(PixCoord(3.981987, 4.131378), major=2.2233, minor=3.3411, angle=32 * u.deg),
+    EllipsePixelRegion(PixCoord(5.981987, 4.131378), major=5.2233, minor=3.3411, angle=12 * u.deg),
     RectanglePixelRegion(PixCoord(5.981987, 4.131378), width=7.2233, height=4.3411, angle=12 * u.deg),
     PolygonPixelRegion(PixCoord([-2.334, 3.631, 1.122, -1.341], [-3.121, -2.118, 2.987, 1.759])),
 ]

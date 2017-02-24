@@ -65,3 +65,19 @@ class TestEllipseSkyRegion:
 
         assert repr(self.reg) == reg_repr
         assert str(self.reg) == reg_str
+
+
+def test_ellipse_pixel_region_bbox():
+    a = 7
+    b = 3
+    reg = EllipsePixelRegion(PixCoord(50, 50), major=a, minor=b,
+                             angle=0.*u.deg)
+    assert reg.bounding_box.shape == (2*b + 1, 2*a + 1)
+
+    reg = EllipsePixelRegion(PixCoord(50.5, 50.5), major=a, minor=b,
+                             angle=0.*u.deg)
+    assert reg.bounding_box.shape == (2*b, 2*a)
+
+    reg = EllipsePixelRegion(PixCoord(50, 50), major=a, minor=b,
+                             angle=90.*u.deg)
+    assert reg.bounding_box.shape == (2*a + 1, 2*b + 1)
