@@ -86,7 +86,7 @@ class RectanglePixelRegion(PixelRegion):
     def bounding_box(self):
         """
         The minimal bounding box (`~regions.BoundingBox`) enclosing the
-        rectangular region for the "exact" case.
+        exact rectangular region.
         """
 
         w2 = self.width / 2.
