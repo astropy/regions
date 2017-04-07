@@ -22,9 +22,9 @@ class EllipsePixelRegion(PixelRegion):
     center : `~regions.PixCoord`
         Center position
     major : float
-        Minor radius
-    minor : float
         Major radius
+    minor : float
+        Minor radius
     angle : `~astropy.units.Quantity`
         The rotation angle of the ellipse.
         If set to zero (the default), the major
