@@ -74,8 +74,9 @@ def ds9_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
 
     for reg in regions:
 
-        # default if unspecified is that include is True
-        include = reg.meta.get('include', True)
+        # default if unspecified is that include is True, which means we
+        # prepend nothing
+        include = reg.meta.get('include', '')
 
         meta_str = " ".join("{0}={{{1}}}".format(key,val) for key,val in
                             reg.meta.items() if key not in ('include',))
