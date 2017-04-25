@@ -74,9 +74,10 @@ def ds9_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
 
     for reg in regions:
 
-        include = reg.meta['include']
+        # default if unspecified is that include is True
+        include = reg.meta.get('include', True)
 
-        meta_str = " ".join("{0}={1}".format(key,val) for key,val in
+        meta_str = " ".join("{0}={{{1}}}".format(key,val) for key,val in
                             reg.meta.items() if key not in ('include',))
 
         if isinstance(reg, shapes.circle.CircleSkyRegion):
