@@ -383,9 +383,9 @@ can be called, which calls the special ``__contains__`` method defined on the re
     True
     >>> SkyCoord(50, 60, unit='deg') in sky_reg
     False
-    >>> PixCoord(29, 3) in pix_reg
+    >>> PixCoord(55, 40) in pix_reg
     True
-    >>> PixCoord(29, 10) in pix_reg
+    >>> PixCoord(55, 200) in pix_reg
     False
 
 The ``in`` operator only works for scalar coordinates,
