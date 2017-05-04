@@ -3,9 +3,13 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import numpy as np
 from astropy import units as u
+from astropy.coordinates import SkyCoord
 
-from ..core import PixelRegion, SkyRegion, Mask, BoundingBox
+from .polygon import PolygonSkyRegion
+
+from ..core import PixCoord, PixelRegion, SkyRegion, Mask, BoundingBox
 from .._geometry import rectangular_overlap_grid
+from .._utils.wcs_helpers import skycoord_to_pixel_scale_angle
 
 __all__ = ['RectanglePixelRegion', 'RectangleSkyRegion']
 
@@ -208,6 +212,66 @@ class RectangleSkyRegion(SkyRegion):
         # TODO: needs to be implemented
         raise NotImplementedError
 
-    def to_pixel(self, wcs, mode='local', tolerance=None):
-        # TODO: needs to be implemented
-        raise NotImplementedError
+    def to_pixel(self, wcs, mode='local', tolerance=100):
+        """
+        Given a WCS, convert the rectangle to a best-approximation rectangle in
+        pixel dimensions.
+
+        Parameters
+        ----------
+        wcs : `~astropy.wcs.WCS`
+            A world coordinate system
+        mode : 'local' or not
+            not implemented
+        tolerance : int
+            not implemented
+
+        Returns
+        -------
+        RectanglePixelRegion
+        """
+
+        if mode == 'local':
+            center, scale, angle = skycoord_to_pixel_scale_angle(self.center, wcs)
+            # The following line is needed to get a scalar PixCoord
+            center = PixCoord(float(center.x), float(center.y))
+            width = self.width.to(u.deg).value * scale
+            height = self.height.to(u.deg).value * scale
+            new_angle = self.angle + angle
+            return RectanglePixelRegion(center, width=width, height=height,
+                                        angle=new_angle)
+
+        elif mode == 'affine':
+            raise NotImplementedError()
+
+        elif mode == 'full':
+
+            return self.to_polygon().to_pixel(wcs)
+
+        else:
+            raise ValueError('mode should be one of local/affine/full')
+
+    def to_polygon(self):
+        """
+        Convert the rectangle to a polygon based on its 4 corners.
+        """
+        clon, clat = self.center.spherical.lon, self.center.spherical.lat
+        w2 = self.width/2
+        h2 = self.height/2
+        sinth = np.sin(self.angle)
+        costh = np.cos(self.angle)
+
+        c1y = clat + w2 * sinth + h2 * costh
+        c2y = clat + w2 * sinth - h2 * costh
+        c3y = clat - w2 * sinth + h2 * costh
+        c4y = clat - w2 * sinth - h2 * costh
+
+        c1x = clon + w2 * costh + h2 * sinth
+        c2x = clon + w2 * costh - h2 * sinth
+        c3x = clon - w2 * costh + h2 * sinth
+        c4x = clon - w2 * costh - h2 * sinth
+
+        vertices_sky = SkyCoord([c1x,c2x,c3x,c4x], [c1y,c2y,c3y,c4y],
+                                frame=self.center.frame)
+
+        return PolygonSkyRegion(vertices_sky)
