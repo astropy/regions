@@ -43,3 +43,6 @@ def test_compound():
 
     diff = c1 ^ c2 ^ c3
     assert (diff.contains(coords) == [True, True, False, True]).all()
+
+
+    assert 'Compound' in str(union)
