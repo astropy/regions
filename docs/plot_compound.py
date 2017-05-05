@@ -49,12 +49,12 @@ skycoords_xor = skycoords[mask_xor]
 fig = plt.figure()
 ax = fig.add_axes([0.15, 0.1, 0.8, 0.8], projection=wcs)
 
-ax.scatter(skycoords.l, skycoords.b, label='all',
+ax.scatter(skycoords.l.value, skycoords.b.value, label='all',
            transform=ax.get_transform('galactic'))
-ax.scatter(skycoords_xor.l, skycoords_xor.b, color='orange', label='xor',
-           transform=ax.get_transform('galactic'))
-ax.scatter(skycoords_and.l, skycoords_and.b, color='magenta', label='and',
-           transform=ax.get_transform('galactic'))
+ax.scatter(skycoords_xor.l.value, skycoords_xor.b.value, color='orange',
+           label='xor', transform=ax.get_transform('galactic'))
+ax.scatter(skycoords_and.l.value, skycoords_and.b.value, color='magenta',
+           label='and', transform=ax.get_transform('galactic'))
 
 circle1.to_pixel(wcs=wcs).plot(ax, edgecolor='green', facecolor='none', alpha=0.8, lw=3)
 circle2.to_pixel(wcs=wcs).plot(ax, edgecolor='red', facecolor='none', alpha=0.8, lw=3)
