@@ -14,6 +14,10 @@ class CompoundPixelRegion(PixelRegion):
         self.region1 = region1
         self.region2 = region2
         self.operator = operator
+        self._repr_params = [('component 1', self.region1),
+                             ('component 2', self.region2),
+                             ('operator', self.operator),
+                            ]
 
     def __contains__(self, pixcoord):
         raise NotImplementedError
@@ -40,6 +44,10 @@ class CompoundSkyRegion(SkyRegion):
         self.region1 = region1
         self.region2 = region2
         self.operator = operator
+        self._repr_params = [('component 1', self.region1),
+                             ('component 2', self.region2),
+                             ('operator', self.operator),
+                            ]
 
     def contains(self, skycoord):
         return self.operator(self.region1.contains(skycoord),
