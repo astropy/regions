@@ -31,8 +31,7 @@ for filename in TEST_FILE_DIR.glob('*.reg'):
     n_regions = 0
     with open(str(filename)) as origin_file:
         for line in origin_file:
-            if '(' in line:
-                n_regions += 1
+            n_regions += line.count("(")
 
     # regions
     try:
