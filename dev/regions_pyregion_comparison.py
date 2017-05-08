@@ -85,4 +85,8 @@ result_table['compl_pyregion'].format = '0.1%'
 result_table['compl_regions'] = [_['compl_regions'] for _ in results]
 result_table['compl_regions'].format = '0.1%'
 result_table.meta['repetitions for timing'] = REPETITIONS
-result_table.pprint()
+
+savename = 'regions_pyregion_comparison.csv'
+print('Writing {}'.format(savename))
+result_table.write(savename)
+
