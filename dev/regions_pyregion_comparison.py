@@ -18,9 +18,12 @@ from regions import read_ds9, write_ds9, DS9RegionParserError
 import pyregion
 import timeit
 import numpy as np
+import re
 
 TEST_FILE_DIR = Path('../regions/io/tests/data')
 REPETITIONS = 1
+
+p_region_count = re.compile(r"[^=\)]\(")
 
 results = list()
 
@@ -31,7 +34,7 @@ for filename in TEST_FILE_DIR.glob('*.reg'):
     n_regions = 0
     with open(str(filename)) as origin_file:
         for line in origin_file:
-            n_regions += line.count("(")
+            n_regions += len(p_region_count.findall(line))
 
     # regions
     try:
