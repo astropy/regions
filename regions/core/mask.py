@@ -12,7 +12,7 @@ class Mask(object):
 
     Parameters
     ----------
-    mask : array_like
+    data : array_like
         A 2D array of a region mask representing the fractional overlap
         of the region on the pixel grid.  This should be the full-sized
         (i.e. not truncated) array that is the direct output of one of
@@ -27,24 +27,23 @@ class Mask(object):
     Usage examples are provided in the :ref:`gs-masks` section of the docs.
     """
 
-    def __init__(self, mask, bbox):
-        if mask.shape != bbox.shape:
-            raise ValueError("shape of mask and bounding box should match")
-        self.data = np.asanyarray(mask)
+    def __init__(self, data, bbox):
+        if data.shape != bbox.shape:
+            raise ValueError("Shape of data and bounding box should match")
+        self.data = np.asanyarray(data)
         self.bbox = bbox
 
     @property
     def shape(self):
         """
-        The shape of the mask array.
+        The shape of the mask data array.
         """
         return self.data.shape
 
     def __array__(self):
         """
-        Array representation of the mask array (e.g., for matplotlib).
+        Array representation of the mask data array (e.g., for matplotlib).
         """
-
         return self.data
 
     def _overlap_slices(self, shape):
@@ -79,7 +78,7 @@ class Mask(object):
         ymin = self.bbox.iymin
         ymax = self.bbox.iymax
 
-        if (xmin >= shape[1] or ymin >= shape[0] or xmax <= 0 or ymax <= 0):
+        if xmin >= shape[1] or ymin >= shape[0] or xmax <= 0 or ymax <= 0:
             # no overlap of the region with the data
             return None, None
 
