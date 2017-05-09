@@ -19,7 +19,7 @@ class CompoundPixelRegion(PixelRegion):
                              ('operator', self.operator),
                             ]
 
-    def __contains__(self, pixcoord):
+    def contains(self, pixcoord):
         raise NotImplementedError
 
     def to_mask(self, mode='center'):
@@ -29,6 +29,9 @@ class CompoundPixelRegion(PixelRegion):
         raise NotImplementedError
 
     def as_patch(self, **kwargs):
+        raise NotImplementedError
+
+    def to_shapely(self, **kwargs):
         raise NotImplementedError
 
     def __repr__(self):
