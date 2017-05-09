@@ -10,7 +10,7 @@ from astropy.coordinates import BaseCoordinateFrame
 from astropy import log
 from astropy.utils.exceptions import AstropyUserWarning
 from warnings import warn
-from ..shapes import circle, rectangle, polygon, ellipse, point
+from ..shapes import circle, rectangle, polygon, ellipse, point, line, annulus
 from ..core import PixCoord
 
 __all__ = [
@@ -123,6 +123,8 @@ language_spec = {'point': (coordinate, coordinate),
                  'ellipse': itertools.chain((coordinate, coordinate), itertools.cycle((radius,))),
                  'box': (coordinate, coordinate, width, height, angle),
                  'polygon': itertools.cycle((coordinate,)),
+                 'line': (coordinate, coordinate, coordinate, coordinate),
+                 'annulus': itertools.chain((coordinate, coordinate), itertools.cycle((radius,))),
                  }
 
 coordinate_systems = ['fk5', 'fk4', 'icrs', 'galactic', 'wcs', 'physical', 'image', 'ecliptic']
@@ -212,6 +214,23 @@ def ds9_region_list_to_objects(region_list):
                 reg = point.PointSkyRegion(coord_list[0])
             elif isinstance(coord_list[0], PixCoord):
                 reg = point.PointPixelRegion(coord_list[0])
+            else:
+                raise DS9RegionParserError("No central coordinate")
+        elif region_type == 'line':
+            if isinstance(coord_list[0], BaseCoordinateFrame):
+                reg = line.LineSkyRegion(coord_list[0], coord_list[1])
+            elif isinstance(coord_list[0], PixCoord):
+                reg = line.LinePixelRegion(coord_list[0], coord_list[1])
+            else:
+                raise DS9RegionParserError("No central coordinate")
+        elif region_type == 'annulus':
+            # Do not read more than one annulus for now
+            if len(coord_list) > 3:
+                continue
+            if isinstance(coord_list[0], BaseCoordinateFrame):
+                reg = annulus.CircleAnnulusSkyRegion(coord_list[0], coord_list[1], coord_list[2])
+            elif isinstance(coord_list[0], PixCoord):
+                reg = annulus.CircleAnnulusPixelRegion(coord_list[0], coord_list[1], coord_list[2])
             else:
                 raise DS9RegionParserError("No central coordinate")
         else:
@@ -401,8 +420,8 @@ def line_parser(line, coordsys=None, errors='strict'):
             parsed = type_parser(coords_etc, language_spec[region_type],
                                  coordsys_name_mapping[coordsys])
 
-            # Reset iterator for ellipse annulus
-            if region_type == 'ellipse':
+            # Reset iterator for ellipse annulus and annulus
+            if region_type in ['ellipse', 'annulus']:
                 language_spec[region_type] = itertools.chain((coordinate, coordinate), itertools.cycle((radius,)))
 
             parsed_angles = [(x, y)
@@ -420,9 +439,11 @@ def line_parser(line, coordsys=None, errors='strict'):
                 # otherwise, they are vector quantitites
                 lon, lat = u.Quantity(lon), u.Quantity(lat)
             sphcoords = coordinates.UnitSphericalRepresentation(lon, lat)
-            coords = frame(sphcoords)
-
-            return region_type, [coords] + parsed[len(coords) * 2:], parsed_meta, composite, include
+            coords = [frame(sphcoords)]
+            if region_type == 'line':
+                coords = [coords[0][0], coords[0][1]]
+                # line constructor expectes two scalar coordinates
+            return region_type, coords + parsed[len(coords) * 2:], parsed_meta, composite, include
         else:
             parsed = type_parser(coords_etc, language_spec[region_type],
                                  coordsys)
@@ -431,13 +452,18 @@ def line_parser(line, coordsys=None, errors='strict'):
                 # b/c can't typecheck when iterating as in sky coord case
                 coord = PixCoord(parsed[0::2], parsed[1::2])
                 parsed_return = [coord]
+            elif region_type == 'line':
+                # special case line because it contains two coordinate points
+                coord1 = PixCoord(parsed[0], parsed[1])
+                coord2 = PixCoord(parsed[2], parsed[3])
+                parsed_return = [coord1, coord2] + parsed[4:]
             else:
                 parsed = [_.value for _ in parsed]
                 coord = PixCoord(parsed[0], parsed[1])
                 parsed_return = [coord] + parsed[2:]
 
-            # Reset iterator for ellipse annulus
-            if region_type == 'ellipse':
+            # Reset iterator for ellipse annulus, annulus
+            if region_type in ['ellipse', 'annulus']:
                 language_spec[region_type] = itertools.chain((coordinate, coordinate), itertools.cycle((radius,)))
 
             return region_type, parsed_return, parsed_meta, composite, include
