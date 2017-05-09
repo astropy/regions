@@ -3,15 +3,15 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import astropy.units as u
 from astropy.coordinates import SkyCoord
 from ...shapes import CircleSkyRegion, CirclePixelRegion
-from ...core import PixCoord
+from ...core import PixCoord, CompoundPixelRegion
 
 
 def test_compound_pixel():
     pixcoord = PixCoord(3, 4)
     c1 = CirclePixelRegion(pixcoord, 2)
     c2 = CirclePixelRegion(pixcoord, 4)
-
     union = c1 | c2
+    assert isinstance(union, CompoundPixelRegion)
 
 
 def test_compound_sky():
