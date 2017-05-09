@@ -1,4 +1,5 @@
 import click
+import pyregion
 from regions import read_ds9
 from pathlib import Path
 
@@ -17,11 +18,16 @@ def list_files():
 
 @cli.command('parse')
 @click.option('--interactive', is_flag=True, default=False)
+@click.option('--parser', default='regions')
 @click.argument('filename')
-def parse(filename, interactive):
+def parse(filename, interactive, parser):
     readname = TEST_FILE_DIR / filename
     print('Reading {}'.format(readname))
-    regions = read_ds9(str(readname))
+    print('Using parser {}'.format(parser))
+    if parser == 'regions':
+        regions = read_ds9(str(readname), errors='warn')
+    elif parser == 'pyregion':
+        regions = pyregion.open(str(readname))
     print(regions)
     if interactive:
         import IPython
