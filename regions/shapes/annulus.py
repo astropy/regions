@@ -1,6 +1,6 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-
 import math
+import operator
 
 import numpy as np
 
@@ -8,11 +8,11 @@ from astropy import wcs
 from astropy import coordinates
 from astropy import units as u
 
-from ..core import PixelRegion, SkyRegion
-from ..utils.wcs_helpers import skycoord_to_pixel_scale_angle
+from ..core import CompoundPixelRegion, CompoundSkyRegion
+from ..shapes import CirclePixelRegion, CircleSkyRegion
 
 
-class AnnulusPixelRegion(PixelRegion):
+class AnnulusPixelRegion(CompoundPixelRegion):
     """
     An annulus in pixel coordinates.
 
@@ -27,40 +27,32 @@ class AnnulusPixelRegion(PixelRegion):
     """
 
     def __init__(self, center, inner_radius, outer_radius, meta=None, visual=None):
-        # TODO: test that center is a 0D PixCoord
-        self.center = center
-        self.inner_radius = inner_radius
-        self.outer_radius = outer_radius
-        self.meta = meta or {}
-        self.visual = visual or {}
+        region1 = CirclePixelRegion(center, inner_radius)
+        region2 = CirclePixelRegion(center, outer_radius)
+        super(AnnulusPixelRegion, self).__init__(
+            region1, region2, operator.xor)
+        self._repr_params = [('inner radius', region1.radius),
+                             ('outer radius', region2.radius),
+                             ('center', region2.center)]
+
 
     @property
-    def area(self):
-        return math.pi * (self.outer_radius ** 2 - self.inner_radius ** 2)
+    def center(self):
+        return self.region1.center
 
-    def contains(self, pixcoord):
-        distance = np.hypot(pixcoord.x - self.center.x, pixcoord.y - self.center.y) 
-        return distance < self.outer_radius and distance > self.inner_radius
+    @property
+    def inner_radius(self):
+        return self.region1.radius
 
-    def to_shapely(self):
-        # TODO: needs to be implemented
-        raise NotImplementedError("")
+    @property
+    def outer_radius(self):
+        return self.region2.radius
 
-    def to_sky(self, mywcs, mode='local', tolerance=None):
-        # TODO: needs to be implemented
-        raise NotImplementedError("")
-
-    def to_mask(self, mode='center'):
-        # TODO: needs to be implemented
-        raise NotImplementedError("")
-
-    def as_patch(self, **kwargs):
-        import matplotlib.patches as mpatches
-        # TODO: needs to be implemented
-        raise NotImplementedError("")
+    def bounding_box():
+        return self.region2.bounding_box()
 
 
-class AnnulusSkyRegion(SkyRegion):
+class AnnulusSkyRegion(CompoundSkyRegion):
     """
     An annulus in sky coordinates.
 
@@ -75,57 +67,23 @@ class AnnulusSkyRegion(SkyRegion):
     """
 
     def __init__(self, center, inner_radius, outer_radius, meta=None, visual=None):
-        # TODO: test that center is a 0D SkyCoord
-        self.center = center
-        self.inner_radius = inner_radius
-        self.outer_radius = outer_radius
-        self.meta = meta or {}
-        self.visual = visual or {}
+        region1 = CircleSkyRegion(center, inner_radius)
+        region2 = CircleSkyRegion(center, outer_radius)
+        super(AnnulusSkyRegion, self).__init__(
+            region1, region2, operator.xor)
+        self._repr_params = [('inner radius', region1.radius),
+                             ('outer radius', region2.radius),
+                             ('center', region2.center)]
+
 
     @property
-    def area(self):
-        return math.pi * (self.outer_radius ** 2 - self.inner_radius ** 2)
+    def center(self):
+        return self.region1.center
 
-    def contains(self, skycoord):
-        distance = self.center.separation(skycoord)
-        return  distance < self.outer_radius and distance > self.inner_radius
+    @property
+    def inner_radius(self):
+        return self.region1.radius
 
-    def __repr__(self):
-        clsnm = self.__class__.__name__
-        coord = self.center
-        irad = self.inner_radius
-        orad = self.outer_radius
-        ss = '{clsnm}\nCenter:{coord}\nInner Radius:{irad}\nOuter Radius:{orad}'
-        return ss.format(**locals())
-
-    def to_pixel(self, mywcs, mode='local', tolerance=None):
-        """
-        Given a WCS, convert the circle to a best-approximation circle in pixel
-        dimensions.
-
-        Parameters
-        ----------
-        mywcs : `~astropy.wcs.WCS`
-            A world coordinate system
-        mode : 'local' or not
-            not implemented
-        tolerance : None
-            not implemented
-
-        Returns
-        -------
-        CirclePixelRegion
-        """
-
-        if mode != 'local':
-            raise NotImplementedError()
-        if tolerance is not None:
-            raise NotImplementedError()
-
-        # TODO: needs to be implemented
-        raise NotImplementedError("")
-
-    def as_patch(self, ax, **kwargs):
-        import matplotlib.patches as mpatches
-        # TODO: needs to be implemented
-        raise NotImplementedError("")
+    @property
+    def outer_radius(self):
+        return self.region2.radius
