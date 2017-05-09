@@ -354,8 +354,8 @@ def line_parser(line, coordsys=None, errors='strict'):
     if errors not in ('strict', 'ignore', 'warn'):
         raise ValueError("``errors`` must be one of strict, ignore, or warn")
 
-    if '# Region file format' in line and line[0] == '#':
-        # This is just a file format line, we can safely skip it
+    if line is not '' and line[0] == '#':
+        # Skip comments
         return
 
     # special case / header: parse global parameters into metadata
