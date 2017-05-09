@@ -19,7 +19,7 @@ class CompoundPixelRegion(PixelRegion):
                              ('operator', self.operator),
                             ]
 
-    def __contains__(self, pixcoord):
+    def contains(self, pixcoord):
         raise NotImplementedError
 
     def to_mask(self, mode='center'):
@@ -31,8 +31,11 @@ class CompoundPixelRegion(PixelRegion):
     def as_patch(self, **kwargs):
         raise NotImplementedError
 
-    def __repr__(self):
-        return "({0} {1} {2})".format(self.region1, self.operator, self.region2)
+    def to_shapely(self, **kwargs):
+        raise NotImplementedError
+
+    def bounding_box(self, **kwargs):
+        raise NotImplementedError
 
 
 class CompoundSkyRegion(SkyRegion):
@@ -58,9 +61,6 @@ class CompoundSkyRegion(SkyRegion):
 
     def as_patch(self, ax, **kwargs):
         raise NotImplementedError
-
-    def __repr__(self):
-        return "({0}\n{1}\n{2})".format(self.region1, self.operator, self.region2)
 
     @property
     def area(self):
