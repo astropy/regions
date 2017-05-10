@@ -31,7 +31,7 @@ class LinePixelRegion(PixelRegion):
     @property
     def area(self):
         """Region area (float)."""
-        return None
+        return 0 * u.sr 
 
     def contains(self, pixcoord):
         return False
@@ -114,25 +114,22 @@ class LineSkyRegion(SkyRegion):
         ----------
         wcs : `~astropy.wcs.WCS`
             A world coordinate system
-        mode : 'local' or not
-            not implemented
+        mode : 'local', 'affine', 'full'
+            all modes are the same
         tolerance : int
-            not implemented
+            not used 
 
         Returns
         -------
         LinePixelRegion
         """
 
-        if mode == 'local':
+        if mode in ['local', 'affine', 'full']:
             start_x, start_y = skycoord_to_pixel(self.start, wcs=wcs)
             start = PixCoord(start_x, start_y)
             end_x, end_y = skycoord_to_pixel(self.end, wcs=wcs)
             end = PixCoord(end_x, end_y)
             return LinePixelRegion(start, end)
-
-        elif mode == 'affine' or mode == 'full':
-            raise NotImplementedError()
 
         else:
             raise ValueError('mode should be one of local/affine/full')
