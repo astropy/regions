@@ -1,9 +1,12 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
 
+import astropy.units as u
 from astropy.wcs.utils import pixel_to_skycoord, skycoord_to_pixel
 
 from ..core import PixCoord, PixelRegion, SkyRegion, BoundingBox
+
 
 __all__ = ['LinePixelRegion', 'LineSkyRegion']
 
@@ -31,7 +34,7 @@ class LinePixelRegion(PixelRegion):
     @property
     def area(self):
         """Region area (float)."""
-        return 0 * u.sr 
+        return 0 * u.sr
 
     def contains(self, pixcoord):
         return False
@@ -117,7 +120,7 @@ class LineSkyRegion(SkyRegion):
         mode : 'local', 'affine', 'full'
             all modes are the same
         tolerance : int
-            not used 
+            not used
 
         Returns
         -------
