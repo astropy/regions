@@ -2,10 +2,19 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 import astropy.units as u
 from astropy.coordinates import SkyCoord
-from ...shapes import CircleSkyRegion
+from ...shapes import CircleSkyRegion, CirclePixelRegion
+from ...core import PixCoord, CompoundPixelRegion
 
 
-def test_compound():
+def test_compound_pixel():
+    pixcoord = PixCoord(3, 4)
+    c1 = CirclePixelRegion(pixcoord, 2)
+    c2 = CirclePixelRegion(pixcoord, 4)
+    union = c1 | c2
+    assert isinstance(union, CompoundPixelRegion)
+
+
+def test_compound_sky():
     skycoord1 = SkyCoord(0 * u.deg, 0 * u.deg, frame='galactic')
     c1 = CircleSkyRegion(skycoord1, 1 * u.deg)
 
@@ -43,6 +52,5 @@ def test_compound():
 
     diff = c1 ^ c2 ^ c3
     assert (diff.contains(coords) == [True, True, False, True]).all()
-
 
     assert 'Compound' in str(union)
