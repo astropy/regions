@@ -38,13 +38,13 @@ for filename in TEST_FILE_DIR.glob('*.reg'):
 
     # regions
     try:
-        region_regions = read_ds9(str(filename))
+        region_regions = read_ds9(str(filename), errors='warn')
     except DS9RegionParserError:
         time_regions = -1
         compl_regions = 0
     else:
         time_regions = timeit.timeit(
-            'read_ds9(str(filename))',
+            "read_ds9(str(filename), errors='warn')",
             setup='from regions import read_ds9',
             globals=globals(),
             number=REPETITIONS) / REPETITIONS
@@ -91,4 +91,4 @@ result_table.meta['repetitions for timing'] = REPETITIONS
 savename = 'regions_pyregion_comparison.csv'
 print('Writing {}'.format(savename))
 result_table.write(savename)
-
+result_table.pprint()
