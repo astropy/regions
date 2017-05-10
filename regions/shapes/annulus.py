@@ -11,10 +11,12 @@ from astropy import units as u
 from ..core import CompoundPixelRegion, CompoundSkyRegion
 from ..shapes import CirclePixelRegion, CircleSkyRegion
 
+__all__ = ['CircleAnnulusPixelRegion', 'CircleAnnulusSkyRegion']
 
-class AnnulusPixelRegion(CompoundPixelRegion):
+
+class CircleAnnulusPixelRegion(CompoundPixelRegion):
     """
-    An annulus in pixel coordinates.
+    A circular annulus in pixel coordinates.
 
     Parameters
     ----------
@@ -29,7 +31,7 @@ class AnnulusPixelRegion(CompoundPixelRegion):
     def __init__(self, center, inner_radius, outer_radius, meta=None, visual=None):
         region1 = CirclePixelRegion(center, inner_radius)
         region2 = CirclePixelRegion(center, outer_radius)
-        super(AnnulusPixelRegion, self).__init__(
+        super(CircleAnnulusPixelRegion, self).__init__(
             region1, region2, operator.xor)
         self._repr_params = [('inner radius', region1.radius),
                              ('outer radius', region2.radius),
@@ -52,9 +54,9 @@ class AnnulusPixelRegion(CompoundPixelRegion):
         return self.region2.bounding_box()
 
 
-class AnnulusSkyRegion(CompoundSkyRegion):
+class CircleAnnulusSkyRegion(CompoundSkyRegion):
     """
-    An annulus in sky coordinates.
+    A circular annulus in sky coordinates.
 
     Parameters
     ----------
@@ -69,7 +71,7 @@ class AnnulusSkyRegion(CompoundSkyRegion):
     def __init__(self, center, inner_radius, outer_radius, meta=None, visual=None):
         region1 = CircleSkyRegion(center, inner_radius)
         region2 = CircleSkyRegion(center, outer_radius)
-        super(AnnulusSkyRegion, self).__init__(
+        super(CircleAnnulusSkyRegion, self).__init__(
             region1, region2, operator.xor)
         self._repr_params = [('inner radius', region1.radius),
                              ('outer radius', region2.radius),
