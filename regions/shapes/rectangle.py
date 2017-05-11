@@ -220,19 +220,6 @@ class RectangleSkyRegion(SkyRegion):
                              ('angle', self.angle)]
 
     def to_pixel(self, wcs):
-        """
-        Given a WCS, return an RectanglePixelRegion which represents the same
-        region but using pixel coordinates.
-
-        Parameters
-        ----------
-        wcs : `~astropy.wcs.WCS`
-            A world coordinate system
-
-        Returns
-        -------
-        RectanglePixelRegion
-        """
         center, scale, north_angle = skycoord_to_pixel_scale_angle(self.center, wcs)
         # FIXME: The following line is needed to get a scalar PixCoord
         center = PixCoord(float(center.x), float(center.y))

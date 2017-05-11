@@ -41,7 +41,7 @@ class LinePixelRegion(PixelRegion):
 
     def to_shapely(self):
         from shapely.geometry import LineString
-        return LineString(self.start.to_shapely(), self.end.to_shapely)
+        return LineString([(self.start.x, self.start.y), (self.end.x, self.end.y)])
 
     def to_sky(self, wcs, mode='local', tolerance=None):
         if mode != 'local':
@@ -104,19 +104,6 @@ class LineSkyRegion(SkyRegion):
         return False
 
     def to_pixel(self, wcs):
-        """
-        Given a WCS, return an LinePixelRegion which represents the same
-        region but using pixel coordinates.
-
-        Parameters
-        ----------
-        wcs : `~astropy.wcs.WCS`
-            A world coordinate system
-
-        Returns
-        -------
-        LinePixelRegion
-        """
         start_x, start_y = skycoord_to_pixel(self.start, wcs=wcs)
         start = PixCoord(start_x, start_y)
         end_x, end_y = skycoord_to_pixel(self.end, wcs=wcs)

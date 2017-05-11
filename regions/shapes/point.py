@@ -3,6 +3,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from astropy.wcs.utils import pixel_to_skycoord, skycoord_to_pixel
 
+from matplotlib.patches import Circle
+
 from ..core import PixCoord, PixelRegion, SkyRegion, BoundingBox
 
 __all__ = ['PointPixelRegion', 'PointSkyRegion']
@@ -45,8 +47,8 @@ class PointPixelRegion(PixelRegion):
         raise NotImplementedError
 
     def as_patch(self, **kwargs):
-        # TODO: needs to be implemented
-        raise NotImplementedError
+        # FIXME: need to make radius constant
+        return Circle((self.center.x, self.center.y), radius=2, **kwargs)
 
 
 class PointSkyRegion(SkyRegion):
@@ -70,19 +72,6 @@ class PointSkyRegion(SkyRegion):
         return False
 
     def to_pixel(self, wcs):
-        """
-        Given a WCS, return an PointPixelRegion which represents the same
-        region but using pixel coordinates.
-
-        Parameters
-        ----------
-        wcs : `~astropy.wcs.WCS`
-            A world coordinate system
-
-        Returns
-        -------
-        PointPixelRegion
-        """
         center_x, center_y = skycoord_to_pixel(self.center, wcs=wcs)
         center = PixCoord(center_x, center_y)
         return PointPixelRegion(center)

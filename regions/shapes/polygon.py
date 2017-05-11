@@ -126,19 +126,6 @@ class PolygonSkyRegion(SkyRegion):
         self._repr_params = [('vertices', self.vertices)]
 
     def to_pixel(self, wcs):
-        """
-        Given a WCS, return an PolygonPixelRegion which represents the same
-        region but using pixel coordinates.
-
-        Parameters
-        ----------
-        wcs : `~astropy.wcs.WCS`
-            A world coordinate system
-
-        Returns
-        -------
-        PolygonPixelRegion
-        """
         x, y = skycoord_to_pixel(self.vertices, wcs)
         vertices_pix = PixCoord(x, y)
         return PolygonPixelRegion(vertices_pix)

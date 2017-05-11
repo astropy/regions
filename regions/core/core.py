@@ -278,7 +278,7 @@ class SkyRegion(Region):
     @abc.abstractmethod
     def to_pixel(self, wcs):
         """
-        Returns a region defined in pixel coordinates.
+        Returns the equivalent region defined in pixel coordinates.
 
         Parameters
         ----------
