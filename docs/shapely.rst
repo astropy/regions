@@ -26,12 +26,20 @@ back to ``regions`` objects. The future of the use of Shapely in ``regions`` is 
 Here's an example how to create a Shapely object and do something that's not implemented in ``regions``,
 namely to buffer a rectangle, resulting in a polygon.
 
-.. code-block:: python
+.. plot::
+   :include-source:
 
-    # TODO: RectanglePixelRegion isn't implemented yet, this doesn't work yet.
-    from regions import RectanglePixelRegion
-    region = RectanglePixelRegion(center=(3, 2), width=2, height=1)
+    from regions import PixCoord, RectanglePixelRegion
+
+    region = RectanglePixelRegion(center=PixCoord(3, 2), width=2, height=1)
+
+    # Get a `shapely.geometry.polygon.Polygon` object
     shape = region.to_shapely()
-    # `shape` is a `shapely.geometry.polygon.Polygon` object
-    shape2 = shape.buffer(distance=3)
-    # `shape2` is a polygon that's buffered by 3 pixels compared to `shape`
+
+    # Get a polygon that is buffered by 3 pixels compared to 'shape'
+    shape_poly = shape.buffer(distance=3)
+
+    # Plot the result
+    x, y = shape_poly.exterior.xy
+    ax = plt.subplot(1, 1, 1)
+    ax.plot(x, y, 'g-')
