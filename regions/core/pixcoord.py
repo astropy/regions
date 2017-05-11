@@ -143,7 +143,6 @@ class PixCoord(object):
         Calls :meth:`astropy.coordinates.SkyCoord.to_pixel`.
         See parameter description there.
         """
-        print(skycoord)
         x, y = skycoord.to_pixel(wcs=wcs, origin=origin, mode=mode)
         return cls(x=x, y=y)
 
