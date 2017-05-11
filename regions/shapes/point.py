@@ -3,8 +3,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from astropy.wcs.utils import pixel_to_skycoord, skycoord_to_pixel
 
-from matplotlib.patches import Circle
-
 from ..core import PixCoord, PixelRegion, SkyRegion, BoundingBox
 
 __all__ = ['PointPixelRegion', 'PointSkyRegion']
@@ -48,6 +46,7 @@ class PointPixelRegion(PixelRegion):
 
     def as_patch(self, **kwargs):
         # FIXME: need to make radius constant
+        from matplotlib.patches import Circle
         return Circle((self.center.x, self.center.y), radius=2, **kwargs)
 
 
