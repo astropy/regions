@@ -193,8 +193,12 @@ class DS9Parser(object):
     def parse_line(self, line):
         """Parse one line"""
         log.debug('Parsing {}'.format(line))
-        # Skip blanks and comments
-        if line is '' or line[0] == '#':
+        # Skip blanks
+        if line == '':
+            return
+
+        # Skip comments
+        if line[0] == '#':
             return
 
         # Special case / header: parse global parameters into metadata
@@ -375,13 +379,20 @@ class DS9RegionParser(object):
         # these some other way, i.e. with regex directly, but I don't know how.
         # We need to copy in order not to burn up the iterators
         elements = [x for x in regex_splitter.split(self.coord_str) if x]
+        element_parsers = self.language_spec[self.region_type]
         for ii, (element, element_parser) in enumerate(
-            zip(elements, copy.deepcopy(self.language_spec[self.region_type]))):
+            zip(elements, element_parsers)):
             if element_parser is coordinate:
                 unit = self.coordinate_units[self.coordsys][ii % 2]
                 coord_list.append(element_parser(element, unit))
             else:
                 coord_list.append(element_parser(element))
+
+        # Reset iterator for ellipse and annulus
+        # Note that this cannot be done with copy.deepcopy on python2
+        if self.region_type in ['ellipse', 'annulus']:
+            self.language_spec[self.region_type] = itertools.chain(
+                (coordinate, coordinate), itertools.cycle((radius,)))
 
         self.coord = coord_list
 
