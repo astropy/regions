@@ -1,6 +1,9 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 from __future__ import absolute_import, division, print_function, unicode_literals
-from ..core import PixelRegion, SkyRegion
+
+from astropy.wcs.utils import pixel_to_skycoord, skycoord_to_pixel
+
+from ..core import PixCoord, PixelRegion, SkyRegion, BoundingBox
 
 __all__ = ['PointPixelRegion', 'PointSkyRegion']
 
@@ -66,6 +69,20 @@ class PointSkyRegion(SkyRegion):
     def contains(self, skycoord):
         return False
 
-    def to_pixel(self, wcs, mode='local', tolerance=None):
-        # TODO: needs to be implemented
-        raise NotImplementedError
+    def to_pixel(self, wcs):
+        """
+        Given a WCS, return an PointPixelRegion which represents the same
+        region but using pixel coordinates.
+
+        Parameters
+        ----------
+        wcs : `~astropy.wcs.WCS`
+            A world coordinate system
+
+        Returns
+        -------
+        PointPixelRegion
+        """
+        center_x, center_y = skycoord_to_pixel(self.center, wcs=wcs)
+        center = PixCoord(center_x, center_y)
+        return PointPixelRegion(center)

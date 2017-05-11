@@ -4,8 +4,9 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import numpy as np
 from astropy import units as u
 
-from ..core import PixelRegion, SkyRegion, Mask, BoundingBox
+from ..core import PixCoord, PixelRegion, SkyRegion, Mask, BoundingBox
 from .._geometry import rectangular_overlap_grid
+from .._utils.wcs_helpers import skycoord_to_pixel_scale_angle
 
 __all__ = ['RectanglePixelRegion', 'RectangleSkyRegion']
 
@@ -71,12 +72,31 @@ class RectanglePixelRegion(PixelRegion):
         return self.width * self.height
 
     def contains(self, pixcoord):
-        # TODO: needs to be implemented
-        raise NotImplementedError
+        cos_angle = np.cos(self.angle)
+        sin_angle = np.sin(self.angle)
+        dx = pixcoord.x - self.center.x
+        dy = pixcoord.y - self.center.y
+        dx_rot = cos_angle * dx - sin_angle * dy
+        dy_rot = sin_angle * dx + cos_angle * dy
+        return (np.abs(dx_rot) < self.width * 0.5) & (np.abs(dy_rot) < self.height * 0.5)
 
     def to_shapely(self):
-        # TODO: needs to be implemented
-        raise NotImplementedError
+
+        from shapely import affinity
+        from shapely.geometry import Polygon
+
+        x1 = self.center.x - self.width * 0.5
+        y1 = self.center.y - self.height * 0.5
+        x2 = self.center.x + self.width * 0.5
+        y2 = self.center.y - self.height * 0.5
+        x3 = self.center.x + self.width * 0.5
+        y3 = self.center.y + self.height * 0.5
+        x4 = self.center.x - self.width * 0.5
+        y4 = self.center.y + self.height * 0.5
+
+        rectangle = Polygon([(x1, y1), (x2, y2), (x3, y3), (x4, y4)])
+
+        return affinity.rotate(rectangle, self.angle.to(u.deg).value)
 
     def to_sky(self, wcs, mode='local', tolerance=None):
         # TODO: needs to be implemented
@@ -199,15 +219,25 @@ class RectangleSkyRegion(SkyRegion):
         self._repr_params = [('width', self.width), ('height', self.height),
                              ('angle', self.angle)]
 
-    @property
-    def area(self):
-        """Region area (`~astropy.units.Quantity`)"""
-        return self.width * self.height
+    def to_pixel(self, wcs):
+        """
+        Given a WCS, return an RectanglePixelRegion which represents the same
+        region but using pixel coordinates.
 
-    def contains(self, skycoord):
-        # TODO: needs to be implemented
-        raise NotImplementedError
+        Parameters
+        ----------
+        wcs : `~astropy.wcs.WCS`
+            A world coordinate system
 
-    def to_pixel(self, wcs, mode='local', tolerance=None):
-        # TODO: needs to be implemented
-        raise NotImplementedError
+        Returns
+        -------
+        RectanglePixelRegion
+        """
+        center, scale, north_angle = skycoord_to_pixel_scale_angle(self.center, wcs)
+        # FIXME: The following line is needed to get a scalar PixCoord
+        center = PixCoord(float(center.x), float(center.y))
+        width = self.width.to('deg').value * scale
+        height = self.height.to('deg').value * scale
+        return RectanglePixelRegion(center, width, height,
+                                    angle=north_angle + self.angle,
+                                    meta=self.meta, visual=self.visual)

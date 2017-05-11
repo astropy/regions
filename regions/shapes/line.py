@@ -100,39 +100,25 @@ class LineSkyRegion(SkyRegion):
         self._repr_params = [('start', self.start),
                              ('end', self.end)]
 
-    @property
-    def area(self):
-        """Region area (`~astropy.units.Quantity`)"""
-        return None
-
     def contains(self, skycoord):
         return False
 
-    def to_pixel(self, wcs, mode='local', tolerance=100):
+    def to_pixel(self, wcs):
         """
-        Given a WCS, convert the line to a line in pixel dimensions by
-        transforming the start and the end point.
+        Given a WCS, return an LinePixelRegion which represents the same
+        region but using pixel coordinates.
 
         Parameters
         ----------
         wcs : `~astropy.wcs.WCS`
             A world coordinate system
-        mode : 'local', 'affine', 'full'
-            all modes are the same
-        tolerance : int
-            not used
 
         Returns
         -------
         LinePixelRegion
         """
-
-        if mode in ['local', 'affine', 'full']:
-            start_x, start_y = skycoord_to_pixel(self.start, wcs=wcs)
-            start = PixCoord(start_x, start_y)
-            end_x, end_y = skycoord_to_pixel(self.end, wcs=wcs)
-            end = PixCoord(end_x, end_y)
-            return LinePixelRegion(start, end)
-
-        else:
-            raise ValueError('mode should be one of local/affine/full')
+        start_x, start_y = skycoord_to_pixel(self.start, wcs=wcs)
+        start = PixCoord(start_x, start_y)
+        end_x, end_y = skycoord_to_pixel(self.end, wcs=wcs)
+        end = PixCoord(end_x, end_y)
+        return LinePixelRegion(start, end)

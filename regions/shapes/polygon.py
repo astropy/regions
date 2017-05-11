@@ -28,11 +28,11 @@ class PolygonPixelRegion(PixelRegion):
         self.visual = visual or {}
         self._repr_params = [('vertices', self.vertices)]
 
-    # # TODO: needs to be implemented
-    # @property
-    # def area(self):
-    #     """Region area (float)."""
-    #     raise NotImplementedError
+    @property
+    def area(self):
+        """Region area (float)."""
+        # FIXME: for now we use shapely, but could try and avoid the dependency in future
+        return self.to_shapely().area
 
     def contains(self, pixcoord):
         pixcoord = PixCoord._validate(pixcoord, 'pixcoord')
@@ -46,8 +46,8 @@ class PolygonPixelRegion(PixelRegion):
         return mask.reshape(shape)
 
     def to_shapely(self):
-        # TODO: needs to be implemented
-        raise NotImplementedError
+        from shapely.geometry import Polygon
+        return Polygon(list(zip(self.vertices.x, self.vertices.y)))
 
     def to_sky(self, wcs, mode='local', tolerance=None):
         if mode != 'local':
@@ -110,7 +110,7 @@ class PolygonPixelRegion(PixelRegion):
 
 class PolygonSkyRegion(SkyRegion):
     """
-    A polygon in sky coordinates.
+    A polygon defined using vertices in sky coordinates.
 
     Parameters
     ----------
@@ -125,16 +125,20 @@ class PolygonSkyRegion(SkyRegion):
         self.visual = visual or {}
         self._repr_params = [('vertices', self.vertices)]
 
-    def contains(self, skycoord):
-        # TODO: needs to be implemented
-        raise NotImplementedError
+    def to_pixel(self, wcs):
+        """
+        Given a WCS, return an PolygonPixelRegion which represents the same
+        region but using pixel coordinates.
 
-    def to_pixel(self, wcs, mode='local', tolerance=None):
-        if mode != 'local':
-            raise NotImplementedError
-        if tolerance is not None:
-            raise NotImplementedError
+        Parameters
+        ----------
+        wcs : `~astropy.wcs.WCS`
+            A world coordinate system
 
+        Returns
+        -------
+        PolygonPixelRegion
+        """
         x, y = skycoord_to_pixel(self.vertices, wcs)
         vertices_pix = PixCoord(x, y)
         return PolygonPixelRegion(vertices_pix)

@@ -6,8 +6,9 @@ import math
 import numpy as np
 from astropy import units as u
 
-from ..core import PixelRegion, SkyRegion, Mask, BoundingBox
+from ..core import PixCoord, PixelRegion, SkyRegion, Mask, BoundingBox
 from .._geometry import elliptical_overlap_grid
+from .._utils.wcs_helpers import skycoord_to_pixel_scale_angle
 
 
 __all__ = ['EllipsePixelRegion', 'EllipseSkyRegion']
@@ -75,14 +76,21 @@ class EllipsePixelRegion(PixelRegion):
         return math.pi * self.major * self.minor
 
     def contains(self, pixcoord):
-        # TODO: needs to be implemented
-        raise NotImplementedError
+        pixcoord = PixCoord._validate(pixcoord, name='pixcoord')
+        cos_angle = np.cos(self.angle)
+        sin_angle = np.sin(self.angle)
+        dx = pixcoord.x - self.center.x
+        dy = pixcoord.y - self.center.y
+        return (((cos_angle * dx + sin_angle * dy) / self.minor) ** 2 +
+                ((sin_angle * dx + cos_angle * dy) / self.major) ** 2 <= 1.)
 
     def to_shapely(self):
-        # TODO: needs to be implemented
-        raise NotImplementedError
+        from shapely import affinity
+        ellipse = self.center.to_shapely().buffer(self.minor)
+        ellipse = affinity.scale(ellipse, xfact=self.major / self.minor, yfact=1)
+        return affinity.rotate(ellipse, self.angle.to(u.deg).value)
 
-    def to_sky(self, wcs, mode='local', tolerance=None):
+    def to_sky(self, wcs):
         # TODO: needs to be implemented
         raise NotImplementedError
 
@@ -93,14 +101,14 @@ class EllipsePixelRegion(PixelRegion):
         exact elliptical region.
         """
 
-        cos_angle = np.cos(self.angle)    # self.angle is a Quantity
-        sin_angle = np.sin(self.angle)    # self.angle is a Quantity
+        cos_angle = np.cos(self.angle)
+        sin_angle = np.sin(self.angle)
         ax = self.major * cos_angle
         ay = self.major * sin_angle
         bx = self.minor * -sin_angle
         by = self.minor * cos_angle
-        dx = np.sqrt(ax*ax + bx*bx)
-        dy = np.sqrt(ay*ay + by*by)
+        dx = np.sqrt(ax * ax + bx * bx)
+        dy = np.sqrt(ay * ay + by * by)
 
         xmin = self.center.x - dx
         xmax = self.center.x + dx
@@ -157,7 +165,7 @@ class EllipsePixelRegion(PixelRegion):
 
 class EllipseSkyRegion(SkyRegion):
     """
-    An ellipse in sky coordinates.
+    An ellipse defined using sky coordinates.
 
     Parameters
     ----------
@@ -184,15 +192,12 @@ class EllipseSkyRegion(SkyRegion):
         self._repr_params = [('major', self.major), ('minor', self.minor),
                              ('angle', self.angle)]
 
-    @property
-    def area(self):
-        """Region sky area approximation (`~astropy.units.Quantity`)"""
-        return math.pi * self.major * self.minor
-
-    def contains(self, skycoord):
-        # TODO: needs to be implemented
-        raise NotImplementedError
-
-    def to_pixel(self, wcs, mode='local', tolerance=None):
-        # TODO: needs to be implemented
-        raise NotImplementedError
+    def to_pixel(self, wcs):
+        center, scale, north_angle = skycoord_to_pixel_scale_angle(self.center, wcs)
+        # FIXME: The following line is needed to get a scalar PixCoord
+        center = PixCoord(float(center.x), float(center.y))
+        minor = self.minor.to('deg').value * scale
+        major = self.major.to('deg').value * scale
+        return EllipsePixelRegion(center, major, minor,
+                                  angle=north_angle + self.angle,
+                                  meta=self.meta, visual=self.visual)
