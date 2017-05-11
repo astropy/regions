@@ -1,14 +1,17 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 from __future__ import absolute_import, division, print_function, unicode_literals
+
 from numpy.testing import assert_allclose
-from astropy.tests.helper import pytest
+
 import astropy.units as u
+from astropy.tests.helper import pytest
 from astropy.coordinates import SkyCoord
+from astropy.tests.helper import assert_quantity_allclose
+
 from ...core import PixCoord
 from ..rectangle import RectanglePixelRegion, RectangleSkyRegion
-from .utils import ASTROPY_LT_13, HAS_MATPLOTLIB
-from astropy.tests.helper import assert_quantity_allclose
 from ...tests.helpers import make_simple_wcs
+from .utils import ASTROPY_LT_13, HAS_MATPLOTLIB  # noqa
 
 
 class TestRectanglePixelRegion:

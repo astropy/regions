@@ -4,9 +4,9 @@ from astropy import units as u
 from astropy.coordinates import SkyCoord
 from astropy.tests.helper import assert_quantity_allclose
 
-from ..annulus import CircleAnnulusPixelRegion, CircleAnnulusSkyRegion
 from ...core import PixCoord
 from ...tests.helpers import make_simple_wcs
+from ..annulus import CircleAnnulusPixelRegion, CircleAnnulusSkyRegion
 
 
 def test_init_pixel():

@@ -1,12 +1,16 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
+
 from __future__ import absolute_import, division, print_function, unicode_literals
+
+from numpy.testing import assert_allclose
+
+from astropy import units as u
 from astropy.coordinates import SkyCoord
+
 from ...core import PixCoord
+from ...tests.helpers import make_simple_wcs
 from ..point import PointPixelRegion, PointSkyRegion
 from .utils import ASTROPY_LT_13
-from ...tests.helpers import make_simple_wcs
-from numpy.testing import assert_allclose
-from astropy import units as u
 
 
 class TestPointPixelRegion:

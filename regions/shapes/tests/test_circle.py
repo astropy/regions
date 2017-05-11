@@ -1,17 +1,21 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
+
 from __future__ import absolute_import, division, print_function, unicode_literals
+
 import numpy as np
 from numpy.testing import assert_allclose, assert_equal
+
 from astropy import units as u
 from astropy.coordinates import SkyCoord
 from astropy.tests.helper import pytest, assert_quantity_allclose
 from astropy.utils.data import get_pkg_data_filename
 from astropy.io import fits
 from astropy.wcs import WCS
+
 from ...core import PixCoord
-from ..circle import CirclePixelRegion, CircleSkyRegion
-from .utils import ASTROPY_LT_13, HAS_MATPLOTLIB
 from ...tests.helpers import make_simple_wcs
+from ..circle import CirclePixelRegion, CircleSkyRegion
+from .utils import ASTROPY_LT_13
 
 
 @pytest.fixture(scope='session')

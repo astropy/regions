@@ -1,15 +1,18 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 from __future__ import absolute_import, division, print_function, unicode_literals
+
 import numpy as np
 from numpy.testing import assert_allclose, assert_equal
+
 from astropy.tests.helper import pytest, assert_quantity_allclose
 from astropy import units as u
 from astropy.coordinates import SkyCoord
+
 from ..._utils.examples import make_example_dataset
 from ...core import PixCoord, BoundingBox
-from ..polygon import PolygonPixelRegion, PolygonSkyRegion
-from .utils import ASTROPY_LT_13, HAS_MATPLOTLIB
 from ...tests.helpers import make_simple_wcs
+from ..polygon import PolygonPixelRegion, PolygonSkyRegion
+from .utils import ASTROPY_LT_13, HAS_MATPLOTLIB  # noqa
 
 
 @pytest.fixture(scope='session')

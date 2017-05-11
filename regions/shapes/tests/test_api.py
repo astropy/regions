@@ -3,12 +3,16 @@
 The tests in this file simply check what functionality is currently
 implemented and doesn't check anything about correctness.
 """
+
 from __future__ import absolute_import, division, print_function, unicode_literals
+
 import itertools
+
 from astropy.tests.helper import pytest
 from astropy import units as u
 from astropy.coordinates import SkyCoord
 from astropy.wcs import WCS
+
 from ...core.mask import Mask
 from ...core.core import Region, SkyRegion, PixelRegion
 from ...core.pixcoord import PixCoord
@@ -73,7 +77,9 @@ def test_pix_to_shapely(region):
     assert isinstance(shape, BaseGeometry)
 
 
-@pytest.mark.parametrize(('region', 'mode'), itertools.product(PIXEL_REGIONS, MASK_MODES), ids=ids_func)
+@pytest.mark.parametrize(('region', 'mode'),
+                         itertools.product(PIXEL_REGIONS, MASK_MODES),
+                         ids=ids_func)
 def test_pix_to_mask(region, mode):
     try:
         mask = region.to_mask(mode=mode)
