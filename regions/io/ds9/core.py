@@ -38,7 +38,7 @@ class ShapeList(list):
 
 class Shape(object):
     """Helper class to represent a DS9
-    
+
     This serves as intermediate step in the parsing process.
 
     Parameters

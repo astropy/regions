@@ -284,7 +284,7 @@ class DS9RegionParser(object):
     region_type : str
         Region type
     global_meta : dict
-        Global meta data 
+        Global meta data
     line : str
         Line to parse
     """

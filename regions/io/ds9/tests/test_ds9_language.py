@@ -109,7 +109,6 @@ def test_ds9_string_to_objects():
     """Simple test case for ds9_string_to_objects
     """
     ds9_str = '# Region file format: DS9 astropy/regions\nfk5\ncircle(42.0000,43.0000,3.0000)\n'
-    
     parser = DS9Parser(ds9_str)
     parser.run()
     regions = parser.shapes.to_region()
