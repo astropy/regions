@@ -31,9 +31,9 @@ class PointPixelRegion(PixelRegion):
     def to_shapely(self):
         return self.center.to_shapely()
 
-    def to_sky(self, wcs, mode='local', tolerance=None):
-        # TODO: needs to be implemented
-        raise NotImplementedError
+    def to_sky(self, wcs):
+        center = pixel_to_skycoord(self.center.x, self.center.y, wcs=wcs)
+        return PointSkyRegion(center)
 
     @property
     def bounding_box(self):

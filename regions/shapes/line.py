@@ -44,11 +44,6 @@ class LinePixelRegion(PixelRegion):
         return LineString([(self.start.x, self.start.y), (self.end.x, self.end.y)])
 
     def to_sky(self, wcs, mode='local', tolerance=None):
-        if mode != 'local':
-            raise NotImplementedError
-        if tolerance is not None:
-            raise NotImplementedError
-
         start = pixel_to_skycoord(self.start.x, self.start.y, wcs)
         end = pixel_to_skycoord(self.end.x, self.end.y, wcs)
         return LineSkyRegion(start, end)

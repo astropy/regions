@@ -11,6 +11,7 @@ from astropy.wcs import WCS
 from ...core import PixCoord
 from ..circle import CirclePixelRegion, CircleSkyRegion
 from .utils import ASTROPY_LT_13, HAS_MATPLOTLIB
+from ...tests.helpers import make_simple_wcs
 
 
 @pytest.fixture(scope='session')
@@ -21,11 +22,19 @@ def wcs():
 
 
 class TestCirclePixelRegion:
+
     def setup(self):
         center = PixCoord(3, 4)
         self.reg = CirclePixelRegion(center, 2)
         self.pixcoord_inside = PixCoord(3, 4)
         self.pixcoord_outside = PixCoord(3, 0)
+
+    def test_pix_sky_roundtrip(self):
+        wcs = make_simple_wcs(SkyCoord(2 * u.deg, 3 * u.deg), 0.1 * u.deg, 20)
+        reg_new = self.reg.to_sky(wcs).to_pixel(wcs)
+        assert_allclose(reg_new.center.x, self.reg.center.x)
+        assert_allclose(reg_new.center.y, self.reg.center.y)
+        assert_allclose(reg_new.radius, self.reg.radius)
 
     def test_repr_str(self):
         reg_repr = '<CirclePixelRegion(PixCoord(x=3, y=4), radius=2)>'

@@ -4,6 +4,9 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import numpy as np
 from astropy import units as u
 
+from astropy.coordinates import Angle
+from astropy.wcs.utils import pixel_to_skycoord
+
 from ..core import PixCoord, PixelRegion, SkyRegion, Mask, BoundingBox
 from .._geometry import rectangular_overlap_grid
 from .._utils.wcs_helpers import skycoord_to_pixel_scale_angle
@@ -98,9 +101,15 @@ class RectanglePixelRegion(PixelRegion):
 
         return affinity.rotate(rectangle, self.angle.to(u.deg).value)
 
-    def to_sky(self, wcs, mode='local', tolerance=None):
-        # TODO: needs to be implemented
-        raise NotImplementedError
+    def to_sky(self, wcs):
+        # TODO: write a pixel_to_skycoord_scale_angle
+        center = pixel_to_skycoord(self.center.x, self.center.y, wcs)
+        _, scale, north_angle = skycoord_to_pixel_scale_angle(center, wcs)
+        width = Angle(self.width / scale, 'deg')
+        height = Angle(self.height / scale, 'deg')
+        return RectangleSkyRegion(center, width, height,
+                                  angle=self.angle - north_angle,
+                                  meta=self.meta, visual=self.visual)
 
     @property
     def bounding_box(self):

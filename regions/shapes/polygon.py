@@ -49,12 +49,7 @@ class PolygonPixelRegion(PixelRegion):
         from shapely.geometry import Polygon
         return Polygon(list(zip(self.vertices.x, self.vertices.y)))
 
-    def to_sky(self, wcs, mode='local', tolerance=None):
-        if mode != 'local':
-            raise NotImplementedError
-        if tolerance is not None:
-            raise NotImplementedError
-
+    def to_sky(self, wcs):
         vertices_sky = pixel_to_skycoord(self.vertices.x, self.vertices.y, wcs)
         return PolygonSkyRegion(vertices=vertices_sky)
 

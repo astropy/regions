@@ -9,6 +9,7 @@ from ..._utils.examples import make_example_dataset
 from ...core import PixCoord, BoundingBox
 from ..polygon import PolygonPixelRegion, PolygonSkyRegion
 from .utils import ASTROPY_LT_13, HAS_MATPLOTLIB
+from ...tests.helpers import make_simple_wcs
 
 
 @pytest.fixture(scope='session')
@@ -19,6 +20,7 @@ def wcs():
 
 
 class TestPolygonPixelRegion:
+
     def setup(self):
         # We will be using this polygon for basic tests:
         #
@@ -28,18 +30,24 @@ class TestPolygonPixelRegion:
         #       |  \
         # (0,0) *---* (2, 0)
         #
-        vertices = PixCoord([0, 2, 0], [0, 0, 3])
+        vertices = PixCoord([1, 3, 1], [1, 1, 4])
         self.reg = PolygonPixelRegion(vertices)
-        self.pixcoord_inside = PixCoord(1, 1)
-        self.pixcoord_outside = PixCoord(1, 2)
+        self.pixcoord_inside = PixCoord(2, 2)
+        self.pixcoord_outside = PixCoord(2, 3)
+
+    def test_pix_sky_roundtrip(self):
+        wcs = make_simple_wcs(SkyCoord(2 * u.deg, 3 * u.deg), 0.1 * u.deg, 20)
+        reg_new = self.reg.to_sky(wcs).to_pixel(wcs)
+        assert_allclose(reg_new.vertices.x, self.reg.vertices.x)
+        assert_allclose(reg_new.vertices.y, self.reg.vertices.y)
 
     def test_repr_str(self):
-        reg_repr = ('<PolygonPixelRegion(vertices=PixCoord(x=[0 2 0], '
-                    'y=[0 0 3]))>')
+        reg_repr = ('<PolygonPixelRegion(vertices=PixCoord(x=[1 3 1], '
+                    'y=[1 1 4]))>')
         assert repr(self.reg) == reg_repr
 
-        reg_str = ('Region: PolygonPixelRegion\nvertices: PixCoord(x=[0 2 0],'
-                   ' y=[0 0 3])')
+        reg_str = ('Region: PolygonPixelRegion\nvertices: PixCoord(x=[1 3 1],'
+                   ' y=[1 1 4])')
         assert str(self.reg) == reg_str
 
     def test_contains_scalar(self):
@@ -50,7 +58,7 @@ class TestPolygonPixelRegion:
         assert self.pixcoord_outside not in self.reg
 
     def test_contains_array_1d(self):
-        pixcoord = PixCoord([1, 1], [1, 2])
+        pixcoord = PixCoord([2, 2], [2, 3])
         actual = self.reg.contains(pixcoord)
         expected = [True, False]
         assert_equal(actual, expected)
@@ -61,8 +69,8 @@ class TestPolygonPixelRegion:
 
     def test_contains_array_2d(self):
         pixcoord = PixCoord(
-            [[1, 1, 1], [1, 1, 1]],
-            [[1, 1, 1], [2, 2, 2]],
+            [[2, 2, 2], [2, 2, 2]],
+            [[2, 2, 2], [3, 3, 3]],
         )
         actual = self.reg.contains(pixcoord)
         expected = [[True, True, True], [False, False, False]]
@@ -70,7 +78,7 @@ class TestPolygonPixelRegion:
 
     def test_bounding_box(self):
         bbox = self.reg.bounding_box
-        assert bbox == BoundingBox(ixmin=0, ixmax=3, iymin=0, iymax=4)
+        assert bbox == BoundingBox(ixmin=1, ixmax=4, iymin=1, iymax=5)
 
     def test_to_mask(self):
         # The true area of this polygon is 3
@@ -84,7 +92,7 @@ class TestPolygonPixelRegion:
         # so we only assert on it once here, not in the other cases below
         mask = self.reg.to_mask(mode='center', subpixels=1)
         assert 2 <= np.sum(mask.data) <= 6
-        assert mask.bbox == BoundingBox(ixmin=0, ixmax=3, iymin=0, iymax=4)
+        assert mask.bbox == BoundingBox(ixmin=1, ixmax=4, iymin=1, iymax=5)
         assert mask.data.shape == (4, 3)
 
         # Test more cases for to_mask
@@ -107,7 +115,7 @@ class TestPolygonPixelRegion:
     @pytest.mark.skipif('not HAS_MATPLOTLIB')
     def test_as_patch(self):
         patch = self.reg.as_patch()
-        expected = [[0, 0], [2, 0], [0, 3], [0, 0]]
+        expected = [[1, 1], [3, 1], [1, 4], [1, 1]]
         assert_allclose(patch.xy, expected)
 
 

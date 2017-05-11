@@ -44,17 +44,10 @@ class CirclePixelRegion(PixelRegion):
     def to_shapely(self):
         return self.center.to_shapely().buffer(self.radius)
 
-    def to_sky(self, wcs, mode='local', tolerance=None):
-        if mode != 'local':
-            raise NotImplementedError
-        if tolerance is not None:
-            raise NotImplementedError
-
+    def to_sky(self, wcs):
+        # TODO: write a pixel_to_skycoord_scale_angle
         center = pixel_to_skycoord(self.center.x, self.center.y, wcs)
-        # TODO: this is just called to compute `scale`
-        # This is inefficient ... we should have that as a separate function.
         _, scale, _ = skycoord_to_pixel_scale_angle(center, wcs)
-
         radius = Angle(self.radius / scale, 'deg')
         return CircleSkyRegion(center, radius)
 

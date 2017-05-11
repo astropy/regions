@@ -4,12 +4,21 @@ from astropy.coordinates import SkyCoord
 from ...core import PixCoord
 from ..point import PointPixelRegion, PointSkyRegion
 from .utils import ASTROPY_LT_13
+from ...tests.helpers import make_simple_wcs
+from numpy.testing import assert_allclose
+from astropy import units as u
 
 
 class TestPointPixelRegion:
     def setup(self):
         center = PixCoord(3, 4)
         self.reg = PointPixelRegion(center)
+
+    def test_pix_sky_roundtrip(self):
+        wcs = make_simple_wcs(SkyCoord(2 * u.deg, 3 * u.deg), 0.1 * u.deg, 20)
+        reg_new = self.reg.to_sky(wcs).to_pixel(wcs)
+        assert_allclose(reg_new.center.x, self.reg.center.x)
+        assert_allclose(reg_new.center.y, self.reg.center.y)
 
     def test_repr_str(self):
         reg_repr = '<PointPixelRegion(PixCoord(x=3, y=4))>'

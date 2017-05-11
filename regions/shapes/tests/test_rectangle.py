@@ -7,6 +7,8 @@ from astropy.coordinates import SkyCoord
 from ...core import PixCoord
 from ..rectangle import RectanglePixelRegion, RectangleSkyRegion
 from .utils import ASTROPY_LT_13, HAS_MATPLOTLIB
+from astropy.tests.helper import assert_quantity_allclose
+from ...tests.helpers import make_simple_wcs
 
 
 class TestRectanglePixelRegion:
@@ -18,6 +20,15 @@ class TestRectanglePixelRegion:
             height=3,
             angle=5 * u.deg,
         )
+
+    def test_pix_sky_roundtrip(self):
+        wcs = make_simple_wcs(SkyCoord(2 * u.deg, 3 * u.deg), 0.1 * u.deg, 20)
+        reg_new = self.reg.to_sky(wcs).to_pixel(wcs)
+        assert_allclose(reg_new.center.x, self.reg.center.x)
+        assert_allclose(reg_new.center.y, self.reg.center.y)
+        assert_allclose(reg_new.width, self.reg.width)
+        assert_allclose(reg_new.height, self.reg.height)
+        assert_quantity_allclose(reg_new.angle, self.reg.angle)
 
     def test_repr_str(self):
         reg_repr = ('<RectanglePixelRegion(PixCoord(x=3, y=4), width=4, '

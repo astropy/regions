@@ -11,6 +11,7 @@ from astropy.wcs import WCS
 from ...core import PixCoord
 from ..line import LinePixelRegion, LineSkyRegion
 from .utils import ASTROPY_LT_13, HAS_MATPLOTLIB
+from ...tests.helpers import make_simple_wcs
 
 
 @pytest.fixture(scope='session')
@@ -26,6 +27,14 @@ class TestLinePixelRegion:
         point2 = PixCoord(4, 4)
         self.reg = LinePixelRegion(point1, point2)
         self.pixcoord = PixCoord(3, 0)
+
+    def test_pix_sky_roundtrip(self):
+        wcs = make_simple_wcs(SkyCoord(2 * u.deg, 3 * u.deg), 0.1 * u.deg, 20)
+        reg_new = self.reg.to_sky(wcs).to_pixel(wcs)
+        assert_allclose(reg_new.start.x, self.reg.start.x)
+        assert_allclose(reg_new.start.y, self.reg.start.y)
+        assert_allclose(reg_new.end.x, self.reg.end.x)
+        assert_allclose(reg_new.end.y, self.reg.end.y)
 
     def test_repr_str(self):
         assert 'Line' in str(self.reg)

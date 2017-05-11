@@ -5,6 +5,8 @@ import math
 
 import numpy as np
 from astropy import units as u
+from astropy.coordinates import Angle
+from astropy.wcs.utils import pixel_to_skycoord
 
 from ..core import PixCoord, PixelRegion, SkyRegion, Mask, BoundingBox
 from .._geometry import elliptical_overlap_grid
@@ -91,8 +93,14 @@ class EllipsePixelRegion(PixelRegion):
         return affinity.rotate(ellipse, self.angle.to(u.deg).value)
 
     def to_sky(self, wcs):
-        # TODO: needs to be implemented
-        raise NotImplementedError
+        # TODO: write a pixel_to_skycoord_scale_angle
+        center = pixel_to_skycoord(self.center.x, self.center.y, wcs)
+        _, scale, north_angle = skycoord_to_pixel_scale_angle(center, wcs)
+        minor = Angle(self.minor / scale, 'deg')
+        major = Angle(self.major / scale, 'deg')
+        return EllipseSkyRegion(center, major, minor,
+                                angle=self.angle - north_angle,
+                                meta=self.meta, visual=self.visual)
 
     @property
     def bounding_box(self):
@@ -199,5 +207,5 @@ class EllipseSkyRegion(SkyRegion):
         minor = self.minor.to('deg').value * scale
         major = self.major.to('deg').value * scale
         return EllipsePixelRegion(center, major, minor,
-                                  angle=north_angle + self.angle,
+                                  angle=self.angle + north_angle,
                                   meta=self.meta, visual=self.visual)
