@@ -70,6 +70,56 @@ def read_ds9(filename, errors='strict'):
     return parser.shapes.to_region()
 
 
+class CoordinateParser(object):
+    """Helper class to structure coordinate parser"""
+    @staticmethod
+    def parse_coordinate(string_rep, unit):
+        """
+        Parse a single coordinate
+        """
+        # Any ds9 coordinate representation (sexagesimal or degrees)
+        if 'd' in string_rep or 'h' in string_rep:
+            return coordinates.Angle(string_rep)
+        elif unit is 'hour_or_deg':
+            if ':' in string_rep:
+                spl = tuple([float(x) for x in string_rep.split(":")])
+                return coordinates.Angle(spl, u.hourangle)
+            else:
+                ang = float(string_rep)
+                return coordinates.Angle(ang, u.deg)
+        elif unit.is_equivalent(u.deg):
+            # return coordinates.Angle(string_rep, unit=unit)
+            if ':' in string_rep:
+                ang = tuple([float(x) for x in string_rep.split(":")])
+            else:
+                ang = float(string_rep)
+            return coordinates.Angle(ang, u.deg)
+        else:
+            return u.Quantity(float(string_rep), unit)
+
+    @staticmethod
+    def parse_angular_length_quantity(string_rep):
+        """
+        Given a string that is either a number or a number and a unit, return a
+        Quantity of that string.  e.g.:
+
+            23.9 -> 23.9*u.deg
+            50" -> 50*u.arcsec
+        """
+        unit_mapping = {
+            '"': u.arcsec,
+            "'": u.arcmin,
+            'r': u.rad,
+            'i': u.dimensionless_unscaled,
+        }
+        has_unit = string_rep[-1] not in string.digits
+        if has_unit:
+            unit = unit_mapping[string_rep[-1]]
+            return u.Quantity(float(string_rep[:-1]), unit=unit)
+        else:
+            return u.Quantity(float(string_rep), unit=u.deg)
+
+
 class DS9Parser(object):
     """Parse a DS9 string
 
@@ -109,7 +159,7 @@ class DS9Parser(object):
 
         # Global states
         self.coordsys = None
-        self.global_meta = None
+        self.global_meta = {}
 
         # Results
         self.shapes = ShapeList()
@@ -202,7 +252,8 @@ class DS9Parser(object):
             raise DS9RegionParserError("No coordinate system specified and a"
                                        " region has been found.")
         else:
-            helper = DS9RegionParser(self.coordsys, include, region_type, line)
+            helper = DS9RegionParser(self.coordsys, region_type,
+                                     self.global_meta, line)
             helper.parse()
             self.shapes.append(helper.shape)
 
@@ -217,7 +268,7 @@ coordinate = CoordinateParser.parse_coordinate
 
 class DS9RegionParser(object):
     """Parse a DS9 region string
-    
+
     This will turn a line containing a DS9 region into a Shape
 
     Parameters
@@ -228,6 +279,8 @@ class DS9RegionParser(object):
         Flag at the beginning of the line
     region_type : str
         Region type
+    global_meta : dict
+        Global meta data 
     line : str
         Line to parse
     """
@@ -257,10 +310,11 @@ class DS9RegionParser(object):
                     }
     """DS9 language specification. This defines how a certain region is read"""
 
-    def __init__(self, coordsys, include, region_type, line):
+    def __init__(self, coordsys, region_type, global_meta, line):
 
-        self.coordsys=coordsys
-        self.region_type=region_type
+        self.coordsys = coordsys
+        self.region_type = region_type
+        self.global_meta = global_meta
         self.line = line
 
         self.meta_str = None
@@ -333,7 +387,9 @@ class DS9RegionParser(object):
 
     def convert_meta(self):
         """Convert meta string to dict"""
-        pass
+        meta_ = DS9Parser.parse_meta(self.meta_str)
+        self.meta = copy.deepcopy(self.global_meta)
+        self.meta.update(meta_)
 
     def make_shape(self):
         """Make shape object"""
@@ -344,53 +400,3 @@ class DS9RegionParser(object):
                            composite=self.composite,
                            include=self.include
                           )
-
-
-class CoordinateParser(object):
-    """Helper class to structure coordinate parser"""
-    @staticmethod
-    def parse_coordinate(string_rep, unit):
-        """
-        Parse a single coordinate
-        """
-        # Any ds9 coordinate representation (sexagesimal or degrees)
-        if 'd' in string_rep or 'h' in string_rep:
-            return coordinates.Angle(string_rep)
-        elif unit is 'hour_or_deg':
-            if ':' in string_rep:
-                spl = tuple([float(x) for x in string_rep.split(":")])
-                return coordinates.Angle(spl, u.hourangle)
-            else:
-                ang = float(string_rep)
-                return coordinates.Angle(ang, u.deg)
-        elif unit.is_equivalent(u.deg):
-            # return coordinates.Angle(string_rep, unit=unit)
-            if ':' in string_rep:
-                ang = tuple([float(x) for x in string_rep.split(":")])
-            else:
-                ang = float(string_rep)
-            return coordinates.Angle(ang, u.deg)
-        else:
-            return u.Quantity(float(string_rep), unit)
-
-    @staticmethod
-    def parse_angular_length_quantity(string_rep):
-        """
-        Given a string that is either a number or a number and a unit, return a
-        Quantity of that string.  e.g.:
-
-            23.9 -> 23.9*u.deg
-            50" -> 50*u.arcsec
-        """
-        unit_mapping = {
-            '"': u.arcsec,
-            "'": u.arcmin,
-            'r': u.rad,
-            'i': u.dimensionless_unscaled,
-        }
-        has_unit = string_rep[-1] not in string.digits
-        if has_unit:
-            unit = unit_mapping[string_rep[-1]]
-            return u.Quantity(float(string_rep[:-1]), unit=unit)
-        else:
-            return u.Quantity(float(string_rep), unit=u.deg)

@@ -24,6 +24,12 @@ class ShapeList(list):
     def to_region(self):
         regions = list()
         for shape in self:
+            # Skip elliptical annuli for now
+            if shape.region_type == 'ellipse' and len(shape.coord) > 5:
+                from .read import DS9RegionParserWarning
+                msg = 'Skipping elliptical annulus {}'.format(shape)
+                warn(msg, DS9RegionParserWarning)
+                continue
             log.debug(shape)
             region = shape.to_region()
             log.debug(region)
@@ -157,4 +163,7 @@ class Shape(object):
             reg = self.shape_to_pixel_region[self.region_type](*coords)
         else:
             raise DS9RegionParserError("No central coordinate")
+
+        reg.visual = {key: self.meta[key] for key in self.meta.keys() if key in viz_keywords}
+        reg.meta = {key: self.meta[key] for key in self.meta.keys() if key not in viz_keywords}
         return reg
