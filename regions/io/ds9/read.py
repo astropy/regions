@@ -133,7 +133,7 @@ class DS9Parser(object):
     `~regions.Shape` object.
 
     Parameters
-    ---------
+    ----------
     region_string : str
         DS9 region string
     errors : ``warn``, ``ignore``, ``strict``
