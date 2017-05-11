@@ -108,7 +108,7 @@ class RectanglePixelRegion(PixelRegion):
         width = Angle(self.width / scale, 'deg')
         height = Angle(self.height / scale, 'deg')
         return RectangleSkyRegion(center, width, height,
-                                  angle=self.angle - north_angle,
+                                  angle=self.angle - (north_angle - 90 * u.deg),
                                   meta=self.meta, visual=self.visual)
 
     @property
@@ -235,5 +235,5 @@ class RectangleSkyRegion(SkyRegion):
         width = self.width.to('deg').value * scale
         height = self.height.to('deg').value * scale
         return RectanglePixelRegion(center, width, height,
-                                    angle=north_angle + self.angle,
+                                    angle=self.angle + (north_angle - 90 * u.deg),
                                     meta=self.meta, visual=self.visual)

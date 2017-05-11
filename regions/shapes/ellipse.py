@@ -83,8 +83,8 @@ class EllipsePixelRegion(PixelRegion):
         sin_angle = np.sin(self.angle)
         dx = pixcoord.x - self.center.x
         dy = pixcoord.y - self.center.y
-        return (((cos_angle * dx + sin_angle * dy) / self.minor) ** 2 +
-                ((sin_angle * dx + cos_angle * dy) / self.major) ** 2 <= 1.)
+        return (((cos_angle * dx + sin_angle * dy) / self.major) ** 2 +
+                ((sin_angle * dx + cos_angle * dy) / self.minor) ** 2 <= 1.)
 
     def to_shapely(self):
         from shapely import affinity
@@ -99,7 +99,7 @@ class EllipsePixelRegion(PixelRegion):
         minor = Angle(self.minor / scale, 'deg')
         major = Angle(self.major / scale, 'deg')
         return EllipseSkyRegion(center, major, minor,
-                                angle=self.angle - north_angle,
+                                angle=self.angle - (north_angle - 90 * u.deg),
                                 meta=self.meta, visual=self.visual)
 
     @property
@@ -207,5 +207,5 @@ class EllipseSkyRegion(SkyRegion):
         minor = self.minor.to('deg').value * scale
         major = self.major.to('deg').value * scale
         return EllipsePixelRegion(center, major, minor,
-                                  angle=self.angle + north_angle,
+                                  angle=self.angle + (north_angle - 90 * u.deg),
                                   meta=self.meta, visual=self.visual)
