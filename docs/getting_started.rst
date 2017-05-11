@@ -377,38 +377,38 @@ can be called, which calls the special ``__contains__`` method defined on the re
 
 .. code-block:: python
 
-    >>> from astropy.coordinates import SkyCoord
     >>> from regions import PixCoord
-    >>> SkyCoord(50, 10, unit='deg') in sky_reg
-    True
-    >>> SkyCoord(50, 60, unit='deg') in sky_reg
-    False
     >>> PixCoord(55, 40) in pix_reg
     True
     >>> PixCoord(55, 200) in pix_reg
     False
 
-The ``in`` operator only works for scalar coordinates,
-because Python requires the return value to be a scalar bool.
-If you try to use ``in`` for non-scalar coordinates, you'll get a ``ValueError``:
+The ``in`` operator only works for scalar coordinates, because Python requires
+the return value to be a scalar bool, and only works for pixel regions. If you
+try to use ``in`` for non-scalar coordinates, you'll get a ``ValueError``:
 
 .. code-block:: python
 
-    >>> skycoords = SkyCoord([50, 50], [10, 60], unit='deg')
-    >>> skycoords in sky_reg
-    ValueError: coord must be scalar. coord=<SkyCoord (ICRS): (ra, dec) in deg
-        [(50.0, 10.0), (50.0, 60.0)]>
+    >>> pixcoord = PixCoord([50, 50], [10, 60])
+    >>> pixcoord in pix_reg
+    ValueError: coord must be scalar. coord=<PixCoord [(50.0, 10.0), (50.0, 60.0)]>
 
-If you have arrays of coordinates, use the `regions.SkyRegion.contains`
-or `regions.PixelRegion.contains` methods:
+If you have arrays of coordinates, use the `regions.SkyRegion.contains` or
+`regions.PixelRegion.contains` methods:
 
 .. code-block:: python
 
-    >>> skycoords = SkyCoord([50, 50], [10, 60], unit='deg')
-    >>> sky_reg.contains(skycoords)
-    array([ True, False], dtype=bool)
     >>> pixcoords = PixCoord.from_sky(skycoords, wcs)
     >>> pix_reg.contains(pixcoords)
+    array([ True, False], dtype=bool)
+
+Note that `regions.SkyRegion.contains`
+requires a WCS to be passed:
+
+.. code-block:: python
+
+    >>> skycoord = SkyCoord([50, 50], [10, 60], unit='deg')
+    >>> sky_reg.contains(skycoord, wcs)
     array([ True, False], dtype=bool)
 
 .. _gs-masks:
@@ -850,6 +850,7 @@ To draw a matplotlib patch object, add it to an `matplotlib.axes.Axes` object.
     patch = region.as_patch()
 
     axes = plt.gca()
+    axes.set_aspect('equal')
     axes.add_patch(patch)
 
     plt.show()
