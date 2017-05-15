@@ -46,7 +46,7 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
         assert_allclose(patch.angle, 5)
 
 
-class TestEllipseSkyRegion:
+class TestEllipseSkyRegion(BaseTestSkyRegion):
 
     reg = EllipseSkyRegion(
         center=SkyCoord(3, 4, unit='deg'),
