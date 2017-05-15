@@ -83,7 +83,7 @@ class EllipsePixelRegion(PixelRegion):
         dx = pixcoord.x - self.center.x
         dy = pixcoord.y - self.center.y
         return (((cos_angle * dx + sin_angle * dy) / self.width) ** 2 +
-                ((sin_angle * dx + cos_angle * dy) / self.height) ** 2 <= 1.)
+                ((sin_angle * dx - cos_angle * dy) / self.height) ** 2 <= 1.)
 
     def to_shapely(self):
         from shapely import affinity
@@ -108,19 +108,36 @@ class EllipsePixelRegion(PixelRegion):
         exact elliptical region.
         """
 
+        # We use the solution described in http://stackoverflow.com/a/88020
+        # which is to use the parametric equation of an ellipse and to find
+        # when dx/dt or dy/dt=0.
+
         cos_angle = np.cos(self.angle)
         sin_angle = np.sin(self.angle)
-        ax = self.width * cos_angle
-        ay = self.width * sin_angle
-        bx = self.height * -sin_angle
-        by = self.height * cos_angle
-        dx = np.sqrt(ax * ax + bx * bx)
-        dy = np.sqrt(ay * ay + by * by)
+        tan_angle = np.tan(self.angle)
 
-        xmin = self.center.x - dx
-        xmax = self.center.x + dx
-        ymin = self.center.y - dy
-        ymax = self.center.y + dy
+        t1 = np.arctan(-self.height * tan_angle / self.width)
+        t2 = t1 + np.pi * u.rad
+
+        dx1 = self.width * cos_angle * np.cos(t1) - self.height * sin_angle * np.sin(t1)
+        dx2 = self.width * cos_angle * np.cos(t2) - self.height * sin_angle * np.sin(t2)
+
+        if dx1 > dx2:
+            dx1, dx2 = dx2, dx1
+
+        t1 = np.arctan(self.height / tan_angle / self.width)
+        t2 = t1 + np.pi * u.rad
+
+        dy1 = self.height * cos_angle * np.sin(t1) + self.width * sin_angle * np.cos(t1)
+        dy2 = self.height * cos_angle * np.sin(t2) + self.width * sin_angle * np.cos(t2)
+
+        if dy1 > dy2:
+            dy1, dy2 = dy2, dy1
+
+        xmin = self.center.x + dx1
+        xmax = self.center.x + dx2
+        ymin = self.center.y + dy1
+        ymax = self.center.y + dy2
 
         return BoundingBox.from_float(xmin, xmax, ymin, ymax)
 

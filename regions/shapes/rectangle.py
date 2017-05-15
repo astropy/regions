@@ -79,8 +79,8 @@ class RectanglePixelRegion(PixelRegion):
         sin_angle = np.sin(self.angle)
         dx = pixcoord.x - self.center.x
         dy = pixcoord.y - self.center.y
-        dx_rot = cos_angle * dx - sin_angle * dy
-        dy_rot = sin_angle * dx + cos_angle * dy
+        dx_rot = cos_angle * dx + sin_angle * dy
+        dy_rot = sin_angle * dx - cos_angle * dy
         return (np.abs(dx_rot) < self.width * 0.5) & (np.abs(dy_rot) < self.height * 0.5)
 
     def to_shapely(self):
