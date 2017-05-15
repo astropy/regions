@@ -54,12 +54,21 @@ class TestLineSkyRegion(BaseTestSkyRegion):
     start = SkyCoord(3 * u.deg, 4 * u.deg, frame='galactic')
     end = SkyCoord(3 * u.deg, 5 * u.deg, frame='galactic')
     reg = LineSkyRegion(start, end)
-    expected_repr = ('<LineSkyRegion(start=<SkyCoord (Galactic): (l, b) in deg\n'
-                     '    ( 3.,  4.)>, end=<SkyCoord (Galactic): (l, b) in deg\n'
-                     '    ( 3.,  5.)>)>')
-    expected_str = ('Region: LineSkyRegion\nstart: <SkyCoord (Galactic): (l, b) in deg\n'
-                     '    ( 3.,  4.)>\nend: <SkyCoord (Galactic): (l, b) in deg\n'
-                     '    ( 3.,  5.)>')
+
+    if ASTROPY_LT_13:
+        expected_repr = ('<LineSkyRegion(start=<SkyCoord (Galactic): (l, b) in deg\n'
+                         '    ( 3.0,  4.0)>, end=<SkyCoord (Galactic): (l, b) in deg\n'
+                         '    ( 3.0,  5.0)>)>')
+        expected_str = ('Region: LineSkyRegion\nstart: <SkyCoord (Galactic): (l, b) in deg\n'
+                         '    ( 3.0,  4.0)>\nend: <SkyCoord (Galactic): (l, b) in deg\n'
+                         '    ( 3.0,  5.0)>')
+    else:
+        expected_repr = ('<LineSkyRegion(start=<SkyCoord (Galactic): (l, b) in deg\n'
+                         '    ( 3.,  4.)>, end=<SkyCoord (Galactic): (l, b) in deg\n'
+                         '    ( 3.,  5.)>)>')
+        expected_str = ('Region: LineSkyRegion\nstart: <SkyCoord (Galactic): (l, b) in deg\n'
+                         '    ( 3.,  4.)>\nend: <SkyCoord (Galactic): (l, b) in deg\n'
+                         '    ( 3.,  5.)>')
 
     def test_transformation(self, wcs):
         pixline = self.reg.to_pixel(wcs)
