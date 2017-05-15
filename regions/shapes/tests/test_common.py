@@ -91,4 +91,5 @@ class BaseTestPixelRegion(BaseTestRegion):
 
 
 class BaseTestSkyRegion(BaseTestRegion):
+    # TODO: here we should add inside/outside tests as above
     pass
