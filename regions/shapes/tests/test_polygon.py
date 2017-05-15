@@ -13,6 +13,7 @@ from ...core import PixCoord, BoundingBox
 from ...tests.helpers import make_simple_wcs
 from ..polygon import PolygonPixelRegion, PolygonSkyRegion
 from .utils import ASTROPY_LT_13, HAS_MATPLOTLIB  # noqa
+from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
 
 
 @pytest.fixture(scope='session')
@@ -22,62 +23,31 @@ def wcs():
     return dataset.wcs
 
 
-class TestPolygonPixelRegion:
+class TestPolygonPixelRegion(BaseTestPixelRegion):
 
-    def setup(self):
-        # We will be using this polygon for basic tests:
-        #
-        # (3,0) *
-        #       |\
-        #       | \
-        #       |  \
-        # (0,0) *---* (2, 0)
-        #
-        vertices = PixCoord([1, 3, 1], [1, 1, 4])
-        self.reg = PolygonPixelRegion(vertices)
-        self.pixcoord_inside = PixCoord(2, 2)
-        self.pixcoord_outside = PixCoord(2, 3)
+    reg = PolygonPixelRegion(PixCoord([1, 3, 1], [1, 1, 4]))
+    sample_box = [0, 4, 0, 5]
+    inside = [(2, 2)]
+    outside = [(3, 2), (3, 3)]
+    expected_area = 3
+    expected_repr = '<PolygonPixelRegion(vertices=PixCoord(x=[1 3 1], y=[1 1 4]))>'
+    expected_str = ('Region: PolygonPixelRegion\nvertices: PixCoord(x=[1 3 1],'
+                    ' y=[1 1 4])')
+
+    # We will be using this polygon for basic tests:
+    #
+    # (3,0) *
+    #       |\
+    #       | \
+    #       |  \
+    # (0,0) *---* (2, 0)
+    #
 
     def test_pix_sky_roundtrip(self):
         wcs = make_simple_wcs(SkyCoord(2 * u.deg, 3 * u.deg), 0.1 * u.deg, 20)
         reg_new = self.reg.to_sky(wcs).to_pixel(wcs)
         assert_allclose(reg_new.vertices.x, self.reg.vertices.x)
         assert_allclose(reg_new.vertices.y, self.reg.vertices.y)
-
-    def test_repr_str(self):
-        reg_repr = ('<PolygonPixelRegion(vertices=PixCoord(x=[1 3 1], '
-                    'y=[1 1 4]))>')
-        assert repr(self.reg) == reg_repr
-
-        reg_str = ('Region: PolygonPixelRegion\nvertices: PixCoord(x=[1 3 1],'
-                   ' y=[1 1 4])')
-        assert str(self.reg) == reg_str
-
-    def test_contains_scalar(self):
-        assert self.reg.contains(self.pixcoord_inside)
-        assert self.pixcoord_inside in self.reg
-
-        assert not self.reg.contains(self.pixcoord_outside)
-        assert self.pixcoord_outside not in self.reg
-
-    def test_contains_array_1d(self):
-        pixcoord = PixCoord([2, 2], [2, 3])
-        actual = self.reg.contains(pixcoord)
-        expected = [True, False]
-        assert_equal(actual, expected)
-
-        with pytest.raises(ValueError) as exc:
-            pixcoord in self.reg
-        assert 'coord must be scalar' in str(exc)
-
-    def test_contains_array_2d(self):
-        pixcoord = PixCoord(
-            [[2, 2, 2], [2, 2, 2]],
-            [[2, 2, 2], [3, 3, 3]],
-        )
-        actual = self.reg.contains(pixcoord)
-        expected = [[True, True, True], [False, False, False]]
-        assert_equal(actual, expected)
 
     def test_bounding_box(self):
         bbox = self.reg.bounding_box
@@ -122,33 +92,28 @@ class TestPolygonPixelRegion:
         assert_allclose(patch.xy, expected)
 
 
-class TestPolygonSkyRegion:
-    def setup(self):
-        vertices = SkyCoord([3, 4, 3] * u.deg, [3, 4, 4] * u.deg)
-        self.poly = PolygonSkyRegion(vertices)
+class TestPolygonSkyRegion(BaseTestSkyRegion):
 
-    def test_repr_str(self):
-        if ASTROPY_LT_13:
-            reg_repr = ('<PolygonSkyRegion(vertices=<SkyCoord (ICRS): (ra, '
-                        'dec) in deg\n    [(3.0, 3.0), (4.0, 4.0), (3.0, '
-                        '4.0)]>)>')
-            reg_str = ('Region: PolygonSkyRegion\nvertices: <SkyCoord (ICRS):'
-                       ' (ra, dec) in deg\n    [(3.0, 3.0), (4.0, 4.0), (3.0,'
-                       ' 4.0)]>')
-        else:
-            reg_repr = ('<PolygonSkyRegion(vertices=<SkyCoord (ICRS): (ra, '
-                        'dec) in deg\n    [( 3.,  3.), ( 4.,  4.), ( 3.,  '
-                        '4.)]>)>')
-            reg_str = ('Region: PolygonSkyRegion\nvertices: <SkyCoord (ICRS):'
-                       ' (ra, dec) in deg\n    [( 3.,  3.), ( 4.,  4.), ( 3.,'
-                       '  4.)]>')
+    reg = PolygonSkyRegion(SkyCoord([3, 4, 3] * u.deg, [3, 4, 4] * u.deg))
 
-        assert repr(self.poly) == reg_repr
-        assert str(self.poly) == reg_str
+    if ASTROPY_LT_13:
+        expected_repr = ('<PolygonSkyRegion(vertices=<SkyCoord (ICRS): (ra, '
+                    'dec) in deg\n    [(3.0, 3.0), (4.0, 4.0), (3.0, '
+                    '4.0)]>)>')
+        expected_str = ('Region: PolygonSkyRegion\nvertices: <SkyCoord (ICRS):'
+                   ' (ra, dec) in deg\n    [(3.0, 3.0), (4.0, 4.0), (3.0,'
+                   ' 4.0)]>')
+    else:
+        expected_repr = ('<PolygonSkyRegion(vertices=<SkyCoord (ICRS): (ra, '
+                    'dec) in deg\n    [( 3.,  3.), ( 4.,  4.), ( 3.,  '
+                    '4.)]>)>')
+        expected_str = ('Region: PolygonSkyRegion\nvertices: <SkyCoord (ICRS):'
+                   ' (ra, dec) in deg\n    [( 3.,  3.), ( 4.,  4.), ( 3.,'
+                   '  4.)]>')
 
     def test_transformation(self, wcs):
 
-        pixpoly = self.poly.to_pixel(wcs)
+        pixpoly = self.reg.to_pixel(wcs)
 
         assert_allclose(pixpoly.vertices.x, [11.187992, 10.976332, 11.024032], atol=1e-5)
         assert_allclose(pixpoly.vertices.y, [1.999486, 2.039001, 2.077076], atol=1e-5)
@@ -158,6 +123,6 @@ class TestPolygonSkyRegion:
         # TODO: we should probably assert something about frame attributes,
         # or generally some better way to check if two SkyCoord are the same?
         # For now, we use the folloing line to transform back to ICRS (`poly` is in Galactic, same as WCS)
-        poly = PolygonSkyRegion(vertices=poly.vertices.transform_to(self.poly.vertices))
-        assert_quantity_allclose(poly.vertices.data.lon, self.poly.vertices.data.lon, atol=1e-3 * u.deg)
-        assert_quantity_allclose(poly.vertices.data.lat, self.poly.vertices.data.lat, atol=1e-3 * u.deg)
+        poly = PolygonSkyRegion(vertices=poly.vertices.transform_to(self.reg.vertices))
+        assert_quantity_allclose(poly.vertices.data.lon, self.reg.vertices.data.lon, atol=1e-3 * u.deg)
+        assert_quantity_allclose(poly.vertices.data.lat, self.reg.vertices.data.lat, atol=1e-3 * u.deg)

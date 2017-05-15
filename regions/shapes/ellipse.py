@@ -74,7 +74,7 @@ class EllipsePixelRegion(PixelRegion):
     @property
     def area(self):
         """Region area (float)"""
-        return math.pi * self.width * self.height
+        return math.pi * self.width * self.height * 0.25
 
     def contains(self, pixcoord):
         pixcoord = PixCoord._validate(pixcoord, name='pixcoord')
@@ -82,12 +82,12 @@ class EllipsePixelRegion(PixelRegion):
         sin_angle = np.sin(self.angle)
         dx = pixcoord.x - self.center.x
         dy = pixcoord.y - self.center.y
-        return (((cos_angle * dx + sin_angle * dy) / self.width) ** 2 +
-                ((sin_angle * dx - cos_angle * dy) / self.height) ** 2 <= 1.)
+        return ((2 * (cos_angle * dx + sin_angle * dy) / self.width) ** 2 +
+                (2 * (sin_angle * dx - cos_angle * dy) / self.height) ** 2 <= 1.)
 
     def to_shapely(self):
         from shapely import affinity
-        ellipse = self.center.to_shapely().buffer(self.height)
+        ellipse = self.center.to_shapely().buffer(0.5 * self.height)
         ellipse = affinity.scale(ellipse, xfact=self.width / self.height, yfact=1)
         return affinity.rotate(ellipse, self.angle.to(u.deg).value)
 
@@ -119,8 +119,8 @@ class EllipsePixelRegion(PixelRegion):
         t1 = np.arctan(-self.height * tan_angle / self.width)
         t2 = t1 + np.pi * u.rad
 
-        dx1 = self.width * cos_angle * np.cos(t1) - self.height * sin_angle * np.sin(t1)
-        dx2 = self.width * cos_angle * np.cos(t2) - self.height * sin_angle * np.sin(t2)
+        dx1 = 0.5 * self.width * cos_angle * np.cos(t1) - 0.5 * self.height * sin_angle * np.sin(t1)
+        dx2 = 0.5 * self.width * cos_angle * np.cos(t2) - 0.5 * self.height * sin_angle * np.sin(t2)
 
         if dx1 > dx2:
             dx1, dx2 = dx2, dx1
@@ -128,8 +128,8 @@ class EllipsePixelRegion(PixelRegion):
         t1 = np.arctan(self.height / tan_angle / self.width)
         t2 = t1 + np.pi * u.rad
 
-        dy1 = self.height * cos_angle * np.sin(t1) + self.width * sin_angle * np.cos(t1)
-        dy2 = self.height * cos_angle * np.sin(t2) + self.width * sin_angle * np.cos(t2)
+        dy1 = 0.5 * self.height * cos_angle * np.sin(t1) + 0.5 * self.width * sin_angle * np.cos(t1)
+        dy2 = 0.5 * self.height * cos_angle * np.sin(t2) + 0.5 * self.width * sin_angle * np.cos(t2)
 
         if dy1 > dy2:
             dy1, dy2 = dy2, dy1
@@ -168,7 +168,7 @@ class EllipsePixelRegion(PixelRegion):
 
         fraction = elliptical_overlap_grid(
             xmin, xmax, ymin, ymax, nx, ny,
-            self.width, self.height,
+            0.5 * self.width, 0.5 * self.height,
             self.angle.to(u.rad).value,
             use_exact, subpixels,
         )
@@ -180,8 +180,8 @@ class EllipsePixelRegion(PixelRegion):
         """
         from matplotlib.patches import Ellipse
         xy = self.center.x, self.center.y
-        width = 2 * self.width
-        height = 2 * self.height
+        width = self.width
+        height = self.height
         # From the docstring: MPL expects "rotation in degrees (anti-clockwise)"
         angle = self.angle.to('deg').value
         return Ellipse(xy=xy, width=width, height=height, angle=angle, **kwargs)

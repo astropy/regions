@@ -2,6 +2,7 @@
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 
+import numpy as np
 import astropy.units as u
 from astropy.wcs.utils import pixel_to_skycoord, skycoord_to_pixel
 
@@ -37,7 +38,10 @@ class LinePixelRegion(PixelRegion):
         return 0 * u.sr
 
     def contains(self, pixcoord):
-        return False
+        if pixcoord.isscalar:
+            return False
+        else:
+            return np.zeros(pixcoord.x.shape, dtype=bool)
 
     def to_shapely(self):
         from shapely.geometry import LineString
@@ -60,7 +64,8 @@ class LinePixelRegion(PixelRegion):
 
         return BoundingBox.from_float(xmin, xmax, ymin, ymax)
 
-    def to_mask(self):
+    def to_mask(self, mode='center', subpixels=5):
+        # TODO: needs to be implemented
         raise NotImplementedError
 
     def as_patch(self, **kwargs):

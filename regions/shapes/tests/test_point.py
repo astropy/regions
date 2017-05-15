@@ -11,12 +11,18 @@ from ...core import PixCoord
 from ...tests.helpers import make_simple_wcs
 from ..point import PointPixelRegion, PointSkyRegion
 from .utils import ASTROPY_LT_13
+from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
 
 
-class TestPointPixelRegion:
-    def setup(self):
-        center = PixCoord(3, 4)
-        self.reg = PointPixelRegion(center)
+class TestPointPixelRegion(BaseTestPixelRegion):
+
+    reg = PointPixelRegion(PixCoord(3, 4))
+    sample_box = [-2, 8, -1, 9]
+    inside = []
+    outside = [(3.1, 4.2), (5, 4)]
+    expected_area = 0
+    expected_repr = '<PointPixelRegion(PixCoord(x=3, y=4))>'
+    expected_str = 'Region: PointPixelRegion\ncenter: PixCoord(x=3, y=4)'
 
     def test_pix_sky_roundtrip(self):
         wcs = make_simple_wcs(SkyCoord(2 * u.deg, 3 * u.deg), 0.1 * u.deg, 20)
@@ -24,30 +30,18 @@ class TestPointPixelRegion:
         assert_allclose(reg_new.center.x, self.reg.center.x)
         assert_allclose(reg_new.center.y, self.reg.center.y)
 
-    def test_repr_str(self):
-        reg_repr = '<PointPixelRegion(PixCoord(x=3, y=4))>'
-        assert repr(self.reg) == reg_repr
 
-        reg_str = 'Region: PointPixelRegion\ncenter: PixCoord(x=3, y=4)'
-        assert str(self.reg) == reg_str
+class TestPointSkyRegion(BaseTestSkyRegion):
 
+    reg = PointSkyRegion(SkyCoord(3, 4, unit='deg'))
 
-class TestPointSkyRegion:
-    def setup(self):
-        center = SkyCoord(3, 4, unit='deg')
-        self.reg = PointSkyRegion(center)
-
-    def test_repr_str(self):
-        if ASTROPY_LT_13:
-            reg_repr = ('<PointSkyRegion(<SkyCoord (ICRS): (ra, dec) in deg\n'
-                        '    (3.0, 4.0)>)>')
-            reg_str = ('Region: PointSkyRegion\ncenter: <SkyCoord (ICRS): '
-                       '(ra, dec) in deg\n    (3.0, 4.0)>')
-        else:
-            reg_repr = ('<PointSkyRegion(<SkyCoord (ICRS): (ra, dec) in deg\n'
-                        '    ( 3.,  4.)>)>')
-            reg_str = ('Region: PointSkyRegion\ncenter: <SkyCoord (ICRS): '
-                       '(ra, dec) in deg\n    ( 3.,  4.)>')
-
-        assert repr(self.reg) == reg_repr
-        assert str(self.reg) == reg_str
+    if ASTROPY_LT_13:
+        expected_repr = ('<PointSkyRegion(<SkyCoord (ICRS): (ra, dec) in deg\n'
+                    '    (3.0, 4.0)>)>')
+        expected_str = ('Region: PointSkyRegion\ncenter: <SkyCoord (ICRS): '
+                   '(ra, dec) in deg\n    (3.0, 4.0)>')
+    else:
+        expected_repr = ('<PointSkyRegion(<SkyCoord (ICRS): (ra, dec) in deg\n'
+                    '    ( 3.,  4.)>)>')
+        expected_str = ('Region: PointSkyRegion\ncenter: <SkyCoord (ICRS): '
+                   '(ra, dec) in deg\n    ( 3.,  4.)>')
