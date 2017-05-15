@@ -57,11 +57,11 @@ class TestLineSkyRegion(BaseTestSkyRegion):
 
     if ASTROPY_LT_13:
         expected_repr = ('<LineSkyRegion(start=<SkyCoord (Galactic): (l, b) in deg\n'
-                         '    ( 3.0,  4.0)>, end=<SkyCoord (Galactic): (l, b) in deg\n'
-                         '    ( 3.0,  5.0)>)>')
+                         '    (3.0, 4.0)>, end=<SkyCoord (Galactic): (l, b) in deg\n'
+                         '    (3.0, 5.0)>)>')
         expected_str = ('Region: LineSkyRegion\nstart: <SkyCoord (Galactic): (l, b) in deg\n'
-                         '    ( 3.0,  4.0)>\nend: <SkyCoord (Galactic): (l, b) in deg\n'
-                         '    ( 3.0,  5.0)>')
+                         '    (3.0, 4.0)>\nend: <SkyCoord (Galactic): (l, b) in deg\n'
+                         '    (3.0, 5.0)>')
     else:
         expected_repr = ('<LineSkyRegion(start=<SkyCoord (Galactic): (l, b) in deg\n'
                          '    ( 3.,  4.)>, end=<SkyCoord (Galactic): (l, b) in deg\n'
