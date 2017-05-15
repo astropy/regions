@@ -37,7 +37,6 @@ User guide
    plotting
    ds9
    shapely
-   epilogue
 
 Advanced
 ========
