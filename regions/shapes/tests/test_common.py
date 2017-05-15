@@ -24,7 +24,10 @@ class BaseTestRegion(object):
 class BaseTestPixelRegion(BaseTestRegion):
 
     def test_area(self):
-        assert_allclose(self.reg.area, self.expected_area)
+        try:
+            assert_allclose(self.reg.area, self.expected_area)
+        except ImportError:
+            pytest.skip()
 
     def test_mask_area(self):
         try:
