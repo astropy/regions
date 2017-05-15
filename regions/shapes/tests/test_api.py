@@ -24,13 +24,13 @@ from .utils import HAS_SHAPELY  # noqa
 
 PIXEL_REGIONS = [
     CirclePixelRegion(PixCoord(3, 4), radius=5),
-    EllipsePixelRegion(PixCoord(3, 4), major=7, minor=5, angle=3 * u.deg),
+    EllipsePixelRegion(PixCoord(3, 4), width=7, height=5, angle=3 * u.deg),
     PolygonPixelRegion(PixCoord([1, 4, 3], [2, 4, 4])),
     RectanglePixelRegion(PixCoord(6, 5), width=3, height=5)]
 
 SKY_REGIONS = [
     CircleSkyRegion(SkyCoord(3 * u.deg, 4 * u.deg), radius=5 * u.deg),
-    EllipseSkyRegion(SkyCoord(3 * u.deg, 4 * u.deg), major=7 * u.deg, minor=5 * u.deg, angle=3 * u.deg),
+    EllipseSkyRegion(SkyCoord(3 * u.deg, 4 * u.deg), width=7 * u.deg, height=5 * u.deg, angle=3 * u.deg),
     PolygonSkyRegion(SkyCoord([1, 4, 3] * u.deg, [2, 4, 4] * u.deg)),
     RectangleSkyRegion(SkyCoord(6 * u.deg, 5 * u.deg), width=3 * u.deg, height=5 * u.deg)]
 

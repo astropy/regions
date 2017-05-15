@@ -245,10 +245,10 @@ currently supported.
     >>> from regions import PixCoord, EllipseSkyRegion, EllipsePixelRegion
 
     >>> ellipse_sky = EllipseSkyRegion(center=SkyCoord(42, 43, unit='deg'),
-    ...                                minor=Angle(3, 'deg'), major=Angle(4, 'deg'),
+    ...                                height=Angle(3, 'deg'), width=Angle(4, 'deg'),
     ...                                angle=Angle(5, 'deg'))
     >>> ellipse_pix = EllipsePixelRegion(center=PixCoord(x=42, y=43),
-    ...                                  minor=4.2, major=4.2,
+    ...                                  height=4.2, width=4.2,
     ...                                  angle=Angle(5, 'deg'))
 
 * `~regions.PointSkyRegion` and `~regions.PointPixelRegion`

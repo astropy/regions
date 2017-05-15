@@ -23,12 +23,12 @@ class RectanglePixelRegion(PixelRegion):
     center : `~regions.PixCoord`
         The position of the center of the rectangle.
     width : float
-        The width of the rectangle
+        The width of the rectangle (before rotation) in pixels
     height : float
-        The height of the rectangle
+        The height of the rectangle (before rotation) in pixels
     angle : `~astropy.units.Quantity`
-        The rotation of the rectangle. If set to zero (the default), the width
-        is lined up with the x axis.
+        The rotation angle of the rectangle, measured anti-clockwise. If set to
+        zero (the default), the width axis is lined up with the x axis.
 
     Examples
     --------
@@ -209,12 +209,13 @@ class RectangleSkyRegion(SkyRegion):
     center : `~astropy.coordinates.SkyCoord`
         The position of the center of the rectangle.
     width : `~astropy.units.Quantity`
-        The width radius of the rectangle
+        The width of the rectangle (before rotation) as an angle
     height : `~astropy.units.Quantity`
-        The height radius of the rectangle
+        The height of the rectangle (before rotation) as an angle
     angle : `~astropy.units.Quantity`
-        The rotation of the rectangle. If set to zero (the default), the width
-        is lined up with the longitude axis of the celestial coordinates.
+        The rotation angle of the rectangle, measured anti-clockwise. If set to
+        zero (the default), the width axis is lined up with the longitude axis
+        of the celestial coordinates.
     """
 
     def __init__(self, center, width, height, angle=0 * u.deg, meta=None, visual=None):
