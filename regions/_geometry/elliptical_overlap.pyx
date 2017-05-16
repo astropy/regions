@@ -54,11 +54,11 @@ def elliptical_overlap_grid(double xmin, double xmax, double ymin, double ymax,
     nx, ny : int
         Grid dimensions.
     rx : float
-        The semimajor axis of the ellipse.
+        The width axis of the ellipse (without rotation).
     ry : float
-        The semiminor axis of the ellipse.
+        The height axis of the ellipse (without rotation).
     theta : float
-        The position angle of the semimajor axis in radians (counterclockwise).
+        The rotation of the ellipse in radians (counterclockwise).
     use_exact : 0 or 1
         If set to 1, calculates the exact overlap, while if set to 0, uses a
         subpixel sampling method with ``subpixel`` subpixels in each direction.
@@ -171,7 +171,7 @@ cdef double elliptical_overlap_single_exact(double xmin, double ymin,
                                             double theta):
     """
     Given a rectangle defined by (xmin, ymin, xmax, ymax) and an ellipse
-    with major and minor axes rx and ry respectively, position angle theta,
+    with width and height rx and ry respectively, rotation angle theta,
     and centered at the origin, find the area of overlap.
     """
 

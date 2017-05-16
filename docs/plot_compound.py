@@ -40,14 +40,14 @@ skycoords = SkyCoord(coords, unit='deg', frame='galactic')
 compound_and = circle1 & circle2
 compound_xor = circle1 ^ circle2
 
-mask_and = compound_and.contains(skycoords)
+mask_and = compound_and.contains(skycoords, wcs)
 skycoords_and = skycoords[mask_and]
-mask_xor = compound_xor.contains(skycoords)
+mask_xor = compound_xor.contains(skycoords, wcs)
 skycoords_xor = skycoords[mask_xor]
 
 # plot
 fig = plt.figure()
-ax = fig.add_axes([0.15, 0.1, 0.8, 0.8], projection=wcs)
+ax = fig.add_axes([0.15, 0.1, 0.8, 0.8], projection=wcs, aspect='equal')
 
 ax.scatter(skycoords.l.value, skycoords.b.value, label='all',
            transform=ax.get_transform('galactic'))

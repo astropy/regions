@@ -1,6 +1,10 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 from __future__ import absolute_import, division, print_function, unicode_literals
-from ..core import PixelRegion, SkyRegion
+
+import numpy as np
+from astropy.wcs.utils import pixel_to_skycoord, skycoord_to_pixel
+
+from ..core import PixCoord, PixelRegion, SkyRegion, BoundingBox
 
 __all__ = ['PointPixelRegion', 'PointSkyRegion']
 
@@ -22,28 +26,36 @@ class PointPixelRegion(PixelRegion):
         self.visual = visual or {}
         self._repr_params = None
 
+    @property
+    def area(self):
+        return 0
+
     def contains(self, pixcoord):
-        return False
+        if pixcoord.isscalar:
+            return False
+        else:
+            return np.zeros(pixcoord.x.shape, dtype=bool)
 
     def to_shapely(self):
         return self.center.to_shapely()
 
-    def to_sky(self, wcs, mode='local', tolerance=None):
-        # TODO: needs to be implemented
-        raise NotImplementedError
+    def to_sky(self, wcs):
+        center = pixel_to_skycoord(self.center.x, self.center.y, wcs=wcs)
+        return PointSkyRegion(center)
 
     @property
     def bounding_box(self):
-        # TODO: needs to be implemented
-        raise NotImplementedError
+        return BoundingBox.from_float(self.center.x, self.center.x,
+                                      self.center.y, self.center.y)
 
-    def to_mask(self, mode='center'):
+    def to_mask(self, mode='center', subpixels=5):
         # TODO: needs to be implemented
         raise NotImplementedError
 
     def as_patch(self, **kwargs):
-        # TODO: needs to be implemented
-        raise NotImplementedError
+        # FIXME: need to make radius constant
+        from matplotlib.patches import Circle
+        return Circle((self.center.x, self.center.y), radius=2, **kwargs)
 
 
 class PointSkyRegion(SkyRegion):
@@ -66,6 +78,7 @@ class PointSkyRegion(SkyRegion):
     def contains(self, skycoord):
         return False
 
-    def to_pixel(self, wcs, mode='local', tolerance=None):
-        # TODO: needs to be implemented
-        raise NotImplementedError
+    def to_pixel(self, wcs):
+        center_x, center_y = skycoord_to_pixel(self.center, wcs=wcs)
+        center = PixCoord(center_x, center_y)
+        return PointPixelRegion(center)

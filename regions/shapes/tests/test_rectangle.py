@@ -1,32 +1,39 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 from __future__ import absolute_import, division, print_function, unicode_literals
+
 from numpy.testing import assert_allclose
-from astropy.tests.helper import pytest
+
 import astropy.units as u
+from astropy.tests.helper import pytest
 from astropy.coordinates import SkyCoord
+from astropy.tests.helper import assert_quantity_allclose
+
 from ...core import PixCoord
 from ..rectangle import RectanglePixelRegion, RectangleSkyRegion
-from .utils import ASTROPY_LT_13, HAS_MATPLOTLIB
+from ...tests.helpers import make_simple_wcs
+from .utils import ASTROPY_LT_13, HAS_MATPLOTLIB  # noqa
+from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
 
 
-class TestRectanglePixelRegion:
-    def setup(self):
-        center = PixCoord(3, 4)
-        self.reg = RectanglePixelRegion(
-            center=center,
-            width=4,
-            height=3,
-            angle=5 * u.deg,
-        )
+class TestRectanglePixelRegion(BaseTestPixelRegion):
 
-    def test_repr_str(self):
-        reg_repr = ('<RectanglePixelRegion(PixCoord(x=3, y=4), width=4, '
-                    'height=3, angle=5.0 deg)>')
-        assert repr(self.reg) == reg_repr
+    reg = RectanglePixelRegion(center=PixCoord(3, 4), width=4, height=3, angle=5 * u.deg)
+    sample_box = [-2, 8, -1, 9]
+    inside = [(4.5, 4)]
+    outside = [(5, 2.5)]
+    expected_area = 12
+    expected_repr = '<RectanglePixelRegion(PixCoord(x=3, y=4), width=4, height=3, angle=5.0 deg)>'
+    expected_str = ('Region: RectanglePixelRegion\ncenter: PixCoord(x=3, y=4)\n'
+                    'width: 4\nheight: 3\nangle: 5.0 deg')
 
-        reg_str = ('Region: RectanglePixelRegion\ncenter: PixCoord(x=3, '
-                   'y=4)\nwidth: 4\nheight: 3\nangle: 5.0 deg')
-        assert str(self.reg) == reg_str
+    def test_pix_sky_roundtrip(self):
+        wcs = make_simple_wcs(SkyCoord(2 * u.deg, 3 * u.deg), 0.1 * u.deg, 20)
+        reg_new = self.reg.to_sky(wcs).to_pixel(wcs)
+        assert_allclose(reg_new.center.x, self.reg.center.x)
+        assert_allclose(reg_new.center.y, self.reg.center.y)
+        assert_allclose(reg_new.width, self.reg.width)
+        assert_allclose(reg_new.height, self.reg.height)
+        assert_quantity_allclose(reg_new.angle, self.reg.angle)
 
     @pytest.mark.skipif('not HAS_MATPLOTLIB')
     def test_as_patch(self):
@@ -78,31 +85,26 @@ def test_rectangular_pixel_region_bbox():
     assert a.bounding_box.shape == (width, height)
 
 
-class TestRectangleSkyRegion:
-    def setup(self):
-        center = SkyCoord(3, 4, unit='deg')
-        self.reg = RectangleSkyRegion(
-            center=center,
-            width=4 * u.deg,
-            height=3 * u.deg,
-            angle=5 * u.deg,
-        )
+class TestRectangleSkyRegion(BaseTestSkyRegion):
 
-    def test_repr_str(self):
-        if ASTROPY_LT_13:
-            reg_repr = ('<RectangleSkyRegion(<SkyCoord (ICRS): (ra, dec) in '
-                        'deg\n    (3.0, 4.0)>, width=4.0 deg, height=3.0 '
-                        'deg, angle=5.0 deg)>')
-            reg_str = ('Region: RectangleSkyRegion\ncenter: <SkyCoord '
-                       '(ICRS): (ra, dec) in deg\n    (3.0, 4.0)>\nwidth: '
-                       '4.0 deg\nheight: 3.0 deg\nangle: 5.0 deg')
-        else:
-            reg_repr = ('<RectangleSkyRegion(<SkyCoord (ICRS): (ra, dec) in '
-                        'deg\n    ( 3.,  4.)>, width=4.0 deg, height=3.0 '
-                        'deg, angle=5.0 deg)>')
-            reg_str = ('Region: RectangleSkyRegion\ncenter: <SkyCoord '
-                       '(ICRS): (ra, dec) in deg\n    ( 3.,  4.)>\nwidth: '
-                       '4.0 deg\nheight: 3.0 deg\nangle: 5.0 deg')
+    reg = RectangleSkyRegion(
+        center=SkyCoord(3, 4, unit='deg'),
+        width=4 * u.deg,
+        height=3 * u.deg,
+        angle=5 * u.deg,
+    )
 
-        assert repr(self.reg) == reg_repr
-        assert str(self.reg) == reg_str
+    if ASTROPY_LT_13:
+        expected_repr = ('<RectangleSkyRegion(<SkyCoord (ICRS): (ra, dec) in '
+                    'deg\n    (3.0, 4.0)>, width=4.0 deg, height=3.0 '
+                    'deg, angle=5.0 deg)>')
+        expected_str = ('Region: RectangleSkyRegion\ncenter: <SkyCoord '
+                   '(ICRS): (ra, dec) in deg\n    (3.0, 4.0)>\nwidth: '
+                   '4.0 deg\nheight: 3.0 deg\nangle: 5.0 deg')
+    else:
+        expected_repr = ('<RectangleSkyRegion(<SkyCoord (ICRS): (ra, dec) in '
+                    'deg\n    ( 3.,  4.)>, width=4.0 deg, height=3.0 '
+                    'deg, angle=5.0 deg)>')
+        expected_str = ('Region: RectangleSkyRegion\ncenter: <SkyCoord '
+                   '(ICRS): (ra, dec) in deg\n    ( 3.,  4.)>\nwidth: '
+                   '4.0 deg\nheight: 3.0 deg\nangle: 5.0 deg')

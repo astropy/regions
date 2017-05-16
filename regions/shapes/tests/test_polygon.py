@@ -1,14 +1,19 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 from __future__ import absolute_import, division, print_function, unicode_literals
+
 import numpy as np
 from numpy.testing import assert_allclose, assert_equal
+
 from astropy.tests.helper import pytest, assert_quantity_allclose
 from astropy import units as u
 from astropy.coordinates import SkyCoord
+
 from ..._utils.examples import make_example_dataset
 from ...core import PixCoord, BoundingBox
+from ...tests.helpers import make_simple_wcs
 from ..polygon import PolygonPixelRegion, PolygonSkyRegion
-from .utils import ASTROPY_LT_13, HAS_MATPLOTLIB
+from .utils import ASTROPY_LT_13, HAS_MATPLOTLIB  # noqa
+from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
 
 
 @pytest.fixture(scope='session')
@@ -18,59 +23,35 @@ def wcs():
     return dataset.wcs
 
 
-class TestPolygonPixelRegion:
-    def setup(self):
-        # We will be using this polygon for basic tests:
-        #
-        # (3,0) *
-        #       |\
-        #       | \
-        #       |  \
-        # (0,0) *---* (2, 0)
-        #
-        vertices = PixCoord([0, 2, 0], [0, 0, 3])
-        self.reg = PolygonPixelRegion(vertices)
-        self.pixcoord_inside = PixCoord(1, 1)
-        self.pixcoord_outside = PixCoord(1, 2)
+class TestPolygonPixelRegion(BaseTestPixelRegion):
 
-    def test_repr_str(self):
-        reg_repr = ('<PolygonPixelRegion(vertices=PixCoord(x=[0 2 0], '
-                    'y=[0 0 3]))>')
-        assert repr(self.reg) == reg_repr
+    reg = PolygonPixelRegion(PixCoord([1, 3, 1], [1, 1, 4]))
+    sample_box = [0, 4, 0, 5]
+    inside = [(2, 2)]
+    outside = [(3, 2), (3, 3)]
+    expected_area = 3
+    expected_repr = '<PolygonPixelRegion(vertices=PixCoord(x=[1 3 1], y=[1 1 4]))>'
+    expected_str = ('Region: PolygonPixelRegion\nvertices: PixCoord(x=[1 3 1],'
+                    ' y=[1 1 4])')
 
-        reg_str = ('Region: PolygonPixelRegion\nvertices: PixCoord(x=[0 2 0],'
-                   ' y=[0 0 3])')
-        assert str(self.reg) == reg_str
+    # We will be using this polygon for basic tests:
+    #
+    # (3,0) *
+    #       |\
+    #       | \
+    #       |  \
+    # (0,0) *---* (2, 0)
+    #
 
-    def test_contains_scalar(self):
-        assert self.reg.contains(self.pixcoord_inside)
-        assert self.pixcoord_inside in self.reg
-
-        assert not self.reg.contains(self.pixcoord_outside)
-        assert self.pixcoord_outside not in self.reg
-
-    def test_contains_array_1d(self):
-        pixcoord = PixCoord([1, 1], [1, 2])
-        actual = self.reg.contains(pixcoord)
-        expected = [True, False]
-        assert_equal(actual, expected)
-
-        with pytest.raises(ValueError) as exc:
-            pixcoord in self.reg
-        assert 'coord must be scalar' in str(exc)
-
-    def test_contains_array_2d(self):
-        pixcoord = PixCoord(
-            [[1, 1, 1], [1, 1, 1]],
-            [[1, 1, 1], [2, 2, 2]],
-        )
-        actual = self.reg.contains(pixcoord)
-        expected = [[True, True, True], [False, False, False]]
-        assert_equal(actual, expected)
+    def test_pix_sky_roundtrip(self):
+        wcs = make_simple_wcs(SkyCoord(2 * u.deg, 3 * u.deg), 0.1 * u.deg, 20)
+        reg_new = self.reg.to_sky(wcs).to_pixel(wcs)
+        assert_allclose(reg_new.vertices.x, self.reg.vertices.x)
+        assert_allclose(reg_new.vertices.y, self.reg.vertices.y)
 
     def test_bounding_box(self):
         bbox = self.reg.bounding_box
-        assert bbox == BoundingBox(ixmin=0, ixmax=3, iymin=0, iymax=4)
+        assert bbox == BoundingBox(ixmin=1, ixmax=4, iymin=1, iymax=5)
 
     def test_to_mask(self):
         # The true area of this polygon is 3
@@ -84,7 +65,7 @@ class TestPolygonPixelRegion:
         # so we only assert on it once here, not in the other cases below
         mask = self.reg.to_mask(mode='center', subpixels=1)
         assert 2 <= np.sum(mask.data) <= 6
-        assert mask.bbox == BoundingBox(ixmin=0, ixmax=3, iymin=0, iymax=4)
+        assert mask.bbox == BoundingBox(ixmin=1, ixmax=4, iymin=1, iymax=5)
         assert mask.data.shape == (4, 3)
 
         # Test more cases for to_mask
@@ -107,37 +88,32 @@ class TestPolygonPixelRegion:
     @pytest.mark.skipif('not HAS_MATPLOTLIB')
     def test_as_patch(self):
         patch = self.reg.as_patch()
-        expected = [[0, 0], [2, 0], [0, 3], [0, 0]]
+        expected = [[1, 1], [3, 1], [1, 4], [1, 1]]
         assert_allclose(patch.xy, expected)
 
 
-class TestPolygonSkyRegion:
-    def setup(self):
-        vertices = SkyCoord([3, 4, 3] * u.deg, [3, 4, 4] * u.deg)
-        self.poly = PolygonSkyRegion(vertices)
+class TestPolygonSkyRegion(BaseTestSkyRegion):
 
-    def test_repr_str(self):
-        if ASTROPY_LT_13:
-            reg_repr = ('<PolygonSkyRegion(vertices=<SkyCoord (ICRS): (ra, '
-                        'dec) in deg\n    [(3.0, 3.0), (4.0, 4.0), (3.0, '
-                        '4.0)]>)>')
-            reg_str = ('Region: PolygonSkyRegion\nvertices: <SkyCoord (ICRS):'
-                       ' (ra, dec) in deg\n    [(3.0, 3.0), (4.0, 4.0), (3.0,'
-                       ' 4.0)]>')
-        else:
-            reg_repr = ('<PolygonSkyRegion(vertices=<SkyCoord (ICRS): (ra, '
-                        'dec) in deg\n    [( 3.,  3.), ( 4.,  4.), ( 3.,  '
-                        '4.)]>)>')
-            reg_str = ('Region: PolygonSkyRegion\nvertices: <SkyCoord (ICRS):'
-                       ' (ra, dec) in deg\n    [( 3.,  3.), ( 4.,  4.), ( 3.,'
-                       '  4.)]>')
+    reg = PolygonSkyRegion(SkyCoord([3, 4, 3] * u.deg, [3, 4, 4] * u.deg))
 
-        assert repr(self.poly) == reg_repr
-        assert str(self.poly) == reg_str
+    if ASTROPY_LT_13:
+        expected_repr = ('<PolygonSkyRegion(vertices=<SkyCoord (ICRS): (ra, '
+                    'dec) in deg\n    [(3.0, 3.0), (4.0, 4.0), (3.0, '
+                    '4.0)]>)>')
+        expected_str = ('Region: PolygonSkyRegion\nvertices: <SkyCoord (ICRS):'
+                   ' (ra, dec) in deg\n    [(3.0, 3.0), (4.0, 4.0), (3.0,'
+                   ' 4.0)]>')
+    else:
+        expected_repr = ('<PolygonSkyRegion(vertices=<SkyCoord (ICRS): (ra, '
+                    'dec) in deg\n    [( 3.,  3.), ( 4.,  4.), ( 3.,  '
+                    '4.)]>)>')
+        expected_str = ('Region: PolygonSkyRegion\nvertices: <SkyCoord (ICRS):'
+                   ' (ra, dec) in deg\n    [( 3.,  3.), ( 4.,  4.), ( 3.,'
+                   '  4.)]>')
 
     def test_transformation(self, wcs):
 
-        pixpoly = self.poly.to_pixel(wcs)
+        pixpoly = self.reg.to_pixel(wcs)
 
         assert_allclose(pixpoly.vertices.x, [11.187992, 10.976332, 11.024032], atol=1e-5)
         assert_allclose(pixpoly.vertices.y, [1.999486, 2.039001, 2.077076], atol=1e-5)
@@ -147,6 +123,6 @@ class TestPolygonSkyRegion:
         # TODO: we should probably assert something about frame attributes,
         # or generally some better way to check if two SkyCoord are the same?
         # For now, we use the folloing line to transform back to ICRS (`poly` is in Galactic, same as WCS)
-        poly = PolygonSkyRegion(vertices=poly.vertices.transform_to(self.poly.vertices))
-        assert_quantity_allclose(poly.vertices.data.lon, self.poly.vertices.data.lon, atol=1e-3 * u.deg)
-        assert_quantity_allclose(poly.vertices.data.lat, self.poly.vertices.data.lat, atol=1e-3 * u.deg)
+        poly = PolygonSkyRegion(vertices=poly.vertices.transform_to(self.reg.vertices))
+        assert_quantity_allclose(poly.vertices.data.lon, self.reg.vertices.data.lon, atol=1e-3 * u.deg)
+        assert_quantity_allclose(poly.vertices.data.lat, self.reg.vertices.data.lat, atol=1e-3 * u.deg)

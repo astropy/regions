@@ -6,7 +6,6 @@ import operator
 
 from astropy.extern import six
 
-
 __all__ = ['Region', 'PixelRegion', 'SkyRegion']
 
 
@@ -87,11 +86,6 @@ class Region(object):
     def __xor__(self, other):
         return self.symmetric_difference(other)
 
-    def __contains__(self, coord):
-        if not coord.isscalar:
-            raise ValueError('coord must be scalar. coord={}'.format(coord))
-        return self.contains(coord)
-
 
 @six.add_metaclass(abc.ABCMeta)
 class PixelRegion(Region):
@@ -134,38 +128,20 @@ class PixelRegion(Region):
             arrays. In future this could also be a `PixCoord` instance.
         """
 
+    def __contains__(self, coord):
+        if not coord.isscalar:
+            raise ValueError('coord must be scalar. coord={}'.format(coord))
+        return self.contains(coord)
+
     @abc.abstractmethod
-    def to_sky(self, wcs, mode='local', tolerance=None):
+    def to_sky(self, wcs):
         """
         Returns a region defined in sky coordinates.
 
         Parameters
         ----------
-
         wcs : `~astropy.wcs.WCS` instance
             The world coordinate system transformation to assume
-
-        mode : str
-            Converting to sky coordinates can be done with various degrees of
-            approximation, which can be set with this option. Possible values
-            are:
-
-            * `'local'`: assume that the field of view is small and that
-              pixels are square, so that e.g. a circle in sky coordinates
-              would be a circle in pixel coordinates. This is the fastest and
-              most commonly used for e.g. photometry.
-
-            * `'affine'`: approximate any deviations from the 'local'
-              assumption by an affine transformation, e.g. a circle would
-              become a rotated ellipse.
-
-            * `'full'`: return an arbitrarily complex polygon in sky
-              coordinates that represents the full level of distortion due to
-              the conversion from pixel to world coordinates. The degree of
-              exactness can be controlled by the ``tolerance`` argument.
-
-        tolerance : `~astropy.units.Quantity`
-            The tolerance for the ``'full'`` mode described above.
         """
 
     @abc.abstractproperty
@@ -283,47 +259,29 @@ class SkyRegion(Region):
         from .compound import CompoundSkyRegion
         return CompoundSkyRegion(self, other, operator.or_)
 
-    @abc.abstractmethod
-    def contains(self, skycoord):
+    def contains(self, skycoord, wcs):
         """
-        Checks whether a position or positions fall inside the region.
+        Check whether a sky coordinate falls inside the region
 
         Parameters
         ----------
         skycoord : `~astropy.coordinates.SkyCoord`
             The position or positions to check
+        wcs : `~astropy.wcs.WCS` instance
+            The world coordinate system transformation to assume
         """
+        from .pixcoord import PixCoord
+        pixel_region = self.to_pixel(wcs)
+        pixcoord = PixCoord.from_sky(skycoord, wcs)
+        return pixel_region.contains(pixcoord)
 
     @abc.abstractmethod
-    def to_pixel(self, wcs, mode='local', tolerance=None):
+    def to_pixel(self, wcs):
         """
-        Returns a region defined in pixel coordinates.
+        Returns the equivalent region defined in pixel coordinates.
 
         Parameters
         ----------
-
         wcs : `~astropy.wcs.WCS` instance
             The world coordinate system transformation to assume
-
-        mode : str
-            Converting to pixel coordinates can be done with various degrees
-            of approximation, which can be set with this option. Possible
-            values are:
-
-            * `'local'`: assume that the field of view is small and that
-              pixels are square, so that e.g. a circle in sky coordinates
-              would be a circle in pixel coordinates. This is the fastest and
-              most commonly used for e.g. photometry.
-
-            * `'affine'`: approximate any deviations from the 'local'
-              assumption by an affine transformation, e.g. a circle would
-              become a rotated ellipse.
-
-            * `'full'`: return an arbitrarily complex polygon in pixel
-              coordinates that represents the full level of distortion due to
-              the conversion from world to pixel coordinates. The degree of
-              exactness can be controlled by the ``tolerance`` argument.
-
-        tolerance : `~astropy.units.Quantity`
-            The tolerance for the ``'full'`` mode described above.
         """

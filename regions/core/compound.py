@@ -52,9 +52,9 @@ class CompoundSkyRegion(SkyRegion):
                              ('operator', self.operator),
                             ]
 
-    def contains(self, skycoord):
-        return self.operator(self.region1.contains(skycoord),
-                             self.region2.contains(skycoord))
+    def contains(self, skycoord, wcs):
+        return self.operator(self.region1.contains(skycoord, wcs),
+                             self.region2.contains(skycoord, wcs))
 
     def to_pixel(self, wcs, mode='local', tolerance=None):
         raise NotImplementedError

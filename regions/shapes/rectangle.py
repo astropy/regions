@@ -4,8 +4,12 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import numpy as np
 from astropy import units as u
 
-from ..core import PixelRegion, SkyRegion, Mask, BoundingBox
+from astropy.coordinates import Angle
+from astropy.wcs.utils import pixel_to_skycoord
+
+from ..core import PixCoord, PixelRegion, SkyRegion, Mask, BoundingBox
 from .._geometry import rectangular_overlap_grid
+from .._utils.wcs_helpers import skycoord_to_pixel_scale_angle
 
 __all__ = ['RectanglePixelRegion', 'RectangleSkyRegion']
 
@@ -19,12 +23,12 @@ class RectanglePixelRegion(PixelRegion):
     center : `~regions.PixCoord`
         The position of the center of the rectangle.
     width : float
-        The width of the rectangle
+        The width of the rectangle (before rotation) in pixels
     height : float
-        The height of the rectangle
+        The height of the rectangle (before rotation) in pixels
     angle : `~astropy.units.Quantity`
-        The rotation of the rectangle. If set to zero (the default), the width
-        is lined up with the x axis.
+        The rotation angle of the rectangle, measured anti-clockwise. If set to
+        zero (the default), the width axis is lined up with the x axis.
 
     Examples
     --------
@@ -71,16 +75,41 @@ class RectanglePixelRegion(PixelRegion):
         return self.width * self.height
 
     def contains(self, pixcoord):
-        # TODO: needs to be implemented
-        raise NotImplementedError
+        cos_angle = np.cos(self.angle)
+        sin_angle = np.sin(self.angle)
+        dx = pixcoord.x - self.center.x
+        dy = pixcoord.y - self.center.y
+        dx_rot = cos_angle * dx + sin_angle * dy
+        dy_rot = sin_angle * dx - cos_angle * dy
+        return (np.abs(dx_rot) < self.width * 0.5) & (np.abs(dy_rot) < self.height * 0.5)
 
     def to_shapely(self):
-        # TODO: needs to be implemented
-        raise NotImplementedError
 
-    def to_sky(self, wcs, mode='local', tolerance=None):
-        # TODO: needs to be implemented
-        raise NotImplementedError
+        from shapely import affinity
+        from shapely.geometry import Polygon
+
+        x1 = self.center.x - self.width * 0.5
+        y1 = self.center.y - self.height * 0.5
+        x2 = self.center.x + self.width * 0.5
+        y2 = self.center.y - self.height * 0.5
+        x3 = self.center.x + self.width * 0.5
+        y3 = self.center.y + self.height * 0.5
+        x4 = self.center.x - self.width * 0.5
+        y4 = self.center.y + self.height * 0.5
+
+        rectangle = Polygon([(x1, y1), (x2, y2), (x3, y3), (x4, y4)])
+
+        return affinity.rotate(rectangle, self.angle.to(u.deg).value)
+
+    def to_sky(self, wcs):
+        # TODO: write a pixel_to_skycoord_scale_angle
+        center = pixel_to_skycoord(self.center.x, self.center.y, wcs)
+        _, scale, north_angle = skycoord_to_pixel_scale_angle(center, wcs)
+        width = Angle(self.width / scale, 'deg')
+        height = Angle(self.height / scale, 'deg')
+        return RectangleSkyRegion(center, width, height,
+                                  angle=self.angle - (north_angle - 90 * u.deg),
+                                  meta=self.meta, visual=self.visual)
 
     @property
     def bounding_box(self):
@@ -180,12 +209,13 @@ class RectangleSkyRegion(SkyRegion):
     center : `~astropy.coordinates.SkyCoord`
         The position of the center of the rectangle.
     width : `~astropy.units.Quantity`
-        The width radius of the rectangle
+        The width of the rectangle (before rotation) as an angle
     height : `~astropy.units.Quantity`
-        The height radius of the rectangle
+        The height of the rectangle (before rotation) as an angle
     angle : `~astropy.units.Quantity`
-        The rotation of the rectangle. If set to zero (the default), the width
-        is lined up with the longitude axis of the celestial coordinates.
+        The rotation angle of the rectangle, measured anti-clockwise. If set to
+        zero (the default), the width axis is lined up with the longitude axis
+        of the celestial coordinates.
     """
 
     def __init__(self, center, width, height, angle=0 * u.deg, meta=None, visual=None):
@@ -199,15 +229,12 @@ class RectangleSkyRegion(SkyRegion):
         self._repr_params = [('width', self.width), ('height', self.height),
                              ('angle', self.angle)]
 
-    @property
-    def area(self):
-        """Region area (`~astropy.units.Quantity`)"""
-        return self.width * self.height
-
-    def contains(self, skycoord):
-        # TODO: needs to be implemented
-        raise NotImplementedError
-
-    def to_pixel(self, wcs, mode='local', tolerance=None):
-        # TODO: needs to be implemented
-        raise NotImplementedError
+    def to_pixel(self, wcs):
+        center, scale, north_angle = skycoord_to_pixel_scale_angle(self.center, wcs)
+        # FIXME: The following line is needed to get a scalar PixCoord
+        center = PixCoord(float(center.x), float(center.y))
+        width = self.width.to('deg').value * scale
+        height = self.height.to('deg').value * scale
+        return RectanglePixelRegion(center, width, height,
+                                    angle=self.angle + (north_angle - 90 * u.deg),
+                                    meta=self.meta, visual=self.visual)

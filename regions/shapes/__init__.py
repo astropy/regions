@@ -6,3 +6,4 @@ from .ellipse import *
 from .point import *
 from .polygon import *
 from .rectangle import *
+from .line import *

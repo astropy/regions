@@ -1,16 +1,21 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
+
 from __future__ import absolute_import, division, print_function, unicode_literals
-import numpy as np
-from numpy.testing import assert_allclose, assert_equal
+
+from numpy.testing import assert_allclose
+
 from astropy import units as u
 from astropy.coordinates import SkyCoord
 from astropy.tests.helper import pytest, assert_quantity_allclose
 from astropy.utils.data import get_pkg_data_filename
 from astropy.io import fits
 from astropy.wcs import WCS
+
+from ...tests.helpers import make_simple_wcs
 from ...core import PixCoord
 from ..line import LinePixelRegion, LineSkyRegion
-from .utils import ASTROPY_LT_13, HAS_MATPLOTLIB
+from .utils import ASTROPY_LT_13, HAS_MATPLOTLIB  # noqa
+from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
 
 
 @pytest.fixture(scope='session')
@@ -20,15 +25,23 @@ def wcs():
     return WCS(header)
 
 
-class TestLinePixelRegion:
-    def setup(self):
-        point1 = PixCoord(3, 4)
-        point2 = PixCoord(4, 4)
-        self.reg = LinePixelRegion(point1, point2)
-        self.pixcoord = PixCoord(3, 0)
+class TestLinePixelRegion(BaseTestPixelRegion):
 
-    def test_repr_str(self):
-        assert 'Line' in str(self.reg)
+    reg = LinePixelRegion(PixCoord(3, 4), PixCoord(4, 4))
+    sample_box = [-2, 8, -1, 9]
+    inside = []
+    outside = [(3.1, 4.2), (5, 4)]
+    expected_area = 0
+    expected_repr = '<LinePixelRegion(start=PixCoord(x=3, y=4), end=PixCoord(x=4, y=4))>'
+    expected_str = 'Region: LinePixelRegion\nstart: PixCoord(x=3, y=4)\nend: PixCoord(x=4, y=4)'
+
+    def test_pix_sky_roundtrip(self):
+        wcs = make_simple_wcs(SkyCoord(2 * u.deg, 3 * u.deg), 0.1 * u.deg, 20)
+        reg_new = self.reg.to_sky(wcs).to_pixel(wcs)
+        assert_allclose(reg_new.start.x, self.reg.start.x)
+        assert_allclose(reg_new.start.y, self.reg.start.y)
+        assert_allclose(reg_new.end.x, self.reg.end.x)
+        assert_allclose(reg_new.end.y, self.reg.end.y)
 
     @pytest.mark.skipif('not HAS_MATPLOTLIB')
     def test_as_patch(self):
@@ -36,14 +49,26 @@ class TestLinePixelRegion:
         assert 'Arrow' in str(patch)
 
 
-class TestLineSkyRegion:
-    def setup(self):
-        start = SkyCoord(3 * u.deg, 4 * u.deg, frame='galactic')
-        end = SkyCoord(3 * u.deg, 5 * u.deg, frame='galactic')
-        self.reg = LineSkyRegion(start, end)
+class TestLineSkyRegion(BaseTestSkyRegion):
 
-    def test_repr_str(self):
-        assert 'start' in str(self.reg)
+    start = SkyCoord(3 * u.deg, 4 * u.deg, frame='galactic')
+    end = SkyCoord(3 * u.deg, 5 * u.deg, frame='galactic')
+    reg = LineSkyRegion(start, end)
+
+    if ASTROPY_LT_13:
+        expected_repr = ('<LineSkyRegion(start=<SkyCoord (Galactic): (l, b) in deg\n'
+                         '    (3.0, 4.0)>, end=<SkyCoord (Galactic): (l, b) in deg\n'
+                         '    (3.0, 5.0)>)>')
+        expected_str = ('Region: LineSkyRegion\nstart: <SkyCoord (Galactic): (l, b) in deg\n'
+                         '    (3.0, 4.0)>\nend: <SkyCoord (Galactic): (l, b) in deg\n'
+                         '    (3.0, 5.0)>')
+    else:
+        expected_repr = ('<LineSkyRegion(start=<SkyCoord (Galactic): (l, b) in deg\n'
+                         '    ( 3.,  4.)>, end=<SkyCoord (Galactic): (l, b) in deg\n'
+                         '    ( 3.,  5.)>)>')
+        expected_str = ('Region: LineSkyRegion\nstart: <SkyCoord (Galactic): (l, b) in deg\n'
+                         '    ( 3.,  4.)>\nend: <SkyCoord (Galactic): (l, b) in deg\n'
+                         '    ( 3.,  5.)>')
 
     def test_transformation(self, wcs):
         pixline = self.reg.to_pixel(wcs)

@@ -77,7 +77,6 @@ class CircleAnnulusSkyRegion(CompoundSkyRegion):
                              ('outer radius', region2.radius),
                              ('center', region2.center)]
 
-
     @property
     def center(self):
         return self.region1.center

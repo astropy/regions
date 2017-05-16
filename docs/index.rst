@@ -23,10 +23,26 @@ and then after some time propose this package for inclusion in the Astropy core.
 * Contributors : https://github.com/astropy/regions/graphs/contributors
 * Releases: https://pypi.python.org/pypi/regions
 
+User guide
+==========
+
 .. toctree::
    :maxdepth: 1
 
-   getting_started
    installation
+   getting_started
+   contains
+   compound
+   masks
+   plotting
+   ds9
+   shapely
+
+Advanced
+========
+
+.. toctree::
+   :maxdepth: 1
+
    api
    development

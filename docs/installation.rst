@@ -6,12 +6,16 @@
 Installation
 ************
 
-* Python 2.7 and 3.4+ are supported.
-* The only required dependency for ``regions`` is Astropy (version 1.2 or later).
+The regions package requires the following packages:
 
-The ``regions`` package works like most other Astropy affiliated packages.
-Since it is planned to be merged into the Astropy core, we didn't put much
-effort into writing up installation instructions for this separate package.
+* Python 2.7 or 3.4 and above
+* `Numpy <http://www.numpy.org>`_ 1.9 or later
+* `Astropy <http://www.astropy.org>`__ 1.2 or later
+
+In addition, the following packages are needed for optional functionality:
+
+* `Matplotlib <http://www.matplotlib.org>`__ 1.5 or later
+* `Shapely <http://toblerity.org/shapely/manual.html>`__
 
 Stable version
 ==============
@@ -22,10 +26,9 @@ Using pip
 ---------
 
 To install regions with `pip <http://www.pip-installer.org/en/latest/>`_
-from `PyPI <https://pypi.python.org/pypi/regions>`_
-simply run::
+from `PyPI <https://pypi.python.org/pypi/regions>`_, run::
 
-    pip install --no-deps regions
+    pip install regions --no-deps
 
 .. note::
 
@@ -42,11 +45,10 @@ simply run::
 
     conda install -c astropy regions
 
-
 Testing installation
 --------------------
 
-To check if your install is OK, run the tests:
+To check if there are any issues with your installation, you can run the tests:
 
 .. code-block:: bash
 
@@ -76,12 +78,3 @@ To build the documentation, do:
 .. code-block:: bash
 
     python setup.py build_docs
-
-Optional dependencies
-=====================
-
-The following packages are optional dependencies, install if needed:
-
-* `shapely`_ for advanced pixel region operations
-* `matplotlib`_ for plotting regions
-* maybe `spherical_geometry`_ for polygons (not used yet)
