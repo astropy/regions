@@ -166,7 +166,7 @@ class Shape(object):
             raise DS9RegionParserError("No central coordinate")
 
         reg.visual = OrderedDict()
-        reg.meta = OrderedDict() 
+        reg.meta = OrderedDict()
         for key in self.meta.keys():
             if key in viz_keywords:
                 reg.visual[key] = self.meta[key]
