@@ -3,4 +3,4 @@
 
 def get_package_data():
     parser_test = ['data/*.reg']
-    return {'regions.io.tests': parser_test}
+    return {'regions.io.ds9.tests': parser_test}

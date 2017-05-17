@@ -20,7 +20,7 @@ import timeit
 import numpy as np
 import re
 
-TEST_FILE_DIR = Path('../regions/io/tests/data')
+TEST_FILE_DIR = Path('../regions/io/ds9/tests/data')
 REPETITIONS = 1
 
 p_region_count = re.compile(r"[^=\)]\(")

@@ -1,8 +1,13 @@
 import click
+import pyregion
+import logging
 from regions import read_ds9
 from pathlib import Path
+from astropy import log
 
-TEST_FILE_DIR = Path('../regions/io/tests/data')
+log.setLevel('DEBUG')
+
+TEST_FILE_DIR = Path('../regions/io/ds9/tests/data')
 
 @click.group()
 def cli():
@@ -17,11 +22,17 @@ def list_files():
 
 @cli.command('parse')
 @click.option('--interactive', is_flag=True, default=False)
+@click.option('--parser', default='regions')
+@click.option('--errors', default='strict')
 @click.argument('filename')
-def parse(filename, interactive):
+def parse(filename, interactive, parser, errors):
     readname = TEST_FILE_DIR / filename
     print('Reading {}'.format(readname))
-    regions = read_ds9(str(readname))
+    print('Using parser {}'.format(parser))
+    if parser == 'regions':
+        regions = read_ds9(str(readname), errors=errors)
+    elif parser == 'pyregion':
+        regions = pyregion.open(str(readname))
     print(regions)
     if interactive:
         import IPython

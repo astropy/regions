@@ -13,9 +13,8 @@ from astropy.coordinates import Angle, SkyCoord
 from astropy.tests.helper import catch_warnings
 from astropy.utils.exceptions import AstropyUserWarning
 
-from ...shapes.circle import CircleSkyRegion
-from ..read_ds9 import read_ds9, ds9_string_to_objects, global_parser
-from ..write_ds9 import write_ds9, ds9_objects_to_string
+from ....shapes.circle import CircleSkyRegion
+from .. import read_ds9, write_ds9, ds9_objects_to_string, DS9Parser
 
 _ASTROPY_MINVERSION = vers.LooseVersion('1.1')
 _ASTROPY_VERSION = vers.LooseVersion(astrov.version)
@@ -110,7 +109,9 @@ def test_ds9_string_to_objects():
     """Simple test case for ds9_string_to_objects
     """
     ds9_str = '# Region file format: DS9 astropy/regions\nfk5\ncircle(42.0000,43.0000,3.0000)\n'
-    regions = ds9_string_to_objects(ds9_str)
+    parser = DS9Parser(ds9_str)
+    parser.run()
+    regions = parser.shapes.to_region()
     reg = regions[0]
 
     assert_allclose(reg.center.ra.deg, 42)
@@ -139,9 +140,10 @@ def test_missing_region_warns():
 
     # this will warn on both the commented first line and the not_a_region line
     with catch_warnings(AstropyUserWarning) as ASWarn:
-        regions = ds9_string_to_objects(ds9_str, errors='warn')
+        parser = DS9Parser(ds9_str, errors='warn')
+        parser.run()
 
-    assert len(regions) == 1
+    assert len(parser.shapes) == 1
     assert len(ASWarn) == 1
     assert "Region type 'notaregiontype'" in str(ASWarn[0].message)
 
@@ -155,23 +157,26 @@ def test_global_parser():
                           ' font="helvetica 10 normal roman" select=1'
                           ' highlite=1 dash=0 fixed=0 edit=1 move=1'
                           ' delete=1 include=1 source=1')
-    global_parsed = global_parser(global_test_str)
-    assert global_parsed[0] == 'global'
-    assert global_parsed[1] == {'dash': '0', 'source': '1', 'move': '1',
-                                'font': '"helvetica 10 normal roman" ',
-                                'dashlist': '8 3 ', 'include': '1',
-                                'highlite': '1', 'color': 'green',
-                                'select': '1',
-                                'fixed': '0', 'width': '1', 'edit': '1',
-                                'delete': '1'}
+    global_parser = DS9Parser(global_test_str)
+    global_parser.run()
+    global_parser.global_meta == {'dash': '0', 'source': '1', 'move': '1',
+                                  'font': '"helvetica 10 normal roman" ',
+                                  'dashlist': '8 3 ', 'include': '1',
+                                  'highlite': '1', 'color': 'green',
+                                  'select': '1',
+                                  'fixed': '0', 'width': '1', 'edit': '1',
+                                  'delete': '1'}
 
 def test_ds9_color():
     """Color parsing test"""
     ds9_str = '# Region file format: DS9 astropy/regions\nfk5\ncircle(42.0000,43.0000,3.0000) # color=green\ncircle(43.0000,43.0000,3.0000) # color=orange\n'
-    regions = ds9_string_to_objects(ds9_str)
 
-    assert regions[0].visual['color'] == 'green'
-    assert regions[1].visual['color'] == 'orange'
+    parser = DS9Parser(ds9_str)
+    parser.run()
+    regions = parser.shapes
+
+    assert regions[0].meta['color'] == 'green'
+    assert regions[1].meta['color'] == 'orange'
 
 def test_ds9_color_override_global():
     """Color parsing test in the presence of a global"""
@@ -185,8 +190,9 @@ def test_ds9_color_override_global():
     reg2str = "circle(43.0000,43.0000,3.0000) # color=orange"
     reg3str = "circle(43.0000,43.0000,3.0000)"
     ds9_str = ds9_str.format(global_str=global_test_str) + "\n".join([reg1str, reg2str, reg3str])
-    regions = ds9_string_to_objects(ds9_str)
-
-    assert regions[0].visual['color'] == 'green'
-    assert regions[1].visual['color'] == 'orange'
-    assert regions[2].visual['color'] == 'blue'
+    parser = DS9Parser(ds9_str)
+    parser.run()
+    regions = parser.shapes
+    assert regions[0].meta['color'] == 'green'
+    assert regions[1].meta['color'] == 'orange'
+    assert regions[2].meta['color'] == 'blue'
