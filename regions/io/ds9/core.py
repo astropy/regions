@@ -4,6 +4,7 @@ import string
 import itertools
 import re
 import copy
+from collections import OrderedDict
 from astropy import units as u
 from astropy import coordinates
 from astropy.coordinates import BaseCoordinateFrame
@@ -164,6 +165,12 @@ class Shape(object):
         else:
             raise DS9RegionParserError("No central coordinate")
 
-        reg.visual = {key: self.meta[key] for key in self.meta.keys() if key in viz_keywords}
-        reg.meta = {key: self.meta[key] for key in self.meta.keys() if key not in viz_keywords}
+        reg.visual = OrderedDict()
+        reg.meta = OrderedDict() 
+        for key in self.meta.keys():
+            if key in viz_keywords:
+                reg.visual[key] = self.meta[key]
+            else:
+                reg.meta[key] = self.meta[key]
+
         return reg

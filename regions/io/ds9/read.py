@@ -4,6 +4,7 @@ import string
 import itertools
 import re
 import copy
+from collections import OrderedDict
 from astropy import units as u
 from astropy import coordinates
 from astropy import log
@@ -21,12 +22,15 @@ __all__ = [
 ]
 
 
-regex_meta = re.compile("([a-zA-Z]+)(=)([^= ]+) ?")
-"""Regular expression to extract meta attributes"""
 regex_global = re.compile("^#? *(-?)([a-zA-Z0-9]+)")
 """Regular expression to extract region type or coodinate system"""
+
+regex_meta = re.compile("([a-zA-Z]+)(=)([^= ]+) ?")
+"""Regular expression to extract meta attributes"""
+
 regex_paren = re.compile("[()]")
 """Regular expression to strip parenthesis"""
+
 regex_splitter = re.compile("[, ]")
 """Regular expression to split coordinate strings"""
 
@@ -237,16 +241,26 @@ class DS9Parser(object):
     def parse_meta(meta_str):
         """Parse the metadata for a single ds9 region string.
 
-        The metadata is everything after the close-paren of the region
-        coordinate specification.  All metadata is specified as key=value pairs
-        separated by whitespace, but sometimes the values can also be
-        whitespace separated.
+        Parameters
+        ----------
+        meta_str : str
+            Meta string, the metadata is everything after the close-paren of the
+            region coordinate specification. All metadata is specified as
+            key=value pairs separated by whitespace, but sometimes the values
+            can also be whitespace separated.
+
+        Returns
+        -------
+        meta : `~collections.OrderedDict`
+            Dictionary containing the meta data
         """
         regex_meta_split = [x for x in regex_meta.split(meta_str.strip()) if x]
         equals_inds = [i for i, x in enumerate(regex_meta_split) if x == '=']
-        result = {regex_meta_split[ii - 1]:
-                  " ".join(regex_meta_split[ii + 1:jj - 1 if jj is not None else None])
-                  for ii, jj in zip(equals_inds, equals_inds[1:] + [None])}
+        result = OrderedDict()
+        for ii, jj in zip(equals_inds, equals_inds[1:] + [None]):
+            key = regex_meta_split[ii - 1]
+            val =  " ".join(regex_meta_split[ii + 1:jj - 1 if jj is not None else None])
+            result[key] = val
 
         return result
 
