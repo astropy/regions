@@ -209,4 +209,4 @@ def test_issue134_regression():
     parser = DS9Parser(regstr)
     parser.run()
     regions = parser.shapes
-    assert regions[0].to_region('radius').value == 30.4
+    assert regions[0].to_region().radius.value == 30.4
