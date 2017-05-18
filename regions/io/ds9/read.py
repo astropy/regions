@@ -10,12 +10,15 @@ from astropy import coordinates
 from astropy import log
 from astropy.utils.exceptions import AstropyUserWarning
 from warnings import warn
-from .core import Shape, ShapeList
+from .core import (
+    Shape,
+    ShapeList,
+    DS9RegionParserWarning,
+    DS9RegionParserError,
+)
 
 __all__ = [
     'read_ds9',
-    'DS9RegionParserWarning',
-    'DS9RegionParserError',
     'DS9Parser',
     'DS9RegionParser',
     'CoordinateParser',
@@ -34,18 +37,6 @@ regex_paren = re.compile("[()]")
 regex_splitter = re.compile("[, ]")
 """Regular expression to split coordinate strings"""
 
-
-class DS9RegionParserWarning(AstropyUserWarning):
-    """
-    A generic warning class for DS9 region parsing inherited from astropy's
-    warnings
-    """
-
-
-class DS9RegionParserError(ValueError):
-    """
-    A generic error class for DS9 region parsing
-    """
 
 
 def read_ds9(filename, errors='strict'):
@@ -260,7 +251,7 @@ class DS9Parser(object):
         result = OrderedDict()
         for ii, jj in zip(equals_inds, equals_inds[1:] + [None]):
             key = regex_meta_split[ii - 1]
-            val =  " ".join(regex_meta_split[ii + 1:jj - 1 if jj is not None else None])
+            val = " ".join(regex_meta_split[ii + 1:jj - 1 if jj is not None else None])
             result[key] = val
 
         return result

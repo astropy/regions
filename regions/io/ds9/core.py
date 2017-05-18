@@ -1,23 +1,32 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 from __future__ import absolute_import, division, print_function
-import string
-import itertools
-import re
-import copy
 from collections import OrderedDict
+from warnings import warn
 from astropy import units as u
 from astropy import coordinates
 from astropy.coordinates import BaseCoordinateFrame
 from astropy import log
 from astropy.utils.exceptions import AstropyUserWarning
-from warnings import warn
 from ... import shapes
 from ...core import PixCoord
 
 __all__ = [
+    'DS9RegionParserWarning',
+    'DS9RegionParserError',
     'Shape',
     'ShapeList',
 ]
+
+class DS9RegionParserWarning(AstropyUserWarning):
+    """
+    A generic warning class for DS9 region parsing inherited from astropy's
+    warnings
+    """
+
+class DS9RegionParserError(ValueError):
+    """
+    A generic error class for DS9 region parsing
+    """
 
 class ShapeList(list):
     """List of Shape
@@ -27,7 +36,6 @@ class ShapeList(list):
         for shape in self:
             # Skip elliptical annuli for now
             if shape.region_type == 'ellipse' and len(shape.coord) > 5:
-                from .read import DS9RegionParserWarning
                 msg = 'Skipping elliptical annulus {}'.format(shape)
                 warn(msg, DS9RegionParserWarning)
                 continue
@@ -39,6 +47,7 @@ class ShapeList(list):
 
 class Shape(object):
     """Helper class to represent a DS9
+
 
     This serves as intermediate step in the parsing process.
 
@@ -78,11 +87,11 @@ class Shape(object):
 
     def __init__(self, coordsys, region_type, coord, meta, composite, include):
         self.coordsys = coordsys
-        self.region_type=region_type
-        self.coord=coord
-        self.meta=meta
-        self.composite=composite
-        self.include=include
+        self.region_type = region_type
+        self.coord = coord
+        self.meta = meta
+        self.composite = composite
+        self.include = include
 
     def __str__(self):
         ss = self.__class__.__name__
@@ -124,7 +133,7 @@ class Shape(object):
         frame = coordinates.frame_transform_graph.lookup_name(self.coordsys)
 
         lon, lat = zip(*parsed_angles)
-        if hasattr(lon, '__len__') and hasattr(lon, '__lat__') and len(lon) == 1 and len(lat==1):
+        if hasattr(lon, '__len__') and hasattr(lon, '__lat__') and len(lon) == 1 and len(lat == 1):
             # force entries to be scalar if they are length-1
             lon, lat = u.Quantity(lon[0]), u.Quantity(lat[0])
         else:
