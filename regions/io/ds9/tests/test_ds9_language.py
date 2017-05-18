@@ -203,3 +203,10 @@ def test_ds9_color_override_global():
     assert regions[0].meta['color'] == 'green'
     assert regions[1].meta['color'] == 'orange'
     assert regions[2].meta['color'] == 'blue'
+
+def test_issue134_regression():
+    regstr = 'galactic; circle(+0:14:26.064,+0:00:45.206,30.400")'
+    parser = DS9Parser(regstr)
+    parser.run()
+    regions = parser.shapes
+    assert regions[0].to_region('radius').value == 30.4
