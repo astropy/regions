@@ -121,16 +121,10 @@ def test_ds9_string_to_objects():
 def test_ds9_string_to_objects_whitespace():
     """Simple test case for ds9_string_to_objects
     """
-    ds9_str = '# Region file format: DS9 astropy/regions\nfk5\n   circle(42.0000,43.0000,3.0000)\n'
+    ds9_str = '# Region file format: DS9 astropy/regions\nfk5\n -circle(42.0000,43.0000,3.0000)\n'
     parser = DS9Parser(ds9_str)
     parser.run()
-    regions = parser.shapes.to_region()
-    reg = regions[0]
-
-    assert_allclose(reg.center.ra.deg, 42)
-    assert_allclose(reg.center.dec.deg, 43)
-    assert_allclose(reg.radius.value, 3)
-
+    assert parser.shapes[0].include == False
 
 def test_ds9_io(tmpdir):
     """Simple test case for write_ds9 and read_ds9.
