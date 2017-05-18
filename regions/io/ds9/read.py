@@ -219,7 +219,7 @@ class DS9Parser(object):
                               "the known region types.".format(region_type))
             return
         else:
-            # Found region specification, 
+            # Found region specification,
             region_end = region_type_search.span()[1]
             self.parse_region(include, region_type, region_end, line)
 
