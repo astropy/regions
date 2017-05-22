@@ -20,8 +20,7 @@ class PointPixelRegion(PixelRegion):
     """
 
     def __init__(self, center, meta=None, visual=None):
-        # TODO: test that center is a 0D PixCoord
-        self.center = center
+        self.center = PixCoord._validate(center, name='center', expected='scalar')
         self.meta = meta or {}
         self.visual = visual or {}
         self._repr_params = None

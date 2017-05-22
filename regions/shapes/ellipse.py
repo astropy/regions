@@ -62,7 +62,7 @@ class EllipsePixelRegion(PixelRegion):
     def __init__(self, center, width, height, angle=0. * u.deg, meta=None,
                  visual=None):
         # TODO: use quantity_input to check that angle is an angle
-        self.center = center
+        self.center = PixCoord._validate(center, name='center', expected='scalar')
         self.width = width
         self.height = height
         self.angle = angle
