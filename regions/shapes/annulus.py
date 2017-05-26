@@ -1,4 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
+from __future__ import absolute_import, division, print_function, unicode_literals
 import math
 import operator
 
@@ -8,7 +9,8 @@ from astropy import wcs
 from astropy import coordinates
 from astropy import units as u
 
-from ..core import CompoundPixelRegion, CompoundSkyRegion
+from .._utils.wcs_helpers import skycoord_to_pixel_scale_angle
+from ..core import CompoundPixelRegion, CompoundSkyRegion, PixCoord
 from ..shapes import CirclePixelRegion, CircleSkyRegion
 
 __all__ = ['CircleAnnulusPixelRegion', 'CircleAnnulusSkyRegion']
@@ -32,7 +34,7 @@ class CircleAnnulusPixelRegion(CompoundPixelRegion):
         region1 = CirclePixelRegion(center, inner_radius)
         region2 = CirclePixelRegion(center, outer_radius)
         super(CircleAnnulusPixelRegion, self).__init__(
-            region1=region1, operator=operator.xor, region2=region2)
+            region1=region1, region2=region2, operator=operator.xor)
         self._repr_params = [('inner radius', region1.radius),
                              ('outer radius', region2.radius),
                              ('center', region2.center)]
@@ -88,3 +90,11 @@ class CircleAnnulusSkyRegion(CompoundSkyRegion):
     @property
     def outer_radius(self):
         return self.region2.radius
+
+    def to_pixel(self, wcs):
+        center, scale, _ = skycoord_to_pixel_scale_angle(self.center, wcs)
+        # FIXME: The following line is needed to get a scalar PixCoord
+        center = PixCoord(float(center.x), float(center.y))
+        inner_radius = self.inner_radius.to('deg').value * scale
+        outer_radius = self.outer_radius.to('deg').value * scale
+        return CircleAnnulusPixelRegion(center, inner_radius, outer_radius)

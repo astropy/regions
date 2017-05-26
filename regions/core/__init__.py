@@ -3,6 +3,6 @@
 """
 from .core import *
 from .pixcoord import *
-from .compound import *
 from .mask import *
 from .bounding_box import *
+from .compound import *
