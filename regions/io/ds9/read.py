@@ -10,12 +10,15 @@ from astropy import coordinates
 from astropy import log
 from astropy.utils.exceptions import AstropyUserWarning
 from warnings import warn
-from .core import Shape, ShapeList
+from .core import (
+    Shape,
+    ShapeList,
+    DS9RegionParserWarning,
+    DS9RegionParserError,
+)
 
 __all__ = [
     'read_ds9',
-    'DS9RegionParserWarning',
-    'DS9RegionParserError',
     'DS9Parser',
     'DS9RegionParser',
     'CoordinateParser',
@@ -34,18 +37,6 @@ regex_paren = re.compile("[()]")
 regex_splitter = re.compile("[, ]")
 """Regular expression to split coordinate strings"""
 
-
-class DS9RegionParserWarning(AstropyUserWarning):
-    """
-    A generic warning class for DS9 region parsing inherited from astropy's
-    warnings
-    """
-
-
-class DS9RegionParserError(ValueError):
-    """
-    A generic error class for DS9 region parsing
-    """
 
 
 def read_ds9(filename, errors='strict'):
@@ -228,8 +219,9 @@ class DS9Parser(object):
                               "the known region types.".format(region_type))
             return
         else:
-            # Found region specification
-            self.parse_region(include, region_type, line)
+            # Found region specification,
+            region_end = region_type_search.span()[1]
+            self.parse_region(include, region_type, region_end, line)
 
     def _raise_error(self, msg):
         if self.errors == 'warn':
@@ -259,19 +251,23 @@ class DS9Parser(object):
         result = OrderedDict()
         for ii, jj in zip(equals_inds, equals_inds[1:] + [None]):
             key = regex_meta_split[ii - 1]
-            val =  " ".join(regex_meta_split[ii + 1:jj - 1 if jj is not None else None])
+            val = " ".join(regex_meta_split[ii + 1:jj - 1 if jj is not None else None])
             result[key] = val
 
         return result
 
-    def parse_region(self, include, region_type, line):
+    def parse_region(self, include, region_type, region_end, line):
         """Extract a Shape from a region string"""
         if self.coordsys is None:
             raise DS9RegionParserError("No coordinate system specified and a"
                                        " region has been found.")
         else:
-            helper = DS9RegionParser(self.coordsys, region_type,
-                                     self.global_meta, line)
+            helper = DS9RegionParser(coordsys=self.coordsys,
+                                     include=include,
+                                     region_type=region_type,
+                                     region_end=region_end,
+                                     global_meta=self.global_meta,
+                                     line=line)
             helper.parse()
             self.shapes.append(helper.shape)
 
@@ -297,6 +293,9 @@ class DS9RegionParser(object):
         Flag at the beginning of the line
     region_type : str
         Region type
+    region_end : int
+        Coordinate of the end of the regions name, this is passed in order to
+        handle whitespaces correctly
     global_meta : dict
         Global meta data
     line : str
@@ -328,16 +327,17 @@ class DS9RegionParser(object):
                     }
     """DS9 language specification. This defines how a certain region is read"""
 
-    def __init__(self, coordsys, region_type, global_meta, line):
+    def __init__(self, coordsys, include, region_type, region_end, global_meta, line):
 
         self.coordsys = coordsys
+        self.include = include
         self.region_type = region_type
+        self.region_end = region_end
         self.global_meta = global_meta
         self.line = line
 
         self.meta_str = None
         self.coord_str = None
-        self.include = None
         self.composite = None
         self.coord = None
         self.meta = None
@@ -346,6 +346,7 @@ class DS9RegionParser(object):
     def __str__(self):
         ss = self.__class__.__name__
         ss += '\nLine : {}'.format(self.line)
+        ss += '\nRegion end : {}'.format(self.region_end)
         ss += '\nMeta string : {}'.format(self.meta_str)
         ss += '\nCoord string: {}'.format(self.coord_str)
         ss += '\nShape: {}'.format(self.shape)
@@ -357,7 +358,6 @@ class DS9RegionParser(object):
         log.debug(self)
 
         self.parse_composite()
-        self.parse_include()
         self.split_line()
         self.convert_coordinates()
         self.convert_meta()
@@ -368,21 +368,11 @@ class DS9RegionParser(object):
         """Determine whether the region is composite"""
         self.composite = "||" in self.line
 
-    def parse_include(self):
-        """Determine wether to include/exclude the region"""
-        if self.line[0] == '-':
-            self.include = False
-        else:
-            self.include = True
-
     def split_line(self):
         """Split line into coordinates and meta string"""
-        end_of_region_name = len(self.region_type)
-        if not self.include:
-            end_of_region_name += 1
         # coordinate of the # symbol or end of the line (-1) if not found
         hash_or_end = self.line.find("#")
-        temp = self.line[end_of_region_name:hash_or_end].strip(" |")
+        temp = self.line[self.region_end:hash_or_end].strip(" |")
         self.coord_str = regex_paren.sub("", temp)
         self.meta_str = self.line[hash_or_end:]
 
@@ -423,5 +413,5 @@ class DS9RegionParser(object):
                            coord=self.coord,
                            meta=self.meta,
                            composite=self.composite,
-                           include=self.include
+                           include=self.include != '-',
                           )

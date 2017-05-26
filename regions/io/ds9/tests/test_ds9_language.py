@@ -118,6 +118,13 @@ def test_ds9_string_to_objects():
     assert_allclose(reg.center.dec.deg, 43)
     assert_allclose(reg.radius.value, 3)
 
+def test_ds9_string_to_objects_whitespace():
+    """Simple test case for ds9_string_to_objects
+    """
+    ds9_str = '# Region file format: DS9 astropy/regions\nfk5\n -circle(42.0000,43.0000,3.0000)\n'
+    parser = DS9Parser(ds9_str)
+    parser.run()
+    assert parser.shapes[0].include == False
 
 def test_ds9_io(tmpdir):
     """Simple test case for write_ds9 and read_ds9.
@@ -196,3 +203,10 @@ def test_ds9_color_override_global():
     assert regions[0].meta['color'] == 'green'
     assert regions[1].meta['color'] == 'orange'
     assert regions[2].meta['color'] == 'blue'
+
+def test_issue134_regression():
+    regstr = 'galactic; circle(+0:14:26.064,+0:00:45.206,30.400")'
+    parser = DS9Parser(regstr)
+    parser.run()
+    regions = parser.shapes
+    assert regions[0].to_region().radius.value == 30.4
