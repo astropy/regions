@@ -23,14 +23,13 @@ class Mask(object):
 
     Examples
     --------
-
     Usage examples are provided in the :ref:`gs-masks` section of the docs.
     """
 
     def __init__(self, data, bbox):
-        if data.shape != bbox.shape:
-            raise ValueError("Shape of data and bounding box should match")
         self.data = np.asanyarray(data)
+        if self.data.shape != bbox.shape:
+            raise ValueError("Shape of data and bounding box should match")
         self.bbox = bbox
 
     @property
