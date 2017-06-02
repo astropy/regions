@@ -16,6 +16,7 @@ environment:
       CONDA_CHANNELS: "defaults conda-forge astropy"
       CONDA_DEPENDENCIES: "Cython pytest-arraydiff"
       PIP_DEPENDENCIES: "shapely"
+      ASTROPY_USE_SYSTEM_PYTEST: 1
 
   matrix:
 
