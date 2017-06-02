@@ -2,9 +2,9 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from numpy.testing import assert_allclose
+import pytest
 
 import astropy.units as u
-from astropy.tests.helper import pytest
 from astropy.coordinates import SkyCoord
 from astropy.tests.helper import assert_quantity_allclose
 

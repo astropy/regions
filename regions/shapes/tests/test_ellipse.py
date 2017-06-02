@@ -4,9 +4,9 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import numpy as np
 from numpy.testing import assert_allclose
+import pytest
 
 import astropy.units as u
-from astropy.tests.helper import pytest
 from astropy.tests.helper import assert_quantity_allclose
 from astropy.coordinates import SkyCoord
 

@@ -7,7 +7,7 @@ import distutils.version as vers
 from numpy.testing import assert_allclose
 
 from astropy.utils.data import get_pkg_data_filename, get_pkg_data_filenames
-from astropy.tests.helper import pytest
+import pytest
 import astropy.version as astrov
 from astropy.coordinates import Angle, SkyCoord
 from astropy.tests.helper import catch_warnings
