@@ -13,7 +13,8 @@ from .._geometry import elliptical_overlap_grid
 from .._utils.wcs_helpers import skycoord_to_pixel_scale_angle
 
 
-__all__ = ['EllipsePixelRegion', 'EllipseSkyRegion']
+__all__ = ['EllipsePixelRegion', 'EllipseSkyRegion', 'Ds9EllipsePixelRegion',
+           'Ds9EllipseSkyRegion']
 
 
 class EllipsePixelRegion(PixelRegion):
@@ -225,3 +226,18 @@ class EllipseSkyRegion(SkyRegion):
         return EllipsePixelRegion(center, width, height,
                                   angle=self.angle + (north_angle - 90 * u.deg),
                                   meta=self.meta, visual=self.visual)
+
+class Ds9EllipseSkyRegion(EllipseSkyRegion):
+    def __init__(self, center, halfwidth, halfheight, angle=0*u.deg, meta=None,
+                 visual=None):
+        super(Ds9EllipseSkyRegion, self).__init__(center, 2*halfwidth,
+                                                  2*halfheight, angle=angle,
+                                                  meta=meta, visual=visual)
+
+class Ds9EllipsePixelRegion(EllipsePixelRegion):
+    def __init__(self, center, halfwidth, halfheight, angle=0*u.deg, meta=None,
+                 visual=None):
+        super(Ds9EllipsePixelRegion, self).__init__(center, 2*halfwidth,
+                                                    2*halfheight, angle=angle,
+                                                    meta=meta, visual=visual)
+

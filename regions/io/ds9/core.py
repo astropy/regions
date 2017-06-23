@@ -68,7 +68,7 @@ class Shape(object):
     """
     shape_to_sky_region = dict(
         circle=shapes.CircleSkyRegion,
-        ellipse=shapes.EllipseSkyRegion,
+        ellipse=shapes.Ds9EllipseSkyRegion,
         box=shapes.RectangleSkyRegion,
         polygon=shapes.PolygonSkyRegion,
         annulus=shapes.CircleAnnulusSkyRegion,
@@ -77,7 +77,7 @@ class Shape(object):
     )
     shape_to_pixel_region = dict(
         circle=shapes.CirclePixelRegion,
-        ellipse=shapes.EllipsePixelRegion,
+        ellipse=shapes.Ds9EllipsePixelRegion,
         box=shapes.RectanglePixelRegion,
         polygon=shapes.PolygonPixelRegion,
         annulus=shapes.CircleAnnulusPixelRegion,
