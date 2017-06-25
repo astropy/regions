@@ -274,6 +274,7 @@ class DS9Parser(object):
 
 # Global definitions to improve readability
 radius = CoordinateParser.parse_angular_length_quantity
+diameter = lambda x: 2*(CoordinateParser.parse_angular_length_quantity(x))
 width = CoordinateParser.parse_angular_length_quantity
 height = CoordinateParser.parse_angular_length_quantity
 angle = CoordinateParser.parse_angular_length_quantity
@@ -318,7 +319,7 @@ class DS9RegionParser(object):
                      'circle': (coordinate, coordinate, radius),
                      # This is a special case to deal with n elliptical annuli
                      'ellipse': itertools.chain((coordinate, coordinate),
-                                                itertools.cycle((radius,))),
+                                                itertools.cycle((diameter,))),
                      'box': (coordinate, coordinate, width, height, angle),
                      'polygon': itertools.cycle((coordinate,)),
                      'line': (coordinate, coordinate, coordinate, coordinate),
@@ -394,7 +395,10 @@ class DS9RegionParser(object):
 
         # Reset iterator for ellipse and annulus
         # Note that this cannot be done with copy.deepcopy on python2
-        if self.region_type in ['ellipse', 'annulus']:
+        if self.region_type == 'ellipse':
+            self.language_spec[self.region_type] = itertools.chain(
+                (coordinate, coordinate), itertools.cycle((diameter,)))
+        elif self.region_type == 'annulus':
             self.language_spec[self.region_type] = itertools.chain(
                 (coordinate, coordinate), itertools.cycle((radius,)))
 
