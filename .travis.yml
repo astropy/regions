@@ -57,8 +57,6 @@ matrix:
 
 
         # Try Astropy development version
-        - python: 2.7
-          env: ASTROPY_VERSION=development
         - python: 3.6
           env: ASTROPY_VERSION=development
                CONDA_CHANNELS='conda-forge astropy'
