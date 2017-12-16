@@ -100,13 +100,13 @@ def ds9_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
             y = reg.center.y
             r = reg.radius
             line = ds9_strings['circle'].format(**locals())
-        elif isinstance(reg, shapes.annulus.AnnulusCircleSkyRegion):
+        elif isinstance(reg, shapes.annulus.CircleAnnulusSkyRegion):
             x = float(reg.center.transform_to(frame).spherical.lon.to('deg').value)
             y = float(reg.center.transform_to(frame).spherical.lat.to('deg').value)
             inner = float(reg.inner_radius.to(radunit).value)
             outer = float(reg.outer_radius.to(radunit).value)
             line = ds9_strings['annulus'].format(**locals())
-        elif isinstance(reg, shapes.annulus.AnnulusCirclePixelRegion):
+        elif isinstance(reg, shapes.annulus.CircleAnnulusPixelRegion):
             x = reg.center.x
             y = reg.center.y
             inner = reg.inner_radius
