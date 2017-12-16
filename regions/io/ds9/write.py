@@ -38,6 +38,8 @@ def ds9_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
     ids = {
         shapes.circle.CircleSkyRegion: 'skycircle',
         shapes.circle.CirclePixelRegion: 'pixcircle',
+        shapes.annulus.CircleAnnulusSkyRegion: 'skycircle',
+        shapes.annulus.CircleAnnulusPixelRegion: 'pixcircle',
         shapes.ellipse.EllipseSkyRegion: 'skyellipse',
         shapes.ellipse.EllipsePixelRegion: 'pixellipse',
         shapes.rectangle.RectangleSkyRegion: 'skyrectangle',
@@ -58,6 +60,7 @@ def ds9_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
 
     ds9_strings = {
         'circle': 'circle({x:' + fmt + '},{y:' + fmt + '},{r:' + fmt + '}' + radunitstr + ')',
+        'annulus': 'annulus({x:' + fmt + '},{y:' + fmt + '},{inner:' + fmt + '}' + radunitstr + ',{outer:' + fmt + '}' + radunitstr + ')',
         'ellipse': 'ellipse({x:' + fmt + '},{y:' + fmt + '},{r1:' + fmt + '}' + radunitstr + ',{r2:' + fmt + '}' + radunitstr + ',{ang:' + fmt + '})',
         'rectangle': 'box({x:' + fmt + '},{y:' + fmt + '},{h1:' + fmt + '}' + radunitstr + ',{h2:' + fmt + '}' + radunitstr + ',{ang:' + fmt + '})',
         'polygon': 'polygon({c})',
@@ -97,6 +100,18 @@ def ds9_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
             y = reg.center.y
             r = reg.radius
             line = ds9_strings['circle'].format(**locals())
+        elif isinstance(reg, shapes.annulus.AnnulusCircleSkyRegion):
+            x = float(reg.center.transform_to(frame).spherical.lon.to('deg').value)
+            y = float(reg.center.transform_to(frame).spherical.lat.to('deg').value)
+            inner = float(reg.inner_radius.to(radunit).value)
+            outer = float(reg.outer_radius.to(radunit).value)
+            line = ds9_strings['annulus'].format(**locals())
+        elif isinstance(reg, shapes.annulus.AnnulusCirclePixelRegion):
+            x = reg.center.x
+            y = reg.center.y
+            inner = reg.inner_radius
+            outer = reg.outer_radius
+            line = ds9_strings['annulus'].format(**locals())
         elif isinstance(reg, shapes.point.PointSkyRegion):
             x = float(reg.center.transform_to(frame).spherical.lon.to('deg').value)
             y = float(reg.center.transform_to(frame).spherical.lat.to('deg').value)
