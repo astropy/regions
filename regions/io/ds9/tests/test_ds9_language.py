@@ -29,6 +29,8 @@ def test_read():
         read_ds9(f, errors='warn')
 
 
+implemented_region_types = ('ellipse', 'circle', 'rectangle', 'polygon', 'point')
+
 @pytest.mark.parametrize('filename',
                          ['data/ds9.fk5.reg',
                           'data/ds9.fk5.hms.reg',

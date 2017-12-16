@@ -44,6 +44,8 @@ def ds9_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
         shapes.rectangle.RectanglePixelRegion: 'pixrectangle',
         shapes.polygon.PolygonSkyRegion: 'skypolygon',
         shapes.polygon.PolygonPixelRegion: 'pixpolygon',
+        shapes.line.LineSkyRegion: 'skyline',
+        shapes.line.LinePixelRegion: 'pixline',
     }
 
     if radunit == 'arcsec':
@@ -60,6 +62,7 @@ def ds9_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
         'rectangle': 'box({x:' + fmt + '},{y:' + fmt + '},{h1:' + fmt + '}' + radunitstr + ',{h2:' + fmt + '}' + radunitstr + ',{ang:' + fmt + '})',
         'polygon': 'polygon({c})',
         'point': 'point({{x:{fmt}}}, {{y:{fmt}}})'.format(fmt=fmt),
+        'line': 'line({{x1:{fmt}}}, {{y1:{fmt}}}, {{x2:{fmt}}}, {{y2:{fmt}}}, )'.format(fmt=fmt),
     }
     for key in ds9_strings:
         # include must be a prefix "-" or ""
@@ -102,6 +105,18 @@ def ds9_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
             x = reg.center.x
             y = reg.center.y
             line = ds9_strings['point'].format(**locals())
+        elif isinstance(reg, shapes.line.LineSkyRegion):
+            x1 = float(reg.start.transform_to(frame).spherical.lon.to('deg').value)
+            y1 = float(reg.start.transform_to(frame).spherical.lat.to('deg').value)
+            x2 = float(reg.end.transform_to(frame).spherical.lon.to('deg').value)
+            y2 = float(reg.end.transform_to(frame).spherical.lat.to('deg').value)
+            line = ds9_strings['line'].format(**locals())
+        elif isinstance(reg, shapes.line.LinePixelRegion):
+            x1 = reg.start.x
+            y1 = reg.start.y
+            x2 = reg.end.x
+            y2 = reg.end.y
+            line = ds9_strings['line'].format(**locals())
         elif isinstance(reg, shapes.ellipse.EllipseSkyRegion):
             x = float(reg.center.transform_to(frame).spherical.lon.to('deg').value)
             y = float(reg.center.transform_to(frame).spherical.lat.to('deg').value)
