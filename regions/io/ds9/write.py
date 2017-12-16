@@ -40,6 +40,8 @@ def ds9_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
         shapes.circle.CirclePixelRegion: 'pixcircle',
         shapes.ellipse.EllipseSkyRegion: 'skyellipse',
         shapes.ellipse.EllipsePixelRegion: 'pixellipse',
+        shapes.rectangle.RectangleSkyRegion: 'skyrectangle',
+        shapes.rectangle.RectanglePixelRegion: 'pixrectangle',
         shapes.polygon.PolygonSkyRegion: 'skypolygon',
         shapes.polygon.PolygonPixelRegion: 'pixpolygon',
     }
@@ -55,6 +57,7 @@ def ds9_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
     ds9_strings = {
         'circle': 'circle({x:' + fmt + '},{y:' + fmt + '},{r:' + fmt + '}' + radunitstr + ')',
         'ellipse': 'ellipse({x:' + fmt + '},{y:' + fmt + '},{r1:' + fmt + '}' + radunitstr + ',{r2:' + fmt + '}' + radunitstr + ',{ang:' + fmt + '})',
+        'rectangle': 'box({x:' + fmt + '},{y:' + fmt + '},{h1:' + fmt + '}' + radunitstr + ',{h2:' + fmt + '}' + radunitstr + ',{ang:' + fmt + '})',
         'polygon': 'polygon({c})',
         'point': 'point({{x:{fmt}}}, {{y:{fmt}}})'.format(fmt=fmt),
     }
@@ -106,6 +109,13 @@ def ds9_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
             r2 = float(reg.height.to(radunit).value)
             ang = float(reg.angle.to('deg').value)
             line = ds9_strings['ellipse'].format(**locals())
+        elif isinstance(reg, shapes.rectangle.RectangleSkyRegion):
+            x = float(reg.center.transform_to(frame).spherical.lon.to('deg').value)
+            y = float(reg.center.transform_to(frame).spherical.lat.to('deg').value)
+            h1 = float(reg.width.to(radunit).value)
+            h2 = float(reg.height.to(radunit).value)
+            ang = float(reg.angle.to('deg').value)
+            line = ds9_strings['rectangle'].format(**locals())
         elif isinstance(reg, shapes.ellipse.EllipsePixelRegion):
             x = reg.center.x
             y = reg.center.y
@@ -113,6 +123,13 @@ def ds9_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
             r2 = reg.height
             ang = reg.angle
             line = ds9_strings['ellipse'].format(**locals())
+        elif isinstance(reg, shapes.rectangle.RectanglePixelRegion):
+            x = reg.center.x
+            y = reg.center.y
+            h1 = reg.width
+            h2 = reg.height
+            ang = reg.angle
+            line = ds9_strings['rectangle'].format(**locals())
         elif isinstance(reg, shapes.polygon.PolygonSkyRegion):
             v = reg.vertices.transform_to(frame)
             coords = [(x.to('deg').value, y.to('deg').value) for x, y in
