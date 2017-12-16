@@ -87,10 +87,10 @@ def ds9_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
         # prepend nothing
         include = reg.meta.get('include', '')
 
-        meta_str = " ".join("{0}={{{1}}}".format(key,val) for key,val in
+        meta_str = " ".join("{0}={{1}}".format(key,val) for key,val in
                             reg.meta.items() if key not in ('include','tag'))
         if 'tag' in reg.meta:
-            meta_str += " "+" ".join(["tag={{{0}}}".format(tag)
+            meta_str += " "+" ".join(["tag={{0}}".format(tag)
                                       for tag in reg.meta['tag']])
         if 'comment' in reg.meta:
             meta_str += " " + reg.meta['comment']

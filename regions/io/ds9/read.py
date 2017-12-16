@@ -246,10 +246,10 @@ class DS9Parser(object):
         meta : `~collections.OrderedDict`
             Dictionary containing the meta data
         """
-        keys, vals = [(x,y) for x,_,y in regex_meta.findall(meta_str.strip())]
+        keys_vals = [(x,y) for x,_,y in regex_meta.findall(meta_str.strip())]
         extra_text = regex_meta.split(meta_str.strip())[-1]
         result = OrderedDict()
-        for key, val in zip(keys, vals):
+        for key, val in keys_vals:
             if key in result:
                 if key == 'tag':
                     result[key].append(val)
