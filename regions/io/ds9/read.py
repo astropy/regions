@@ -252,7 +252,16 @@ class DS9Parser(object):
         for ii, jj in zip(equals_inds, equals_inds[1:] + [None]):
             key = regex_meta_split[ii - 1]
             val = " ".join(regex_meta_split[ii + 1:jj - 1 if jj is not None else None])
-            result[key] = val
+            if key in result:
+                if key == 'tag':
+                    result[key].append(val)
+                else:
+                    raise ValueError("Duplicate key {0} found".format(key))
+            else:
+                if key == 'tag':
+                    result[key] = [val]
+                else:
+                    result[key] = val
 
         return result
 
