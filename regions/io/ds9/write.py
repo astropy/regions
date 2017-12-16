@@ -90,7 +90,10 @@ def ds9_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
         meta_str = " ".join("{0}={{{1}}}".format(key,val) for key,val in
                             reg.meta.items() if key not in ('include','tag'))
         if 'tag' in reg.meta:
-            meta_str += " ".join(["tag={{{0}}}" for tag in reg.meta['tag']])
+            meta_str += " "+" ".join(["tag={{{0}}}".format(tag)
+                                      for tag in reg.meta['tag']])
+        if 'comment' in reg.meta:
+            meta_str += " " + reg.meta['comment']
 
         if isinstance(reg, shapes.circle.CircleSkyRegion):
             x = float(reg.center.transform_to(frame).spherical.lon.to('deg').value)

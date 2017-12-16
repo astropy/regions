@@ -28,7 +28,7 @@ __all__ = [
 regex_global = re.compile("^#? *(-?)([a-zA-Z0-9]+)")
 """Regular expression to extract region type or coodinate system"""
 
-regex_meta = re.compile("([a-zA-Z]+)(=)([^= ]+) ?")
+regex_meta = re.compile("([a-zA-Z]+)(=)({.*?}|\".*?\"|[^= ]+) ?")
 """Regular expression to extract meta attributes"""
 
 regex_paren = re.compile("[()]")
@@ -246,12 +246,10 @@ class DS9Parser(object):
         meta : `~collections.OrderedDict`
             Dictionary containing the meta data
         """
-        regex_meta_split = [x for x in regex_meta.split(meta_str.strip()) if x]
-        equals_inds = [i for i, x in enumerate(regex_meta_split) if x == '=']
+        keys, vals = [(x,y) for x,_,y in regex_meta.findall(meta_str.strip())]
+        extra_text = regex_meta.split(meta_str.strip())[-1]
         result = OrderedDict()
-        for ii, jj in zip(equals_inds, equals_inds[1:] + [None]):
-            key = regex_meta_split[ii - 1]
-            val = " ".join(regex_meta_split[ii + 1:jj - 1 if jj is not None else None])
+        for key, val in zip(keys, vals):
             if key in result:
                 if key == 'tag':
                     result[key].append(val)
@@ -262,6 +260,8 @@ class DS9Parser(object):
                     result[key] = [val]
                 else:
                     result[key] = val
+        if extra_text:
+            result['comment'] = extra_text
 
         return result
 
