@@ -58,8 +58,12 @@ def test_fk5(filename):
     # since metadata is not required to preserve order, we have to do a more
     # complex comparison
     desired_lines = [set(line.split()) for line in desired.split("\n")]
-    for line in actual.split("\n"):
-        assert set(line.split()) in desired_lines
+    actual_lines = [set(line.split()) for line in actual.split("\n")]
+    for split_line in actual_lines:
+        assert split_line in desired_lines
+
+    for split_line in desired_lines:
+        assert split_line in actual_lines
 
 
 @pytest.mark.parametrize('filename',
@@ -81,7 +85,15 @@ def test_galactic(filename):
     with open(reference_file, 'r') as fh:
         desired = fh.read()
 
-    assert actual == desired
+    # since metadata is not required to preserve order, we have to do a more
+    # complex comparison
+    desired_lines = [set(line.split()) for line in desired.split("\n")]
+    actual_lines = [set(line.split()) for line in actual.split("\n")]
+    for split_line in actual_lines:
+        assert split_line in desired_lines
+
+    for split_line in desired_lines:
+        assert split_line in actual_lines
 
 
 # Todo : data/ds9.physical.windows.reg contains different values -> Why?
@@ -102,7 +114,15 @@ def test_physical(filename):
     with open(reference_file, 'r') as fh:
         desired = fh.read()
 
-    assert actual == desired
+    # since metadata is not required to preserve order, we have to do a more
+    # complex comparison
+    desired_lines = [set(line.split()) for line in desired.split("\n")]
+    actual_lines = [set(line.split()) for line in actual.split("\n")]
+    for split_line in actual_lines:
+        assert split_line in desired_lines
+
+    for split_line in desired_lines:
+        assert split_line in actual_lines
 
 
 def test_ds9_objects_to_str():
