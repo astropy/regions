@@ -28,7 +28,7 @@ __all__ = [
 regex_global = re.compile("^#? *(-?)([a-zA-Z0-9]+)")
 """Regular expression to extract region type or coodinate system"""
 
-regex_meta = re.compile("([a-zA-Z]+)(=)({.*?}|\".*?\"|[^= ]+) ?")
+regex_meta = re.compile("([a-zA-Z]+)(=)({.*?}|\".*?\"|[0-9 ]+ ?|[^= ]+) ?")
 """Regular expression to extract meta attributes"""
 
 regex_paren = re.compile("[()]")
@@ -250,6 +250,8 @@ class DS9Parser(object):
         extra_text = regex_meta.split(meta_str.strip())[-1]
         result = OrderedDict()
         for key, val in keys_vals:
+            # regex can include trailing whitespace; remove it
+            val = val.strip()
             if key in result:
                 if key == 'tag':
                     result[key].append(val)
