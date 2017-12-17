@@ -81,7 +81,10 @@ def test_galactic(filename):
     # print(actual)
     # 1 / 0
 
-    reference_file = get_pkg_data_filename('data/galactic_reference.reg')
+    if 'strip' in filename:
+        reference_file = get_pkg_data_filename('data/galactic_strip_reference.reg')
+    else:
+        reference_file = get_pkg_data_filename('data/galactic_reference.reg')
     with open(reference_file, 'r') as fh:
         desired = fh.read()
 
