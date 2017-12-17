@@ -2,9 +2,11 @@
 fk5
 circle(202.49,47.21,3.96") # source=1 highlite=1 delete=1 fixed=0 tag={foo} tag={foo bar} This is a Comment move=1 dashlist=8 3  text={Circle} edit=1 dash=0 select=1
 -ellipse(202.48,47.20,7.93",3.96",2.40) # edit=1 move=1 fixed=0 delete=1 dashlist=8 3  source=1 dash=0 highlite=1  select=1 text={Ellipse} background
-ellipse(202.48,47.20,7.93",3.96",2.40) # edit=1 move=1 fixed=0 delete=1 dashlist=8 3  source=1 dash=0 highlite=1  select=1 text={Box}
-polygon(202.47,47.20,202.47,47.20,202.47,47.20,202.47,47.20) # highlite=1 delete=1 fixed=0 edit=1 move=1 dashlist=8 3  text={Polygon} source=1 rotate=0 dash=0 select=1
-polygon(202.47,47.20,202.47,47.20,202.47,47.20,202.47,47.20) # edit=1 move=1 fixed=0 dashlist=8 3  source=1 dash=0 delete=1 highlite=1 select=1 text={Box Annulus}
+-box(202.48,47.20,15.86",7.93",2.40) # edit=1 move=1 fixed=0 delete=1 dashlist=8 3  source=1 dash=0 highlite=1  select=1 text={Box}
+polygon(202.47,47.20,202.47,47.20,202.47,47.20,202.47,47.20) # highlite=1 delete=1 fixed=0 edit=0 move=1 dashlist=8 3  text={Polygon} source=1 rotate=0 dash=0 select=1
+-line(202.47,47.19,202.46,47.19) # edit=1 move=1 fixed=0 dashlist=8 3  source=1 dash=0 delete=1 highlite=1 select=1 line=1 1 color=cyan text={Line}
+annulus(202.49,47.20,1.98",3.96") # dashlist=8 3 select=1 highlite=1 dash=0 fixed=0 edit=1 move=1 delete=1 source=1 text={Annulus}
+box(202.48,47.20,7.93",3.96",0.00) # dashlist=8 3 select=1 highlite=1 dash=0 fixed=0 edit=1 move=1 delete=1 source=1 text={Box Annulus}
 point(202.50, 47.20) # edit=1 move=1 fixed=0 dashlist=8 3  source=1 dash=0 delete=1 highlite=1 select=1 text={Circle Point}
 point(202.49, 47.20) # edit=1 move=1 fixed=0 delete=1 dashlist=8 3  source=1 dash=0 highlite=1 select=1 text={Box Point}
 point(202.49, 47.19) # edit=1 move=1 fixed=0 dashlist=8 3  source=1 dash=0 delete=1 highlite=1 select=1 text={Diamond Point}

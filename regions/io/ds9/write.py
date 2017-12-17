@@ -85,7 +85,7 @@ def ds9_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
 
         # default if unspecified is that include is True, which means we
         # prepend nothing
-        include = "-" if reg.meta.get('include') is False else ""
+        include = "-" if reg.meta.get('include') in (False,'-') else ""
 
         meta_str = " ".join("{0}={1}".format(key,val) for key,val in
                             reg.meta.items() if key not in ('include','tag','comment'))

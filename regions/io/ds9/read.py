@@ -61,7 +61,6 @@ def read_ds9(filename, errors='strict'):
         region_string = fh.read()
 
     parser = DS9Parser(region_string, errors=errors)
-    parser.run()
     return parser.shapes.to_region()
 
 
@@ -159,6 +158,8 @@ class DS9Parser(object):
         # Results
         self.shapes = ShapeList()
 
+        self.run()
+
     def __str__(self):
         ss = self.__class__.__name__
         ss += '\nErrors: {}'.format(self.errors)
@@ -199,6 +200,11 @@ class DS9Parser(object):
         # Special case / header: parse global parameters into metadata
         if line.lstrip()[:6] == 'global':
             self.global_meta = self.parse_meta(line)
+            # global_meta can specify "include=1"; never seen other options
+            # used but presumably =0 means false
+            self.global_meta['include'] = (False if
+                                           self.global_meta.get('include') in
+                                           ('0', 'False', False) else True)
             return
 
         # Try to parse the line
@@ -416,6 +422,10 @@ class DS9RegionParser(object):
         meta_ = DS9Parser.parse_meta(self.meta_str)
         self.meta = copy.deepcopy(self.global_meta)
         self.meta.update(meta_)
+        # the 'include' is not part of the metadata string;
+        # it is pre-parsed as part of the shape type and should always
+        # override the global one
+        self.meta['include'] = self.include
 
     def make_shape(self):
         """Make shape object"""
