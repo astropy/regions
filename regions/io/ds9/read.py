@@ -391,7 +391,12 @@ class DS9RegionParser(object):
         hash_or_end = self.line.find("#")
         temp = self.line[self.region_end:hash_or_end].strip(" |")
         self.coord_str = regex_paren.sub("", temp)
-        self.meta_str = self.line[hash_or_end:]
+
+        # don't want any meta_str if there is no metadata found
+        if hash_or_end >= 0:
+            self.meta_str = self.line[hash_or_end:]
+        else:
+            self.meta_str = ""
 
     def convert_coordinates(self):
         """Convert coordinate string to objects"""

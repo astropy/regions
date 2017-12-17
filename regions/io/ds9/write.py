@@ -64,8 +64,8 @@ def ds9_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
         'ellipse': 'ellipse({x:' + fmt + '},{y:' + fmt + '},{r1:' + fmt + '}' + radunitstr + ',{r2:' + fmt + '}' + radunitstr + ',{ang:' + fmt + '})',
         'rectangle': 'box({x:' + fmt + '},{y:' + fmt + '},{h1:' + fmt + '}' + radunitstr + ',{h2:' + fmt + '}' + radunitstr + ',{ang:' + fmt + '})',
         'polygon': 'polygon({c})',
-        'point': 'point({{x:{fmt}}}, {{y:{fmt}}})'.format(fmt=fmt),
-        'line': 'line({{x1:{fmt}}}, {{y1:{fmt}}}, {{x2:{fmt}}}, {{y2:{fmt}}}, )'.format(fmt=fmt),
+        'point': 'point({{x:{fmt}}},{{y:{fmt}}})'.format(fmt=fmt),
+        'line': 'line({{x1:{fmt}}},{{y1:{fmt}}},{{x2:{fmt}}},{{y2:{fmt}}})'.format(fmt=fmt),
     }
     for key in ds9_strings:
         # include must be a prefix "-" or ""
@@ -94,6 +94,10 @@ def ds9_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
                                       for tag in reg.meta['tag']])
         if 'comment' in reg.meta:
             meta_str += " " + reg.meta['comment']
+
+        viz_meta_str = " ".join(["{0}={1}".format(key, val)
+                                 for key,val in reg.visual.items()])
+        meta_str += " " + viz_meta_str
 
         if isinstance(reg, shapes.circle.CircleSkyRegion):
             x = float(reg.center.transform_to(frame).spherical.lon.to('deg').value)
@@ -183,7 +187,10 @@ def ds9_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
         else:
             raise ValueError("Cannot write {0}".format(reg))
 
-        output += "{0} # {1} \n".format(line, meta_str)
+        if meta_str.strip():
+            output += "{0} # {1} \n".format(line, meta_str)
+        else:
+            output += "{0}\n".format(line)
 
     return output
 
