@@ -14,6 +14,9 @@ class CompoundPixelRegion(PixelRegion):
         self.region1 = region1
         self.region2 = region2
         self.operator = operator
+        if not callable(operator):
+            raise TypeError("The operator passed to a compound region must "
+                            "be callable.")
         self._repr_params = [('component 1', self.region1),
                              ('component 2', self.region2),
                              ('operator', self.operator),
@@ -43,10 +46,13 @@ class CompoundSkyRegion(SkyRegion):
     Represents the logical combination of two regions in sky coordinates.
     """
 
-    def __init__(self, region1, region2, operator):
+    def __init__(self, region1, operator, region2):
         self.region1 = region1
         self.region2 = region2
         self.operator = operator
+        if not callable(operator):
+            raise TypeError("The operator passed to a compound region must "
+                            "be callable.")
         self._repr_params = [('component 1', self.region1),
                              ('component 2', self.region2),
                              ('operator', self.operator),
