@@ -113,7 +113,10 @@ def test_physical(filename):
     # print(actual)
     # 1 / 0
 
-    reference_file = get_pkg_data_filename('data/physical_reference.reg')
+    if 'strip' in filename:
+        reference_file = get_pkg_data_filename('data/physical_strip_reference.reg')
+    else:
+        reference_file = get_pkg_data_filename('data/physical_reference.reg')
     with open(reference_file, 'r') as fh:
         desired = fh.read()
 
@@ -135,7 +138,7 @@ def test_ds9_objects_to_str():
     radius = Angle(3, 'deg')
     region = CircleSkyRegion(center, radius)
     expected = '# Region file format: DS9 astropy/regions\nfk5\ncircle(42.0000,43.0000,3.0000)\n'
-    actual = ds9_objects_to_string([region])
+    actual = ds9_objects_to_string([region], fmt='.4f')
     assert actual == expected
 
 
@@ -163,13 +166,13 @@ def test_ds9_string_to_objects_whitespace():
 def test_ds9_io(tmpdir):
     """Simple test case for write_ds9 and read_ds9.
     """
-    center = SkyCoord(42, 43, unit='deg')
+    center = SkyCoord(42, 43, unit='deg', frame='fk5')
     radius = Angle(3, 'deg')
     reg = CircleSkyRegion(center, radius)
     reg.meta['name'] = 'MyName'
 
     filename = os.path.join(str(tmpdir), 'ds9.reg')
-    write_ds9([reg], filename)
+    write_ds9([reg], filename, coordsys='fk5')
     reg = read_ds9(filename)[0]
 
     assert_allclose(reg.center.ra.deg, 42)
@@ -185,7 +188,6 @@ def test_missing_region_warns():
     # this will warn on both the commented first line and the not_a_region line
     with catch_warnings(AstropyUserWarning) as ASWarn:
         parser = DS9Parser(ds9_str, errors='warn')
-        parser.run()
 
     assert len(parser.shapes) == 1
     assert len(ASWarn) == 1
