@@ -242,7 +242,7 @@ class SkyRegion(Region):
         ``other``.
         """
         from .compound import CompoundSkyRegion
-        return CompoundSkyRegion(self, other, operator.and_)
+        return CompoundSkyRegion(region1=self, region2=other, operator=operator.and_)
 
     def symmetric_difference(self, other):
         """
@@ -250,14 +250,14 @@ class SkyRegion(Region):
         intersection of the two regions.
         """
         from .compound import CompoundSkyRegion
-        return CompoundSkyRegion(self, other, operator.xor)
+        return CompoundSkyRegion(region1=self, region2=other, operator=operator.xor)
 
     def union(self, other):
         """
         Returns a region representing the union of this region with ``other``.
         """
         from .compound import CompoundSkyRegion
-        return CompoundSkyRegion(self, other, operator.or_)
+        return CompoundSkyRegion(region1=self, region2=other, operator=operator.or_)
 
     def contains(self, skycoord, wcs):
         """
