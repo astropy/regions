@@ -99,7 +99,7 @@ class PixelRegion(Region):
         ``other``.
         """
         from .compound import CompoundPixelRegion
-        return CompoundPixelRegion(self, other, operator.and_)
+        return CompoundPixelRegion(region1=self, region2=other, operator=operator.and_)
 
     def symmetric_difference(self, other):
         """
@@ -107,14 +107,14 @@ class PixelRegion(Region):
         intersection of the two regions.
         """
         from .compound import CompoundPixelRegion
-        return CompoundPixelRegion(self, other, operator.xor)
+        return CompoundPixelRegion(region1=self, region2=other, operator=operator.xor)
 
     def union(self, other):
         """
         Returns a region representing the union of this region with ``other``.
         """
         from .compound import CompoundPixelRegion
-        return CompoundPixelRegion(self, other, operator.or_)
+        return CompoundPixelRegion(region1=self, region2=other, operator=operator.or_)
 
     @abc.abstractmethod
     def contains(self, pixcoord):
