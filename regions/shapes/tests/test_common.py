@@ -8,13 +8,17 @@ from numpy.testing import assert_equal, assert_allclose
 import pytest
 
 from ...core import PixCoord, BoundingBox
-from .utils import ASTROPY_LT_13, HAS_SHAPELY  # noqa
+from .utils import ASTROPY_LT_13, NUMPY_LT_1_14, HAS_SHAPELY  # noqa
 
 
 class BaseTestRegion(object):
 
     def test_repr(self):
-        assert repr(self.reg) == self.expected_repr
+        if NUMPY_LT_1_14:
+            assert repr(self.reg) == self.expected_repr
+        else:
+            # numpy 1.14+ adds extra whitespace; we should not fail when whitespace changes
+            assert repr(self.reg).replace(" ","") == self.expected_repr.replace(" ","")
 
     def test_str(self):
         assert str(self.reg) == self.expected_str
