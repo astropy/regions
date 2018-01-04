@@ -21,7 +21,11 @@ class BaseTestRegion(object):
             assert repr(self.reg).replace(" ","") == self.expected_repr.replace(" ","")
 
     def test_str(self):
-        assert str(self.reg) == self.expected_str
+        if NUMPY_LT_1_14:
+            assert str(self.reg) == self.expected_str
+        else:
+            # numpy 1.14+ adds extra whitespace; we should not fail when whitespace changes
+            assert str(self.reg).replace(" ","") == self.expected_str.replace(" ","")
 
 
 class BaseTestPixelRegion(BaseTestRegion):
