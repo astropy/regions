@@ -31,61 +31,36 @@ def test_read():
 
 implemented_region_types = ('ellipse', 'circle', 'rectangle', 'polygon', 'point')
 
+
 @pytest.mark.parametrize('filename',
                          ['data/ds9.fk5.reg',
                           'data/ds9.fk5.hms.reg',
                           'data/ds9.fk5.hms.strip.reg',
-                          'data/ds9.fk5.strip.reg'])
-def test_fk5(filename):
-    filename = get_pkg_data_filename(filename)
-    regs = read_ds9(filename, errors='warn')
-
-    actual = ds9_objects_to_string(regs, coordsys='fk5', fmt='.2f', radunit='arcsec')
-
-    # Use this to produce reference file for now
-    # print(actual)
-    # 1/0
-
-    if 'strip' in filename:
-        reference_file = get_pkg_data_filename('data/fk5_strip_reference.reg')
-    else:
-        # preserves metadata
-        reference_file = get_pkg_data_filename('data/fk5_reference.reg')
-
-    with open(reference_file, 'r') as fh:
-        desired = fh.read()
-
-    # since metadata is not required to preserve order, we have to do a more
-    # complex comparison
-    desired_lines = [set(line.split()) for line in desired.split("\n")]
-    actual_lines = [set(line.split()) for line in actual.split("\n")]
-    for split_line in actual_lines:
-        assert split_line in desired_lines
-
-    for split_line in desired_lines:
-        assert split_line in actual_lines
-
-
-@pytest.mark.parametrize('filename',
-                         ['data/ds9.galactic.reg',
+                          'data/ds9.fk5.strip.reg',
+                          'data/ds9.galactic.reg',
                           'data/ds9.galactic.hms.reg',
                           'data/ds9.galactic.hms.strip.reg',
-                          'data/ds9.galactic.strip.reg'])
-def test_galactic(filename):
+                          'data/ds9.galactic.strip.reg',
+                          # TODO : data/ds9.physical.windows.reg contains different values -> Why?
+                          'data/ds9.physical.reg',
+                          'data/ds9.physical.strip.reg',
+                         ])
+def test_file(filename):
     filename = get_pkg_data_filename(filename)
     regs = read_ds9(filename, errors='warn')
 
-    actual = ds9_objects_to_string(regs, coordsys='galactic', fmt='.2f', radunit='arcsec')
+    coordsys = os.path.basename(filename).split(".")[1]
 
-    # Use this to produce reference file for now
-    # print(actual)
-    # 1 / 0
+    actual = ds9_objects_to_string(regs, coordsys=coordsys, fmt='.2f',
+                                   radunit=None if coordsys=='physical' else 'arcsec')
 
-    if 'strip' in filename:
-        reference_file = get_pkg_data_filename('data/galactic_strip_reference.reg')
-    else:
-        reference_file = get_pkg_data_filename('data/galactic_reference.reg')
-    with open(reference_file, 'r') as fh:
+    reffile = get_pkg_data_filename('data/{coordsys}{strip}_reference.reg'
+                                    .format(coordsys=coordsys,
+                                            strip=("_strip"
+                                                   if "strip" in filename
+                                                   else "")))
+
+    with open(reffile, 'r') as fh:
         desired = fh.read()
 
     # since metadata is not required to preserve order, we have to do a more
@@ -98,37 +73,6 @@ def test_galactic(filename):
     for split_line in desired_lines:
         assert split_line in actual_lines
 
-
-# Todo : data/ds9.physical.windows.reg contains different values -> Why?
-@pytest.mark.parametrize('filename',
-                         ['data/ds9.physical.reg',
-                          'data/ds9.physical.strip.reg'])
-def test_physical(filename):
-    filename = get_pkg_data_filename(filename)
-    regs = read_ds9(filename, errors='warn')
-
-    actual = ds9_objects_to_string(regs, coordsys='physical', fmt='.2f')
-
-    # Use this to produce reference file for now
-    # print(actual)
-    # 1 / 0
-
-    if 'strip' in filename:
-        reference_file = get_pkg_data_filename('data/physical_strip_reference.reg')
-    else:
-        reference_file = get_pkg_data_filename('data/physical_reference.reg')
-    with open(reference_file, 'r') as fh:
-        desired = fh.read()
-
-    # since metadata is not required to preserve order, we have to do a more
-    # complex comparison
-    desired_lines = [set(line.split()) for line in desired.split("\n")]
-    actual_lines = [set(line.split()) for line in actual.split("\n")]
-    for split_line in actual_lines:
-        assert split_line in desired_lines
-
-    for split_line in desired_lines:
-        assert split_line in actual_lines
 
 
 def test_ds9_objects_to_str():
