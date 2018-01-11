@@ -59,14 +59,16 @@ def ds9_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
         radunitstr = ''
 
     ds9_strings = {
-        'circle': 'circle({x:' + fmt + '},{y:' + fmt + '},{r:' + fmt + '}' + radunitstr + ')',
-        'annulus': 'annulus({x:' + fmt + '},{y:' + fmt + '},{inner:' + fmt + '}' + radunitstr + ',{outer:' + fmt + '}' + radunitstr + ')',
-        'ellipse': 'ellipse({x:' + fmt + '},{y:' + fmt + '},{r1:' + fmt + '}' + radunitstr + ',{r2:' + fmt + '}' + radunitstr + ',{ang:' + fmt + '})',
-        'rectangle': 'box({x:' + fmt + '},{y:' + fmt + '},{h1:' + fmt + '}' + radunitstr + ',{h2:' + fmt + '}' + radunitstr + ',{ang:' + fmt + '})',
+        'circle': 'circle({x:FMT},{y:FMT},{r:FMT}RAD)',
+        'annulus': 'annulus({x:FMT},{y:FMT},{inner:FMT}RAD,{outer:FMT}RAD)',
+        'ellipse': 'ellipse({x:FMT},{y:FMT},{r1:FMT}RAD,{r2:FMT}RAD,{ang:FMT})',
+        'rectangle': 'box({x:FMT},{y:FMT},{h1:FMT}RAD,{h2:FMT}RAD,{ang:FMT})',
         'polygon': 'polygon({c})',
-        'point': 'point({{x:{fmt}}},{{y:{fmt}}})'.format(fmt=fmt),
-        'line': 'line({{x1:{fmt}}},{{y1:{fmt}}},{{x2:{fmt}}},{{y2:{fmt}}})'.format(fmt=fmt),
+        'point': 'point({x:FMT},{y:FMT})',
+        'line': 'line({x1:FMT},{y1:FMT},{x2:FMT},{y2:FMT})',
     }
+    for key, val in ds9_strings.items():
+        ds9_strings[key] = val.replace("FMT", fmt).replace("RAD", radunitstr)
     for key in ds9_strings:
         # include must be a prefix "-" or ""
         ds9_strings[key] = "{include}" + ds9_strings[key]

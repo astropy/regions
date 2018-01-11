@@ -5,7 +5,6 @@ import astropy
 import numpy
 
 ASTROPY_LT_13 = LooseVersion(astropy.__version__) < LooseVersion('1.3')
-NUMPY_LT_1_14 = LooseVersion(numpy.__version__) < LooseVersion('1.14')
 
 try:
     import matplotlib  # noqa
