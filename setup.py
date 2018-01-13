@@ -106,7 +106,8 @@ setup(name=PACKAGENAME,
       version=VERSION,
       description=DESCRIPTION,
       scripts=scripts,
-      install_requires=['astropy'],
+      setup_requires=['numpy'],
+      install_requires=['numpy', 'astropy'],
       extras_require=dict(
           plot=[
               'matplotlib',
