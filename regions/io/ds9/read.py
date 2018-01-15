@@ -28,7 +28,7 @@ __all__ = [
 regex_global = re.compile("^#? *(-?)([a-zA-Z0-9]+)")
 """Regular expression to extract region type or coodinate system"""
 
-regex_meta = re.compile("([a-zA-Z]+)(=)([^= ]+) ?")
+regex_meta = re.compile("([a-zA-Z]+)(=)({.*?}|\".*?\"|[0-9 ]+ ?|[^= ]+) ?")
 """Regular expression to extract meta attributes"""
 
 regex_paren = re.compile("[()]")
@@ -61,7 +61,6 @@ def read_ds9(filename, errors='strict'):
         region_string = fh.read()
 
     parser = DS9Parser(region_string, errors=errors)
-    parser.run()
     return parser.shapes.to_region()
 
 
@@ -159,6 +158,8 @@ class DS9Parser(object):
         # Results
         self.shapes = ShapeList()
 
+        self.run()
+
     def __str__(self):
         ss = self.__class__.__name__
         ss += '\nErrors: {}'.format(self.errors)
@@ -199,6 +200,11 @@ class DS9Parser(object):
         # Special case / header: parse global parameters into metadata
         if line.lstrip()[:6] == 'global':
             self.global_meta = self.parse_meta(line)
+            # global_meta can specify "include=1"; never seen other options
+            # used but presumably =0 means false
+            self.global_meta['include'] = (False if
+                                           self.global_meta.get('include') in
+                                           ('0', 'False', False) else True)
             return
 
         # Try to parse the line
@@ -246,13 +252,24 @@ class DS9Parser(object):
         meta : `~collections.OrderedDict`
             Dictionary containing the meta data
         """
-        regex_meta_split = [x for x in regex_meta.split(meta_str.strip()) if x]
-        equals_inds = [i for i, x in enumerate(regex_meta_split) if x == '=']
+        keys_vals = [(x,y) for x,_,y in regex_meta.findall(meta_str.strip())]
+        extra_text = regex_meta.split(meta_str.strip())[-1]
         result = OrderedDict()
-        for ii, jj in zip(equals_inds, equals_inds[1:] + [None]):
-            key = regex_meta_split[ii - 1]
-            val = " ".join(regex_meta_split[ii + 1:jj - 1 if jj is not None else None])
-            result[key] = val
+        for key, val in keys_vals:
+            # regex can include trailing whitespace; remove it
+            val = val.strip()
+            if key in result:
+                if key == 'tag':
+                    result[key].append(val)
+                else:
+                    raise ValueError("Duplicate key {0} found".format(key))
+            else:
+                if key == 'tag':
+                    result[key] = [val]
+                else:
+                    result[key] = val
+        if extra_text:
+            result['comment'] = extra_text
 
         return result
 
@@ -374,7 +391,12 @@ class DS9RegionParser(object):
         hash_or_end = self.line.find("#")
         temp = self.line[self.region_end:hash_or_end].strip(" |")
         self.coord_str = regex_paren.sub("", temp)
-        self.meta_str = self.line[hash_or_end:]
+
+        # don't want any meta_str if there is no metadata found
+        if hash_or_end >= 0:
+            self.meta_str = self.line[hash_or_end:]
+        else:
+            self.meta_str = ""
 
     def convert_coordinates(self):
         """Convert coordinate string to objects"""
@@ -405,6 +427,10 @@ class DS9RegionParser(object):
         meta_ = DS9Parser.parse_meta(self.meta_str)
         self.meta = copy.deepcopy(self.global_meta)
         self.meta.update(meta_)
+        # the 'include' is not part of the metadata string;
+        # it is pre-parsed as part of the shape type and should always
+        # override the global one
+        self.meta['include'] = self.include
 
     def make_shape(self):
         """Make shape object"""

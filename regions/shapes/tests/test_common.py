@@ -14,10 +14,10 @@ from .utils import ASTROPY_LT_13, HAS_SHAPELY  # noqa
 class BaseTestRegion(object):
 
     def test_repr(self):
-        assert repr(self.reg) == self.expected_repr
+        assert repr(self.reg).replace(" ","") == self.expected_repr.replace(" ","")
 
     def test_str(self):
-        assert str(self.reg) == self.expected_str
+        assert str(self.reg).replace(" ","") == self.expected_str.replace(" ","")
 
 
 class BaseTestPixelRegion(BaseTestRegion):

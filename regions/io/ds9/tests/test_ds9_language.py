@@ -29,69 +29,50 @@ def test_read():
         read_ds9(f, errors='warn')
 
 
+implemented_region_types = ('ellipse', 'circle', 'rectangle', 'polygon', 'point')
+
+
 @pytest.mark.parametrize('filename',
                          ['data/ds9.fk5.reg',
                           'data/ds9.fk5.hms.reg',
                           'data/ds9.fk5.hms.strip.reg',
-                          'data/ds9.fk5.strip.reg'])
-def test_fk5(filename):
-    filename = get_pkg_data_filename(filename)
-    regs = read_ds9(filename, errors='warn')
-
-    actual = ds9_objects_to_string(regs, coordsys='fk5', fmt='.2f', radunit='arcsec')
-
-    # Use this to produce reference file for now
-    # print(actual)
-    # 1/0
-
-    reference_file = get_pkg_data_filename('data/fk5_reference.reg')
-    with open(reference_file, 'r') as fh:
-        desired = fh.read()
-
-    assert actual == desired
-
-
-@pytest.mark.parametrize('filename',
-                         ['data/ds9.galactic.reg',
+                          'data/ds9.fk5.strip.reg',
+                          'data/ds9.galactic.reg',
                           'data/ds9.galactic.hms.reg',
                           'data/ds9.galactic.hms.strip.reg',
-                          'data/ds9.galactic.strip.reg'])
-def test_galactic(filename):
+                          'data/ds9.galactic.strip.reg',
+                          # TODO : data/ds9.physical.windows.reg contains different values -> Why?
+                          'data/ds9.physical.reg',
+                          'data/ds9.physical.strip.reg',
+                         ])
+def test_file(filename):
     filename = get_pkg_data_filename(filename)
     regs = read_ds9(filename, errors='warn')
 
-    actual = ds9_objects_to_string(regs, coordsys='galactic', fmt='.2f', radunit='arcsec')
+    coordsys = os.path.basename(filename).split(".")[1]
 
-    # Use this to produce reference file for now
-    # print(actual)
-    # 1 / 0
+    actual = ds9_objects_to_string(regs, coordsys=coordsys, fmt='.2f',
+                                   radunit=None if coordsys=='physical' else 'arcsec')
 
-    reference_file = get_pkg_data_filename('data/galactic_reference.reg')
-    with open(reference_file, 'r') as fh:
+    reffile = get_pkg_data_filename('data/{coordsys}{strip}_reference.reg'
+                                    .format(coordsys=coordsys,
+                                            strip=("_strip"
+                                                   if "strip" in filename
+                                                   else "")))
+
+    with open(reffile, 'r') as fh:
         desired = fh.read()
 
-    assert actual == desired
+    # since metadata is not required to preserve order, we have to do a more
+    # complex comparison
+    desired_lines = [set(line.split()) for line in desired.split("\n")]
+    actual_lines = [set(line.split()) for line in actual.split("\n")]
+    for split_line in actual_lines:
+        assert split_line in desired_lines
 
+    for split_line in desired_lines:
+        assert split_line in actual_lines
 
-# Todo : data/ds9.physical.windows.reg contains different values -> Why?
-@pytest.mark.parametrize('filename',
-                         ['data/ds9.physical.reg',
-                          'data/ds9.physical.strip.reg'])
-def test_physical(filename):
-    filename = get_pkg_data_filename(filename)
-    regs = read_ds9(filename, errors='warn')
-
-    actual = ds9_objects_to_string(regs, coordsys='physical', fmt='.2f')
-
-    # Use this to produce reference file for now
-    # print(actual)
-    # 1 / 0
-
-    reference_file = get_pkg_data_filename('data/physical_reference.reg')
-    with open(reference_file, 'r') as fh:
-        desired = fh.read()
-
-    assert actual == desired
 
 
 def test_ds9_objects_to_str():
@@ -101,7 +82,7 @@ def test_ds9_objects_to_str():
     radius = Angle(3, 'deg')
     region = CircleSkyRegion(center, radius)
     expected = '# Region file format: DS9 astropy/regions\nfk5\ncircle(42.0000,43.0000,3.0000)\n'
-    actual = ds9_objects_to_string([region])
+    actual = ds9_objects_to_string([region], fmt='.4f')
     assert actual == expected
 
 
@@ -129,17 +110,20 @@ def test_ds9_string_to_objects_whitespace():
 def test_ds9_io(tmpdir):
     """Simple test case for write_ds9 and read_ds9.
     """
-    center = SkyCoord(42, 43, unit='deg')
+    center = SkyCoord(42, 43, unit='deg', frame='fk5')
     radius = Angle(3, 'deg')
     reg = CircleSkyRegion(center, radius)
+    reg.meta['name'] = 'MyName'
 
     filename = os.path.join(str(tmpdir), 'ds9.reg')
-    write_ds9([reg], filename)
+    write_ds9([reg], filename, coordsys='fk5')
     reg = read_ds9(filename)[0]
 
     assert_allclose(reg.center.ra.deg, 42)
     assert_allclose(reg.center.dec.deg, 43)
     assert_allclose(reg.radius.value, 3)
+    assert 'name' in reg.meta
+    assert reg.meta['name'] == 'MyName'
 
 
 def test_missing_region_warns():
@@ -148,7 +132,6 @@ def test_missing_region_warns():
     # this will warn on both the commented first line and the not_a_region line
     with catch_warnings(AstropyUserWarning) as ASWarn:
         parser = DS9Parser(ds9_str, errors='warn')
-        parser.run()
 
     assert len(parser.shapes) == 1
     assert len(ASWarn) == 1
