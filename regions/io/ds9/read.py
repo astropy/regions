@@ -136,12 +136,13 @@ class DS9Parser(object):
       ``warn`` will raise a warning, and ``ignore`` will do nothing
       (i.e., be silent).
     """
-    coordinate_systems = ['fk5', 'fk4', 'icrs', 'galactic', 'wcs', 'physical', 'image', 'ecliptic']
+    coordinate_systems = ['fk5', 'fk4', 'icrs', 'galactic', 'wcs', 'physical', 'image', 'ecliptic', 'J2000']
     coordinate_systems += ['wcs{0}'.format(letter) for letter in string.ascii_lowercase]
     """List of valid coordinate systems"""
     coordsys_mapping = dict(zip(coordinates.frame_transform_graph.get_names(),
                                 coordinates.frame_transform_graph.get_names()))
     coordsys_mapping['ecliptic'] = 'geocentrictrueecliptic'
+    coordsys_mapping['J2000'] = 'fk5'
     """Map to convert coordinate system names"""
 
     def __init__(self, region_string, errors='strict'):
