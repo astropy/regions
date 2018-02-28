@@ -203,4 +203,3 @@ def test_issue65_regression():
     assert reg.center.ra.value[0] == 188.5557102
     assert reg.center.dec.value[0] == 12.0314056
     assert reg.radius.value == 1.0
-
