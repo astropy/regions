@@ -40,10 +40,10 @@ class CirclePixelRegion(PixelRegion):
     def contains(self, pixcoord):
         pixcoord = PixCoord._validate(pixcoord, name='pixcoord')
         in_circle = self.center.separation(pixcoord) < self.radius
-        if self.meta.get('inverted', False) is False:
-            return in_circle
-        else:
+        if self.meta.get('inverted', False):
             return not in_circle
+        else:
+            return in_circle
 
     def to_shapely(self):
         return self.center.to_shapely().buffer(self.radius)
