@@ -133,7 +133,7 @@ class Shape(object):
         frame = coordinates.frame_transform_graph.lookup_name(self.coordsys)
 
         lon, lat = zip(*parsed_angles)
-        if hasattr(lon, '__len__') and hasattr(lon, '__lat__') and len(lon) == 1 and len(lat == 1):
+        if hasattr(lon, '__len__') and hasattr(lat, '__len__') and len(lon) == 1 and len(lat) == 1:
             # force entries to be scalar if they are length-1
             lon, lat = u.Quantity(lon[0]), u.Quantity(lat[0])
         else:
