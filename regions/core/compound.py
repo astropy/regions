@@ -13,6 +13,8 @@ class CompoundPixelRegion(PixelRegion):
     def __init__(self, region1, operator, region2):
         self.region1 = region1
         self.region2 = region2
+        self.meta = [region1.meta, region2.meta]
+        self.visual = [region1.visual, region2.visual]
         self.operator = operator
         if not callable(operator):
             raise TypeError("The operator passed to a compound region must "
@@ -40,6 +42,10 @@ class CompoundPixelRegion(PixelRegion):
     def bounding_box(self, **kwargs):
         raise NotImplementedError
 
+    @property
+    def area(self):
+        raise NotImplementedError
+
 
 class CompoundSkyRegion(SkyRegion):
     """
@@ -49,6 +55,8 @@ class CompoundSkyRegion(SkyRegion):
     def __init__(self, region1, operator, region2):
         self.region1 = region1
         self.region2 = region2
+        self.meta = [region1.meta, region2.meta]
+        self.visual = [region1.visual, region2.visual]
         self.operator = operator
         if not callable(operator):
             raise TypeError("The operator passed to a compound region must "
@@ -66,8 +74,4 @@ class CompoundSkyRegion(SkyRegion):
         raise NotImplementedError
 
     def as_patch(self, ax, **kwargs):
-        raise NotImplementedError
-
-    @property
-    def area(self):
         raise NotImplementedError
