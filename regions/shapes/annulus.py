@@ -34,8 +34,8 @@ class CircleAnnulusPixelRegion(CompoundPixelRegion):
     """
 
     def __init__(self, center, inner_radius, outer_radius, meta=None, visual=None):
-        region1 = CirclePixelRegion(center, inner_radius, meta[0], visual[0])
-        region2 = CirclePixelRegion(center, outer_radius, meta[1], visual[1])
+        region1 = CirclePixelRegion(center, inner_radius, meta, visual)
+        region2 = CirclePixelRegion(center, outer_radius, meta, visual)
         super(CircleAnnulusPixelRegion, self).__init__(
             region1=region1, operator=operator.xor, region2=region2)
         self._repr_params = [('inner radius', region1.radius),
