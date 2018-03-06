@@ -10,11 +10,17 @@ class CompoundPixelRegion(PixelRegion):
     Represents the logical combination of two regions in pixel coordinates.
     """
 
-    def __init__(self, region1, operator, region2):
+    def __init__(self, region1, operator, region2, meta=None, visual=None):
         self.region1 = region1
         self.region2 = region2
-        self.meta = [region1.meta, region2.meta]
-        self.visual = [region1.visual, region2.visual]
+        if meta is None:
+            self.meta = [region1.meta, region2.meta]
+        else:
+            self.meta = meta
+        if visual is None:
+            self.visual = [region1.visual, region2.visual]
+        else:
+            self.visual = visual
         self.operator = operator
         if not callable(operator):
             raise TypeError("The operator passed to a compound region must "
@@ -52,11 +58,17 @@ class CompoundSkyRegion(SkyRegion):
     Represents the logical combination of two regions in sky coordinates.
     """
 
-    def __init__(self, region1, operator, region2):
+    def __init__(self, region1, operator, region2, meta=None, visual=None):
         self.region1 = region1
         self.region2 = region2
-        self.meta = [region1.meta, region2.meta]
-        self.visual = [region1.visual, region2.visual]
+        if meta is None:
+            self.meta = [region1.meta, region2.meta]
+        else:
+            self.meta = meta
+        if visual is None:
+            self.visual = [region1.visual, region2.visual]
+        else:
+            self.visual = visual
         self.operator = operator
         if not callable(operator):
             raise TypeError("The operator passed to a compound region must "
