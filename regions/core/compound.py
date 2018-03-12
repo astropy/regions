@@ -14,11 +14,11 @@ class CompoundPixelRegion(PixelRegion):
         self.region1 = region1
         self.region2 = region2
         if meta is None:
-            self.meta = [region1.meta, region2.meta]
+            self.meta = region1.meta
         else:
             self.meta = meta
         if visual is None:
-            self.visual = [region1.visual, region2.visual]
+            self.visual = region1.visual
         else:
             self.visual = visual
         self.operator = operator
