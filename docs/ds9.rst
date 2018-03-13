@@ -15,7 +15,6 @@ representing one DS9 region. The `~regions.Shape` objects can be converted to
     >>> from regions import DS9Parser
     >>> reg_string = 'galactic\ncircle(42,43,3) # color=green'
     >>> parser = DS9Parser(reg_string)
-    >>> parser.run()
     >>> print(parser.shapes[0])
     Shape
     Coord sys : galactic
