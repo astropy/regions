@@ -1,7 +1,6 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 import math
 import operator
-import warnings
 
 import numpy as np
 
@@ -13,7 +12,6 @@ from ..core import PixCoord
 from .._utils.wcs_helpers import skycoord_to_pixel_scale_angle
 from astropy.wcs.utils import pixel_to_skycoord
 from astropy.coordinates import Angle
-from astropy.utils.exceptions import AstropyUserWarning
 
 from ..core import CompoundPixelRegion, CompoundSkyRegion
 from ..shapes import CirclePixelRegion, CircleSkyRegion
@@ -37,7 +35,7 @@ class CircleAnnulusPixelRegion(CompoundPixelRegion):
 
     def __init__(self, center, inner_radius, outer_radius, meta=None, visual=None):
         if inner_radius > outer_radius:
-            warnings.warn('Outer radius should be larger than inner radius.', AstropyUserWarning)
+            raise ValueError('Outer radius should be larger than inner radius.')
         region1 = CirclePixelRegion(center, inner_radius)
         region2 = CirclePixelRegion(center, outer_radius)
         super(CircleAnnulusPixelRegion, self).__init__(
@@ -92,7 +90,7 @@ class CircleAnnulusSkyRegion(CompoundSkyRegion):
 
     def __init__(self, center, inner_radius, outer_radius, meta=None, visual=None):
         if inner_radius > outer_radius:
-            warnings.warn('Outer radius should be larger than inner radius.', AstropyUserWarning)
+            raise ValueError('Outer radius should be larger than inner radius.')
         region1 = CircleSkyRegion(center, inner_radius)
         region2 = CircleSkyRegion(center, outer_radius)
         super(CircleAnnulusSkyRegion, self).__init__(
