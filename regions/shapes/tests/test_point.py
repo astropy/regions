@@ -30,6 +30,17 @@ class TestPointPixelRegion(BaseTestPixelRegion):
         assert_allclose(reg_new.center.x, self.reg.center.x)
         assert_allclose(reg_new.center.y, self.reg.center.y)
 
+    def test_to_shapely(self):
+        reg_new = self.reg.to_shapely()
+        assert_allclose(self.reg.center.x, reg_new.x)
+        assert_allclose(self.reg.center.y, reg_new.y)
+
+    def test_from_shapely(self):
+        reg_new = self.reg.to_shapely()
+        reg2 = PointPixelRegion.from_shapely(reg_new)
+        assert_allclose(self.reg.center.x, reg2.center.x)
+        assert_allclose(self.reg.center.y, reg2.center.y)
+
 
 class TestPointSkyRegion(BaseTestSkyRegion):
 

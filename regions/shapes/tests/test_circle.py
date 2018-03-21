@@ -44,6 +44,19 @@ class TestCirclePixelRegion(BaseTestPixelRegion):
         assert_allclose(reg_new.center.y, self.reg.center.y)
         assert_allclose(reg_new.radius, self.reg.radius)
 
+    def test_to_shapely(self):
+        reg_shapely = self.reg.to_shapely()
+        assert_allclose(self.reg.center.x, reg_shapely.centroid.x)
+        assert_allclose(self.reg.center.y, reg_shapely.centroid.y)
+        assert_allclose(self.reg.radius, reg_shapely.exterior.coords[0][0]-reg_shapely.centroid.x)
+
+    def test_from_shapely(self):
+        reg_shapely = self.reg.to_shapely()
+        reg2 = CirclePixelRegion.from_shapely(reg_shapely)
+        assert_allclose(self.reg.center.x, reg2.center.x)
+        assert_allclose(self.reg.center.y, reg2.center.y)
+        assert_allclose(self.reg.radius, reg2.radius)
+
     @pytest.mark.skipif('not HAS_MATPLOTLIB')
     def test_as_patch(self):
         patch = self.reg.as_patch()
