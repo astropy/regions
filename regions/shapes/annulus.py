@@ -54,8 +54,8 @@ class CircleAnnulusPixelRegion(CompoundPixelRegion):
         return self.region2.bounding_box()
 
     def to_shapely(self):
-        r1 = self.region1.center.to_shapely().buffer(self.region1.radius)
-        r2 = self.region2.center.to_shapely().buffer(self.region2.radius)
+        r1 = self.region1.to_shapely()
+        r2 = self.region2.to_shapely()
         return r2.symmetric_difference(r1)
 
 
