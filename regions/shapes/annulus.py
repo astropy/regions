@@ -37,7 +37,6 @@ class CircleAnnulusPixelRegion(CompoundPixelRegion):
                              ('outer radius', region2.radius),
                              ('center', region2.center)]
 
-
     @property
     def center(self):
         return self.region1.center
@@ -52,6 +51,11 @@ class CircleAnnulusPixelRegion(CompoundPixelRegion):
 
     def bounding_box(self):
         return self.region2.bounding_box()
+
+    def to_shapely(self):
+        r1 = self.region1.to_shapely()
+        r2 = self.region2.to_shapely()
+        return r2.symmetric_difference(r1)
 
 
 class CircleAnnulusSkyRegion(CompoundSkyRegion):

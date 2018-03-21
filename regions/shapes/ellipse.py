@@ -87,8 +87,8 @@ class EllipsePixelRegion(PixelRegion):
 
     def to_shapely(self):
         from shapely import affinity
-        ellipse = self.center.to_shapely().buffer(0.5 * self.height)
-        ellipse = affinity.scale(ellipse, xfact=self.width / self.height, yfact=1)
+        circle = self.center.to_shapely().buffer(0.5 * self.height)
+        ellipse = affinity.scale(circle, xfact=self.width / self.height, yfact=1)
         return affinity.rotate(ellipse, self.angle.to(u.deg).value)
 
     def to_sky(self, wcs):

@@ -44,6 +44,16 @@ class CirclePixelRegion(PixelRegion):
     def to_shapely(self):
         return self.center.to_shapely().buffer(self.radius)
 
+    @staticmethod
+    def from_shapely(circle):
+        from shapely.geometry import Polygon
+        if not isinstance(circle, Polygon):
+            raise TypeError('the given argument is not of type "shapely.geometry.polygon.Polygon".')
+        else:
+            center = PixCoord(circle.centroid.x, circle.centroid.y)
+            radius = circle.exterior.coords[0][0] - center.x
+            return CirclePixelRegion(center, radius)
+
     def to_sky(self, wcs):
         # TODO: write a pixel_to_skycoord_scale_angle
         center = pixel_to_skycoord(self.center.x, self.center.y, wcs)
