@@ -20,8 +20,7 @@ class PointPixelRegion(PixelRegion):
     """
 
     def __init__(self, center, meta=None, visual=None):
-        # TODO: test that center is a 0D PixCoord
-        self.center = center
+        self.center = PixCoord._validate(center, name='center', expected='scalar')
         self.meta = meta or {}
         self.visual = visual or {}
         self._repr_params = None
@@ -38,6 +37,14 @@ class PointPixelRegion(PixelRegion):
 
     def to_shapely(self):
         return self.center.to_shapely()
+
+    @staticmethod
+    def from_shapely(point):
+        from shapely.geometry import Point
+        if not isinstance(point, Point):
+            raise TypeError('the given argument is not of type "shapely.geometry.point.Point".')
+        center = PixCoord(point.x, point.y)
+        return PointPixelRegion(center)
 
     def to_sky(self, wcs):
         center = pixel_to_skycoord(self.center.x, self.center.y, wcs=wcs)
