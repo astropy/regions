@@ -5,15 +5,38 @@ from astropy.coordinates import SkyCoord
 from ...shapes import CircleSkyRegion, CirclePixelRegion
 from ...core import PixCoord, CompoundPixelRegion
 from ...tests.helpers import make_simple_wcs
-
+import pytest
+from numpy.testing import assert_allclose
 
 def test_compound_pixel():
-    pixcoord = PixCoord(3, 4)
-    c1 = CirclePixelRegion(pixcoord, 2)
-    c2 = CirclePixelRegion(pixcoord, 4)
+    # Two circles that overlap in one column
+    pixcoord1 = PixCoord(5, 5)
+    c1 = CirclePixelRegion(pixcoord1, 4)
+    pixcoord2 = PixCoord(11, 5)
+    c2 = CirclePixelRegion(pixcoord2, 4)
+
     union = c1 | c2
     assert isinstance(union, CompoundPixelRegion)
+    mask = union.to_mask()
+    assert_allclose(mask.data[:,7], [0, 0, 1, 1, 1, 1, 1, 0, 0])
+    assert_allclose(mask.data[:,6], [0, 1, 1, 1, 1, 1, 1, 1, 0])
 
+    intersection = c1 & c2
+    mask = intersection.to_mask()
+    assert_allclose(mask.data[:,7], [0, 0, 1, 1, 1, 1, 1, 0, 0])
+    assert_allclose(mask.data[:,6], [0, 0, 0, 0, 0, 0, 0, 0, 0])
+
+    symdiff = c1 ^ c2
+    mask = symdiff.to_mask()
+    assert_allclose(mask.data[:,7], [0, 0, 0, 0, 0, 0, 0, 0, 0])
+    assert_allclose(mask.data[:,6], [0, 1, 1, 1, 1, 1, 1, 1, 0])
+
+    # Circle bigger than map, see 
+    pixcoord3 = PixCoord(1, 1)
+    c3 = CirclePixelRegion(pixcoord3, 4)
+    union2 = c1 | c3
+    with pytest.raises(NotImplementedError):
+        mask = union2.to_mask()
 
 def test_compound_sky():
 
