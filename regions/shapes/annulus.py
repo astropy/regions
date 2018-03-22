@@ -8,6 +8,7 @@ import numpy as np
 from astropy import wcs
 from astropy import coordinates
 from astropy import units as u
+from astropy.wcs.utils import pixel_to_skycoord
 
 from .._utils.wcs_helpers import skycoord_to_pixel_scale_angle
 from ..core import CompoundPixelRegion, CompoundSkyRegion, PixCoord
@@ -54,6 +55,13 @@ class CircleAnnulusPixelRegion(CompoundPixelRegion):
 
     def bounding_box(self):
         return self.region2.bounding_box()
+
+    def to_sky(self, wcs):
+        center = pixel_to_skycoord(self.center.x, self.center.y, wcs)
+        _, scale, _ = skycoord_to_pixel_scale_angle(center, wcs)
+        inner_radius = self.inner_radius / scale * u.deg
+        outer_radius = self.outer_radius / scale * u.deg
+        return CircleAnnulusSkyRegion(center, inner_radius, outer_radius)
 
 
 class CircleAnnulusSkyRegion(CompoundSkyRegion):

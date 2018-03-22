@@ -27,6 +27,9 @@ class CompoundPixelRegion(PixelRegion):
         raise NotImplementedError
 
     def to_mask(self, mode='center', subpixels=1):
+        if mode != 'center':
+            raise NotImplementedError
+
         mask1 = self.region1.to_mask(mode=mode, subpixels=subpixels)
         mask2 = self.region2.to_mask(mode=mode, subpixels=subpixels)
 
@@ -51,7 +54,12 @@ class CompoundPixelRegion(PixelRegion):
         data = self.operator(*np.array(padded_data, dtype=np.bool))
         return Mask(data=data, bbox=bbox)
 
-    def to_sky(self, wcs, mode='local', tolerance=None):
+    def to_sky(self, wcs):
+        skyreg1 = self.region1.to_sky(wcs=wcs)
+        skyreg2 = self.region2.to_sky(wcs=wcs)
+        return CompoundSkyRegion(region1=skyreg1,
+                                 operator=self.operator,
+                                 region2=skyreg2)
         raise NotImplementedError
 
     def as_patch(self, **kwargs):
