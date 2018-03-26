@@ -45,6 +45,7 @@ class CompoundPixelRegion(PixelRegion):
             iymax=max(mask1.bbox.iymax, mask2.bbox.iymax)
         )
 
+        # Bounding boxes must not extend over array, see #168
         bbox_borders = np.array([bbox.ixmin, bbox.ixmax, bbox.iymin, bbox.iymax]) 
         if (bbox_borders < 0).any():
             raise NotImplementedError("Bounding box must be within array for "

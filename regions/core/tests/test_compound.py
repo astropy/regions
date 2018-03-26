@@ -31,7 +31,7 @@ def test_compound_pixel():
     assert_allclose(mask.data[:,7], [0, 0, 0, 0, 0, 0, 0, 0, 0])
     assert_allclose(mask.data[:,6], [0, 1, 1, 1, 1, 1, 1, 1, 0])
 
-    # Circle bigger than map, see 
+    # Circle bigger than map, see #168
     pixcoord3 = PixCoord(1, 1)
     c3 = CirclePixelRegion(pixcoord3, 4)
     union2 = c1 | c3
