@@ -14,7 +14,7 @@ The regions package requires the following packages:
 
 In addition, the following packages are needed for optional functionality:
 
-* `Matplotlib <http://www.matplotlib.org>`__ 1.5 or later
+* `Matplotlib <https://matplotlib.org>`__ 1.5 or later
 * `Shapely <http://toblerity.org/shapely/manual.html>`__
 
 Stable version
@@ -25,7 +25,7 @@ Installing the latest stable version is possible either using pip or conda.
 Using pip
 ---------
 
-To install regions with `pip <http://www.pip-installer.org/en/latest/>`_
+To install regions with `pip <https://pip.pypa.io/en/latest/>`_
 from `PyPI <https://pypi.python.org/pypi/regions>`_, run::
 
     pip install regions --no-deps
@@ -39,7 +39,7 @@ from `PyPI <https://pypi.python.org/pypi/regions>`_, run::
 Using conda
 -----------
 
-To install regions with `Anaconda <https://www.continuum.io/downloads>`_
+To install regions with `Anaconda <https://www.anaconda.com/download/>`_
 from the `astropy channel on anaconda.org <https://anaconda.org/astropy/regions>`__
 simply run::
 
