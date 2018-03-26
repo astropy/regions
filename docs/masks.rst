@@ -152,7 +152,7 @@ We then define the aperture:
     >>> aperture = CirclePixelRegion(center, 4.)
 
 We convert the aperture to a mask and extract a cutout from the data, as well
-as a cutout with the data multipled by the mask:
+as a cutout with the data multiplied by the mask:
 
 .. plot::
    :context:
