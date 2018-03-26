@@ -15,6 +15,10 @@ def test_init_pixel():
     annulus = CircleAnnulusPixelRegion(pixcoord, 2, 3)
     assert 'inner' in str(annulus)
 
+    skycoord = SkyCoord(3 * u.deg, 4 * u.deg, frame='icrs')
+    wcs = make_simple_wcs(skycoord, 5 * u.arcsec, 20)
+    skyannulus = annulus.to_sky(wcs=wcs)
+    assert isinstance(skyannulus, CircleAnnulusSkyRegion)
 
 def test_init_sky():
 
@@ -39,3 +43,7 @@ def test_init_sky():
 
     assert 'Annulus' in str(annulus)
     assert 'inner' in str(annulus)
+
+    pixannulus = annulus.to_pixel(wcs=wcs)
+    assert isinstance(pixannulus, CircleAnnulusPixelRegion)
+
