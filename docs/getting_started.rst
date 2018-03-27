@@ -48,7 +48,7 @@ started quickly.
 
 Also, this example image was created to illustrate some of the key issues when
 working with regions. It represents an all-sky image in Aitoff (``AIT``)
-projection, which means that there are pixels at the edge of the iamge that
+projection, which means that there are pixels at the edge of the image that
 don't correspond to positions on the sky. And the pixels are huge, roughly 10
 deg time 10 deg, which means that there are well-visible differences between sky
 and pixel regions, caused by the WCS projection.
