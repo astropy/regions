@@ -22,11 +22,10 @@ class TestCircleAnnulusPixelRegion(BaseTestPixelRegion):
     expected_repr = '<CircleAnnulusPixelRegion(PixCoord(x=3, y=4), inner radius=2, outer radius=3)>'
     expected_str = 'Region: CircleAnnulusPixelRegion\ncenter: PixCoord(x=3, y=4)\ninner radius: 2\nouter radius: 3'
 
-    def test_init(self):
-        assert_quantity_allclose(self.reg.center.x, 3)
-        assert_quantity_allclose(self.reg.center.y, 4)
-        assert_quantity_allclose(self.reg.inner_radius, 2)
-        assert_quantity_allclose(self.reg.outer_radius, 3)
+    skycoord = SkyCoord(3 * u.deg, 4 * u.deg, frame='icrs')
+    wcs = make_simple_wcs(skycoord, 5 * u.arcsec, 20)
+    skyannulus = annulus.to_sky(wcs=wcs)
+    assert isinstance(skyannulus, CircleAnnulusSkyRegion)
 
 
 class TestCircleAnnulusSkyRegion(BaseTestSkyRegion):
@@ -60,5 +59,8 @@ class TestCircleAnnulusSkyRegion(BaseTestSkyRegion):
         test_coord = SkyCoord(3 * u.deg, 10 * u.deg, frame='icrs')
         assert not self.reg.contains(test_coord, wcs)
 
-        test_coord = SkyCoord(3 * u.deg, 4.007 * u.deg, frame='icrs')
-        assert self.reg.contains(test_coord, wcs)
+    assert 'Annulus' in str(annulus)
+    assert 'inner' in str(annulus)
+
+    pixannulus = annulus.to_pixel(wcs=wcs)
+    assert isinstance(pixannulus, CircleAnnulusPixelRegion)
