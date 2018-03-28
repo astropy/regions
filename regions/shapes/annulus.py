@@ -41,8 +41,7 @@ class CircleAnnulusPixelRegion(CompoundPixelRegion):
         super(CircleAnnulusPixelRegion, self).__init__(
             region1=region1, operator=operator.xor, region2=region2, meta=meta, visual=visual)
         self._repr_params = [('inner radius', region1.radius),
-                             ('outer radius', region2.radius),
-                             ('center', region2.center)]
+                             ('outer radius', region2.radius)]
 
     @property
     def center(self):
@@ -63,7 +62,7 @@ class CircleAnnulusPixelRegion(CompoundPixelRegion):
     @property
     def area(self):
         """Region area (float)."""
-        return abs(self.region2.area() - self.region1.area())
+        return abs(self.region2.area - self.region1.area)
 
     def to_sky(self, wcs, mode='local', tolerance=None):
         # TODO: write a pixel_to_skycoord_scale_angle
@@ -96,8 +95,7 @@ class CircleAnnulusSkyRegion(CompoundSkyRegion):
         super(CircleAnnulusSkyRegion, self).__init__(
             region1=region1, operator=operator.xor, region2=region2, meta=meta, visual=visual)
         self._repr_params = [('inner radius', region1.radius),
-                             ('outer radius', region2.radius),
-                             ('center', region2.center)]
+                             ('outer radius', region2.radius)]
 
     @property
     def center(self):

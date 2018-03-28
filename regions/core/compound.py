@@ -31,9 +31,9 @@ class CompoundPixelRegion(PixelRegion):
                             ]
 
     def contains(self, pixcoord):
-        raise NotImplementedError
+        return self.operator(self.region1.contains(pixcoord), self.region2.contains(pixcoord))
 
-    def to_mask(self, mode='center'):
+    def to_mask(self, mode='center', subpixels=1):
         raise NotImplementedError
 
     def to_sky(self, wcs, mode='local', tolerance=None):
