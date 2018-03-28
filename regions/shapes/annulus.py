@@ -54,6 +54,10 @@ class CircleAnnulusPixelRegion(CompoundPixelRegion):
         return self.region2.radius
 
     @property
+    def area(self):
+        return self.region2.area - self.region1.area
+
+    @property
     def bounding_box(self):
         return self.region2.bounding_box()
 
