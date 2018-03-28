@@ -24,12 +24,23 @@ class TestCircleAnnulusPixelRegion(BaseTestPixelRegion):
 
     skycoord = SkyCoord(3 * u.deg, 4 * u.deg, frame='icrs')
     wcs = make_simple_wcs(skycoord, 5 * u.arcsec, 20)
-    skyannulus = annulus.to_sky(wcs=wcs)
-    assert isinstance(skyannulus, CircleAnnulusSkyRegion)
+
+    def test_init(self):
+        assert_quantity_allclose(self.reg.center.x, 3)
+        assert_quantity_allclose(self.reg.center.y, 4)
+        assert_quantity_allclose(self.reg.inner_radius, 2)
+        assert_quantity_allclose(self.reg.outer_radius, 3)
+
+    def test_transformation(self):
+        skyannulus = self.reg.to_sky(wcs=self.wcs)
+        assert isinstance(skyannulus, CircleAnnulusSkyRegion)
 
 
 class TestCircleAnnulusSkyRegion(BaseTestSkyRegion):
+
     reg = CircleAnnulusSkyRegion(SkyCoord(3 * u.deg, 4 * u.deg), 20 * u.arcsec, 30 * u.arcsec)
+    skycoord = SkyCoord(3 * u.deg, 4 * u.deg, frame='icrs')
+    wcs = make_simple_wcs(skycoord, 5 * u.arcsec, 20)
 
     if ASTROPY_LT_13:
         expected_repr = ('<CircleAnnulusSkyRegion(<SkyCoord (ICRS): (ra, dec) in '
@@ -45,22 +56,15 @@ class TestCircleAnnulusSkyRegion(BaseTestSkyRegion):
                         'arcsec\nouter radius: 30.0 arcsec')
 
     def test_init(self):
-        skycoord = SkyCoord(3 * u.deg, 4 * u.deg, frame='icrs')
-        assert_quantity_allclose(self.reg.center.ra, skycoord.ra)
+        assert_quantity_allclose(self.reg.center.ra, self.skycoord.ra)
         assert_quantity_allclose(self.reg.inner_radius, 20*u.arcsec)
         assert_quantity_allclose(self.reg.outer_radius, 30*u.arcsec)
 
     def test_contains(self):
-
-        skycoord = SkyCoord(3 * u.deg, 4 * u.deg, frame='icrs')
-        wcs = make_simple_wcs(skycoord, 5 * u.arcsec, 20)
-        assert not self.reg.contains(skycoord, wcs)
-
+        assert not self.reg.contains(self.skycoord, self.wcs)
         test_coord = SkyCoord(3 * u.deg, 10 * u.deg, frame='icrs')
-        assert not self.reg.contains(test_coord, wcs)
+        assert not self.reg.contains(test_coord, self.wcs)
 
-    assert 'Annulus' in str(annulus)
-    assert 'inner' in str(annulus)
-
-    pixannulus = annulus.to_pixel(wcs=wcs)
-    assert isinstance(pixannulus, CircleAnnulusPixelRegion)
+    def test_transformation(self):
+        pixannulus = self.reg.to_pixel(wcs=self.wcs)
+        assert isinstance(pixannulus, CircleAnnulusPixelRegion)

@@ -11,7 +11,7 @@ class CompoundPixelRegion(PixelRegion):
     Represents the logical combination of two regions in pixel coordinates.
     """
 
-    def __init__(self, region1, region2, operator):
+    def __init__(self, region1, region2, operator, meta=None, visual=None):
         if not isinstance(region1, PixelRegion):
             raise TypeError("region1 must be a PixelRegion")
         if not isinstance(region2, PixelRegion):
@@ -78,8 +78,7 @@ class CompoundPixelRegion(PixelRegion):
         skyreg2 = self.region2.to_sky(wcs=wcs)
         return CompoundSkyRegion(region1=skyreg1,
                                  operator=self.operator,
-                                 region2=skyreg2)
-        raise NotImplementedError
+                                 region2=skyreg2, meta=self.meta, visual=self.visual)
 
     def as_patch(self, **kwargs):
         raise NotImplementedError
@@ -100,7 +99,7 @@ class CompoundSkyRegion(SkyRegion):
     Represents the logical combination of two regions in sky coordinates.
     """
 
-    def __init__(self, region1, region2, operator):
+    def __init__(self, region1, region2, operator, meta=None, visual=None):
         if not isinstance(region1, SkyRegion):
             raise TypeError("region1 must be a SkyRegion")
         if not isinstance(region2, SkyRegion):
@@ -134,7 +133,7 @@ class CompoundSkyRegion(SkyRegion):
         pixreg2 = self.region2.to_pixel(wcs=wcs)
         return CompoundPixelRegion(region1=pixreg1,
                                    operator=self.operator,
-                                   region2=pixreg2)
+                                   region2=pixreg2, meta=self.meta, visual=self.visual)
 
     def as_patch(self, ax, **kwargs):
         raise NotImplementedError
