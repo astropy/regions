@@ -16,7 +16,7 @@ The `regions` package provides (or plans to provide) classes to represent:
 * Regions defined using celestial coordinates, but still in an Euclidean geometry (`~regions.CircleSkyRegion`)
 * Regions defined on the celestial sphere (no examples yet)
 
-To transform between sky and pixel regions, a word coordinate system
+To transform between sky and pixel regions, a world coordinate system
 (represented by a `~astropy.wcs.WCS` object) is needed. Some functions for
 region-based calculations (e.g. filtering a table of sky or pixel positions) as
 well as functions for region serialisation (e.g. to and from ds9 region string
