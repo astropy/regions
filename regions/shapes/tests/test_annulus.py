@@ -46,4 +46,3 @@ def test_init_sky():
 
     pixannulus = annulus.to_pixel(wcs=wcs)
     assert isinstance(pixannulus, CircleAnnulusPixelRegion)
-

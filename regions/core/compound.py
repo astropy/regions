@@ -46,10 +46,10 @@ class CompoundPixelRegion(PixelRegion):
         )
 
         # Bounding boxes must not extend over array, see #168
-        bbox_borders = np.array([bbox.ixmin, bbox.ixmax, bbox.iymin, bbox.iymax]) 
+        bbox_borders = np.array([bbox.ixmin, bbox.ixmax, bbox.iymin, bbox.iymax])
         if (bbox_borders < 0).any():
             raise NotImplementedError("Bounding box must be within array for "
-                                      "compound regions, see ")
+                                      "compound regions, see #168")
 
         # Pad mask1.data and mask2.data to get the same shape
         padded_data = list()
