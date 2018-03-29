@@ -83,3 +83,10 @@ class TestCircleSkyRegion(BaseTestSkyRegion):
         assert_quantity_allclose(skycircle.center.data.lon, skycircle2.center.data.lon)
         assert_quantity_allclose(skycircle.center.data.lat, skycircle2.center.data.lat)
         assert_quantity_allclose(skycircle2.radius, skycircle.radius)
+
+    def test_dimension_center(self):
+        center = SkyCoord([1, 2] * u.deg, [3, 4] * u.deg)
+        radius = 2 * u.arcsec
+        with pytest.raises(ValueError) as err:
+            CircleSkyRegion(center, radius)
+        assert 'the centre should be a 0D SkyCoord object' in str(err)

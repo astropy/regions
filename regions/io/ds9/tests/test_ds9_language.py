@@ -194,12 +194,13 @@ def test_issue134_regression():
     regions = parser.shapes
     assert regions[0].to_region().radius.value == 30.4
 
+
 def test_issue65_regression():
     regstr = 'J2000; circle 188.5557102 12.0314056 1" # color=red'
     parser = DS9Parser(regstr)
     parser.run()
     regions = parser.shapes
     reg = regions[0].to_region()
-    assert reg.center.ra.value[0] == 188.5557102
-    assert reg.center.dec.value[0] == 12.0314056
+    assert reg.center.ra.value == 188.5557102
+    assert reg.center.dec.value == 12.0314056
     assert reg.radius.value == 1.0
