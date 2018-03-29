@@ -59,7 +59,7 @@ class CircleAnnulusPixelRegion(CompoundPixelRegion):
 
     @property
     def bounding_box(self):
-        return self.region2.bounding_box()
+        return self.region2.bounding_box
 
     def to_sky(self, wcs):
         center = pixel_to_skycoord(self.center.x, self.center.y, wcs)

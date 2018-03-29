@@ -8,6 +8,7 @@ from numpy.testing import assert_equal, assert_allclose
 import pytest
 
 from ...core import PixCoord, BoundingBox
+from .utils import ASTROPY_LT_13, HAS_SHAPELY # noqa
 
 
 class BaseTestRegion(object):
