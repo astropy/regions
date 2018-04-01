@@ -36,7 +36,11 @@ class CompoundPixelRegion(PixelRegion):
                             ]
 
     def contains(self, pixcoord):
-        return self.operator(self.region1.contains(pixcoord), self.region2.contains(pixcoord))
+        in_reg = self.operator(self.region1.contains(pixcoord), self.region2.contains(pixcoord))
+        if self.meta.get('inverted', False):
+            return not in_reg
+        else:
+            return in_reg
 
     def to_mask(self, mode='center', subpixels=1):
         if mode != 'center':
@@ -125,8 +129,12 @@ class CompoundSkyRegion(SkyRegion):
                             ]
 
     def contains(self, skycoord, wcs):
-        return self.operator(self.region1.contains(skycoord, wcs),
+        in_reg = self.operator(self.region1.contains(skycoord, wcs),
                              self.region2.contains(skycoord, wcs))
+        if self.meta.get('inverted', False):
+            return not in_reg
+        else:
+            return in_reg
 
     def to_pixel(self, wcs):
         pixreg1 = self.region1.to_pixel(wcs=wcs)
