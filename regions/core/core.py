@@ -23,7 +23,7 @@ users should not touch them.
 _DEFAULT_WCS_ORIGIN = 0
 _DEFAULT_WCS_MODE = 'all'
 
-VALID_MASK_MODES = set(['center', 'exact', 'subpixels'])
+VALID_MASK_MODES = {'center', 'exact', 'subpixels'}
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -127,6 +127,7 @@ class PixelRegion(Region):
             The position or positions to check, as a tuple of scalars or
             arrays. In future this could also be a `PixCoord` instance.
         """
+        raise NotImplementedError
 
     def __contains__(self, coord):
         if not coord.isscalar:
@@ -143,6 +144,7 @@ class PixelRegion(Region):
         wcs : `~astropy.wcs.WCS` instance
             The world coordinate system transformation to assume
         """
+        raise NotImplementedError
 
     @abc.abstractproperty
     def bounding_box(self):
@@ -150,7 +152,7 @@ class PixelRegion(Region):
         The minimal bounding box (in integer pixel coordinates) that contains
         the region.
         """
-        pass
+        raise NotImplementedError
 
     @abc.abstractmethod
     def to_mask(self, mode='center', subpixels=5):
@@ -182,6 +184,7 @@ class PixelRegion(Region):
         mask : `~regions.Mask`
             A region mask object.
         """
+        raise NotImplementedError
 
     @staticmethod
     def _validate_mode(mode, subpixels):
@@ -198,6 +201,7 @@ class PixelRegion(Region):
         """
         Convert this region to a Shapely object.
         """
+        raise NotImplementedError
 
     @abc.abstractmethod
     def as_patch(self, **kwargs):
@@ -208,6 +212,7 @@ class PixelRegion(Region):
         patch : `~matplotlib.patches.Patch`
             Matplotlib patch
         """
+        raise NotImplementedError
 
     def plot(self, ax=None, **kwargs):
         """
@@ -285,3 +290,4 @@ class SkyRegion(Region):
         wcs : `~astropy.wcs.WCS` instance
             The world coordinate system transformation to assume
         """
+        raise NotImplementedError
