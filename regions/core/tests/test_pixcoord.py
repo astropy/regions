@@ -21,6 +21,12 @@ def wcs():
     return dataset.wcs
 
 
+def test_pixcoord_basic_dimension():
+    with pytest.raises(ValueError) as err :
+        PixCoord(np.array([1, 2]), 3)
+    assert '[1 2] and 3 must be of same dimensions' in str(err)
+
+
 def test_pixcoord_basics_scalar():
     p = PixCoord(x=1, y=2)
 
