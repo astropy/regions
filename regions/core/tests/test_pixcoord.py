@@ -101,9 +101,7 @@ def test_pixcoord_to_sky_scalar(wcs):
     assert_allclose(s.data.lat.deg, 10.003028030623508)
 
     p2 = PixCoord.from_sky(skycoord=s, wcs=wcs)
-    assert isinstance(p2.x, np.ndarray)
-    assert p2.x.shape == tuple()
-    assert p2.x.ndim == 0
+    assert isinstance(p2.x, float)
     assert p2.isscalar
     assert_allclose(p2.x, p.x)
     assert_allclose(p2.y, p.y)

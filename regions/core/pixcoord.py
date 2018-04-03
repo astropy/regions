@@ -11,7 +11,7 @@ __all__ = ['PixCoord']
 class PixCoord(object):
     """Pixel coordinates.
 
-    This class can represent scalar or array pixel coordinates.
+    This class can represent scalar or array pixel of coordinates.
 
     The data members are either numbers or Numpy arrays
     (not `~astropy.units.Quantity` objects with unit "pixel").
@@ -33,6 +33,8 @@ class PixCoord(object):
     """
 
     def __init__(self, x, y):
+        if np.asanyarray(x).shape != np.asanyarray(y).shape:
+            raise ValueError('{} and {} must be of same dimensions'.format(x, y))
         self.x = self._standardize_coordinate(x)
         self.y = self._standardize_coordinate(y)
 
@@ -49,6 +51,8 @@ class PixCoord(object):
         if isinstance(val, numbers.Number):
             return val
         else:
+            if np.asanyarray(val).shape == ():
+                return float(val)
             return np.array(val)
 
     @staticmethod
@@ -90,13 +94,7 @@ class PixCoord(object):
 
     @property
     def isscalar(self):
-        """Is this pixcoord a scalar? (a bool property)"""
-        # TODO: what's the best solution to implement this?
-        # Maybe we should sub-class ShapedLikeNDArray?
-        # See https://github.com/astropy/regions/issues/108
-        # This is a temp solution that matches the bahaviour of SkyCoord
-        return np.asanyarray(self.x).shape == ()
-        # return np.isscalar(self.x) and np.isscalar(self.y)
+        return np.isscalar(self.x)
 
     def __repr__(self):
         data = dict(name=self.__class__.__name__, x=self.x, y=self.y)
