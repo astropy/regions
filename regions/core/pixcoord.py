@@ -37,19 +37,11 @@ class PixCoord(object):
         self.x = self._standardize_coordinate(x)
         self.y = self._standardize_coordinate(y)
 
-        for a, b in ((x, y), (y, x)):
-            z, shape = a, np.asanyarray(a).shape
-            if shape == () or shape == (1,):
-                while np.asanyarray(z).shape != np.asanyarray(b).shape:
-                    z = np.append(z, a)
-
-                if self.x is a:
-                    self.x = z
-                else:
-                    self.y = z
-
         if np.asanyarray(self.x).shape != np.asanyarray(self.y).shape:
-            raise ValueError('Input parameters x and y must be of same dimensions')
+            try:
+                self.x, self.y = np.broadcast_arrays(self.x, self.y)
+            except ValueError:
+                raise ValueError('Input parameters x and y cannot be broadcast')
 
     @staticmethod
     def _standardize_coordinate(val):

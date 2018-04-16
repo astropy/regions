@@ -24,7 +24,7 @@ def wcs():
 def test_pixcoord_basic_dimension():
     with pytest.raises(ValueError) as err :
         PixCoord(np.array([1, 2]), [3, 4, 5, 6])
-    assert 'Input parameters x and y must be of same dimensions' in str(err)
+    assert 'Input parameters x and y cannot be broadcast' in str(err)
 
 
 def test_pixcoord_basics_scalar():
