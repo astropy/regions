@@ -11,7 +11,7 @@ __all__ = ['PixCoord']
 class PixCoord(object):
     """Pixel coordinates.
 
-    This class can represent scalar or array of pixel coordinates.
+    This class can represent scalar or array pixel coordinates.
 
     The data members are either numbers or Numpy arrays
     (not `~astropy.units.Quantity` objects with unit "pixel").
