@@ -34,31 +34,12 @@ class PixCoord(object):
 
     def __init__(self, x, y):
 
-        self.x = self._standardize_coordinate(x)
-        self.y = self._standardize_coordinate(y)
+        x, y = np.broadcast_arrays(x, y)
 
-        if np.asanyarray(self.x).shape != np.asanyarray(self.y).shape:
-            try:
-                self.x, self.y = np.broadcast_arrays(self.x, self.y)
-            except ValueError:
-                raise ValueError('Input parameters x and y cannot be broadcast')
-
-    @staticmethod
-    def _standardize_coordinate(val):
-        """Standardize coordinate.
-
-        Output should be either:
-        * Scalar Python number
-        * Numpy array
-
-        That's it, nothing else allowed!
-        """
-        if isinstance(val, numbers.Number):
-            return val
+        if x.shape == ():
+            self.x, self.y = np.asscalar(x), np.asscalar(y)
         else:
-            if np.asanyarray(val).shape == ():
-                return float(val)
-            return np.array(val)
+            self.x, self.y = x, y
 
     @staticmethod
     def _validate(val, name, expected='any'):

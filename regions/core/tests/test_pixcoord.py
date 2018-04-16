@@ -22,9 +22,8 @@ def wcs():
 
 
 def test_pixcoord_basic_dimension():
-    with pytest.raises(ValueError) as err :
+    with pytest.raises(ValueError):
         PixCoord(np.array([1, 2]), [3, 4, 5, 6])
-    assert 'Input parameters x and y cannot be broadcast' in str(err)
 
 
 def test_pixcoord_basics_scalar():
