@@ -33,10 +33,23 @@ class PixCoord(object):
     """
 
     def __init__(self, x, y):
-        if np.asanyarray(x).shape != np.asanyarray(y).shape:
-            raise ValueError('{} and {} must be of same dimensions'.format(x, y))
+
         self.x = self._standardize_coordinate(x)
         self.y = self._standardize_coordinate(y)
+
+        for a, b in ((x, y), (y, x)):
+            z, shape = a, np.asanyarray(a).shape
+            if shape == () or shape == (1,):
+                while np.asanyarray(z).shape != np.asanyarray(b).shape:
+                    z = np.append(z, a)
+
+                if self.x is a:
+                    self.x = z
+                else:
+                    self.y = z
+
+        if np.asanyarray(self.x).shape != np.asanyarray(self.y).shape:
+            raise ValueError('Input parameters x and y must be of same dimensions')
 
     @staticmethod
     def _standardize_coordinate(val):
