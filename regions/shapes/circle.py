@@ -127,7 +127,5 @@ class CircleSkyRegion(SkyRegion):
 
     def to_pixel(self, wcs):
         center, scale, _ = skycoord_to_pixel_scale_angle(self.center, wcs)
-        # FIXME: The following line is needed to get a scalar PixCoord
-        center = PixCoord(float(center.x), float(center.y))
         radius = self.radius.to('deg').value * scale
         return CirclePixelRegion(center, radius, self.meta, self.visual)
