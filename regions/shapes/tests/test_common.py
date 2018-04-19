@@ -65,33 +65,27 @@ class BaseTestPixelRegion(BaseTestRegion):
 
     def test_contains_scalar(self):
 
-        try:
-            if len(self.inside) > 0:
-                pixcoord = PixCoord(*self.inside[0])
-                assert self.reg.contains(pixcoord)
-                assert pixcoord in self.reg
+        if len(self.inside) > 0:
+            pixcoord = PixCoord(*self.inside[0])
+            assert self.reg.contains(pixcoord)
+            assert pixcoord in self.reg
 
-            if len(self.outside) > 0:
-                pixcoord = PixCoord(*self.outside[0])
-                assert not self.reg.contains(pixcoord)
-                assert pixcoord not in self.reg
-        except NotImplementedError:
-            pytest.skip()
+        if len(self.outside) > 0:
+            pixcoord = PixCoord(*self.outside[0])
+            assert not self.reg.contains(pixcoord)
+            assert pixcoord not in self.reg
 
     def test_contains_array_1d(self):
 
-        try:
-            pixcoord = PixCoord(*zip(*(self.inside + self.outside)))
+        pixcoord = PixCoord(*zip(*(self.inside + self.outside)))
 
-            actual = self.reg.contains(pixcoord)
-            assert_equal(actual[:len(self.inside)], True)
-            assert_equal(actual[len(self.inside):], False)
+        actual = self.reg.contains(pixcoord)
+        assert_equal(actual[:len(self.inside)], True)
+        assert_equal(actual[len(self.inside):], False)
 
-            with pytest.raises(ValueError) as exc:
-                pixcoord in self.reg
-            assert 'coord must be scalar' in str(exc)
-        except NotImplementedError:
-            pytest.skip()
+        with pytest.raises(ValueError) as exc:
+            pixcoord in self.reg
+        assert 'coord must be scalar' in str(exc)
 
     def test_contains_array_2d(self):
 
