@@ -45,7 +45,7 @@ class BaseTestPixelRegion(BaseTestRegion):
         np.random.seed(12345)
         x = np.random.uniform(self.sample_box[0], self.sample_box[1], 1000)
         y = np.random.uniform(self.sample_box[2], self.sample_box[3], 1000)
-        try:
+        try:  # handles when `to_shapely` is not implemented for the subclass.
             inside = self.reg.contains(PixCoord(x, y))
             reg_shapely = self.reg.to_shapely()
             inside_shapely = [reg_shapely.contains(Point(x[i], y[i])) for i in range(len(x))]
@@ -55,7 +55,7 @@ class BaseTestPixelRegion(BaseTestRegion):
 
     @pytest.mark.skipif('not HAS_SHAPELY')
     def test_bbox_compared_to_shapely(self):
-        try:
+        try:  # handles when `to_shapely` is not implemented for the subclass.
             reg_shapely = self.reg.to_shapely()
             xmin, ymin, xmax, ymax = reg_shapely.bounds
             bbox_shapely = BoundingBox.from_float(xmin, xmax, ymin, ymax)
