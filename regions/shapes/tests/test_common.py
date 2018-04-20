@@ -8,7 +8,7 @@ from numpy.testing import assert_equal, assert_allclose
 import pytest
 
 from ...core import PixCoord, BoundingBox
-from .utils import ASTROPY_LT_13, HAS_SHAPELY  # noqa
+from .utils import ASTROPY_LT_13, HAS_SHAPELY # noqa
 
 
 class BaseTestRegion(object):
@@ -45,17 +45,23 @@ class BaseTestPixelRegion(BaseTestRegion):
         np.random.seed(12345)
         x = np.random.uniform(self.sample_box[0], self.sample_box[1], 1000)
         y = np.random.uniform(self.sample_box[2], self.sample_box[3], 1000)
-        inside = self.reg.contains(PixCoord(x, y))
-        reg_shapely = self.reg.to_shapely()
-        inside_shapely = [reg_shapely.contains(Point(x[i], y[i])) for i in range(len(x))]
-        assert_equal(inside, inside_shapely)
+        try:  # handles when `to_shapely` is not implemented for the subclass.
+            inside = self.reg.contains(PixCoord(x, y))
+            reg_shapely = self.reg.to_shapely()
+            inside_shapely = [reg_shapely.contains(Point(x[i], y[i])) for i in range(len(x))]
+            assert_equal(inside, inside_shapely)
+        except NotImplementedError:
+            pytest.skip()
 
     @pytest.mark.skipif('not HAS_SHAPELY')
     def test_bbox_compared_to_shapely(self):
-        reg_shapely = self.reg.to_shapely()
-        xmin, ymin, xmax, ymax = reg_shapely.bounds
-        bbox_shapely = BoundingBox.from_float(xmin, xmax, ymin, ymax)
-        assert self.reg.bounding_box == bbox_shapely
+        try:  # handles when `to_shapely` is not implemented for the subclass.
+            reg_shapely = self.reg.to_shapely()
+            xmin, ymin, xmax, ymax = reg_shapely.bounds
+            bbox_shapely = BoundingBox.from_float(xmin, xmax, ymin, ymax)
+            assert self.reg.bounding_box == bbox_shapely
+        except NotImplementedError:
+            pytest.skip()
 
     def test_contains_scalar(self):
 
