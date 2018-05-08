@@ -5,17 +5,14 @@ import itertools
 import re
 import copy
 from collections import OrderedDict
+from warnings import warn
+
 from astropy import units as u
 from astropy import coordinates
 from astropy import log
-from astropy.utils.exceptions import AstropyUserWarning
-from warnings import warn
-from .core import (
-    Shape,
-    ShapeList,
-    DS9RegionParserWarning,
-    DS9RegionParserError,
-)
+
+from ..core import Shape, ShapeList
+from .core import DS9RegionParserError, DS9RegionParserWarning
 
 __all__ = [
     'read_ds9',
@@ -36,7 +33,6 @@ regex_paren = re.compile("[()]")
 
 regex_splitter = re.compile("[, ]")
 """Regular expression to split coordinate strings"""
-
 
 
 def read_ds9(filename, errors='strict'):
@@ -136,14 +132,17 @@ class DS9Parser(object):
       ``warn`` will raise a warning, and ``ignore`` will do nothing
       (i.e., be silent).
     """
+
+    # List of valid coordinate system
     coordinate_systems = ['fk5', 'fk4', 'icrs', 'galactic', 'wcs', 'physical', 'image', 'ecliptic', 'J2000']
     coordinate_systems += ['wcs{0}'.format(letter) for letter in string.ascii_lowercase]
-    """List of valid coordinate systems"""
+
+    # Map to convert coordinate system names
     coordsys_mapping = dict(zip(coordinates.frame_transform_graph.get_names(),
                                 coordinates.frame_transform_graph.get_names()))
     coordsys_mapping['ecliptic'] = 'geocentrictrueecliptic'
     coordsys_mapping['J2000'] = 'fk5'
-    """Map to convert coordinate system names"""
+
 
     def __init__(self, region_string, errors='strict'):
         if errors not in ('strict', 'ignore', 'warn'):
@@ -319,6 +318,8 @@ class DS9RegionParser(object):
     line : str
         Line to parse
     """
+
+    # Coordinate unit transformations
     coordinate_units = {'fk5': ('hour_or_deg', u.deg),
                         'fk4': ('hour_or_deg', u.deg),
                         'icrs': ('hour_or_deg', u.deg),
@@ -328,10 +329,10 @@ class DS9RegionParser(object):
                         'image': (u.dimensionless_unscaled, u.dimensionless_unscaled),
                         'wcs': (u.dimensionless_unscaled, u.dimensionless_unscaled),
                         }
-    """Coordinate unit transformations"""
     for letter in string.ascii_lowercase:
         coordinate_units['wcs{0}'.format(letter)] = (u.dimensionless_unscaled, u.dimensionless_unscaled)
 
+    # DS9 language specification. This defines how a certain region is read
     language_spec = {'point': (coordinate, coordinate),
                      'circle': (coordinate, coordinate, radius),
                      # This is a special case to deal with n elliptical annuli
@@ -343,7 +344,6 @@ class DS9RegionParser(object):
                      'annulus': itertools.chain((coordinate, coordinate),
                                                 itertools.cycle((radius,))),
                     }
-    """DS9 language specification. This defines how a certain region is read"""
 
     def __init__(self, coordsys, include, region_type, region_end, global_meta, line):
 
