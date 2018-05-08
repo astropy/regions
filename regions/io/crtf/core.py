@@ -11,12 +11,11 @@ __all__ = [
 
 class CRTFRegionParserWarning(AstropyUserWarning):
     """
-    A generic warning class for DS9 region parsing inherited from astropy's
-    warnings
+    A generic warning class for CRTF region parsing
     """
 
 
 class CRTFRegionParserError(ValueError):
     """
-    A generic error class for DS9 region parsing
+    A generic error class for CRTF region parsing
     """

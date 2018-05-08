@@ -162,21 +162,23 @@ class CRTFRegionParser:
     coordsys_mapping['ecliptic'] = 'geocentrictrueecliptic'
 
     def __init__(self, global_meta, include, type, region_type, reg_str, meta_str):
+
         self.global_meta = global_meta
         self.reg_str = reg_str
         self.meta_str = meta_str
 
-        self.coordsys = self.global_meta.get('coordsys', 'image')
+        self.coordsys = None
         self.coord_str = None
         self.type = type
         self.region_type = region_type
-        self.meta = global_meta
+        self.meta = copy.deepcopy(global_meta)
         self.shape = None
         self.include = include
 
     def parse(self):
 
         self.convert_meta()
+        self.coordsys = self.meta.get('coord', 'image')
         self.convert_coordinates()
         self.make_shape()
         log.debug(self)
@@ -189,7 +191,13 @@ class CRTFRegionParser:
         self.meta_str = self.meta_str.split(",")
         for par in self.meta_str:
             par = par.split("=")
-            self.meta[par[0].strip()] = par[1].strip()
+            val1 = par[0].strip()
+            val2 = par[1].strip()
+            if val1 in ('range', 'corr', 'labeloff'):
+                val2 = val2.lstrip('[')
+                val2 = val2.rstrip(']')
+                val2 = [x.strip() for x in val2]
+            self.meta[val1] = val2
 
     def make_shape(self):
         pass
