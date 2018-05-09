@@ -23,16 +23,18 @@ regex_comment = re.compile(r'^#.*$')
 regex_global = re.compile(r'^global\s+(?P<parameters>.*)?')
 
 # Coordinate Format : "[x, y]"
-regex_coordinate = re.compile(r'\[(?P<x>[\w.+-]*?)\s*[,]\s*(?P<y>[\w.+-]*?)\]')
+regex_coordinate = re.compile(r'\[([\w.+-:]*?)\s*[,]\s*([\w.+-:]*?)\]')
 
 # last length Format. For Ex : radius of a circle
-regex_length = re.compile(r'(?:\[[^=]*\])+[,]\s*([\w.]*)\]')
+regex_length = re.compile(r'(?:\[[^=]*\])+[,]\s*([\w.+-]*)\]')
+
+regex_meta = re.compile(r'((?:\w+\s*=\s*[^,\[\]]+)|(?:\w+\s*=\s*\[.*?\]))')
 
 # region format
-regex_region = re.compile(r'(?P<include>[+-])?(?P<type>ann)?(?P<regiontype>[a-z]*?)\[[^=]*]')
+regex_region = re.compile(r'(?P<include>[+-])?(?P<type>ann(?=\s))?(?P<regiontype>[a-z]*?)\[[^=]*]')
 
 # line format
-regex_line = re.compile(r'(?P<region>[+-]?(?:ann)?[a-z]*?\[[^=]*\])(?:\s*[,]\s*(?P<parameters>.*))?')
+regex_line = re.compile(r'(?P<region>[+-]?(?:ann(?=\s))?[a-z]*?\[[^=]*\])(?:\s*[,]\s*(?P<parameters>.*))?')
 
 
 def read_crtf(filename, errors='strict'):
@@ -64,20 +66,18 @@ def read_crtf(filename, errors='strict'):
 
 class CRTFParser:
 
-    valid_definition = {
-                        'reg': ('box', 'centerbox', 'rotbox', 'poly', 'circle', 'annulus', 'ellipse'),
-                        'ann': ('line', 'vector', 'text', 'symbol')
-                       }
+    valid_definition = ('box', 'centerbox', 'rotbox', 'poly', 'circle', 'annulus', 'ellipse',
+                        'line', 'vector', 'text', 'symbol')
 
     valid_global_keys = ['coord', 'frame', 'corr', 'veltype', 'restfreq', 'linewidth', 'linestyle', 'symsize',
                          'symthick', 'color', 'font', 'fontsize', 'fontstyle', 'usetex', 'labelpos','labelcolor',
-                         'labeloff']
+                         'labeloff', 'range']
 
     def __init__(self, region_string, errors='strict'):
         if errors not in ('strict', 'ignore', 'warn'):
             msg = "``errors`` must be one of strict, ignore, or warn; is {}"
             raise ValueError(msg.format(errors))
-        self.region_string = region_string.lower()
+        self.region_string = region_string
         self.errors = errors
 
         # Global states
@@ -85,11 +85,11 @@ class CRTFParser:
 
         # Results
         self.shapes = ShapeList()
+        self.run()
 
     def __str__(self):
         ss = self.__class__.__name__
         ss += '\nErrors: {}'.format(self.errors)
-        ss += '\nCoordsys: {}'.format(self.coordsys)
         ss += '\nGlobal meta: {}'.format(self.global_meta)
         ss += '\nShapes: {}'.format(self.shapes)
         ss += '\n'
@@ -110,7 +110,7 @@ class CRTFParser:
         # Special case / header: parse global parameters into metadata
         global_parameters = regex_global.search(line)
         if global_parameters:
-            self.global_meta = self.parse_global_meta(global_parameters.group('parameters'))
+            self.parse_global_meta(global_parameters.group('parameters'))
             return
 
         # Try to parse the line
@@ -122,8 +122,9 @@ class CRTFParser:
             include = region.group('include') or '+'
             region_type = region.group('regiontype')
 
-            if region_type in self.valid_definition[type]:
-                helper = CRTFRegionParser(self.global_meta, include, type, region_type, *crtf_line.group('region', 'parameters'))
+            if region_type in self.valid_definition:
+                helper = CRTFRegionParser(self.global_meta, include, type, region_type,
+                                          *crtf_line.group('region', 'parameters'))
                 helper.parse()
                 self.shapes.append(helper.shape)
             else:
@@ -142,35 +143,39 @@ class CRTFParser:
     def run(self):
         """Run all steps"""
         for line in self.region_string.split('\n'):
-            self.parse_line(line)
+            self.parse_line(line.lower())
             log.debug('Global state: {}'.format(self))
 
     def parse_global_meta(self, global_meta_str):
 
-        global_meta_str  = global_meta_str.split(",")
-        for par in global_meta_str:
-            par = par.split("=")
-            val1 = par[0].strip()
-            val2 = par[1].strip()
-            if val1 in self.valid_global_keys :
-                if val1 in ('range', 'corr', 'labeloff'):
-                    val2 = val2.lstrip('[')
-                    val2 = val2.rstrip(']')
-                    val2 = [x.strip() for x in val2]
-            else:
-                self._raise_error('{0} is not a valid global meta key').format(val1)
-            self.global_meta[val1] = val2
+        if global_meta_str:
+            global_meta_str = regex_meta.findall(global_meta_str + ',')
+        if global_meta_str:
+            for par in global_meta_str:
+                par = par.strip()
+                par = par.rstrip(',')
+                par = par.split('=')
+                val1 = par[0].strip()
+                val2 = par[1].strip()
+                if val1 in self.valid_global_keys :
+                    if val1 in ('range', 'corr', 'labeloff'):
+                        val2 = val2[1:-1]
+                        val2 = val2.split(",")
+                        val2 = [x.strip() for x in val2 if x]
+                    self.global_meta[val1] = val2
+                else:
+                    self._raise_error('{0} is not a valid global meta key').format(val1)
 
 
 class CRTFRegionParser:
 
     # List of valid coordinate system
     # TODO : There are still many reference systems to support
-    coordinate_systems = ['J2000', 'icrs', 'galactic', 'supergal', 'image', 'ecliptic']
+    coordinate_systems = ['j2000', 'icrs', 'galactic', 'supergal', 'image', 'ecliptic']
 
     coordsys_mapping = dict(zip(coordinates.frame_transform_graph.get_names(),
                                 coordinates.frame_transform_graph.get_names()))
-    coordsys_mapping['J2000'] = 'fk5'
+    coordsys_mapping['j2000'] = 'fk5'
     coordsys_mapping['supergal'] = 'supergalactic'
     coordsys_mapping['ecliptic'] = 'geocentrictrueecliptic'
 
@@ -193,13 +198,14 @@ class CRTFRegionParser:
         self.meta_str = meta_str
         self.errors = errors
 
+        self.coord = None
         self.coordsys = None
         self.coord_str = None
-        self.type = type
+        self.type = type or 'reg'
         self.region_type = region_type
         self.meta = copy.deepcopy(global_meta)
         self.shape = None
-        self.include = include
+        self.include = include or '+'
 
     def _raise_error(self, msg):
         if self.errors == 'warn':
@@ -224,14 +230,13 @@ class CRTFRegionParser:
         if self.coordsys in self.coordsys_mapping:
             self.coordsys = self.coordsys_mapping[self.coordsys]
 
-
     def convert_coordinates(self):
 
         coord_list_str = regex_coordinate.findall(self.reg_str) + regex_length.findall(self.reg_str)
         coord_list = []
 
         if self.region_type == 'poly':
-            if len(coord_list_str) < 4 or coord_list_str[0] != coord_list_str[-1] :
+            if len(coord_list_str) < 4 or coord_list_str[0] != coord_list_str[-1]:
                 self._raise_error('{} not in proper format'.format(self.reg_str))
         else:
             if len(coord_list_str) != len(self.language_spec[self.region_type]):
@@ -239,39 +244,45 @@ class CRTFRegionParser:
 
         for x, y in zip(self.language_spec[self.region_type], coord_list_str):
 
-            if x in 'c':
+            if x == 'c':
                 if len(y) == 2:
                     coord_list.append(CoordinateParser.parse_coordinate(y[0]))
                     coord_list.append(CoordinateParser.parse_coordinate(y[1]))
                 else:
                     self._raise_error('{} not in proper format'.format(self.reg_str))
-            if x in 'pl':
+            if x == 'pl':
                 if len(y) == 2:
                     coord_list.append(CoordinateParser.parse_angular_length_quantity(y[0]))
                     coord_list.append(CoordinateParser.parse_angular_length_quantity(y[1]))
                 else:
                     self._raise_error('{} not in proper format'.format(self.reg_str))
-            if x in 'l':
-                if type(y) is 'str':
+            if x == 'l':
+                if isinstance(y, str):
                     coord_list.append(CoordinateParser.parse_angular_length_quantity(y))
                 else:
                     self._raise_error('{} not in proper format'.format(self.reg_str))
 
+        self.coord = coord_list
+
     def convert_meta(self):
 
-        self.meta_str = self.meta_str.split(",")
-        for par in self.meta_str:
-            par = par.split("=")
-            val1 = par[0].strip()
-            val2 = par[1].strip()
-            if val1 in CRTFParser.valid_global_keys or val1 == 'label':
-                if val1 in ('range', 'corr', 'labeloff'):
-                    val2 = val2.lstrip('[')
-                    val2 = val2.rstrip(']')
-                    val2 = [x.strip() for x in val2]
-            else:
-                self._raise_error('{0} is not a valid meta key'.format(val1))
-            self.meta[val1] = val2
+        if self.meta_str:
+            self.meta_str = regex_meta.findall(self.meta_str + ',')
+        if self.meta_str:
+            for par in self.meta_str:
+                par = par.strip()
+                par = par.rstrip(',')
+                par = par.split("=")
+                val1 = par[0].strip()
+                val2 = par[1].strip()
+                if val1 in CRTFParser.valid_global_keys or val1 == 'label':
+                    if val1 in ('range', 'corr', 'labeloff'):
+                        val2 = val2[1:-1]
+                        val2 = val2.split(',')
+                        val2 = [x.strip() for x in val2]
+                    self.meta[val1] = val2
+                else:
+                    self._raise_error('{0} is not a valid meta key'.format(val1))
         self.meta['include'] = self.include
 
     def make_shape(self):
@@ -280,7 +291,7 @@ class CRTFRegionParser:
                            region_type=self.region_type,
                            coord=self.coord,
                            meta=self.meta,
-                           composite=self.composite,
+                           composite=False,
                            include=self.include != '-',
                            )
 
@@ -295,7 +306,7 @@ class CoordinateParser(object):
         # Any CRTF coordinate representation (sexagesimal or degrees)
 
         if 'pix' in string_rep:
-            return u.Quantity(float(string_rep), u.dimensionless_unscaled)
+            return u.Quantity(string_rep[:-3], u.dimensionless_unscaled)
         if 'h' in string_rep or 'rad' in string_rep:
             return coordinates.Angle(string_rep)
         else:
