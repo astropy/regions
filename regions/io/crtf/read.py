@@ -3,15 +3,18 @@ from __future__ import absolute_import, division, print_function
 import re
 import copy
 import itertools
-from collections import OrderedDict
 from warnings import warn
 
 from astropy import units as u
 from astropy import coordinates
-from astropy import log
+
+__all__ = [
+    'CRTFParser',
+    'CRTFRegionParser',
+]
 
 from .core import CRTFRegionParserError, CRTFRegionParserWarning
-from ..core import *
+from ..core import Shape, ShapeList
 
 # All CASA files start with '#CRTF' . It may also include the version number like '#CRTFv0' .
 regex_begin = re.compile(r'^#CRTFv?[\d]?$')
@@ -38,7 +41,8 @@ regex_line = re.compile(r'(?P<region>[+-]?(?:ann(?=\s))?[a-z]*?\[[^=]*\])(?:\s*[
 
 
 def read_crtf(filename, errors='strict'):
-    """Read a CRTF region file and a list of region objects.
+    """
+    Read a CRTF region file and a list of region objects.
 
     Parameters
     ----------
@@ -59,7 +63,7 @@ def read_crtf(filename, errors='strict'):
         if regex_begin.search(fh.readline()):
             region_string = fh.read()
             parser = CRTFParser(region_string, errors)
-            return parser.shapes.to_region()
+            return parser.shapes.to_regions()
         else:
             raise CRTFRegionParserError('Every CRTF Region must start with "#CRTF" ')
 
@@ -96,8 +100,9 @@ class CRTFParser:
         return ss
 
     def parse_line(self, line):
-        """Parse one line"""
-        log.debug('Parsing {}'.format(line))
+        """
+        Parse one line
+        """
 
         # Skip blanks
         if line == '':
@@ -144,7 +149,7 @@ class CRTFParser:
         """Run all steps"""
         for line in self.region_string.split('\n'):
             self.parse_line(line.lower())
-            log.debug('Global state: {}'.format(self))
+
 
     def parse_global_meta(self, global_meta_str):
 
@@ -171,6 +176,7 @@ class CRTFRegionParser:
 
     # List of valid coordinate system
     # TODO : There are still many reference systems to support
+
     coordinate_systems = ['j2000', 'icrs', 'galactic', 'supergal', 'image', 'ecliptic']
 
     coordsys_mapping = dict(zip(coordinates.frame_transform_graph.get_names(),
@@ -220,10 +226,10 @@ class CRTFRegionParser:
         self.set_coordsys()
         self.convert_coordinates()
         self.make_shape()
-        log.debug(self)
 
     def set_coordsys(self):
-        """Mapping to astropy's coordinate system name
+        """
+        Mapping to astropy's coordinate system name
 
         # TODO: needs expert attention (Most reference systems are not mapped)
         """
@@ -286,8 +292,10 @@ class CRTFRegionParser:
         self.meta['include'] = self.include
 
     def make_shape(self):
-        """Make shape object"""
-        self.shape = Shape(coordsys=self.coordsys,
+        """
+        Make shape object
+        """
+        self.shape = Shape('CRTF', coordsys=self.coordsys,
                            region_type=self.region_type,
                            coord=self.coord,
                            meta=self.meta,

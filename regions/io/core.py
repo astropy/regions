@@ -17,9 +17,10 @@ __all__ = ['ShapeList', 'Shape']
 
 
 class ShapeList(list):
-    """List of Shape
     """
-    def to_region(self):
+    List of Shape
+    """
+    def to_regions(self):
         regions = list()
         for shape in self:
             # Skip elliptical annulus for now
@@ -35,7 +36,8 @@ class ShapeList(list):
 
 
 class Shape(object):
-    """Helper class to represent a DS9
+    """
+    Helper class to represent a DS9
 
 
     This serves as intermediate step in the parsing process.
@@ -74,7 +76,9 @@ class Shape(object):
         point=shapes.PointPixelRegion,
     )
 
-    def __init__(self, coordsys, region_type, coord, meta, composite, include):
+    def __init__(self, format_type, coordsys, region_type, coord, meta, composite, include):
+
+        self.format_type = format_type
         self.coordsys = coordsys
         self.region_type = region_type
         self.coord = coord
@@ -84,6 +88,7 @@ class Shape(object):
 
     def __str__(self):
         ss = self.__class__.__name__
+        ss += '\nFormat Type : {}'.format(self.format_type)
         ss += '\nCoord sys : {}'.format(self.coordsys)
         ss += '\nRegion type : {}'.format(self.region_type)
         ss += '\nCoord: {}'.format(self.coord)
@@ -94,7 +99,8 @@ class Shape(object):
         return ss
 
     def convert_coords(self):
-        """Process list of coordinates
+        """
+        Process list of coordinates
 
         This mainly seaches for tuple of coordinates in the coordinate list and
         creates a SkyCoord or PixCoord object from them if appropriate for a
@@ -113,7 +119,9 @@ class Shape(object):
         return coords
 
     def _convert_sky_coords(self):
-        """Convert to sky coords"""
+        """
+        Convert to sky coords
+        """
         parsed_angles = [(x, y)
                          for x, y in zip(self.coord[:-1:2], self.coord[1::2])
                          if (isinstance(x, coordinates.Angle) and
@@ -137,7 +145,9 @@ class Shape(object):
         return coords
 
     def _convert_pix_coords(self):
-        """Convert to pix coords"""
+        """
+        Convert to pix coords
+        """
         if self.region_type in ['polygon', 'line']:
             # have to special-case polygon in the phys coord case
             # b/c can't typecheck when iterating as in sky coord case
@@ -150,7 +160,9 @@ class Shape(object):
         return coords
 
     def to_region(self):
-        """Convert to region object"""
+        """
+        Convert to region object
+        """
 
         coords = self.convert_coords()
         log.debug(coords)
