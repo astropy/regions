@@ -5,9 +5,9 @@ import os
 import distutils.version as vers
 
 from numpy.testing import assert_allclose
+import pytest
 
 from astropy.utils.data import get_pkg_data_filename, get_pkg_data_filenames
-import pytest
 import astropy.version as astrov
 from astropy.coordinates import Angle, SkyCoord
 from astropy.tests.helper import catch_warnings
@@ -74,9 +74,9 @@ def test_file(filename):
         assert split_line in actual_lines
 
 
-
 def test_ds9_objects_to_str():
-    """Simple test case for ds9_objects_to_str.
+    """
+    Simple test case for ds9_objects_to_str.
     """
     center = SkyCoord(42, 43, unit='deg')
     radius = Angle(3, 'deg')
@@ -87,11 +87,11 @@ def test_ds9_objects_to_str():
 
 
 def test_ds9_string_to_objects():
-    """Simple test case for ds9_string_to_objects
+    """
+    Simple test case for ds9_string_to_objects.
     """
     ds9_str = '# Region file format: DS9 astropy/regions\nfk5\ncircle(42.0000,43.0000,3.0000)\n'
     parser = DS9Parser(ds9_str)
-    parser.run()
     regions = parser.shapes.to_region()
     reg = regions[0]
 
@@ -99,16 +99,19 @@ def test_ds9_string_to_objects():
     assert_allclose(reg.center.dec.deg, 43)
     assert_allclose(reg.radius.value, 3)
 
+
 def test_ds9_string_to_objects_whitespace():
-    """Simple test case for ds9_string_to_objects
+    """
+    Simple test case for ds9_string_to_objects.
     """
     ds9_str = '# Region file format: DS9 astropy/regions\nfk5\n -circle(42.0000,43.0000,3.0000)\n'
     parser = DS9Parser(ds9_str)
-    parser.run()
     assert parser.shapes[0].include == False
 
+
 def test_ds9_io(tmpdir):
-    """Simple test case for write_ds9 and read_ds9.
+    """
+    Simple test case for write_ds9 and read_ds9.
     """
     center = SkyCoord(42, 43, unit='deg', frame='fk5')
     radius = Angle(3, 'deg')
@@ -135,11 +138,14 @@ def test_missing_region_warns():
 
     assert len(parser.shapes) == 1
     assert len(ASWarn) == 1
-    assert "Region type 'notaregiontype'" in str(ASWarn[0].message)
+    assert "Region type 'notaregiontype' was identified, but it is not one of the known region types." in str(ASWarn[0].message)
 
 
 def test_global_parser():
-    """ Check that the global_parser does what's expected """
+    """
+    Check that the global_parser does what's expected
+    """
+
     # have to force "str" here because unicode_literals makes this string a
     # unicode string, even though in python2.7 we don't want it to be.  But in
     # py3, we don't want it to be bytes.
@@ -148,28 +154,32 @@ def test_global_parser():
                           ' highlite=1 dash=0 fixed=0 edit=1 move=1'
                           ' delete=1 include=1 source=1')
     global_parser = DS9Parser(global_test_str)
-    global_parser.run()
-    global_parser.global_meta == {'dash': '0', 'source': '1', 'move': '1',
-                                  'font': '"helvetica 10 normal roman" ',
-                                  'dashlist': '8 3 ', 'include': '1',
+    assert dict(global_parser.global_meta) == {'dash': '0', 'source': '1', 'move': '1',
+                                  'font': '"helvetica 10 normal roman"',
+                                  'dashlist': '8 3', 'include': True,
                                   'highlite': '1', 'color': 'green',
                                   'select': '1',
                                   'fixed': '0', 'width': '1', 'edit': '1',
                                   'delete': '1'}
 
+
 def test_ds9_color():
-    """Color parsing test"""
+    """
+    Color parsing test
+    """
     ds9_str = '# Region file format: DS9 astropy/regions\nfk5\ncircle(42.0000,43.0000,3.0000) # color=green\ncircle(43.0000,43.0000,3.0000) # color=orange\n'
 
     parser = DS9Parser(ds9_str)
-    parser.run()
     regions = parser.shapes
 
     assert regions[0].meta['color'] == 'green'
     assert regions[1].meta['color'] == 'orange'
 
+
 def test_ds9_color_override_global():
-    """Color parsing test in the presence of a global"""
+    """
+    Color parsing test in the presence of a global
+    """
     global_test_str = str('global color=blue dashlist=8 3 width=1'
                           ' font="helvetica 10 normal roman" select=1'
                           ' highlite=1 dash=0 fixed=0 edit=1 move=1'
@@ -181,16 +191,15 @@ def test_ds9_color_override_global():
     reg3str = "circle(43.0000,43.0000,3.0000)"
     ds9_str = ds9_str.format(global_str=global_test_str) + "\n".join([reg1str, reg2str, reg3str])
     parser = DS9Parser(ds9_str)
-    parser.run()
     regions = parser.shapes
     assert regions[0].meta['color'] == 'green'
     assert regions[1].meta['color'] == 'orange'
     assert regions[2].meta['color'] == 'blue'
 
+
 def test_issue134_regression():
     regstr = 'galactic; circle(+0:14:26.064,+0:00:45.206,30.400")'
     parser = DS9Parser(regstr)
-    parser.run()
     regions = parser.shapes
     assert regions[0].to_region().radius.value == 30.4
 
@@ -198,7 +207,6 @@ def test_issue134_regression():
 def test_issue65_regression():
     regstr = 'J2000; circle 188.5557102 12.0314056 1" # color=red'
     parser = DS9Parser(regstr)
-    parser.run()
     regions = parser.shapes
     reg = regions[0].to_region()
     assert reg.center.ra.value == 188.5557102
