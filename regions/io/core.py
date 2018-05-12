@@ -15,8 +15,6 @@ from .. import shapes
 from ..core import PixCoord
 from .ds9.core import DS9RegionParserWarning, DS9RegionParserError
 from .crtf.core import CRTFRegionParserWarning, CRTFRegionParserError
-from .crtf.read import CRTFParser
-from .ds9.read import DS9Parser
 
 
 class ShapeList(list):
@@ -60,6 +58,7 @@ class Shape(object):
     include : bool
         Include/exclude region
     """
+
     shape_to_sky_region = {'DS9': dict(circle=shapes.CircleSkyRegion,
                                        ellipse=shapes.EllipseSkyRegion,
                                        box=shapes.RectangleSkyRegion,
@@ -100,9 +99,11 @@ class Shape(object):
 
     error = {'DS9': DS9RegionParserError, 'CRTF': CRTFRegionParserError}
     warning = {'DS9': DS9RegionParserWarning, 'CRTF': CRTFRegionParserWarning}
-    parser = {'DS9': DS9Parser, 'CRTF': CRTFParser}
 
     def __init__(self, format_type, coordsys, region_type, coord, meta, composite, include):
+
+        from . import CRTFParser, DS9Parser
+        self.parser = {'DS9': DS9Parser, 'CRTF': CRTFParser}
 
         self.format_type = format_type
         self.coordsys = coordsys
@@ -171,7 +172,7 @@ class Shape(object):
 
     def _convert_pix_coords(self):
         """
-        Convert to pix coords
+        Convert to pixel coordinates, `regions.PixCoord`
         """
         if self.region_type in ['polygon', 'line']:
             # have to special-case polygon in the phys coord case
@@ -195,9 +196,9 @@ class Shape(object):
                         'usetex', 'labelpos', 'labeloff', 'linewidth', 'linestyle']
 
         if isinstance(coords[0], BaseCoordinateFrame):
-            reg = self.shape_to_sky_region[self.region_type](*coords)
+            reg = self.shape_to_sky_region[self.format_type][self.region_type](*coords)
         elif isinstance(coords[0], PixCoord):
-            reg = self.shape_to_pixel_region[self.region_type](*coords)
+            reg = self.shape_to_pixel_region[self.format_type][self.region_type](*coords)
         else:
             self._raise_error("No central coordinate")
 

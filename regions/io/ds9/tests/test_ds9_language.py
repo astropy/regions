@@ -14,7 +14,8 @@ from astropy.tests.helper import catch_warnings
 from astropy.utils.exceptions import AstropyUserWarning
 
 from ....shapes.circle import CircleSkyRegion
-from .. import read_ds9, write_ds9, ds9_objects_to_string, DS9Parser
+from ..read import read_ds9, DS9Parser
+from ..write import write_ds9, ds9_objects_to_string
 
 _ASTROPY_MINVERSION = vers.LooseVersion('1.1')
 _ASTROPY_VERSION = vers.LooseVersion(astrov.version)
