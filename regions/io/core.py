@@ -9,11 +9,14 @@ from astropy import coordinates
 from astropy.coordinates import BaseCoordinateFrame
 from astropy import log
 
+__all__ = ['ShapeList', 'Shape']
+
 from .. import shapes
 from ..core import PixCoord
 from .ds9.core import DS9RegionParserWarning, DS9RegionParserError
-
-__all__ = ['ShapeList', 'Shape']
+from .crtf.core import CRTFRegionParserWarning, CRTFRegionParserError
+from .crtf.read import CRTFParser
+from .ds9.read import DS9Parser
 
 
 class ShapeList(list):
@@ -57,24 +60,47 @@ class Shape(object):
     include : bool
         Include/exclude region
     """
-    shape_to_sky_region = dict(
-        circle=shapes.CircleSkyRegion,
-        ellipse=shapes.EllipseSkyRegion,
-        box=shapes.RectangleSkyRegion,
-        polygon=shapes.PolygonSkyRegion,
-        annulus=shapes.CircleAnnulusSkyRegion,
-        line=shapes.LineSkyRegion,
-        point=shapes.PointSkyRegion,
-    )
-    shape_to_pixel_region = dict(
-        circle=shapes.CirclePixelRegion,
-        ellipse=shapes.EllipsePixelRegion,
-        box=shapes.RectanglePixelRegion,
-        polygon=shapes.PolygonPixelRegion,
-        annulus=shapes.CircleAnnulusPixelRegion,
-        line=shapes.LinePixelRegion,
-        point=shapes.PointPixelRegion,
-    )
+    shape_to_sky_region = {'DS9': dict(circle=shapes.CircleSkyRegion,
+                                       ellipse=shapes.EllipseSkyRegion,
+                                       box=shapes.RectangleSkyRegion,
+                                       polygon=shapes.PolygonSkyRegion,
+                                       annulus=shapes.CircleAnnulusSkyRegion,
+                                       line=shapes.LineSkyRegion,
+                                       point=shapes.PointSkyRegion
+                                       ),
+
+                           'CRTF': dict(circle=shapes.CircleSkyRegion,
+                                        ellipse=shapes.EllipseSkyRegion,
+                                        centerbox=shapes.RectangleSkyRegion,
+                                        rotatedbox=shapes.RectangleSkyRegion,
+                                        pol=shapes.PolygonSkyRegion,
+                                        annulus=shapes.CircleAnnulusSkyRegion,
+                                        line=shapes.LineSkyRegion,
+                                        point=shapes.PointSkyRegion)
+                           }
+    shape_to_pixel_region = {'DS9': dict(circle=shapes.CirclePixelRegion,
+                                         ellipse=shapes.EllipsePixelRegion,
+                                         box=shapes.RectanglePixelRegion,
+                                         polygon=shapes.PolygonPixelRegion,
+                                         annulus=shapes.CircleAnnulusPixelRegion,
+                                         line=shapes.LinePixelRegion,
+                                         point=shapes.PointPixelRegion
+                                         ),
+
+                             'CRTF': dict(circle=shapes.CirclePixelRegion,
+                                          ellipse=shapes.EllipsePixelRegion,
+                                          centerbox=shapes.RectanglePixelRegion,
+                                          rotatedbox=shapes.RectanglePixelRegion,
+                                          poly=shapes.PolygonPixelRegion,
+                                          annulus=shapes.CircleAnnulusPixelRegion,
+                                          line=shapes.LinePixelRegion,
+                                          point=shapes.PointPixelRegion
+                                          )
+                             }
+
+    error = {'DS9': DS9RegionParserError, 'CRTF': CRTFRegionParserError}
+    warning = {'DS9': DS9RegionParserWarning, 'CRTF': CRTFRegionParserWarning}
+    parser = {'DS9': DS9Parser, 'CRTF': CRTFParser}
 
     def __init__(self, format_type, coordsys, region_type, coord, meta, composite, include):
 
@@ -107,8 +133,7 @@ class Shape(object):
         given region type. This involves again some coordinate transformation,
         so this step could be moved to the parsing process
         """
-        from .ds9 import DS9Parser
-        if self.coordsys in DS9Parser.coordsys_mapping:
+        if self.coordsys in self.parser[self.format_type].coordsys_mapping:
             coords = self._convert_sky_coords()
         else:
             coords = self._convert_pix_coords()
@@ -166,14 +191,15 @@ class Shape(object):
 
         coords = self.convert_coords()
         log.debug(coords)
-        viz_keywords = ['color', 'dashed', 'width', 'point', 'font']
+        viz_keywords = ['color', 'dashed', 'width', 'point', 'font', 'symsize', 'symsize', 'fontsize', 'fontstyle',
+                        'usetex', 'labelpos', 'labeloff', 'linewidth', 'linestyle']
 
         if isinstance(coords[0], BaseCoordinateFrame):
             reg = self.shape_to_sky_region[self.region_type](*coords)
         elif isinstance(coords[0], PixCoord):
             reg = self.shape_to_pixel_region[self.region_type](*coords)
         else:
-            raise DS9RegionParserError("No central coordinate")
+            self._raise_error("No central coordinate")
 
         reg.visual = OrderedDict()
         reg.meta = OrderedDict()
@@ -184,3 +210,6 @@ class Shape(object):
                 reg.meta[key] = self.meta[key]
 
         return reg
+
+    def _raise_error(self, msg):
+        raise self.error[self.format_type](msg)

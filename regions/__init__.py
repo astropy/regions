@@ -20,6 +20,5 @@ from ._astropy_init import *
 if not _ASTROPY_SETUP_:
     from ._utils.examples import *
     from .core import *
-    from .io.ds9 import *
-    from .io.core import *
     from .shapes import *
+    from .io import *

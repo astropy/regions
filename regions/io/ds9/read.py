@@ -15,7 +15,7 @@ __all__ = [
     'read_ds9',
     'DS9Parser',
     'DS9RegionParser',
-    'CoordinateParser',
+    'CoordinateParser'
 ]
 
 from ..core import Shape, ShapeList
