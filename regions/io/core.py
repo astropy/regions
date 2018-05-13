@@ -43,7 +43,7 @@ class Shape(object):
     This serves as intermediate step in the parsing process.
 
     Parameters
-    ---------
+    ----------
     format_type : str
         File Format type
     coordsys : str
