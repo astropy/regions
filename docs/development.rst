@@ -11,8 +11,8 @@ Notes
 
 Minutes for the discussions on regions:
 
-* `Python in astronomy 2015 <http://dx.doi.org/10.5281/zenodo.19330>`__
-* `Python in astronomy 2016 <http://dx.doi.org/10.5281/zenodo.56793>`__
+* `Python in astronomy 2015 <https://doi.org/10.5281/zenodo.19330>`__
+* `Python in astronomy 2016 <https://doi.org/10.5281/zenodo.56793>`__
 
 
 Dependencies
