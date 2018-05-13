@@ -8,13 +8,10 @@ from warnings import warn
 from astropy import units as u
 from astropy import coordinates
 
-__all__ = [
-    'CRTFParser',
-    'CRTFRegionParser',
-]
-
 from .core import CRTFRegionParserError, CRTFRegionParserWarning
 from ..core import Shape, ShapeList
+
+__all__ = ['CRTFParser', 'CRTFRegionParser']
 
 # All CASA files start with '#CRTF' . It may also include the version number like '#CRTFv0' .
 regex_begin = re.compile(r'^#CRTFv?[\d]?$')
@@ -22,27 +19,29 @@ regex_begin = re.compile(r'^#CRTFv?[\d]?$')
 # Comment Format :
 regex_comment = re.compile(r'^#.*$')
 
-# Meta attributes of a region
+# Identifies the global attributes Format.
 regex_global = re.compile(r'^global\s+(?P<parameters>.*)?')
 
 # Coordinate Format : "[x, y]"
 regex_coordinate = re.compile(r'\[([\w.+-:]*?)\s*[,]\s*([\w.+-:]*?)\]')
 
-# last length Format. For Ex : radius of a circle
+# Single length Format. For Ex : helps us to extract the radius of a circle.
 regex_length = re.compile(r'(?:\[[^=]*\])+[,]\s*([\w.+-]*)\]')
 
+# Extracts each 'parameter=value' pair.
 regex_meta = re.compile(r'((?:\w+\s*=\s*[^,\[\]]+)|(?:\w+\s*=\s*\[.*?\]))')
 
-# region format
+# Region format which segregates include('+'|'-') parameter, kind of definition ('ann' for annotations | '' for regions)
+# and region type.
 regex_region = re.compile(r'(?P<include>[+-])?(?P<type>ann(?=\s))?(?P<regiontype>[a-z]*?)\[[^=]*]')
 
-# line format
+# Line format which checks the validity of the line and segregates the meta attributes from the region format.
 regex_line = re.compile(r'(?P<region>[+-]?(?:ann(?=\s))?[a-z]*?\[[^=]*\])(?:\s*[,]\s*(?P<parameters>.*))?')
 
 
 def read_crtf(filename, errors='strict'):
     """
-    Read a CRTF region file and a list of region objects.
+    Reads a CRTF region file and returns a list of region objects.
 
     Parameters
     ----------
@@ -69,18 +68,43 @@ def read_crtf(filename, errors='strict'):
 
 
 class CRTFParser:
+    """
+    Parses a CRTF string.
 
+    This class transforms a CRTF string to a `~regions.io.core.ShapeList`. The
+    result is stored as ``shapes`` attribute.
+
+    Each line is tested for either containing a region with meta attributes or global parameters.
+    If global parameters are found then, it is stored in the ``global_meta`` attribute.
+    If a region is found the `~regions.io.crtf.CRTFRegionParser` is invoked to transform the line into a
+    `~regions.io.core.Shape` object.
+
+    Parameters
+    ----------
+    region_string : str
+        CRTF region string
+    errors : ``warn``, ``ignore``, ``strict``
+        The error handling scheme to use for handling parsing errors.
+        The default is 'strict', which will raise a ``CRTFRegionParserError``.
+        ``warn`` will raise a ``CRTFRegionParserWarning``, and ``ignore`` will do nothing
+        (i.e., be silent).
+    """
+
+    # It contains a tuple of valid definition (region, annotation) type.
     valid_definition = ('box', 'centerbox', 'rotbox', 'poly', 'circle', 'annulus', 'ellipse',
                         'line', 'vector', 'text', 'symbol')
 
-    valid_global_keys = ['coord', 'frame', 'corr', 'veltype', 'restfreq', 'linewidth', 'linestyle', 'symsize',
+    # It contains a tuple of valid name of the parameters(attributes).
+    valid_global_keys = ('coord', 'frame', 'corr', 'veltype', 'restfreq', 'linewidth', 'linestyle', 'symsize',
                          'symthick', 'color', 'font', 'fontsize', 'fontstyle', 'usetex', 'labelpos','labelcolor',
-                         'labeloff', 'range']
+                         'labeloff', 'range')
 
     def __init__(self, region_string, errors='strict'):
+
         if errors not in ('strict', 'ignore', 'warn'):
             msg = "``errors`` must be one of strict, ignore, or warn; is {}"
             raise ValueError(msg.format(errors))
+
         self.region_string = region_string
         self.errors = errors
 
@@ -89,6 +113,7 @@ class CRTFParser:
 
         # Results
         self.shapes = ShapeList()
+
         self.run()
 
     def __str__(self):
@@ -101,7 +126,7 @@ class CRTFParser:
 
     def parse_line(self, line):
         """
-        Parse one line
+        Parses a single line.
         """
 
         # Skip blanks
@@ -118,25 +143,26 @@ class CRTFParser:
             self.parse_global_meta(global_parameters.group('parameters'))
             return
 
-        # Try to parse the line
+        # Tries to check the validity of the line.
         crtf_line = regex_line.search(line)
-
         if crtf_line:
+            # Tries to parse the line.
+
+            # Finds info about the region.
             region = regex_region.search(crtf_line.group('region'))
-            type = region.group('type') or 'reg'
+            type_ = region.group('type') or 'reg'
             include = region.group('include') or '+'
             region_type = region.group('regiontype')
 
             if region_type in self.valid_definition:
-                helper = CRTFRegionParser(self.global_meta, include, type, region_type,
+                helper = CRTFRegionParser(self.global_meta, include, type_, region_type,
                                           *crtf_line.group('region', 'parameters'))
-                helper.parse()
                 self.shapes.append(helper.shape)
             else:
-                self._raise_error("Not a valid CRTF Region type '{0}'.".format(region_type))
+                self._raise_error("Not a valid CRTF Region type: '{0}'.".format(region_type))
 
         else:
-            self._raise_error("Not a valid CRTF line '{0}'.".format(line))
+            self._raise_error("Not a valid CRTF line: '{0}'.".format(line))
             return
 
     def _raise_error(self, msg):
@@ -146,12 +172,17 @@ class CRTFParser:
             raise CRTFRegionParserError(msg)
 
     def run(self):
-        """Run all steps"""
+        """
+        Run all the steps.
+        Splits the regions into line and calls ``parse_line`` for each line.
+        """
         for line in self.region_string.split('\n'):
             self.parse_line(line.lower())
 
-
     def parse_global_meta(self, global_meta_str):
+        """
+        Parses the line starting with global to extract all the valid meta key/value pair.
+        """
 
         if global_meta_str:
             global_meta_str = regex_meta.findall(global_meta_str + ',')
@@ -172,19 +203,48 @@ class CRTFParser:
                     self._raise_error('{0} is not a valid global meta key').format(val1)
 
 
-class CRTFRegionParser:
+class CRTFRegionParser(object):
+    """
+    Parse a CRTF region string
+
+    This will turn a line containing a CRTF region into a `regions.Shape` object.
+
+    Parameters
+    ----------
+    global_meta : dict
+        Global meta data of the CRTF file which is used as default meta values for regions
+    include : str {'+', '-'}
+        Flag at the beginning of the line
+    type_ : str {'reg', 'ann'}
+        Kind of the region definition
+    region_type : str
+        Region type
+    reg_str : str
+        Region string to parse
+    meta_str : str
+        Meta string to parse
+    errors : ``warn``, ``ignore``, ``strict``
+        The error handling scheme to use for handling parsing errors.
+        The default is 'strict', which will raise a ``CRTFRegionParserError``.
+        `warn`` will raise a ``CRTFRegionParserWarning``, and ``ignore`` will do nothing
+        (i.e., be silent).
+    """
 
     # List of valid coordinate system
     # TODO : There are still many reference systems to support
 
     coordinate_systems = ['j2000', 'icrs', 'galactic', 'supergal', 'image', 'ecliptic']
 
+    # Maps CASA coordinate frame to appropriate astropy coordinate frames.
     coordsys_mapping = dict(zip(coordinates.frame_transform_graph.get_names(),
                                 coordinates.frame_transform_graph.get_names()))
     coordsys_mapping['j2000'] = 'fk5'
     coordsys_mapping['supergal'] = 'supergalactic'
     coordsys_mapping['ecliptic'] = 'geocentrictrueecliptic'
 
+    # CRTF Format specifications. This define how a certain region is read.
+    # 'c' denotes a coordinates, 'l' denotes a length, 'pl' denotes a pair of lengths,
+    # 's' denotes a string(generally a text or symbol)
     language_spec = {'circle': ['c', 'l'],
                      'box': ['c', 'c'],
                      'centerbox': ['c', 'pl'],
@@ -197,7 +257,7 @@ class CRTFRegionParser:
                      'symbol': ['c', 's'],
                      'text': ['c', 's']}
 
-    def __init__(self, global_meta, include, type, region_type, reg_str, meta_str, errors='strict'):
+    def __init__(self, global_meta, include, type_, region_type, reg_str, meta_str, errors='strict'):
 
         self.global_meta = global_meta
         self.reg_str = reg_str
@@ -207,11 +267,13 @@ class CRTFRegionParser:
         self.coord = None
         self.coordsys = None
         self.coord_str = None
-        self.type = type or 'reg'
+        self.type_ = type_ or 'reg'
         self.region_type = region_type
         self.meta = copy.deepcopy(global_meta)
         self.shape = None
         self.include = include or '+'
+
+        self.parse()
 
     def _raise_error(self, msg):
         if self.errors == 'warn':
@@ -220,6 +282,9 @@ class CRTFRegionParser:
             raise CRTFRegionParserError(msg)
 
     def parse(self):
+        """
+        Starting point to parse the CRTF region string.
+        """
 
         self.convert_meta()
         self.coordsys = self.meta.get('coord', 'image')
@@ -237,7 +302,9 @@ class CRTFRegionParser:
             self.coordsys = self.coordsys_mapping[self.coordsys]
 
     def convert_coordinates(self):
-
+        """
+        Convert coordinate string to `astropy.coordinates.angles.Angle` or `astropy.units.quantity.Quantity` objects
+        """
         coord_list_str = regex_coordinate.findall(self.reg_str) + regex_length.findall(self.reg_str)
         coord_list = []
 
@@ -271,7 +338,9 @@ class CRTFRegionParser:
         self.coord = coord_list
 
     def convert_meta(self):
-
+        """
+        Parses the meta_str to python dictionary and stores in ``meta`` attribute.
+        """
         if self.meta_str:
             self.meta_str = regex_meta.findall(self.meta_str + ',')
         if self.meta_str:
@@ -305,14 +374,16 @@ class CRTFRegionParser:
 
 
 class CoordinateParser(object):
-
+    """
+    Helper class to structure coordinate parser
+    """
     @staticmethod
     def parse_coordinate(string_rep):
         """
         Parse a single coordinate
         """
-        # Any CRTF coordinate representation (sexagesimal or degrees)
 
+        # Any CRTF coordinate representation (sexagesimal or degrees)
         if 'pix' in string_rep:
             return u.Quantity(string_rep[:-3], u.dimensionless_unscaled)
         if 'h' in string_rep or 'rad' in string_rep:
@@ -326,6 +397,7 @@ class CoordinateParser(object):
         Given a string that is a number and a unit, return a
         Quantity of that string.Raise an Error If there is no unit.  e.g.:
             50" -> 50*u.arcsec
+            50 -> CRTFRegionParserError : Units must be specified for 50
         """
         unit_mapping = {
             '"': u.arcsec,
