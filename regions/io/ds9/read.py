@@ -116,7 +116,7 @@ class DS9Parser(object):
     """
     Parse a DS9 string
 
-    This class transforms a DS9 string to a `~regions.io.ds9.ShapeList`. The
+    This class transforms a DS9 string to a `~regions.io.core.ShapeList`. The
     result is stored as ``shapes`` attribute.
 
     Each line is tested for either containing a region type or a coordinate

@@ -8,11 +8,13 @@ __all__ = [
     'DS9RegionParserError',
 ]
 
+
 class DS9RegionParserWarning(AstropyUserWarning):
     """
     A generic warning class for DS9 region parsing inherited from astropy's
     warnings
     """
+
 
 class DS9RegionParserError(ValueError):
     """

@@ -38,13 +38,14 @@ class ShapeList(list):
 
 class Shape(object):
     """
-    Helper class to represent a DS9
-
+    Helper class to represent a DS9/CRTF Region.
 
     This serves as intermediate step in the parsing process.
 
     Parameters
     ---------
+    format_type : str
+        File Format type
     coordsys : str
         Coordinate system
     region_type : str
@@ -52,7 +53,7 @@ class Shape(object):
     coord : list of `~astropy.coordinates.Angle` or `~astropy.units.Quantity`
         Coordinates
     meta : dict
-        Meta attributed
+        Meta attributes
     composite : bool
         Composite region
     include : bool
@@ -102,8 +103,8 @@ class Shape(object):
 
     def __init__(self, format_type, coordsys, region_type, coord, meta, composite, include):
 
-        from . import CRTFParser, DS9Parser
-        self.parser = {'DS9': DS9Parser, 'CRTF': CRTFParser}
+        from . import CRTFRegionParser, DS9Parser
+        self.parser = {'DS9': DS9Parser, 'CRTF': CRTFRegionParser}
 
         self.format_type = format_type
         self.coordsys = coordsys
@@ -118,6 +119,10 @@ class Shape(object):
         ss += '\nFormat Type : {}'.format(self.format_type)
         ss += '\nCoord sys : {}'.format(self.coordsys)
         ss += '\nRegion type : {}'.format(self.region_type)
+        if self.region_type == 'symbol':
+            ss += '\nSymbol : {}'.format(self.meta['string'])
+        if self.region_type == 'text':
+            ss += '\nText : {}'.format(self.meta['string'])
         ss += '\nCoord: {}'.format(self.coord)
         ss += '\nMeta: {}'.format(self.meta)
         ss += '\nComposite: {}'.format(self.composite)

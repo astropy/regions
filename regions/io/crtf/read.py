@@ -11,7 +11,7 @@ from astropy import coordinates
 from .core import CRTFRegionParserError, CRTFRegionParserWarning
 from ..core import Shape, ShapeList
 
-__all__ = ['CRTFParser', 'CRTFRegionParser']
+__all__ = ['read_crtf', 'CRTFParser', 'CRTFRegionParser']
 
 # All CASA files start with '#CRTF' . It may also include the version number like '#CRTFv0' .
 regex_begin = re.compile(r'^#CRTFv?[\d]?$')
@@ -334,6 +334,12 @@ class CRTFRegionParser(object):
                     coord_list.append(CoordinateParser.parse_angular_length_quantity(y))
                 else:
                     self._raise_error('{} not in proper format'.format(self.reg_str))
+            if x == 's':
+                if isinstance(y, str):
+                    self.meta['string'] = y
+                else:
+                    self._raise_error('{} not in proper format'.format(self.reg_str))
+
 
         self.coord = coord_list
 
