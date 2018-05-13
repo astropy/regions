@@ -17,13 +17,14 @@ representing one DS9 region. The `~regions.Shape` objects can be converted to
     >>> parser = DS9Parser(reg_string)
     >>> print(parser.shapes[0])
     Shape
+    Format Type : DS9
     Coord sys : galactic
     Region type : circle
     Coord: [<Angle 42.0 deg>, <Angle 43.0 deg>, <Quantity 3.0 deg>]
     Meta: {'color': 'green'}
     Composite: False
     Include: True
-    >>> regions = parser.shapes.to_region()
+    >>> regions = parser.shapes.to_regions()
     >>> print(regions[0])
     Region: CircleSkyRegion
     center: <Galactic Coordinate: (l, b) in deg
