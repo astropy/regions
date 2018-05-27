@@ -29,7 +29,7 @@ regex_coordinate = re.compile(r'\[([\w.+-:]*?)\s*[,]\s*([\w.+-:]*?)\]')
 regex_length = re.compile(r'(?:\[[^=]*\])+[,]\s*([\w.+-]*)\]')
 
 # Extracts each 'parameter=value' pair.
-regex_meta = re.compile(r'((?:\w+\s*=\s*[^,\[\]]+)|(?:\w+\s*=\s*\[.*?\]))')
+regex_meta = re.compile(r'(?:(\w+)\s*=[\s\'\"]*([^,\[\]]+?)[\'\",]+)|(?:(\w+)\s*=\s*\[(.*?)\])')
 
 # Region format which segregates include('+'|'-') parameter, kind of definition ('ann' for annotations | '' for regions)
 # and region type.
@@ -188,14 +188,16 @@ class CRTFParser:
             global_meta_str = regex_meta.findall(global_meta_str + ',')
         if global_meta_str:
             for par in global_meta_str:
-                par = par.strip()
-                par = par.rstrip(',')
-                par = par.split('=')
-                val1 = par[0].strip()
-                val2 = par[1].strip()
+                if par[0] is not '':
+                    val1 = par[0]
+                    val2 = par[1]
+                else:
+                    val1 = par[2]
+                    val2 = par[3]
+                val1 = val1.strip()
+                val2 = val2.strip()
                 if val1 in self.valid_global_keys :
                     if val1 in ('range', 'corr', 'labeloff'):
-                        val2 = val2[1:-1]
                         val2 = val2.split(",")
                         val2 = [x.strip() for x in val2 if x]
                     self.global_meta[val1] = val2
@@ -340,7 +342,6 @@ class CRTFRegionParser(object):
                 else:
                     self._raise_error('{} not in proper format'.format(self.reg_str))
 
-
         self.coord = coord_list
 
     def convert_meta(self):
@@ -351,20 +352,22 @@ class CRTFRegionParser(object):
             self.meta_str = regex_meta.findall(self.meta_str + ',')
         if self.meta_str:
             for par in self.meta_str:
-                par = par.strip()
-                par = par.rstrip(',')
-                par = par.split("=")
-                val1 = par[0].strip()
-                val2 = par[1].strip()
+                if par[0] is not '':
+                    val1 = par[0]
+                    val2 = par[1]
+                else:
+                    val1 = par[2]
+                    val2 = par[3]
+                val1 = val1.strip()
+                val2 = val2.strip()
                 if val1 in CRTFParser.valid_global_keys or val1 == 'label':
                     if val1 in ('range', 'corr', 'labeloff'):
-                        val2 = val2[1:-1]
                         val2 = val2.split(',')
                         val2 = [x.strip() for x in val2]
                     self.meta[val1] = val2
                 else:
                     self._raise_error('{0} is not a valid meta key'.format(val1))
-        self.meta['include'] = self.include
+        self.meta['type'] = self.type_
 
     def make_shape(self):
         """
@@ -394,8 +397,10 @@ class CoordinateParser(object):
             return u.Quantity(string_rep[:-3], u.dimensionless_unscaled)
         if 'h' in string_rep or 'rad' in string_rep:
             return coordinates.Angle(string_rep)
-        else:
-            return coordinates.Angle(string_rep, u.deg)
+        if len(string_rep.split('.')) >= 3:
+            string_rep = string_rep.replace('.', ':', 2)
+
+        return coordinates.Angle(string_rep, u.deg)
 
     @staticmethod
     def parse_angular_length_quantity(string_rep):
@@ -406,6 +411,11 @@ class CoordinateParser(object):
             50 -> CRTFRegionParserError : Units must be specified for 50
         """
         unit_mapping = {
+            'deg': u.deg,
+            'rad': u.rad,
+            'arcmin': u.arcmin,
+            'arcsec': u.arcsec,
+            'pix': u.dimensionless_unscaled,
             '"': u.arcsec,
             "'": u.arcmin,
         }

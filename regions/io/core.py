@@ -117,6 +117,8 @@ class Shape(object):
     def __str__(self):
         ss = self.__class__.__name__
         ss += '\nFormat Type : {}'.format(self.format_type)
+        if self.format_type == 'CRTF':
+            ss += '\nType : {}'.format(self.meta.get('type', 'reg'))
         ss += '\nCoord sys : {}'.format(self.coordsys)
         ss += '\nRegion type : {}'.format(self.region_type)
         if self.region_type == 'symbol':
@@ -179,7 +181,7 @@ class Shape(object):
         """
         Convert to pixel coordinates, `regions.PixCoord`
         """
-        if self.region_type in ['polygon', 'line']:
+        if self.region_type in ['polygon', 'line', 'poly']:
             # have to special-case polygon in the phys coord case
             # b/c can't typecheck when iterating as in sky coord case
             coords = [PixCoord(self.coord[0::2], self.coord[1::2])]
@@ -214,7 +216,7 @@ class Shape(object):
                 reg.visual[key] = self.meta[key]
             else:
                 reg.meta[key] = self.meta[key]
-
+        reg.meta['include'] = self.include
         return reg
 
     def _raise_error(self, msg):
