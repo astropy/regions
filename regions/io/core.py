@@ -122,7 +122,7 @@ class Shape(object):
         ss += '\nCoord sys : {}'.format(self.coordsys)
         ss += '\nRegion type : {}'.format(self.region_type)
         if self.region_type == 'symbol':
-            ss += '\nSymbol : {}'.format(self.meta['string'])
+            ss += '\nSymbol : {}'.format(self.meta['symbol'])
         if self.region_type == 'text':
             ss += '\nText : {}'.format(self.meta['string'])
         ss += '\nCoord: {}'.format(self.coord)

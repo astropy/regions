@@ -26,7 +26,7 @@ regex_global = re.compile(r'^global\s+(?P<parameters>.*)?')
 regex_coordinate = re.compile(r'\[([\w.+-:]*?)\s*[,]\s*([\w.+-:]*?)\]')
 
 # Single length Format. For Ex : helps us to extract the radius of a circle.
-regex_length = re.compile(r'(?:\[[^=]*\])+[,]\s*([\w.+-]*)\]')
+regex_length = re.compile(r'(?:\[[^=]*\])+[,]\s*([\w.+-]+)\]')
 
 # Extracts each 'parameter=value' pair.
 regex_meta = re.compile(r'(?:(\w+)\s*=[\s\'\"]*([^,\[\]]+?)[\'\",]+)|(?:(\w+)\s*=\s*\[(.*?)\])')
@@ -36,7 +36,7 @@ regex_meta = re.compile(r'(?:(\w+)\s*=[\s\'\"]*([^,\[\]]+?)[\'\",]+)|(?:(\w+)\s*
 regex_region = re.compile(r'(?P<include>[+-])?(?P<type>ann(?=\s))?(?P<regiontype>[a-z]*?)\[[^=]*]')
 
 # Line format which checks the validity of the line and segregates the meta attributes from the region format.
-regex_line = re.compile(r'(?P<region>[+-]?(?:ann(?=\s))?[a-z]*?\[[^=]*\])(?:\s*[,]\s*(?P<parameters>.*))?')
+regex_line = re.compile(r'(?P<region>[+-]?(?:ann(?=\s))?[a-z]+?\[[^=]+\])(?:\s*[,]\s*(?P<parameters>.*))?')
 
 
 def read_crtf(filename, errors='strict'):
@@ -202,7 +202,7 @@ class CRTFParser:
                         val2 = [x.strip() for x in val2 if x]
                     self.global_meta[val1] = val2
                 else:
-                    self._raise_error('{0} is not a valid global meta key').format(val1)
+                    self._raise_error("'{0}' is not a valid global meta key".format(val1))
 
 
 class CRTFRegionParser(object):
@@ -259,6 +259,31 @@ class CRTFRegionParser(object):
                      'symbol': ['c', 's'],
                      'text': ['c', 's']}
 
+    # Valid symbols for symbol region
+    valid_symbols = {'.': 'point',
+                     ',': 'pixel',
+                     'o': 'circle',
+                     'v': 'triangle_down',
+                     '^': 'triangle_up',
+                     '<': 'triangle_left',
+                     '>': 'triangle_right',
+                     '1':  'tri_down',
+                     '2': 'tri_up',
+                     '3': 'tri_left',
+                     '4': 'tri_right',
+                     's': 'square',
+                     'p': 'pentagon',
+                     '*': 'star',
+                     'h': 'hexagon1',
+                     'H': 'hexagon2',
+                     '+': 'plus',
+                     'x': 'x',
+                     'D': 'diamond',
+                     'd': 'thin_diamond',
+                     '|': 'vline',
+                     '_': 'hline'
+                    }
+
     def __init__(self, global_meta, include, type_, region_type, reg_str, meta_str, errors='strict'):
 
         self.global_meta = global_meta
@@ -311,36 +336,41 @@ class CRTFRegionParser(object):
         coord_list = []
 
         if self.region_type == 'poly':
-            if len(coord_list_str) < 4 or coord_list_str[0] != coord_list_str[-1]:
-                self._raise_error('{} not in proper format'.format(self.reg_str))
+            if len(coord_list_str) < 4:
+                self._raise_error('Not in proper format: {} polygon should have > 4 coordinates'.format(self.reg_str))
+            if coord_list_str[0] != coord_list_str[-1]:
+                self._raise_error("Not in proper format: '{0}', "
+                                  "In polygon, the last and first coordinates should be same".format(self.reg_str))
         else:
             if len(coord_list_str) != len(self.language_spec[self.region_type]):
-                self._raise_error('{} not in proper format'.format(self.reg_str))
+                self._raise_error("Not in proper format: '{0}', "
+                                  "Does not contain expected number of parameters for the region '{1}'"
+                                  .format(self.reg_str, self.region_type))
 
         for x, y in zip(self.language_spec[self.region_type], coord_list_str):
 
             if x == 'c':
-                if len(y) == 2:
+                if len(y) == 2 and y[1] != '':
                     coord_list.append(CoordinateParser.parse_coordinate(y[0]))
                     coord_list.append(CoordinateParser.parse_coordinate(y[1]))
                 else:
-                    self._raise_error('{} not in proper format'.format(self.reg_str))
+                    self._raise_error("Not in proper format: {0} should be a coordinate".format(y))
             if x == 'pl':
-                if len(y) == 2:
+                if len(y) == 2 and y[1] != '':
                     coord_list.append(CoordinateParser.parse_angular_length_quantity(y[0]))
                     coord_list.append(CoordinateParser.parse_angular_length_quantity(y[1]))
                 else:
-                    self._raise_error('{} not in proper format'.format(self.reg_str))
+                    self._raise_error("Not in proper format: {0} should be a pair of length".format(y))
             if x == 'l':
                 if isinstance(y, str):
                     coord_list.append(CoordinateParser.parse_angular_length_quantity(y))
                 else:
-                    self._raise_error('{} not in proper format'.format(self.reg_str))
+                    self._raise_error("Not in proper format: {0} should be a single length".format(y))
             if x == 's':
-                if isinstance(y, str):
-                    self.meta['string'] = y
+                if y in self.valid_symbols.keys():
+                    self.meta['symbol'] = self.valid_symbols[y]
                 else:
-                    self._raise_error('{} not in proper format'.format(self.reg_str))
+                    self._raise_error("Not in proper format: '{0}' should be a symbol".format(y))
 
         self.coord = coord_list
 
@@ -366,7 +396,7 @@ class CRTFRegionParser(object):
                         val2 = [x.strip() for x in val2]
                     self.meta[val1] = val2
                 else:
-                    self._raise_error('{0} is not a valid meta key'.format(val1))
+                    self._raise_error("'{0}' is not a valid meta key".format(val1))
         self.meta['type'] = self.type_
 
     def make_shape(self):
