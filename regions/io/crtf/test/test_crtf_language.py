@@ -69,7 +69,7 @@ def test_valid_global_meta_key():
 
 def test_valid_meta_key():
     """
-    Checks whether the global key is valid or not.
+    Checks whether the key is valid or not.
     """
 
     meta_test_str = str("annulus[[17h51m03.2s, -45d17m50s], [0.10deg, 4.12deg]], hello='My label here'")

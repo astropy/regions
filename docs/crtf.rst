@@ -18,10 +18,11 @@ representing one CRTF region. The `~regions.Shape` objects can be converted to
     >>> print(parser.shapes[0])
     Shape
     Format Type : CRTF
-    Coord sys : j2000
+    Type: reg
+    Coord sys : fk5
     Region type : circle
     Coord: [<Angle 42.0 deg>, <Angle 43.0 deg>, <Quantity 3.0 deg>]
-    Meta: {'color': 'green', 'coord': 'j2000', 'include': '+'}
+    Meta: {'color': 'green', 'coord': 'j2000', 'type': 'reg'}
     Composite: False
     Include: True
 
