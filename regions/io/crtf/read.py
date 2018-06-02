@@ -9,7 +9,7 @@ from astropy import units as u
 from astropy import coordinates
 
 from .core import CRTFRegionParserError, CRTFRegionParserWarning
-from ..core import Shape, ShapeList
+from ..core import Shape, ShapeList, reg_mapping
 
 __all__ = ['read_crtf', 'CRTFParser', 'CRTFRegionParser']
 
@@ -241,6 +241,7 @@ class CRTFRegionParser(object):
     coordsys_mapping = dict(zip(coordinates.frame_transform_graph.get_names(),
                                 coordinates.frame_transform_graph.get_names()))
     coordsys_mapping['j2000'] = 'fk5'
+    coordsys_mapping['b1950'] = 'fk4'
     coordsys_mapping['supergal'] = 'supergalactic'
     coordsys_mapping['ecliptic'] = 'geocentrictrueecliptic'
 
@@ -404,7 +405,7 @@ class CRTFRegionParser(object):
         Make shape object
         """
         self.shape = Shape('CRTF', coordsys=self.coordsys,
-                           region_type=self.region_type,
+                           region_type=reg_mapping[self.region_type],
                            coord=self.coord,
                            meta=self.meta,
                            composite=False,

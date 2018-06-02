@@ -11,6 +11,8 @@ from astropy import units as u
 from astropy import coordinates
 from astropy import log
 
+from ..core import reg_mapping
+
 __all__ = [
     'read_ds9',
     'DS9Parser',
@@ -461,7 +463,7 @@ class DS9RegionParser(object):
         Make shape object
         """
         self.shape = Shape("DS9", coordsys=self.coordsys,
-                           region_type=self.region_type,
+                           region_type=reg_mapping['DS9'][self.region_type],
                            coord=self.coord,
                            meta=self.meta,
                            composite=self.composite,
