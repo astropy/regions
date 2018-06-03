@@ -108,19 +108,19 @@ class ShapeList(list):
         """
 
         ds9_strings = {
-            'circle': 'circle({1:FMT},{2:FMT},{3:FMT}RAD)',
-            'annulus': 'annulus({1:FMT},{2:FMT},{3:FMT}RAD,{4:FMT}RAD)',
-            'ellipse': 'ellipse({1:FMT},{2:FMT},{3:FMT}RAD,{4:FMT}RAD,{5:FMT})',
-            'rectangle': 'box({1:FMT},{2:FMT},{3:FMT}RAD,{4:FMT}RAD,{5:FMT})',
-            'polygon': 'polygon({1})',
-            'point': 'point({1:FMT},{2:FMT})',
-            'line': 'line({1:FMT},{2:FMT},{3:FMT},{4:FMT})',
-        }
+            'circle': '{0}circle({1:FMT},{2:FMT},{3:FMT}RAD)',
+            'annulus': '{0}annulus({1:FMT},{2:FMT},{3:FMT}RAD,{4:FMT}RAD)',
+            'ellipse': '{0}ellipse({1:FMT},{2:FMT},{3:FMT}RAD,{4:FMT}RAD,{5:FMT})',
+            'rectangle': '{0}box({1:FMT},{2:FMT},{3:FMT}RAD,{4:FMT}RAD,{5:FMT})',
+            'polygon': '{0}polygon({1})',
+            'point': '{0}point({1:FMT},{2:FMT})',
+            'line': '{0}line({1:FMT},{2:FMT},{3:FMT},{4:FMT})'
+                      }
 
         output = '# Region file format: DS9 astropy/regions\n'
 
-        # what's this for?
         if radunit == 'arcsec':
+            # what's this for?
             if coordsys in coordsys_mapping['DS9'].values():
                 radunitstr = '"'
             else:
@@ -130,30 +130,26 @@ class ShapeList(list):
 
         for key, val in ds9_strings.items():
             ds9_strings[key] = val.replace("FMT", fmt).replace("RAD", radunitstr)
-        for key in ds9_strings:
-            # include must be a prefix "-" or ""
-            ds9_strings[key] = "{0}" + ds9_strings[key]
 
         output += '{}\n'.format(coordsys)
 
-        for reg in self:
+        for shape in self:
 
-            # default if unspecified is that include is True, which means we
-            # pretend nothing
-            include = "-" if reg.meta.get('include') in (False, '-') else ""
+            # default : if unspecified, include is True, which means we pretend nothing
+            include = "-" if shape.meta.get('include') in (False, '-') else ""
 
             meta_str = " ".join("{0}={1}".format(key, val) for key, val in
-                                reg.meta.items() if key not in ('include', 'tag', 'comment'))
-            if 'tag' in reg.meta:
+                                shape.meta.items() if key not in ('include', 'tag', 'comment'))
+            if 'tag' in shape.meta:
                 meta_str += " " + " ".join(["tag={0}".format(tag)
-                                                for tag in reg.meta['tag']])
-            if 'comment' in reg.meta:
-                meta_str += " " + reg.meta['comment']
+                                                for tag in shape.meta['tag']])
+            if 'comment' in shape.meta:
+                meta_str += " " + shape.meta['comment']
 
             coord = []
 
             if coordsys not in ['image', 'physical'] :
-                for val in reg.coord:
+                for val in shape.coord:
                     if isinstance(val, Angle):
                         coord.append(float(val.value))
                     else:
@@ -161,22 +157,22 @@ class ShapeList(list):
                             coord.append(float(val.value))
                         else:
                             coord.append(float(val.to(radunit).value))
-                if reg.region_type in ['ellipse', 'rectangle']:
-                    coord[-1] = float(reg.coord[-1].to('deg').value)
+                if shape.region_type in ['ellipse', 'rectangle']:
+                    coord[-1] = float(shape.coord[-1].to('deg').value)
             else:
-                for val in reg.coord:
+                for val in shape.coord:
                     if isinstance(val, u.Quantity):
                         coord.append(float(val.value))
                     else:
                         coord.append(float(val))
 
-            if reg.region_type == 'polygon':
+            if shape.region_type == 'polygon':
                 val = "{0:" + fmt + "}"
                 temp = [val.format(x) for x in coord]
                 coord = ",".join(temp)
                 line = ds9_strings['polygon'].format(include, coord)
             else:
-                line = ds9_strings[reg.region_type].format(include, *coord)
+                line = ds9_strings[shape.region_type].format(include, *coord)
 
             if meta_str.strip():
                 output += "{0} # {1} \n".format(line, meta_str)
@@ -412,8 +408,8 @@ def to_shape_list(region_list, format_type='DS9', coordinate_system='fk5'):
     for region in region_list:
 
         coord = []
-
         reg_type = str((type(region))).split(".")[2]
+
         for val in regions_attributes[reg_type]:
             coord.append(getattr(region, val))
 
@@ -440,6 +436,7 @@ def to_shape_list(region_list, format_type='DS9', coordinate_system='fk5'):
 
         meta = copy.deepcopy(region.meta)
         meta.update(region.visual)
+
         shape_list.append(Shape(format_type, coordsys, reg_type, new_coord, meta, False,
                                 region.meta.get('include', False)))
 
