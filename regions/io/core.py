@@ -38,7 +38,7 @@ reg_mapping['CRTF']['poly'] = 'polygon'
 valid_coordsys = {'DS9': ['image', 'physical', 'fk4', 'b1950', 'fk5', 'j2000', 'icrs', 'galactic',
                           'geocentrictrueecliptic', 'wcs'],
                   'CRTF': ['image','j2000', 'b1950', 'galactic', 'geocentrictrueecliptic', 'supergalactic', 'icrs']
-                   }
+                  }
 valid_coordsys['DS9'] += ['wcs{}'.format(x) for x in string.ascii_lowercase]
 
 # Maps astropy's coordinate frame names with their respective name in the file format.
@@ -80,13 +80,10 @@ class ShapeList(list):
 
     def to_ds9(self, coordsys='fk5', fmt='.6f', radunit='deg'):
         """
-        Convert list of Shape objects to ds9 region strings.
+        Convert list of ``regions.Shape`` objects to ds9 region strings.
 
         Parameters
         ----------
-        regions : list
-             List of `regions.Region` objects
-
         coordsys : str
             This overrides the coordinate system frame for all regions.
 
@@ -141,14 +138,13 @@ class ShapeList(list):
             meta_str = " ".join("{0}={1}".format(key, val) for key, val in
                                 shape.meta.items() if key not in ('include', 'tag', 'comment'))
             if 'tag' in shape.meta:
-                meta_str += " " + " ".join(["tag={0}".format(tag)
-                                                for tag in shape.meta['tag']])
+                meta_str += " " + " ".join(["tag={0}".format(tag) for tag in shape.meta['tag']])
             if 'comment' in shape.meta:
                 meta_str += " " + shape.meta['comment']
 
             coord = []
 
-            if coordsys not in ['image', 'physical'] :
+            if coordsys not in ['image', 'physical']:
                 for val in shape.coord:
                     if isinstance(val, Angle):
                         coord.append(float(val.value))
@@ -311,9 +307,8 @@ class Shape(object):
         """
         parsed_angles = [(x, y)
                          for x, y in zip(self.coord[:-1:2], self.coord[1::2])
-                         if (isinstance(x, coordinates.Angle) and
-                             isinstance(y, coordinates.Angle))
-                        ]
+                         if (isinstance(x, coordinates.Angle) and isinstance(y, coordinates.Angle))
+                         ]
         frame = coordinates.frame_transform_graph.lookup_name(self.coordsys)
 
         lon, lat = zip(*parsed_angles)
@@ -348,7 +343,7 @@ class Shape(object):
 
     def to_region(self):
         """
-        Convert to region object
+        Convert to region, ``regions.Region`` object
         """
 
         coords = self.convert_coords()
