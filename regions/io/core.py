@@ -8,15 +8,15 @@ import string
 
 from astropy import units as u
 from astropy import coordinates
-from astropy.coordinates import BaseCoordinateFrame, SkyCoord, Angle
+from astropy.coordinates import BaseCoordinateFrame, Angle
 from astropy import log
-
-__all__ = ['ShapeList', 'Shape', 'to_shape_list']
 
 from .. import shapes
 from ..core import PixCoord, SkyRegion
 from .ds9.core import DS9RegionParserWarning, DS9RegionParserError
 from .crtf.core import CRTFRegionParserWarning, CRTFRegionParserError
+
+__all__ = ['ShapeList', 'Shape', 'to_shape_list']
 
 regions_attributes = dict(circle=['center', 'radius'],
                           ellipse=['center', 'width', 'height', 'angle'],
@@ -38,7 +38,7 @@ reg_mapping['CRTF']['poly'] = 'polygon'
 valid_coordsys = {'DS9': ['image', 'physical', 'fk4', 'b1950', 'fk5', 'j2000', 'icrs', 'galactic',
                           'geocentrictrueecliptic', 'wcs'],
                   'CRTF': ['image','j2000', 'b1950', 'galactic', 'geocentrictrueecliptic', 'supergalactic', 'icrs']
-                 }
+                   }
 valid_coordsys['DS9'] += ['wcs{}'.format(x) for x in string.ascii_lowercase]
 
 # Maps astropy's coordinate frame names with their respective name in the file format.
@@ -78,28 +78,33 @@ class ShapeList(list):
     def to_crtf(self):
         pass
 
-    def to_ds9(self, fmt='.6f', radunit='deg', coordsys='fk5'):
+    def to_ds9(self, coordsys='fk5', fmt='.6f', radunit='deg'):
         """
-            Convert list of regions to ds9 region strings.
+        Convert list of Shape objects to ds9 region strings.
 
-            Parameters
-            ----------
-            fmt : str
-                A python string format defining the output precision.  Default is .6f,
-                which is accurate to 0.0036 arcseconds.
+        Parameters
+        ----------
+        regions : list
+             List of `regions.Region` objects
 
-            radunit : str
+        coordsys : str
+            This overrides the coordinate system frame for all regions.
 
-            coordsys : str
+        fmt : str
+            A python string format defining the output precision.  Default is .6f,
+            which is accurate to 0.0036 arcseconds.
 
-            Returns
-            -------
-            region_string : str
-                ds9 region string
+        radunit : str
+            This denotes the unit of the radius.
 
-            Examples
-            --------
-            TODO
+        Returns
+        -------
+        region_string : str
+            ds9 region string
+
+        Examples
+        --------
+        TODO
         """
 
         ds9_strings = {
