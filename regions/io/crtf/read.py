@@ -67,7 +67,7 @@ def read_crtf(filename, errors='strict'):
             raise CRTFRegionParserError('Every CRTF Region must start with "#CRTF" ')
 
 
-class CRTFParser:
+class CRTFParser(object):
     """
     Parses a CRTF string.
 
