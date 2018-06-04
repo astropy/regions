@@ -36,6 +36,7 @@ User guide
    masks
    plotting
    ds9
+   crtf
    shapely
 
 Advanced
