@@ -1,18 +1,13 @@
-import os
-import distutils.version as vers
 
-from numpy.testing import assert_allclose
+import distutils.version as vers
 import pytest
 
-from astropy.utils.data import get_pkg_data_filename, get_pkg_data_filenames
-import astropy.version as astrov
-from astropy.coordinates import Angle, SkyCoord
-from astropy.tests.helper import catch_warnings
-from astropy.utils.exceptions import AstropyUserWarning
 
-from ....shapes.circle import CircleSkyRegion
-from ..read import read_crtf, CRTFParser
-from ..core import CRTFRegionParserWarning, CRTFRegionParserError
+import astropy.version as astrov
+
+
+from ..read import CRTFParser
+from ..core import CRTFRegionParserError
 
 _ASTROPY_MINVERSION = vers.LooseVersion('1.1')
 _ASTROPY_VERSION = vers.LooseVersion(astrov.version)
