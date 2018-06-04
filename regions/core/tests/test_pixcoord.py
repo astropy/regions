@@ -21,13 +21,22 @@ def wcs():
     return dataset.wcs
 
 
+def test_pixcoord_basic_dimension():
+    with pytest.raises(ValueError):
+        PixCoord(np.array([1, 2]), [3, 4, 5, 6])
+
+
 def test_pixcoord_basics_scalar():
     p = PixCoord(x=1, y=2)
+    p1 = PixCoord(x=np.array(1), y=2)
+    p2 = PixCoord(x=np.array(1), y=np.array(2))
 
     assert p.x == 1
     assert p.y == 2
 
-    assert p.isscalar is True
+    assert p.isscalar
+    assert p1.isscalar
+    assert p2.isscalar
 
     assert str(p) == 'PixCoord(x=1, y=2)'
     assert repr(p) == 'PixCoord(x=1, y=2)'
@@ -41,16 +50,25 @@ def test_pixcoord_basics_scalar():
 
 def test_pixcoord_basics_array_1d():
     p = PixCoord(x=[1, 2, 3], y=[11, 22, 33])
+    p1 = PixCoord(x=1, y=[1, 2, 3])
 
     assert_equal(p.x, [1, 2, 3])
     assert_equal(p.y, [11, 22, 33])
 
-    assert p.isscalar is False
+    assert_equal(p1.x, [1, 1, 1])
+    assert_equal(p1.y, [1, 2, 3])
+
+    assert not p.isscalar
+    assert not p1.isscalar
 
     assert str(p) == 'PixCoord(x=[1 2 3], y=[11 22 33])'
+    assert str(p1) == 'PixCoord(x=[1 1 1], y=[1 2 3])'
+
     assert repr(p) == 'PixCoord(x=[1 2 3], y=[11 22 33])'
+    assert repr(p1) == 'PixCoord(x=[1 1 1], y=[1 2 3])'
 
     assert len(p) == 3
+    assert len(p1) == 3
 
     # Test `__iter__` via assertions on the last element
     p2 = [_ for _ in p][-1]
@@ -101,9 +119,7 @@ def test_pixcoord_to_sky_scalar(wcs):
     assert_allclose(s.data.lat.deg, 10.003028030623508)
 
     p2 = PixCoord.from_sky(skycoord=s, wcs=wcs)
-    assert isinstance(p2.x, np.ndarray)
-    assert p2.x.shape == tuple()
-    assert p2.x.ndim == 0
+    assert isinstance(p2.x, float)
     assert p2.isscalar
     assert_allclose(p2.x, p.x)
     assert_allclose(p2.y, p.y)

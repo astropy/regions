@@ -5,42 +5,38 @@ import itertools
 import re
 import copy
 from collections import OrderedDict
+from warnings import warn
+
 from astropy import units as u
 from astropy import coordinates
 from astropy import log
-from astropy.utils.exceptions import AstropyUserWarning
-from warnings import warn
-from .core import (
-    Shape,
-    ShapeList,
-    DS9RegionParserWarning,
-    DS9RegionParserError,
-)
 
 __all__ = [
     'read_ds9',
     'DS9Parser',
     'DS9RegionParser',
-    'CoordinateParser',
+    'CoordinateParser'
 ]
 
+from ..core import Shape, ShapeList
+from .core import DS9RegionParserError, DS9RegionParserWarning
 
+# Regular expression to extract region type or coodinate system
 regex_global = re.compile("^#? *(-?)([a-zA-Z0-9]+)")
-"""Regular expression to extract region type or coodinate system"""
 
-regex_meta = re.compile("([a-zA-Z]+)(=)([^= ]+) ?")
-"""Regular expression to extract meta attributes"""
+# Regular expression to extract meta attributes
+regex_meta = re.compile("([a-zA-Z]+)(=)({.*?}|\".*?\"|[0-9 ]+ ?|[^= ]+) ?")
 
+# Regular expression to strip parenthesis
 regex_paren = re.compile("[()]")
-"""Regular expression to strip parenthesis"""
 
+# Regular expression to split coordinate strings
 regex_splitter = re.compile("[, ]")
-"""Regular expression to split coordinate strings"""
-
 
 
 def read_ds9(filename, errors='strict'):
-    """Read a ds9 region file in as a list of region objects.
+    """
+    Read a ds9 region file in as a list of region objects.
 
     Parameters
     ----------
@@ -61,12 +57,13 @@ def read_ds9(filename, errors='strict'):
         region_string = fh.read()
 
     parser = DS9Parser(region_string, errors=errors)
-    parser.run()
-    return parser.shapes.to_region()
+    return parser.shapes.to_regions()
 
 
 class CoordinateParser(object):
-    """Helper class to structure coordinate parser"""
+    """
+    Helper class to structure coordinate parser
+    """
     @staticmethod
     def parse_coordinate(string_rep, unit):
         """
@@ -116,9 +113,10 @@ class CoordinateParser(object):
 
 
 class DS9Parser(object):
-    """Parse a DS9 string
+    """
+    Parse a DS9 string
 
-    This class transforms a DS9 string to a `~regions.io.ds9.ShapeList`. The
+    This class transforms a DS9 string to a `~regions.io.core.ShapeList`. The
     result is stored as ``shapes`` attribute.
 
     Each line is tested for either containing a region type or a coordinate
@@ -137,13 +135,17 @@ class DS9Parser(object):
       ``warn`` will raise a warning, and ``ignore`` will do nothing
       (i.e., be silent).
     """
-    coordinate_systems = ['fk5', 'fk4', 'icrs', 'galactic', 'wcs', 'physical', 'image', 'ecliptic']
+
+    # List of valid coordinate system
+    coordinate_systems = ['fk5', 'fk4', 'icrs', 'galactic', 'wcs', 'physical', 'image', 'ecliptic', 'J2000']
     coordinate_systems += ['wcs{0}'.format(letter) for letter in string.ascii_lowercase]
-    """List of valid coordinate systems"""
+
+    # Map to convert coordinate system names
     coordsys_mapping = dict(zip(coordinates.frame_transform_graph.get_names(),
                                 coordinates.frame_transform_graph.get_names()))
     coordsys_mapping['ecliptic'] = 'geocentrictrueecliptic'
-    """Map to convert coordinate system names"""
+    coordsys_mapping['J2000'] = 'fk5'
+
 
     def __init__(self, region_string, errors='strict'):
         if errors not in ('strict', 'ignore', 'warn'):
@@ -159,6 +161,8 @@ class DS9Parser(object):
         # Results
         self.shapes = ShapeList()
 
+        self.run()
+
     def __str__(self):
         ss = self.__class__.__name__
         ss += '\nErrors: {}'.format(self.errors)
@@ -169,7 +173,8 @@ class DS9Parser(object):
         return ss
 
     def set_coordsys(self, coordsys):
-        """Transform coordinate system
+        """
+        Transform coordinate system
 
         # TODO: needs expert attention
         """
@@ -179,15 +184,20 @@ class DS9Parser(object):
             self.coordsys = coordsys
 
     def run(self):
-        """Run all steps"""
+        """
+        Run all steps
+        """
         for line_ in self.region_string.split('\n'):
             for line in line_.split(";"):
                 self.parse_line(line)
                 log.debug('Global state: {}'.format(self))
 
     def parse_line(self, line):
-        """Parse one line"""
+        """
+        Parse one line
+        """
         log.debug('Parsing {}'.format(line))
+
         # Skip blanks
         if line == '':
             return
@@ -199,6 +209,11 @@ class DS9Parser(object):
         # Special case / header: parse global parameters into metadata
         if line.lstrip()[:6] == 'global':
             self.global_meta = self.parse_meta(line)
+            # global_meta can specify "include=1"; never seen other options
+            # used but presumably =0 means false
+            self.global_meta['include'] = (False if
+                                           self.global_meta.get('include') in
+                                           ('0', 'False', False) else True)
             return
 
         # Try to parse the line
@@ -231,7 +246,8 @@ class DS9Parser(object):
 
     @staticmethod
     def parse_meta(meta_str):
-        """Parse the metadata for a single ds9 region string.
+        """
+        Parse the metadata for a single ds9 region string.
 
         Parameters
         ----------
@@ -246,18 +262,31 @@ class DS9Parser(object):
         meta : `~collections.OrderedDict`
             Dictionary containing the meta data
         """
-        regex_meta_split = [x for x in regex_meta.split(meta_str.strip()) if x]
-        equals_inds = [i for i, x in enumerate(regex_meta_split) if x == '=']
+        keys_vals = [(x,y) for x,_,y in regex_meta.findall(meta_str.strip())]
+        extra_text = regex_meta.split(meta_str.strip())[-1]
         result = OrderedDict()
-        for ii, jj in zip(equals_inds, equals_inds[1:] + [None]):
-            key = regex_meta_split[ii - 1]
-            val = " ".join(regex_meta_split[ii + 1:jj - 1 if jj is not None else None])
-            result[key] = val
+        for key, val in keys_vals:
+            # regex can include trailing whitespace; remove it
+            val = val.strip()
+            if key in result:
+                if key == 'tag':
+                    result[key].append(val)
+                else:
+                    raise ValueError("Duplicate key {0} found".format(key))
+            else:
+                if key == 'tag':
+                    result[key] = [val]
+                else:
+                    result[key] = val
+        if extra_text:
+            result['comment'] = extra_text
 
         return result
 
     def parse_region(self, include, region_type, region_end, line):
-        """Extract a Shape from a region string"""
+        """
+        Extract a Shape from a region string
+        """
         if self.coordsys is None:
             raise DS9RegionParserError("No coordinate system specified and a"
                                        " region has been found.")
@@ -282,7 +311,8 @@ coordinate = CoordinateParser.parse_coordinate
 
 
 class DS9RegionParser(object):
-    """Parse a DS9 region string
+    """
+    Parse a DS9 region string
 
     This will turn a line containing a DS9 region into a Shape
 
@@ -302,6 +332,8 @@ class DS9RegionParser(object):
     line : str
         Line to parse
     """
+
+    # Coordinate unit transformations
     coordinate_units = {'fk5': ('hour_or_deg', u.deg),
                         'fk4': ('hour_or_deg', u.deg),
                         'icrs': ('hour_or_deg', u.deg),
@@ -311,10 +343,10 @@ class DS9RegionParser(object):
                         'image': (u.dimensionless_unscaled, u.dimensionless_unscaled),
                         'wcs': (u.dimensionless_unscaled, u.dimensionless_unscaled),
                         }
-    """Coordinate unit transformations"""
     for letter in string.ascii_lowercase:
         coordinate_units['wcs{0}'.format(letter)] = (u.dimensionless_unscaled, u.dimensionless_unscaled)
 
+    # DS9 language specification. This defines how a certain region is read.
     language_spec = {'point': (coordinate, coordinate),
                      'circle': (coordinate, coordinate, radius),
                      # This is a special case to deal with n elliptical annuli
@@ -326,7 +358,6 @@ class DS9RegionParser(object):
                      'annulus': itertools.chain((coordinate, coordinate),
                                                 itertools.cycle((radius,))),
                     }
-    """DS9 language specification. This defines how a certain region is read"""
 
     def __init__(self, coordsys, include, region_type, region_end, global_meta, line):
 
@@ -355,7 +386,9 @@ class DS9RegionParser(object):
         return ss
 
     def parse(self):
-        """Convert line to shape object"""
+        """
+        Convert line to shape object
+        """
         log.debug(self)
 
         self.parse_composite()
@@ -366,19 +399,30 @@ class DS9RegionParser(object):
         log.debug(self)
 
     def parse_composite(self):
-        """Determine whether the region is composite"""
+        """
+        Determine whether the region is composite
+        """
         self.composite = "||" in self.line
 
     def split_line(self):
-        """Split line into coordinates and meta string"""
+        """
+        Split line into coordinates and meta string
+        """
         # coordinate of the # symbol or end of the line (-1) if not found
         hash_or_end = self.line.find("#")
         temp = self.line[self.region_end:hash_or_end].strip(" |")
         self.coord_str = regex_paren.sub("", temp)
-        self.meta_str = self.line[hash_or_end:]
+
+        # don't want any meta_str if there is no metadata found
+        if hash_or_end >= 0:
+            self.meta_str = self.line[hash_or_end:]
+        else:
+            self.meta_str = ""
 
     def convert_coordinates(self):
-        """Convert coordinate string to objects"""
+        """
+        Convert coordinate string to objects
+        """
         coord_list = []
         # strip out "null" elements, i.e. ''.  It might be possible to eliminate
         # these some other way, i.e. with regex directly, but I don't know how.
@@ -405,14 +449,22 @@ class DS9RegionParser(object):
         self.coord = coord_list
 
     def convert_meta(self):
-        """Convert meta string to dict"""
+        """
+        Convert meta string to dict
+        """
         meta_ = DS9Parser.parse_meta(self.meta_str)
         self.meta = copy.deepcopy(self.global_meta)
         self.meta.update(meta_)
+        # the 'include' is not part of the metadata string;
+        # it is pre-parsed as part of the shape type and should always
+        # override the global one
+        self.meta['include'] = self.include
 
     def make_shape(self):
-        """Make shape object"""
-        self.shape = Shape(coordsys=self.coordsys,
+        """
+        Make shape object
+        """
+        self.shape = Shape("DS9", coordsys=self.coordsys,
                            region_type=self.region_type,
                            coord=self.coord,
                            meta=self.meta,

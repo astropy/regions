@@ -2,7 +2,6 @@ language: python
 
 python:
     - 2.7
-    - 3.4
     - 3.5
     - 3.6
 
@@ -57,8 +56,6 @@ matrix:
 
 
         # Try Astropy development version
-        - python: 2.7
-          env: ASTROPY_VERSION=development
         - python: 3.6
           env: ASTROPY_VERSION=development
                CONDA_CHANNELS='conda-forge astropy'

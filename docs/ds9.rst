@@ -15,21 +15,21 @@ representing one DS9 region. The `~regions.Shape` objects can be converted to
     >>> from regions import DS9Parser
     >>> reg_string = 'galactic\ncircle(42,43,3) # color=green'
     >>> parser = DS9Parser(reg_string)
-    >>> parser.run()
     >>> print(parser.shapes[0])
     Shape
+    Format Type : DS9
     Coord sys : galactic
     Region type : circle
     Coord: [<Angle 42.0 deg>, <Angle 43.0 deg>, <Quantity 3.0 deg>]
-    Meta: {'color': 'green'}
+    Meta: {'color': 'green', 'include': ''}
     Composite: False
     Include: True
-    >>> regions = parser.shapes.to_region()
+    >>> regions = parser.shapes.to_regions()
     >>> print(regions[0])
     Region: CircleSkyRegion
     center: <Galactic Coordinate: (l, b) in deg
-        [( 42.,  43.)]>
-        radius: 3.0 deg
+        ( 42.,  43.)>
+    radius: 3.0 deg
 
 Serialisation is done using the `~regions.ds9_objects_to_string` function
 
@@ -59,3 +59,14 @@ read from a file in addition to doing the region serialisation and parsing.
      center: <FK5 Coordinate (equinox=J2000.000): (ra, dec) in deg
          (245.3477, 24.4291)>
      radius: 3.0 deg]
+
+The ``visual`` metadata includes items used for display, e.g.::
+
+    >>> r.visual
+    {'color': 'green',
+     'font': '"helvetica 10 normal roman" ',
+     'point': 'x',
+     'width': '1'}
+
+Some of these keyword may eventually be used by the plotting utilities and
+standardized, but they are not as of v0.3.

@@ -2,6 +2,7 @@
 from distutils.version import LooseVersion
 
 import astropy
+import numpy
 
 ASTROPY_LT_13 = LooseVersion(astropy.__version__) < LooseVersion('1.3')
 

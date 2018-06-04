@@ -33,23 +33,13 @@ class PixCoord(object):
     """
 
     def __init__(self, x, y):
-        self.x = self._standardize_coordinate(x)
-        self.y = self._standardize_coordinate(y)
 
-    @staticmethod
-    def _standardize_coordinate(val):
-        """Standardize coordinate.
+        x, y = np.broadcast_arrays(x, y)
 
-        Output should be either:
-        * Scalar Python number
-        * Numpy array
-
-        That's it, nothing else allowed!
-        """
-        if isinstance(val, numbers.Number):
-            return val
+        if x.shape == ():
+            self.x, self.y = np.asscalar(x), np.asscalar(y)
         else:
-            return np.array(val)
+            self.x, self.y = x, y
 
     @staticmethod
     def _validate(val, name, expected='any'):
@@ -90,13 +80,7 @@ class PixCoord(object):
 
     @property
     def isscalar(self):
-        """Is this pixcoord a scalar? (a bool property)"""
-        # TODO: what's the best solution to implement this?
-        # Maybe we should sub-class ShapedLikeNDArray?
-        # See https://github.com/astropy/regions/issues/108
-        # This is a temp solution that matches the bahaviour of SkyCoord
-        return np.asanyarray(self.x).shape == ()
-        # return np.isscalar(self.x) and np.isscalar(self.y)
+        return np.isscalar(self.x)
 
     def __repr__(self):
         data = dict(name=self.__class__.__name__, x=self.x, y=self.y)

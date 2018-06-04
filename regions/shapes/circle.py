@@ -39,7 +39,11 @@ class CirclePixelRegion(PixelRegion):
 
     def contains(self, pixcoord):
         pixcoord = PixCoord._validate(pixcoord, name='pixcoord')
-        return self.center.separation(pixcoord) < self.radius
+        in_circle = self.center.separation(pixcoord) < self.radius
+        if self.meta.get('inverted', False):
+            return not in_circle
+        else:
+            return in_circle
 
     def to_shapely(self):
         return self.center.to_shapely().buffer(self.radius)
@@ -112,8 +116,10 @@ class CircleSkyRegion(SkyRegion):
     """
 
     def __init__(self, center, radius, meta=None, visual=None):
-        # TODO: test that center is a 0D SkyCoord
-        self.center = center
+        if center.isscalar:
+            self.center = center
+        else:
+            raise ValueError('the centre should be a 0D SkyCoord object')
         self.radius = radius
         self.meta = meta or {}
         self.visual = visual or {}
@@ -121,7 +127,5 @@ class CircleSkyRegion(SkyRegion):
 
     def to_pixel(self, wcs):
         center, scale, _ = skycoord_to_pixel_scale_angle(self.center, wcs)
-        # FIXME: The following line is needed to get a scalar PixCoord
-        center = PixCoord(float(center.x), float(center.y))
         radius = self.radius.to('deg').value * scale
-        return CirclePixelRegion(center, radius)
+        return CirclePixelRegion(center, radius, self.meta, self.visual)
