@@ -6,7 +6,7 @@ from astropy.wcs.utils import pixel_to_skycoord, skycoord_to_pixel
 
 from ..core import PixCoord, PixelRegion, SkyRegion, BoundingBox
 
-__all__ = ['PointPixelRegion', 'PointSkyRegion']
+__all__ = ['PointPixelRegion', 'PointSkyRegion', 'TextSkyRegion', 'TextPixelRegion']
 
 
 class PointPixelRegion(PixelRegion):
@@ -20,8 +20,7 @@ class PointPixelRegion(PixelRegion):
     """
 
     def __init__(self, center, meta=None, visual=None):
-        # TODO: test that center is a 0D PixCoord
-        self.center = center
+        self.center = PixCoord._validate(center, name='center', expected='scalar')
         self.meta = meta or {}
         self.visual = visual or {}
         self._repr_params = None
@@ -69,13 +68,15 @@ class PointSkyRegion(SkyRegion):
     """
 
     def __init__(self, center, meta=None, visual=None):
-        # TODO: test that center is a 0D SkyCoord
-        self.center = center
+        if center.isscalar:
+            self.center = center
+        else:
+            raise ValueError('the centre should be a 0D SkyCoord object')
         self.meta = meta or {}
         self.visual = visual or {}
         self._repr_params = None
 
-    def contains(self, skycoord):
+    def contains(self, skycoord, wcs):
         return False
 
     def to_pixel(self, wcs):
@@ -100,6 +101,10 @@ class TextPixelRegion(PointPixelRegion):
         self.text = text
         super().__init__(center, meta, visual)
         self._repr_params = ['Text', self.text]
+
+    def to_sky(self, wcs):
+        center = pixel_to_skycoord(self.center.x, self.center.y, wcs=wcs)
+        return TextSkyRegion(center, self.text)
 
     def as_patch(self, **kwargs):
         raise NotImplementedError
