@@ -398,18 +398,23 @@ class CRTFRegionParser(object):
                     self.meta[val1] = val2
                 else:
                     self._raise_error("'{0}' is not a valid meta key".format(val1))
-        self.meta['type'] = self.type_
+
+        self.meta['include'] = self.include != '-'
+        self.include = self.meta['include']
+
+        # Not needed now. May be in the future.
+        # self.meta['type'] = self.type_
 
     def make_shape(self):
         """
         Make shape object
         """
         self.shape = Shape('CRTF', coordsys=self.coordsys,
-                           region_type=reg_mapping[self.region_type],
+                           region_type=reg_mapping['CRTF'][self.region_type],
                            coord=self.coord,
                            meta=self.meta,
                            composite=False,
-                           include=self.include != '-',
+                           include=self.include
                            )
 
 
