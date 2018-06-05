@@ -363,7 +363,7 @@ class CRTFRegionParser(object):
                 else:
                     self._raise_error("Not in proper format: {0} should be a pair of length".format(y))
             if x == 'l':
-                if isinstance(y, str):
+                if 'str' in str(type(y)) or 'unicode' in str(type(y)):
                     coord_list.append(CoordinateParser.parse_angular_length_quantity(y))
                 else:
                     self._raise_error("Not in proper format: {0} should be a single length".format(y))
