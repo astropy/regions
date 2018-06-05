@@ -456,6 +456,7 @@ class DS9RegionParser(object):
         # the 'include' is not part of the metadata string;
         # it is pre-parsed as part of the shape type and should always
         # override the global one
+        self.include = self.meta.get('include', True) if self.include == '' else self.include != '-'
         self.meta['include'] = self.include
 
     def make_shape(self):
@@ -467,5 +468,5 @@ class DS9RegionParser(object):
                            coord=self.coord,
                            meta=self.meta,
                            composite=self.composite,
-                           include=self.include != '-',
+                           include=self.include,
                           )
