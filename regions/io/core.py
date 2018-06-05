@@ -35,9 +35,9 @@ reg_mapping['CRTF']['poly'] = 'polygon'
 
 
 # valid astropy coordinate frames in their respective formats.
-valid_coordsys = {'DS9': ['image', 'physical', 'fk4', 'b1950', 'fk5', 'j2000', 'icrs', 'galactic',
+valid_coordsys = {'DS9': ['image', 'physical', 'fk4', 'fk5', 'icrs', 'galactic',
                           'geocentrictrueecliptic', 'wcs'],
-                  'CRTF': ['image','j2000', 'b1950', 'galactic', 'geocentrictrueecliptic', 'supergalactic', 'icrs']
+                  'CRTF': ['image', 'fk5', 'fk4', 'galactic', 'geocentrictrueecliptic', 'supergalactic', 'icrs']
                   }
 valid_coordsys['DS9'] += ['wcs{}'.format(x) for x in string.ascii_lowercase]
 
@@ -403,7 +403,7 @@ def to_shape_list(region_list, format_type='DS9', coordinate_system='fk5'):
     for region in region_list:
 
         coord = []
-        reg_type = str((type(region))).split(".")[2]
+        reg_type = str(type(region)).split(".")[2]
 
         for val in regions_attributes[reg_type]:
             coord.append(getattr(region, val))
