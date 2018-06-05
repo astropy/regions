@@ -2,6 +2,8 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import pytest
+
 from astropy.tests.helper import assert_quantity_allclose
 
 from .. import DS9Parser, CRTFParser, to_shape_list
@@ -42,3 +44,26 @@ def test_shape_crtf():
         assert_quantity_allclose(x.to('deg'), y.to('deg'))
     assert dict(shape1.meta) == dict(shape2.meta)
     assert shape1.composite == shape2.composite
+
+
+def test_valid_shape():
+
+    reg_str = "circle[[18h12m24s, -23d11m00s], 2.3arcsec], linewidth=2, coord=J2000, symsize=2"
+
+    shape = CRTFParser(reg_str).shapes[0]
+    with pytest.raises(ValueError) as err:
+        shape.format_type = 'CAIO'
+
+    assert "CAIO is not available as io" in str(err)
+
+    shape = CRTFParser(reg_str).shapes[0]
+    with pytest.raises(ValueError) as err:
+        shape.region_type = 'box'
+
+    assert "box is not a valid region type in this package" in str(err)
+
+    shape = CRTFParser(reg_str).shapes[0]
+    with pytest.raises(ValueError) as err:
+        shape.coordsys = 'hello'
+
+    assert "hello is not a valid coordinate reference frame in astropy" in str(err)

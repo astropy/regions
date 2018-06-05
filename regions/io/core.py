@@ -27,6 +27,7 @@ regions_attributes = dict(circle=['center', 'radius'],
                           point=['center']
                           )
 
+# This helps to map the region names in the respective format to the ones available in this package
 reg_mapping = {'DS9': {x: x for x in regions_attributes.keys()},
                'CRTF': {x: x for x in regions_attributes.keys()}}
 reg_mapping['DS9']['box'] = 'rectangle'
@@ -189,9 +190,9 @@ class Shape(object):
     format_type : str
         File Format type
     coordsys : str
-        Coordinate system
+        Astropy Coordinate system frame used in the region.
     region_type : str
-        Region type
+        Type of the region (as defined in this package).
     coord : list of `~astropy.coordinates.Angle` or `~astropy.units.Quantity`
         Coordinates
     meta : dict
@@ -390,9 +391,9 @@ class Shape(object):
         if self.format_type not in ['CRTF', 'DS9']:
             raise ValueError("{0} is not available as io".format(self.format_type))
         if self.region_type not in regions_attributes.keys():
-            raise ValueError("{0} is not a valid region type in {1}".format(self.region_type, self.format_type))
+            raise ValueError("{0} is not a valid region type in this package".format(self.region_type, self.format_type))
         if self.coordsys not in valid_coordsys[self.format_type]:
-            raise ValueError("{0} is not a valid coordinate reference frame in {1}".
+            raise ValueError("{0} is not a valid coordinate reference frame in astropy".
                              format(self.coordsys, self.format_type))
 
 
