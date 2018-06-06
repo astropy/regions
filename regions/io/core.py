@@ -12,11 +12,11 @@ from astropy.coordinates import BaseCoordinateFrame, Angle
 from astropy import log
 
 from .. import shapes
-from ..core import PixCoord, SkyRegion
+from ..core import PixCoord, SkyRegion, RegionMeta, RegionVisual
 from .ds9.core import DS9RegionParserWarning, DS9RegionParserError
 from .crtf.core import CRTFRegionParserWarning, CRTFRegionParserError
 
-__all__ = ['ShapeList', 'Shape', 'to_shape_list']
+__all__ = ['ShapeList', 'Shape', 'to_shape_list', 'to_crtf_meta', 'to_ds9_meta']
 
 regions_attributes = dict(circle=['center', 'radius'],
                           ellipse=['center', 'width', 'height', 'angle'],
@@ -349,7 +349,7 @@ class Shape(object):
 
         coords = self.convert_coords()
         log.debug(coords)
-        viz_keywords = ['color', 'dashed', 'width', 'point', 'font', 'symsize', 'symsize', 'fontsize', 'fontstyle',
+        viz_keywords = ['color', 'dash', 'dashlist', 'width', 'font', 'symsize', 'symsize', 'fontsize', 'fontstyle',
                         'usetex', 'labelpos', 'labeloff', 'linewidth', 'linestyle']
 
         if isinstance(coords[0], BaseCoordinateFrame):
@@ -359,8 +359,8 @@ class Shape(object):
         else:
             self._raise_error("No central coordinate")
 
-        reg.visual = OrderedDict()
-        reg.meta = OrderedDict()
+        reg.visual = RegionVisual()
+        reg.meta = RegionMeta()
         for key in self.meta.keys():
             if key in viz_keywords:
                 reg.visual[key] = self.meta[key]
@@ -430,10 +430,51 @@ def to_shape_list(region_list, format_type='DS9', coordinate_system='fk5'):
                 new_coord.append(Angle(val.transform_to(frame).spherical.lon))
                 new_coord.append(Angle(val.transform_to(frame).spherical.lat))
 
-        meta = copy.deepcopy(region.meta)
-        meta.update(region.visual)
+        if format_type == 'DS9':
+            meta = to_ds9_meta(region.meta, region.visual)
+        else:
+            meta = to_crtf_meta(region.meta, region.visual)
 
         shape_list.append(Shape(format_type, coordsys, reg_type, new_coord, meta, False,
                                 region.meta.get('include', False)))
 
     return shape_list
+
+
+def to_ds9_meta(region_meta, region_visual):
+
+    valid_keys = ['label', 'symbol', 'include', 'tag', 'line', 'comment', 'name', 'select', 'highlite', 'fixed',
+                  'edit', 'move', 'rotate', 'delete', 'source', 'background']  # meta keys allowed in DS9
+    valid_keys += ['color', 'dash', 'linewidth', 'font', 'dashlist', 'fill']  # visual keys allowed in DS9
+
+    key_mappings = {'symbol': 'point', 'label': 'text', 'linewidth': 'width'}  # mapped to actual names in DS9
+
+    meta = dict()
+    for key in region_meta:
+        if key in valid_keys:
+            meta[key_mappings.get(key, key)] = region_meta[key]
+    for key in region_visual:
+        if key in valid_keys:
+            meta[key_mappings.get(key, key)] = region_visual[key]
+
+    return meta
+
+
+def to_crtf_meta(region_meta, region_visual):
+
+    valid_keys = ['label', 'symbol', 'include', 'frame', 'range', 'veltype', 'restfreq', 'coord']  # meta keys allowed in CRTF
+    valid_keys += ['color', 'width', 'font', 'symthick', 'symsize', 'fontsize', 'fontstyle',
+                   'usetex', 'labelpos', 'labeloff', 'linewidth', 'linestyle']  # visual keys allowed in CRTF
+
+    key_mappings = {}
+
+    meta = dict()
+
+    for key in region_meta:
+        if key in valid_keys:
+            meta[key_mappings.get(key, key)] = region_meta[key]
+    for key in region_visual:
+        if key in valid_keys:
+            meta[key_mappings.get(key, key)] = region_visual[key]
+
+    return meta
