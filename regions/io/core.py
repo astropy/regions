@@ -1,9 +1,7 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
 from __future__ import absolute_import, division, print_function
-from collections import OrderedDict
 from warnings import warn
-import copy
 import string
 
 from astropy import units as u
@@ -28,8 +26,8 @@ regions_attributes = dict(circle=['center', 'radius'],
                           )
 
 # This helps to map the region names in the respective format to the ones available in this package
-reg_mapping = {'DS9': {x: x for x in regions_attributes.keys()},
-               'CRTF': {x: x for x in regions_attributes.keys()}}
+reg_mapping = {'DS9': {x: x for x in regions_attributes},
+               'CRTF': {x: x for x in regions_attributes}}
 reg_mapping['DS9']['box'] = 'rectangle'
 reg_mapping['CRTF']['rotbox'] = 'rectangle'
 reg_mapping['CRTF']['poly'] = 'polygon'
@@ -38,7 +36,8 @@ reg_mapping['CRTF']['poly'] = 'polygon'
 # valid astropy coordinate frames in their respective formats.
 valid_coordsys = {'DS9': ['image', 'physical', 'fk4', 'fk5', 'icrs', 'galactic',
                           'geocentrictrueecliptic', 'wcs'],
-                  'CRTF': ['image', 'fk5', 'fk4', 'galactic', 'geocentrictrueecliptic', 'supergalactic', 'icrs']
+                  'CRTF': ['image', 'fk5', 'fk4', 'galactic',
+                           'geocentrictrueecliptic', 'supergalactic', 'icrs']
                   }
 valid_coordsys['DS9'] += ['wcs{}'.format(x) for x in string.ascii_lowercase]
 
@@ -89,8 +88,8 @@ class ShapeList(list):
             This overrides the coordinate system frame for all regions.
 
         fmt : str
-            A python string format defining the output precision.  Default is .6f,
-            which is accurate to 0.0036 arcseconds.
+            A python string format defining the output precision.
+            Default is .6f, which is accurate to 0.0036 arcseconds.
 
         radunit : str
             This denotes the unit of the radius.
@@ -133,7 +132,7 @@ class ShapeList(list):
 
         for shape in self:
 
-            # default : if unspecified, include is True, which means we pretend nothing
+            # if unspecified, include is True.
             include = "-" if shape.meta.get('include') in (False, '-') else ""
 
             meta_str = " ".join("{0}={1}".format(key, val) for key, val in
@@ -349,8 +348,9 @@ class Shape(object):
 
         coords = self.convert_coords()
         log.debug(coords)
-        viz_keywords = ['color', 'dash', 'dashlist', 'width', 'font', 'symsize', 'symsize', 'fontsize', 'fontstyle',
-                        'usetex', 'labelpos', 'labeloff', 'linewidth', 'linestyle']
+        viz_keywords = ['color', 'dash', 'dashlist', 'width', 'font', 'symsize',
+                        'symsize', 'fontsize', 'fontstyle', 'usetex',
+                        'labelpos', 'labeloff', 'linewidth', 'linestyle']
 
         if isinstance(coords[0], BaseCoordinateFrame):
             reg = self.shape_to_sky_region[self.region_type](*coords)
@@ -443,11 +443,16 @@ def to_shape_list(region_list, format_type='DS9', coordinate_system='fk5'):
 
 def to_ds9_meta(region_meta, region_visual):
 
-    valid_keys = ['label', 'symbol', 'include', 'tag', 'line', 'comment', 'name', 'select', 'highlite', 'fixed',
-                  'edit', 'move', 'rotate', 'delete', 'source', 'background']  # meta keys allowed in DS9
-    valid_keys += ['color', 'dash', 'linewidth', 'font', 'dashlist', 'fill']  # visual keys allowed in DS9
+    # meta keys allowed in DS9
+    valid_keys = ['label', 'symbol', 'include', 'tag', 'line', 'comment',
+                  'name', 'select', 'highlite', 'fixed',
+                  'edit', 'move', 'rotate', 'delete', 'source', 'background']
 
-    key_mappings = {'symbol': 'point', 'label': 'text', 'linewidth': 'width'}  # mapped to actual names in DS9
+    # visual keys allowed in DS9
+    valid_keys += ['color', 'dash', 'linewidth', 'font', 'dashlist', 'fill']
+
+    # mapped to actual names in DS9
+    key_mappings = {'symbol': 'point', 'label': 'text', 'linewidth': 'width'}
 
     meta = dict()
     for key in region_meta:
@@ -462,9 +467,14 @@ def to_ds9_meta(region_meta, region_visual):
 
 def to_crtf_meta(region_meta, region_visual):
 
-    valid_keys = ['label', 'symbol', 'include', 'frame', 'range', 'veltype', 'restfreq', 'coord']  # meta keys allowed in CRTF
-    valid_keys += ['color', 'width', 'font', 'symthick', 'symsize', 'fontsize', 'fontstyle',
-                   'usetex', 'labelpos', 'labeloff', 'linewidth', 'linestyle']  # visual keys allowed in CRTF
+    # meta keys allowed in CRTF
+    valid_keys = ['label', 'symbol', 'include', 'frame', 'range', 'veltype',
+                  'restfreq', 'coord']
+
+    # visual keys allowed in CRTF
+    valid_keys += ['color', 'width', 'font', 'symthick', 'symsize', 'fontsize',
+                   'fontstyle', 'usetex', 'labelpos', 'labeloff', 'linewidth',
+                   'linestyle']
 
     key_mappings = {}
 
