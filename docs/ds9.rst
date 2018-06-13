@@ -60,13 +60,12 @@ read from a file in addition to doing the region serialisation and parsing.
          (245.3477, 24.4291)>
      radius: 3.0 deg]
 
-The ``visual`` metadata includes items used for display, e.g.::
+The ``visual`` metadata includes items used for display, e.g.:
 
-    >>> r.visual
-    {'color': 'green',
-     'font': '"helvetica 10 normal roman" ',
-     'point': 'x',
-     'width': '1'}
+.. code-block:: python
+
+    >>> print(regions[0].visual)
+    OrderedDict([('color', 'green')])
 
 Some of these keyword may eventually be used by the plotting utilities and
 standardized, but they are not as of v0.3.
