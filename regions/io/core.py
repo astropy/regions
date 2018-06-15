@@ -76,7 +76,7 @@ class ShapeList(list):
         return regions
 
     def to_crtf(self):
-        pass
+        raise NotImplementedError('This method intends to convert ShapeList to CRTF strings')
 
     def to_ds9(self, coordsys='fk5', fmt='.6f', radunit='deg'):
         """
@@ -131,6 +131,8 @@ class ShapeList(list):
         output += '{}\n'.format(coordsys)
 
         for shape in self:
+
+            shape.check_ds9()
 
             # if unspecified, include is True.
             include = "-" if shape.meta.get('include') in (False, '-') else ""
@@ -188,16 +190,22 @@ class Shape(object):
     ----------
     format_type : str
         File Format type
+
     coordsys : str
         Astropy Coordinate system frame used in the region.
+
     region_type : str
         Type of the region (as defined in this package).
+
     coord : list of `~astropy.coordinates.Angle` or `~astropy.units.Quantity`
         Coordinates
+
     meta : dict
         Meta attributes
+
     composite : bool
         Composite region
+
     include : bool
         Include/exclude region
     """
@@ -235,16 +243,11 @@ class Shape(object):
         self.meta = meta
         self.composite = composite
         self.include = include
-        self._validate()
+        self._validate(self.format_type)
 
     @property
     def format_type(self):
         return self._format_type
-
-    @format_type.setter
-    def format_type(self, value):
-        self._format_type = value.upper()
-        self._validate()
 
     @property
     def coordsys(self):
@@ -253,7 +256,7 @@ class Shape(object):
     @coordsys.setter
     def coordsys(self, value):
         self._coordsys = value.lower()
-        self._validate()
+        self._validate(self.format_type)
 
     @property
     def region_type(self):
@@ -262,7 +265,7 @@ class Shape(object):
     @region_type.setter
     def region_type(self, value):
         self._region_type = value.lower()
-        self._validate()
+        self._validate(self.format_type)
 
     def __str__(self):
         ss = self.__class__.__name__
@@ -372,32 +375,52 @@ class Shape(object):
     def _raise_error(self, msg):
         raise self.error[self.format_type](msg)
 
-    def to_crtf(self):
+    def check_crtf(self):
         """
         Makes shape CRTF compatible.
         """
-        self.format_type = 'CRTF'
+        self._validate('CRTF')
 
-    def to_ds9(self):
+    def check_ds9(self):
         """
         Makes shape DS9 compatible
         """
-        self.format_type = 'DS9'
+        self._validate('DS9')
 
-    def _validate(self):
+    def _validate(self, format_type):
         """
         Checks whether all the attributes of this object is valid according to the given format.
         """
-        if self.format_type not in ['CRTF', 'DS9']:
-            raise ValueError("{0} is not available as io".format(self.format_type))
+        if format_type not in ['CRTF', 'DS9']:
+            raise ValueError("'{0}' is not available as io".format(format_type))
         if self.region_type not in regions_attributes.keys():
-            raise ValueError("{0} is not a valid region type in this package".format(self.region_type, self.format_type))
-        if self.coordsys not in valid_coordsys[self.format_type]:
-            raise ValueError("{0} is not a valid coordinate reference frame in astropy".
-                             format(self.coordsys, self.format_type))
+            raise ValueError("'{0}' is not a valid region type in this package".format(self.region_type, format_type))
+        if self.coordsys not in valid_coordsys[format_type]:
+            raise ValueError("'{0}' is not a valid coordinate reference frame in astropy".
+                             format(self.coordsys, format_type))
 
 
 def to_shape_list(region_list, format_type='DS9', coordinate_system='fk5'):
+    """
+    Converts a list of regions into a `regions.ShapeList` object.
+
+    Parameters
+    ----------
+    region_list: python list
+        Lists of `regions.Region` objects
+
+    format_type: str ('DS9' or 'CRTF')
+        The format type of the Shape object. Default is 'DS9'.
+
+    coordinate_system: str
+        The astropy coordinate system frame in which all the coordinates present
+        in the `region_list` will be converted. Default is 'fk5'.
+
+    Returns
+    -------
+    shape_list: `regions.ShapeList` object
+        list of `regions.Shape` objects.
+    """
 
     shape_list = ShapeList()
 
@@ -412,11 +435,14 @@ def to_shape_list(region_list, format_type='DS9', coordinate_system='fk5'):
         if reg_type == 'polygon':
             coord = [x for x in region.vertices]
 
-        coordsys = 'image'
-        if isinstance(region, SkyRegion):
-            coordsys = coord[0].name
+        if coordinate_system:
+            coordsys = coordinate_system
+        else:
+            if isinstance(region, SkyRegion):
+                coordsys = coord[0].name
+            else:
+                coordsys = 'image'
 
-        coordsys = coordinate_system or coordsys
         frame = coordinates.frame_transform_graph.lookup_name(coordsys)
 
         new_coord = []
@@ -442,8 +468,25 @@ def to_shape_list(region_list, format_type='DS9', coordinate_system='fk5'):
 
 
 def to_ds9_meta(region_meta, region_visual):
+    """
+    Makes the meta data DS9 compatible by filtering and mapping the valid keys
 
-    # meta keys allowed in DS9
+    Parameters
+    ----------
+    region_meta: dict
+        meta attribute of a `regions.Region` object
+
+    region_visual : dict
+        visual attribute of a `regions.Region` object.
+
+    Returns
+    -------
+    meta : dict
+        DS9 compatible meta dictionary
+
+    """
+
+    # meta keys allowed in DS9.
     valid_keys = ['label', 'symbol', 'include', 'tag', 'line', 'comment',
                   'name', 'select', 'highlite', 'fixed',
                   'edit', 'move', 'rotate', 'delete', 'source', 'background']
@@ -454,18 +497,28 @@ def to_ds9_meta(region_meta, region_visual):
     # mapped to actual names in DS9
     key_mappings = {'symbol': 'point', 'label': 'text', 'linewidth': 'width'}
 
-    meta = dict()
-    for key in region_meta:
-        if key in valid_keys:
-            meta[key_mappings.get(key, key)] = region_meta[key]
-    for key in region_visual:
-        if key in valid_keys:
-            meta[key_mappings.get(key, key)] = region_visual[key]
-
-    return meta
+    return _to_io_meta(region_meta, region_visual, valid_keys, key_mappings)
 
 
 def to_crtf_meta(region_meta, region_visual):
+    """
+    Makes the meta data CRTF compatible by filtering and mapping the valid keys
+
+    Parameters
+    ----------
+    region_meta: dict
+        meta attribute of a `regions.Region` object
+
+    region_visual : dict
+        visual attribute of a `regions.Region` object
+
+    Returns
+    -------
+    meta : dict
+        CRTF compatible meta dictionary
+
+    """
+    # please refer : https://casaguides.nrao.edu/index.php/CASA_Region_Format
 
     # meta keys allowed in CRTF
     valid_keys = ['label', 'symbol', 'include', 'frame', 'range', 'veltype',
@@ -478,6 +531,35 @@ def to_crtf_meta(region_meta, region_visual):
 
     key_mappings = {}
 
+    return _to_io_meta(region_meta, region_visual, valid_keys, key_mappings)
+
+
+def _to_io_meta(region_meta, region_visual, valid_keys, key_mappings):
+    """
+    This is used to make meta data compatible with a specific io
+    by filtering and mapping to it's valid keys
+
+    Parameters
+    ----------
+    region_meta: dict
+        meta attribute of a `regions.Region` object
+
+    region_visual : dict
+        visual attribute of a `regions.Region` object.
+
+    valid_keys : python list
+        Contains all the valid keys of a particular file format.
+
+    key_mappings : python dict
+        Maps to the actual name of the key in the format.
+
+    Returns
+    -------
+    meta : dict
+        io compatible meta dictionary according to valid_keys and key_mappings
+
+    """
+
     meta = dict()
 
     for key in region_meta:
@@ -488,3 +570,4 @@ def to_crtf_meta(region_meta, region_visual):
             meta[key_mappings.get(key, key)] = region_visual[key]
 
     return meta
+

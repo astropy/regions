@@ -51,19 +51,17 @@ def test_valid_shape():
     reg_str = "circle[[18h12m24s, -23d11m00s], 2.3arcsec], linewidth=2, coord=J2000, symsize=2"
 
     shape = CRTFParser(reg_str).shapes[0]
-    with pytest.raises(ValueError) as err:
+    with pytest.raises(AttributeError):
         shape.format_type = 'CAIO'
-
-    assert "CAIO is not available as io" in str(err)
 
     shape = CRTFParser(reg_str).shapes[0]
     with pytest.raises(ValueError) as err:
         shape.region_type = 'box'
 
-    assert "box is not a valid region type in this package" in str(err)
+    assert "'box' is not a valid region type in this package" in str(err)
 
     shape = CRTFParser(reg_str).shapes[0]
     with pytest.raises(ValueError) as err:
         shape.coordsys = 'hello'
 
-    assert "hello is not a valid coordinate reference frame in astropy" in str(err)
+    assert "'hello' is not a valid coordinate reference frame in astropy" in str(err)
