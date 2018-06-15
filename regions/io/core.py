@@ -190,6 +190,9 @@ class Shape(object):
             coord = PixCoord(temp[0], temp[1])
             coords = [coord] + temp[2:]
 
+        if self.region_type in ['ellipse', 'rectangle'] and len(coords) == 4:
+            coords[-1] = self.coord[-1]
+
         return coords
 
     def to_region(self):
