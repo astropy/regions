@@ -5,6 +5,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import pytest
 
 from astropy.tests.helper import assert_quantity_allclose
+from astropy.units.quantity import Quantity
 
 from .. import DS9Parser, CRTFParser, to_shape_list
 
@@ -26,6 +27,17 @@ def test_shape_ds9():
     assert dict(shape1.meta) == dict(shape2.meta)
     assert shape1.composite == shape2.composite
 
+    # Checks for pixel offset since DS9 has a origin=1 pixel system
+    reg_str = 'image\nbox(1, 2, 3, 4, 5)'
+
+    parser = DS9Parser(reg_str)
+    shape = parser.shapes[0]
+
+    assert shape.coord[0] == 0
+    assert shape.coord[1] == 1
+    assert_quantity_allclose(shape.coord[2:-1], [Quantity("3"), Quantity("4")])
+    assert_quantity_allclose(shape.coord[-1], Quantity("5deg"))
+
 
 def test_shape_crtf():
 
@@ -40,11 +52,16 @@ def test_shape_crtf():
     assert shape1.coordsys == shape2.coordsys
     assert shape1.region_type == shape2.region_type
     assert shape1.include == shape2.include
-    for x, y in zip(shape1.coord, shape2.coord):
-        assert_quantity_allclose(x.to('deg'), y.to('deg'))
+    assert_quantity_allclose(shape1.coord, shape2.coord)
     # assert dict(shape1.meta) == dict(shape2.meta)
     assert shape1.composite == shape2.composite
 
+    # Pixel origin is assumed to be 0 origin. Needs to be checked though.
+    reg_str = "circle[[1pix, 2pix], 3pix], linewidth=2, coord=image, symsize=2"
+
+    parser = CRTFParser(reg_str)
+    shape = parser.shapes[0]
+    assert_quantity_allclose(shape.coord, [Quantity("1"), Quantity("2"), Quantity("3")])
 
 def test_valid_shape():
 

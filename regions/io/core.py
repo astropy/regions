@@ -155,7 +155,7 @@ class ShapeList(list):
                             coord.append(float(val.value))
                         else:
                             coord.append(float(val.to(radunit).value))
-                if shape.region_type in ['ellipse', 'rectangle']:
+                if shape.region_type in ['ellipse', 'rectangle'] and len(shape.coord) % 2 == 1:
                     coord[-1] = float(shape.coord[-1].to('deg').value)
             else:
                 for val in shape.coord:
@@ -163,6 +163,11 @@ class ShapeList(list):
                         coord.append(float(val.value))
                     else:
                         coord.append(float(val))
+                if shape.region_type in ['polygon', 'line']:
+                    coord = [x+1 for x in coord]
+                else:
+                    coord[0] += 1
+                    coord[1] += 1
 
             if shape.region_type == 'polygon':
                 val = "{0:" + fmt + "}"

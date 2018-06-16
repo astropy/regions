@@ -88,11 +88,13 @@ class CoordinateParser(object):
             else:
                 ang = float(string_rep)
             return coordinates.Angle(ang, u.deg)
+        elif unit.is_equivalent(u.dimensionless_unscaled):
+            return u.Quantity(float(string_rep), unit)-1
         else:
             return u.Quantity(float(string_rep), unit)
 
     @staticmethod
-    def parse_angular_length_quantity(string_rep):
+    def parse_angular_length_quantity(string_rep, unit=u.deg):
         """
         Given a string that is either a number or a number and a unit, return a
         Quantity of that string.  e.g.:
@@ -111,7 +113,7 @@ class CoordinateParser(object):
             unit = unit_mapping[string_rep[-1]]
             return u.Quantity(float(string_rep[:-1]), unit=unit)
         else:
-            return u.Quantity(float(string_rep), unit=u.deg)
+            return u.Quantity(float(string_rep), unit=unit)
 
 
 class DS9Parser(object):
@@ -435,8 +437,13 @@ class DS9RegionParser(object):
             if element_parser is coordinate:
                 unit = self.coordinate_units[self.coordsys][ii % 2]
                 coord_list.append(element_parser(element, unit))
+            elif self.coordinate_units[self.coordsys][0] is u.dimensionless_unscaled:
+                    coord_list.append(element_parser(element, unit=u.dimensionless_unscaled))
             else:
                 coord_list.append(element_parser(element))
+
+        if self.region_type in ['ellipse', 'box'] and len(coord_list) % 2 == 1:
+                coord_list[-1] = CoordinateParser.parse_angular_length_quantity(elements[len(coord_list)-1])
 
         # Reset iterator for ellipse and annulus
         # Note that this cannot be done with copy.deepcopy on python2
