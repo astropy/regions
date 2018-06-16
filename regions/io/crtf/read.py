@@ -4,10 +4,10 @@ import re
 import copy
 import itertools
 from warnings import warn
-from six import string_types
 
 from astropy import units as u
 from astropy import coordinates
+from astropy.extern import six
 
 from .core import CRTFRegionParserError, CRTFRegionParserWarning
 from ..core import Shape, ShapeList, reg_mapping
@@ -364,7 +364,7 @@ class CRTFRegionParser(object):
                 else:
                     self._raise_error("Not in proper format: {0} should be a pair of length".format(y))
             if x == 'l':
-                if isinstance(y, string_types):
+                if isinstance(y, six.string_types):
                     coord_list.append(CoordinateParser.parse_angular_length_quantity(y))
                 else:
                     self._raise_error("Not in proper format: {0} should be a single length".format(y))

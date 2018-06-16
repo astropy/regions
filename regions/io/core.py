@@ -347,6 +347,11 @@ class Shape(object):
             coord = PixCoord(temp[0], temp[1])
             coords = [coord] + temp[2:]
 
+        # The angle remains as a quantity object.
+        # Modulus check makes sure that it works for ellipse/rectangle annulus
+        if self.region_type in ['ellipse', 'rectangle'] and len(coords) % 2 == 0:
+            coords[-1] = self.coord[-1]
+
         return coords
 
     def to_region(self):
@@ -575,4 +580,3 @@ def _to_io_meta(region_meta, region_visual, valid_keys, key_mappings):
             meta[key_mappings.get(key, key)] = region_visual[key]
 
     return meta
-
