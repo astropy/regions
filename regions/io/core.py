@@ -80,7 +80,7 @@ class ShapeList(list):
 
     def to_ds9(self, coordsys='fk5', fmt='.6f', radunit='deg'):
         """
-        Convert list of ``regions.Shape`` objects to ds9 region strings.
+        Converts a list of ``regions.Shape`` objects to ds9 region strings.
 
         Parameters
         ----------
@@ -351,7 +351,7 @@ class Shape(object):
 
     def to_region(self):
         """
-        Convert to region, ``regions.Region`` object
+        Converts to region, ``regions.Region`` object
         """
 
         coords = self.convert_coords()
@@ -382,13 +382,13 @@ class Shape(object):
 
     def check_crtf(self):
         """
-        Makes shape CRTF compatible.
+        Checks for CRTF compatibility.
         """
         self._validate('CRTF')
 
     def check_ds9(self):
         """
-        Makes shape DS9 compatible
+        Checks for DS9 compatibility.
         """
         self._validate('DS9')
 
