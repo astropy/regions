@@ -300,7 +300,7 @@ class RegionMeta(dict):
     valid_keys = ['label', 'symbol', 'include', 'frame', 'range', 'veltype',
                   'restfreq', 'tag', 'comment', 'coord', 'line', 'name',
                   'select', 'highlite', 'fixed', 'edit', 'move', 'rotate',
-                  'delete', 'source', 'background'
+                  'delete', 'source', 'background', 'corr'
                   ]
 
     key_mapping = {'point': 'symbol', 'text': 'label'}

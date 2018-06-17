@@ -465,3 +465,5 @@ class CoordinateParser(object):
             return u.Quantity(str.group(1))
         else:
             raise CRTFRegionParserError('Units must be specified for {0} '.format(string_rep))
+
+valid_symbols = CRTFRegionParser.valid_symbols
