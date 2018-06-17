@@ -9,7 +9,7 @@ from astropy import units as u
 from astropy import coordinates
 from astropy.extern import six
 
-from .core import CRTFRegionParserError, CRTFRegionParserWarning
+from .core import CRTFRegionParserError, CRTFRegionParserWarning, valid_symbols
 from ..core import Shape, ShapeList, reg_mapping
 
 __all__ = ['read_crtf', 'CRTFParser', 'CRTFRegionParser']
@@ -34,10 +34,10 @@ regex_meta = re.compile(r'(?:(\w+)\s*=[\s\'\"]*([^,\[\]]+?)[\'\",]+)|(?:(\w+)\s*
 
 # Region format which segregates include('+'|'-') parameter, kind of definition ('ann' for annotations | '' for regions)
 # and region type.
-regex_region = re.compile(r'(?P<include>[+-])?(?P<type>ann(?=\s))?(?P<regiontype>[a-z]*?)\[[^=]*]')
+regex_region = re.compile(r'(?P<include>[+-])?(?P<type>ann(?=\s))?\s*(?P<regiontype>[a-z]*?)\[[^=]*]')
 
 # Line format which checks the validity of the line and segregates the meta attributes from the region format.
-regex_line = re.compile(r'(?P<region>[+-]?(?:ann(?=\s))?[a-z]+?\[[^=]+\])(?:\s*[,]\s*(?P<parameters>.*))?')
+regex_line = re.compile(r'(?P<region>[+-]?(?:ann(?=\s))?\s*[a-z]+?\[[^=]+\])(?:\s*[,]\s*(?P<parameters>.*))?')
 
 
 def read_crtf(filename, errors='strict'):
@@ -154,7 +154,6 @@ class CRTFParser(object):
             type_ = region.group('type') or 'reg'
             include = region.group('include') or '+'
             region_type = region.group('regiontype')
-
             if region_type in self.valid_definition:
                 helper = CRTFRegionParser(self.global_meta, include, type_, region_type,
                                           *crtf_line.group('region', 'parameters'))
@@ -261,31 +260,6 @@ class CRTFRegionParser(object):
                      'symbol': ['c', 's'],
                      'text': ['c', 's']}
 
-    # Valid symbols for symbol region
-    valid_symbols = {'.': 'point',
-                     ',': 'pixel',
-                     'o': 'circle',
-                     'v': 'triangle_down',
-                     '^': 'triangle_up',
-                     '<': 'triangle_left',
-                     '>': 'triangle_right',
-                     '1':  'tri_down',
-                     '2': 'tri_up',
-                     '3': 'tri_left',
-                     '4': 'tri_right',
-                     's': 'square',
-                     'p': 'pentagon',
-                     '*': 'star',
-                     'h': 'hexagon1',
-                     'H': 'hexagon2',
-                     '+': 'plus',
-                     'x': 'x',
-                     'D': 'diamond',
-                     'd': 'thin_diamond',
-                     '|': 'vline',
-                     '_': 'hline'
-                    }
-
     def __init__(self, global_meta, include, type_, region_type, reg_str, meta_str, errors='strict'):
 
         self.global_meta = global_meta
@@ -296,7 +270,7 @@ class CRTFRegionParser(object):
         self.coord = None
         self.coordsys = None
         self.coord_str = None
-        self.type_ = type_ or 'reg'
+        self.type_ = type_
         self.region_type = region_type
         self.meta = copy.deepcopy(global_meta)
         self.shape = None
@@ -369,8 +343,8 @@ class CRTFRegionParser(object):
                 else:
                     self._raise_error("Not in proper format: {0} should be a single length".format(y))
             if x == 's':
-                if y in self.valid_symbols.keys():
-                    self.meta['symbol'] = self.valid_symbols[y]
+                if y in valid_symbols:
+                    self.meta['symbol'] = valid_symbols[y]
                 else:
                     self._raise_error("Not in proper format: '{0}' should be a symbol".format(y))
 
@@ -403,8 +377,7 @@ class CRTFRegionParser(object):
         self.meta['include'] = self.include != '-'
         self.include = self.meta['include']
 
-        # Not needed now. May be in the future.
-        # self.meta['type'] = self.type_
+        self.meta['type'] = self.type_
 
     def make_shape(self):
         """
@@ -456,7 +429,7 @@ class CoordinateParser(object):
             '"': u.arcsec,
             "'": u.arcmin,
         }
-        regex_str = re.compile(r'([0-9+-,.]*)(.*)')
+        regex_str = re.compile(r'([0-9+,-.]*)(.*)')
         str = regex_str.search(string_rep)
         unit = str.group(2)
         if unit:
@@ -465,5 +438,3 @@ class CoordinateParser(object):
             return u.Quantity(str.group(1))
         else:
             raise CRTFRegionParserError('Units must be specified for {0} '.format(string_rep))
-
-valid_symbols = CRTFRegionParser.valid_symbols

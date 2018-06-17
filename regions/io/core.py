@@ -12,7 +12,7 @@ from astropy import log
 from .. import shapes
 from ..core import PixCoord, SkyRegion, RegionMeta, RegionVisual
 from .ds9.core import DS9RegionParserWarning, DS9RegionParserError
-from .crtf.core import CRTFRegionParserWarning, CRTFRegionParserError
+from .crtf.core import CRTFRegionParserWarning, CRTFRegionParserError, valid_symbols
 
 __all__ = ['ShapeList', 'Shape', 'to_shape_list', 'to_crtf_meta', 'to_ds9_meta']
 
@@ -68,7 +68,7 @@ class ShapeList(list):
                 msg = 'Skipping elliptical annulus {}'.format(shape)
                 warn(msg, DS9RegionParserWarning)
                 continue
-            if shape.region_type in ['box', 'symbol', 'text'] and shape.format_type == 'CRTF':
+            if shape.region_type in ['box'] and shape.format_type == 'CRTF':
                 msg = 'Skipping {} {}'.format(shape.region_type, shape)
                 warn(msg, CRTFRegionParserWarning)
                 continue
@@ -116,6 +116,8 @@ class ShapeList(list):
             'line': '{0}line[[{1:FMT}deg, {2:FMT}deg], [{3:FMT}deg, {4:FMT}deg]]'
                         }
 
+        reverse_symbol_mapping = {y: x for x, y in valid_symbols.items()}
+
         output = '#CRTF\n'
 
         if radunit == 'arcsec':
@@ -141,13 +143,18 @@ class ShapeList(list):
 
             # if unspecified, include is True.
             include = "-" if shape.meta.get('include') in (False, '-') else "+"
+            include += "ann " if shape.meta.get('type', 'reg') == 'ann' else ""
 
             meta_str = ", ".join("{0}={1}".format(key, val) for key, val in
                                 shape.meta.items() if
-                                key not in ('include', 'comment', 'symbol', 'coord', 'text'))
+                                key not in ('include', 'comment', 'symbol', 'coord', 'text', 'range', 'corr', 'type'))
 
             if 'comment' in shape.meta:
-                meta_str += " " + shape.meta['comment']
+                meta_str += ", " + shape.meta['comment']
+            if 'range' in shape.meta:
+                meta_str += ", range={}".format(shape.meta['range']).replace("'", "")
+            if 'corr' in shape.meta:
+                meta_str += ", corr={}".format(shape.meta['corr']).replace("'", "")
 
             coord = []
 
@@ -178,11 +185,11 @@ class ShapeList(list):
             elif shape.region_type == 'point':
                 if 'symbol' in shape.meta.keys():
                     line = crtf_strings['symbol'].format(include, *coord,
-                                                         shape.meta['symbol'])
+                                                         reverse_symbol_mapping[shape.meta['symbol']])
                 elif 'text' in shape.meta.keys():
                     line = crtf_strings['text'].format(include, *coord, shape.meta['text'])
                 else:
-                    line = crtf_strings['line'].format(include, *coord)
+                    line = crtf_strings['point'].format(include, *coord)
             else:
                 line = crtf_strings[shape.region_type].format(include, *coord)
 
@@ -647,7 +654,7 @@ def to_crtf_meta(region_meta, region_visual):
 
     # meta keys allowed in CRTF
     valid_keys = ['label', 'symbol', 'include', 'frame', 'range', 'veltype',
-                  'restfreq', 'coord']
+                  'restfreq', 'coord', 'type']
 
     # visual keys allowed in CRTF
     valid_keys += ['color', 'width', 'font', 'symthick', 'symsize', 'fontsize',
