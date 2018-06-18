@@ -4,15 +4,17 @@ import pytest
 
 
 import astropy.version as astrov
+from astropy.utils.data import get_pkg_data_filename
 
 
-from ..read import CRTFParser
+from ..read import CRTFParser, read_crtf
+from ..write import crtf_objects_to_string
 from ..core import CRTFRegionParserError
 
 _ASTROPY_MINVERSION = vers.LooseVersion('1.1')
 _ASTROPY_VERSION = vers.LooseVersion(astrov.version)
 
-implemented_region_types = ('ellipse', 'circle', 'rectangle', 'poly', 'point')
+implemented_region_types = ('ellipse', 'circle', 'rectangle', 'poly', 'point', 'text', 'symbol')
 
 
 def test_global_parser():
@@ -121,3 +123,16 @@ def test_valid_region_syntax():
         CRTFParser(reg_str6)
 
     assert "('3arcmin', '') should be a pair of length" in str(err)
+
+
+@pytest.mark.parametrize('filename', ['data/CRTFgeneral.crtf', 'data/CRTFgeneraloutput.crtf'])
+def test_file_crtf(filename):
+
+    filename = get_pkg_data_filename(filename)
+    regs = read_crtf(filename, 'warn')
+    actual_output = crtf_objects_to_string(regs, 'fk4', '.2f')
+
+    with open(get_pkg_data_filename('data/CRTFgeneraloutput.crtf')) as f:
+        ref_output = f.read()
+
+    assert ref_output == actual_output
