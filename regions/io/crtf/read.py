@@ -7,9 +7,10 @@ from warnings import warn
 
 from astropy import units as u
 from astropy import coordinates
+from astropy.extern import six
 
 from .core import CRTFRegionParserError, CRTFRegionParserWarning
-from ..core import Shape, ShapeList
+from ..core import Shape, ShapeList, reg_mapping
 
 __all__ = ['read_crtf', 'CRTFParser', 'CRTFRegionParser']
 
@@ -241,6 +242,7 @@ class CRTFRegionParser(object):
     coordsys_mapping = dict(zip(coordinates.frame_transform_graph.get_names(),
                                 coordinates.frame_transform_graph.get_names()))
     coordsys_mapping['j2000'] = 'fk5'
+    coordsys_mapping['b1950'] = 'fk4'
     coordsys_mapping['supergal'] = 'supergalactic'
     coordsys_mapping['ecliptic'] = 'geocentrictrueecliptic'
 
@@ -362,7 +364,7 @@ class CRTFRegionParser(object):
                 else:
                     self._raise_error("Not in proper format: {0} should be a pair of length".format(y))
             if x == 'l':
-                if isinstance(y, str):
+                if isinstance(y, six.string_types):
                     coord_list.append(CoordinateParser.parse_angular_length_quantity(y))
                 else:
                     self._raise_error("Not in proper format: {0} should be a single length".format(y))
@@ -397,18 +399,23 @@ class CRTFRegionParser(object):
                     self.meta[val1] = val2
                 else:
                     self._raise_error("'{0}' is not a valid meta key".format(val1))
-        self.meta['type'] = self.type_
+
+        self.meta['include'] = self.include != '-'
+        self.include = self.meta['include']
+
+        # Not needed now. May be in the future.
+        # self.meta['type'] = self.type_
 
     def make_shape(self):
         """
         Make shape object
         """
         self.shape = Shape('CRTF', coordsys=self.coordsys,
-                           region_type=self.region_type,
+                           region_type=reg_mapping['CRTF'][self.region_type],
                            coord=self.coord,
                            meta=self.meta,
                            composite=False,
-                           include=self.include != '-',
+                           include=self.include
                            )
 
 

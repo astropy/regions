@@ -12,6 +12,7 @@ import astropy.version as astrov
 from astropy.coordinates import Angle, SkyCoord
 from astropy.tests.helper import catch_warnings
 from astropy.utils.exceptions import AstropyUserWarning
+from astropy import units as u
 
 from ....shapes.circle import CircleSkyRegion
 from ..read import read_ds9, DS9Parser
@@ -214,3 +215,14 @@ def test_issue65_regression():
     assert reg.center.ra.value == 188.5557102
     assert reg.center.dec.value == 12.0314056
     assert reg.radius.value == 1.0
+
+
+def test_pixel_angle():
+    """
+    Checks whether angle in PixelRegions is a u.Quantity object.
+    """
+    reg_str = 'image\nbox(1.5,2,2,1,0)'
+
+    reg = DS9Parser(reg_str).shapes.to_regions()[0]
+
+    assert isinstance(reg.angle, u.quantity.Quantity)
