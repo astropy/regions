@@ -19,7 +19,7 @@ The `regions` package provides (or plans to provide) classes to represent:
 To transform between sky and pixel regions, a world coordinate system
 (represented by a `~astropy.wcs.WCS` object) is needed. Some functions for
 region-based calculations (e.g. filtering a table of sky or pixel positions) as
-well as functions for region serialisation (e.g. to and from ds9 region string
+well as functions for region serialisation (e.g. to and from ds9/crtf region string
 format) are available.
 
 .. _gs-ds:
