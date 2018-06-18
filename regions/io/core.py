@@ -86,11 +86,9 @@ class ShapeList(list):
         ----------
         coordsys : str
             This overrides the coordinate system frame for all regions.
-
         fmt : str
             A python string format defining the output precision.
             Default is .6f, which is accurate to 0.0036 arcseconds.
-
         radunit : str
             This denotes the unit of the radius.
 
@@ -195,22 +193,16 @@ class Shape(object):
     ----------
     format_type : str
         File Format type
-
     coordsys : str
         Astropy Coordinate system frame used in the region.
-
     region_type : str
         Type of the region (as defined in this package).
-
     coord : list of `~astropy.coordinates.Angle` or `~astropy.units.Quantity`
         Coordinates
-
     meta : dict
         Meta attributes
-
     composite : bool
         Composite region
-
     include : bool
         Include/exclude region
     """
@@ -418,10 +410,8 @@ def to_shape_list(region_list, format_type='DS9', coordinate_system='fk5'):
     ----------
     region_list: python list
         Lists of `regions.Region` objects
-
     format_type: str ('DS9' or 'CRTF')
         The format type of the Shape object. Default is 'DS9'.
-
     coordinate_system: str
         The astropy coordinate system frame in which all the coordinates present
         in the `region_list` will be converted. Default is 'fk5'.
@@ -485,7 +475,6 @@ def to_ds9_meta(region_meta, region_visual):
     ----------
     region_meta: dict
         meta attribute of a `regions.Region` object
-
     region_visual : dict
         visual attribute of a `regions.Region` object.
 
@@ -518,7 +507,6 @@ def to_crtf_meta(region_meta, region_visual):
     ----------
     region_meta: dict
         meta attribute of a `regions.Region` object
-
     region_visual : dict
         visual attribute of a `regions.Region` object
 
@@ -553,13 +541,10 @@ def _to_io_meta(region_meta, region_visual, valid_keys, key_mappings):
     ----------
     region_meta: dict
         meta attribute of a `regions.Region` object
-
     region_visual : dict
         visual attribute of a `regions.Region` object.
-
     valid_keys : python list
         Contains all the valid keys of a particular file format.
-
     key_mappings : python dict
         Maps to the actual name of the key in the format.
 
