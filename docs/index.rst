@@ -106,3 +106,9 @@ experience necessary):
 
 * `Developer Documentation <http://docs.astropy.org/en/latest/#developer-documentation>`_
 
+
+Get Help
+========
+
+Besides github, You can `get help`_ from the community in a number of ways.
+There is also a slack channel for regions.
