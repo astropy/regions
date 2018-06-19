@@ -93,3 +93,14 @@ def test_valid_ellipse_ds9():
     assert_quantity_allclose(shape.coord[2:-1], [6, 8])
     assert_quantity_allclose(shape.coord[:2], [0, 1])
     assert_quantity_allclose(shape.coord[-1], Quantity("5deg"))
+
+
+def test_valid_ellipse_crtf():
+
+    reg_str = "ellipse[[1, 2], [3, 4], 5]"
+
+    shape = CRTFParser(reg_str, 'warn').shapes[0]
+
+    assert_quantity_allclose(shape.coord[2:-1], [6, 8])
+    assert_quantity_allclose(shape.coord[:2], [1, 2])
+    assert_quantity_allclose(shape.coord[-1], Quantity("5deg"))
