@@ -470,6 +470,11 @@ class DS9RegionParser(object):
         """
         Make shape object
         """
+        if self.region_type == 'ellipse':
+            self.coord[2:] = [x * 2 for x in self.coord[2:]]
+            if len(self.coord) % 2 == 1:
+                self.coord[-1] /= 2
+
         self.shape = Shape("DS9", coordsys=self.coordsys,
                            region_type=reg_mapping['DS9'][self.region_type],
                            coord=self.coord,
