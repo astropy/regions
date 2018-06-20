@@ -1,7 +1,7 @@
 #CRTF
 global coord=fk4
-+ann circle[[273.10deg, -23.18deg], 0.00deg], frame=bary, color=blue 
-+rotbox[[180.39deg, 12.39deg], [0.05deg, 0.02deg], 12.00deg], frame=bary, color=blue, range=[-1240km/s, 1240km/s] 
-+annulus[[267.76deg, -45.30deg], [0.10deg, 4.12deg]], frame=bary, label=my label here, color=red 
--ellipse[[12.00deg, 45.00deg], [0.25deg, 1.34deg], 2578.31deg], frame=bary, label=removed this, color=green, range=[1.420ghz, 1.421ghz] 
-+symbol[[31.47deg, 11.90deg], d], frame=bary, color=blue, linewidth=2, symsize=2 
++ann circle[[273.10deg, -23.18deg], 0.00deg], frame=bary, color=blue
++rotbox[[180.39deg, 12.39deg], [0.05deg, 0.02deg], 12.00deg], frame=bary, color=blue, range=[-1240km/s, 1240km/s]
++annulus[[267.76deg, -45.30deg], [0.10deg, 4.12deg]], frame=bary, label=my label here, color=red
+-ellipse[[12.00deg, 45.00deg], [0.25deg, 1.34deg], 2578.31deg], frame=bary, label=removed this, color=green, range=[1.420ghz, 1.421ghz]
++symbol[[31.47deg, 11.90deg], d], frame=bary, color=blue, linewidth=2, symsize=2

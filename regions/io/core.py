@@ -111,8 +111,8 @@ class ShapeList(list):
             'rectangle': '{0}rotbox[[{1:FMT}deg, {2:FMT}deg], [{3:FMT}RAD, {4:FMT}RAD], {5:FMT}deg]',
             'polygon': '{0}poly[{1}]',
             'point': '{0}point[[{1:FMT}deg, {2:FMT}deg]]',
-            'symbol': '{0}symbol[[{1:FMT}deg, {2:FMT}deg], {3}]',
-            'text': '{0}text[[{1:FMT}deg, {2:FMT}deg], \'{3}\']',
+            'symbol': '{0}symbol[[{1:FMT}deg, {2:FMT}deg], {symbol}]',
+            'text': '{0}text[[{1:FMT}deg, {2:FMT}deg], \'{text}\']',
             'line': '{0}line[[{1:FMT}deg, {2:FMT}deg], [{3:FMT}deg, {4:FMT}deg]]'
                         }
 
@@ -185,16 +185,16 @@ class ShapeList(list):
             elif shape.region_type == 'point':
                 if 'symbol' in shape.meta.keys():
                     line = crtf_strings['symbol'].format(include, *coord,
-                                                         reverse_symbol_mapping[shape.meta['symbol']])
+                                                         symbol=reverse_symbol_mapping[shape.meta['symbol']])
                 elif 'text' in shape.meta.keys():
-                    line = crtf_strings['text'].format(include, *coord, shape.meta['text'])
+                    line = crtf_strings['text'].format(include, *coord, text=shape.meta['text'])
                 else:
                     line = crtf_strings['point'].format(include, *coord)
             else:
                 line = crtf_strings[shape.region_type].format(include, *coord)
 
             if meta_str.strip():
-                output += "{0}, {1} \n".format(line, meta_str)
+                output += "{0}, {1}\n".format(line, meta_str)
             else:
                 output += "{0}\n".format(line)
 

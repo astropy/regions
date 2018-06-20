@@ -135,4 +135,12 @@ def test_file_crtf(filename):
     with open(get_pkg_data_filename('data/CRTFgeneraloutput.crtf')) as f:
         ref_output = f.read()
 
-    assert ref_output == actual_output
+    # since metadata is not required to preserve order, we have to do a more
+    # complex comparison
+    desired_lines = [set(line.split(",")) for line in ref_output.split("\n")]
+    actual_lines = [set(line.split(",")) for line in actual_output.split("\n")]
+    for split_line in actual_lines:
+        assert split_line in desired_lines
+
+    for split_line in desired_lines:
+        assert split_line in actual_lines
