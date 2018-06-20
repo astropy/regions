@@ -470,9 +470,11 @@ class DS9RegionParser(object):
         """
         Make shape object
         """
+        # In DS9, ellipse can also represents an elliptical annulus
+        # For elliptical annulus angle is optional.
         if self.region_type == 'ellipse':
             self.coord[2:] = [x * 2 for x in self.coord[2:]]
-            if len(self.coord) % 2 == 1:
+            if len(self.coord) % 2 == 1:  # This checks if angle is present
                 self.coord[-1] /= 2
 
         self.shape = Shape("DS9", coordsys=self.coordsys,

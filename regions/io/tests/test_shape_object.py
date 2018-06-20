@@ -89,18 +89,23 @@ def test_valid_ellipse_ds9():
 
     reg_str1 = "image\nellipse (1, 2, 3, 4, 5)"
     reg_str2 = "fk5\nellipse (1, 2, 3, 4, 5)"
+    reg_str3 = "image\nellipse (1, 2, 3, 4, 5, 6, 7)"  # Elliptical Annulus
 
     shape1 = DS9Parser(reg_str1, 'warn').shapes[0]
     shape2 = DS9Parser(reg_str2, 'warn').shapes[0]
+    shape3 = DS9Parser(reg_str3, 'warn').shapes[0]
 
     assert_quantity_allclose(shape1.coord[:2], [0, 1])
     assert_quantity_allclose(shape2.coord[:2], [Quantity("1deg"), Quantity("2deg")])
+    assert_quantity_allclose(shape3.coord[:2], [0, 1])
 
     assert_quantity_allclose(shape1.coord[2:-1], [6, 8])
     assert_quantity_allclose(shape2.coord[2:-1], [Quantity("6deg"), Quantity("8deg")])
+    assert_quantity_allclose(shape3.coord[2:-1], [6, 8, 10, 12])
 
     assert_quantity_allclose(shape1.coord[-1], Quantity("5deg"))
     assert_quantity_allclose(shape2.coord[-1], Quantity("5deg"))
+    assert_quantity_allclose(shape3.coord[-1], Quantity("7deg"))
 
 
 def test_valid_ellipse_crtf():
