@@ -239,4 +239,8 @@ class Mask(object):
             input ``data``.
         """
 
-        return self.cutout(data, fill_value=fill_value) * self.data
+        cutout = self.cutout(data, fill_value=fill_value)
+        if cutout is None:
+            return None
+        else:
+            return cutout * self.data
