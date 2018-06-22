@@ -1,7 +1,10 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import (absolute_import, division, print_function,
+                        unicode_literals)
+
 import numpy as np
-from astropy import units as u
+import astropy.units as u
+
 
 __all__ = ['Mask']
 
@@ -23,32 +26,37 @@ class Mask(object):
 
     Examples
     --------
-    Usage examples are provided in the :ref:`gs-masks` section of the docs.
+    Usage examples are provided in the :ref:`gs-masks` section of the
+    docs.
     """
 
     def __init__(self, data, bbox):
         self.data = np.asanyarray(data)
         if self.data.shape != bbox.shape:
-            raise ValueError("Shape of data and bounding box should match")
+            raise ValueError('data and bounding box must have the same '
+                             'shape.')
         self.bbox = bbox
+
+    def __array__(self):
+        """
+        Array representation of the mask data array (e.g., for
+        matplotlib).
+        """
+
+        return self.data
 
     @property
     def shape(self):
         """
         The shape of the mask data array.
         """
-        return self.data.shape
 
-    def __array__(self):
-        """
-        Array representation of the mask data array (e.g., for matplotlib).
-        """
-        return self.data
+        return self.data.shape
 
     def _overlap_slices(self, shape):
         """
-        Calculate the slices for the overlapping part of the bounding box
-        and an array of the given shape.
+        Calculate the slices for the overlapping part of the bounding
+        box and an array of the given shape.
 
         Parameters
         ----------
