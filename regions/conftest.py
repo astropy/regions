@@ -13,32 +13,38 @@ else:
     # function name.
     del pytest_arraydiff
 
-from astropy.tests.pytest_plugins import *
+from astropy.tests.pytest_plugins import *    # noqa
 
-## Uncomment the following line to treat all DeprecationWarnings as
-## exceptions
-enable_deprecations_as_exceptions()
+# Uncomment the following line to treat all DeprecationWarnings as
+# exceptions
+# enable_deprecations_as_exceptions()    # noqa
 
-# The KeyError below is essential in some cases when the package uses other
-# astropy affiliated packages.
+# Uncomment and customize the following lines to add/remove entries from
+# the list of packages for which version numbers are displayed when running
+# the tests. Making it pass for KeyError is essential in some cases when
+# the package uses other astropy affiliated packages.
 try:
-    PYTEST_HEADER_MODULES['Astropy'] = 'astropy'
-    del PYTEST_HEADER_MODULES['h5py']
-    del PYTEST_HEADER_MODULES['Pandas']
-except KeyError:
+    PYTEST_HEADER_MODULES['Cython'] = 'Cython'    # noqa
+    PYTEST_HEADER_MODULES['Astropy'] = 'astropy'    # noqa
+    del PYTEST_HEADER_MODULES['h5py']    # noqa
+    del PYTEST_HEADER_MODULES['Pandas']    # noqa
+except (NameError, KeyError):  # NameError is needed to support Astropy < 1.0
     pass
 
-## Uncomment the following lines to display the version number of the
-## package rather than the version number of Astropy in the top line when
-## running the tests.
+# Uncomment the following lines to display the version number of the
+# package rather than the version number of Astropy in the top line when
+# running the tests.
 import os
 
-## This is to figure out the affiliated package version, rather than
-## using Astropy's
+# This is to figure out the affiliated package version, rather than
+# using Astropy's
 try:
     from .version import version
 except ImportError:
     version = 'dev'
 
-packagename = os.path.basename(os.path.dirname(__file__))
-TESTED_VERSIONS[packagename] = version
+try:
+    packagename = os.path.basename(os.path.dirname(__file__))
+    TESTED_VERSIONS[packagename] = version    # noqa
+except NameError:   # Needed to support Astropy <= 1.0.0
+    pass
