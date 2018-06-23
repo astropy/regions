@@ -520,6 +520,8 @@ class Shape(object):
         for key in self.meta:
             if key in viz_keywords:
                 reg.visual[key] = self.meta[key]
+            elif key == 'range':
+                reg.meta[key] = [u.Quantity(x) for x in self.meta[key]]
             else:
                 reg.meta[key] = self.meta[key]
         reg.meta['include'] = self.include

@@ -189,10 +189,10 @@ class CRTFParser(object):
         if global_meta_str:
             for par in global_meta_str:
                 if par[0] is not '':
-                    val1 = par[0]
+                    val1 = par[0].lower()
                     val2 = par[1]
                 else:
-                    val1 = par[2]
+                    val1 = par[2].lower()
                     val2 = par[3]
                 val1 = val1.strip()
                 val2 = val2.strip()
@@ -263,7 +263,7 @@ class CRTFRegionParser(object):
     def __init__(self, global_meta, include, type_, region_type, reg_str, meta_str, errors='strict'):
 
         self.global_meta = global_meta
-        self.reg_str = reg_str
+        self.reg_str = reg_str.lower()
         self.meta_str = meta_str
         self.errors = errors
 
@@ -301,8 +301,8 @@ class CRTFRegionParser(object):
 
         # TODO: needs expert attention (Most reference systems are not mapped)
         """
-        if self.coordsys in self.coordsys_mapping:
-            self.coordsys = self.coordsys_mapping[self.coordsys]
+        if self.coordsys.lower() in self.coordsys_mapping:
+            self.coordsys = self.coordsys_mapping[self.coordsys.lower()]
 
     def convert_coordinates(self):
         """
