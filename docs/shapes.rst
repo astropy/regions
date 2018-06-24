@@ -145,76 +145,143 @@ The meta attribute provides additional data about regions such labels, tags,
 comments, name, options io(DS9/CRTF) specific.
 These classes , for now, just checks whether the key is valid or not.
 
-The valid keys for RegionMeta class are:
+The valid keys for :class:`~regions.RegionMeta` class are:
 
-1. ``label``:
+1. ``label``/``text``: CRTF, DS9 (text label for a region)
+
+    - Ex: meta['label'] = 'this is a circle'
+
 2. ``symbol``/``point``: CRTF, DS9 (Symbol for which a point region is described)
 
+    - Ex: meta['symbol'] = 'point marker'
+
 3. ``include``: CRTF, DS9 (Region inclusion)
+
     - Possible Value: True, False
+
     - Ex: meta['include'] = True
+
 4. ``frame``: CRTF (Frequency/Velocity Axis)
+
     - Possible values: 'REST', 'LSRK', 'LSRD', 'BARY', 'GEO', 'TOPO', 'GALACTO', 'LGROUP', 'CMB'
+
     - Default: image value
+
     - Ex: meta['frame'] = 'TOPO'
 
 5. ``range``: CRTF (Frequency/Velocity Range)
+
     - Possible units: GHz, MHz, kHz, km/s, Hz, channel, chan (=channel)
+
     - Default: image range
+
     - Format: [min, max]
+
     - Ex: meta['range'] = [-320 * u.m/u.sec, -330 * u.m/u.s]
 
 6. ``veltype``: CRTF (Velocity Calculation)
+
     - Possible values: 'RADIO', 'OPTICAL', 'Z', 'BETA', 'GAMMA'
+
     - Default: image value
+
     - Ex: meta['veltype'] = 'RADIO'
 
 7. ``restfreq``: CRTF (Rest Frequency)
+
     - Possible values: `~astropy.units.Quantity` object
+
     - Default: image value
+
     - Ex: meta['restfreq'] = Quantity("1.42GHz")
 
 8. ``corr``: CRTF (Correlational Axis)
-    - Possible values: 'I', 'Q', 'U', 'V', 'RR', 'RL', 'LR', 'LL', 'XX', 'XY',
-    'YX', 'YY', 'RX', 'RY', 'LX', 'LY', 'XR', 'XL', 'YR', 'YL', 'PP', 'PQ', 'QP'
-    , 'QQ', 'RCircular', 'LCircular', 'Linear', 'Ptotal', 'Plinear', 'PFtotal',
-     'PFlinear', 'Pangle
-    - Default: all planes present in image
-    - corr=[X, Y]
 
-9. ``comment``:
-10. ``coord``:
+    - Possible values: 'I', 'Q', 'U', 'V', 'RR', 'RL', 'LR', 'LL', 'XX', 'XY',
+      'YX', 'YY', 'RX', 'RY', 'LX', 'LY', 'XR', 'XL', 'YR', 'YL', 'PP', 'PQ',
+      'QP', 'QQ', 'RCircular', 'LCircular', 'Linear', 'Ptotal', 'Plinear',
+      'PFtotal', 'PFlinear', 'Pangle'
+
+    - Default: all planes present in image
+
+    - Ex: meta['corr'] = ['X', 'Y']
+
+9. ``comment``: DS9
+
+    - Ex: meta['comment'] = 'Any comment for the region'
+
+10. ``coord``: CRTF (the coordinate system that the region follows)
+
+    - Possible values: 'J2000', 'JMEAN', 'JTRUE', 'APP', 'B1950', 'B1950_VLA',
+       'BMEAN', 'BTRUE', 'GALACTIC', 'HADEC', 'AZEL', 'AZELSW', 'AZELNE',
+       'AZELGEO', 'AZELSWGEO', 'AZELNEGEO', 'JNAT', 'ECLIPTIC', 'MECLIPTIC',
+       'TECLIPTIC', 'SUPERGAL', 'ITRF', 'TOPO', 'ICRS'
+
+    - Default: image value
+
+    - Ex: meta['coord'] = 'J2000'
+
 11. ``line``:
+
+
 12. ``name``:
+
 13. ``select``:
+
 14. ``highlite``:
+
 15. ``fixed``:
+
 16. ``edit``:
+
 17. ``move``:
+
 18. ``rotate``:
+
 19. ``delete``:
+
 20. ``source``:
+
 21. ``background``:
-``tag``:
+
+22. ``tag``:
+
 The visual attributes are meta data meant to be used to visualize regions, especially
 used by plotting libraries such as `Matplotlib`_ in future.
 
 The valid keys for RegionVisual class are:
 
-1. ``color``:
+1. ``color``: CRTF, DS9 (Region, symbol and text color)
+    - Possible values: any color recognized by `Matplotlib`_, including hex values
+    - Default: color=green
+    - Ex: visual['color'] = 'blue'
+
 2. ``dash``:
+
 3. ``font``:
+
 4. ``dashlist``:
+
 5. ``symsize``:
+
 6. ``symthick``:
+
 7. ``fontsize``:
+
 8. ``fontstyle``:
+
 9. ``usetex``:
+
 10. ``labelpos``:
+
 11. ``labeloff``:
+
 12. ``linewidth``:
+
 13. ``linestyle``:
+
 14. ``fill``:
+
 15. ``line``:
 
 .. _sh-lists:
