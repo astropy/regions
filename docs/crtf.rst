@@ -3,12 +3,19 @@
 Reading/writing to CRTF region files
 ====================================
 
+CASA Region Text Format (CRTF) : The CASA region file format provides a
+flexible, easily edited set of region definitions which are accepted across
+CASA tasks.
+
 The regions package provides the functionality to serialise and de-serialise
 Python lists of `~regions.Region` objects to CRTF region strings.
 De-serialisation is done using  the `~regions.CRTFParser`. It converts the CRTF
 string to `~regions.ShapeList` object, which is a list of `~regions.Shape` each
 representing one CRTF region. The `~regions.Shape` objects can be converted to
 `~regions.Region` objects.
+
+To know more about the format specifications, please go to `the official page
+<https://casaguides.nrao.edu/index.php/CASA_Region_Format#Region_definitions>`_
 
 .. code-block:: python
 

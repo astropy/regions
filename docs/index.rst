@@ -31,6 +31,7 @@ User Documentation
 
    installation
    getting_started
+   shapes
    contains
    compound
    masks
