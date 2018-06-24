@@ -22,6 +22,18 @@ currently supported.
     >>> circle_pix = CirclePixelRegion(center=PixCoord(x=42, y=43),
     ...                                radius=4.2)
 
+* `~regions.CircleAnnulusSkyRegion` and `~regions.CircleAnnulusPixelRegion`
+
+.. code-block:: python
+
+    >>> from astropy.coordinates import Angle, SkyCoord
+    >>> from regions import PixCoord, CircleAnnulusSkyRegion, CircleAnnulusPixelRegion
+
+    >>> circle_annulus_sky = CircleAnnulusSkyRegion(center=SkyCoord(42, 43, unit='deg'),
+    ...                               inner_radius=Angle(3, 'deg'), outer_radius=Angle(4, 'deg'))
+    >>> circle_annulus_pix = CircleAnnulusPixelRegion(center=PixCoord(x=42, y=43),
+    ...                                inner_radius=4.2, outer_radius=5.2)
+
 * `~regions.EllipseSkyRegion` and `~regions.EllipsePixelRegion`
 
 .. code-block:: python
@@ -45,6 +57,16 @@ currently supported.
 
     >>> point_sky = PointSkyRegion(center=SkyCoord(42, 43, unit='deg'))
     >>> point_pix = PointPixelRegion(center=PixCoord(x=42, y=43))
+
+* `~regions.LineSkyRegion` and `~regions.LinePixelRegion`
+
+.. code-block:: python
+
+    >>> from astropy.coordinates import SkyCoord
+    >>> from regions import PixCoord, LineSkyRegion, LinePixelRegion
+
+    >>> line_sky = LineSkyRegion(start=SkyCoord(42, 43, unit='deg'), end=SkyCoord(52, 53, unit='deg'))
+    >>> line_pix = LinePixelRegion(start=PixCoord(x=42, y=43), end=PixCoord(x=52, y=53))
 
 * `~regions.PolygonSkyRegion` and `~regions.PolygonPixelRegion`
 
@@ -135,14 +157,16 @@ Also to convert a :class:`~regions.PixelRegion` to a
 Meta Data
 ---------
 
-A :class:`~regions.Region` has ``meta`` and ``visual`` attribute stores the meta
-data of the region. Since, this package supports various file formats
-it is necessary to handle the meta attributes supported by them. To handle them
-efficiently there are :class:`~regions.RegionMeta` and
-:class:`~regions.RegionVisual` for meta and visual attributes.
+A :class:`~regions.Region` has ``meta`` and ``visual`` attributes which
+stores the meta data of the region. Since, this package supports various file
+formats it is necessary to handle the meta attributes supported by them.
+To handle them there are :class:`~regions.RegionMeta` and
+:class:`~regions.RegionVisual` for meta and visual attributes respectively.
+They are subclasses of the python dictionary (`~dict`).
 
-The meta attribute provides additional data about regions such labels, tags,
-comments, name, options io(DS9/CRTF) specific.
+The meta attribute provides additional data about regions such as labels, tags,
+comments, name, etc.. which are used for non-display tasks.
+It also stores the spectral dimensions of the region.
 These classes , for now, just checks whether the key is valid or not.
 
 The valid keys for :class:`~regions.RegionMeta` class are:
