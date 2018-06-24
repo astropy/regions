@@ -1,3 +1,5 @@
+.. include:: references.txt
+
 .. _sh:
 
 .. _sh-shapes:
@@ -73,12 +75,13 @@ currently supported.
 .. Polygons
 .. --------
 ..
-.. Polygons are the most versatile region, since any region can be approximated as a polygon.
+.. Polygons are the most versatile region, since any region can be approximated
+.. as a polygon.
 ..
-.. TODO: explain how polygons are implemented and special polygon methods, e.g. how to
-.. obtain a polygon approximation for any shape.
-.. This is not available yet, for now see `spherical_geometry`_ for spherical polygons
-.. and `Shapely`_ for pixel polygons.
+.. TODO: explain how polygons are implemented and special polygon methods,
+.. e.g. how to obtain a polygon approximation for any shape.
+.. This is not available yet, for now see `spherical_geometry`_
+.. for spherical polygons and `Shapely`_ for pixel polygons.
 
 .. _sh-wcs:
 
@@ -93,46 +96,149 @@ A key feature of the regions package is that, for a given image, more precisely
 a given `~astropy.wcs.WCS` object, it is possible to convert back and forth
 between sky and image regions.
 
-As an example, let's use this sky circle region:
+As an example, let's use this :class:`~regions.CircleSkyRegion`, a sky circle region:
 
 .. code-block:: python
 
-    from astropy.coordinates import Angle, SkyCoord
-    from regions import CircleSkyRegion
+    >>> from astropy.coordinates import Angle, SkyCoord
+    >>> from regions import CircleSkyRegion
 
-    center = SkyCoord(50, 10, unit='deg')
-    radius = Angle(30, 'deg')
-    sky_reg = CircleSkyRegion(center, radius)
+    >>> center = SkyCoord(50, 10, unit='deg')
+    >>> radius = Angle(30, 'deg')
+    >>> sky_reg = CircleSkyRegion(center, radius)
 
-To convert it to a pixel region, call the :meth:`~regions.SkyRegion.to_pixel` method:
+To convert it to a :class:`~regions.PixelRegion`, call the
+:meth:`~regions.SkyRegion.to_pixel` method:
 
 .. code-block:: python
 
     >>> pix_reg = sky_reg.to_pixel(wcs)
-    >>> pix_reg
+    >>> print(pix_reg)
     CirclePixelRegion
     center: PixCoord(x=55.35205711214607, y=40.0958313892697)
     radius: 36.93290808340659
+
+Also to convert a :class:`~regions.PixelRegion` to a
+:class:`~regions.SkyRegion`, call the :meth:`~regions.PixelRegion.to_sky` method:
+
+.. code-block:: python
+
+    >>> sky_reg = pix_reg.to_sky(wcs)
+    >>> print(sky_reg)
+    Region: CircleSkyRegion
+    center: <SkyCoord (ICRS): (ra, dec) in deg
+        (50., 10.)>
+    radius: 30.0 deg
+
+.. _sh-meta:
+
+Meta Data
+---------
+
+A :class:`~regions.Region` has ``meta`` and ``visual`` attribute stores the meta
+data of the region. Since, this package supports various file formats
+it is necessary to handle the meta attributes supported by them. To handle them
+efficiently there are :class:`~regions.RegionMeta` and
+:class:`~regions.RegionVisual` for meta and visual attributes.
+
+The meta attribute provides additional data about regions such labels, tags,
+comments, name, options io(DS9/CRTF) specific.
+These classes , for now, just checks whether the key is valid or not.
+
+The valid keys for RegionMeta class are:
+
+1. ``label``:
+2. ``symbol``/``point``: CRTF, DS9 (Symbol for which a point region is described)
+
+3. ``include``: CRTF, DS9 (Region inclusion)
+    - Possible Value: True, False
+    - Ex: meta['include'] = True
+4. ``frame``: CRTF (Frequency/Velocity Axis)
+    - Possible values: 'REST', 'LSRK', 'LSRD', 'BARY', 'GEO', 'TOPO', 'GALACTO', 'LGROUP', 'CMB'
+    - Default: image value
+    - Ex: meta['frame'] = 'TOPO'
+
+5. ``range``: CRTF (Frequency/Velocity Range)
+    - Possible units: GHz, MHz, kHz, km/s, Hz, channel, chan (=channel)
+    - Default: image range
+    - Format: [min, max]
+    - Ex: meta['range'] = [-320 * u.m/u.sec, -330 * u.m/u.s]
+
+6. ``veltype``: CRTF (Velocity Calculation)
+    - Possible values: 'RADIO', 'OPTICAL', 'Z', 'BETA', 'GAMMA'
+    - Default: image value
+    - Ex: meta['veltype'] = 'RADIO'
+
+7. ``restfreq``: CRTF (Rest Frequency)
+    - Possible values: `~astropy.units.Quantity` object
+    - Default: image value
+    - Ex: meta['restfreq'] = Quantity("1.42GHz")
+
+8. ``corr``: CRTF (Correlational Axis)
+    - Possible values: 'I', 'Q', 'U', 'V', 'RR', 'RL', 'LR', 'LL', 'XX', 'XY',
+    'YX', 'YY', 'RX', 'RY', 'LX', 'LY', 'XR', 'XL', 'YR', 'YL', 'PP', 'PQ', 'QP'
+    , 'QQ', 'RCircular', 'LCircular', 'Linear', 'Ptotal', 'Plinear', 'PFtotal',
+     'PFlinear', 'Pangle
+    - Default: all planes present in image
+    - corr=[X, Y]
+
+9. ``comment``:
+10. ``coord``:
+11. ``line``:
+12. ``name``:
+13. ``select``:
+14. ``highlite``:
+15. ``fixed``:
+16. ``edit``:
+17. ``move``:
+18. ``rotate``:
+19. ``delete``:
+20. ``source``:
+21. ``background``:
+``tag``:
+The visual attributes are meta data meant to be used to visualize regions, especially
+used by plotting libraries such as `Matplotlib`_ in future.
+
+The valid keys for RegionVisual class are:
+
+1. ``color``:
+2. ``dash``:
+3. ``font``:
+4. ``dashlist``:
+5. ``symsize``:
+6. ``symthick``:
+7. ``fontsize``:
+8. ``fontstyle``:
+9. ``usetex``:
+10. ``labelpos``:
+11. ``labeloff``:
+12. ``linewidth``:
+13. ``linestyle``:
+14. ``fill``:
+15. ``line``:
 
 .. _sh-lists:
 
 Lists
 -----
 
-A `~regions.Region` object can only represent one region, not an array (a.k.a. vector or list) of regions.
+A `~regions.Region` object can only represent one region,
+an array (a.k.a. vector or list) of regions.
 
-This is in contrast to the aperture classes in `photutils` like :class:`~photutils.CircularAperture` that
-do allow the ``positions`` (but usually not the other parameters) to be arrays:
+This is in contrast to the aperture classes in `photutils` like
+:class:`~photutils.CircularAperture` that do allow the ``positions``
+(but usually not the other parameters) to be arrays:
 
-.. code-block:: python
+.. doctest-skip::
 
-    from photutils import CircularAperture
-    positions = [(1, 2), (3, 4)]
-    apertures = CircularAperture(positions, r=4.2)
+    >>> from photutils import CircularAperture
+    >>> positions = [(1, 2), (3, 4)]
+    >>> apertures = CircularAperture(positions, r=4.2)
 
-To represent lists of `~regions.Region` objects, you can store them in Python lists
-(or other containers, but lists are the most common).
-To create many similar regions or process many regions you can use for loops or list comprehensions.
+To represent lists of `~regions.Region` objects, you can store them in
+Python lists (or other containers, but lists are the most common).
+To create many similar regions or process many regions you can use for loops or
+list comprehensions.
 
 .. code-block:: python
 
