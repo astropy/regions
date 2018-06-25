@@ -190,6 +190,11 @@ class ShapeList(list):
                     line = crtf_strings['text'].format(include, *coord, text=shape.meta['text'])
                 else:
                     line = crtf_strings['point'].format(include, *coord)
+            elif shape.region_type == 'ellipse':
+                coord[2:] = [x / 2 for x in coord[2:]]
+                if len(coord) % 2 == 1:
+                    coord[-1] *= 2
+                line = crtf_strings['ellipse'].format(include, *coord)
             else:
                 line = crtf_strings[shape.region_type].format(include, *coord)
 
