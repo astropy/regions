@@ -173,7 +173,7 @@ class Mask(object):
 
         Returns
         -------
-        result : `~numpy.ndarray`
+        result : `~numpy.ndarray` or `None`
             A 2D array cut out from the input ``data`` representing the
             same cutout region as the region mask.  If there is a
             partial overlap of the region mask with the input data,
@@ -232,7 +232,7 @@ class Mask(object):
 
         Returns
         -------
-        result : `~numpy.ndarray`
+        result : `~numpy.ndarray` or `None`
             A 2D mask-weighted cutout from the input ``data``.  If there
             is a partial overlap of the region mask with the input data,
             pixels outside of the data will be assigned to
