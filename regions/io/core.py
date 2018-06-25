@@ -172,6 +172,11 @@ class ShapeList(list):
                 temp = [val.format(x) for x in coord]
                 coord = ",".join(temp)
                 line = ds9_strings['polygon'].format(include, coord)
+            elif shape.region_type == 'ellipse':
+                coord[2:] = [x / 2 for x in coord[2:]]
+                if len(coord) % 2 == 1:
+                    coord[-1] *= 2
+                line = ds9_strings['ellipse'].format(include, *coord)
             else:
                 line = ds9_strings[shape.region_type].format(include, *coord)
 

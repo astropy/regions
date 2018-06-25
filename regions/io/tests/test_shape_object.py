@@ -63,6 +63,7 @@ def test_shape_crtf():
     shape = parser.shapes[0]
     assert_quantity_allclose(shape.coord, [Quantity("1"), Quantity("2"), Quantity("3")])
 
+
 def test_valid_shape():
 
     reg_str = "circle[[18h12m24s, -23d11m00s], 2.3arcsec], linewidth=2, coord=J2000, symsize=2"
@@ -82,3 +83,44 @@ def test_valid_shape():
         shape.coordsys = 'hello'
 
     assert "'hello' is not a valid coordinate reference frame in astropy" in str(err)
+
+
+def test_valid_ellipse_ds9():
+
+    reg_str1 = "image\nellipse (1, 2, 3, 4, 5)"
+    reg_str2 = "fk5\nellipse (1, 2, 3, 4, 5)"
+    reg_str3 = "image\nellipse (1, 2, 3, 4, 5, 6, 7)"  # Elliptical Annulus
+
+    shape1 = DS9Parser(reg_str1, 'warn').shapes[0]
+    shape2 = DS9Parser(reg_str2, 'warn').shapes[0]
+    shape3 = DS9Parser(reg_str3, 'warn').shapes[0]
+
+    assert_quantity_allclose(shape1.coord[:2], [0, 1])
+    assert_quantity_allclose(shape2.coord[:2], [Quantity("1deg"), Quantity("2deg")])
+    assert_quantity_allclose(shape3.coord[:2], [0, 1])
+
+    assert_quantity_allclose(shape1.coord[2:-1], [6, 8])
+    assert_quantity_allclose(shape2.coord[2:-1], [Quantity("6deg"), Quantity("8deg")])
+    assert_quantity_allclose(shape3.coord[2:-1], [6, 8, 10, 12])
+
+    assert_quantity_allclose(shape1.coord[-1], Quantity("5deg"))
+    assert_quantity_allclose(shape2.coord[-1], Quantity("5deg"))
+    assert_quantity_allclose(shape3.coord[-1], Quantity("7deg"))
+
+
+def test_valid_ellipse_crtf():
+
+    reg_str1 = "ellipse[[1pix, 2pix], [3pix, 4pix], 5deg]"
+    reg_str2 = "ellipse[[1deg, 2deg], [3deg, 4deg], 5deg], coord=fk5"
+
+    shape1 = CRTFParser(reg_str1, 'warn').shapes[0]
+    shape2 = CRTFParser(reg_str2, 'warn').shapes[0]
+
+    assert_quantity_allclose(shape1.coord[:2], [1, 2])
+    assert_quantity_allclose(shape2.coord[:2], [Quantity("1deg"), Quantity("2deg")])
+
+    assert_quantity_allclose(shape1.coord[2:-1], [6, 8])
+    assert_quantity_allclose(shape2.coord[2:-1], [Quantity("6deg"), Quantity("8deg")])
+
+    assert_quantity_allclose(shape1.coord[-1], Quantity("5deg"))
+    assert_quantity_allclose(shape2.coord[-1], Quantity("5deg"))
