@@ -50,3 +50,6 @@ distribute-*.tar.gz
 
 # Mac OSX
 .DS_Store
+
+# Pytest
+.pytest_cache
