@@ -12,7 +12,7 @@ from astropy import log
 from .. import shapes
 from ..core import PixCoord, SkyRegion, RegionMeta, RegionVisual
 from .ds9.core import DS9RegionParserWarning, DS9RegionParserError
-from .crtf.core import CRTFRegionParserWarning, CRTFRegionParserError
+from .crtf.core import CRTFRegionParserWarning, CRTFRegionParserError, valid_symbols
 
 __all__ = ['ShapeList', 'Shape', 'to_shape_list', 'to_crtf_meta', 'to_ds9_meta']
 
@@ -30,7 +30,10 @@ reg_mapping = {'DS9': {x: x for x in regions_attributes},
                'CRTF': {x: x for x in regions_attributes}}
 reg_mapping['DS9']['box'] = 'rectangle'
 reg_mapping['CRTF']['rotbox'] = 'rectangle'
+reg_mapping['CRTF']['centerbox'] = 'rectangle'
 reg_mapping['CRTF']['poly'] = 'polygon'
+reg_mapping['CRTF']['symbol'] = 'point'
+reg_mapping['CRTF']['text'] = 'point'
 
 
 # valid astropy coordinate frames in their respective formats.
@@ -65,7 +68,7 @@ class ShapeList(list):
                 msg = 'Skipping elliptical annulus {}'.format(shape)
                 warn(msg, DS9RegionParserWarning)
                 continue
-            if shape.region_type in ['box', 'symbol', 'text'] and shape.format_type == 'CRTF':
+            if shape.region_type in ['box'] and shape.format_type == 'CRTF':
                 msg = 'Skipping {} {}'.format(shape.region_type, shape)
                 warn(msg, CRTFRegionParserWarning)
                 continue
@@ -75,8 +78,127 @@ class ShapeList(list):
             regions.append(region)
         return regions
 
-    def to_crtf(self):
-        raise NotImplementedError('This method intends to convert ShapeList to CRTF strings')
+    def to_crtf(self,  coordsys='fk5', fmt='.6f', radunit='deg'):
+        """
+        Converts a list of ``regions.Shape`` objects to crtf region strings.
+
+        Parameters
+        ----------
+        coordsys : str
+            This overrides the coordinate system frame for all regions.
+
+        fmt : str
+            A python string format defining the output precision.
+            Default is .6f, which is accurate to 0.0036 arcseconds.
+
+        radunit : str
+            This denotes the unit of the radius.
+
+        Returns
+        -------
+        region_string : str
+            crtf region string
+
+        Examples
+        --------
+        TODO
+        """
+
+        crtf_strings = {
+            'circle': '{0}circle[[{1:FMT}deg, {2:FMT}deg], {3:FMT}RAD]',
+            'annulus': '{0}annulus[[{1:FMT}deg, {2:FMT}deg], [{3:FMT}RAD, {4:FMT}RAD]]',
+            'ellipse': '{0}ellipse[[{1:FMT}deg, {2:FMT}deg], [{3:FMT}RAD, {4:FMT}RAD], {5:FMT}deg]',
+            'rectangle': '{0}rotbox[[{1:FMT}deg, {2:FMT}deg], [{3:FMT}RAD, {4:FMT}RAD], {5:FMT}deg]',
+            'polygon': '{0}poly[{1}]',
+            'point': '{0}point[[{1:FMT}deg, {2:FMT}deg]]',
+            'symbol': '{0}symbol[[{1:FMT}deg, {2:FMT}deg], {symbol}]',
+            'text': '{0}text[[{1:FMT}deg, {2:FMT}deg], \'{text}\']',
+            'line': '{0}line[[{1:FMT}deg, {2:FMT}deg], [{3:FMT}deg, {4:FMT}deg]]'
+                        }
+
+        reverse_symbol_mapping = {y: x for x, y in valid_symbols.items()}
+
+        output = '#CRTF\n'
+
+        if radunit == 'arcsec':
+            # what's this for?
+            if coordsys in coordsys_mapping['CRTF'].values():
+                radunitstr = '"'
+            else:
+                raise ValueError(
+                    'Radius unit arcsec not valid for coordsys {}'.format(
+                        coordsys))
+        else:
+            radunitstr = radunit
+
+        for key, val in crtf_strings.items():
+            crtf_strings[key] = val.replace("FMT", fmt).replace("RAD",
+                                                               radunitstr)
+
+        output += 'global coord={}\n'.format(coordsys)
+
+        for shape in self:
+
+            shape.check_crtf()
+
+            # if unspecified, include is True.
+            include = "-" if shape.meta.get('include') in (False, '-') else "+"
+            include += "ann " if shape.meta.get('type', 'reg') == 'ann' else ""
+
+            meta_str = ", ".join("{0}={1}".format(key, val) for key, val in
+                                shape.meta.items() if
+                                key not in ('include', 'comment', 'symbol', 'coord', 'text', 'range', 'corr', 'type'))
+
+            if 'comment' in shape.meta:
+                meta_str += ", " + shape.meta['comment']
+            if 'range' in shape.meta:
+                meta_str += ", range={}".format(shape.meta['range']).replace("'", "")
+            if 'corr' in shape.meta:
+                meta_str += ", corr={}".format(shape.meta['corr']).replace("'", "")
+
+            coord = []
+
+            if coordsys not in ['image', 'physical']:
+                for val in shape.coord:
+                    if isinstance(val, Angle):
+                        coord.append(float(val.value))
+                    else:
+                        if radunit == '' or None:
+                            coord.append(float(val.value))
+                        else:
+                            coord.append(float(val.to(radunit).value))
+            else:
+                for val in shape.coord:
+                    if isinstance(val, u.Quantity):
+                        coord.append(float(val.value))
+                    else:
+                        coord.append(float(val))
+
+            if shape.region_type in ['ellipse', 'rectangle'] and len(shape.coord) % 2 == 1:
+                coord[-1] = float(shape.coord[-1].to('deg').value)
+
+            if shape.region_type == 'polygon':
+                val = '[{0:' + fmt + '}deg, {1:' + fmt + '}deg]'
+                temp = [val.format(x, y) for x, y in zip(coord[::2], coord[1::2])]
+                coord = ", ".join(temp)
+                line = crtf_strings['polygon'].format(include, coord)
+            elif shape.region_type == 'point':
+                if 'symbol' in shape.meta.keys():
+                    line = crtf_strings['symbol'].format(include, *coord,
+                                                         symbol=reverse_symbol_mapping[shape.meta['symbol']])
+                elif 'text' in shape.meta.keys():
+                    line = crtf_strings['text'].format(include, *coord, text=shape.meta['text'])
+                else:
+                    line = crtf_strings['point'].format(include, *coord)
+            else:
+                line = crtf_strings[shape.region_type].format(include, *coord)
+
+            if meta_str.strip():
+                output += "{0}, {1}\n".format(line, meta_str)
+            else:
+                output += "{0}\n".format(line)
+
+        return output
 
     def to_ds9(self, coordsys='fk5', fmt='.6f', radunit='deg'):
         """
@@ -525,7 +647,7 @@ def to_crtf_meta(region_meta, region_visual):
 
     # meta keys allowed in CRTF
     valid_keys = ['label', 'symbol', 'include', 'frame', 'range', 'veltype',
-                  'restfreq', 'coord']
+                  'restfreq', 'coord', 'type']
 
     # visual keys allowed in CRTF
     valid_keys += ['color', 'width', 'font', 'symthick', 'symsize', 'fontsize',
