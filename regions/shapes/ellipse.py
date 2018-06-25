@@ -13,7 +13,7 @@ from .._geometry import elliptical_overlap_grid
 from .._utils.wcs_helpers import skycoord_to_pixel_scale_angle
 
 
-__all__ = ['EllipsePixelRegion', 'EllipseSkyRegion']
+__all__ = ['EllipsePixelRegion', 'EllipseSkyRegion',]
 
 
 class EllipsePixelRegion(PixelRegion):
