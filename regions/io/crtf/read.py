@@ -380,6 +380,9 @@ class CRTFRegionParser(object):
         self.meta['include'] = self.include != '-'
         self.include = self.meta['include']
 
+        if 'range' in self.meta:
+            self.meta['range'] = [u.Quantity(x) for x in self.meta['range']]
+
         self.meta['type'] = self.type_
 
     def make_shape(self):

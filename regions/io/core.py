@@ -165,7 +165,7 @@ class ShapeList(list):
             if 'comment' in shape.meta:
                 meta_str += ", " + shape.meta['comment']
             if 'range' in shape.meta:
-                meta_str += ", range={}".format(shape.meta['range']).replace("'", "")
+                meta_str += ", range={}".format([str(x) for x in shape.meta['range']]).replace("'", "")
             if 'corr' in shape.meta:
                 meta_str += ", corr={}".format(shape.meta['corr']).replace("'", "")
 
@@ -520,8 +520,6 @@ class Shape(object):
         for key in self.meta:
             if key in viz_keywords:
                 reg.visual[key] = self.meta[key]
-            elif key == 'range':
-                reg.meta[key] = [u.Quantity(x) for x in self.meta[key]]
             else:
                 reg.meta[key] = self.meta[key]
         reg.meta['include'] = self.include
