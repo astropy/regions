@@ -72,11 +72,17 @@ class LinePixelRegion(PixelRegion):
     def as_patch(self, **kwargs):
         """Matplotlib patch object for this region (`matplotlib.patches.Line`)."""
         # Long term we want to support DS9 lines with arrow heads
+
+        # We may want to use Line2D instead of arrow for lines because the width
+        # of the arrow is non-scalable in patches
+
         from matplotlib.patches import Arrow
         x = self.start.x
         y = self.start.y
         dx = self.end.x - self.start.x
         dy = self.end.y - self.start.y
+        if not 'width' in kwargs:
+            kwargs['width'] = .1 # Let the default width be .1 instead of 1.
         return Arrow(x, y, dx, dy, **kwargs)
 
 
