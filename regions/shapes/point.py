@@ -71,7 +71,7 @@ class PointSkyRegion(SkyRegion):
         if center.isscalar:
             self.center = center
         else:
-            raise ValueError('the centre should be a 0D SkyCoord object')
+            raise ValueError('The Center should be a 0D SkyCoord object')
         self.meta = meta or {}
         self.visual = visual or {}
         self._repr_params = None
