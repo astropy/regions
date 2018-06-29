@@ -344,7 +344,7 @@ class CRTFRegionParser(object):
                     self._raise_error("Not in proper format: {0} should be a single length".format(y))
             if x == 's':
                 if y in valid_symbols:
-                    self.meta['symbol'] = valid_symbols[y]
+                    self.meta['symbol'] = y
                 else:
                     self._raise_error("Not in proper format: '{0}' should be a symbol".format(y))
 

@@ -117,8 +117,6 @@ class ShapeList(list):
             'line': '{0}line[[{1:FMT}deg, {2:FMT}deg], [{3:FMT}deg, {4:FMT}deg]]'
                         }
 
-        reverse_symbol_mapping = {y: x for x, y in valid_symbols.items()}
-
         output = '#CRTF\n'
 
         if radunit == 'arcsec':
@@ -186,7 +184,7 @@ class ShapeList(list):
             elif shape.region_type == 'point':
                 if 'symbol' in shape.meta.keys():
                     line = crtf_strings['symbol'].format(include, *coord,
-                                                         symbol=reverse_symbol_mapping[shape.meta['symbol']])
+                                                         symbol=shape.meta['symbol'])
                 elif 'text' in shape.meta.keys():
                     line = crtf_strings['text'].format(include, *coord, text=shape.meta['text'])
                 else:
@@ -487,8 +485,9 @@ class Shape(object):
         coords = self.convert_coords()
         log.debug(coords)
         viz_keywords = ['color', 'dash', 'dashlist', 'width', 'font', 'symsize',
-                        'symsize', 'fontsize', 'fontstyle', 'usetex',
-                        'labelpos', 'labeloff', 'linewidth', 'linestyle']
+                        'symbol', 'symsize', 'fontsize', 'fontstyle', 'usetex',
+                        'labelpos', 'labeloff', 'linewidth', 'linestyle',
+                        'point']
 
         if isinstance(coords[0], SkyCoord):
             reg = self.shape_to_sky_region[self.region_type](*coords)
@@ -499,7 +498,7 @@ class Shape(object):
 
         reg.visual = RegionVisual()
         reg.meta = RegionMeta()
-        for key in self.meta.keys():
+        for key in self.meta:
             if key in viz_keywords:
                 reg.visual[key] = self.meta[key]
             else:

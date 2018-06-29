@@ -278,7 +278,7 @@ class RegionMeta(dict):
     """
     A python dictionary subclass which holds the meta attributes of the region.
     """
-    valid_keys = ['label', 'symbol', 'include', 'frame', 'range', 'veltype',
+    valid_keys = ['label', 'include', 'frame', 'range', 'veltype',
                   'restfreq', 'tag', 'comment', 'coord', 'line', 'name',
                   'select', 'highlite', 'fixed', 'edit', 'move', 'rotate',
                   'delete', 'source', 'background', 'corr', 'type'
@@ -303,10 +303,10 @@ class RegionVisual(dict):
     A python dictionary subclass which holds the visual attributes of the region.
     """
     valid_keys = ['color', 'dash', 'font', 'dashlist', 'symsize', 'symthick',
-                  'fontsize', 'fontstyle', 'usetex', 'labelpos', 'labeloff',
-                  'linewidth', 'linestyle', 'fill', 'line']
+                  'symbol', 'fontsize', 'fontstyle', 'usetex', 'labelpos',
+                  'labeloff', 'linewidth', 'linestyle', 'fill', 'line']
 
-    key_mapping = {'width': 'linewidth'}
+    key_mapping = {'width': 'linewidth', 'point': 'symbol'}
 
     def __setitem__(self, key, value):
         key = self.key_mapping.get(key, key)
