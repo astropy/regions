@@ -8,3 +8,4 @@ from .polygon import *
 from .rectangle import *
 from .annulus import *
 from .line import *
+from .text import *
