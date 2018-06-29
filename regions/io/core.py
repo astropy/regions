@@ -165,7 +165,9 @@ class ShapeList(list):
             if 'comment' in shape.meta:
                 meta_str += ", " + shape.meta['comment']
             if 'range' in shape.meta:
-                meta_str += ", range={}".format([str(x) for x in shape.meta['range']]).replace("'", "")
+                shape.meta['range'] = [str(str(x).replace(" ", "")) for x in
+                                       shape.meta['range']]
+                meta_str += ", range={}".format(shape.meta['range']).replace("'", "")
             if 'corr' in shape.meta:
                 meta_str += ", corr={}".format(shape.meta['corr']).replace("'", "")
 
