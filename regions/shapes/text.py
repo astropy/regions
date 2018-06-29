@@ -22,9 +22,9 @@ class TextPixelRegion(PointPixelRegion):
 
     def __init__(self, center, text, meta=None, visual=None):
 
-        super(PointPixelRegion).__init__(center, meta, visual)
+        super(TextPixelRegion, self).__init__(center, meta, visual)
         self.text = text
-        self._repr_params = ['Text', self.text]
+        self._repr_params = [('Text', self.text)]
 
     def to_sky(self, wcs):
         center = pixel_to_skycoord(self.center.x, self.center.y, wcs=wcs)
@@ -32,6 +32,32 @@ class TextPixelRegion(PointPixelRegion):
 
     def as_patch(self, **kwargs):
         raise NotImplementedError
+
+    def plot(self, ax=None, **kwargs):
+        """
+        Forwarding all kwargs to `~matplotlib.text.Text` object and add it
+        to given axis.
+
+        Parameters
+        ----------
+        ax : `~matplotlib.axes`, optional
+            Axes
+
+        kwargs: dict
+            keywords that a `~matplotlib.text.Text` accepts
+
+        """
+        import matplotlib.pyplot as plt
+        from matplotlib.text import Text
+
+        if ax is None:
+            ax = plt.gca()
+
+        text = Text(self.center.x, self.center.y, self.text, **kwargs)
+
+        ax.add_artist(text)
+
+        return ax
 
 
 class TextSkyRegion(PointSkyRegion):
@@ -47,9 +73,9 @@ class TextSkyRegion(PointSkyRegion):
     """
     def __init__(self, center, text, meta=None, visual=None):
 
-        super(PointSkyRegion).__init__(center,  meta, visual)
+        super(TextSkyRegion, self).__init__(center,  meta, visual)
         self.text = text
-        self._repr_params = ['Text', self.text]
+        self._repr_params = [('Text', self.text)]
 
     def to_pixel(self, wcs):
         center_x, center_y = skycoord_to_pixel(self.center, wcs=wcs)

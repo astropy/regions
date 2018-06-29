@@ -6,7 +6,7 @@ from astropy.wcs.utils import pixel_to_skycoord, skycoord_to_pixel
 
 from ..core import PixCoord, PixelRegion, SkyRegion, BoundingBox
 
-__all__ = ['PointPixelRegion', 'PointSkyRegion', 'TextSkyRegion', 'TextPixelRegion']
+__all__ = ['PointPixelRegion', 'PointSkyRegion']
 
 
 class PointPixelRegion(PixelRegion):
