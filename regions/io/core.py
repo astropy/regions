@@ -12,8 +12,8 @@ from astropy import log
 from .. import shapes
 from ..core import PixCoord, SkyRegion
 from ..core.attributes import RegionMeta, RegionVisual
-from .ds9.core import DS9RegionParserWarning, DS9RegionParserError
-from .crtf.core import CRTFRegionParserWarning, CRTFRegionParserError, valid_symbols
+from .ds9.core import DS9RegionParserWarning, DS9RegionParserError, valid_symbols_ds9
+from .crtf.core import CRTFRegionParserWarning, CRTFRegionParserError
 
 __all__ = ['ShapeList', 'Shape', 'to_shape_list', 'to_crtf_meta', 'to_ds9_meta']
 
@@ -227,6 +227,7 @@ class ShapeList(list):
         --------
         TODO
         """
+        valid_symbols_reverse = {y: x for x, y in valid_symbols_ds9.items()}
 
         ds9_strings = {
             'circle': '{0}circle({1:FMT},{2:FMT},{3:FMT}RAD)',
@@ -260,6 +261,9 @@ class ShapeList(list):
 
             # if unspecified, include is True.
             include = "-" if shape.meta.get('include') in (False, '-') else ""
+
+            if 'point' in shape.meta:
+                shape.meta['point'] = valid_symbols_reverse[shape.meta['point']]
 
             meta_str = " ".join("{0}={1}".format(key, val) for key, val in
                                 shape.meta.items() if key not in ('include', 'tag', 'comment', 'font', 'text'))

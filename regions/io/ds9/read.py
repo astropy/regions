@@ -12,6 +12,8 @@ from astropy import coordinates
 from astropy import log
 
 from ..core import reg_mapping
+from ..core import Shape, ShapeList
+from .core import DS9RegionParserError, DS9RegionParserWarning, valid_symbols_ds9
 
 __all__ = [
     'read_ds9',
@@ -19,9 +21,6 @@ __all__ = [
     'DS9RegionParser',
     'CoordinateParser'
 ]
-
-from ..core import Shape, ShapeList
-from .core import DS9RegionParserError, DS9RegionParserWarning
 
 # Regular expression to extract region type or coodinate system
 regex_global = re.compile("^#? *(-?)([a-zA-Z0-9]+)")
@@ -479,6 +478,9 @@ class DS9RegionParser(object):
             self.coord[2:] = [x * 2 for x in self.coord[2:]]
             if len(self.coord) % 2 == 1:  # This checks if angle is present
                 self.coord[-1] /= 2
+
+        if 'point' in self.meta:
+            self.meta['point'] = valid_symbols_ds9[self.meta['point']]
 
         self.shape = Shape("DS9", coordsys=self.coordsys,
                            region_type=reg_mapping['DS9'][self.region_type],
