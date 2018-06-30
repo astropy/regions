@@ -69,6 +69,18 @@ class CircleAnnulusPixelRegion(CompoundPixelRegion):
         return CircleAnnulusSkyRegion(center, inner_radius, outer_radius,
                                       self.meta, self.visual)
 
+    def as_patch(self, **kwargs):
+        """
+        Matplotlib patch object for this region .
+        """
+        import matplotlib.patches as mpatches
+
+        patch_inner = self.region1.as_patch()
+        patch_outer = self.region2.as_patch()
+        path = self._make_annulus_path(patch_inner, patch_outer)
+        patch = mpatches.PathPatch(path, **kwargs)
+        return patch
+
 
 class CircleAnnulusSkyRegion(CompoundSkyRegion):
     """
