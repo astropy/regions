@@ -27,7 +27,7 @@ from .core import DS9RegionParserError, DS9RegionParserWarning
 regex_global = re.compile("^#? *(-?)([a-zA-Z0-9]+)")
 
 # Regular expression to extract meta attributes
-regex_meta = re.compile("([a-zA-Z]+)(=)({.*?}|\".*?\"|[0-9 ]+ ?|[^= ]+) ?")
+regex_meta = re.compile("([a-zA-Z]+)(=)({.*?}|\'.*?\'|\".*?\"|[0-9 ]+ ?|[^= ]+) ?")
 
 # Regular expression to strip parenthesis
 regex_paren = re.compile("[()]")
@@ -266,12 +266,15 @@ class DS9Parser(object):
         meta : `~collections.OrderedDict`
             Dictionary containing the meta data
         """
-        keys_vals = [(x,y) for x,_,y in regex_meta.findall(meta_str.strip())]
+        keys_vals = [(x, y) for x, _, y in regex_meta.findall(meta_str.strip())]
         extra_text = regex_meta.split(meta_str.strip())[-1]
         result = OrderedDict()
         for key, val in keys_vals:
-            # regex can include trailing whitespace; remove it
-            val = val.strip()
+            # regex can include trailing whitespace or inverted commas
+            # remove it
+            val = val.strip().strip("'").strip('"')
+            if key == 'text':
+                val = val.lstrip("{").rstrip("}")
             if key in result:
                 if key == 'tag':
                     result[key].append(val)

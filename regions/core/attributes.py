@@ -284,7 +284,7 @@ class RegionMeta(dict):
                   'delete', 'source', 'background', 'corr', 'type'
                   ]
 
-    key_mapping = {'point': 'symbol', 'text': 'label'}
+    key_mapping = {'text': 'label'}
 
     def __setitem__(self, key, value):
         key = self.key_mapping.get(key, key)
@@ -304,7 +304,8 @@ class RegionVisual(dict):
     """
     valid_keys = ['color', 'dash', 'font', 'dashlist', 'symsize', 'symthick',
                   'symbol', 'fontsize', 'fontstyle', 'usetex', 'labelpos',
-                  'labeloff', 'linewidth', 'linestyle', 'fill', 'line']
+                  'labeloff', 'linewidth', 'linestyle', 'fill', 'line',
+                  'textangle']
 
     key_mapping = {'width': 'linewidth', 'point': 'symbol'}
 

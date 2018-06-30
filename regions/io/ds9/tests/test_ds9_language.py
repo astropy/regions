@@ -157,7 +157,7 @@ def test_global_parser():
                           ' delete=1 include=1 source=1')
     global_parser = DS9Parser(global_test_str)
     assert dict(global_parser.global_meta) == {'dash': '0', 'source': '1', 'move': '1',
-                                  'font': '"helvetica 10 normal roman"',
+                                  'font': 'helvetica 10 normal roman',
                                   'dashlist': '8 3', 'include': True,
                                   'highlite': '1', 'color': 'green',
                                   'select': '1',

@@ -262,9 +262,13 @@ class ShapeList(list):
             include = "-" if shape.meta.get('include') in (False, '-') else ""
 
             meta_str = " ".join("{0}={1}".format(key, val) for key, val in
-                                shape.meta.items() if key not in ('include', 'tag', 'comment'))
+                                shape.meta.items() if key not in ('include', 'tag', 'comment', 'font', 'text'))
             if 'tag' in shape.meta:
                 meta_str += " " + " ".join(["tag={0}".format(tag) for tag in shape.meta['tag']])
+            if 'font' in shape.meta:
+                meta_str += " " + 'font="{0}"'.format(shape.meta['font'])
+            if 'text' in shape.meta:
+                meta_str += " " + 'text={' + shape.meta['text'] + '}'
             if 'comment' in shape.meta:
                 meta_str += " " + shape.meta['comment']
 
@@ -487,7 +491,7 @@ class Shape(object):
         viz_keywords = ['color', 'dash', 'dashlist', 'width', 'font', 'symsize',
                         'symbol', 'symsize', 'fontsize', 'fontstyle', 'usetex',
                         'labelpos', 'labeloff', 'linewidth', 'linestyle',
-                        'point']
+                        'point', 'textangle']
 
         if isinstance(coords[0], SkyCoord):
             reg = self.shape_to_sky_region[self.region_type](*coords)
@@ -623,7 +627,8 @@ def to_ds9_meta(region_meta, region_visual):
                   'edit', 'move', 'rotate', 'delete', 'source', 'background']
 
     # visual keys allowed in DS9
-    valid_keys += ['color', 'dash', 'linewidth', 'font', 'dashlist', 'fill']
+    valid_keys += ['color', 'dash', 'linewidth', 'font', 'dashlist',
+                   'fill', 'textangle']
 
     # mapped to actual names in DS9
     key_mappings = {'symbol': 'point', 'label': 'text', 'linewidth': 'width'}
