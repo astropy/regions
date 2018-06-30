@@ -637,7 +637,13 @@ def to_ds9_meta(region_meta, region_visual):
     # mapped to actual names in DS9
     key_mappings = {'symbol': 'point', 'label': 'text', 'linewidth': 'width'}
 
-    return _to_io_meta(region_meta, region_visual, valid_keys, key_mappings)
+    meta = _to_io_meta(region_meta, region_visual, valid_keys, key_mappings)
+
+    if 'font' in meta:
+        meta['font'] += " {0} {1}".format(region_visual['fontsize'],
+                                          region_visual['fontstyle'])
+
+    return meta
 
 
 def to_crtf_meta(region_meta, region_visual):
@@ -693,7 +699,6 @@ def _to_io_meta(region_meta, region_visual, valid_keys, key_mappings):
     -------
     meta : dict
         io compatible meta dictionary according to valid_keys and key_mappings
-
     """
 
     meta = dict()

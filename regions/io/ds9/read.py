@@ -482,6 +482,13 @@ class DS9RegionParser(object):
         if 'point' in self.meta:
             self.meta['point'] = valid_symbols_ds9[self.meta['point']]
 
+        if 'font' in self.meta:
+            fonts = self.meta['font'].split(" ")
+            self.meta['font'] = fonts[0]
+            self.meta['fontsize'] = fonts[1]
+            self.meta['fontstyle'] = fonts[2]+" "+fonts[3]
+
+
         self.shape = Shape("DS9", coordsys=self.coordsys,
                            region_type=reg_mapping['DS9'][self.region_type],
                            coord=self.coord,
