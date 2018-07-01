@@ -23,8 +23,8 @@ def test_global_parser():
     """
     global_test_str = str("global coord=B1950_VLA, frame=BARY, corr=[I, Q], color=blue")
     global_parser = CRTFParser(global_test_str)
-    assert dict(global_parser.global_meta) == {'coord': 'b1950_vla', 'frame': 'bary',
-                                               'corr': ['i', 'q'], 'color': 'blue'}
+    assert dict(global_parser.global_meta) == {'coord': 'B1950_VLA', 'frame': 'BARY',
+                                               'corr': ['I', 'Q'], 'color': 'blue'}
 
 
 def test_valid_crtf_line():
@@ -130,7 +130,7 @@ def test_file_crtf(filename):
 
     filename = get_pkg_data_filename(filename)
     regs = read_crtf(filename, 'warn')
-    actual_output = crtf_objects_to_string(regs, 'fk4', '.2f')
+    actual_output = crtf_objects_to_string(regs, 'fk4', '.3f')
 
     with open(get_pkg_data_filename('data/CRTFgeneraloutput.crtf')) as f:
         ref_output = f.read()

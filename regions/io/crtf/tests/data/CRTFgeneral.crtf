@@ -18,3 +18,6 @@ annulus[[17h51m03.2s, -45d17m50s], [0.10deg, 4.12deg]], corr=[I,Q,U,V], color=re
 
 # A diamond marker, in J2000 coordinates:
 symbol[[32.1423deg, 12.1412deg], D], linewidth=2, coord=J2000, symsize=2
+
+# Text region
+text[[32.1423deg, 12.1412deg], 'my text'], linewidth=2, coord=J2000

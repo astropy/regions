@@ -144,9 +144,13 @@ class ShapeList(list):
             include = "-" if shape.meta.get('include') in (False, '-') else "+"
             include += "ann " if shape.meta.get('type', 'reg') == 'ann' else ""
 
+            if 'label' in shape.meta:
+                shape.meta['label'] = "'{}'".format(shape.meta['label'])
             meta_str = ", ".join("{0}={1}".format(key, val) for key, val in
                                 shape.meta.items() if
-                                key not in ('include', 'comment', 'symbol', 'coord', 'text', 'range', 'corr', 'type'))
+                                key not in ('include', 'comment', 'symbol',
+                                            'coord', 'text', 'range', 'corr',
+                                            'type', 'text'))
 
             if 'comment' in shape.meta:
                 meta_str += ", " + shape.meta['comment']
@@ -156,7 +160,6 @@ class ShapeList(list):
                 meta_str += ", corr={}".format(shape.meta['corr']).replace("'", "")
 
             coord = []
-
             if coordsys not in ['image', 'physical']:
                 for val in shape.coord:
                     if isinstance(val, Angle):
@@ -182,10 +185,10 @@ class ShapeList(list):
                 coord = ", ".join(temp)
                 line = crtf_strings['polygon'].format(include, coord)
             elif shape.region_type == 'point':
-                if 'symbol' in shape.meta.keys():
+                if 'symbol' in shape.meta:
                     line = crtf_strings['symbol'].format(include, *coord,
                                                          symbol=shape.meta['symbol'])
-                elif 'text' in shape.meta.keys():
+                elif 'text' in shape.meta:
                     line = crtf_strings['text'].format(include, *coord, text=shape.meta['text'])
                 else:
                     line = crtf_strings['point'].format(include, *coord)
@@ -626,22 +629,25 @@ def to_ds9_meta(region_meta, region_visual):
     """
 
     # meta keys allowed in DS9.
-    valid_keys = ['label', 'symbol', 'include', 'tag', 'line', 'comment',
+    valid_keys = ['text', 'symbol', 'include', 'tag', 'line', 'comment',
                   'name', 'select', 'highlite', 'fixed',
                   'edit', 'move', 'rotate', 'delete', 'source', 'background']
 
     # visual keys allowed in DS9
     valid_keys += ['color', 'dash', 'linewidth', 'font', 'dashlist',
-                   'fill', 'textangle']
+                   'fill', 'textangle', 'symsize']
 
     # mapped to actual names in DS9
-    key_mappings = {'symbol': 'point', 'label': 'text', 'linewidth': 'width'}
+    key_mappings = {'symbol': 'point', 'linewidth': 'width'}
 
     meta = _to_io_meta(region_meta, region_visual, valid_keys, key_mappings)
 
     if 'font' in meta:
         meta['font'] += " {0} {1}".format(region_visual['fontsize'],
                                           region_visual['fontstyle'])
+    if 'point' in meta:
+        if 'symsize' in meta:
+            meta['point'] += " {}".format(meta['symsize'])
 
     return meta
 
@@ -666,13 +672,13 @@ def to_crtf_meta(region_meta, region_visual):
     # please refer : https://casaguides.nrao.edu/index.php/CASA_Region_Format
 
     # meta keys allowed in CRTF
-    valid_keys = ['label', 'symbol', 'include', 'frame', 'range', 'veltype',
-                  'restfreq', 'coord', 'type']
+    valid_keys = ['label', 'include', 'frame', 'range', 'veltype',
+                  'restfreq', 'coord', 'type', 'text', 'corr']
 
     # visual keys allowed in CRTF
     valid_keys += ['color', 'width', 'font', 'symthick', 'symsize', 'fontsize',
                    'fontstyle', 'usetex', 'labelpos', 'labeloff', 'linewidth',
-                   'linestyle']
+                   'linestyle', 'symbol']
 
     key_mappings = {}
 

@@ -1,7 +1,8 @@
 #CRTF
 global coord=fk4
-+ann circle[[273.10deg, -23.18deg], 0.00deg], frame=bary, color=blue
-+rotbox[[180.39deg, 12.39deg], [0.05deg, 0.02deg], 12.00deg], frame=bary, color=blue, range=[-1240km/s, 1240km/s]
-+annulus[[267.76deg, -45.30deg], [0.10deg, 4.12deg]], frame=bary, label=my label here, color=red
--ellipse[[12.00deg, 45.00deg], [0.25deg, 1.34deg], 2578.31deg], frame=bary, label=removed this, color=green, range=[1.420ghz, 1.421ghz]
-+symbol[[31.47deg, 11.90deg], d], frame=bary, color=blue, linewidth=2, symsize=2
++ann circle[[273.100deg, -23.183deg], 0.001deg], frame=BARY, color=blue, corr=[I, Q]
++rotbox[[180.392deg, 12.393deg], [0.050deg, 0.017deg], 12.000deg], frame=BARY, color=blue, range=[-1240km/s, 1240km/s], corr=[I, Q]
++annulus[[267.763deg, -45.297deg], [0.100deg, 4.120deg]], frame=BARY, label='My label here', color=red, corr=[I, Q, U, V]
+-ellipse[[12.000deg, 45.000deg], [0.250deg, 1.340deg], 2578.310deg], frame=BARY, label='Removed this', color=green, range=[1.420GHz, 1.421GHz], corr=[Q]
++symbol[[31.470deg, 11.905deg], D], frame=BARY, color=blue, linewidth=2, symsize=2, corr=[I, Q]
++text[[31.470deg, 11.905deg], 'my text'], frame=BARY, color=blue, linewidth=2, corr=[I, Q]

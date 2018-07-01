@@ -281,10 +281,10 @@ class RegionMeta(dict):
     valid_keys = ['label', 'include', 'frame', 'range', 'veltype',
                   'restfreq', 'tag', 'comment', 'coord', 'line', 'name',
                   'select', 'highlite', 'fixed', 'edit', 'move', 'rotate',
-                  'delete', 'source', 'background', 'corr', 'type'
+                  'delete', 'source', 'background', 'corr', 'type','text'
                   ]
 
-    key_mapping = {'text': 'label'}
+    key_mapping = {}
 
     def __setitem__(self, key, value):
         key = self.key_mapping.get(key, key)
