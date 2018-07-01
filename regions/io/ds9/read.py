@@ -489,7 +489,8 @@ class DS9RegionParser(object):
             fonts = self.meta['font'].split(" ")
             self.meta['font'] = fonts[0]
             self.meta['fontsize'] = fonts[1]
-            self.meta['fontstyle'] = fonts[2]+" "+fonts[3]
+            self.meta['fontstyle'] = fonts[2]
+            self.meta['fontweight'] = fonts[3]
 
 
         self.shape = Shape("DS9", coordsys=self.coordsys,

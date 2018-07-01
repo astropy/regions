@@ -305,7 +305,7 @@ class RegionVisual(dict):
     valid_keys = ['color', 'dash', 'font', 'dashlist', 'symsize', 'symthick',
                   'symbol', 'fontsize', 'fontstyle', 'usetex', 'labelpos',
                   'labeloff', 'linewidth', 'linestyle', 'fill', 'line',
-                  'textangle']
+                  'textangle', 'fontweight']
 
     key_mapping = {'width': 'linewidth', 'point': 'symbol'}
 

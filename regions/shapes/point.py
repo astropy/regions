@@ -70,7 +70,7 @@ class PointPixelRegion(PixelRegion):
                     Axis
 
         kwargs: dict
-            All keywords that a ``Line2D`` object requires
+            All keywords that a ``Line2D`` object accepts
 
         """
         from matplotlib import pyplot as plt
@@ -80,9 +80,13 @@ class PointPixelRegion(PixelRegion):
             ax = plt.gca()
 
         # We can move this to a method like `as_patch`
-        symbol = self.visual.get('symbol', 'o')
-        point = Line2D([self.center.x], [self.center.y],
-                       marker=symbol, **kwargs)
+        if 'text' in self.meta:
+            mpl_params = self.mpl_properties_default_ds9('text')
+        else:
+            mpl_params = self.mpl_properties_default_ds9('Line2D')
+
+        mpl_params.update(kwargs)
+        point = Line2D([self.center.x], [self.center.y], **mpl_params)
 
         ax.add_line(point)
 

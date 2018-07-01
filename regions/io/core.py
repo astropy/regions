@@ -498,7 +498,7 @@ class Shape(object):
         viz_keywords = ['color', 'dash', 'dashlist', 'width', 'font', 'symsize',
                         'symbol', 'symsize', 'fontsize', 'fontstyle', 'usetex',
                         'labelpos', 'labeloff', 'linewidth', 'linestyle',
-                        'point', 'textangle']
+                        'point', 'textangle', 'fontweight']
 
         if isinstance(coords[0], SkyCoord):
             reg = self.shape_to_sky_region[self.region_type](*coords)
@@ -643,8 +643,9 @@ def to_ds9_meta(region_meta, region_visual):
     meta = _to_io_meta(region_meta, region_visual, valid_keys, key_mappings)
 
     if 'font' in meta:
-        meta['font'] += " {0} {1}".format(region_visual['fontsize'],
-                                          region_visual['fontstyle'])
+        meta['font'] += " {0} {1} {2}".format(region_visual.get('fontsize', 12),
+                                          region_visual.get('fontstyle', 'normal'),
+                                              region_visual.get('fontweight', 'roman'))
     if 'point' in meta:
         if 'symsize' in meta:
             meta['point'] += " {}".format(meta['symsize'])
