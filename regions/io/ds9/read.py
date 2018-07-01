@@ -480,7 +480,10 @@ class DS9RegionParser(object):
                 self.coord[-1] /= 2
 
         if 'point' in self.meta:
-            self.meta['point'] = valid_symbols_ds9[self.meta['point']]
+            point = self.meta['point'].split(" ")
+            if len(point) > 1:
+                self.meta['symsize'] = point[1]
+            self.meta['point'] = valid_symbols_ds9[point[0]]
 
         if 'font' in self.meta:
             fonts = self.meta['font'].split(" ")
