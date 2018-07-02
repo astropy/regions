@@ -43,6 +43,7 @@ class CompoundPixelRegion(PixelRegion):
             return in_reg
 
     def to_mask(self, mode='center', subpixels=1):
+
         if mode != 'center':
             raise NotImplementedError
 
@@ -57,19 +58,13 @@ class CompoundPixelRegion(PixelRegion):
             iymax=max(mask1.bbox.iymax, mask2.bbox.iymax)
         )
 
-        # Bounding boxes must not extend over array, see #168
-        bbox_borders = np.array([bbox.ixmin, bbox.ixmax, bbox.iymin, bbox.iymax])
-        if (bbox_borders < 0).any():
-            raise NotImplementedError("Bounding box must be within array for "
-                                      "compound regions, see #168")
-
         # Pad mask1.data and mask2.data to get the same shape
         padded_data = list()
         for mask in (mask1, mask2):
-            pleft = mask.bbox.ixmin - bbox.ixmin
-            pright = bbox.ixmax - mask.bbox.ixmax
-            ptop = bbox.iymax - mask.bbox.iymax
-            pbottom = mask.bbox.iymin - bbox.iymin
+            pleft = abs(mask.bbox.ixmin - bbox.ixmin)
+            pright = abs(bbox.ixmax - mask.bbox.ixmax)
+            ptop = abs(bbox.iymax - mask.bbox.iymax)
+            pbottom = abs(mask.bbox.iymin - bbox.iymin)
             padded_data.append(np.pad(mask.data,
                                       ((ptop, pbottom), (pleft, pright)),
                                       'constant'))
