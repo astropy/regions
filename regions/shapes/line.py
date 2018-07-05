@@ -83,7 +83,7 @@ class LinePixelRegion(PixelRegion):
         dy = self.end.y - self.start.y
         if not 'width' in kwargs:
             kwargs['width'] = .1  # Let the default width be .1 instead of 1.
-            
+
         return Arrow(x, y, dx, dy, **kwargs)
 
 

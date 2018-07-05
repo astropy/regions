@@ -219,34 +219,6 @@ class PixelRegion(Region):
         """
         raise NotImplementedError
 
-    def _make_annulus_path(self, patch_inner, patch_outer):
-        """
-        Define a matplotlib annulus path from two patches.
-
-        This preserves the cubic Bezier curves (CURVE4) of the aperture
-        paths.
-
-        # This is borrowed from photutils aperture.
-        """
-
-        import matplotlib.path as mpath
-
-        path_inner = patch_inner.get_path()
-        transform_inner = patch_inner.get_transform()
-        path_inner = transform_inner.transform_path(path_inner)
-
-        path_outer = patch_outer.get_path()
-        transform_outer = patch_outer.get_transform()
-        path_outer = transform_outer.transform_path(path_outer)
-
-        verts_inner = path_inner.vertices[:-1][::-1]
-        verts_inner = np.concatenate((verts_inner, [verts_inner[-1]]))
-
-        verts = np.vstack((path_outer.vertices, verts_inner))
-        codes = np.hstack((path_outer.codes, path_inner.codes))
-
-        return mpath.Path(verts, codes)
-
     def mpl_properties_default(self, shape='patch'):
 
         # The default values are set as per DS9 convention.
