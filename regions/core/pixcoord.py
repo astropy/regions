@@ -109,6 +109,13 @@ class PixCoord(object):
         y = self.y[key]
         return PixCoord(x=x, y=y)
 
+    def __eq__(self, other):
+
+        if isinstance(other, PixCoord):
+            return self.x == other.x and self.y == other.y
+        else:
+            return False
+
     def to_sky(self, wcs, origin=_DEFAULT_WCS_ORIGIN, mode=_DEFAULT_WCS_MODE):
         """Convert this `PixCoord` to `~astropy.coordinates.SkyCoord`.
 
