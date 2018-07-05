@@ -75,18 +75,20 @@ class PointPixelRegion(PixelRegion):
         """
         from matplotlib import pyplot as plt
         from matplotlib.lines import Line2D
+        from matplotlib.text import Text
 
         if ax is None:
             ax = plt.gca()
 
         # We can move this to a method like `as_patch`
         if 'text' in self.meta:
-            mpl_params = self.mpl_properties_default_ds9('text')
+            mpl_params = self.mpl_properties_default('text')
+            mpl_params.update(kwargs)
+            point = Text([self.center.x], [self.center.y], **mpl_params)
         else:
-            mpl_params = self.mpl_properties_default_ds9('Line2D')
-
-        mpl_params.update(kwargs)
-        point = Line2D([self.center.x], [self.center.y], **mpl_params)
+            mpl_params = self.mpl_properties_default('Line2D')
+            mpl_params.update(kwargs)
+            point = Line2D([self.center.x], [self.center.y], **mpl_params)
 
         ax.add_line(point)
 

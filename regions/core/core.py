@@ -247,7 +247,9 @@ class PixelRegion(Region):
 
         return mpath.Path(verts, codes)
 
-    def mpl_properties_default_ds9(self, shape='patch'):
+    def mpl_properties_default(self, shape='patch'):
+
+        # The default values are set as per DS9 convention.
 
         kwargs = dict()
         kwargs['color'] = self.visual.get('color', 'green')
@@ -290,7 +292,7 @@ class PixelRegion(Region):
         if ax is None:
             ax = plt.gca()
 
-        mpl_params = self.mpl_properties_default_ds9('patch')
+        mpl_params = self.mpl_properties_default('patch')
         mpl_params.update(kwargs)
         patch = self.as_patch(**mpl_params)
         ax.add_patch(patch)
