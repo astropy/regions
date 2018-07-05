@@ -84,13 +84,13 @@ class PointPixelRegion(PixelRegion):
         if 'text' in self.meta:
             mpl_params = self.mpl_properties_default('text')
             mpl_params.update(kwargs)
-            point = Text([self.center.x], [self.center.y], **mpl_params)
+            text = Text(self.center.x, self.center.y, self.meta['text'], **mpl_params)
+            ax.add_artist(text)
         else:
             mpl_params = self.mpl_properties_default('Line2D')
             mpl_params.update(kwargs)
             point = Line2D([self.center.x], [self.center.y], **mpl_params)
-
-        ax.add_line(point)
+            ax.add_line(point)
 
         return ax
 

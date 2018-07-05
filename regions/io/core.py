@@ -35,6 +35,7 @@ reg_mapping['CRTF']['centerbox'] = 'rectangle'
 reg_mapping['CRTF']['poly'] = 'polygon'
 reg_mapping['CRTF']['symbol'] = 'point'
 reg_mapping['CRTF']['text'] = 'point'
+reg_mapping['DS9']['text'] = 'point'
 
 
 # valid astropy coordinate frames in their respective formats.

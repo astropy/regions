@@ -353,6 +353,7 @@ class DS9RegionParser(object):
 
     # DS9 language specification. This defines how a certain region is read.
     language_spec = {'point': (coordinate, coordinate),
+                     'text': (coordinate, coordinate),
                      'circle': (coordinate, coordinate, radius),
                      # This is a special case to deal with n elliptical annuli
                      'ellipse': itertools.chain((coordinate, coordinate),
@@ -362,7 +363,7 @@ class DS9RegionParser(object):
                      'line': (coordinate, coordinate, coordinate, coordinate),
                      'annulus': itertools.chain((coordinate, coordinate),
                                                 itertools.cycle((radius,))),
-                    }
+                     }
 
     def __init__(self, coordsys, include, region_type, region_end, global_meta, line):
 
@@ -491,7 +492,6 @@ class DS9RegionParser(object):
             self.meta['fontsize'] = fonts[1]
             self.meta['fontstyle'] = fonts[2]
             self.meta['fontweight'] = fonts[3]
-
 
         self.shape = Shape("DS9", coordsys=self.coordsys,
                            region_type=reg_mapping['DS9'][self.region_type],
