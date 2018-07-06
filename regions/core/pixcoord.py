@@ -110,9 +110,13 @@ class PixCoord(object):
         return PixCoord(x=x, y=y)
 
     def __eq__(self, other):
-
+        """
+        It checks whether ``other`` is `PixCoord` object and whether their
+        abscissa and ordinate values are equal using ``np.assert_allclose``
+        with their default tolerance values.
+        """
         if isinstance(other, PixCoord):
-            return self.x == other.x and self.y == other.y
+            return np.allclose([self.x, self.y], [other.x, other.y])
         else:
             return False
 
