@@ -20,8 +20,7 @@ class PointPixelRegion(PixelRegion):
     """
 
     def __init__(self, center, meta=None, visual=None):
-        # TODO: test that center is a 0D PixCoord
-        self.center = center
+        self.center = PixCoord._validate(center, name='center', expected='scalar')
         self.meta = meta or {}
         self.visual = visual or {}
         self._repr_params = None
@@ -69,13 +68,15 @@ class PointSkyRegion(SkyRegion):
     """
 
     def __init__(self, center, meta=None, visual=None):
-        # TODO: test that center is a 0D SkyCoord
-        self.center = center
+        if center.isscalar:
+            self.center = center
+        else:
+            raise ValueError('The Center should be a 0D SkyCoord object')
         self.meta = meta or {}
         self.visual = visual or {}
         self._repr_params = None
 
-    def contains(self, skycoord):
+    def contains(self, skycoord, wcs):
         return False
 
     def to_pixel(self, wcs):
