@@ -1,12 +1,16 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 from __future__ import absolute_import, division, print_function, unicode_literals
+
+import numpy as np
+from numpy.testing import assert_allclose
+
 import astropy.units as u
 from astropy.coordinates import SkyCoord
+
 from ...shapes import CircleSkyRegion, CirclePixelRegion
 from ...core import PixCoord, CompoundPixelRegion
 from ...tests.helpers import make_simple_wcs
-import pytest
-from numpy.testing import assert_allclose
+
 
 def test_compound_pixel():
     # Two circles that overlap in one column
@@ -31,12 +35,36 @@ def test_compound_pixel():
     assert_allclose(mask.data[:,7], [0, 0, 0, 0, 0, 0, 0, 0, 0])
     assert_allclose(mask.data[:,6], [0, 1, 1, 1, 1, 1, 1, 1, 0])
 
-    # Circle bigger than map, see #168
+    # fixes #168
     pixcoord3 = PixCoord(1, 1)
     c3 = CirclePixelRegion(pixcoord3, 4)
     union2 = c1 | c3
-    with pytest.raises(NotImplementedError):
-        mask = union2.to_mask()
+    mask1 = union2.to_mask()
+
+    pixcoord4 = PixCoord(9, 9)
+    c4 = CirclePixelRegion(pixcoord4, 4)
+    union3 = c1 | c4
+    mask2 = union3.to_mask()
+
+    # mask1 and mask2 should be equal
+    assert_allclose(mask1.data, mask2.data)
+
+    ref_data = np.array([[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                         [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0],
+                         [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0],
+                         [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0],
+                         [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0],
+                         [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+                         [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+                         [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+                         [0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0],
+                         [0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0],
+                         [0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0],
+                         [0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0],
+                         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
+                        )
+    assert_allclose(mask1.data, ref_data)
+
 
 def test_compound_sky():
 
