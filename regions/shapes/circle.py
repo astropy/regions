@@ -26,21 +26,32 @@ class CirclePixelRegion(PixelRegion):
     """
 
     def __init__(self, center, radius, meta=None, visual=None):
-        self.center = PixCoord._validate(center, name='center', expected='scalar')
-        self.radius = radius
+
+        self._center = PixCoord._validate(center, name='center', expected='scalar')
+        self._radius = radius
         self.meta = meta or {}
         self.visual = visual or {}
-        self._repr_params = [('radius', self.radius)]
+        self._repr_params = ('radius',)
+
+    @property
+    def center(self):
+        return self._center
+
+    @property
+    def radius(self):
+        return self._radius
 
     @property
     def area(self):
-        """Region area (float)."""
+        """
+        Region area (float).
+        """
         return math.pi * self.radius ** 2
 
     def contains(self, pixcoord):
         pixcoord = PixCoord._validate(pixcoord, name='pixcoord')
         in_circle = self.center.separation(pixcoord) < self.radius
-        if self.meta.get('inverted', False):
+        if self.meta.get('include', False):
             return not in_circle
         else:
             return in_circle
@@ -95,7 +106,8 @@ class CirclePixelRegion(PixelRegion):
         return Mask(fraction, bbox=bbox)
 
     def as_patch(self, **kwargs):
-        """Matplotlib patch object for this region (`matplotlib.patches.Circle`).
+        """
+        Matplotlib patch object for this region (`matplotlib.patches.Circle`).
         """
         from matplotlib.patches import Circle
         xy = self.center.x, self.center.y
@@ -116,14 +128,23 @@ class CircleSkyRegion(SkyRegion):
     """
 
     def __init__(self, center, radius, meta=None, visual=None):
+
         if center.isscalar:
-            self.center = center
+            self._center = center
         else:
-            raise ValueError('the centre should be a 0D SkyCoord object')
-        self.radius = radius
+            raise ValueError('The center should be a 0D SkyCoord object')
+        self._radius = radius
         self.meta = meta or {}
         self.visual = visual or {}
-        self._repr_params = [('radius', self.radius)]
+        self._repr_params = ('radius',)
+
+    @property
+    def center(self):
+        return self._center
+
+    @property
+    def radius(self):
+        return self._radius
 
     def to_pixel(self, wcs):
         center, scale, _ = skycoord_to_pixel_scale_angle(self.center, wcs)
