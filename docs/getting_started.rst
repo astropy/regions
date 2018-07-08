@@ -217,5 +217,5 @@ IPython print the list using:
     In [1]: import regions
     In [2]: regions.*PixelRegion?
 
-You can learn more about :class:`~regions.Region` and it's capabilities in
+To learn more about :class:`~regions.Region` and it's capabilities in
 :ref:`sh`

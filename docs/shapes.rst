@@ -17,8 +17,8 @@ currently supported.
     >>> from astropy.coordinates import Angle, SkyCoord
     >>> from regions import PixCoord, CircleSkyRegion, CirclePixelRegion
 
-    >>> circle_sky = CircleSkyRegion(center=SkyCoord(42, 43, unit='deg'),
-    ...                              radius=Angle(3, 'deg'))
+    >>> center_sky = SkyCoord(42, 43, unit='deg', frame='fk5')
+    >>> circle_sky = CircleSkyRegion(center=center_sky, radius=Angle(3, 'deg'))
     >>> circle_pix = CirclePixelRegion(center=PixCoord(x=42, y=43),
     ...                                radius=4.2)
 
@@ -29,7 +29,8 @@ currently supported.
     >>> from astropy.coordinates import Angle, SkyCoord
     >>> from regions import PixCoord, CircleAnnulusSkyRegion, CircleAnnulusPixelRegion
 
-    >>> circle_annulus_sky = CircleAnnulusSkyRegion(center=SkyCoord(42, 43, unit='deg'),
+    >>> center_sky = SkyCoord(42, 43, unit='deg', frame='fk5')
+    >>> circle_annulus_sky = CircleAnnulusSkyRegion(center=center_sky,
     ...                               inner_radius=Angle(3, 'deg'), outer_radius=Angle(4, 'deg'))
     >>> circle_annulus_pix = CircleAnnulusPixelRegion(center=PixCoord(x=42, y=43),
     ...                                inner_radius=4.2, outer_radius=5.2)
@@ -41,7 +42,8 @@ currently supported.
     >>> from astropy.coordinates import Angle, SkyCoord
     >>> from regions import PixCoord, EllipseSkyRegion, EllipsePixelRegion
 
-    >>> ellipse_sky = EllipseSkyRegion(center=SkyCoord(42, 43, unit='deg'),
+    >>> center_sky = SkyCoord(42, 43, unit='deg', frame='fk5')
+    >>> ellipse_sky = EllipseSkyRegion(center=center_sky,
     ...                                height=Angle(3, 'deg'), width=Angle(4, 'deg'),
     ...                                angle=Angle(5, 'deg'))
     >>> ellipse_pix = EllipsePixelRegion(center=PixCoord(x=42, y=43),
@@ -55,7 +57,8 @@ currently supported.
     >>> from astropy.coordinates import SkyCoord
     >>> from regions import PixCoord, PointSkyRegion, PointPixelRegion
 
-    >>> point_sky = PointSkyRegion(center=SkyCoord(42, 43, unit='deg'))
+    >>> center_sky = SkyCoord(42, 43, unit='deg', frame='fk5')
+    >>> point_sky = PointSkyRegion(center=center_sky)
     >>> point_pix = PointPixelRegion(center=PixCoord(x=42, y=43))
 
 * `~regions.LineSkyRegion` and `~regions.LinePixelRegion`
@@ -65,18 +68,10 @@ currently supported.
     >>> from astropy.coordinates import SkyCoord
     >>> from regions import PixCoord, LineSkyRegion, LinePixelRegion
 
-    >>> line_sky = LineSkyRegion(start=SkyCoord(42, 43, unit='deg'), end=SkyCoord(52, 53, unit='deg'))
+    >>> start_sky = SkyCoord(42, 43, unit='deg', frame='fk5')
+    >>> end_sky = SkyCoord(52, 53, unit='deg', frame='fk5')
+    >>> line_sky = LineSkyRegion(start=start_sky, end=end_sky)
     >>> line_pix = LinePixelRegion(start=PixCoord(x=42, y=43), end=PixCoord(x=52, y=53))
-
-* `~regions.PolygonSkyRegion` and `~regions.PolygonPixelRegion`
-
-.. code-block:: python
-
-    >>> from astropy.coordinates import SkyCoord
-    >>> from regions import PixCoord, PolygonSkyRegion, PolygonPixelRegion
-
-    >>> polygon_sky = PolygonSkyRegion(vertices=SkyCoord([1, 2, 2], [1, 1, 2], unit='deg'),
-    >>> polygon_pix = PolygonPixelRegion(vertices=PixCoord(x=[1, 2, 2], y=[1, 1, 2]))
 
 * `~regions.RectangleSkyRegion` and `~regions.RectanglePixelRegion`
 
@@ -85,12 +80,23 @@ currently supported.
     >>> from astropy.coordinates import Angle, SkyCoord
     >>> from regions import PixCoord, RectangleSkyRegion, RectanglePixelRegion
 
-    >>> rectangle_sky = RectangleSkyRegion(center=SkyCoord(42, 43, unit='deg'),
+    >>> center_sky = SkyCoord(42, 43, unit='deg', frame='fk5')
+    >>> rectangle_sky = RectangleSkyRegion(center=center_sky,
     ...                                    width=Angle(3, 'deg'), height=Angle(4, 'deg'),
     ...                                    angle=Angle(5, 'deg'))
     >>> rectangle_pix = RectanglePixelRegion(center=PixCoord(x=42, y=43),
-    ...                                    width=3, height=4,
-    ...                                    angle=Angle(5, 'deg'))
+    ...                                      width=3, height=4,
+    ...                                      angle=Angle(5, 'deg'))
+
+* `~regions.PolygonSkyRegion` and `~regions.PolygonPixelRegion`
+
+.. code-block:: python
+
+    >>> from astropy.coordinates import SkyCoord
+    >>> from regions import PixCoord, PolygonSkyRegion, PolygonPixelRegion
+
+    >>> polygon_sky = PolygonSkyRegion(vertices=SkyCoord([1, 2, 2], [1, 1, 2], unit='deg', frame='fk5'),
+    >>> polygon_pix = PolygonPixelRegion(vertices=PixCoord(x=[1, 2, 2], y=[1, 1, 2]))
 
 .. .. _sh-poly:
 ..
@@ -165,9 +171,9 @@ To handle them there are :class:`~regions.RegionMeta` and
 They are subclasses of the python dictionary (`~dict`).
 
 The meta attribute provides additional data about regions such as labels, tags,
-comments, name, etc.. which are used for non-display tasks.
+comments, name, etc. which are used for non-display tasks.
 It also stores the spectral dimensions of the region.
-These classes , for now, just checks whether the key is valid or not.
+These classes, for now, just checks whether the key is valid or not.
 
 The valid keys for :class:`~regions.RegionMeta` class are:
 
@@ -271,9 +277,9 @@ The valid keys for :class:`~regions.RegionMeta` class are:
 22. ``tag``:
 
 The visual attributes are meta data meant to be used to visualize regions, especially
-used by plotting libraries such as `Matplotlib`_ in future.
+used by plotting libraries such as `Matplotlib`_ .
 
-The valid keys for RegionVisual class are:
+The valid keys for `~regions.RegionVisual` class are:
 
 1. ``color``: CRTF, DS9 (Region, symbol and text color)
     - Possible values: any color recognized by `Matplotlib`_, including hex values
@@ -313,7 +319,7 @@ The valid keys for RegionVisual class are:
 Lists
 -----
 
-A `~regions.Region` object can only represent one region,
+A `~regions.Region` object can only represent one region, not
 an array (a.k.a. vector or list) of regions.
 
 This is in contrast to the aperture classes in `photutils` like

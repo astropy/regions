@@ -39,9 +39,9 @@ Serialisation is done using the `~regions.ds9_objects_to_string` function
 
 .. warning::
 
-    Also, all regions currently have ``meta`` and ``visual`` arguments for ``__init__`` and stored as
-    region data members. These need to be documented and tests added, or
-    removed.
+    Also, all regions currently have ``meta`` and ``visual`` arguments for
+    ``__init__`` and stored as region data members. These need to be documented
+    and tests added, or removed.
 
 There's also `~regions.write_ds9` and `~regions.read_ds9` with write to and
 read from a file in addition to doing the region serialisation and parsing.
