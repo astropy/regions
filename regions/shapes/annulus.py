@@ -39,8 +39,7 @@ class CircleAnnulusPixelRegion(CompoundPixelRegion):
         region2 = CirclePixelRegion(center, outer_radius)
         super(CircleAnnulusPixelRegion, self).__init__(
             region1=region1, region2=region2, operator=operator.xor, meta=meta, visual=visual)
-        self._repr_params = [('inner radius', region1.radius),
-                             ('outer radius', region2.radius)]
+        self._repr_params = ('inner_radius', 'outer_radius')
 
     @property
     def center(self):
@@ -91,8 +90,7 @@ class CircleAnnulusSkyRegion(CompoundSkyRegion):
         region2 = CircleSkyRegion(center, outer_radius)
         super(CircleAnnulusSkyRegion, self).__init__(
             region1=region1, operator=operator.xor, region2=region2, meta=meta, visual=visual)
-        self._repr_params = [('inner radius', region1.radius),
-                             ('outer radius', region2.radius)]
+        self._repr_params = ('inner_radius', 'outer_radius')
 
     @property
     def center(self):
@@ -151,11 +149,8 @@ class EllipseAnnulusPixelRegion(CompoundPixelRegion):
         super(EllipseAnnulusPixelRegion, self).__init__(
             region1=region1, region2=region2, operator=operator.xor, meta=meta, visual=visual)
 
-        self._repr_params = [('inner width', region1.width),
-                             ('inner height', region1.height),
-                             ('outer width', region2.width),
-                             ('outer height', region2.height)
-                             ]
+        self._repr_params = ('inner_width', 'inner_height',
+                             'outer_width', 'outer_height')
 
     @property
     def center(self):
@@ -241,11 +236,8 @@ class EllipseAnnulusSkyRegion(CompoundSkyRegion):
         super(EllipseAnnulusSkyRegion, self).__init__(region1=region1, region2=region2, operator=operator.xor,
                 meta=meta, visual=visual)
 
-        self._repr_params = [('inner width', region1.width),
-                             ('inner height', region1.height),
-                             ('outer width', region2.width),
-                             ('outer height', region2.height)
-                             ]
+        self._repr_params = ('inner_width', 'inner_height',
+                             'outer_width', 'outer_height')
 
     @property
     def center(self):
@@ -322,11 +314,8 @@ class RectangleAnnulusPixelRegion(CompoundPixelRegion):
         super(RectangleAnnulusPixelRegion, self).__init__(
             region1=region1, region2=region2, operator=operator.xor, meta=meta, visual=visual)
 
-        self._repr_params = [('inner width', region1.width),
-                             ('inner height', region1.height),
-                             ('outer width', region2.width),
-                             ('outer height', region2.height)
-                             ]
+        self._repr_params = ('inner_width', 'inner_height',
+                             'outer_width', 'outer_height')
 
     @property
     def center(self):
@@ -412,11 +401,8 @@ class RectangleAnnulusSkyRegion(CompoundSkyRegion):
         super(RectangleAnnulusSkyRegion, self).__init__(region1=region1, region2=region2, operator=operator.xor,
                 meta=meta, visual=visual)
 
-        self._repr_params = [('inner width', region1.width),
-                             ('inner height', region1.height),
-                             ('outer width', region2.width),
-                             ('outer height', region2.height)
-                             ]
+        self._repr_params = ('inner_width', 'inner_height',
+                             'outer_width', 'outer_height')
 
     @property
     def center(self):

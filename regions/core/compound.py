@@ -12,6 +12,7 @@ class CompoundPixelRegion(PixelRegion):
     """
 
     def __init__(self, region1, region2, operator, meta=None, visual=None):
+
         if not isinstance(region1, PixelRegion):
             raise TypeError("region1 must be a PixelRegion")
         if not isinstance(region2, PixelRegion):
@@ -19,8 +20,8 @@ class CompoundPixelRegion(PixelRegion):
         if not callable(operator):
             raise TypeError("operator must be callable")
 
-        self.region1 = region1
-        self.region2 = region2
+        self._region1 = region1
+        self._region2 = region2
         if meta is None:
             self.meta = region1.meta
         else:
@@ -29,11 +30,20 @@ class CompoundPixelRegion(PixelRegion):
             self.visual = region1.visual
         else:
             self.visual = visual
-        self.operator = operator
-        self._repr_params = [('component 1', self.region1),
-                             ('component 2', self.region2),
-                             ('operator', self.operator),
-                            ]
+        self._operator = operator
+        self._repr_params = ('region1', 'region2', 'operator')
+
+    @property
+    def region1(self):
+        return self._region1
+
+    @property
+    def region2(self):
+        return self._region2
+
+    @property
+    def operator(self):
+        return self._operator
 
     def contains(self, pixcoord):
         in_reg = self.operator(self.region1.contains(pixcoord), self.region2.contains(pixcoord))
@@ -99,6 +109,7 @@ class CompoundSkyRegion(SkyRegion):
     """
 
     def __init__(self, region1, region2, operator, meta=None, visual=None):
+
         if not isinstance(region1, SkyRegion):
             raise TypeError("region1 must be a SkyRegion")
         if not isinstance(region2, SkyRegion):
@@ -106,8 +117,8 @@ class CompoundSkyRegion(SkyRegion):
         if not callable(operator):
             raise TypeError("operator must be callable")
 
-        self.region1 = region1
-        self.region2 = region2
+        self._region1 = region1
+        self._region2 = region2
         if meta is None:
             self.meta = region1.meta
         else:
@@ -116,12 +127,21 @@ class CompoundSkyRegion(SkyRegion):
             self.visual = region1.visual
         else:
             self.visual = visual
-        self.operator = operator
+        self._operator = operator
 
-        self._repr_params = [('component 1', self.region1),
-                             ('component 2', self.region2),
-                             ('operator', self.operator),
-                            ]
+        self._repr_params = ('region1', 'region2', 'operator')
+
+    @property
+    def region1(self):
+        return self._region1
+
+    @property
+    def region2(self):
+        return self._region2
+
+    @property
+    def operator(self):
+        return self._operator
 
     def contains(self, skycoord, wcs):
         in_reg = self.operator(self.region1.contains(skycoord, wcs),
