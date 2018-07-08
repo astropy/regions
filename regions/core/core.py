@@ -38,8 +38,8 @@ class Region(object):
         else:
             params = []
         if self._repr_params is not None:
-            for key, val in self._repr_params:
-                params.append('{0}={1}'.format(key, val))
+            for key in self._repr_params:
+                params.append('{0}={1}'.format(key, self.__getattribute__(key)))
         params = ', '.join(params)
 
         return '<{0}({1})>'.format(self.__class__.__name__, params)
@@ -49,7 +49,9 @@ class Region(object):
         if hasattr(self, 'center'):
             cls_info.append(('center', self.center))
         if self._repr_params is not None:
-            cls_info += self._repr_params
+            params_value = [(x, self.__getattribute__(x))
+                            for x in self._repr_params]
+            cls_info += params_value
         fmt = ['{0}: {1}'.format(key, val) for key, val in cls_info]
 
         return '\n'.join(fmt)
