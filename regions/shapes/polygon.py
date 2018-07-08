@@ -23,14 +23,20 @@ class PolygonPixelRegion(PixelRegion):
     """
 
     def __init__(self, vertices, meta=None, visual=None):
-        self.vertices = PixCoord._validate(vertices, name='vertices', expected='not scalar')
+        self._vertices = PixCoord._validate(vertices, name='vertices', expected='not scalar')
         self.meta = meta or {}
         self.visual = visual or {}
-        self._repr_params = [('vertices', self.vertices)]
+        self._repr_params = ('vertices',)
+
+    @property
+    def vertices(self):
+        return self._vertices
 
     @property
     def area(self):
-        """Region area (float)."""
+        """
+        Region area (float).
+        """
         # FIXME: for now we use shapely, but could try and avoid the dependency in future
         return self.to_shapely().area
 
@@ -114,11 +120,18 @@ class PolygonSkyRegion(SkyRegion):
     """
 
     def __init__(self, vertices, meta=None, visual=None):
-        # TODO: test that vertices is a 1D SkyCoord
-        self.vertices = vertices
+
+        if vertices.ndim == 1:
+            self._vertices = vertices
+        else:
+            raise ValueError('The vertices should be a 1D SkyCoord object')
         self.meta = meta or {}
         self.visual = visual or {}
-        self._repr_params = [('vertices', self.vertices)]
+        self._repr_params = ('vertices',)
+
+    @property
+    def vertices(self):
+        return self._vertices
 
     def to_pixel(self, wcs):
         x, y = skycoord_to_pixel(self.vertices, wcs)
