@@ -21,8 +21,8 @@ class TestTextPixelRegion(BaseTestPixelRegion):
     inside = []
     outside = [(3.1, 4.2), (5, 4)]
     expected_area = 0
-    expected_repr = '<TextPixelRegion(PixCoord(x=3, y=4), Text=Sample Text)>'
-    expected_str = 'Region: TextPixelRegion\ncenter: PixCoord(x=3, y=4)\nText: Sample Text'
+    expected_repr = '<TextPixelRegion(PixCoord(x=3, y=4), text=Sample Text)>'
+    expected_str = 'Region: TextPixelRegion\ncenter: PixCoord(x=3, y=4)\ntext: Sample Text'
 
     def test_pix_sky_roundtrip(self):
         wcs = make_simple_wcs(SkyCoord(2 * u.deg, 3 * u.deg), 0.1 * u.deg, 20)
@@ -37,11 +37,11 @@ class TestTextSkyRegion(BaseTestSkyRegion):
 
     if ASTROPY_LT_13:
         expected_repr = ('<TextSkyRegion(<SkyCoord (ICRS): (ra, dec) in deg\n'
-                            '    (3.0, 4.0)>, Text=Sample Text)>')
+                            '    (3.0, 4.0)>, text=Sample Text)>')
         expected_str = ('Region: TextSkyRegion\ncenter: <SkyCoord (ICRS): '
-                          '(ra, dec) in deg\n    (3.0, 4.0)>\nText: Sample Text')
+                          '(ra, dec) in deg\n    (3.0, 4.0)>\ntext: Sample Text')
     else:
         expected_repr = ('<TextSkyRegion(<SkyCoord (ICRS): (ra, dec) in deg\n'
-                             '    ( 3.,  4.)>, Text=Sample Text)>')
+                             '    ( 3.,  4.)>, text=Sample Text)>')
         expected_str = ('Region: TextSkyRegion\ncenter: <SkyCoord (ICRS): '
-                        '(ra, dec) in deg\n    ( 3.,  4.)>\nText: Sample Text')
+                        '(ra, dec) in deg\n    ( 3.,  4.)>\ntext: Sample Text')
