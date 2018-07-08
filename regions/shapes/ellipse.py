@@ -61,19 +61,36 @@ class EllipsePixelRegion(PixelRegion):
 
     def __init__(self, center, width, height, angle=0. * u.deg, meta=None,
                  visual=None):
-        # TODO: use quantity_input to check that angle is an angle
-        self.center = center
-        self.width = width
-        self.height = height
-        self.angle = angle
+
+        self._center = PixCoord._validate(center, name='center', expected='scalar')
+        self._width = width
+        self._height = height
+        self._angle = angle
         self.meta = meta or {}
         self.visual = visual or {}
-        self._repr_params = [('width', self.width), ('height', self.height),
-                             ('angle', self.angle)]
+        self._repr_params = ('width', 'height', 'angle')
+
+    @property
+    def center(self):
+        return self._center
+
+    @property
+    def width(self):
+        return self._width
+
+    @property
+    def height(self):
+        return self._height
+
+    @property
+    def angle(self):
+        return self._angle
 
     @property
     def area(self):
-        """Region area (float)"""
+        """
+        Region area (float)
+        """
         return math.pi * self.width * self.height * 0.25
 
     def contains(self, pixcoord):
@@ -176,7 +193,8 @@ class EllipsePixelRegion(PixelRegion):
         return Mask(fraction, bbox=bbox)
 
     def as_patch(self, **kwargs):
-        """Matplotlib patch object for this region (`matplotlib.patches.Ellipse`).
+        """
+        Matplotlib patch object for this region (`matplotlib.patches.Ellipse`).
         """
         from matplotlib.patches import Ellipse
         xy = self.center.x, self.center.y
@@ -207,14 +225,32 @@ class EllipseSkyRegion(SkyRegion):
 
     def __init__(self, center, width, height, angle=0. * u.deg, meta=None, visual=None):
         # TODO: use quantity_input to check that height, width, and angle are angles
-        self.center = center
-        self.width = width
-        self.height = height
-        self.angle = angle
+        if center.isscalar:
+            self._center = center
+        else:
+            raise ValueError('The center should be a 0D SkyCoord object')
+        self._width = width
+        self._height = height
+        self._angle = angle
         self.meta = meta or {}
         self.visual = visual or {}
-        self._repr_params = [('width', self.width), ('height', self.height),
-                             ('angle', self.angle)]
+        self._repr_params = ('width', 'height', 'angle')
+
+    @property
+    def center(self):
+        return self._center
+
+    @property
+    def width(self):
+        return self._width
+
+    @property
+    def height(self):
+        return self._height
+
+    @property
+    def angle(self):
+        return self._angle
 
     def to_pixel(self, wcs):
         center, scale, north_angle = skycoord_to_pixel_scale_angle(self.center, wcs)
