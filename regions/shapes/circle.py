@@ -26,7 +26,6 @@ class CirclePixelRegion(PixelRegion):
     """
 
     def __init__(self, center, radius, meta=None, visual=None):
-
         self._center = PixCoord._validate(center, name='center', expected='scalar')
         self._radius = radius
         self.meta = meta or {}
@@ -43,9 +42,7 @@ class CirclePixelRegion(PixelRegion):
 
     @property
     def area(self):
-        """
-        Region area (float).
-        """
+        """Region area (float)."""
         return math.pi * self.radius ** 2
 
     def contains(self, pixcoord):
@@ -68,9 +65,7 @@ class CirclePixelRegion(PixelRegion):
 
     @property
     def bounding_box(self):
-        """
-        Bounding box (`~regions.BoundingBox`).
-        """
+        """Bounding box (`~regions.BoundingBox`)."""
         xmin = self.center.x - self.radius
         xmax = self.center.x + self.radius
         ymin = self.center.y - self.radius
@@ -106,9 +101,7 @@ class CirclePixelRegion(PixelRegion):
         return Mask(fraction, bbox=bbox)
 
     def as_patch(self, **kwargs):
-        """
-        Matplotlib patch object for this region (`matplotlib.patches.Circle`).
-        """
+        """Matplotlib patch object for this region (`matplotlib.patches.Circle`)"""
         from matplotlib.patches import Circle
         xy = self.center.x, self.center.y
         radius = self.radius
@@ -128,7 +121,6 @@ class CircleSkyRegion(SkyRegion):
     """
 
     def __init__(self, center, radius, meta=None, visual=None):
-
         if center.isscalar:
             self._center = center
         else:

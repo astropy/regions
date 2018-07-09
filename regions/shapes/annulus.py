@@ -136,7 +136,6 @@ class EllipseAnnulusPixelRegion(CompoundPixelRegion):
 
     def __init__(self, center, inner_width, inner_height, outer_width,
                  outer_height, angle, meta=None, visual=None):
-
         if inner_width > outer_width:
             raise ValueError('Outer width should be larger than inner width.')
 
@@ -223,7 +222,6 @@ class EllipseAnnulusSkyRegion(CompoundSkyRegion):
 
     def __init__(self, center, inner_width, inner_height, outer_width,
                     outer_height, angle=0 * u.deg, meta=None, visual=None):
-
         if inner_width > outer_width:
             raise ValueError('Outer width should be larger than inner width.')
 
@@ -301,7 +299,6 @@ class RectangleAnnulusPixelRegion(CompoundPixelRegion):
 
     def __init__(self, center, inner_width, inner_height, outer_width,
                  outer_height, angle, meta=None, visual=None):
-
         if inner_width > outer_width:
             raise ValueError('Outer width should be larger than inner width.')
 
@@ -388,7 +385,6 @@ class RectangleAnnulusSkyRegion(CompoundSkyRegion):
 
     def __init__(self, center, inner_width, inner_height, outer_width,
                     outer_height, angle=0 * u.deg, meta=None, visual=None):
-
         if inner_width > outer_width:
             raise ValueError('Outer width should be larger than inner width.')
 

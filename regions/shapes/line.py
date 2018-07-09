@@ -25,7 +25,6 @@ class LinePixelRegion(PixelRegion):
     """
 
     def __init__(self, start, end, meta=None, visual=None):
-
         self._start = PixCoord._validate(start, name='start', expected='scalar')
         self._end = PixCoord._validate(end, name='end', expected='scalar')
         self.meta = meta or {}
@@ -42,9 +41,7 @@ class LinePixelRegion(PixelRegion):
 
     @property
     def area(self):
-        """
-        Region area (float).
-        """
+        """Region area (float)."""
         return 0 * u.sr
 
     def contains(self, pixcoord):
@@ -64,9 +61,7 @@ class LinePixelRegion(PixelRegion):
 
     @property
     def bounding_box(self):
-        """
-        Bounding box (`~regions.BoundingBox`).
-        """
+        """Bounding box (`~regions.BoundingBox`)."""
         xmin = min(self.start.x, self.end.x)
         xmax = max(self.start.x, self.end.x)
         ymin = min(self.start.y, self.end.y)
@@ -79,9 +74,7 @@ class LinePixelRegion(PixelRegion):
         raise NotImplementedError
 
     def as_patch(self, **kwargs):
-        """
-        Matplotlib patch object for this region (`matplotlib.patches.Line`).
-        """
+        """Matplotlib patch object for this region (`matplotlib.patches.Line`)."""
         # Long term we want to support DS9 lines with arrow heads
         from matplotlib.patches import Arrow
         x = self.start.x
@@ -103,7 +96,6 @@ class LineSkyRegion(SkyRegion):
         End position
     """
     def __init__(self, start, end, meta=None, visual=None):
-
         if start.isscalar and end.isscalar:
             self._start = start
             self._end = end

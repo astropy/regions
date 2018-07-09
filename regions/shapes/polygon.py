@@ -34,9 +34,7 @@ class PolygonPixelRegion(PixelRegion):
 
     @property
     def area(self):
-        """
-        Region area (float).
-        """
+        """Region area (float)."""
         # FIXME: for now we use shapely, but could try and avoid the dependency in future
         return self.to_shapely().area
 
@@ -101,9 +99,7 @@ class PolygonPixelRegion(PixelRegion):
         return Mask(fraction, bbox=bbox)
 
     def as_patch(self, **kwargs):
-        """
-        Matplotlib patch object for this region (`matplotlib.patches.Polygon`).
-        """
+        """Matplotlib patch object for this region (`matplotlib.patches.Polygon`)."""
         from matplotlib.patches import Polygon
         xy = np.vstack([self.vertices.x, self.vertices.y]).transpose()
         return Polygon(xy=xy, **kwargs)
@@ -120,7 +116,6 @@ class PolygonSkyRegion(SkyRegion):
     """
 
     def __init__(self, vertices, meta=None, visual=None):
-
         if vertices.ndim == 1:
             self._vertices = vertices
         else:

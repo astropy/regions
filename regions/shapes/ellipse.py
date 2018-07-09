@@ -61,7 +61,6 @@ class EllipsePixelRegion(PixelRegion):
 
     def __init__(self, center, width, height, angle=0. * u.deg, meta=None,
                  visual=None):
-
         self._center = PixCoord._validate(center, name='center', expected='scalar')
         self._width = width
         self._height = height
@@ -88,9 +87,7 @@ class EllipsePixelRegion(PixelRegion):
 
     @property
     def area(self):
-        """
-        Region area (float)
-        """
+        """Region area (float)"""
         return math.pi * self.width * self.height * 0.25
 
     def contains(self, pixcoord):
@@ -193,9 +190,7 @@ class EllipsePixelRegion(PixelRegion):
         return Mask(fraction, bbox=bbox)
 
     def as_patch(self, **kwargs):
-        """
-        Matplotlib patch object for this region (`matplotlib.patches.Ellipse`).
-        """
+        """Matplotlib patch object for this region (`matplotlib.patches.Ellipse`)."""
         from matplotlib.patches import Ellipse
         xy = self.center.x, self.center.y
         width = self.width

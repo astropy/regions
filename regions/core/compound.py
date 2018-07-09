@@ -12,7 +12,6 @@ class CompoundPixelRegion(PixelRegion):
     """
 
     def __init__(self, region1, region2, operator, meta=None, visual=None):
-
         if not isinstance(region1, PixelRegion):
             raise TypeError("region1 must be a PixelRegion")
         if not isinstance(region2, PixelRegion):
@@ -109,7 +108,6 @@ class CompoundSkyRegion(SkyRegion):
     """
 
     def __init__(self, region1, region2, operator, meta=None, visual=None):
-
         if not isinstance(region1, SkyRegion):
             raise TypeError("region1 must be a SkyRegion")
         if not isinstance(region2, SkyRegion):
