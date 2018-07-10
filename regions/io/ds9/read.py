@@ -493,6 +493,8 @@ class DS9RegionParser(object):
             self.meta['fontstyle'] = fonts[2]
             self.meta['fontweight'] = fonts[3]
 
+        self.meta.pop('coord', None)
+
         self.shape = Shape("DS9", coordsys=self.coordsys,
                            region_type=reg_mapping['DS9'][self.region_type],
                            coord=self.coord,

@@ -279,9 +279,9 @@ class RegionMeta(dict):
     A python dictionary subclass which holds the meta attributes of the region.
     """
     valid_keys = ['label', 'include', 'frame', 'range', 'veltype',
-                  'restfreq', 'tag', 'comment', 'coord', 'line', 'name',
+                  'restfreq', 'tag', 'comment', 'line', 'name',
                   'select', 'highlite', 'fixed', 'edit', 'move', 'rotate',
-                  'delete', 'source', 'background', 'corr', 'type', 'text'
+                  'delete', 'source', 'background', 'corr', 'type'
                   ]
 
     key_mapping = {}
