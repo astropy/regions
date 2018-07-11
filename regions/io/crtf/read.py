@@ -393,7 +393,7 @@ class CRTFRegionParser(object):
 
         self.meta.pop('coord', None)
 
-        self.shape = Shape('CRTF', coordsys=self.coordsys,
+        self.shape = Shape(coordsys=self.coordsys,
                            region_type=reg_mapping['CRTF'][self.region_type],
                            coord=self.coord,
                            meta=self.meta,
