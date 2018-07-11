@@ -8,7 +8,7 @@ ann circle[[18h12m24s, -23d11m00s], 2.3arcsec]
 # ann box[[140.0342deg, -12.34243deg], [140.0360deg, -12.34320deg]]
 
 # A rotated box region, for a particular range of velocities:
-rotbox[[12h01m34.1s, 12d23m33s], [3arcmin, 1arcmin], 12deg], range=[-1240km/s, 1240km/s]
+rotbox[[12h01m34.1s, 12d23m32s], [3arcmin, 1arcmin], 12deg], range=[-1240km/s, 1240km/s]
 
 # An annular region, overriding some of the global defaults:
 annulus[[17h51m03.2s, -45d17m50s], [0.10deg, 4.12deg]], corr=[I,Q,U,V], color=red, label='My label here'
