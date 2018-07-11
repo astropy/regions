@@ -37,3 +37,4 @@ bpanda(1185,489,45,90,1,80,40,120,60,1,45) # bpanda=(45 90 180 270)(80 40 120 60
 bpanda(1185,489,90,180,1,80,40,120,60,1,45) # bpanda=ignore
 bpanda(1185,489,180,270,1,80,40,120,60,1,45) # bpanda=ignore
 # segment(1336.9946,1154.9931,1364.9942,1074.9929,1416.9942,1074.9927) text={Segment}
+point(248,339) # point=box 14 color=red width=3 text={Box Point}

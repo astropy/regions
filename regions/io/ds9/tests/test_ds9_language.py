@@ -55,7 +55,7 @@ def test_file(filename):
     coordsys = os.path.basename(filename).split(".")[1]
 
     actual = ds9_objects_to_string(regs, coordsys=coordsys, fmt='.2f',
-                                   radunit=None if coordsys=='physical' else 'arcsec')
+                                   radunit=None if coordsys=='physical' else 'arcsec').strip()
 
     reffile = get_pkg_data_filename('data/{coordsys}{strip}_reference.reg'
                                     .format(coordsys=coordsys,
@@ -64,12 +64,12 @@ def test_file(filename):
                                                    else "")))
 
     with open(reffile, 'r') as fh:
-        desired = fh.read()
+        desired = fh.read().strip()
 
     # since metadata is not required to preserve order, we have to do a more
     # complex comparison
-    desired_lines = [set(line.split()) for line in desired.split("\n")]
-    actual_lines = [set(line.split()) for line in actual.split("\n")]
+    desired_lines = [set(line.split(" ")) for line in desired.split("\n")]
+    actual_lines = [set(line.split(" ")) for line in actual.split("\n")]
     for split_line in actual_lines:
         assert split_line in desired_lines
 

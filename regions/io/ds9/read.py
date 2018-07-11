@@ -26,7 +26,7 @@ __all__ = [
 regex_global = re.compile("^#? *(-?)([a-zA-Z0-9]+)")
 
 # Regular expression to extract meta attributes
-regex_meta = re.compile("([a-zA-Z]+)(=)({.*?}|\'.*?\'|\".*?\"|[0-9 ]+ ?|[^= ]+) ?")
+regex_meta = re.compile("([a-zA-Z]+)(=)({.*?}|\'.*?\'|\".*?\"|[0-9\s]+\s?|[^=\s]+\s?[0-9]*)\s?")
 
 # Regular expression to strip parenthesis
 regex_paren = re.compile("[()]")

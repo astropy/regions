@@ -130,10 +130,10 @@ def test_file_crtf(filename):
 
     filename = get_pkg_data_filename(filename)
     regs = read_crtf(filename, 'warn')
-    actual_output = str(crtf_objects_to_string(regs, 'fk4', '.3f'))
+    actual_output = crtf_objects_to_string(regs, 'fk4', '.3f').strip()
 
     with open(get_pkg_data_filename('data/CRTFgeneraloutput.crtf')) as f:
-        ref_output = str(f.read())
+        ref_output = f.read().strip()
 
     # since metadata is not required to preserve order, we have to do a more
     # complex comparison

@@ -280,6 +280,9 @@ class ShapeList(list):
             if 'point' in shape.meta:
                 shape.meta['point'] = valid_symbols_reverse[shape.meta['point']]
 
+            if 'symsize' in shape.meta:
+                shape.meta['point'] += " {}".format(shape.meta.pop('symsize'))
+
             meta_str = " ".join("{0}={1}".format(key, val) for key, val in
                                 shape.meta.items() if key not in ('include', 'tag', 'comment', 'font', 'text'))
             if 'tag' in shape.meta:
@@ -330,7 +333,7 @@ class ShapeList(list):
                 line = ds9_strings[shape.region_type].format(include, *coord)
 
             if meta_str.strip():
-                output += "{0} # {1} \n".format(line, meta_str)
+                output += "{0} # {1}\n".format(line, meta_str)
             else:
                 output += "{0}\n".format(line)
 
@@ -662,9 +665,6 @@ def to_ds9_meta(shape_meta):
         meta['font'] += " {0} {1} {2}".format(shape_meta.get('fontsize', 12),
                                           shape_meta.get('fontstyle', 'normal'),
                                               shape_meta.get('fontweight', 'roman'))
-    if 'point' in meta:
-        if 'symsize' in meta:
-            meta['point'] += " {}".format(meta['symsize'])
 
     return meta
 
