@@ -61,6 +61,17 @@ currently supported.
     >>> point_sky = PointSkyRegion(center=center_sky)
     >>> point_pix = PointPixelRegion(center=PixCoord(x=42, y=43))
 
+* `~regions.TextSkyRegion` and `~regions.TextPixelRegion`
+
+.. code-block:: python
+
+    >>> from astropy.coordinates import SkyCoord
+    >>> from regions import PixCoord, TextSkyRegion, TextPixelRegion
+
+    >>> center_sky = SkyCoord(42, 43, unit='deg', frame='fk5')
+    >>> point_sky = TextSkyRegion(center=center_sky, "Demo Text")
+    >>> point_pix = TextPixelRegion(center=PixCoord(x=42, y=43), 'Demo Text')
+
 * `~regions.LineSkyRegion` and `~regions.LinePixelRegion`
 
 .. code-block:: python
@@ -177,17 +188,18 @@ These classes, for now, just checks whether the key is valid or not.
 
 The valid keys for :class:`~regions.RegionMeta` class are:
 
-1. ``label``/``text``: CRTF, DS9 (text label for a region)
+1. ``label``: CRTF, DS9 (text label for a region)
 
     - Ex: meta['label'] = 'this is a circle'
 
-2. ``symbol``/``point``: CRTF, DS9 (Symbol for which a point region is described)
+2. ``tag``: DS9 (All regions may have zero or more tags associated with it,
+                which may be used for grouping and searching.)
 
-    - Ex: meta['symbol'] = 'point marker'
+    - Ex: meta['tags'] = ['{Group 1}', '{Group 2}']}
 
 3. ``include``: CRTF, DS9 (Region inclusion)
 
-    - Possible Value: True, False
+    - Possible Values: True, False
 
     - Ex: meta['include'] = True
 
@@ -236,23 +248,15 @@ The valid keys for :class:`~regions.RegionMeta` class are:
 
     - Ex: meta['corr'] = ['X', 'Y']
 
-9. ``comment``: DS9
+9. ``comment``: DS9, CRTF
 
     - Ex: meta['comment'] = 'Any comment for the region'
 
-10. ``coord``: CRTF (the coordinate system that the region follows)
+11. ``line``: DS9 (The line region may be rendered with arrows, one at each end.
+                   To indicate arrows, use the line property. A '1' indicates an arrow, '0'
+                   indicates no arrow.)
 
-    - Possible values: 'J2000', 'JMEAN', 'JTRUE', 'APP', 'B1950', 'B1950_VLA',
-       'BMEAN', 'BTRUE', 'GALACTIC', 'HADEC', 'AZEL', 'AZELSW', 'AZELNE',
-       'AZELGEO', 'AZELSWGEO', 'AZELNEGEO', 'JNAT', 'ECLIPTIC', 'MECLIPTIC',
-       'TECLIPTIC', 'SUPERGAL', 'ITRF', 'TOPO', 'ICRS'
-
-    - Default: image value
-
-    - Ex: meta['coord'] = 'J2000'
-
-11. ``line``:
-
+    - Ex: meta['line'] = [1, 1]
 
 12. ``name``:
 
@@ -262,19 +266,31 @@ The valid keys for :class:`~regions.RegionMeta` class are:
 
 15. ``fixed``:
 
-16. ``edit``:
+16. ``edit``: DS9 (The Edit property specifies if the user is allowed to edit
+                  the region via the GUI.)
 
-17. ``move``:
+    - Ex: meta['edit'] = 1
 
-18. ``rotate``:
+17. ``move``: DS9 (The Move property specifies if the user is allowed to move
+                   the region via the GUI. )
 
-19. ``delete``:
+    - Ex: meta['move'] = 1
+
+18. ``rotate``: DS9 (The Rotate property specifies if the user is allowed to
+                     rotate the region via the GUI. )
+
+    - Ex: meta['rotate'] = 1
+
+19. ``delete``: DS9 (The Delete property specifies if the user is allowed to
+                     delete the region via the GUI. )
+
+    - Ex: meta['delete'] = 1
 
 20. ``source``:
 
 21. ``background``:
 
-22. ``tag``:
+
 
 The visual attributes are meta data meant to be used to visualize regions, especially
 used by plotting libraries such as `Matplotlib`_ .
@@ -286,33 +302,38 @@ The valid keys for `~regions.RegionVisual` class are:
     - Default: color=green
     - Ex: visual['color'] = 'blue'
 
-2. ``dash``:
+2. ``dash``: Render region using dashed lines using current dashlist value.
 
-3. ``font``:
+3. ``font``: Name of the font.
 
-4. ``dashlist``:
+4. ``dashlist``: Sets dashed line parameters. This does not render the region in dashed lines.
 
-5. ``symsize``:
+5. ``symsize``: Size of the symbol
 
-6. ``symthick``:
+6. ``symthick``: Thickness of the symbol
 
-7. ``fontsize``:
+7. ``fontsize``: Size of the font.
 
-8. ``fontstyle``:
+8. ``fontstyle``: Style of the font.
 
-9. ``usetex``:
+9. ``usetex``: Boolean value whether the label uses tex.
 
-10. ``labelpos``:
+10. ``labelpos``: position of the label
 
-11. ``labeloff``:
+11. ``labeloff``: label offset
 
-12. ``linewidth``:
+12. ``linewidth``: width of the line
 
-13. ``linestyle``:
+13. ``linestyle``: style of the line
 
-14. ``fill``:
+14. ``fill``: Boolean value whether the regions is filled
 
-15. ``line``:
+15. ``line``: The line region may be rendered with arrows, one at each end.
+              To indicate arrows, use the line property. A '1' indicates an arrow, '0' indicates no arrow.
+
+16. ``symbol``/``point``: CRTF, DS9 (Symbol for which a point region is described)
+
+    - Ex: meta['symbol'] = 'point marker'
 
 .. _sh-lists:
 
