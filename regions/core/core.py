@@ -40,7 +40,7 @@ class Region(object):
         if self._repr_params is not None:
             for key in self._repr_params:
                 params.append('{0}={1}'.format(key.replace("_", " "),
-                                               self.__getattribute__(key)))
+                                               getattr(self, key)))
         params = ', '.join(params)
 
         return '<{0}({1})>'.format(self.__class__.__name__, params)
@@ -50,7 +50,7 @@ class Region(object):
         if hasattr(self, 'center'):
             cls_info.append(('center', self.center))
         if self._repr_params is not None:
-            params_value = [(x.replace("_", " "), self.__getattribute__(x))
+            params_value = [(x.replace("_", " "), getattr(self, x))
                             for x in self._repr_params]
             cls_info += params_value
         fmt = ['{0}: {1}'.format(key, val) for key, val in cls_info]
