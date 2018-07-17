@@ -546,12 +546,11 @@ class Shape(object):
         """
         if self.region_type not in regions_attributes:
             raise ValueError("'{0}' is not a valid region type in this package"
-                             "supported by DS9"
-                             .format(self.region_type))
+                             "supported by DS9".format(self.region_type))
 
         if self.coordsys not in valid_coordsys['DS9']:
-            raise ValueError("'{0}' is not a valid coordinate reference frame in"
-                             " astropy supported by DS9".format(self.coordsys))
+            raise ValueError("'{0}' is not a valid coordinate reference frame "
+                             "in astropy supported by DS9".format(self.coordsys))
 
     def _validate(self):
         """
@@ -559,11 +558,11 @@ class Shape(object):
         """
         if self.region_type not in regions_attributes:
             raise ValueError("'{0}' is not a valid region type in this package"
-                            .format(self.region_type))
+                             .format(self.region_type))
 
         if self.coordsys not in valid_coordsys['DS9'] + valid_coordsys['CRTF']:
-            raise ValueError("'{0}' is not a valid coordinate reference frame in astropy".
-                             format(self.coordsys))
+            raise ValueError("'{0}' is not a valid coordinate reference frame "
+                             "in astropy".format(self.coordsys))
 
 
 def to_shape_list(region_list, coordinate_system='fk5'):
@@ -663,7 +662,7 @@ def to_ds9_meta(shape_meta):
 
     if 'font' in meta:
         meta['font'] += " {0} {1} {2}".format(shape_meta.get('fontsize', 12),
-                                          shape_meta.get('fontstyle', 'normal'),
+                                              shape_meta.get('fontstyle', 'normal'),
                                               shape_meta.get('fontweight', 'roman'))
 
     return meta

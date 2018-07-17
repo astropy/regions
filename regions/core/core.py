@@ -225,7 +225,7 @@ class PixelRegion(Region):
 
         kwargs = dict()
         kwargs['color'] = self.visual.get('color', 'green')
-        kwargs['label'] = self.meta.get('text', "")
+        kwargs['label'] = self.meta.get('label', "")
 
         if shape == 'text':
             kwargs['family'] = self.visual.get('font', 'helvetica')
@@ -241,8 +241,8 @@ class PixelRegion(Region):
                 kwargs['markeredgecolor'] = kwargs['color']
                 kwargs['markeredgewidth'] = self.visual.get('width', 1)
             if shape == 'patch':
-                kwargs['edgecolor'] = kwargs['color']
-                kwargs['fill'] = self.visual.get('fill', True)
+                kwargs['edgecolor'] = kwargs.pop('color')
+                kwargs['fill'] = self.visual.get('fill', False)
 
             kwargs['linewidth'] = self.visual.get('linewidth', 1)
             kwargs['linestyle'] = self.visual.get('linstyle', 'solid')

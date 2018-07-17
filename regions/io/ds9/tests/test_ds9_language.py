@@ -29,7 +29,7 @@ def test_read():
     files = get_pkg_data_filenames('data')
     for f in files:
         with open(f) as f:
-            f.read()
+            DS9Parser(f.read(), errors='warn')
 
 
 implemented_region_types = ('ellipse', 'circle', 'rectangle', 'polygon', 'point')
@@ -54,7 +54,7 @@ def test_file(filename):
 
     coordsys = os.path.basename(filename).split(".")[1]
 
-    actual = ds9_objects_to_string(regs, coordsys=coordsys, fmt='.2f',
+    actual = ds9_objects_to_string(regs, coordsys=str(coordsys), fmt='.2f',
                                    radunit=None if coordsys=='physical' else 'arcsec').strip()
 
     reffile = get_pkg_data_filename('data/{coordsys}{strip}_reference.reg'

@@ -27,7 +27,7 @@ regex_global = re.compile(r'^global\s+(?P<parameters>.*)?')
 regex_coordinate = re.compile(r'\[([\w.+-:]*?)\s*[,]\s*([\w.+-:]*?)\]')
 
 # Single length Format. For Ex : helps us to extract the radius of a circle.
-regex_length = re.compile(r'(?:\[[^=]*\])+[,]\s*[\'\"]?([\s\w.+-]+)[\'\"]?\]')
+regex_length = re.compile(r'(?:\[[^=]*\])+[,]\s*([^\[]*)\]')
 
 # Extracts each 'parameter=value' pair.
 regex_meta = re.compile(r'(?:(\w+)\s*=[\s\'\"]*([^,\[\]]+?)[\'\",]+)|(?:(\w+)\s*=\s*\[(.*?)\])')
@@ -349,7 +349,7 @@ class CRTFRegionParser(object):
                     else:
                         self._raise_error("Not in proper format: '{0}' should be a symbol".format(y))
                 elif self.region_type == 'text':
-                    self.meta['text'] = y
+                    self.meta['text'] = y[1:-1]
 
         self.coord = coord_list
 
