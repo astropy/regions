@@ -3,12 +3,13 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import math
 
-from astropy.coordinates import Angle
+from astropy.coordinates import Angle, SkyCoord
 from astropy.wcs.utils import pixel_to_skycoord
 
 from ..core import PixCoord, PixelRegion, SkyRegion, Mask, BoundingBox
 from .._utils.wcs_helpers import skycoord_to_pixel_scale_angle
 from .._geometry import circular_overlap_grid
+from ..core.core import CenterSky, CenterPix, QuantityLength, ScalarLength
 
 __all__ = ['CirclePixelRegion', 'CircleSkyRegion']
 
@@ -25,20 +26,15 @@ class CirclePixelRegion(PixelRegion):
         Radius
     """
 
+    center = CenterPix()
+    radius = ScalarLength("Radius")
+
     def __init__(self, center, radius, meta=None, visual=None):
-        self._center = PixCoord._validate(center, name='center', expected='scalar')
-        self._radius = radius
+        self.center = center
+        self.radius = radius
         self.meta = meta or {}
         self.visual = visual or {}
         self._repr_params = ('radius',)
-
-    @property
-    def center(self):
-        return self._center
-
-    @property
-    def radius(self):
-        return self._radius
 
     @property
     def area(self):
@@ -120,23 +116,16 @@ class CircleSkyRegion(SkyRegion):
         Radius in angular units
     """
 
+    center = CenterSky()
+    radius = QuantityLength("Radius")
+
     def __init__(self, center, radius, meta=None, visual=None):
-        if center.isscalar:
-            self._center = center
-        else:
-            raise ValueError('The center should be a 0D SkyCoord object')
-        self._radius = radius
+
+        self.center = center
+        self.radius = radius
         self.meta = meta or {}
         self.visual = visual or {}
         self._repr_params = ('radius',)
-
-    @property
-    def center(self):
-        return self._center
-
-    @property
-    def radius(self):
-        return self._radius
 
     def to_pixel(self, wcs):
         center, scale, _ = skycoord_to_pixel_scale_angle(self.center, wcs)

@@ -3,8 +3,13 @@ from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 import abc
 import operator
+import weakref
 
 from astropy.extern import six
+from astropy.coordinates import BaseCoordinateFrame
+from astropy.units import Quantity
+import numpy as np
+
 
 __all__ = ['Region', 'PixelRegion', 'SkyRegion', 'RegionMeta', 'RegionVisual']
 
@@ -24,6 +29,8 @@ _DEFAULT_WCS_ORIGIN = 0
 _DEFAULT_WCS_MODE = 'all'
 
 VALID_MASK_MODES = {'center', 'exact', 'subpixels'}
+
+from .pixcoord import PixCoord
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -294,6 +301,203 @@ class SkyRegion(Region):
             The world coordinate system transformation to assume
         """
         raise NotImplementedError
+
+
+@six.add_metaclass(abc.ABCMeta)
+class RegionAttr(object):
+
+    def __init__(self):
+        self._values = weakref.WeakKeyDictionary()
+
+    def __get__(self, instance, owner):
+        if instance is None:
+            return self
+        return self._values.get(instance, None)
+
+    def __set__(self, instance, value):
+        self._validate(value)
+        self._values[instance] = value
+
+    def _validate(self, value):
+        raise NotImplementedError
+
+
+class CenterPix(RegionAttr):
+
+    def _validate(self, value):
+        if isinstance(value, PixCoord) and value.isscalar:
+            return
+        else:
+            raise ValueError('The center must be a 0D PixCoord object')
+
+
+class AnnulusCenterPix(object):
+
+    def __get__(self, instance, owner):
+        if instance is None:
+            return self
+        reg1 = getattr(instance, 'region1')
+        return getattr(reg1, 'center')
+
+    def __set__(self, instance, value):
+
+        reg1 = getattr(instance, 'region1')
+
+        if isinstance(value, PixCoord) and value.isscalar:
+            setattr(reg1, 'center', value)
+        else:
+            raise ValueError('The center must be a 0D PixCoord object')
+
+
+class ScalarLength(RegionAttr):
+
+    def __init__(self, name):
+        self._name = name
+        super(ScalarLength, self).__init__()
+
+    def _validate(self, value):
+        if not np.isscalar(value):
+            raise ValueError(
+                'The {} must be a scalar numpy/python number'.format(self._name))
+
+
+class AnnulusInnerScalarLength(object):
+
+    def __init__(self, name):
+        self._name = name
+
+    def __get__(self, instance, owner):
+        reg1 = getattr(instance, 'region1')
+        return getattr(reg1, self._name)
+
+    def __set__(self, instance, value):
+        reg1 = getattr(instance, 'region1')
+        reg2 = getattr(instance, 'region2')
+
+        if np.isscalar(value):
+            if getattr(reg2, self._name) < value:
+                raise ValueError("The inner {0} must be less than the outer {0}"
+                                .format(self._name)
+                             )
+            else:
+                setattr(reg1, self._name, value)
+        else:
+            raise ValueError('The inner {} must be a scalar numpy/python number'
+                             .format(self._name))
+
+
+class AnnulusOuterScalarLength(object):
+
+    def __init__(self, name):
+        self._name = name
+
+    def __get__(self, instance, owner):
+        reg2 = getattr(instance, 'region2')
+        return getattr(reg2, self._name)
+
+    def __set__(self, instance, value):
+        reg1 = getattr(instance, 'region1')
+        reg2 = getattr(instance, 'region2')
+
+        if np.isscalar(value):
+            if getattr(reg1, self._name) > value:
+                raise ValueError("The outer {0} must be greater than the outer"
+                                 " {0}".format(self._name)
+                                 )
+            else:
+                setattr(reg2, self._name, value)
+        else:
+            raise ValueError('The outer {} must be a scalar numpy/python number'
+                             .format(self._name))
+
+
+class CenterSky(RegionAttr):
+
+    def _validate(self, value):
+        if not value.isscalar:
+            raise ValueError('The center must be a 0D SkyCoord object')
+
+
+class AnnulusCenterSky(object):
+
+    def __get__(self, instance, owner):
+        if instance is None:
+            return self
+        reg1 = getattr(instance, 'region1')
+        return getattr(reg1, 'center')
+
+    def __set__(self, instance, value):
+
+        reg1 = getattr(instance, 'region1')
+
+        if not value.isscalar:
+            raise ValueError('The center must be a 0D SkyCoord object')
+        else:
+            setattr(reg1, 'center', value)
+
+
+class QuantityLength(RegionAttr):
+
+    def __init__(self, name):
+        self._name = name
+        super(QuantityLength, self).__init__()
+
+    def _validate(self, value):
+        if isinstance(value, Quantity) and value.isscalar:
+            return
+        else:
+            raise ValueError('The {} must be a scalar astropy Quantity object'
+                             .format(self._name))
+
+
+class AnnulusInnerQuantityLength(object):
+
+    def __init__(self, name):
+        self._name = name
+
+    def __get__(self, instance, owner):
+        reg1 = getattr(instance, 'region1')
+        return getattr(reg1, self._name)
+
+    def __set__(self, instance, value):
+        reg1 = getattr(instance, 'region1')
+        reg2 = getattr(instance, 'region2')
+
+        if isinstance(value, Quantity) and value.isscalar:
+            if getattr(reg2, self._name) < value:
+                raise ValueError("The inner {0} must be less than the outer {0}"
+                                 .format(self._name)
+                                 )
+            else:
+                setattr(reg1, self._name, value)
+        else:
+            raise ValueError('The inner {} must be a scalar astropy Quantity '
+                             'object'.format(self._name))
+
+
+class AnnulusOuterQuantityLength(object):
+
+    def __init__(self, name):
+        self._name = name
+
+    def __get__(self, instance, owner):
+        reg2 = getattr(instance, 'region2')
+        return getattr(reg2, self._name)
+
+    def __set__(self, instance, value):
+        reg1 = getattr(instance, 'region1')
+        reg2 = getattr(instance, 'region2')
+
+        if isinstance(value, Quantity) and value.isscalar:
+            if getattr(reg1, self._name) > value:
+                raise ValueError("The inner {0} must be less than the outer {0}"
+                                 .format(self._name)
+                                 )
+            else:
+                setattr(reg2, self._name, value)
+        else:
+            raise ValueError('The outer {} must be a scalar astropy Quantity '
+                             'object'.format(self._name))
 
 
 class RegionMeta(dict):
