@@ -6,7 +6,7 @@ import operator
 import weakref
 
 from astropy.extern import six
-from astropy.coordinates import BaseCoordinateFrame
+from astropy.coordinates import SkyCoord
 from astropy.units import Quantity
 import numpy as np
 
@@ -414,7 +414,9 @@ class AnnulusOuterScalarLength(object):
 class CenterSky(RegionAttr):
 
     def _validate(self, value):
-        if not value.isscalar:
+        if isinstance(value, SkyCoord) and value.isscalar:
+            return
+        else:
             raise ValueError('The center must be a 0D SkyCoord object')
 
 
@@ -430,10 +432,10 @@ class AnnulusCenterSky(object):
 
         reg1 = getattr(instance, 'region1')
 
-        if not value.isscalar:
-            raise ValueError('The center must be a 0D SkyCoord object')
-        else:
+        if isinstance(value, SkyCoord) and value.isscalar:
             setattr(reg1, 'center', value)
+        else:
+            raise ValueError('The center must be a 0D SkyCoord object')
 
 
 class QuantityLength(RegionAttr):
