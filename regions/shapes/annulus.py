@@ -45,8 +45,11 @@ class CircleAnnulusPixelRegion(CompoundPixelRegion):
     def __init__(self, center, inner_radius, outer_radius, meta=None, visual=None):
         region1 = CirclePixelRegion(center, inner_radius)
         region2 = CirclePixelRegion(center, outer_radius)
-        super(CircleAnnulusPixelRegion, self).__init__(
-            region1=region1, region2=region2, operator=operator.xor, meta=meta, visual=visual)
+        super(CircleAnnulusPixelRegion, self).__init__(region1=region1,
+                                                       region2=region2,
+                                                       operator=operator.xor,
+                                                       meta=meta,
+                                                       visual=visual)
         self._repr_params = ('inner_radius', 'outer_radius')
 
     @property
@@ -62,7 +65,8 @@ class CircleAnnulusPixelRegion(CompoundPixelRegion):
         _, scale, _ = skycoord_to_pixel_scale_angle(center, wcs)
         inner_radius = self.inner_radius / scale * u.deg
         outer_radius = self.outer_radius / scale * u.deg
-        return CircleAnnulusSkyRegion(center, inner_radius, outer_radius, self.meta, self.visual)
+        return CircleAnnulusSkyRegion(center, inner_radius, outer_radius,
+                                      self.meta, self.visual)
 
 
 class CircleAnnulusSkyRegion(CompoundSkyRegion):
@@ -86,8 +90,11 @@ class CircleAnnulusSkyRegion(CompoundSkyRegion):
     def __init__(self, center, inner_radius, outer_radius, meta=None, visual=None):
         region1 = CircleSkyRegion(center, inner_radius)
         region2 = CircleSkyRegion(center, outer_radius)
-        super(CircleAnnulusSkyRegion, self).__init__(
-            region1=region1, operator=operator.xor, region2=region2, meta=meta, visual=visual)
+        super(CircleAnnulusSkyRegion, self).__init__(region1=region1,
+                                                     operator=operator.xor,
+                                                     region2=region2,
+                                                     meta=meta,
+                                                     visual=visual)
         self._repr_params = ('inner_radius', 'outer_radius')
 
     def to_pixel(self, wcs):
@@ -96,7 +103,8 @@ class CircleAnnulusSkyRegion(CompoundSkyRegion):
         center = PixCoord(float(center.x), float(center.y))
         inner_radius = self.inner_radius.to('deg').value * scale
         outer_radius = self.outer_radius.to('deg').value * scale
-        return CircleAnnulusPixelRegion(center, inner_radius, outer_radius, self.meta, self.visual)
+        return CircleAnnulusPixelRegion(center, inner_radius, outer_radius,
+                                        self.meta, self.visual)
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -122,8 +130,11 @@ class AsymmetricAnnulusPixelRegion(CompoundPixelRegion):
 
     def __init__(self, region1, region2, meta=None, visual=None):
 
-        super(AsymmetricAnnulusPixelRegion, self).__init__(
-            region1=region1, region2=region2, operator=operator.xor, meta=meta, visual=visual)
+        super(AsymmetricAnnulusPixelRegion, self).__init__(region1=region1,
+                                                           region2=region2,
+                                                           operator=operator.xor,
+                                                           meta=meta,
+                                                           visual=visual)
 
         self._repr_params = ('inner_width', 'inner_height',
                              'outer_width', 'outer_height', 'angle')
@@ -179,8 +190,11 @@ class AsymmetricAnnulusSkyRegion(CompoundSkyRegion):
 
     def __init__(self, region1, region2, meta=None, visual=None):
 
-        super(AsymmetricAnnulusSkyRegion, self).__init__(region1=region1, region2=region2, operator=operator.xor,
-                meta=meta, visual=visual)
+        super(AsymmetricAnnulusSkyRegion, self).__init__(region1=region1,
+                                                         region2=region2,
+                                                         operator=operator.xor,
+                                                         meta=meta,
+                                                         visual=visual)
 
         self._repr_params = ('inner_width', 'inner_height',
                              'outer_width', 'outer_height', 'angle')
@@ -190,17 +204,16 @@ class AsymmetricAnnulusSkyRegion(CompoundSkyRegion):
         return self.region2.angle
 
     def to_pixel_args(self, wcs):
-        center, scale, north_angle = skycoord_to_pixel_scale_angle(self.center, wcs)
-        # FIXME: The following line is needed to get a scalar PixCoord
-        center = PixCoord(float(center.x), float(center.y))
-
+        center, scale, north_angle = skycoord_to_pixel_scale_angle(self.center,
+                                                                   wcs)
+        center = PixCoord(center.x, center.y)
         inner_width = self.inner_width.to('deg').value * scale
         inner_height = self.inner_height.to('deg').value * scale
         outer_width = self.outer_width.to('deg').value * scale
         outer_height = self.outer_height.to('deg').value * scale
         angle = self.angle + (north_angle - 90 * u.deg)
 
-        return center,inner_width, inner_height, outer_width, outer_height, angle
+        return center, inner_width, inner_height, outer_width, outer_height, angle
 
 
 class EllipseAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
@@ -220,23 +233,19 @@ class EllipseAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
     outer_height: float
         The outer height of the elliptical annulus (before rotation) in pixels
     angle: `~astropy.units.Quantity`
-        The rotation angle of the elliptical annulus, measured anti-clockwise. If set to
-        zero (the default), the width axis is lined up with the x axis.
+        The rotation angle of the elliptical annulus, measured anti-clockwise.
+        If set to zero (the default), the width axis is lined up with the x axis.
     """
 
     def __init__(self, center, inner_width, inner_height, outer_width,
                  outer_height, angle=0 * u.deg, meta=None, visual=None):
-        if inner_width > outer_width:
-            raise ValueError('Outer width should be larger than inner width.')
-
-        if inner_height > outer_height:
-            raise ValueError('Outer height should be larger than inner height.')
-
         region1 = EllipsePixelRegion(center, inner_width, inner_height, angle)
         region2 = EllipsePixelRegion(center, outer_width, outer_height, angle)
 
-        super(EllipseAnnulusPixelRegion, self).__init__(
-            region1=region1, region2=region2, meta=meta, visual=visual)
+        super(EllipseAnnulusPixelRegion, self).__init__(region1=region1,
+                                                        region2=region2,
+                                                        meta=meta,
+                                                        visual=visual)
 
     def to_sky(self, wcs):
         return EllipseAnnulusSkyRegion(*self.to_sky_args(wcs),
@@ -260,24 +269,20 @@ class EllipseAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
     outer_height: `~astropy.units.Quantity`
         The outer height of the elliptical annulus (before rotation) as angle
     angle: `~astropy.units.Quantity`, optional
-        The rotation angle of the elliptical annulus, measured anti-clockwise. If set to
-        zero (the default), the width axis is lined up with the longitude axis
-        of the celestial coordinates
+        The rotation angle of the elliptical annulus, measured anti-clockwise.
+        If set to zero (the default), the width axis is lined up with the
+        longitude axis of the celestial coordinates
     """
 
     def __init__(self, center, inner_width, inner_height, outer_width,
-                    outer_height, angle=0 * u.deg, meta=None, visual=None):
-        if inner_width > outer_width:
-            raise ValueError('Outer width should be larger than inner width.')
-
-        if inner_height > outer_height:
-            raise ValueError('Outer height should be larger than inner height.')
-
+                 outer_height, angle=0 * u.deg, meta=None, visual=None):
         region1 = EllipseSkyRegion(center, inner_width, inner_height, angle)
         region2 = EllipseSkyRegion(center, outer_width, outer_height, angle)
 
-        super(EllipseAnnulusSkyRegion, self).__init__(
-            region1=region1, region2=region2, meta=meta, visual=visual)
+        super(EllipseAnnulusSkyRegion, self).__init__(region1=region1,
+                                                      region2=region2,
+                                                      meta=meta,
+                                                      visual=visual)
 
     def to_pixel(self, wcs):
         return EllipseAnnulusPixelRegion(*self.to_pixel_args(wcs),
@@ -307,12 +312,6 @@ class RectangleAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
 
     def __init__(self, center, inner_width, inner_height, outer_width,
                  outer_height, angle=0 * u.deg, meta=None, visual=None):
-        if inner_width > outer_width:
-            raise ValueError('Outer width should be larger than inner width.')
-
-        if inner_height > outer_height:
-            raise ValueError('Outer height should be larger than inner height.')
-
         region1 = RectanglePixelRegion(center, inner_width, inner_height, angle)
         region2 = RectanglePixelRegion(center, outer_width, outer_height, angle)
 
@@ -341,19 +340,13 @@ class RectangleAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
     outer_height: `~astropy.units.Quantity`
         The outer height of the rectangular annulus (before rotation) as angle
     angle: `~astropy.units.Quantity`, optional
-        The rotation angle of the rectangular annulus, measured anti-clockwise. If set to
-        zero (the default), the width axis is lined up with the longitude axis
-        of the celestial coordinates
+        The rotation angle of the rectangular annulus, measured anti-clockwise.
+        If set to zero (the default), the width axis is lined up with the
+        longitude axis of the celestial coordinates
     """
 
     def __init__(self, center, inner_width, inner_height, outer_width,
-                    outer_height, angle=0 * u.deg, meta=None, visual=None):
-        if inner_width > outer_width:
-            raise ValueError('Outer width should be larger than inner width.')
-
-        if inner_height > outer_height:
-            raise ValueError('Outer height should be larger than inner height.')
-
+                 outer_height, angle=0 * u.deg, meta=None, visual=None):
         region1 = RectangleSkyRegion(center, inner_width, inner_height, angle)
         region2 = RectangleSkyRegion(center, outer_width, outer_height, angle)
 
