@@ -7,3 +7,4 @@ from .pixcoord import *
 from .mask import *
 from .bounding_box import *
 from .compound import *
+from .attributes import *

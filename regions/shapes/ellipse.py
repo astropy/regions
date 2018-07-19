@@ -11,7 +11,7 @@ from astropy.wcs.utils import pixel_to_skycoord
 from ..core import PixCoord, PixelRegion, SkyRegion, Mask, BoundingBox
 from .._geometry import elliptical_overlap_grid
 from .._utils.wcs_helpers import skycoord_to_pixel_scale_angle
-from ..core.core import ScalarPix, ScalarLength, QuantityLength, ScalarSky
+from ..core.attributes import ScalarPix, ScalarLength, QuantityLength, ScalarSky
 
 
 __all__ = ['EllipsePixelRegion', 'EllipseSkyRegion']

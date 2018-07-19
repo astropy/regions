@@ -10,7 +10,8 @@ from astropy.coordinates import BaseCoordinateFrame, Angle, SkyCoord
 from astropy import log
 
 from .. import shapes
-from ..core import PixCoord, SkyRegion, RegionMeta, RegionVisual
+from ..core import PixCoord, SkyRegion
+from ..core.attributes import RegionMeta, RegionVisual
 from .ds9.core import DS9RegionParserWarning, DS9RegionParserError
 from .crtf.core import CRTFRegionParserWarning, CRTFRegionParserError, valid_symbols
 

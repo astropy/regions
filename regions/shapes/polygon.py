@@ -8,7 +8,7 @@ from astropy.wcs.utils import skycoord_to_pixel, pixel_to_skycoord
 from ..core import PixelRegion, SkyRegion, Mask, BoundingBox, PixCoord
 from .._geometry import polygonal_overlap_grid
 from .._geometry.pnpoly import points_in_polygon
-from ..core.core import OneDPix, OneDSky
+from ..core.attributes import OneDPix, OneDSky
 
 __all__ = ['PolygonPixelRegion', 'PolygonSkyRegion']
 

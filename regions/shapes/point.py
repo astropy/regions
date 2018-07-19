@@ -5,7 +5,7 @@ import numpy as np
 from astropy.wcs.utils import pixel_to_skycoord, skycoord_to_pixel
 
 from ..core import PixCoord, PixelRegion, SkyRegion, BoundingBox
-from ..core.core import ScalarPix, ScalarSky
+from ..core.attributes import ScalarPix, ScalarSky
 
 __all__ = ['PointPixelRegion', 'PointSkyRegion']
 

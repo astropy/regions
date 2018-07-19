@@ -4,7 +4,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import numpy as np
 
 from . import PixelRegion, SkyRegion, BoundingBox, Mask
-from ..core.core import CompoundRegionPix, CompoundRegionSky
+from ..core.attributes import CompoundRegionPix, CompoundRegionSky
 
 
 __all__ = ['CompoundPixelRegion', 'CompoundSkyRegion']

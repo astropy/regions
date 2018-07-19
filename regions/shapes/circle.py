@@ -9,7 +9,7 @@ from astropy.wcs.utils import pixel_to_skycoord
 from ..core import PixCoord, PixelRegion, SkyRegion, Mask, BoundingBox
 from .._utils.wcs_helpers import skycoord_to_pixel_scale_angle
 from .._geometry import circular_overlap_grid
-from ..core.core import ScalarSky, ScalarPix, QuantityLength, ScalarLength
+from ..core.attributes import ScalarSky, ScalarPix, QuantityLength, ScalarLength
 
 __all__ = ['CirclePixelRegion', 'CircleSkyRegion']
 

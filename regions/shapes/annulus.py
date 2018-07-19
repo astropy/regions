@@ -14,7 +14,7 @@ from ..core import CompoundPixelRegion, CompoundSkyRegion, PixCoord
 from ..shapes.circle import CirclePixelRegion, CircleSkyRegion
 from ..shapes.ellipse import EllipsePixelRegion, EllipseSkyRegion
 from ..shapes.rectangle import RectanglePixelRegion, RectangleSkyRegion
-from ..core.core import (AnnulusCenterPix, AnnulusInnerScalarLength,
+from ..core.attributes import (AnnulusCenterPix, AnnulusInnerScalarLength,
                          AnnulusOuterScalarLength, AnnulusCenterSky,
                          AnnulusInnerQuantityLength, AnnulusOuterQuantityLength,
                          AnnulusAngle)

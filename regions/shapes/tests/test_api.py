@@ -45,7 +45,7 @@ SKY_REGIONS = [
                             5 * u.deg, 9 * u.deg, angle=3 * u.deg),
     PolygonSkyRegion(SkyCoord([1, 4, 3] * u.deg, [2, 4, 4] * u.deg)),
     RectangleSkyRegion(SkyCoord(6 * u.deg, 5 * u.deg), width=3 * u.deg, height=5 * u.deg),
-    RectangleSkyRegion(SkyCoord(6 * u.deg, 5 * u.deg), 3 * u.deg, 5 * u.deg,
+    RectangleAnnulusSkyRegion(SkyCoord(6 * u.deg, 5 * u.deg), 3 * u.deg, 5 * u.deg,
                        5 * u.deg, 7 * u.deg),
     PointSkyRegion(SkyCoord(6 * u.deg, 5 * u.deg))]
 
