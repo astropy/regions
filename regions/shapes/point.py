@@ -5,6 +5,7 @@ import numpy as np
 from astropy.wcs.utils import pixel_to_skycoord, skycoord_to_pixel
 
 from ..core import PixCoord, PixelRegion, SkyRegion, BoundingBox
+from ..core.attributes import ScalarPix, ScalarSky
 
 __all__ = ['PointPixelRegion', 'PointSkyRegion']
 
@@ -19,8 +20,10 @@ class PointPixelRegion(PixelRegion):
         The position of the point
     """
 
+    center = ScalarPix('center')
+
     def __init__(self, center, meta=None, visual=None):
-        self.center = PixCoord._validate(center, name='center', expected='scalar')
+        self.center = center
         self.meta = meta or {}
         self.visual = visual or {}
         self._repr_params = None
@@ -67,11 +70,10 @@ class PointSkyRegion(SkyRegion):
         The position of the point
     """
 
+    center = ScalarSky('center')
+
     def __init__(self, center, meta=None, visual=None):
-        if center.isscalar:
-            self.center = center
-        else:
-            raise ValueError('The Center should be a 0D SkyCoord object')
+        self.center = center
         self.meta = meta or {}
         self.visual = visual or {}
         self._repr_params = None

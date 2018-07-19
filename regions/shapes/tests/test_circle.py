@@ -89,4 +89,4 @@ class TestCircleSkyRegion(BaseTestSkyRegion):
         radius = 2 * u.arcsec
         with pytest.raises(ValueError) as err:
             CircleSkyRegion(center, radius)
-        assert 'the centre should be a 0D SkyCoord object' in str(err)
+        assert 'The center must be a 0D SkyCoord object' in str(err)

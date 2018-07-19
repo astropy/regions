@@ -45,6 +45,21 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
         assert_allclose(patch.height, 3)
         assert_allclose(patch.angle, 5)
 
+    def test_region_bbox(self):
+        a = 7
+        b = 3
+        reg = EllipsePixelRegion(PixCoord(50, 50), width=a, height=b,
+                                 angle=0. * u.deg)
+        assert reg.bounding_box.shape == (b, a)
+
+        reg = EllipsePixelRegion(PixCoord(50.5, 50.5), width=a, height=b,
+                                 angle=0. * u.deg)
+        assert reg.bounding_box.shape == (b + 1, a + 1)
+
+        reg = EllipsePixelRegion(PixCoord(50, 50), width=a, height=b,
+                                 angle=90. * u.deg)
+        assert reg.bounding_box.shape == (a, b)
+
 
 class TestEllipseSkyRegion(BaseTestSkyRegion):
 
@@ -70,18 +85,10 @@ class TestEllipseSkyRegion(BaseTestSkyRegion):
                    '(ra, dec) in deg\n    ( 3.,  4.)>\nwidth: 4.0 deg\n'
                    'height: 3.0 deg\nangle: 5.0 deg')
 
-
-def test_ellipse_pixel_region_bbox():
-    a = 7
-    b = 3
-    reg = EllipsePixelRegion(PixCoord(50, 50), width=a, height=b,
-                             angle=0. * u.deg)
-    assert reg.bounding_box.shape == (b, a)
-
-    reg = EllipsePixelRegion(PixCoord(50.5, 50.5), width=a, height=b,
-                             angle=0. * u.deg)
-    assert reg.bounding_box.shape == (b + 1, a + 1)
-
-    reg = EllipsePixelRegion(PixCoord(50, 50), width=a, height=b,
-                             angle=90. * u.deg)
-    assert reg.bounding_box.shape == (a, b)
+    def test_dimension_center(self):
+        center = SkyCoord([1, 2] * u.deg, [3, 4] * u.deg)
+        width = 2 * u.arcsec
+        height = 3 * u.arcsec
+        with pytest.raises(ValueError) as err:
+            EllipseSkyRegion(center, width, height)
+        assert 'The center must be a 0D SkyCoord object' in str(err)

@@ -1,7 +1,11 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 from __future__ import absolute_import, division, print_function, unicode_literals
-from . import PixCoord, PixelRegion, SkyRegion, BoundingBox, Mask
+
 import numpy as np
+
+from . import PixelRegion, SkyRegion, BoundingBox, Mask
+from ..core.attributes import CompoundRegionPix, CompoundRegionSky
+
 
 __all__ = ['CompoundPixelRegion', 'CompoundSkyRegion']
 
@@ -11,11 +15,11 @@ class CompoundPixelRegion(PixelRegion):
     Represents the logical combination of two regions in pixel coordinates.
     """
 
+    region1 = CompoundRegionPix('region1')
+    region2 = CompoundRegionPix('region2')
+
     def __init__(self, region1, region2, operator, meta=None, visual=None):
-        if not isinstance(region1, PixelRegion):
-            raise TypeError("region1 must be a PixelRegion")
-        if not isinstance(region2, PixelRegion):
-            raise TypeError("region2 must be a PixelRegion")
+
         if not callable(operator):
             raise TypeError("operator must be callable")
 
@@ -29,11 +33,12 @@ class CompoundPixelRegion(PixelRegion):
             self.visual = region1.visual
         else:
             self.visual = visual
-        self.operator = operator
-        self._repr_params = [('component 1', self.region1),
-                             ('component 2', self.region2),
-                             ('operator', self.operator),
-                            ]
+        self._operator = operator
+        self._repr_params = ('region1', 'region2', 'operator')
+
+    @property
+    def operator(self):
+        return self._operator
 
     def contains(self, pixcoord):
         in_reg = self.operator(self.region1.contains(pixcoord), self.region2.contains(pixcoord))
@@ -97,12 +102,10 @@ class CompoundSkyRegion(SkyRegion):
     """
     Represents the logical combination of two regions in sky coordinates.
     """
+    region1 = CompoundRegionSky('region1')
+    region2 = CompoundRegionSky('region2')
 
     def __init__(self, region1, region2, operator, meta=None, visual=None):
-        if not isinstance(region1, SkyRegion):
-            raise TypeError("region1 must be a SkyRegion")
-        if not isinstance(region2, SkyRegion):
-            raise TypeError("region2 must be a SkyRegion")
         if not callable(operator):
             raise TypeError("operator must be callable")
 
@@ -116,12 +119,13 @@ class CompoundSkyRegion(SkyRegion):
             self.visual = region1.visual
         else:
             self.visual = visual
-        self.operator = operator
+        self._operator = operator
 
-        self._repr_params = [('component 1', self.region1),
-                             ('component 2', self.region2),
-                             ('operator', self.operator),
-                            ]
+        self._repr_params = ('region1', 'region2', 'operator')
+
+    @property
+    def operator(self):
+        return self._operator
 
     def contains(self, skycoord, wcs):
         in_reg = self.operator(self.region1.contains(skycoord, wcs),

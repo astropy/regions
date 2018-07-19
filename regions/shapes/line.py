@@ -7,6 +7,7 @@ import astropy.units as u
 from astropy.wcs.utils import pixel_to_skycoord, skycoord_to_pixel
 
 from ..core import PixCoord, PixelRegion, SkyRegion, BoundingBox
+from ..core.attributes import ScalarPix, ScalarSky
 
 
 __all__ = ['LinePixelRegion', 'LineSkyRegion']
@@ -24,13 +25,15 @@ class LinePixelRegion(PixelRegion):
         End position
     """
 
+    start = ScalarPix('start')
+    end = ScalarPix('end')
+
     def __init__(self, start, end, meta=None, visual=None):
-        self.start = PixCoord._validate(start, name='start', expected='scalar')
-        self.end = PixCoord._validate(end, name='end', expected='scalar')
+        self.start = start
+        self.end = end
         self.meta = meta or {}
         self.visual = visual or {}
-        self._repr_params = [('start', self.start),
-                             ('end', self.end)]
+        self._repr_params = ('start', 'end')
 
     @property
     def area(self):
@@ -54,9 +57,7 @@ class LinePixelRegion(PixelRegion):
 
     @property
     def bounding_box(self):
-        """
-        Bounding box (`~regions.BoundingBox`).
-        """
+        """Bounding box (`~regions.BoundingBox`)."""
         xmin = min(self.start.x, self.end.x)
         xmax = max(self.start.x, self.end.x)
         ymin = min(self.start.y, self.end.y)
@@ -69,8 +70,7 @@ class LinePixelRegion(PixelRegion):
         raise NotImplementedError
 
     def as_patch(self, **kwargs):
-        """Matplotlib patch object for this region (`matplotlib.patches.Line`).
-        """
+        """Matplotlib patch object for this region (`matplotlib.patches.Line`)."""
         # Long term we want to support DS9 lines with arrow heads
         from matplotlib.patches import Arrow
         x = self.start.x
@@ -91,16 +91,18 @@ class LineSkyRegion(SkyRegion):
     end : `~astropy.coordinates.SkyCoord`
         End position
     """
+
+    start = ScalarSky('start')
+    end = ScalarSky('end')
+
     def __init__(self, start, end, meta=None, visual=None):
-        # TODO: test that start, end is a 0D SkyCoord
         self.start = start
         self.end = end
         self.meta = meta or {}
         self.visual = visual or {}
-        self._repr_params = [('start', self.start),
-                             ('end', self.end)]
+        self._repr_params = ('start', 'end')
 
-    def contains(self, skycoord):
+    def contains(self, skycoord, wcs):
         return False
 
     def to_pixel(self, wcs):

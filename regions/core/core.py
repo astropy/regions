@@ -6,7 +6,7 @@ import operator
 
 from astropy.extern import six
 
-__all__ = ['Region', 'PixelRegion', 'SkyRegion', 'RegionMeta', 'RegionVisual']
+__all__ = ['Region', 'PixelRegion', 'SkyRegion']
 
 
 """
@@ -38,8 +38,9 @@ class Region(object):
         else:
             params = []
         if self._repr_params is not None:
-            for key, val in self._repr_params:
-                params.append('{0}={1}'.format(key, val))
+            for key in self._repr_params:
+                params.append('{0}={1}'.format(key.replace("_", " "),
+                                               getattr(self, key)))
         params = ', '.join(params)
 
         return '<{0}({1})>'.format(self.__class__.__name__, params)
@@ -49,7 +50,9 @@ class Region(object):
         if hasattr(self, 'center'):
             cls_info.append(('center', self.center))
         if self._repr_params is not None:
-            cls_info += self._repr_params
+            params_value = [(x.replace("_", " "), getattr(self, x))
+                            for x in self._repr_params]
+            cls_info += params_value
         fmt = ['{0}: {1}'.format(key, val) for key, val in cls_info]
 
         return '\n'.join(fmt)
@@ -291,49 +294,3 @@ class SkyRegion(Region):
             The world coordinate system transformation to assume
         """
         raise NotImplementedError
-
-
-class RegionMeta(dict):
-    """
-    A python dictionary subclass which holds the meta attributes of the region.
-    """
-    valid_keys = ['label', 'symbol', 'include', 'frame', 'range', 'veltype',
-                  'restfreq', 'tag', 'comment', 'coord', 'line', 'name',
-                  'select', 'highlite', 'fixed', 'edit', 'move', 'rotate',
-                  'delete', 'source', 'background', 'corr', 'type'
-                  ]
-
-    key_mapping = {'point': 'symbol', 'text': 'label'}
-
-    def __setitem__(self, key, value):
-        key = self.key_mapping.get(key, key)
-        if key in self.valid_keys:
-            super(RegionMeta, self).__setitem__(key, value)
-        else:
-            raise KeyError("{} is not a valid meta key for region.".format(key))
-
-    def __getitem__(self, item):
-        item = self.key_mapping.get(item, item)
-        return super(RegionMeta, self).__getitem__(item)
-
-
-class RegionVisual(dict):
-    """
-    A python dictionary subclass which holds the visual attributes of the region.
-    """
-    valid_keys = ['color', 'dash', 'font', 'dashlist', 'symsize', 'symthick',
-                  'fontsize', 'fontstyle', 'usetex', 'labelpos', 'labeloff',
-                  'linewidth', 'linestyle', 'fill', 'line']
-
-    key_mapping = {'width': 'linewidth'}
-
-    def __setitem__(self, key, value):
-        key = self.key_mapping.get(key, key)
-        if key in self.valid_keys:
-            super(RegionVisual, self).__setitem__(key, value)
-        else:
-            raise KeyError("{} is not a valid visual meta key for region.".format(key))
-
-    def __getitem__(self, item):
-        item = self.key_mapping.get(item, item)
-        return super(RegionVisual, self).__getitem__(item)

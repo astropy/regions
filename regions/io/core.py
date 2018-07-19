@@ -6,11 +6,12 @@ import string
 
 from astropy import units as u
 from astropy import coordinates
-from astropy.coordinates import BaseCoordinateFrame, Angle
+from astropy.coordinates import BaseCoordinateFrame, Angle, SkyCoord
 from astropy import log
 
 from .. import shapes
-from ..core import PixCoord, SkyRegion, RegionMeta, RegionVisual
+from ..core import PixCoord, SkyRegion
+from ..core.attributes import RegionMeta, RegionVisual
 from .ds9.core import DS9RegionParserWarning, DS9RegionParserError
 from .crtf.core import CRTFRegionParserWarning, CRTFRegionParserError, valid_symbols
 
@@ -451,7 +452,7 @@ class Shape(object):
             # otherwise, they are vector quantities
             lon, lat = u.Quantity(lon), u.Quantity(lat)
         sphcoords = coordinates.UnitSphericalRepresentation(lon, lat)
-        coords = [frame(sphcoords)]
+        coords = [SkyCoord(frame(sphcoords))]
 
         if self.region_type != 'polygon':
             coords += self.coord[len(coords * 2):]
@@ -489,7 +490,7 @@ class Shape(object):
                         'symsize', 'fontsize', 'fontstyle', 'usetex',
                         'labelpos', 'labeloff', 'linewidth', 'linestyle']
 
-        if isinstance(coords[0], BaseCoordinateFrame):
+        if isinstance(coords[0], SkyCoord):
             reg = self.shape_to_sky_region[self.region_type](*coords)
         elif isinstance(coords[0], PixCoord):
             reg = self.shape_to_pixel_region[self.region_type](*coords)
