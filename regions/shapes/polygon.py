@@ -8,6 +8,7 @@ from astropy.wcs.utils import skycoord_to_pixel, pixel_to_skycoord
 from ..core import PixelRegion, SkyRegion, Mask, BoundingBox, PixCoord
 from .._geometry import polygonal_overlap_grid
 from .._geometry.pnpoly import points_in_polygon
+from ..core.core import OneDPix, OneDSky
 
 __all__ = ['PolygonPixelRegion', 'PolygonSkyRegion']
 
@@ -22,15 +23,13 @@ class PolygonPixelRegion(PixelRegion):
         The vertices of the polygon
     """
 
+    vertices = OneDPix('vertices')
+
     def __init__(self, vertices, meta=None, visual=None):
-        self._vertices = PixCoord._validate(vertices, name='vertices', expected='not scalar')
+        self.vertices = vertices
         self.meta = meta or {}
         self.visual = visual or {}
         self._repr_params = ('vertices',)
-
-    @property
-    def vertices(self):
-        return self._vertices
 
     @property
     def area(self):
@@ -115,18 +114,13 @@ class PolygonSkyRegion(SkyRegion):
         The vertices of the polygon
     """
 
+    vertices = OneDSky('vertices')
+
     def __init__(self, vertices, meta=None, visual=None):
-        if vertices.ndim == 1:
-            self._vertices = vertices
-        else:
-            raise ValueError('The vertices should be a 1D SkyCoord object')
+        self.vertices = vertices
         self.meta = meta or {}
         self.visual = visual or {}
         self._repr_params = ('vertices',)
-
-    @property
-    def vertices(self):
-        return self._vertices
 
     def to_pixel(self, wcs):
         x, y = skycoord_to_pixel(self.vertices, wcs)

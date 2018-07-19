@@ -7,6 +7,7 @@ import astropy.units as u
 from astropy.wcs.utils import pixel_to_skycoord, skycoord_to_pixel
 
 from ..core import PixCoord, PixelRegion, SkyRegion, BoundingBox
+from ..core.core import ScalarPix, ScalarSky
 
 
 __all__ = ['LinePixelRegion', 'LineSkyRegion']
@@ -24,20 +25,15 @@ class LinePixelRegion(PixelRegion):
         End position
     """
 
+    start = ScalarPix('start')
+    end = ScalarPix('end')
+
     def __init__(self, start, end, meta=None, visual=None):
-        self._start = PixCoord._validate(start, name='start', expected='scalar')
-        self._end = PixCoord._validate(end, name='end', expected='scalar')
+        self.start = start
+        self.end = end
         self.meta = meta or {}
         self.visual = visual or {}
         self._repr_params = ('start', 'end')
-
-    @property
-    def start(self):
-        return self._start
-
-    @property
-    def end(self):
-        return self._end
 
     @property
     def area(self):
@@ -95,24 +91,16 @@ class LineSkyRegion(SkyRegion):
     end : `~astropy.coordinates.SkyCoord`
         End position
     """
-    def __init__(self, start, end, meta=None, visual=None):
-        if start.isscalar and end.isscalar:
-            self._start = start
-            self._end = end
-        else:
-            raise ValueError('The start and end points should be 0D SkyCoord object')
 
+    start = ScalarSky('start')
+    end = ScalarSky('end')
+
+    def __init__(self, start, end, meta=None, visual=None):
+        self.start = start
+        self.end = end
         self.meta = meta or {}
         self.visual = visual or {}
         self._repr_params = ('start', 'end')
-
-    @property
-    def start(self):
-        return self._start
-
-    @property
-    def end(self):
-        return self._end
 
     def contains(self, skycoord, wcs):
         return False

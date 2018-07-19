@@ -306,7 +306,8 @@ class SkyRegion(Region):
 @six.add_metaclass(abc.ABCMeta)
 class RegionAttr(object):
 
-    def __init__(self):
+    def __init__(self, name):
+        self._name = name
         self._values = weakref.WeakKeyDictionary()
 
     def __get__(self, instance, owner):
@@ -322,13 +323,21 @@ class RegionAttr(object):
         raise NotImplementedError
 
 
-class CenterPix(RegionAttr):
+class ScalarPix(RegionAttr):
 
     def _validate(self, value):
-        if isinstance(value, PixCoord) and value.isscalar:
-            return
-        else:
-            raise ValueError('The center must be a 0D PixCoord object')
+        if not(isinstance(value, PixCoord) and value.isscalar):
+            raise ValueError('The {} must be a 0D PixCoord object'
+                             .format(self._name))
+
+
+class OneDPix(RegionAttr):
+
+    def _validate(self, value):
+        if not(isinstance(value, PixCoord) and not value.isscalar
+               and value.x.ndim == 1):
+            raise ValueError('The {} must be a 1D PixCoord object'
+                             .format(self._name))
 
 
 class AnnulusCenterPix(object):
@@ -342,18 +351,16 @@ class AnnulusCenterPix(object):
     def __set__(self, instance, value):
 
         reg1 = getattr(instance, 'region1')
+        reg2 = getattr(instance, 'region2')
 
         if isinstance(value, PixCoord) and value.isscalar:
             setattr(reg1, 'center', value)
+            setattr(reg2, 'center', value)
         else:
             raise ValueError('The center must be a 0D PixCoord object')
 
 
 class ScalarLength(RegionAttr):
-
-    def __init__(self, name):
-        self._name = name
-        super(ScalarLength, self).__init__()
 
     def _validate(self, value):
         if not np.isscalar(value):
@@ -367,6 +374,8 @@ class AnnulusInnerScalarLength(object):
         self._name = name
 
     def __get__(self, instance, owner):
+        if instance is None:
+            return self
         reg1 = getattr(instance, 'region1')
         return getattr(reg1, self._name)
 
@@ -392,6 +401,8 @@ class AnnulusOuterScalarLength(object):
         self._name = name
 
     def __get__(self, instance, owner):
+        if instance is None:
+            return self
         reg2 = getattr(instance, 'region2')
         return getattr(reg2, self._name)
 
@@ -411,13 +422,20 @@ class AnnulusOuterScalarLength(object):
                              .format(self._name))
 
 
-class CenterSky(RegionAttr):
+class ScalarSky(RegionAttr):
 
     def _validate(self, value):
-        if isinstance(value, SkyCoord) and value.isscalar:
-            return
-        else:
-            raise ValueError('The center must be a 0D SkyCoord object')
+        if not(isinstance(value, SkyCoord) and value.isscalar):
+            raise ValueError('The {} must be a 0D SkyCoord object'.
+                             format(self._name))
+
+
+class OneDSky(RegionAttr):
+
+    def _validate(self, value):
+        if not(isinstance(value, SkyCoord) and value.ndim == 1):
+            raise ValueError('The {} must be a 1D SkyCoord object'.
+                             format(self._name))
 
 
 class AnnulusCenterSky(object):
@@ -431,23 +449,19 @@ class AnnulusCenterSky(object):
     def __set__(self, instance, value):
 
         reg1 = getattr(instance, 'region1')
+        reg2 = getattr(instance, 'region2')
 
         if isinstance(value, SkyCoord) and value.isscalar:
             setattr(reg1, 'center', value)
+            setattr(reg2, 'center', value)
         else:
             raise ValueError('The center must be a 0D SkyCoord object')
 
 
 class QuantityLength(RegionAttr):
 
-    def __init__(self, name):
-        self._name = name
-        super(QuantityLength, self).__init__()
-
     def _validate(self, value):
-        if isinstance(value, Quantity) and value.isscalar:
-            return
-        else:
+        if not(isinstance(value, Quantity) and value.isscalar):
             raise ValueError('The {} must be a scalar astropy Quantity object'
                              .format(self._name))
 
@@ -458,6 +472,8 @@ class AnnulusInnerQuantityLength(object):
         self._name = name
 
     def __get__(self, instance, owner):
+        if instance is None:
+            return self
         reg1 = getattr(instance, 'region1')
         return getattr(reg1, self._name)
 
@@ -483,6 +499,8 @@ class AnnulusOuterQuantityLength(object):
         self._name = name
 
     def __get__(self, instance, owner):
+        if instance is None:
+            return self
         reg2 = getattr(instance, 'region2')
         return getattr(reg2, self._name)
 
@@ -500,6 +518,26 @@ class AnnulusOuterQuantityLength(object):
         else:
             raise ValueError('The outer {} must be a scalar astropy Quantity '
                              'object'.format(self._name))
+
+
+class AnnulusAngle(object):
+
+    def __get__(self, instance, owner):
+        if instance is None:
+            return self
+        reg1 = getattr(instance, 'region1')
+        return getattr(reg1, 'angle')
+
+    def __set__(self, instance, value):
+
+        reg1 = getattr(instance, 'region1')
+        reg2 = getattr(instance, 'region2')
+
+        if isinstance(value, Quantity) and value.isscalar:
+            setattr(reg1, 'angle', value)
+            setattr(reg2, 'angle', value)
+        else:
+            raise ValueError('The angle must be a scalar astropy quantity object')
 
 
 class RegionMeta(dict):

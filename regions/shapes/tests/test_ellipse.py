@@ -91,4 +91,4 @@ class TestEllipseSkyRegion(BaseTestSkyRegion):
         height = 3 * u.arcsec
         with pytest.raises(ValueError) as err:
             EllipseSkyRegion(center, width, height)
-        assert 'The center should be a 0D SkyCoord object' in str(err)
+        assert 'The center must be a 0D SkyCoord object' in str(err)

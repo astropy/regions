@@ -16,7 +16,8 @@ from ..shapes.ellipse import EllipsePixelRegion, EllipseSkyRegion
 from ..shapes.rectangle import RectanglePixelRegion, RectangleSkyRegion
 from ..core.core import (AnnulusCenterPix, AnnulusInnerScalarLength,
                          AnnulusOuterScalarLength, AnnulusCenterSky,
-                         AnnulusInnerQuantityLength, AnnulusOuterQuantityLength)
+                         AnnulusInnerQuantityLength, AnnulusOuterQuantityLength,
+                         AnnulusAngle)
 
 __all__ = ['CircleAnnulusPixelRegion', 'CircleAnnulusSkyRegion',
            'EllipseAnnulusPixelRegion', 'EllipseAnnulusSkyRegion',
@@ -127,6 +128,7 @@ class AsymmetricAnnulusPixelRegion(CompoundPixelRegion):
     outer_width = AnnulusOuterScalarLength('width')
     inner_height = AnnulusInnerScalarLength('height')
     outer_height = AnnulusOuterScalarLength('height')
+    angle = AnnulusAngle()
 
     def __init__(self, region1, region2, meta=None, visual=None):
 
@@ -138,10 +140,6 @@ class AsymmetricAnnulusPixelRegion(CompoundPixelRegion):
 
         self._repr_params = ('inner_width', 'inner_height',
                              'outer_width', 'outer_height', 'angle')
-
-    @property
-    def angle(self):
-        return self.region2.angle
 
     @property
     def area(self):
@@ -187,6 +185,7 @@ class AsymmetricAnnulusSkyRegion(CompoundSkyRegion):
     outer_width = AnnulusOuterQuantityLength('width')
     inner_height = AnnulusInnerQuantityLength('height')
     outer_height = AnnulusOuterQuantityLength('height')
+    angle = AnnulusAngle()
 
     def __init__(self, region1, region2, meta=None, visual=None):
 
@@ -198,10 +197,6 @@ class AsymmetricAnnulusSkyRegion(CompoundSkyRegion):
 
         self._repr_params = ('inner_width', 'inner_height',
                              'outer_width', 'outer_height', 'angle')
-
-    @property
-    def angle(self):
-        return self.region2.angle
 
     def to_pixel_args(self, wcs):
         center, scale, north_angle = skycoord_to_pixel_scale_angle(self.center,
