@@ -1,7 +1,11 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 from __future__ import absolute_import, division, print_function, unicode_literals
-from . import PixCoord, PixelRegion, SkyRegion, BoundingBox, Mask
+
 import numpy as np
+
+from . import PixelRegion, SkyRegion, BoundingBox, Mask
+from ..core.core import CompoundRegionPix, CompoundRegionSky
+
 
 __all__ = ['CompoundPixelRegion', 'CompoundSkyRegion']
 
@@ -11,16 +15,16 @@ class CompoundPixelRegion(PixelRegion):
     Represents the logical combination of two regions in pixel coordinates.
     """
 
+    region1 = CompoundRegionPix('region1')
+    region2 = CompoundRegionPix('region2')
+
     def __init__(self, region1, region2, operator, meta=None, visual=None):
-        if not isinstance(region1, PixelRegion):
-            raise TypeError("region1 must be a PixelRegion")
-        if not isinstance(region2, PixelRegion):
-            raise TypeError("region2 must be a PixelRegion")
+
         if not callable(operator):
             raise TypeError("operator must be callable")
 
-        self._region1 = region1
-        self._region2 = region2
+        self.region1 = region1
+        self.region2 = region2
         if meta is None:
             self.meta = region1.meta
         else:
@@ -31,14 +35,6 @@ class CompoundPixelRegion(PixelRegion):
             self.visual = visual
         self._operator = operator
         self._repr_params = ('region1', 'region2', 'operator')
-
-    @property
-    def region1(self):
-        return self._region1
-
-    @property
-    def region2(self):
-        return self._region2
 
     @property
     def operator(self):
@@ -106,17 +102,15 @@ class CompoundSkyRegion(SkyRegion):
     """
     Represents the logical combination of two regions in sky coordinates.
     """
+    region1 = CompoundRegionSky('region1')
+    region2 = CompoundRegionSky('region2')
 
     def __init__(self, region1, region2, operator, meta=None, visual=None):
-        if not isinstance(region1, SkyRegion):
-            raise TypeError("region1 must be a SkyRegion")
-        if not isinstance(region2, SkyRegion):
-            raise TypeError("region2 must be a SkyRegion")
         if not callable(operator):
             raise TypeError("operator must be callable")
 
-        self._region1 = region1
-        self._region2 = region2
+        self.region1 = region1
+        self.region2 = region2
         if meta is None:
             self.meta = region1.meta
         else:
@@ -128,14 +122,6 @@ class CompoundSkyRegion(SkyRegion):
         self._operator = operator
 
         self._repr_params = ('region1', 'region2', 'operator')
-
-    @property
-    def region1(self):
-        return self._region1
-
-    @property
-    def region2(self):
-        return self._region2
 
     @property
     def operator(self):

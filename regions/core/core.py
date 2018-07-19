@@ -540,6 +540,22 @@ class AnnulusAngle(object):
             raise ValueError('The angle must be a scalar astropy quantity object')
 
 
+class CompoundRegionPix(RegionAttr):
+
+    def _validate(self, value):
+        if not isinstance(value, PixelRegion):
+            raise ValueError('The {} must be a PixelRegion object'
+                             .format(self._name))
+
+
+class CompoundRegionSky(RegionAttr):
+
+    def _validate(self, value):
+        if not isinstance(value, SkyRegion):
+            raise ValueError('The {} must be a SkyRegion object'
+                             .format(self._name))
+
+
 class RegionMeta(dict):
     """
     A python dictionary subclass which holds the meta attributes of the region.
