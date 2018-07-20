@@ -263,7 +263,7 @@ class CRTFRegionParser(object):
     def __init__(self, global_meta, include, type_, region_type, reg_str, meta_str, errors='strict'):
 
         self.global_meta = global_meta
-        self.reg_str = reg_str.lower()
+        self.reg_str = reg_str
         self.meta_str = meta_str
         self.errors = errors
 

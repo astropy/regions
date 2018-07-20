@@ -274,7 +274,39 @@ class CompoundRegionSky(RegionAttr):
                              .format(self._name))
 
 
-class RegionMeta(dict):
+@six.add_metaclass(abc.ABCMeta)
+class Meta(dict):
+
+    def __init__(self, seq=None, **kwargs):
+
+        super(Meta, self).__init__()
+
+        if seq:
+            if isinstance(seq, dict):
+                for key, val in seq.items():
+                    self.__setitem__(key, val)
+            else:
+                for key, val in seq:
+                    self.__setitem__(key, val)
+
+        if len(kwargs) > 0:
+            for key, val in kwargs.items():
+                self.__setitem__(key, val)
+
+    def __setitem__(self, key, value):
+        key = self.key_mapping.get(key, key)
+        if key in self.valid_keys:
+            super(Meta, self).__setitem__(key, value)
+        else:
+            raise KeyError(
+                "{} is not a valid key for this class.".format(key))
+
+    def __getitem__(self, item):
+        item = self.key_mapping.get(item, item)
+        return super(Meta, self).__getitem__(item)
+
+
+class RegionMeta(Meta):
     """
     A python dictionary subclass which holds the meta attributes of the region.
     """
@@ -286,19 +318,8 @@ class RegionMeta(dict):
 
     key_mapping = {}
 
-    def __setitem__(self, key, value):
-        key = self.key_mapping.get(key, key)
-        if key in self.valid_keys:
-            super(RegionMeta, self).__setitem__(key, value)
-        else:
-            raise KeyError("{} is not a valid meta key for region.".format(key))
 
-    def __getitem__(self, item):
-        item = self.key_mapping.get(item, item)
-        return super(RegionMeta, self).__getitem__(item)
-
-
-class RegionVisual(dict):
+class RegionVisual(Meta):
     """
     A python dictionary subclass which holds the visual attributes of the region.
     """
@@ -308,14 +329,3 @@ class RegionVisual(dict):
                   'textangle', 'fontweight']
 
     key_mapping = {'width': 'linewidth', 'point': 'symbol'}
-
-    def __setitem__(self, key, value):
-        key = self.key_mapping.get(key, key)
-        if key in self.valid_keys:
-            super(RegionVisual, self).__setitem__(key, value)
-        else:
-            raise KeyError("{} is not a valid visual meta key for region.".format(key))
-
-    def __getitem__(self, item):
-        item = self.key_mapping.get(item, item)
-        return super(RegionVisual, self).__getitem__(item)

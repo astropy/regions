@@ -6,15 +6,14 @@ import string
 
 from astropy import units as u
 from astropy import coordinates
-from astropy.coordinates import BaseCoordinateFrame, Angle, SkyCoord
+from astropy.coordinates import Angle, SkyCoord
 from astropy import log
-from astropy.utils.exceptions import AstropyUserWarning
 
 from .. import shapes
 from ..core import PixCoord, SkyRegion
 from ..core.attributes import RegionMeta, RegionVisual
-from .ds9.core import DS9RegionParserWarning, DS9RegionParserError, valid_symbols_ds9
-from .crtf.core import CRTFRegionParserWarning, CRTFRegionParserError
+from .ds9.core import DS9RegionParserWarning, valid_symbols_ds9
+from .crtf.core import CRTFRegionParserWarning
 
 __all__ = ['ShapeList', 'Shape', 'to_shape_list', 'to_crtf_meta', 'to_ds9_meta']
 
