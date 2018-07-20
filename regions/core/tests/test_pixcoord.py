@@ -31,6 +31,9 @@ def test_pixcoord_basics_scalar():
     p1 = PixCoord(x=np.array(1), y=2)
     p2 = PixCoord(x=np.array(1), y=np.array(2))
 
+    assert p == p1
+    assert p1 == p2
+
     assert p.x == 1
     assert p.y == 2
 
@@ -121,8 +124,8 @@ def test_pixcoord_to_sky_scalar(wcs):
     p2 = PixCoord.from_sky(skycoord=s, wcs=wcs)
     assert isinstance(p2.x, float)
     assert p2.isscalar
-    assert_allclose(p2.x, p.x)
-    assert_allclose(p2.y, p.y)
+
+    assert p == p2
 
 
 def test_pixcoord_to_sky_array_1d(wcs):
@@ -137,18 +140,21 @@ def test_pixcoord_to_sky_array_1d(wcs):
     assert isinstance(p2.x, np.ndarray)
     assert p2.x.shape == (2, )
     assert not p2.isscalar
-    assert_allclose(p2.x, p.x)
-    assert_allclose(p2.y, p.y)
+
+    assert p == p2
 
 
 def test_pixcoord_to_sky_array_2d(wcs):
-    # p = PixCoord(x=[[17, 17, 17], [18, 18, 18]], y=[[8, 8, 8], [9, 9, 9]])
+    p1 = PixCoord(x=[[17, 17, 17], [18, 18, 18]], y=[[8, 8, 8], [9, 9, 9]])
     p = PixCoord(x=[[17, 18]], y=[[8, 9]])
 
     s = p.to_sky(wcs=wcs)
     assert s.name == 'galactic'
-    # assert_allclose(s.data.lon.deg, [[0, 0, 0], [349.88094, 349.88094, 349.88094]])
-    # assert_allclose(s.data.lat.deg, [[0, 0, 0], [10.003028, 10.003028, 10.003028]])
+
+    s1 = p1.to_sky(wcs=wcs)
+    assert s.name == 'galactic'
+    assert_allclose(s1.data.lon.deg, [[0, 0, 0], [349.88094, 349.88094, 349.88094]])
+    assert_allclose(s1.data.lat.deg, [[0, 0, 0], [10.003028, 10.003028, 10.003028]])
     assert_allclose(s.data.lon.deg, [[0, 349.88094]])
     assert_allclose(s.data.lat.deg, [[0, 10.003028]])
 
@@ -156,8 +162,8 @@ def test_pixcoord_to_sky_array_2d(wcs):
     assert isinstance(p2.x, np.ndarray)
     assert p2.x.shape == (1, 2)
     assert not p2.isscalar
-    assert_allclose(p2.x, p.x)
-    assert_allclose(p2.y, p.y)
+
+    assert p == p2
 
 
 def test_pixcoord_separation_scalar():
@@ -202,3 +208,26 @@ def test_pixcoord_shapely_array():
     p = PixCoord(x=[1, 2, 3], y=[11, 22, 33])
     with pytest.raises(TypeError):
         p.to_shapely()
+
+
+def test_equality():
+    a = np.array([1, 2])
+    b = PixCoord(a[0], a[1])
+    c = PixCoord(a[0]+0.0000001, a[1])
+
+    assert not b == a
+    assert b == b
+    assert b == c
+
+    a = PixCoord(
+        [[1, 2, 3], [4, 5, 6]],
+        [[11, 12, 13], [14, 15, 16]],
+    )
+
+    b = PixCoord(
+        [[1, 2, 3], [4, 5, 6]],
+        [[11.0000002, 12, 13], [14, 15, 16]],
+    )
+
+    assert a == b
+    assert a == a

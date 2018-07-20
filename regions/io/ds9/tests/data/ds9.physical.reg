@@ -7,7 +7,7 @@ circle(331,1091,40) # color=pink width=3 font="times 10 normal roman" text={Circ
 polygon(813.49446,1075,889,1150.5055,964.50554,1075,889,999.49446) # font="courier 10 normal roman" text={Polygon} edit=0 rotate=0
 -line(1017,1025,1137,1127) # line=1 1 color=cyan text={Line}
 # vector(1205,1069,80,45) vector=1 color=red text={Vector}
-# text(1315,1041) color=magenta font="helvetica 14 bold roman" text={Region}
+text(1315,1041) # color=magenta font="helvetica 14 bold roman" text={Region}
 # ruler(773,803,901,921) ruler=physical physical color=white font="helvetica 12 normal roman" text={Ruler}
 annulus(331,867,20,40,60) # color=magenta font="helvetica 10 bold roman" text={Annulus}
 ellipse(501,859,30,15,60,30,45) # color=red width=3 font="helvetica 10 bold roman" text={Ellipse Annulus}
@@ -37,3 +37,4 @@ bpanda(1185,489,45,90,1,80,40,120,60,1,45) # bpanda=(45 90 180 270)(80 40 120 60
 bpanda(1185,489,90,180,1,80,40,120,60,1,45) # bpanda=ignore
 bpanda(1185,489,180,270,1,80,40,120,60,1,45) # bpanda=ignore
 # segment(1336.9946,1154.9931,1364.9942,1074.9929,1416.9942,1074.9927) text={Segment}
+point(248,339) # point=box 14 color=red width=3 text={Box Point}

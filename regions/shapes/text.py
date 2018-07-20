@@ -53,7 +53,9 @@ class TextPixelRegion(PointPixelRegion):
         if ax is None:
             ax = plt.gca()
 
-        text = Text(self.center.x, self.center.y, self.text, **kwargs)
+        mpl_params = self.mpl_properties_default('text')
+        mpl_params.update(kwargs)
+        text = Text(self.center.x, self.center.y, self.text, **mpl_params)
 
         ax.add_artist(text)
 

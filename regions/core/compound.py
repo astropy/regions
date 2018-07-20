@@ -1,11 +1,12 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import operator as op
+
 import numpy as np
 
 from . import PixelRegion, SkyRegion, BoundingBox, Mask
 from ..core.attributes import CompoundRegionPix, CompoundRegionSky
-
 
 __all__ = ['CompoundPixelRegion', 'CompoundSkyRegion']
 
@@ -84,8 +85,47 @@ class CompoundPixelRegion(PixelRegion):
                                  operator=self.operator,
                                  region2=skyreg2, meta=self.meta, visual=self.visual)
 
+    @staticmethod
+    def _make_annulus_path(patch_inner, patch_outer):
+        """
+        Define a matplotlib annulus path from two patches.
+
+        This preserves the cubic Bezier curves (CURVE4) of the aperture
+        paths.
+
+        # This is borrowed from photutils aperture.
+        """
+
+        import matplotlib.path as mpath
+
+        path_inner = patch_inner.get_path()
+        transform_inner = patch_inner.get_transform()
+        path_inner = transform_inner.transform_path(path_inner)
+
+        path_outer = patch_outer.get_path()
+        transform_outer = patch_outer.get_transform()
+        path_outer = transform_outer.transform_path(path_outer)
+
+        verts_inner = path_inner.vertices[:-1][::-1]
+        verts_inner = np.concatenate((verts_inner, [verts_inner[-1]]))
+
+        verts = np.vstack((path_outer.vertices, verts_inner))
+        codes = np.hstack((path_outer.codes, path_inner.codes))
+
+        return mpath.Path(verts, codes)
+
     def as_patch(self, **kwargs):
-        raise NotImplementedError
+
+        if self.region1.center == self.region2.center and self.operator == op.xor:
+            import matplotlib.patches as mpatches
+
+            patch_inner = self.region1.as_patch()
+            patch_outer = self.region2.as_patch()
+            path = self._make_annulus_path(patch_inner, patch_outer)
+            patch = mpatches.PathPatch(path, **kwargs)
+            return patch
+        else:
+            raise NotImplementedError
 
     def to_shapely(self, **kwargs):
         raise NotImplementedError

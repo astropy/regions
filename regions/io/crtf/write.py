@@ -37,7 +37,7 @@ def crtf_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
     --------
     TODO
     """
-    shapelist = to_shape_list(regions, 'CRTF', coordsys)
+    shapelist = to_shape_list(regions, coordsys)
     return shapelist.to_crtf(coordsys, fmt, radunit)
 
 

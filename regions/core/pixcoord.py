@@ -109,6 +109,17 @@ class PixCoord(object):
         y = self.y[key]
         return PixCoord(x=x, y=y)
 
+    def __eq__(self, other):
+        """
+        It checks whether ``other`` is `PixCoord` object and whether their
+        abscissa and ordinate values are equal using ``np.assert_allclose``
+        with their default tolerance values.
+        """
+        if isinstance(other, PixCoord):
+            return np.allclose([self.x, self.y], [other.x, other.y])
+        else:
+            return False
+
     def to_sky(self, wcs, origin=_DEFAULT_WCS_ORIGIN, mode=_DEFAULT_WCS_MODE):
         """Convert this `PixCoord` to `~astropy.coordinates.SkyCoord`.
 

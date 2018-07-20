@@ -27,7 +27,7 @@ regex_global = re.compile(r'^global\s+(?P<parameters>.*)?')
 regex_coordinate = re.compile(r'\[([\w.+-:]*?)\s*[,]\s*([\w.+-:]*?)\]')
 
 # Single length Format. For Ex : helps us to extract the radius of a circle.
-regex_length = re.compile(r'(?:\[[^=]*\])+[,]\s*([\w.+-]+)\]')
+regex_length = re.compile(r'(?:\[[^=]*\])+[,]\s*([^\[]*)\]')
 
 # Extracts each 'parameter=value' pair.
 regex_meta = re.compile(r'(?:(\w+)\s*=[\s\'\"]*([^,\[\]]+?)[\'\",]+)|(?:(\w+)\s*=\s*\[(.*?)\])')
@@ -153,7 +153,7 @@ class CRTFParser(object):
             region = regex_region.search(crtf_line.group('region'))
             type_ = region.group('type') or 'reg'
             include = region.group('include') or '+'
-            region_type = region.group('regiontype')
+            region_type = region.group('regiontype').lower()
             if region_type in self.valid_definition:
                 helper = CRTFRegionParser(self.global_meta, include, type_, region_type,
                                           *crtf_line.group('region', 'parameters'))
@@ -177,7 +177,7 @@ class CRTFParser(object):
         Splits the regions into line and calls ``parse_line`` for each line.
         """
         for line in self.region_string.split('\n'):
-            self.parse_line(line.lower())
+            self.parse_line(line)
 
     def parse_global_meta(self, global_meta_str):
         """
@@ -290,7 +290,7 @@ class CRTFRegionParser(object):
         """
 
         self.convert_meta()
-        self.coordsys = self.meta.get('coord', 'image')
+        self.coordsys = self.meta.get('coord', 'image').lower()
         self.set_coordsys()
         self.convert_coordinates()
         self.make_shape()
@@ -343,10 +343,13 @@ class CRTFRegionParser(object):
                 else:
                     self._raise_error("Not in proper format: {0} should be a single length".format(y))
             if x == 's':
-                if y in valid_symbols:
-                    self.meta['symbol'] = valid_symbols[y]
-                else:
-                    self._raise_error("Not in proper format: '{0}' should be a symbol".format(y))
+                if self.region_type == 'symbol':
+                    if y in valid_symbols:
+                        self.meta['symbol'] = y
+                    else:
+                        self._raise_error("Not in proper format: '{0}' should be a symbol".format(y))
+                elif self.region_type == 'text':
+                    self.meta['text'] = y[1:-1]
 
         self.coord = coord_list
 
@@ -385,9 +388,12 @@ class CRTFRegionParser(object):
         """
         if self.region_type == 'ellipse':
             self.coord[2:] = [x * 2 for x in self.coord[2:]]
-            if len(self.coord) % 2 == 1:
+            if len(self.coord) % 2 == 1:  # This checks if the angle is present.
                 self.coord[-1] /= 2
-        self.shape = Shape('CRTF', coordsys=self.coordsys,
+
+        self.meta.pop('coord', None)
+
+        self.shape = Shape(coordsys=self.coordsys,
                            region_type=reg_mapping['CRTF'][self.region_type],
                            coord=self.coord,
                            meta=self.meta,

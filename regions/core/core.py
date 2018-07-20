@@ -4,6 +4,8 @@ from __future__ import (absolute_import, division, print_function,
 import abc
 import operator
 
+import numpy as np
+
 from astropy.extern import six
 
 __all__ = ['Region', 'PixelRegion', 'SkyRegion']
@@ -217,6 +219,36 @@ class PixelRegion(Region):
         """
         raise NotImplementedError
 
+    def mpl_properties_default(self, shape='patch'):
+
+        # The default values are set as per DS9 convention.
+
+        kwargs = dict()
+        kwargs['color'] = self.visual.get('color', 'green')
+        kwargs['label'] = self.meta.get('label', "")
+
+        if shape == 'text':
+            kwargs['family'] = self.visual.get('font', 'helvetica')
+            kwargs['rotation'] = self.visual.get('textangle', '0')
+            kwargs['size'] = self.visual.get('fontsize', '12')
+            kwargs['style'] = self.visual.get('fontsyle', 'normal')
+            kwargs['weight'] = self.visual.get('fontweight', 'roman')
+
+        else:
+            if shape == 'Line2D':
+                kwargs['marker'] = self.visual.get('symbol', 'o')
+                kwargs['markersize'] = self.visual.get('symsize', 11)
+                kwargs['markeredgecolor'] = kwargs['color']
+                kwargs['markeredgewidth'] = self.visual.get('width', 1)
+            if shape == 'patch':
+                kwargs['edgecolor'] = kwargs.pop('color')
+                kwargs['fill'] = self.visual.get('fill', False)
+
+            kwargs['linewidth'] = self.visual.get('linewidth', 1)
+            kwargs['linestyle'] = self.visual.get('linstyle', 'solid')
+
+        return kwargs
+
     def plot(self, ax=None, **kwargs):
         """
         Calls as_patch method forwarding all kwargs and adds patch
@@ -232,7 +264,9 @@ class PixelRegion(Region):
         if ax is None:
             ax = plt.gca()
 
-        patch = self.as_patch(**kwargs)
+        mpl_params = self.mpl_properties_default('patch')
+        mpl_params.update(kwargs)
+        patch = self.as_patch(**mpl_params)
         ax.add_patch(patch)
 
         return ax

@@ -17,9 +17,8 @@ def test_shape_ds9():
     parser = DS9Parser(reg_str)
     shape1 = parser.shapes[0]
     region = parser.shapes.to_regions()
-    shape2 = to_shape_list(region,'DS9','galactic')[0]
+    shape2 = to_shape_list(region, 'galactic')[0]
 
-    assert shape1.format_type == shape2.format_type
     assert shape1.coordsys == shape2.coordsys
     assert shape1.region_type == shape2.region_type
     assert shape1.include == shape2.include
@@ -46,9 +45,8 @@ def test_shape_crtf():
     parser = CRTFParser(reg_str)
     shape1 = parser.shapes[0]
     region = parser.shapes.to_regions()
-    shape2 = to_shape_list(region, 'CRTF', 'fk5')[0]
+    shape2 = to_shape_list(region, 'fk5')[0]
 
-    assert shape1.format_type == shape2.format_type
     assert shape1.coordsys == shape2.coordsys
     assert shape1.region_type == shape2.region_type
     assert shape1.include == shape2.include
@@ -69,10 +67,7 @@ def test_valid_shape():
     reg_str = "circle[[18h12m24s, -23d11m00s], 2.3arcsec], linewidth=2, coord=J2000, symsize=2"
 
     shape = CRTFParser(reg_str).shapes[0]
-    with pytest.raises(AttributeError):
-        shape.format_type = 'CAIO'
 
-    shape = CRTFParser(reg_str).shapes[0]
     with pytest.raises(ValueError) as err:
         shape.region_type = 'box'
 

@@ -12,6 +12,8 @@ from astropy import coordinates
 from astropy import log
 
 from ..core import reg_mapping
+from ..core import Shape, ShapeList
+from .core import DS9RegionParserError, DS9RegionParserWarning, valid_symbols_ds9
 
 __all__ = [
     'read_ds9',
@@ -20,14 +22,11 @@ __all__ = [
     'CoordinateParser'
 ]
 
-from ..core import Shape, ShapeList
-from .core import DS9RegionParserError, DS9RegionParserWarning
-
 # Regular expression to extract region type or coodinate system
 regex_global = re.compile("^#? *(-?)([a-zA-Z0-9]+)")
 
 # Regular expression to extract meta attributes
-regex_meta = re.compile("([a-zA-Z]+)(=)({.*?}|\".*?\"|[0-9 ]+ ?|[^= ]+) ?")
+regex_meta = re.compile("([a-zA-Z]+)(=)({.*?}|\'.*?\'|\".*?\"|[0-9\s]+\s?|[^=\s]+\s?[0-9]*)\s?")
 
 # Regular expression to strip parenthesis
 regex_paren = re.compile("[()]")
@@ -266,12 +265,15 @@ class DS9Parser(object):
         meta : `~collections.OrderedDict`
             Dictionary containing the meta data
         """
-        keys_vals = [(x,y) for x,_,y in regex_meta.findall(meta_str.strip())]
+        keys_vals = [(x, y) for x, _, y in regex_meta.findall(meta_str.strip())]
         extra_text = regex_meta.split(meta_str.strip())[-1]
         result = OrderedDict()
         for key, val in keys_vals:
-            # regex can include trailing whitespace; remove it
-            val = val.strip()
+            # regex can include trailing whitespace or inverted commas
+            # remove it
+            val = val.strip().strip("'").strip('"')
+            if key == 'text':
+                val = val.lstrip("{").rstrip("}")
             if key in result:
                 if key == 'tag':
                     result[key].append(val)
@@ -351,6 +353,7 @@ class DS9RegionParser(object):
 
     # DS9 language specification. This defines how a certain region is read.
     language_spec = {'point': (coordinate, coordinate),
+                     'text': (coordinate, coordinate),
                      'circle': (coordinate, coordinate, radius),
                      # This is a special case to deal with n elliptical annuli
                      'ellipse': itertools.chain((coordinate, coordinate),
@@ -360,7 +363,7 @@ class DS9RegionParser(object):
                      'line': (coordinate, coordinate, coordinate, coordinate),
                      'annulus': itertools.chain((coordinate, coordinate),
                                                 itertools.cycle((radius,))),
-                    }
+                     }
 
     def __init__(self, coordsys, include, region_type, region_end, global_meta, line):
 
@@ -477,7 +480,22 @@ class DS9RegionParser(object):
             if len(self.coord) % 2 == 1:  # This checks if angle is present
                 self.coord[-1] /= 2
 
-        self.shape = Shape("DS9", coordsys=self.coordsys,
+        if 'point' in self.meta:
+            point = self.meta['point'].split(" ")
+            if len(point) > 1:
+                self.meta['symsize'] = point[1]
+            self.meta['point'] = valid_symbols_ds9[point[0]]
+
+        if 'font' in self.meta:
+            fonts = self.meta['font'].split(" ")
+            self.meta['font'] = fonts[0]
+            self.meta['fontsize'] = fonts[1]
+            self.meta['fontstyle'] = fonts[2]
+            self.meta['fontweight'] = fonts[3]
+
+        self.meta.pop('coord', None)
+
+        self.shape = Shape(coordsys=self.coordsys,
                            region_type=reg_mapping['DS9'][self.region_type],
                            coord=self.coord,
                            meta=self.meta,

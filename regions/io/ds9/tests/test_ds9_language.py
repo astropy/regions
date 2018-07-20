@@ -28,7 +28,8 @@ def test_read():
     # Check that all test files including reference files are readable
     files = get_pkg_data_filenames('data')
     for f in files:
-        read_ds9(f, errors='warn')
+        with open(f) as f:
+            DS9Parser(f.read(), errors='warn')
 
 
 implemented_region_types = ('ellipse', 'circle', 'rectangle', 'polygon', 'point')
@@ -53,8 +54,8 @@ def test_file(filename):
 
     coordsys = os.path.basename(filename).split(".")[1]
 
-    actual = ds9_objects_to_string(regs, coordsys=coordsys, fmt='.2f',
-                                   radunit=None if coordsys=='physical' else 'arcsec')
+    actual = ds9_objects_to_string(regs, coordsys=str(coordsys), fmt='.2f',
+                                   radunit=None if coordsys=='physical' else 'arcsec').strip()
 
     reffile = get_pkg_data_filename('data/{coordsys}{strip}_reference.reg'
                                     .format(coordsys=coordsys,
@@ -63,12 +64,12 @@ def test_file(filename):
                                                    else "")))
 
     with open(reffile, 'r') as fh:
-        desired = fh.read()
+        desired = fh.read().strip()
 
     # since metadata is not required to preserve order, we have to do a more
     # complex comparison
-    desired_lines = [set(line.split()) for line in desired.split("\n")]
-    actual_lines = [set(line.split()) for line in actual.split("\n")]
+    desired_lines = [set(line.split(" ")) for line in desired.split("\n")]
+    actual_lines = [set(line.split(" ")) for line in actual.split("\n")]
     for split_line in actual_lines:
         assert split_line in desired_lines
 
@@ -157,7 +158,7 @@ def test_global_parser():
                           ' delete=1 include=1 source=1')
     global_parser = DS9Parser(global_test_str)
     assert dict(global_parser.global_meta) == {'dash': '0', 'source': '1', 'move': '1',
-                                  'font': '"helvetica 10 normal roman"',
+                                  'font': 'helvetica 10 normal roman',
                                   'dashlist': '8 3', 'include': True,
                                   'highlite': '1', 'color': 'green',
                                   'select': '1',

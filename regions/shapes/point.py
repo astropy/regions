@@ -59,6 +59,34 @@ class PointPixelRegion(PixelRegion):
         from matplotlib.patches import Circle
         return Circle((self.center.x, self.center.y), radius=2, **kwargs)
 
+    def plot(self, ax=None, **kwargs):
+        """
+        Forwards all kwargs to `Line2D` object and adds the line
+        to given axis.
+
+        Parameters
+        ----------
+        ax: `~matplotlib.axes`, optional
+                    Axis
+
+        kwargs: dict
+            All keywords that a ``Line2D`` object accepts
+
+        """
+        from matplotlib import pyplot as plt
+        from matplotlib.lines import Line2D
+
+        if ax is None:
+            ax = plt.gca()
+
+        # We can move this to a method like `as_patch`
+        mpl_params = self.mpl_properties_default('Line2D')
+        mpl_params.update(kwargs)
+        point = Line2D([self.center.x], [self.center.y], **mpl_params)
+        ax.add_line(point)
+
+        return ax
+
 
 class PointSkyRegion(SkyRegion):
     """
