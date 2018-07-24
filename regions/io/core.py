@@ -37,7 +37,8 @@ regions_attributes = dict(circle=['center', 'radius'],
 # This helps to map the region names in the respective format to the ones
 # available in this package
 reg_mapping = {'DS9': {x: x for x in regions_attributes},
-               'CRTF': {x: x for x in regions_attributes}}
+               'CRTF': {x: x for x in regions_attributes},
+               'FITS_REGION': {x: x for x in regions_attributes}}
 reg_mapping['DS9']['box'] = 'rectangle'
 reg_mapping['CRTF']['rotbox'] = 'rectangle'
 reg_mapping['CRTF']['centerbox'] = 'rectangle'
@@ -45,6 +46,8 @@ reg_mapping['CRTF']['poly'] = 'polygon'
 reg_mapping['CRTF']['symbol'] = 'point'
 reg_mapping['CRTF']['text'] = 'text'
 reg_mapping['DS9']['text'] = 'text'
+reg_mapping['FITS_REGION']['box'] = 'rectangle'
+reg_mapping['FITS_REGION']['rotbox'] = 'rectangle'
 
 
 # valid astropy coordinate frames in their respective formats.
