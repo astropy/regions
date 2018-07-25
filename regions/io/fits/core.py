@@ -11,13 +11,13 @@ __all__ = [
 
 class FITSRegionParserWarning(AstropyUserWarning):
     """
-    A generic warning class for CRTF region parsing
+    A generic warning class for FITS region parsing
     """
 
 
 class FITSRegionParserError(ValueError):
     """
-    A generic error class for CRTF region parsing
+    A generic error class for FITS region parsing
     """
 
 

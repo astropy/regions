@@ -5,11 +5,14 @@ from warnings import warn
 
 from astropy import units as u
 import numpy as np
+from astropy.table import Table
+from astropy.io import fits
+from astropy.wcs import WCS
 
 from .core import FITSRegionParserError, FITSRegionParserWarning, language_spec
 from ..core import Shape, ShapeList, reg_mapping
 
-__all__ = ['FITSRegionParser']
+__all__ = ['FITSRegionParser', 'read_fits']
 
 
 class FITSRegionParser(object):
@@ -18,16 +21,22 @@ class FITSRegionParser(object):
         A fits region table
     errors : ``warn``, ``ignore``, ``strict``
         The error handling scheme to use for handling parsing errors.
-        The default is 'strict', which will raise a ``CRTFRegionParserError``.
-        `warn`` will raise a ``CRTFRegionParserWarning``, and ``ignore`` will do nothing
-        (i.e., be silent).
+        The default is 'strict', which will raise a `FITSRegionParserError`.
+        `warn`` will raise a `FITSRegionParserWarning`, and ``ignore`` will
+        do nothing (i.e., be silent).
     """
 
     valid_columns = ['X', 'Y', 'SHAPE', 'COMPONENT', 'R', 'ROTANG']
 
     def __init__(self, table, errors='strict'):
-        self.errors = errors
+
+        if errors not in ('strict', 'ignore', 'warn'):
+            msg = "``errors`` must be one of strict, ignore, or warn; is {}"
+            raise ValueError(msg.format(errors))
+        if not isinstance(table, Table):
+            raise TypeError("The table should be a astropy table object")
         self.table = table
+        self.errors = errors
         self.unit = {}
         self._shapes = {}
 
@@ -70,13 +79,25 @@ class FITSRegionParser(object):
 
 
 class FITSRegionRowParser():
-
+    """
+    Parses a single row of the table
+    row: `~astropy.table.row.Row` object
+        Single row of the region table that is to be parsed.
+    unit: `dict`
+        Units of each column in the row.
+    errors : ``warn``, ``ignore``, ``strict``
+        The error handling scheme to use for handling parsing errors.
+        The default is 'strict', which will raise a ``FITSRegionParserError``.
+        `warn`` will raise a ``FITSRegionParserWarning``, and ``ignore`` will
+        do nothing (i.e., be silent).
+    """
     def __init__(self, row, unit, errors='strict'):
         self.errors = errors
         self.unit = unit
         self.row = row
 
         region_type = self._get_col_value('SHAPE0', 'POINT')[0]
+
         if region_type[0] == '!':
             self.include = False
             region_type = region_type[1:]
@@ -107,7 +128,6 @@ class FITSRegionRowParser():
                 val = np.array(val).reshape(1, )
             if index is not None:
                 if index < len(val) and val[index] != 0:
-                    print("here")
                     return val[index], unit
                 else:
                     raise ValueError("The {0} must have more than {1} value for the "
@@ -134,7 +154,6 @@ class FITSRegionRowParser():
 
         for x in language_spec[self.region_type]:
             y, unit = self._get_col_value(x)
-            print(x, y)
             coords.append(self._parse_value(y, unit))
 
         meta = {'tag': self.component}
@@ -154,3 +173,38 @@ class FITSRegionRowParser():
             return val * units.get(str(unit), unit)
         else:
             self._raise_error("The unit: {} is invalid".format(unit))
+
+
+def read_fits(filename, errors='strict'):
+    """
+    Reads a FITS region file and scans for any fits regions table and
+    converts them into `Region` objects.
+
+    Parameters
+    ----------
+    filename : str
+        The file path
+    errors : ``warn``, ``ignore``, ``strict``
+      The error handling scheme to use for handling parsing errors.
+      The default is 'strict', which will raise a `FITSRegionParserError`.
+      ``warn`` will raise a `FITSRegionParserWarning`, and ``ignore`` will do nothing
+      (i.e., be silent).
+
+    Returns
+    -------
+    regions : list
+        Python list of `regions.Region` objects.
+    """
+    regions = []
+
+    hdul = fits.open(filename)
+
+    for hdu in hdul:
+        if hdu.name == 'REGION':
+            table = Table.read(hdu)
+            wcs = WCS(hdu.header)
+            regions_list = FITSRegionParser(table, errors).shapes.to_regions()
+            for reg in regions_list:
+                regions.append(reg.to_sky(wcs))
+
+    return regions
