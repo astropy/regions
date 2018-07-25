@@ -14,11 +14,12 @@ currently supported.
 
 .. code-block:: python
 
-    >>> from astropy.coordinates import Angle, SkyCoord
+    >>> from astropy.coordinates import SkyCoord
+    >>> from astropy import units as u
     >>> from regions import PixCoord, CircleSkyRegion, CirclePixelRegion
 
     >>> center_sky = SkyCoord(42, 43, unit='deg', frame='fk5')
-    >>> circle_sky = CircleSkyRegion(center=center_sky, radius=Angle(3, 'deg'))
+    >>> circle_sky = CircleSkyRegion(center=center_sky, radius=3 * u.deg)
     >>> circle_pix = CirclePixelRegion(center=PixCoord(x=42, y=43),
     ...                                radius=4.2)
 
@@ -26,29 +27,55 @@ currently supported.
 
 .. code-block:: python
 
-    >>> from astropy.coordinates import Angle, SkyCoord
+    >>> from astropy.coordinates import SkyCoord
+    >>> from astropy import units as u
     >>> from regions import PixCoord, CircleAnnulusSkyRegion, CircleAnnulusPixelRegion
 
     >>> center_sky = SkyCoord(42, 43, unit='deg', frame='fk5')
     >>> circle_annulus_sky = CircleAnnulusSkyRegion(center=center_sky,
-    ...                               inner_radius=Angle(3, 'deg'), outer_radius=Angle(4, 'deg'))
+    ...                                             inner_radius=3 * u.deg,
+    ...                                             outer_radius=4 * u.deg)
     >>> circle_annulus_pix = CircleAnnulusPixelRegion(center=PixCoord(x=42, y=43),
-    ...                                inner_radius=4.2, outer_radius=5.2)
+    ...                                               inner_radius=4.2,
+    ...                                               outer_radius=5.2)
 
 * `~regions.EllipseSkyRegion` and `~regions.EllipsePixelRegion`
 
 .. code-block:: python
 
-    >>> from astropy.coordinates import Angle, SkyCoord
+    >>> from astropy.coordinates import SkyCoord
+    >>> from astropy import units as u
     >>> from regions import PixCoord, EllipseSkyRegion, EllipsePixelRegion
 
     >>> center_sky = SkyCoord(42, 43, unit='deg', frame='fk5')
     >>> ellipse_sky = EllipseSkyRegion(center=center_sky,
-    ...                                height=Angle(3, 'deg'), width=Angle(4, 'deg'),
-    ...                                angle=Angle(5, 'deg'))
+    ...                                height=3 * u.deg, width=3 * u.deg,
+    ...                                angle=5 * u.deg)
     >>> ellipse_pix = EllipsePixelRegion(center=PixCoord(x=42, y=43),
     ...                                  height=4.2, width=4.2,
-    ...                                  angle=Angle(5, 'deg'))
+    ...                                  angle=5 * u.deg)
+
+* `~regions.EllipseAnnulusSkyRegion` and `~regions.EllipseAnnulusPixelRegion`
+
+.. code-block:: python
+
+    >>> from astropy.coordinates import SkyCoord
+    >>> from astropy import units as u
+    >>> from regions import PixCoord, EllipseAnnulusSkyRegion, EllipseAnnulusPixelRegion
+
+    >>> center_sky = SkyCoord(42, 43, unit='deg', frame='fk5')
+    >>> ellipse_annulus_sky = EllipseAnnulusSkyRegion(center=center_sky,
+    ...                                               inner_width=3 * u.deg,
+    ...                                               outer_width=4 * u.deg,
+    ...                                               inner_height=6 * u.deg,
+    ...                                               outer_height=7 * u.deg,
+    ...                                               angle=6 * u.deg)
+    >>> ellipse_annulus_pix = EllipseAnnulusPixelRegion(center=PixCoord(x=42, y=43),
+    ...                                                 inner_width=4.2,
+    ...                                                 outer_width=5.2,
+    ...                                                 inner_height=7.2,
+    ...                                                 outer_height=8.2,
+    ...                                                 angle=6 * u.deg)
 
 * `~regions.PointSkyRegion` and `~regions.PointPixelRegion`
 
@@ -69,7 +96,7 @@ currently supported.
     >>> from regions import PixCoord, TextSkyRegion, TextPixelRegion
 
     >>> center_sky = SkyCoord(42, 43, unit='deg', frame='fk5')
-    >>> point_sky = TextSkyRegion(center=center_sky, "Demo Text")
+    >>> point_sky = TextSkyRegion(center=center_sky, 'Demo Text')
     >>> point_pix = TextPixelRegion(center=PixCoord(x=42, y=43), 'Demo Text')
 
 * `~regions.LineSkyRegion` and `~regions.LinePixelRegion`
@@ -88,16 +115,39 @@ currently supported.
 
 .. code-block:: python
 
-    >>> from astropy.coordinates import Angle, SkyCoord
+    >>> from astropy.coordinates import SkyCoord
+    >>> from astropy import units as u
     >>> from regions import PixCoord, RectangleSkyRegion, RectanglePixelRegion
 
     >>> center_sky = SkyCoord(42, 43, unit='deg', frame='fk5')
     >>> rectangle_sky = RectangleSkyRegion(center=center_sky,
-    ...                                    width=Angle(3, 'deg'), height=Angle(4, 'deg'),
-    ...                                    angle=Angle(5, 'deg'))
+    ...                                    width=3 * u.deg, height=4 * u.deg,
+    ...                                    angle=5 * u.deg)
     >>> rectangle_pix = RectanglePixelRegion(center=PixCoord(x=42, y=43),
     ...                                      width=3, height=4,
-    ...                                      angle=Angle(5, 'deg'))
+    ...                                      angle=5 * u.deg)
+
+* `~regions.RectangleAnnulusSkyRegion` and `~regions.RectangleAnnulusPixelRegion`
+
+.. code-block:: python
+
+    >>> from astropy.coordinates import SkyCoord
+    >>> from astropy import units as u
+    >>> from regions import PixCoord, RectangleAnnulusSkyRegion, RectangleAnnulusPixelRegion
+
+    >>> center_sky = SkyCoord(42, 43, unit='deg', frame='fk5')
+    >>> rectangle_annulus_sky = RectangleAnnulusSkyRegion(center=center_sky,
+    ...                                                   inner_width=3 * u.deg,
+    ...                                                   outer_width=4 * u.deg,
+    ...                                                   inner_height=6 * u.deg,
+    ...                                                   outer_height=7 * u.deg,
+    ...                                                   angle=15 * u.deg)
+    >>> rectangle_annulus_pix = RectangleAnnulusPixelRegion(center=PixCoord(x=42, y=43),
+    ...                                                     inner_width=4.2,
+    ...                                                     outer_width=5.2,
+    ...                                                     inner_height=7.2,
+    ...                                                     outer_height=8.2,
+    ...                                                     angle=15 * u.deg)
 
 * `~regions.PolygonSkyRegion` and `~regions.PolygonPixelRegion`
 
@@ -106,7 +156,7 @@ currently supported.
     >>> from astropy.coordinates import SkyCoord
     >>> from regions import PixCoord, PolygonSkyRegion, PolygonPixelRegion
 
-    >>> polygon_sky = PolygonSkyRegion(vertices=SkyCoord([1, 2, 2], [1, 1, 2], unit='deg', frame='fk5'),
+    >>> polygon_sky = PolygonSkyRegion(vertices=SkyCoord([1, 2, 2], [1, 1, 2], unit='deg', frame='fk5'))
     >>> polygon_pix = PolygonPixelRegion(vertices=PixCoord(x=[1, 2, 2], y=[1, 1, 2]))
 
 .. .. _sh-poly:
@@ -175,7 +225,7 @@ Meta Data
 ---------
 
 A :class:`~regions.Region` has ``meta`` and ``visual`` attributes which
-stores the meta data of the region. Since, this package supports various file
+stores the meta data of the region. Since this package supports various file
 formats it is necessary to handle the meta attributes supported by them.
 To handle them there are :class:`~regions.RegionMeta` and
 :class:`~regions.RegionVisual` for meta and visual attributes respectively.
@@ -184,26 +234,34 @@ They are subclasses of the python dictionary (`~dict`).
 The meta attribute provides additional data about regions such as labels, tags,
 comments, name, etc. which are used for non-display tasks.
 It also stores the spectral dimensions of the region.
-These classes, for now, just checks whether the key is valid or not.
+These classes, for now, just check whether the key is valid or not.
 
 The valid keys for :class:`~regions.RegionMeta` class are:
 
-1. ``label``: CRTF, DS9 (text label for a region)
+1. ``label``:
+
+    - CRTF, DS9 (text label for a region)
 
     - Ex: meta['label'] = 'this is a circle'
 
-2. ``tag``: DS9 (All regions may have zero or more tags associated with it,
-                which may be used for grouping and searching.)
+2. ``tag``:
+
+    - DS9 (All regions may have zero or more tags associated with it,
+          which may be used for grouping and searching.)
 
     - Ex: meta['tags'] = ['{Group 1}', '{Group 2}']}
 
-3. ``include``: CRTF, DS9 (Region inclusion)
+3. ``include``:
+
+    - CRTF, DS9 (Region inclusion)
 
     - Possible Values: True, False
 
     - Ex: meta['include'] = True
 
-4. ``frame``: CRTF (Frequency/Velocity Axis)
+4. ``frame``:
+
+    - CRTF (Frequency/Velocity Axis)
 
     - Possible values: 'REST', 'LSRK', 'LSRD', 'BARY', 'GEO', 'TOPO', 'GALACTO', 'LGROUP', 'CMB'
 
@@ -211,7 +269,9 @@ The valid keys for :class:`~regions.RegionMeta` class are:
 
     - Ex: meta['frame'] = 'TOPO'
 
-5. ``range``: CRTF (Frequency/Velocity Range)
+5. ``range``:
+
+    - CRTF (Frequency/Velocity Range)
 
     - Possible units: GHz, MHz, kHz, km/s, Hz, channel, chan (=channel)
 
@@ -221,7 +281,9 @@ The valid keys for :class:`~regions.RegionMeta` class are:
 
     - Ex: meta['range'] = [-320 * u.m/u.sec, -330 * u.m/u.s]
 
-6. ``veltype``: CRTF (Velocity Calculation)
+6. ``veltype``:
+
+    - CRTF (Velocity Calculation)
 
     - Possible values: 'RADIO', 'OPTICAL', 'Z', 'BETA', 'GAMMA'
 
@@ -229,7 +291,9 @@ The valid keys for :class:`~regions.RegionMeta` class are:
 
     - Ex: meta['veltype'] = 'RADIO'
 
-7. ``restfreq``: CRTF (Rest Frequency)
+7. ``restfreq``:
+
+    - CRTF (Rest Frequency)
 
     - Possible values: `~astropy.units.Quantity` object
 
@@ -237,7 +301,9 @@ The valid keys for :class:`~regions.RegionMeta` class are:
 
     - Ex: meta['restfreq'] = Quantity("1.42GHz")
 
-8. ``corr``: CRTF (Correlational Axis)
+8. ``corr``:
+
+    - CRTF (Correlational Axis)
 
     - Possible values: 'I', 'Q', 'U', 'V', 'RR', 'RL', 'LR', 'LL', 'XX', 'XY',
       'YX', 'YY', 'RX', 'RY', 'LX', 'LY', 'XR', 'XL', 'YR', 'YL', 'PP', 'PQ',
@@ -248,47 +314,59 @@ The valid keys for :class:`~regions.RegionMeta` class are:
 
     - Ex: meta['corr'] = ['X', 'Y']
 
-9. ``comment``: DS9, CRTF
+9. ``comment``:
+
+    - DS9, CRTF (Comment on the region)
 
     - Ex: meta['comment'] = 'Any comment for the region'
 
-11. ``line``: DS9 (The line region may be rendered with arrows, one at each end.
+11. ``line``:
+
+    - DS9 (The line region may be rendered with arrows, one at each end.
                    To indicate arrows, use the line property. A '1' indicates an arrow, '0'
                    indicates no arrow.)
 
     - Ex: meta['line'] = [1, 1]
 
-12. ``name``:
+12. ``name``
 
-13. ``select``:
+13. ``select``
 
-14. ``highlite``:
+14. ``highlite``
 
-15. ``fixed``:
+15. ``fixed``
 
-16. ``edit``: DS9 (The Edit property specifies if the user is allowed to edit
+16. ``edit``:
+
+    - DS9 (The Edit property specifies if the user is allowed to edit
                   the region via the GUI.)
 
     - Ex: meta['edit'] = 1
 
-17. ``move``: DS9 (The Move property specifies if the user is allowed to move
-                   the region via the GUI. )
+17. ``move``:
+
+    - DS9 (The Move property specifies if the user is allowed to move
+          the region via the GUI. )
 
     - Ex: meta['move'] = 1
 
-18. ``rotate``: DS9 (The Rotate property specifies if the user is allowed to
+18. ``rotate``:
+
+    - DS9 (The Rotate property specifies if the user is allowed to
                      rotate the region via the GUI. )
 
     - Ex: meta['rotate'] = 1
 
-19. ``delete``: DS9 (The Delete property specifies if the user is allowed to
+19. ``delete``:
+
+    - DS9 (The Delete property specifies if the user is allowed to
                      delete the region via the GUI. )
 
     - Ex: meta['delete'] = 1
 
-20. ``source``:
+20. ``source``
 
-21. ``background``:
+21. ``background``
 
 
 
