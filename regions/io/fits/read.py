@@ -7,15 +7,13 @@ from astropy import units as u
 import numpy as np
 
 from .core import FITSRegionParserError, FITSRegionParserWarning, language_spec
-from ..core import Shape, reg_mapping
+from ..core import Shape, ShapeList, reg_mapping
 
 __all__ = ['FITSRegionParser']
 
 
 class FITSRegionParser(object):
     """
-    header:
-        The FITS Region header
     table: `~astropy.table.Table` object
         A fits region table
     errors : ``warn``, ``ignore``, ``strict``
@@ -33,9 +31,16 @@ class FITSRegionParser(object):
         self.unit = {}
         self._shapes = {}
 
+        self.parse_table()
+
     @property
     def shapes(self):
-        return list(self._shapes.values())
+        shape_list = ShapeList()
+        components = list(self._shapes.keys())
+        components.sort()
+        for component in components:
+            shape_list += ShapeList(self._shapes[component])
+        return shape_list
 
     def _raise_error(self, msg):
         if self.errors == 'warn':
@@ -72,7 +77,6 @@ class FITSRegionRowParser():
         self.row = row
 
         region_type = self._get_col_value('SHAPE0', 'POINT')[0]
-        print(region_type)
         if region_type[0] == '!':
             self.include = False
             region_type = region_type[1:]
@@ -101,7 +105,6 @@ class FITSRegionRowParser():
 
             if np.isscalar(val):
                 val = np.array(val).reshape(1, )
-            print(val, index)
             if index is not None:
                 if index < len(val) and val[index] != 0:
                     print("here")
@@ -134,7 +137,7 @@ class FITSRegionRowParser():
             print(x, y)
             coords.append(self._parse_value(y, unit))
 
-        meta = {}
+        meta = {'tag': self.component}
 
         return self.component, Shape('physical',
                                      reg_mapping['FITS_REGION'][self.region_type.lower()],

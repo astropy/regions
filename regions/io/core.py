@@ -28,11 +28,15 @@ regions_attributes = dict(circle=['center', 'radius'],
                           ellipse=['center', 'width', 'height', 'angle'],
                           rectangle=['center', 'width', 'height', 'angle'],
                           polygon=['vertices'],
-                          annulus=['center', 'inner_radius', 'outer_radius'],
+                          circleannulus=['center', 'inner_radius', 'outer_radius'],
+                          ellipseannulus=['center', 'inner_width',
+                                          'inner_height', 'outer_width',
+                                          'outer_height', 'angle'],
                           line=['start', 'end'],
                           point=['center'],
                           text=['center']
                           )
+regions_attributes['rectangleannulus'] = regions_attributes['ellipseannulus']
 
 # This helps to map the region names in the respective format to the ones
 # available in this package
@@ -45,10 +49,13 @@ reg_mapping['CRTF']['centerbox'] = 'rectangle'
 reg_mapping['CRTF']['poly'] = 'polygon'
 reg_mapping['CRTF']['symbol'] = 'point'
 reg_mapping['CRTF']['text'] = 'text'
+reg_mapping['CRTF']['annulus'] = 'circleannulus'
 reg_mapping['DS9']['text'] = 'text'
+reg_mapping['DS9']['annulus'] = 'circleannulus'
+reg_mapping['FITS_REGION']['annulus'] = 'circleannulus'
 reg_mapping['FITS_REGION']['box'] = 'rectangle'
 reg_mapping['FITS_REGION']['rotbox'] = 'rectangle'
-
+reg_mapping['FITS_REGION']['elliptannulus'] = 'ellipseannulus'
 
 # valid astropy coordinate frames in their respective formats.
 valid_coordsys = {'DS9': ['image', 'physical', 'fk4', 'fk5', 'icrs', 'galactic',
@@ -118,7 +125,7 @@ class ShapeList(list):
 
         crtf_strings = {
             'circle': '{0}circle[[{1:FMT}deg, {2:FMT}deg], {3:FMT}RAD]',
-            'annulus': '{0}annulus[[{1:FMT}deg, {2:FMT}deg], [{3:FMT}RAD, {4:FMT}RAD]]',
+            'circleannulus': '{0}annulus[[{1:FMT}deg, {2:FMT}deg], [{3:FMT}RAD, {4:FMT}RAD]]',
             'ellipse': '{0}ellipse[[{1:FMT}deg, {2:FMT}deg], [{3:FMT}RAD, {4:FMT}RAD], {5:FMT}deg]',
             'rectangle': '{0}rotbox[[{1:FMT}deg, {2:FMT}deg], [{3:FMT}RAD, {4:FMT}RAD], {5:FMT}deg]',
             'polygon': '{0}poly[{1}]',
@@ -248,7 +255,7 @@ class ShapeList(list):
 
         ds9_strings = {
             'circle': '{0}circle({1:FMT},{2:FMT},{3:FMT}RAD)',
-            'annulus': '{0}annulus({1:FMT},{2:FMT},{3:FMT}RAD,{4:FMT}RAD)',
+            'circleannulus': '{0}annulus({1:FMT},{2:FMT},{3:FMT}RAD,{4:FMT}RAD)',
             'ellipse': '{0}ellipse({1:FMT},{2:FMT},{3:FMT}RAD,{4:FMT}RAD,{5:FMT})',
             'rectangle': '{0}box({1:FMT},{2:FMT},{3:FMT}RAD,{4:FMT}RAD,{5:FMT})',
             'polygon': '{0}polygon({1})',
@@ -370,7 +377,9 @@ class Shape(object):
                                ellipse=shapes.EllipseSkyRegion,
                                rectangle=shapes.RectangleSkyRegion,
                                polygon=shapes.PolygonSkyRegion,
-                               annulus=shapes.CircleAnnulusSkyRegion,
+                               circleannulus=shapes.CircleAnnulusSkyRegion,
+                               ellipseannulus=shapes.EllipseAnnulusSkyRegion,
+                               rectangleannulus=shapes.RectangleAnnulusSkyRegion,
                                line=shapes.LineSkyRegion,
                                point=shapes.PointSkyRegion,
                                text=shapes.TextSkyRegion
@@ -380,7 +389,9 @@ class Shape(object):
                                  ellipse=shapes.EllipsePixelRegion,
                                  rectangle=shapes.RectanglePixelRegion,
                                  polygon=shapes.PolygonPixelRegion,
-                                 annulus=shapes.CircleAnnulusPixelRegion,
+                                 circleannulus=shapes.CircleAnnulusPixelRegion,
+                                 ellipseannulus=shapes.EllipseAnnulusPixelRegion,
+                                 rectangleannulus=shapes.RectangleAnnulusPixelRegion,
                                  line=shapes.LinePixelRegion,
                                  point=shapes.PointPixelRegion,
                                  text=shapes.TextPixelRegion
@@ -594,7 +605,10 @@ def to_shape_list(region_list, coordinate_system='fk5'):
     for region in region_list:
 
         coord = []
-        reg_type = str(type(region)).split(".")[2]
+        if isinstance(region, SkyRegion):
+            reg_type = region.__class__.__name__[:-9].lower()
+        else:
+            reg_type = region.__class__.__name__[:-11].lower()
 
         for val in regions_attributes[reg_type]:
             coord.append(getattr(region, val))
