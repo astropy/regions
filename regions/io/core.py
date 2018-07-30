@@ -491,7 +491,7 @@ class Shape(object):
         """
         Convert to pixel coordinates, `regions.PixCoord`
         """
-        if self.region_type in ['polygon', 'line', 'poly']:
+        if self.region_type in ['polygon', 'line']:
             # have to special-case polygon in the phys coord case
             # b/c can't typecheck when iterating as in sky coord case
             coords = [PixCoord(self.coord[0::2], self.coord[1::2])]

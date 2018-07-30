@@ -98,13 +98,17 @@ class FITSRegionRowParser():
 
         region_type = self._get_col_value('SHAPE0', 'POINT')[0]
 
+        # Default region is POINT
+        if region_type == '':
+            region_type = 'POINT'
+
         if region_type[0] == '!':
             self.include = False
             region_type = region_type[1:]
         else:
             self.include = True
 
-        region_type = region_type.strip()
+        region_type = region_type.strip().upper()
 
         if region_type in language_spec:
             self.region_type = region_type
@@ -157,6 +161,12 @@ class FITSRegionRowParser():
             coords.append(self._parse_value(y, unit))
 
         meta = {'tag': self.component}
+
+        if self.region_type == 'POLYGON':
+            coords_new = []
+            for x, y in zip(coords[0], coords[1]):
+                coords_new += [x, y]
+            coords = coords_new
 
         return self.component, Shape('physical',
                                      reg_mapping['FITS_REGION'][self.region_type.lower()],
