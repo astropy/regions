@@ -12,7 +12,7 @@ from astropy.wcs import WCS
 from .core import FITSRegionParserError, FITSRegionParserWarning, language_spec
 from ..core import Shape, ShapeList, reg_mapping
 
-__all__ = ['FITSRegionParser', 'read_fits']
+__all__ = ['FITSRegionParser', 'read_fits', 'FITSRegionRowParser']
 
 
 class FITSRegionParser(object):

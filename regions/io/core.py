@@ -3,11 +3,13 @@
 from __future__ import absolute_import, division, print_function
 from warnings import warn
 import string
+import numpy as np
 
 from astropy import units as u
 from astropy import coordinates
 from astropy.coordinates import Angle, SkyCoord
 from astropy import log
+from astropy.table import Table
 
 from .. import shapes
 from ..core import PixCoord, SkyRegion
@@ -349,6 +351,73 @@ class ShapeList(list):
                 output += "{0}\n".format(line)
 
         return output
+
+    def to_fits(self):
+        """
+        Converts a list of regions to a `~astropy.table.Table` object.
+        """
+
+        max_length_coord = 1
+        x = []
+        y = []
+        shapes = []
+        r = []
+        rotangle = []
+        components = []
+
+        reg_reverse_mapping = {y: x for x, y in
+                               reg_mapping['FITS_REGION'].items()}
+
+        for num, shape in enumerate(self):
+            shapes.append(reg_reverse_mapping[shape.region_type])
+            if shape.region_type == 'polygon':
+                max_length_coord = max(len(shape.coord)/2, max_length_coord)
+                coord = [x.value for x in shape.coord]
+                x.append(coord[::2])
+                y.append(coord[1::2])
+                r.append(0)
+                rotangle.append(0)
+            else:
+                x.append(shape.coord[0].value)
+                y.append(shape.coord[1].value)
+                if shape.region_type in ['circle', 'circleannulus', 'point']:
+                    r.append([x.value for x in shape.coord[2:]])
+                    rotangle.append(0)
+                else:
+                    r.append([x.value for x in shape.coord[2:-1]])
+                    rotangle.append(shape.coord[-1].to('deg').value)
+
+            tag = shape.meta.get('tag', '')
+            if tag.isdigit():
+                components.append(int(tag))
+            else:
+                components.append(num + 1)
+
+        # padding every data with zeros at the end to make sure that all values
+        # in the column have same length.
+        for i in range(len(self)):
+            if np.isscalar(x[i]):
+                x[i] = np.array([x[i]])
+            if np.isscalar(y[i]):
+                y[i] = np.array([y[i]])
+            if np.isscalar(r[i]):
+                r[i] = np.array([r[i]])
+
+            x[i] = np.pad(x[i], (0, int(max_length_coord - len(x[i]))),
+                          'constant', constant_values=(0, 0))
+            y[i] = np.pad(y[i], (0, int(max_length_coord - len(y[i]))),
+                          'constant', constant_values=(0, 0))
+            r[i] = np.pad(r[i], (0, 4 - len(r[i])), 'constant',
+                          constant_values=(0, 0))
+
+        table = Table([x, y, shapes, r, rotangle, components],
+                      names=('X', 'Y', 'SHAPE', 'R', 'ROTANG', 'COMPONENT'))
+        table['X'].unit = 'pix'
+        table['Y'].unit = 'pix'
+        table['R'].unit = 'pix'
+        table['ROTANG'].unit = 'deg'
+
+        return table
 
 
 class Shape(object):
