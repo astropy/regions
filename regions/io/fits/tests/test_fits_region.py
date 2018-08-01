@@ -6,7 +6,7 @@ from numpy.testing import assert_allclose
 import astropy.version as astrov
 from astropy.utils.data import get_pkg_data_filename
 from astropy.table import Table
-
+from astropy.io import fits
 
 from ..read import FITSRegionParser
 from ..core import FITSRegionParserError
@@ -18,7 +18,7 @@ implemented_region_types = ('ellipse', 'circle', 'box', 'polygon', 'point',
                             'annulus', 'elliptannulus')
 
 
-@pytest.mark.parametrize('filename', ['data/fits_region_sample.fits'])
+@pytest.mark.parametrize('filename', ['data/region.fits'])
 def test_file_fits(filename):
 
     filename = get_pkg_data_filename(filename)
@@ -45,4 +45,13 @@ def test_file_fits(filename):
 
     assert_allclose(shapes[0].coord[2:], [table['R'][0][0]])
     for x in range(1, 5):
-        assert_allclose(shapes[1].coord[2:], list(table['R'][1]) + [table['ROTANG'][1]])
+        assert_allclose([x.value for x in shapes[1].coord[2:]], list(table['R'][1]) + [table['ROTANG'][1]])
+
+    table_ouput = shapes.to_fits()
+
+    shape_ouput = FITSRegionParser(table_ouput).shapes
+
+    for i in range(len(shapes)):
+        assert shapes[i].region_type == shape_ouput[i].region_type
+        assert shapes[i].coord == shape_ouput[i].coord
+        assert shapes[i].meta == shape_ouput[i].meta

@@ -17,6 +17,10 @@ __all__ = ['FITSRegionParser', 'read_fits', 'FITSRegionRowParser']
 
 class FITSRegionParser(object):
     """
+    Parses a FITs region table.
+
+    Parameters:
+    ----------
     table: `~astropy.table.Table` object
         A fits region table
     errors : ``warn``, ``ignore``, ``strict``
@@ -80,7 +84,10 @@ class FITSRegionParser(object):
 
 class FITSRegionRowParser():
     """
-    Parses a single row of the table
+    Parses a single row of the FITS region table
+
+    Parameters:
+    ----------
     row: `~astropy.table.row.Row` object
         Single row of the region table that is to be parsed.
     unit: `dict`
