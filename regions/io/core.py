@@ -354,7 +354,7 @@ class ShapeList(list):
 
     def to_fits(self):
         """
-        Converts a list of regions to a `~astropy.table.Table` object.
+        Converts a `~regions.ShapeList` to a `~astropy.table.Table` object.
         """
 
         max_length_coord = 1
