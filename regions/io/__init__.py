@@ -10,3 +10,4 @@ from .crtf.core import *
 
 from .fits.core import *
 from .fits.read import *
+from .fits.write import *

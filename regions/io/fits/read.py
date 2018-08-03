@@ -19,7 +19,7 @@ class FITSRegionParser(object):
     """
     Parses a FITs region table.
 
-    Parameters:
+    Parameters
     ----------
     table: `~astropy.table.Table` object
         A fits region table
@@ -65,7 +65,7 @@ class FITSRegionParser(object):
 
         for col in self.table.colnames:
             if col not in self.valid_columns:
-                self._raise_error('This table has an invalid col name: {}'
+                self._raise_error("This table has an invalid column name: '{}'"
                                   .format(col))
             else:
                 self.unit[col] = self.table[col].unit
@@ -86,7 +86,7 @@ class FITSRegionRowParser():
     """
     Parses a single row of the FITS region table
 
-    Parameters:
+    Parameters
     ----------
     row: `~astropy.table.row.Row` object
         Single row of the region table that is to be parsed.
@@ -120,7 +120,7 @@ class FITSRegionRowParser():
         if region_type in language_spec:
             self.region_type = region_type
         else:
-            self._raise_error("{} is not a valid FITS Region type"
+            self._raise_error("'{0}' is not a valid FITS Region type"
                               .format(region_type))
 
         self.component = str(self.row['COMPONENT'])
@@ -141,14 +141,14 @@ class FITSRegionRowParser():
                 if index < len(val) and val[index] != 0:
                     return val[index], unit
                 else:
-                    raise ValueError("The {0} must have more than {1} value for the "
+                    raise ValueError("The column: {0} must have more than {1} value for the "
                                      "region {2}".format(colname, index,
                                                         self.region_type))
             else:
                 return val, unit
         except KeyError:
             if default is None:
-                self._raise_error("The {0} is missing in the table"
+                self._raise_error("The column: '{0}' is missing in the table"
                                   .format(colname))
             else:
                 return default

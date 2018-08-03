@@ -367,6 +367,9 @@ class ShapeList(list):
 
         reg_reverse_mapping = {y: x for x, y in
                                reg_mapping['FITS_REGION'].items()}
+        reg_reverse_mapping['rectangle'] = 'ROTBOX'
+        reg_reverse_mapping['circleannulus'] = 'ANNULUS'
+        reg_reverse_mapping['ellipseannulus'] = 'ELLIPTANNULUS'
 
         for num, shape in enumerate(self):
             shapes.append(reg_reverse_mapping[shape.region_type])
@@ -381,10 +384,10 @@ class ShapeList(list):
                 x.append(shape.coord[0].value)
                 y.append(shape.coord[1].value)
                 if shape.region_type in ['circle', 'circleannulus', 'point']:
-                    r.append([x.value for x in shape.coord[2:]])
+                    r.append([float(x) for x in shape.coord[2:]])
                     rotangle.append(0)
                 else:
-                    r.append([x.value for x in shape.coord[2:-1]])
+                    r.append([float(x) for x in shape.coord[2:-1]])
                     rotangle.append(shape.coord[-1].to('deg').value)
 
             tag = shape.meta.get('tag', '')
@@ -393,7 +396,7 @@ class ShapeList(list):
             else:
                 components.append(num + 1)
 
-        # padding every data with zeros at the end to make sure that all values
+        # padding every value with zeros at the end to make sure that all values
         # in the column have same length.
         for i in range(len(self)):
             if np.isscalar(x[i]):
