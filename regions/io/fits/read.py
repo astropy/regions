@@ -175,8 +175,14 @@ class FITSRegionRowParser():
                 coords_new += [x, y]
             coords = coords_new
 
-        return self.component, Shape('physical',
-                                     reg_mapping['FITS_REGION'][self.region_type.lower()],
+        region_type = self.region_type.lower()
+        if region_type in reg_mapping['FITS_REGION']:
+            region_type = reg_mapping['FITS_REGION'][region_type]
+        else:
+            self._raise_error("'{0}' is currently not supported in "
+                              "regions".format(self.region_type))
+
+        return self.component, Shape('physical', region_type,
                                      coords, meta, False, False)
 
     def _parse_value(self, val, unit):

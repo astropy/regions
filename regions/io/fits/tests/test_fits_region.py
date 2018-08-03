@@ -77,7 +77,7 @@ def test_valid_columns():
 
     t = Table([[1, 2, 3]], names=('a'))
 
-    with pytest.raises(ValueError) as err:
+    with pytest.raises(FITSRegionParserError) as err:
         FITSRegionParser(t)
 
     assert "This table has an invalid column name: 'a'" in str(err)
@@ -92,14 +92,23 @@ def test_valid_row():
     t['X'].unit = 'pix'
     t['Y'].unit = 'pix'
 
-    with pytest.raises(ValueError) as err:
+    with pytest.raises(FITSRegionParserError) as err:
         FITSRegionParser(t)
 
     assert "The column: 'R' is missing in the table" in str(err)
 
     t[0]['SHAPE'] = 'PONT'
 
-    with pytest.raises(ValueError) as err:
+    with pytest.raises(FITSRegionParserError) as err:
         FITSRegionParser(t)
 
     assert "'PONT' is not a valid FITS Region type" in str(err)
+
+    t['ROTANG'] = [[20, 30]]
+    t['ROTANG'].unit = 'deg'
+    t[0]['SHAPE'] = 'PIE'
+
+    with pytest.raises(FITSRegionParserError) as err:
+        FITSRegionParser(t)
+
+    assert "'PIE' is currently not supported in regions" in str(err)
