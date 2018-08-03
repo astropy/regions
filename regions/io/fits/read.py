@@ -12,7 +12,7 @@ from astropy.wcs import WCS
 from .core import FITSRegionParserError, FITSRegionParserWarning, language_spec
 from ..core import Shape, ShapeList, reg_mapping
 
-__all__ = ['FITSRegionParser', 'read_fits', 'FITSRegionRowParser']
+__all__ = ['FITSRegionParser', 'read_fits_region', 'FITSRegionRowParser']
 
 
 class FITSRegionParser(object):
@@ -28,6 +28,31 @@ class FITSRegionParser(object):
         The default is 'strict', which will raise a `FITSRegionParserError`.
         `warn`` will raise a `FITSRegionParserWarning`, and ``ignore`` will
         do nothing (i.e., be silent).
+
+    Examples
+    --------
+
+    >>> from regions import FITSRegionParser
+    >>> from astropy.table import Table
+    >>> from astropy.utils.data import get_pkg_data_filename
+    >>> filename = get_pkg_data_filename('data/regions.fits',
+    ...                                  package='regions.io.fits.tests')
+    >>> table = Table.read(filename)
+    >>> print(table)
+        X         Y      SHAPE          R [2]            ROTANG  COMPONENT
+      pix       pix                     pix              deg
+    --------- --------- ------- ---------------------- --------- ---------
+       2896.5    5056.5  CIRCLE        381.9716 .. 0.0       0.0         1
+    5282.0541 4854.5699     BOX 1303.4597 .. 655.09466 28.395178         2
+       2944.5    3472.5 ELLIPSE         288.0 .. 512.0  337.4048         3
+        341.0     345.0  ROTBOX           56.0 .. 78.0      65.0         4
+        341.0     345.0 ANNULUS           56.0 .. 78.0       0.0         5
+        341.0     345.0   POINT             0.0 .. 0.0       0.0         6
+        341.0     345.0                     0.0 .. 0.0       0.0         7
+    >>> parser = FITSRegionParser(table)
+    >>> shapes = parser.shapes
+    >>> regions = shapes.to_regions()
+
     """
 
     valid_columns = ['X', 'Y', 'SHAPE', 'COMPONENT', 'R', 'ROTANG']
@@ -97,6 +122,7 @@ class FITSRegionRowParser():
         The default is 'strict', which will raise a ``FITSRegionParserError``.
         `warn`` will raise a ``FITSRegionParserWarning``, and ``ignore`` will
         do nothing (i.e., be silent).
+
     """
     def __init__(self, row, unit, errors='strict'):
         self.errors = errors
@@ -198,7 +224,7 @@ class FITSRegionRowParser():
             self._raise_error("The unit: {} is invalid".format(unit))
 
 
-def read_fits(filename, errors='strict'):
+def read_fits_region(filename, errors='strict'):
     """
     Reads a FITS region file and scans for any fits regions table and
     converts them into `Region` objects.
@@ -217,6 +243,16 @@ def read_fits(filename, errors='strict'):
     -------
     regions : list
         Python list of `regions.Region` objects.
+
+    Examples
+    --------
+
+    >>> from astropy.utils.data import get_pkg_data_filename
+    >>> from regions import read_fits_region
+    >>> file_read = get_pkg_data_filename('data/region.fits',
+    ...                                   package='regions.io.fits.tests')
+    >>> regions = read_fits_region(file_read)
+
     """
     regions = []
 

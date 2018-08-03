@@ -3,6 +3,7 @@
 from __future__ import absolute_import, division, print_function
 from warnings import warn
 import string
+import numbers
 import numpy as np
 
 from astropy import units as u
@@ -700,7 +701,7 @@ def to_shape_list(region_list, coordinate_system='fk5'):
 
         new_coord = []
         for val in coord:
-            if isinstance(val, Angle) or isinstance(val, u.Quantity) or isinstance(val, float):
+            if isinstance(val, Angle) or isinstance(val, u.Quantity) or isinstance(val, numbers.Number):
                 new_coord.append(val)
             elif isinstance(val, PixCoord):
                 new_coord.append(u.Quantity(val.x, u.dimensionless_unscaled))
