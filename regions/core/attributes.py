@@ -23,9 +23,17 @@ Also, contains RegionMeta and RegionVisual classes to handle meta data of region
 
 @six.add_metaclass(abc.ABCMeta)
 class RegionAttr(object):
+    """
+     Meta descriptor class for attribute of an `~regions.Region`
+     which makes sure that it's value is valid all the time.
+    """
 
     def __init__(self, name):
         self._name = name
+
+        # WeakKeyDictionary has an object instance as the key
+        # and the key value pair remains until the object instance is not
+        # free from memory, thus prevents memory leak.
         self._values = weakref.WeakKeyDictionary()
 
     def __get__(self, instance, owner):
@@ -38,10 +46,18 @@ class RegionAttr(object):
         self._values[instance] = value
 
     def _validate(self, value):
+        """
+        Validates the value of the attribute. Raises an exception if invalid
+        else does nothing.
+        """
         raise NotImplementedError
 
 
 class ScalarPix(RegionAttr):
+    """
+    Descriptor class for `~regions.PixelRegion`  which allows values
+    to be a scalar `regions.PixCoord` object.
+    """
 
     def _validate(self, value):
         if not(isinstance(value, PixCoord) and value.isscalar):
@@ -50,7 +66,11 @@ class ScalarPix(RegionAttr):
 
 
 class OneDPix(RegionAttr):
-
+    """
+    Descriptor class for `~regions.PixelRegion`  which allows values
+    to be a one dimensional `regions.PixCoord` object.
+    """
+    
     def _validate(self, value):
         if not(isinstance(value, PixCoord) and not value.isscalar
                and value.x.ndim == 1):
@@ -59,6 +79,12 @@ class OneDPix(RegionAttr):
 
 
 class AnnulusCenterPix(object):
+    """
+    This descriptor class is for the ``center`` of an
+    ``annulus`` `~regions.PixelRegion`. It allows the value to be a scalar
+    `~regions.PixCoord` object. It also makes sure that ``region1`` and
+    ``region2`` are in sync in case of an updation.
+    """
 
     def __get__(self, instance, owner):
         if instance is None:
@@ -79,6 +105,10 @@ class AnnulusCenterPix(object):
 
 
 class ScalarLength(RegionAttr):
+    """
+    Descriptor class for `~regions.PixelRegion`  which allows
+    values to be a scalar python/numpy number.
+    """
 
     def _validate(self, value):
         if not np.isscalar(value):
@@ -87,6 +117,12 @@ class ScalarLength(RegionAttr):
 
 
 class AnnulusInnerScalarLength(object):
+    """
+    This descriptor class is for an inner length of an
+    ``annulus`` `~regions.PixelRegion`. It allows the value to be a scalar
+    python/numpy number and makes sure that it is less than the outer
+    length of the annulus.
+    """
 
     def __init__(self, name):
         self._name = name
@@ -114,6 +150,12 @@ class AnnulusInnerScalarLength(object):
 
 
 class AnnulusOuterScalarLength(object):
+    """
+    This descriptor class is for an outer length of an
+    ``annulus`` `~regions.PixelRegion`. It allows the values to be a scalar
+    python/numpy number and makes sure that it is greater than the inner
+    length of the annulus.
+    """
 
     def __init__(self, name):
         self._name = name
@@ -141,6 +183,10 @@ class AnnulusOuterScalarLength(object):
 
 
 class ScalarSky(RegionAttr):
+    """
+    Descriptor class for `~regions.SkyRegion` which allows values to be a
+    scalar `~astropy.coordinates.SkyCoord` object.
+    """
 
     def _validate(self, value):
         if not(isinstance(value, SkyCoord) and value.isscalar):
@@ -149,6 +195,10 @@ class ScalarSky(RegionAttr):
 
 
 class OneDSky(RegionAttr):
+    """
+    Descriptor class for `~regions.SkyRegion` which allows values to be a
+    one dimensional `~astropy.coordinates.SkyCoord` object.
+    """
 
     def _validate(self, value):
         if not(isinstance(value, SkyCoord) and value.ndim == 1):
@@ -157,6 +207,12 @@ class OneDSky(RegionAttr):
 
 
 class AnnulusCenterSky(object):
+    """
+    This descriptor class is for the ``center`` of an
+    ``annulus`` `~regions.SkyRegion`. It allows the value to be a scalar
+    `~astropy.coordinates.SkyCoord` object. It also makes sure that ``region1``
+    and ``region2`` are in sync in case of an updation.
+    """
 
     def __get__(self, instance, owner):
         if instance is None:
@@ -177,6 +233,10 @@ class AnnulusCenterSky(object):
 
 
 class QuantityLength(RegionAttr):
+    """
+    Descriptor class for `~regions.SkyRegion`  which allows
+    values to be a scalar `~astropy.units.Quantity` object.
+    """
 
     def _validate(self, value):
         if not(isinstance(value, Quantity) and value.isscalar):
@@ -185,6 +245,12 @@ class QuantityLength(RegionAttr):
 
 
 class AnnulusInnerQuantityLength(object):
+    """
+    This descriptor class is for an inner length of an
+    ``annulus`` `~regions.SkyRegion`. It allows the value to be a scalar
+    `astropy.units.Quantity` object and makes sure that it is less than the outer
+    length of the annulus.
+    """
 
     def __init__(self, name):
         self._name = name
@@ -212,6 +278,12 @@ class AnnulusInnerQuantityLength(object):
 
 
 class AnnulusOuterQuantityLength(object):
+    """
+    This descriptor class is for an outer length of an
+    ``annulus`` `~regions.SkyRegion`. It allows the value to be a scalar
+    `astropy.units.Quantity` object and makes sure that it is less than the
+    inner length of the annulus.
+    """
 
     def __init__(self, name):
         self._name = name
@@ -239,6 +311,12 @@ class AnnulusOuterQuantityLength(object):
 
 
 class AnnulusAngle(object):
+    """
+    This descriptor class is for the ``center`` of an
+    ``annulus`` `~regions.SkyRegion`. It allows the value to be a scalar
+    `~astropy.units.Quantity` object. It also makes sure that ``region1``
+    and ``region2`` are in sync in case of an updation.
+    """
 
     def __get__(self, instance, owner):
         if instance is None:
@@ -259,6 +337,10 @@ class AnnulusAngle(object):
 
 
 class CompoundRegionPix(RegionAttr):
+    """
+    Descriptor class for `~regions.CompoundPixelRegion` which allows values
+    to be `~regions.PixelRegion` object.
+    """
 
     def _validate(self, value):
         if not isinstance(value, PixelRegion):
@@ -267,6 +349,10 @@ class CompoundRegionPix(RegionAttr):
 
 
 class CompoundRegionSky(RegionAttr):
+    """
+    Descriptor class is for `~regions.CompoundSkyRegion` which allows values
+    to be `~regions.SkyRegion` object.
+    """
 
     def _validate(self, value):
         if not isinstance(value, SkyRegion):
