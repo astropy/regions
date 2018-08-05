@@ -56,7 +56,7 @@ class RegionAttr(object):
 class ScalarPix(RegionAttr):
     """
     Descriptor class for `~regions.PixelRegion`  which allows values
-    to be a scalar `regions.PixCoord` object.
+    to be a scalar `~regions.PixCoord` object.
     """
 
     def _validate(self, value):

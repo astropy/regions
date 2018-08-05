@@ -42,10 +42,8 @@ class TextPixelRegion(PointPixelRegion):
         ----------
         ax : `~matplotlib.axes`, optional
             Axes
-
-        kwargs: dict
+        kwargs: `dict`
             keywords that a `~matplotlib.text.Text` accepts
-
         """
         import matplotlib.pyplot as plt
         from matplotlib.text import Text

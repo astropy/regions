@@ -6,7 +6,8 @@ import operator as op
 import numpy as np
 
 from . import PixelRegion, SkyRegion, BoundingBox, Mask
-from ..core.attributes import CompoundRegionPix, CompoundRegionSky
+from ..core.attributes import (CompoundRegionPix, CompoundRegionSky,
+                               RegionVisual, RegionMeta)
 
 __all__ = ['CompoundPixelRegion', 'CompoundSkyRegion']
 
@@ -17,16 +18,16 @@ class CompoundPixelRegion(PixelRegion):
 
     Parameters
     ----------
-    region1: `regions.PixelRegion` object
+    region1: `~regions.PixelRegion` object
         The inner Pixel region.
-    region2: `regions.PixelRegion` object
+    region2: `~regions.PixelRegion` object
         The outer Pixel region.
-    operator: ``function``
+    operator: `function`
         A callable binary operator.
-    meta: `region.RegionMeta` object
+    meta: `~regions.RegionMeta` object, optional
         A dictionary which stores the meta attributes of this region.
-    visual: `region.RegionVisual` object
-        A dictionary which stores the visual meta attributes of this region
+    visual: `~regions.RegionVisual` object, optional
+        A dictionary which stores the visual meta attributes of this region.
     """
 
     region1 = CompoundRegionPix('region1')
@@ -42,11 +43,11 @@ class CompoundPixelRegion(PixelRegion):
         if meta is None:
             self.meta = region1.meta
         else:
-            self.meta = meta
+            self.meta = RegionMeta()
         if visual is None:
             self.visual = region1.visual
         else:
-            self.visual = visual
+            self.visual = RegionVisual()
         self._operator = operator
         self._repr_params = ('region1', 'region2', 'operator')
 
@@ -55,8 +56,9 @@ class CompoundPixelRegion(PixelRegion):
         return self._operator
 
     def contains(self, pixcoord):
-        in_reg = self.operator(self.region1.contains(pixcoord), self.region2.contains(pixcoord))
-        if self.meta.get('inverted', False):
+        in_reg = self.operator(self.region1.contains(pixcoord),
+                               self.region2.contains(pixcoord))
+        if self.meta.get('include', False):
             return not in_reg
         else:
             return in_reg
@@ -157,16 +159,16 @@ class CompoundSkyRegion(SkyRegion):
 
     Parameters
     ----------
-    region1: `regions.SkyRegion` object
+    region1: `~regions.SkyRegion` object
         The inner sky region.
-    region2: `regions.SkyRegion` object
+    region2: `~regions.SkyRegion` object
         The outer sky region.
-    operator: ``function``
+    operator: `function`
         A callable binary operator.
-    meta: `region.RegionMeta` object
+    meta: `~regions.RegionMeta` object, optional
         A dictionary which stores the meta attributes of this region.
-    visual: `region.RegionVisual` object
-        A dictionary which stores the visual meta attributes of this region
+    visual: `~regions.RegionVisual` object, optional
+        A dictionary which stores the visual meta attributes of this region.
     """
     region1 = CompoundRegionSky('region1')
     region2 = CompoundRegionSky('region2')
@@ -180,11 +182,11 @@ class CompoundSkyRegion(SkyRegion):
         if meta is None:
             self.meta = region1.meta
         else:
-            self.meta = meta
+            self.meta = RegionMeta()
         if visual is None:
             self.visual = region1.visual
         else:
-            self.visual = visual
+            self.visual = RegionVisual()
         self._operator = operator
 
         self._repr_params = ('region1', 'region2', 'operator')
@@ -195,8 +197,8 @@ class CompoundSkyRegion(SkyRegion):
 
     def contains(self, skycoord, wcs):
         in_reg = self.operator(self.region1.contains(skycoord, wcs),
-                             self.region2.contains(skycoord, wcs))
-        if self.meta.get('inverted', False):
+                               self.region2.contains(skycoord, wcs))
+        if self.meta.get('include', False):
             return not in_reg
         else:
             return in_reg

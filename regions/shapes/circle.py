@@ -9,7 +9,8 @@ from astropy.wcs.utils import pixel_to_skycoord
 from ..core import PixCoord, PixelRegion, SkyRegion, Mask, BoundingBox
 from .._utils.wcs_helpers import skycoord_to_pixel_scale_angle
 from .._geometry import circular_overlap_grid
-from ..core.attributes import ScalarSky, ScalarPix, QuantityLength, ScalarLength
+from ..core.attributes import (ScalarSky, ScalarPix, QuantityLength,
+                               ScalarLength, RegionVisual, RegionMeta)
 
 __all__ = ['CirclePixelRegion', 'CircleSkyRegion']
 
@@ -24,6 +25,10 @@ class CirclePixelRegion(PixelRegion):
         Center position
     radius : float
         Radius
+    meta: `~regions.RegionMeta` object, optional
+        A dictionary which stores the meta attributes of this region.
+    visual: `~regions.RegionVisual` object, optional
+        A dictionary which stores the visual meta attributes of this region.
     """
 
     center = ScalarPix('center')
@@ -32,8 +37,8 @@ class CirclePixelRegion(PixelRegion):
     def __init__(self, center, radius, meta=None, visual=None):
         self.center = center
         self.radius = radius
-        self.meta = meta or {}
-        self.visual = visual or {}
+        self.meta = meta or RegionMeta()
+        self.visual = visual or RegionVisual()
         self._repr_params = ('radius',)
 
     @property
@@ -114,6 +119,10 @@ class CircleSkyRegion(SkyRegion):
         Center position
     radius : `~astropy.units.Quantity`
         Radius in angular units
+    meta: `~regions.RegionMeta` object, optional
+        A dictionary which stores the meta attributes of this region.
+    visual: `~regions.RegionVisual` object, optional
+        A dictionary which stores the visual meta attributes of this region.
     """
 
     center = ScalarSky('center')
@@ -123,8 +132,8 @@ class CircleSkyRegion(SkyRegion):
 
         self.center = center
         self.radius = radius
-        self.meta = meta or {}
-        self.visual = visual or {}
+        self.meta = meta or RegionMeta()
+        self.visual = visual or RegionVisual()
         self._repr_params = ('radius',)
 
     def to_pixel(self, wcs):

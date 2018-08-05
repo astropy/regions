@@ -210,7 +210,8 @@ class PixelRegion(Region):
 
     @abc.abstractmethod
     def as_patch(self, **kwargs):
-        """Convert to mpl patch
+        """
+        Convert to mpl patch
 
         Returns
         -------
@@ -220,8 +221,10 @@ class PixelRegion(Region):
         raise NotImplementedError
 
     def mpl_properties_default(self, shape='patch'):
-
-        # The default values are set as per DS9 convention.
+        """
+        This sets the default values of the visual attributes as specified
+        under DS9 convention.
+        """
 
         kwargs = dict()
         kwargs['color'] = self.visual.get('color', 'green')
@@ -251,13 +254,20 @@ class PixelRegion(Region):
 
     def plot(self, ax=None, **kwargs):
         """
-        Calls as_patch method forwarding all kwargs and adds patch
+        Calls ``as_patch`` method forwarding all kwargs and adds patch
         to given axis.
 
         Parameters
         ----------
         ax : `~matplotlib.axes`, optional
             Axis
+        kwargs: `dict`
+            keywords that a `~matplotlib.text.Text` accepts
+
+        Returns
+        -------
+        ax: `~matplotlib.axes`
+            Axis on which the patch is added.
         """
         import matplotlib.pyplot as plt
 
