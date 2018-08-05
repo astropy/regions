@@ -14,6 +14,19 @@ __all__ = ['CompoundPixelRegion', 'CompoundSkyRegion']
 class CompoundPixelRegion(PixelRegion):
     """
     Represents the logical combination of two regions in pixel coordinates.
+
+    Parameters
+    ----------
+    region1: `regions.PixelRegion` object
+        The inner Pixel region.
+    region2: `regions.PixelRegion` object
+        The outer Pixel region.
+    operator: ``function``
+        A callable binary operator.
+    meta: `region.RegionMeta` object
+        A dictionary which stores the meta attributes of this region.
+    visual: `region.RegionVisual` object
+        A dictionary which stores the visual meta attributes of this region
     """
 
     region1 = CompoundRegionPix('region1')
@@ -88,7 +101,7 @@ class CompoundPixelRegion(PixelRegion):
     @staticmethod
     def _make_annulus_path(patch_inner, patch_outer):
         """
-        Define a matplotlib annulus path from two patches.
+        Defines a matplotlib annulus path from two patches.
 
         This preserves the cubic Bezier curves (CURVE4) of the aperture
         paths.
@@ -141,6 +154,19 @@ class CompoundPixelRegion(PixelRegion):
 class CompoundSkyRegion(SkyRegion):
     """
     Represents the logical combination of two regions in sky coordinates.
+
+    Parameters
+    ----------
+    region1: `regions.SkyRegion` object
+        The inner sky region.
+    region2: `regions.SkyRegion` object
+        The outer sky region.
+    operator: ``function``
+        A callable binary operator.
+    meta: `region.RegionMeta` object
+        A dictionary which stores the meta attributes of this region.
+    visual: `region.RegionVisual` object
+        A dictionary which stores the visual meta attributes of this region
     """
     region1 = CompoundRegionSky('region1')
     region2 = CompoundRegionSky('region2')

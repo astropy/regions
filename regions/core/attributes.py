@@ -70,7 +70,7 @@ class OneDPix(RegionAttr):
     Descriptor class for `~regions.PixelRegion`  which allows values
     to be a one dimensional `regions.PixCoord` object.
     """
-    
+
     def _validate(self, value):
         if not(isinstance(value, PixCoord) and not value.isscalar
                and value.x.ndim == 1):
