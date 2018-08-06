@@ -26,9 +26,9 @@ class EllipsePixelRegion(PixelRegion):
     ----------
     center : `~regions.PixCoord`
         The position of the center of the ellipse.
-    width : `float`
+    width : `~numbers.Number`
         The width of the ellipse (before rotation) in pixels
-    height : `float`
+    height : `~numbers.Number`
         The height of the ellipse (before rotation) in pixels
     angle : `~astropy.units.Quantity`
         The rotation angle of the ellipse, measured anti-clockwise. If set to

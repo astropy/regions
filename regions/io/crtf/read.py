@@ -46,18 +46,35 @@ def read_crtf(filename, errors='strict'):
 
     Parameters
     ----------
-    filename : str
+    filename : `str`
         The file path
-    errors : ``warn``, ``ignore``, ``strict``
+    errors : ``warn``, ``ignore``, ``strict``, optional
       The error handling scheme to use for handling parsing errors.
-      The default is 'strict', which will raise a ``CRTFRegionParserError``.
-      ``warn`` will raise a ``CRTFRegionParserWarning``, and ``ignore`` will do nothing
+      The default is 'strict', which will raise a `~regions.CRTFRegionParserError`.
+      ``warn`` will raise a `~regions.CRTFRegionParserWarning`, and ``ignore`` will do nothing
       (i.e., be silent).
 
     Returns
     -------
-    regions : list
-        Python list of `regions.Region` objects.
+    regions : `list`
+        Python `list` of `~regions.Region` objects.
+
+    Examples
+    --------
+    >>> from regions import read_crtf
+    >>> from astropy.utils.data import get_pkg_data_filename
+    >>> file = get_pkg_data_filename('data/CRTFgeneral.crtf', package='regions.io.crtf.tests')
+    >>> regs = read_crtf(file, errors='warn')
+    >>> print(regs[0])
+    Region: CircleSkyRegion
+    center: <SkyCoord (FK4: equinox=B1950.000, obstime=B1950.000): (ra, dec) in deg
+    (273.1, -23.18333333)>
+    radius: 2.3 arcsec
+    >>> print(regs[0].meta)
+    {'frame': 'BARY', 'corr': ['I', 'Q'], 'include': True, 'type': 'ann'}
+    >>> print(regs[0].visual)
+    {'color': 'blue'}
+
     """
     with open(filename) as fh:
         if regex_begin.search(fh.readline()):
@@ -82,13 +99,29 @@ class CRTFParser(object):
 
     Parameters
     ----------
-    region_string : str
+    region_string : `str`
         CRTF region string
-    errors : ``warn``, ``ignore``, ``strict``
+    errors : ``warn``, ``ignore``, ``strict``, optional
         The error handling scheme to use for handling parsing errors.
-        The default is 'strict', which will raise a ``CRTFRegionParserError``.
-        ``warn`` will raise a ``CRTFRegionParserWarning``, and ``ignore`` will do nothing
+        The default is 'strict', which will raise a `~regions.CRTFRegionParserError``.
+        ``warn`` will raise a `~regions.CRTFRegionParserWarning`, and ``ignore`` will do nothing
         (i.e., be silent).
+
+    Examples
+    --------
+    >>> from regions import CRTFParser
+    >>> reg_str = "ann circle[[18h12m24s, -23d11m00s], 2.3arcsec], coord=B1950, frame=BARY, corr=[I, Q], color=blue"
+    >>> regs = CRTFParser(reg_str, errors='warn')
+    >>> print(regs[0])
+    Region: CircleSkyRegion
+    center: <SkyCoord (FK4: equinox=B1950.000, obstime=B1950.000): (ra, dec) in deg
+    (273.1, -23.18333333)>
+    radius: 2.3 arcsec
+    >>> print(regs[0].meta)
+    {'frame': 'BARY', 'corr': ['I', 'Q'], 'include': True, 'type': 'ann'}
+    >>> print(regs[0].visual)
+    {'color': 'blue'}
+
     """
 
     # It contains a tuple of valid definition (region, annotation) type.
@@ -209,27 +242,27 @@ class CRTFRegionParser(object):
     """
     Parse a CRTF region string
 
-    This will turn a line containing a CRTF region into a `regions.Shape` object.
+    This will turn a line containing a CRTF region into a `~regions.Shape` object.
 
     Parameters
     ----------
-    global_meta : dict
+    global_meta : `dict`
         Global meta data of the CRTF file which is used as default meta values for regions
-    include : str {'+', '-'}
+    include : `str` {'+', '-'}
         Flag at the beginning of the line
-    type_ : str {'reg', 'ann'}
+    type_ : `str` {'reg', 'ann'}
         Kind of the region definition
-    region_type : str
+    region_type : `str`
         Region type
-    reg_str : str
+    reg_str : `str`
         Region string to parse
-    meta_str : str
+    meta_str : `str`
         Meta string to parse
-    errors : ``warn``, ``ignore``, ``strict``
+    errors : ``warn``, ``ignore``, ``strict``, optional
         The error handling scheme to use for handling parsing errors.
-        The default is 'strict', which will raise a ``CRTFRegionParserError``.
-        `warn`` will raise a ``CRTFRegionParserWarning``, and ``ignore`` will do nothing
-        (i.e., be silent).
+        The default is 'strict', which will raise a `~regions.CRTFRegionParserError`.
+        ``warn`` will raise a `~regions.CRTFRegionParserWarning`, and
+        ``ignore`` will do nothing (i.e., be silent).
     """
 
     # List of valid coordinate system
@@ -306,7 +339,7 @@ class CRTFRegionParser(object):
 
     def convert_coordinates(self):
         """
-        Convert coordinate string to `astropy.coordinates.angles.Angle` or `astropy.units.quantity.Quantity` objects
+        Convert coordinate string to `~astropy.coordinates.Angle` or `~astropy.units.quantity.Quantity` objects
         """
         coord_list_str = regex_coordinate.findall(self.reg_str) + regex_length.findall(self.reg_str)
         coord_list = []
