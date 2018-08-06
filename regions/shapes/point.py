@@ -18,10 +18,37 @@ class PointPixelRegion(PixelRegion):
     ----------
     center : `~regions.PixCoord`
         The position of the point
-    meta: `~regions.RegionMeta` object, optional
+    meta : `~regions.RegionMeta` object, optional
         A dictionary which stores the meta attributes of this region.
-    visual: `~regions.RegionVisual` object, optional
+    visual : `~regions.RegionVisual` object, optional
         A dictionary which stores the visual meta attributes of this region.
+
+    Examples
+    --------
+
+    .. plot::
+        :include-source:
+
+        from regions import PixCoord, PointPixelRegion, RegionVisual
+        import matplotlib.pyplot as plt
+
+        fig, ax = plt.subplots(1, 1)
+        regs = []
+        regs.append(PointPixelRegion(PixCoord(2, 2), visual=RegionVisual(symbol='D')))
+        regs.append(PointPixelRegion(PixCoord(2, 3), visual=RegionVisual(symbol='*')))
+        regs.append(PointPixelRegion(PixCoord(3, 3), visual=RegionVisual(symbol='^')))
+        regs.append(PointPixelRegion(PixCoord(3, 2), visual=RegionVisual(symbol='*')))
+        regs.append(PointPixelRegion(PixCoord(2, 4), visual=RegionVisual(symbol='x')))
+        regs.append(PointPixelRegion(PixCoord(4, 2)))
+
+        for reg in regs:
+            reg.plot(ax)
+
+        plt.xlim(0, 6)
+        plt.ylim(0, 6)
+        ax.set_aspect('equal')
+        plt.show()
+
     """
 
     center = ScalarPix('center')
@@ -103,9 +130,9 @@ class PointSkyRegion(SkyRegion):
     ----------
     center : `~astropy.coordinates.SkyCoord`
         The position of the point
-    meta: `regions.RegionMeta` object, optional
+    meta : `regions.RegionMeta` object, optional
         A dictionary which stores the meta attributes of this region.
-    visual: `~regions.RegionVisual` object, optional
+    visual : `~regions.RegionVisual` object, optional
         A dictionary which stores the visual meta attributes of this region.
     """
 

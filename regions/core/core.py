@@ -148,6 +148,10 @@ class PixelRegion(Region):
         ----------
         wcs : `~astropy.wcs.WCS` instance
             The world coordinate system transformation to assume
+
+        Returns
+        -------
+        sky_region : `~regions.SkyRegion` object.
         """
         raise NotImplementedError
 

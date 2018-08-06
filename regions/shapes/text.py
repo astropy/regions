@@ -16,8 +16,35 @@ class TextPixelRegion(PointPixelRegion):
     ----------
     center : `~regions.PixCoord`
         The position of the leftmost point of the text string
-    text : str
-        The text string .
+    text : `str`
+        The text string.
+    meta : `~regions.RegionMeta` object, optional
+        A dictionary which stores the meta attributes of this region.
+    visual : `~regions.RegionVisual` object, optional
+        A dictionary which stores the visual meta attributes of this region.
+
+    Examples
+    --------
+
+    .. plot::
+        :include-source:
+
+        from regions import PixCoord, TextPixelRegion, RegionVisual
+        import matplotlib.pyplot as plt
+
+        x, y = 15, 10
+        textangle = '30'
+
+        fig, ax = plt.subplots(1, 1)
+
+        center = PixCoord(x=x, y=y)
+        reg = TextPixelRegion(center=center, text="Hello World!", visual=RegionVisual(textangle=textangle))
+        reg.plot(ax)
+
+        plt.xlim(10, 30)
+        plt.ylim(2.5, 20)
+        ax.set_aspect('equal')
+        plt.show()
     """
 
     def __init__(self, center, text, meta=None, visual=None):
@@ -44,6 +71,11 @@ class TextPixelRegion(PointPixelRegion):
             Axes
         kwargs: `dict`
             keywords that a `~matplotlib.text.Text` accepts
+
+        Returns
+        -------
+        ax : `~matplotlib.axes`
+            The axis with the patch.
         """
         import matplotlib.pyplot as plt
         from matplotlib.text import Text
@@ -68,8 +100,12 @@ class TextSkyRegion(PointSkyRegion):
     ----------
     center : `~astropy.coordinates.SkyCoord`
         The position of the leftmost point of the text string
-    text : str
-        The text string .
+    text : `str`
+        The text string.
+    meta : `~regions.RegionMeta` object, optional
+        A dictionary which stores the meta attributes of this region.
+    visual : `~regions.RegionVisual` object, optional
+        A dictionary which stores the visual meta attributes of this region.
     """
     def __init__(self, center, text, meta=None, visual=None):
 

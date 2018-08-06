@@ -24,13 +24,17 @@ class RectanglePixelRegion(PixelRegion):
     ----------
     center : `~regions.PixCoord`
         The position of the center of the rectangle.
-    width : float
+    width : `float`
         The width of the rectangle (before rotation) in pixels
-    height : float
+    height : `float`
         The height of the rectangle (before rotation) in pixels
     angle : `~astropy.units.Quantity`
         The rotation angle of the rectangle, measured anti-clockwise. If set to
         zero (the default), the width axis is lined up with the x axis.
+    meta : `~regions.RegionMeta` object, optional
+        A dictionary which stores the meta attributes of this region.
+    visual : `~regions.RegionVisual` object, optional
+        A dictionary which stores the visual meta attributes of this region.
 
     Examples
     --------
@@ -222,6 +226,10 @@ class RectangleSkyRegion(SkyRegion):
         The rotation angle of the rectangle, measured anti-clockwise. If set to
         zero (the default), the width axis is lined up with the longitude axis
         of the celestial coordinates.
+    meta : `~regions.RegionMeta` object, optional
+        A dictionary which stores the meta attributes of this region.
+    visual : `~regions.RegionVisual` object, optional
+        A dictionary which stores the visual meta attributes of this region.
     """
 
     center = ScalarSky('center')

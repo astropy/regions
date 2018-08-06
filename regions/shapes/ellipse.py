@@ -26,16 +26,16 @@ class EllipsePixelRegion(PixelRegion):
     ----------
     center : `~regions.PixCoord`
         The position of the center of the ellipse.
-    width : `~numbers.Number`
+    width : `float`
         The width of the ellipse (before rotation) in pixels
-    height : `~numbers.Number`
+    height : `float`
         The height of the ellipse (before rotation) in pixels
     angle : `~astropy.units.Quantity`
         The rotation angle of the ellipse, measured anti-clockwise. If set to
         zero (the default), the width axis is lined up with the x axis.
-    meta: `~regions.RegionMeta` object, optional
+    meta : `~regions.RegionMeta` object, optional
         A dictionary which stores the meta attributes of this region.
-    visual: `~regions.RegionVisual` object, optional
+    visual : `~regions.RegionVisual` object, optional
         A dictionary which stores the visual meta attributes of this region.
 
     Examples
@@ -58,7 +58,7 @@ class EllipsePixelRegion(PixelRegion):
         ax.imshow(e(x, y), origin='lower', interpolation='none', cmap='Greys_r')
 
         center = PixCoord(x=x0, y=y0)
-        reg = EllipsePixelRegion(center=center, width=a, height=b, angle=theta)
+        reg = EllipsePixelRegion(center=center, width=2*a, height=2*b, angle=theta)
         patch = reg.as_patch(facecolor='none', edgecolor='red', lw=2)
         ax.add_patch(patch)
 
@@ -211,9 +211,9 @@ class EllipseSkyRegion(SkyRegion):
         The rotation angle of the ellipse, measured anti-clockwise. If set to
         zero (the default), the width axis is lined up with the longitude axis
         of the celestial coordinates.
-    meta: `~regions.RegionMeta` object, optional
+    meta : `~regions.RegionMeta` object, optional
         A dictionary which stores the meta attributes of this region.
-    visual: `~regions.RegionVisual` object, optional
+    visual : `~regions.RegionVisual` object, optional
         A dictionary which stores the visual meta attributes of this region.
     """
 

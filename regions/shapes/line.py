@@ -23,9 +23,9 @@ class LinePixelRegion(PixelRegion):
         Start position
     end : `~regions.PixCoord`
         End position
-    meta: `~regions.RegionMeta` object, optional
+    meta : `~regions.RegionMeta` object, optional
         A dictionary which stores the meta attributes of this region.
-    visual: `~regions.RegionVisual` object, optional
+    visual : `~regions.RegionVisual` object, optional
         A dictionary which stores the visual meta attributes of this region.
     """
 
@@ -106,10 +106,35 @@ class LineSkyRegion(SkyRegion):
         Start position
     end : `~astropy.coordinates.SkyCoord`
         End position
-    meta: `~regions.RegionMeta` object, optional
+    meta : `~regions.RegionMeta` object, optional
         A dictionary which stores the meta attributes of this region.
-    visual: `~regions.RegionVisual` object, optional
+    visual : `~regions.RegionVisual` object, optional
         A dictionary which stores the visual meta attributes of this region.
+
+    Examples
+    --------
+
+    .. plot::
+        :include-source:
+
+        from regions import PixCoord, LinePixelRegion
+        import matplotlib.pyplot as plt
+
+        x1, y1 = 15, 10
+        x2, y2 = 20, 25
+
+        fig, ax = plt.subplots(1, 1)
+
+        start = PixCoord(x=x1, y=y1)
+        end = PixCoord(x=x2, y=y2)
+        reg = LinePixelRegion(start=start, end=end)
+        patch = reg.as_patch(facecolor='none', edgecolor='red', lw=2)
+        ax.add_patch(patch)
+
+        plt.xlim(0, 30)
+        plt.ylim(0, 30)
+        ax.set_aspect('equal')
+        plt.show()
     """
 
     start = ScalarSky('start')

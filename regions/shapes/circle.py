@@ -23,12 +23,36 @@ class CirclePixelRegion(PixelRegion):
     ----------
     center : `~regions.PixCoord`
         Center position
-    radius : float
+    radius : `float`
         Radius
-    meta: `~regions.RegionMeta` object, optional
+    meta : `~regions.RegionMeta` object, optional
         A dictionary which stores the meta attributes of this region.
-    visual: `~regions.RegionVisual` object, optional
+    visual : `~regions.RegionVisual` object, optional
         A dictionary which stores the visual meta attributes of this region.
+
+    Examples
+    --------
+
+    .. plot::
+        :include-source:
+
+        from regions import PixCoord, CirclePixelRegion
+        import matplotlib.pyplot as plt
+
+        x, y = 6, 6
+        radius = 5.5
+
+        fig, ax = plt.subplots(1, 1)
+
+        center = PixCoord(x=x, y=y)
+        reg = CirclePixelRegion(center=center, radius=radius)
+        patch = reg.as_patch(facecolor='none', edgecolor='red', lw=2)
+        ax.add_patch(patch)
+
+        plt.xlim(0, 15)
+        plt.ylim(0, 15)
+        ax.set_aspect('equal')
+        plt.show()
     """
 
     center = ScalarPix('center')
@@ -43,7 +67,7 @@ class CirclePixelRegion(PixelRegion):
 
     @property
     def area(self):
-        """Region area (float)."""
+        """Region area (`float`)."""
         return math.pi * self.radius ** 2
 
     def contains(self, pixcoord):
@@ -119,9 +143,9 @@ class CircleSkyRegion(SkyRegion):
         Center position
     radius : `~astropy.units.Quantity`
         Radius in angular units
-    meta: `~regions.RegionMeta` object, optional
+    meta : `~regions.RegionMeta` object, optional
         A dictionary which stores the meta attributes of this region.
-    visual: `~regions.RegionVisual` object, optional
+    visual : `~regions.RegionVisual` object, optional
         A dictionary which stores the visual meta attributes of this region.
     """
 
