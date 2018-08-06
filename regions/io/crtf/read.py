@@ -94,7 +94,7 @@ class CRTFParser(object):
 
     Each line is tested for either containing a region with meta attributes or global parameters.
     If global parameters are found then, it is stored in the ``global_meta`` attribute.
-    If a region is found the `~regions.io.crtf.CRTFRegionParser` is invoked to transform the line into a
+    If a region is found the `~regions.CRTFRegionParser` is invoked to transform the line into a
     `~regions.io.core.Shape` object.
 
     Parameters
@@ -103,7 +103,7 @@ class CRTFParser(object):
         CRTF region string
     errors : ``warn``, ``ignore``, ``strict``, optional
         The error handling scheme to use for handling parsing errors.
-        The default is 'strict', which will raise a `~regions.CRTFRegionParserError``.
+        The default is 'strict', which will raise a `~regions.CRTFRegionParserError`.
         ``warn`` will raise a `~regions.CRTFRegionParserWarning`, and ``ignore`` will do nothing
         (i.e., be silent).
 

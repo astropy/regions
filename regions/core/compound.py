@@ -18,15 +18,15 @@ class CompoundPixelRegion(PixelRegion):
 
     Parameters
     ----------
-    region1: `~regions.PixelRegion` object
+    region1 : `~regions.PixelRegion` object
         The inner Pixel region.
-    region2: `~regions.PixelRegion` object
+    region2 : `~regions.PixelRegion` object
         The outer Pixel region.
-    operator: `function`
+    operator : `function`
         A callable binary operator.
-    meta: `~regions.RegionMeta` object, optional
+    meta : `~regions.RegionMeta` object, optional
         A dictionary which stores the meta attributes of this region.
-    visual: `~regions.RegionVisual` object, optional
+    visual : `~regions.RegionVisual` object, optional
         A dictionary which stores the visual meta attributes of this region.
     """
 
@@ -159,15 +159,15 @@ class CompoundSkyRegion(SkyRegion):
 
     Parameters
     ----------
-    region1: `~regions.SkyRegion` object
+    region1 : `~regions.SkyRegion` object
         The inner sky region.
-    region2: `~regions.SkyRegion` object
+    region2 : `~regions.SkyRegion` object
         The outer sky region.
-    operator: `function`
+    operator : `function`
         A callable binary operator.
-    meta: `~regions.RegionMeta` object, optional
+    meta : `~regions.RegionMeta` object, optional
         A dictionary which stores the meta attributes of this region.
-    visual: `~regions.RegionVisual` object, optional
+    visual : `~regions.RegionVisual` object, optional
         A dictionary which stores the visual meta attributes of this region.
     """
     region1 = CompoundRegionSky('region1')

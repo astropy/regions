@@ -28,7 +28,7 @@ class RectanglePixelRegion(PixelRegion):
         The width of the rectangle (before rotation) in pixels
     height : `float`
         The height of the rectangle (before rotation) in pixels
-    angle : `~astropy.units.Quantity`
+    angle : `~astropy.units.Quantity`, optional
         The rotation angle of the rectangle, measured anti-clockwise. If set to
         zero (the default), the width axis is lined up with the x axis.
     meta : `~regions.RegionMeta` object, optional
@@ -222,7 +222,7 @@ class RectangleSkyRegion(SkyRegion):
         The width of the rectangle (before rotation) as an angle
     height : `~astropy.units.Quantity`
         The height of the rectangle (before rotation) as an angle
-    angle : `~astropy.units.Quantity`
+    angle : `~astropy.units.Quantity`, optional
         The rotation angle of the rectangle, measured anti-clockwise. If set to
         zero (the default), the width axis is lined up with the longitude axis
         of the celestial coordinates.

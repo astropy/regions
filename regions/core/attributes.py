@@ -55,8 +55,8 @@ class RegionAttr(object):
 
 class ScalarPix(RegionAttr):
     """
-    Descriptor class for `~regions.PixelRegion`  which allows values
-    to be a scalar `~regions.PixCoord` object.
+    Descriptor class for `~regions.PixelRegion` which takes a scalar
+    `~regions.PixCoord` object.
     """
 
     def _validate(self, value):
@@ -67,8 +67,8 @@ class ScalarPix(RegionAttr):
 
 class OneDPix(RegionAttr):
     """
-    Descriptor class for `~regions.PixelRegion`  which allows values
-    to be a one dimensional `regions.PixCoord` object.
+    Descriptor class for `~regions.PixelRegion`  which takes a one dimensional
+    `regions.PixCoord` object.
     """
 
     def _validate(self, value):
@@ -81,7 +81,7 @@ class OneDPix(RegionAttr):
 class AnnulusCenterPix(object):
     """
     This descriptor class is for the ``center`` of an
-    ``annulus`` `~regions.PixelRegion`. It allows the value to be a scalar
+    ``annulus`` `~regions.PixelRegion`. It takes a scalar
     `~regions.PixCoord` object. It also makes sure that ``region1`` and
     ``region2`` are in sync in case of an updation.
     """
@@ -106,8 +106,8 @@ class AnnulusCenterPix(object):
 
 class ScalarLength(RegionAttr):
     """
-    Descriptor class for `~regions.PixelRegion`  which allows
-    values to be a scalar python/numpy number.
+    Descriptor class for `~regions.PixelRegion` which takes a scalar
+    python/numpy number.
     """
 
     def _validate(self, value):
@@ -119,7 +119,7 @@ class ScalarLength(RegionAttr):
 class AnnulusInnerScalarLength(object):
     """
     This descriptor class is for an inner length of an
-    ``annulus`` `~regions.PixelRegion`. It allows the value to be a scalar
+    ``annulus`` `~regions.PixelRegion`. It takes a scalar
     python/numpy number and makes sure that it is less than the outer
     length of the annulus.
     """
@@ -152,7 +152,7 @@ class AnnulusInnerScalarLength(object):
 class AnnulusOuterScalarLength(object):
     """
     This descriptor class is for an outer length of an
-    ``annulus`` `~regions.PixelRegion`. It allows the values to be a scalar
+    ``annulus`` `~regions.PixelRegion`. It takes a scalar
     python/numpy number and makes sure that it is greater than the inner
     length of the annulus.
     """
@@ -184,8 +184,8 @@ class AnnulusOuterScalarLength(object):
 
 class ScalarSky(RegionAttr):
     """
-    Descriptor class for `~regions.SkyRegion` which allows values to be a
-    scalar `~astropy.coordinates.SkyCoord` object.
+    Descriptor class for `~regions.SkyRegion` which takes a scalar
+    `~astropy.coordinates.SkyCoord` object.
     """
 
     def _validate(self, value):
@@ -196,8 +196,8 @@ class ScalarSky(RegionAttr):
 
 class OneDSky(RegionAttr):
     """
-    Descriptor class for `~regions.SkyRegion` which allows values to be a
-    one dimensional `~astropy.coordinates.SkyCoord` object.
+    Descriptor class for `~regions.SkyRegion` which takes a one dimensional
+    `~astropy.coordinates.SkyCoord` object.
     """
 
     def _validate(self, value):
@@ -209,7 +209,7 @@ class OneDSky(RegionAttr):
 class AnnulusCenterSky(object):
     """
     This descriptor class is for the ``center`` of an
-    ``annulus`` `~regions.SkyRegion`. It allows the value to be a scalar
+    ``annulus`` `~regions.SkyRegion`. It takes a scalar
     `~astropy.coordinates.SkyCoord` object. It also makes sure that ``region1``
     and ``region2`` are in sync in case of an updation.
     """
@@ -234,8 +234,8 @@ class AnnulusCenterSky(object):
 
 class QuantityLength(RegionAttr):
     """
-    Descriptor class for `~regions.SkyRegion`  which allows
-    values to be a scalar `~astropy.units.Quantity` object.
+    Descriptor class for `~regions.SkyRegion`  which takes a scalar
+    `~astropy.units.Quantity` object.
     """
 
     def _validate(self, value):
@@ -246,10 +246,9 @@ class QuantityLength(RegionAttr):
 
 class AnnulusInnerQuantityLength(object):
     """
-    This descriptor class is for an inner length of an
-    ``annulus`` `~regions.SkyRegion`. It allows the value to be a scalar
-    `astropy.units.Quantity` object and makes sure that it is less than the outer
-    length of the annulus.
+    This descriptor class is for an inner length of an ``annulus``
+    `~regions.SkyRegion`. It takes a scalar `astropy.units.Quantity` object and
+    makes sure that it is less than the outer length of the annulus.
     """
 
     def __init__(self, name):
@@ -279,10 +278,9 @@ class AnnulusInnerQuantityLength(object):
 
 class AnnulusOuterQuantityLength(object):
     """
-    This descriptor class is for an outer length of an
-    ``annulus`` `~regions.SkyRegion`. It allows the value to be a scalar
-    `astropy.units.Quantity` object and makes sure that it is less than the
-    inner length of the annulus.
+    This descriptor class is for an outer length of an ``annulus``
+    `~regions.SkyRegion`. It takes a scalar `astropy.units.Quantity` object
+    and makes sure that it is less than the inner length of the annulus.
     """
 
     def __init__(self, name):
@@ -312,10 +310,10 @@ class AnnulusOuterQuantityLength(object):
 
 class AnnulusAngle(object):
     """
-    This descriptor class is for the ``center`` of an
-    ``annulus`` `~regions.SkyRegion`. It allows the value to be a scalar
-    `~astropy.units.Quantity` object. It also makes sure that ``region1``
-    and ``region2`` are in sync in case of an updation.
+    This descriptor class is for the ``center`` of an ``annulus``
+    `~regions.SkyRegion`. It takes a scalar `~astropy.units.Quantity` object.
+    It also makes sure that ``region1`` and ``region2`` are in sync in case of
+    an updation.
     """
 
     def __get__(self, instance, owner):
@@ -338,8 +336,8 @@ class AnnulusAngle(object):
 
 class CompoundRegionPix(RegionAttr):
     """
-    Descriptor class for `~regions.CompoundPixelRegion` which allows values
-    to be `~regions.PixelRegion` object.
+    Descriptor class for `~regions.CompoundPixelRegion` which takes a
+    `~regions.PixelRegion` object.
     """
 
     def _validate(self, value):
@@ -350,8 +348,8 @@ class CompoundRegionPix(RegionAttr):
 
 class CompoundRegionSky(RegionAttr):
     """
-    Descriptor class is for `~regions.CompoundSkyRegion` which allows values
-    to be `~regions.SkyRegion` object.
+    Descriptor class is for `~regions.CompoundSkyRegion` which takes a
+    `~regions.SkyRegion` object.
     """
 
     def _validate(self, value):

@@ -260,7 +260,7 @@ class EllipseAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
         The outer width of the elliptical annulus (before rotation) in pixels
     outer_height : `float`
         The outer height of the elliptical annulus (before rotation) in pixels
-    angle : `~astropy.units.Quantity`
+    angle : `~astropy.units.Quantity`, optional
         The rotation angle of the elliptical annulus, measured anti-clockwise.
         If set to zero (the default), the width axis is lined up with the x axis.
     meta : `~regions.RegionMeta` object, optional
@@ -373,7 +373,7 @@ class RectangleAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
         The outer width of the rectangular annulus (before rotation) in pixels
     outer_height : `float`
         The outer height of the rectangular annulus (before rotation) in pixels
-    angle : `~astropy.units.Quantity`
+    angle : `~astropy.units.Quantity`, optional
         The rotation angle of the rectangular annulus, measured anti-clockwise.
         If set to zero (the default), the width axis is lined up with the x axis.
     meta : `~regions.RegionMeta` object, optional

@@ -154,7 +154,7 @@ class DS9Parser(object):
       ``warn`` will raise a `~regions.DS9RegionParserWarning`, and
       ``ignore`` will do nothing (i.e., be silent).
 
-        Examples
+    Examples
     --------
     >>> from regions import DS9Parser
     >>> reg_str = 'image circle(331.00,1091.00,40.00) # dashlist=8 3 select=1 highlite=1 dash=0 fixed=0 edit=1 move=1 delete=1 source=1 text={Circle} tag={foo} tag={foo bar} This is a Comment color=pink width=3 font="times 10 normal roman"'
