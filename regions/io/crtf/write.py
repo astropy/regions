@@ -21,10 +21,10 @@ def crtf_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
         Astropy Coordinate system that overrides the coordinate system frame for
         all regions. Default is 'fk5'.
     fmt : `str`, optional
-        A python string format defining the output precision.  Default is .6f,
+        A python string format defining the output precision. Default is .6f,
         which is accurate to 0.0036 arcseconds.
     radunit : `str`, optional
-        This denotes the unit of the radius.Default is deg (degrees)
+        This denotes the unit of the radius. Default is deg (degrees)
 
     Returns
     -------
@@ -62,7 +62,7 @@ def write_crtf(regions, filename, coordsys='fk5', fmt='.6f', radunit='deg'):
         Astropy Coordinate system that overrides the coordinate frames of all
         regions. Default is 'fk5'.
     fmt : `str`, optional
-        A python string format defining the output precision.  Default is .6f,
+        A python string format defining the output precision. Default is .6f,
         which is accurate to 0.0036 arcseconds.
     radunit : `str`, optional
         This denotes the unit of the radius. Default is deg (degrees)

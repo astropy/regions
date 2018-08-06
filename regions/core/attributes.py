@@ -24,8 +24,8 @@ Also, contains RegionMeta and RegionVisual classes to handle meta data of region
 @six.add_metaclass(abc.ABCMeta)
 class RegionAttr(object):
     """
-     Meta descriptor class for attribute of an `~regions.Region`
-     which makes sure that it's value is valid all the time.
+    Meta descriptor class for attribute of an `~regions.Region`
+    which makes sure that it's value is valid all the time.
     """
 
     def __init__(self, name):
@@ -67,7 +67,7 @@ class ScalarPix(RegionAttr):
 
 class OneDPix(RegionAttr):
     """
-    Descriptor class for `~regions.PixelRegion`  which takes a one dimensional
+    Descriptor class for `~regions.PixelRegion` which takes a one dimensional
     `regions.PixCoord` object.
     """
 

@@ -54,7 +54,8 @@ class RectanglePixelRegion(PixelRegion):
         fig, ax = plt.subplots(1, 1)
 
         center = PixCoord(x=x, y=y)
-        reg = RectanglePixelRegion(center=center, width=width, height=height, angle=angle)
+        reg = RectanglePixelRegion(center=center, width=width,
+                                   height=height, angle=angle)
         patch = reg.as_patch(facecolor='none', edgecolor='red', lw=2)
         ax.add_patch(patch)
 
