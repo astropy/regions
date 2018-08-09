@@ -359,14 +359,14 @@ class ShapeList(list):
         """
 
         max_length_coord = 1
-        x = []
-        y = []
+        coord_x = []
+        coord_y = []
         shapes = []
-        r = []
-        rotangle = []
+        radius = []
+        rotangle_deg = []
         components = []
 
-        reg_reverse_mapping = {y: x for x, y in
+        reg_reverse_mapping = {value: key for key, value in
                                reg_mapping['FITS_REGION'].items()}
         reg_reverse_mapping['rectangle'] = 'ROTBOX'
         reg_reverse_mapping['circleannulus'] = 'ANNULUS'
@@ -377,19 +377,19 @@ class ShapeList(list):
             if shape.region_type == 'polygon':
                 max_length_coord = max(len(shape.coord)/2, max_length_coord)
                 coord = [x.value for x in shape.coord]
-                x.append(coord[::2])
-                y.append(coord[1::2])
-                r.append(0)
-                rotangle.append(0)
+                coord_x.append(coord[::2])
+                coord_y.append(coord[1::2])
+                radius.append(0)
+                rotangle_deg.append(0)
             else:
-                x.append(shape.coord[0].value)
-                y.append(shape.coord[1].value)
+                coord_x.append(shape.coord[0].value)
+                coord_y.append(shape.coord[1].value)
                 if shape.region_type in ['circle', 'circleannulus', 'point']:
-                    r.append([float(x) for x in shape.coord[2:]])
-                    rotangle.append(0)
+                    radius.append([float(val) for val in shape.coord[2:]])
+                    rotangle_deg.append(0)
                 else:
-                    r.append([float(x) for x in shape.coord[2:-1]])
-                    rotangle.append(shape.coord[-1].to('deg').value)
+                    radius.append([float(x) for x in shape.coord[2:-1]])
+                    rotangle_deg.append(shape.coord[-1].to('deg').value)
 
             tag = shape.meta.get('tag', '')
             if tag.isdigit():
@@ -400,22 +400,22 @@ class ShapeList(list):
         # padding every value with zeros at the end to make sure that all values
         # in the column have same length.
         for i in range(len(self)):
-            if np.isscalar(x[i]):
-                x[i] = np.array([x[i]])
-            if np.isscalar(y[i]):
-                y[i] = np.array([y[i]])
-            if np.isscalar(r[i]):
-                r[i] = np.array([r[i]])
+            if np.isscalar(coord_x[i]):
+                coord_x[i] = np.array([coord_x[i]])
+            if np.isscalar(coord_y[i]):
+                coord_y[i] = np.array([coord_y[i]])
+            if np.isscalar(radius[i]):
+                radius[i] = np.array([radius[i]])
 
-            x[i] = np.pad(x[i], (0, int(max_length_coord - len(x[i]))),
-                          'constant', constant_values=(0, 0))
-            y[i] = np.pad(y[i], (0, int(max_length_coord - len(y[i]))),
-                          'constant', constant_values=(0, 0))
-            r[i] = np.pad(r[i], (0, 4 - len(r[i])), 'constant',
-                          constant_values=(0, 0))
+            coord_x[i] = np.pad(coord_x[i], (0, int(max_length_coord - len(coord_x[i]))),
+                                'constant', constant_values=(0, 0))
+            coord_y[i] = np.pad(coord_y[i], (0, int(max_length_coord - len(coord_y[i]))),
+                                'constant', constant_values=(0, 0))
+            radius[i] = np.pad(radius[i], (0, 4 - len(radius[i])), 'constant',
+                               constant_values=(0, 0))
 
-        table = Table([x, y, shapes, r, rotangle, components],
-                      names=('X', 'Y', 'SHAPE', 'R', 'ROTANG', 'COMPONENT'))
+        table = Table([coord_x, coord_y, shapes, radius, rotangle_deg, components],
+                       names=('X', 'Y', 'SHAPE', 'R', 'ROTANG', 'COMPONENT'))
         table['X'].unit = 'pix'
         table['Y'].unit = 'pix'
         table['R'].unit = 'pix'
