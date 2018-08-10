@@ -38,7 +38,6 @@ def fits_region_objects_to_table(regions):
     ----- ----- ------ ---------- ------ ---------
       1.0   2.0 circle 5.0 .. 0.0      0         1
 
-
     """
     for reg in regions:
         if isinstance(reg, SkyRegion):
@@ -58,7 +57,6 @@ def write_fits_region(filename, regions, header=None):
         Filename in which the table is to be written. Default is 'new.fits'
     regions: list
         List of `regions.Region` objects
-
     header: `~astropy.io.fits.header.Header` object
         The FITS header.
 
@@ -68,7 +66,7 @@ def write_fits_region(filename, regions, header=None):
     >>> from astropy.utils.data import get_pkg_data_filename
     >>> from astropy.io import fits
     >>> file_sample = get_pkg_data_filename('data/region.fits', package='regions.io.fits.tests')
-    >>> from regions import CirclePixelRegion, PixCoord
+    >>> from regions import CirclePixelRegion, PixCoord, write_fits_region
     >>> reg_pixel = CirclePixelRegion(PixCoord(1, 2), 5)
     >>> hdul = fits.open(filename)
     >>> write_fits_region('region_output.fits', regions=[reg_pixel], header=hdul[1].header)

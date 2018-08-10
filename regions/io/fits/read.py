@@ -17,7 +17,7 @@ __all__ = ['FITSRegionParser', 'read_fits_region', 'FITSRegionRowParser']
 
 class FITSRegionParser(object):
     """
-    Parses a FITs region table.
+    Parses a FITS Region table.
 
     Parameters
     ----------
@@ -49,6 +49,7 @@ class FITSRegionParser(object):
         341.0     345.0 ANNULUS           56.0 .. 78.0       0.0         5
         341.0     345.0   POINT             0.0 .. 0.0       0.0         6
         341.0     345.0                     0.0 .. 0.0       0.0         7
+
     >>> parser = FITSRegionParser(table)
     >>> shapes = parser.shapes
     >>> regions = shapes.to_regions()
@@ -63,7 +64,7 @@ class FITSRegionParser(object):
             msg = "``errors`` must be one of strict, ignore, or warn; is {}"
             raise ValueError(msg.format(errors))
         if not isinstance(table, Table):
-            raise TypeError("The table should be a astropy table object")
+            raise TypeError("The table should be an astropy table object")
         self.table = table
         self.errors = errors
         self.unit = {}
@@ -261,7 +262,7 @@ def read_fits_region(filename, errors='strict'):
     for hdu in hdul:
         if hdu.name == 'REGION':
             table = Table.read(hdu)
-            wcs = WCS(hdu.header)
+            wcs = WCS(hdu.header, keysel=['image', 'binary', 'pixel'])
             regions_list = FITSRegionParser(table, errors).shapes.to_regions()
             for reg in regions_list:
                 regions.append(reg.to_sky(wcs))

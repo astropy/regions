@@ -32,5 +32,5 @@ language_spec = {'CIRCLE': ['X0', 'Y0', 'R0'],
                  'ROTRECTANGLE': ['X0', 'X1', 'Y0', 'Y1', 'ROTANG0'],
                  'POLYGON': ['X', 'Y'],
                  'PIE': ['X0', 'Y0', 'ROTANG0', 'ROTANG1']
-                }
+                 }
 language_spec['SECTOR'] = language_spec['PIE']

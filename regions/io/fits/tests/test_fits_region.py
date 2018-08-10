@@ -8,28 +8,25 @@ from astropy.utils.data import get_pkg_data_filename
 from astropy.table import Table
 from astropy.coordinates import SkyCoord
 from astropy import units as u
+from astropy.io import fits
+from astropy.wcs import WCS
 
-from ..read import FITSRegionParser
+from ..read import FITSRegionParser, read_fits_region
 from ..write import fits_region_objects_to_table
 from ..core import FITSRegionParserError
+from ...core import to_shape_list
 
 from ....shapes.circle import CircleSkyRegion
-
-_ASTROPY_MINVERSION = vers.LooseVersion('1.1')
-_ASTROPY_VERSION = vers.LooseVersion(astrov.version)
 
 implemented_region_types = ('ellipse', 'circle', 'box', 'polygon', 'point',
                             'annulus', 'elliptannulus')
 
 
-@pytest.mark.parametrize('filename', ['data/region.fits'])
+@pytest.mark.parametrize('filename', ['data/fits_region.fits'])
 def test_file_fits(filename):
 
     filename = get_pkg_data_filename(filename)
     table = Table.read(filename)
-    table['X'] = table['X'].astype(list)
-    table['Y'] = table['Y'].astype(list)
-    table.add_row([[1, 2, 3, 4], [5, 6, 7, 8], 'polygon', 0, 0, 8])
 
     shapes = FITSRegionParser(table, 'warn').shapes
 
@@ -43,13 +40,16 @@ def test_file_fits(filename):
     assert shapes[7].region_type == 'polygon'
 
     for x in range(7):
-        assert_allclose(shapes[x].coord[:2], list(table['X', 'Y'][x]))
+        assert_allclose(shapes[x].coord[:2],
+                        [table['X'][x][0], table['Y'][x][0]])
 
     assert_allclose(shapes[7].coord, [1, 5, 2, 6, 3, 7, 4, 8])
 
     assert_allclose(shapes[0].coord[2:], [table['R'][0][0]])
-    for x in range(1, 5):
-        assert_allclose([x.value for x in shapes[1].coord[2:]], list(table['R'][1]) + [table['ROTANG'][1]])
+
+    for x in range(1, 4):
+        assert_allclose([val.value for val in shapes[x].coord[2:]],
+                        list(table['R'][x][:2]) + [table['ROTANG'][x]])
 
     regs = shapes.to_regions()
     table_ouput = fits_region_objects_to_table(regs)
@@ -60,6 +60,17 @@ def test_file_fits(filename):
         assert shapes[i].region_type == shape_ouput[i].region_type
         assert shapes[i].coord == shape_ouput[i].coord
         assert shapes[i].meta == shape_ouput[i].meta
+
+    # Reading the regions directly from file and converting to sky regions.
+    regs_sky = read_fits_region(filename)
+    header = fits.open(filename)[1].header
+    wcs = WCS(header, keysel=['image', 'binary', 'pixel'])
+    regs_pix = [reg.to_pixel(wcs) for reg in regs_sky]
+    shapes_roundtrip = to_shape_list(regs_pix, 'image')
+
+    for i in range(len(shapes)):
+        assert shapes[i].region_type == shapes_roundtrip[i].region_type
+        assert_allclose(shapes[i].coord[:-1], shapes_roundtrip[i].coord[:-1])
 
 
 def test_only_pixel_regions():
