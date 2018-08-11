@@ -83,7 +83,7 @@ class AnnulusCenterPix(object):
     This descriptor class is for the ``center`` of an
     ``annulus`` `~regions.PixelRegion`. It takes a scalar
     `~regions.PixCoord` object. It also makes sure that ``region1`` and
-    ``region2`` are in sync in case of an updation.
+    ``region2`` are in sync in case of an update.
     """
 
     def __get__(self, instance, owner):
@@ -211,7 +211,7 @@ class AnnulusCenterSky(object):
     This descriptor class is for the ``center`` of an
     ``annulus`` `~regions.SkyRegion`. It takes a scalar
     `~astropy.coordinates.SkyCoord` object. It also makes sure that ``region1``
-    and ``region2`` are in sync in case of an updation.
+    and ``region2`` are in sync in case of an update.
     """
 
     def __get__(self, instance, owner):
@@ -313,7 +313,7 @@ class AnnulusAngle(object):
     This descriptor class is for the ``center`` of an ``annulus``
     `~regions.SkyRegion`. It takes a scalar `~astropy.units.Quantity` object.
     It also makes sure that ``region1`` and ``region2`` are in sync in case of
-    an updation.
+    an update.
     """
 
     def __get__(self, instance, owner):

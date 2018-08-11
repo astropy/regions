@@ -39,7 +39,7 @@ User guide
    crtf
    shapely
 
-These plot are made using :download:`plot_image.reg`.
+These plots are made using :download:`plot_image.reg`.
 
 +----------------------------------------+----------------------------------------+
 | ds9                                    | regions + matplotlib                   |
