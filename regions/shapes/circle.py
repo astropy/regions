@@ -123,10 +123,25 @@ class CirclePixelRegion(PixelRegion):
 
         return Mask(fraction, bbox=bbox)
 
-    def as_patch(self, **kwargs):
-        """Matplotlib patch object for this region (`matplotlib.patches.Circle`)"""
+    def as_patch(self, origin=(0, 0), **kwargs):
+        """
+        Matplotlib patch object for this region (`matplotlib.patches.Circle`)
+
+        Parameters:
+        -----------
+        origin : array_like, optional
+            The ``(x, y)`` position of the origin of the displayed image.
+            Default is (0, 0).
+        kwargs: dict
+            All keywords that a `~matplotlib.patches.Circle` object accepts
+
+        Returns
+        -------
+        patch : `~matplotlib.patches.Circle`
+            Matplotlib circle patch
+        """
         from matplotlib.patches import Circle
-        xy = self.center.x, self.center.y
+        xy = self.center.x - origin[0], self.center.y - origin[1]
         radius = self.radius
         return Circle(xy=xy, radius=radius, **kwargs)
 

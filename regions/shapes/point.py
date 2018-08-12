@@ -93,13 +93,16 @@ class PointPixelRegion(PixelRegion):
         from matplotlib.patches import Circle
         return Circle((self.center.x, self.center.y), radius=2, **kwargs)
 
-    def plot(self, ax=None, **kwargs):
+    def plot(self, origin=(0, 0), ax=None, **kwargs):
         """
         Forwards all kwargs to `Line2D` object and adds the line
         to given axis.
 
         Parameters
         ----------
+        origin : array_like, optional
+            The ``(x, y)`` position of the origin of the displayed image.
+            Default is (0, 0).
         ax: `~matplotlib.axes`, optional
                     Axis
         kwargs: dict

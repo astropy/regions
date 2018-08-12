@@ -27,6 +27,6 @@ for source in dataset.source_table:
     region = CircleSkyRegion(center=center, radius=radius)
     pix_region = region.to_pixel(wcs=wcs)
 
-    pix_region.plot(ax, edgecolor='yellow', facecolor='yellow', alpha=0.5, lw=3)
+    pix_region.plot(ax=ax, edgecolor='yellow', facecolor='yellow', alpha=0.5, lw=3)
 
 plt.show()

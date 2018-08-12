@@ -124,10 +124,26 @@ class PolygonPixelRegion(PixelRegion):
 
         return Mask(fraction, bbox=bbox)
 
-    def as_patch(self, **kwargs):
-        """Matplotlib patch object for this region (`matplotlib.patches.Polygon`)."""
+    def as_patch(self, origin=(0, 0), **kwargs):
+        """
+        Matplotlib patch object for this region (`matplotlib.patches.Polygon`).
+
+        Parameters:
+        -----------
+        origin : array_like, optional
+            The ``(x, y)`` position of the origin of the displayed image.
+            Default is (0, 0).
+        kwargs: dict
+            All keywords that a `~matplotlib.patches.Polygon` object accepts
+
+        Returns
+        -------
+        patch : `~matplotlib.patches.Polygon`
+            Matplotlib polygon patch
+        """
         from matplotlib.patches import Polygon
-        xy = np.vstack([self.vertices.x, self.vertices.y]).transpose()
+        xy = np.vstack([self.vertices.x - origin[0],
+                        self.vertices.y - origin[1]]).transpose()
         return Polygon(xy=xy, **kwargs)
 
 

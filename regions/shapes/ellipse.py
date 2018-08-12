@@ -182,10 +182,26 @@ class EllipsePixelRegion(PixelRegion):
 
         return Mask(fraction, bbox=bbox)
 
-    def as_patch(self, **kwargs):
-        """Matplotlib patch object for this region (`matplotlib.patches.Ellipse`)."""
+    def as_patch(self, origin=(0, 0), **kwargs):
+        """
+        Matplotlib patch object for this region (`matplotlib.patches.Ellipse`).
+
+        Parameters:
+        -----------
+        origin : array_like, optional
+            The ``(x, y)`` position of the origin of the displayed image.
+            Default is (0, 0).
+        kwargs: dict
+            All keywords that a `~matplotlib.patches.Ellipse` object accepts
+
+        Returns
+        -------
+        patch : `~matplotlib.patches.Ellipse`
+            Matplotlib ellipse patch
+
+        """
         from matplotlib.patches import Ellipse
-        xy = self.center.x, self.center.y
+        xy = self.center.x - origin[0], self.center.y - origin[1]
         width = self.width
         height = self.height
         # From the docstring: MPL expects "rotation in degrees (anti-clockwise)"
