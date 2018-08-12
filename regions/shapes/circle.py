@@ -7,7 +7,7 @@ import math
 from astropy.coordinates import Angle, SkyCoord
 from astropy.wcs.utils import pixel_to_skycoord
 
-from ..core import PixCoord, PixelRegion, SkyRegion, Mask, BoundingBox
+from ..core import PixCoord, PixelRegion, SkyRegion, RegionMask, BoundingBox
 from .._utils.wcs_helpers import skycoord_to_pixel_scale_angle
 from .._geometry import circular_overlap_grid
 from ..core.attributes import (ScalarSky, ScalarPix, QuantityLength,
@@ -121,7 +121,7 @@ class CirclePixelRegion(PixelRegion):
         fraction = circular_overlap_grid(xmin, xmax, ymin, ymax, nx, ny,
                                          self.radius, use_exact, subpixels)
 
-        return Mask(fraction, bbox=bbox)
+        return RegionMask(fraction, bbox=bbox)
 
     def as_patch(self, origin=(0, 0), **kwargs):
         """

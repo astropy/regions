@@ -7,7 +7,7 @@ from numpy.testing import assert_allclose
 import pytest
 
 from ..bounding_box import BoundingBox
-from ..mask import Mask
+from ..mask import RegionMask
 from ..pixcoord import PixCoord
 from ...shapes import CirclePixelRegion
 
@@ -25,13 +25,13 @@ def test_mask_input_shapes():
     with pytest.raises(ValueError):
         mask_data = np.ones((10, 10))
         bbox = BoundingBox(5, 10, 5, 10)
-        Mask(mask_data, bbox)
+        RegionMask(mask_data, bbox)
 
 
 def test_mask_array():
     mask_data = np.ones((10, 10))
     bbox = BoundingBox(5, 15, 5, 15)
-    mask = Mask(mask_data, bbox)
+    mask = RegionMask(mask_data, bbox)
     data = np.array(mask)
     assert_allclose(data, mask.data)
 
@@ -39,7 +39,7 @@ def test_mask_array():
 def test_mask_cutout_shape():
     mask_data = np.ones((10, 10))
     bbox = BoundingBox(5, 15, 5, 15)
-    mask = Mask(mask_data, bbox)
+    mask = RegionMask(mask_data, bbox)
 
     with pytest.raises(ValueError):
         mask.cutout(np.arange(10))

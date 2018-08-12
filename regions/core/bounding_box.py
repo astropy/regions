@@ -231,7 +231,7 @@ class BoundingBox(object):
         xypos = PixCoord(xpos, ypos)
         h, w = self.shape
 
-        return RectanglePixelRegion(xypos, width=w, height=h, angle=0.)
+        return RectanglePixelRegion(center=xypos, width=w, height=h)
 
     def plot(self, origin=(0, 0), ax=None, **kwargs):
         """

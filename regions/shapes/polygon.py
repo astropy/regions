@@ -5,7 +5,7 @@ import numpy as np
 
 from astropy.wcs.utils import skycoord_to_pixel, pixel_to_skycoord
 
-from ..core import PixelRegion, SkyRegion, Mask, BoundingBox, PixCoord
+from ..core import PixelRegion, SkyRegion, RegionMask, BoundingBox, PixCoord
 from .._geometry import polygonal_overlap_grid
 from .._geometry.pnpoly import points_in_polygon
 from ..core.attributes import OneDPix, OneDSky, RegionMeta, RegionVisual
@@ -122,7 +122,7 @@ class PolygonPixelRegion(PixelRegion):
             nx, ny, vx, vy, use_exact, subpixels,
         )
 
-        return Mask(fraction, bbox=bbox)
+        return RegionMask(fraction, bbox=bbox)
 
     def as_patch(self, origin=(0, 0), **kwargs):
         """

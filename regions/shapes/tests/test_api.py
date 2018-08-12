@@ -13,7 +13,7 @@ from astropy import units as u
 from astropy.coordinates import SkyCoord
 from astropy.wcs import WCS
 
-from ...core.mask import Mask
+from ...core.mask import RegionMask
 from ...core.core import Region, SkyRegion, PixelRegion
 from ...core.pixcoord import PixCoord
 from ..circle import CirclePixelRegion, CircleSkyRegion
@@ -91,7 +91,7 @@ def test_pix_to_sky(region):
 def test_pix_to_mask(region, mode):
     try:
         mask = region.to_mask(mode=mode)
-        assert isinstance(mask, Mask)
+        assert isinstance(mask, RegionMask)
     except NotImplementedError:
         pytest.xfail()
 

@@ -5,9 +5,9 @@ import operator as op
 
 import numpy as np
 
-from . import PixelRegion, SkyRegion, BoundingBox, Mask
+from . import PixelRegion, SkyRegion, BoundingBox, RegionMask
 from ..core.attributes import (CompoundRegionPix, CompoundRegionSky,
-                               RegionVisual, RegionMeta)
+                               RegionMeta, RegionVisual)
 
 __all__ = ['CompoundPixelRegion', 'CompoundSkyRegion']
 
@@ -91,7 +91,7 @@ class CompoundPixelRegion(PixelRegion):
                                       'constant'))
 
         data = self.operator(*np.array(padded_data, dtype=np.int))
-        return Mask(data=data, bbox=bbox)
+        return RegionMask(data=data, bbox=bbox)
 
     def to_sky(self, wcs):
         skyreg1 = self.region1.to_sky(wcs=wcs)
