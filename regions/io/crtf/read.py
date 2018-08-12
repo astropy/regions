@@ -356,33 +356,33 @@ class CRTFRegionParser(object):
                                   "Does not contain expected number of parameters for the region '{1}'"
                                   .format(self.reg_str, self.region_type))
 
-        for x, y in zip(self.language_spec[self.region_type], coord_list_str):
+        for attr_spec, val_str in zip(self.language_spec[self.region_type], coord_list_str):
 
-            if x == 'c':
-                if len(y) == 2 and y[1] != '':
-                    coord_list.append(CoordinateParser.parse_coordinate(y[0]))
-                    coord_list.append(CoordinateParser.parse_coordinate(y[1]))
+            if attr_spec == 'c':
+                if len(val_str) == 2 and val_str[1] != '':
+                    coord_list.append(CoordinateParser.parse_coordinate(val_str[0]))
+                    coord_list.append(CoordinateParser.parse_coordinate(val_str[1]))
                 else:
-                    self._raise_error("Not in proper format: {0} should be a coordinate".format(y))
-            if x == 'pl':
-                if len(y) == 2 and y[1] != '':
-                    coord_list.append(CoordinateParser.parse_angular_length_quantity(y[0]))
-                    coord_list.append(CoordinateParser.parse_angular_length_quantity(y[1]))
+                    self._raise_error("Not in proper format: {0} should be a coordinate".format(val_str))
+            if attr_spec == 'pl':
+                if len(val_str) == 2 and val_str[1] != '':
+                    coord_list.append(CoordinateParser.parse_angular_length_quantity(val_str[0]))
+                    coord_list.append(CoordinateParser.parse_angular_length_quantity(val_str[1]))
                 else:
-                    self._raise_error("Not in proper format: {0} should be a pair of length".format(y))
-            if x == 'l':
-                if isinstance(y, six.string_types):
-                    coord_list.append(CoordinateParser.parse_angular_length_quantity(y))
+                    self._raise_error("Not in proper format: {0} should be a pair of length".format(val_str))
+            if attr_spec == 'l':
+                if isinstance(val_str, six.string_types):
+                    coord_list.append(CoordinateParser.parse_angular_length_quantity(val_str))
                 else:
-                    self._raise_error("Not in proper format: {0} should be a single length".format(y))
-            if x == 's':
+                    self._raise_error("Not in proper format: {0} should be a single length".format(val_str))
+            if attr_spec == 's':
                 if self.region_type == 'symbol':
-                    if y in valid_symbols:
-                        self.meta['symbol'] = y
+                    if val_str in valid_symbols:
+                        self.meta['symbol'] = val_str
                     else:
-                        self._raise_error("Not in proper format: '{0}' should be a symbol".format(y))
+                        self._raise_error("Not in proper format: '{0}' should be a symbol".format(val_str))
                 elif self.region_type == 'text':
-                    self.meta['text'] = y[1:-1]
+                    self.meta['text'] = val_str[1:-1]
 
         self.coord = coord_list
 
@@ -426,6 +426,13 @@ class CRTFRegionParser(object):
             self.coord[2:] = [x * 2 for x in self.coord[2:]]
             if len(self.coord) % 2 == 1:  # This checks if the angle is present.
                 self.coord[-1] /= 2
+
+        if self.region_type == 'box':
+            x = (self.coord[0] + self.coord[2]) / 2
+            y = (self.coord[1] + self.coord[3]) / 2
+            w = u.Quantity(self.coord[0] - self.coord[2])
+            h = u.Quantity(self.coord[1] - self.coord[3])
+            self.coord = [x, y, abs(w), abs(h)]
 
         self.meta.pop('coord', None)
 
