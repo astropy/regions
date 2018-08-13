@@ -59,7 +59,7 @@ class CompoundPixelRegion(PixelRegion):
         in_reg = self.operator(self.region1.contains(pixcoord),
                                self.region2.contains(pixcoord))
         if self.meta.get('include', False):
-            return not in_reg
+            return np.logical_not(in_reg)
         else:
             return in_reg
 
