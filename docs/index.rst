@@ -40,6 +40,16 @@ User guide
    fits_region
    shapely
 
+These plots are made using :download:`plot_image.reg`.
+
++----------------------------------------+----------------------------------------+
+| ds9                                    | regions + matplotlib                   |
++========================================+========================================+
+| .. image::    _static/region_ds9.png   | .. plot:: plot_reg.py                  |
+|   :width: 300px                        |   :width: 300px                        |
+|   :target:    _static/region_ds9.png   |                                        |
++----------------------------------------+----------------------------------------+
+
 Advanced
 ========
 

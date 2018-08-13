@@ -6,7 +6,8 @@ import operator as op
 import numpy as np
 
 from . import PixelRegion, SkyRegion, BoundingBox, Mask
-from ..core.attributes import CompoundRegionPix, CompoundRegionSky
+from ..core.attributes import (CompoundRegionPix, CompoundRegionSky,
+                               RegionVisual, RegionMeta)
 
 __all__ = ['CompoundPixelRegion', 'CompoundSkyRegion']
 
@@ -14,6 +15,19 @@ __all__ = ['CompoundPixelRegion', 'CompoundSkyRegion']
 class CompoundPixelRegion(PixelRegion):
     """
     Represents the logical combination of two regions in pixel coordinates.
+
+    Parameters
+    ----------
+    region1 : `~regions.PixelRegion` object
+        The inner Pixel region.
+    region2 : `~regions.PixelRegion` object
+        The outer Pixel region.
+    operator : `function`
+        A callable binary operator.
+    meta : `~regions.RegionMeta` object, optional
+        A dictionary which stores the meta attributes of this region.
+    visual : `~regions.RegionVisual` object, optional
+        A dictionary which stores the visual meta attributes of this region.
     """
 
     region1 = CompoundRegionPix('region1')
@@ -29,11 +43,11 @@ class CompoundPixelRegion(PixelRegion):
         if meta is None:
             self.meta = region1.meta
         else:
-            self.meta = meta
+            self.meta = RegionMeta()
         if visual is None:
             self.visual = region1.visual
         else:
-            self.visual = visual
+            self.visual = RegionVisual()
         self._operator = operator
         self._repr_params = ('region1', 'region2', 'operator')
 
@@ -42,8 +56,9 @@ class CompoundPixelRegion(PixelRegion):
         return self._operator
 
     def contains(self, pixcoord):
-        in_reg = self.operator(self.region1.contains(pixcoord), self.region2.contains(pixcoord))
-        if self.meta.get('inverted', False):
+        in_reg = self.operator(self.region1.contains(pixcoord),
+                               self.region2.contains(pixcoord))
+        if self.meta.get('include', False):
             return not in_reg
         else:
             return in_reg
@@ -88,7 +103,7 @@ class CompoundPixelRegion(PixelRegion):
     @staticmethod
     def _make_annulus_path(patch_inner, patch_outer):
         """
-        Define a matplotlib annulus path from two patches.
+        Defines a matplotlib annulus path from two patches.
 
         This preserves the cubic Bezier curves (CURVE4) of the aperture
         paths.
@@ -141,6 +156,19 @@ class CompoundPixelRegion(PixelRegion):
 class CompoundSkyRegion(SkyRegion):
     """
     Represents the logical combination of two regions in sky coordinates.
+
+    Parameters
+    ----------
+    region1 : `~regions.SkyRegion` object
+        The inner sky region.
+    region2 : `~regions.SkyRegion` object
+        The outer sky region.
+    operator : `function`
+        A callable binary operator.
+    meta : `~regions.RegionMeta` object, optional
+        A dictionary which stores the meta attributes of this region.
+    visual : `~regions.RegionVisual` object, optional
+        A dictionary which stores the visual meta attributes of this region.
     """
     region1 = CompoundRegionSky('region1')
     region2 = CompoundRegionSky('region2')
@@ -154,11 +182,11 @@ class CompoundSkyRegion(SkyRegion):
         if meta is None:
             self.meta = region1.meta
         else:
-            self.meta = meta
+            self.meta = RegionMeta()
         if visual is None:
             self.visual = region1.visual
         else:
-            self.visual = visual
+            self.visual = RegionVisual()
         self._operator = operator
 
         self._repr_params = ('region1', 'region2', 'operator')
@@ -169,8 +197,8 @@ class CompoundSkyRegion(SkyRegion):
 
     def contains(self, skycoord, wcs):
         in_reg = self.operator(self.region1.contains(skycoord, wcs),
-                             self.region2.contains(skycoord, wcs))
-        if self.meta.get('inverted', False):
+                               self.region2.contains(skycoord, wcs))
+        if self.meta.get('include', False):
             return not in_reg
         else:
             return in_reg

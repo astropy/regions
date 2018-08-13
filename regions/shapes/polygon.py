@@ -8,7 +8,7 @@ from astropy.wcs.utils import skycoord_to_pixel, pixel_to_skycoord
 from ..core import PixelRegion, SkyRegion, Mask, BoundingBox, PixCoord
 from .._geometry import polygonal_overlap_grid
 from .._geometry.pnpoly import points_in_polygon
-from ..core.attributes import OneDPix, OneDSky
+from ..core.attributes import OneDPix, OneDSky, RegionMeta, RegionVisual
 
 __all__ = ['PolygonPixelRegion', 'PolygonSkyRegion']
 
@@ -21,14 +21,42 @@ class PolygonPixelRegion(PixelRegion):
     ----------
     vertices : `~regions.PixCoord`
         The vertices of the polygon
+    meta : `~regions.RegionMeta` object, optional
+        A dictionary which stores the meta attributes of this region.
+    visual : `~regions.RegionVisual` object, optional
+        A dictionary which stores the visual meta attributes of this region.
+
+    Examples
+    --------
+
+    .. plot::
+        :include-source:
+
+        import numpy as np
+        from astropy.coordinates import Angle
+        from regions import PixCoord, PolygonPixelRegion
+        import matplotlib.pyplot as plt
+
+        x, y = [45, 45, 55, 60], [75, 70, 65, 75]
+        fig, ax = plt.subplots(1, 1)
+
+        vertices = PixCoord(x=x, y=y)
+        reg = PolygonPixelRegion(vertices=vertices)
+        patch = reg.as_patch(facecolor='none', edgecolor='red', lw=2)
+        ax.add_patch(patch)
+
+        plt.xlim(30, 80)
+        plt.ylim(50, 80)
+        ax.set_aspect('equal')
+        plt.show()
     """
 
     vertices = OneDPix('vertices')
 
     def __init__(self, vertices, meta=None, visual=None):
         self.vertices = vertices
-        self.meta = meta or {}
-        self.visual = visual or {}
+        self.meta = meta or RegionMeta()
+        self.visual = visual or RegionVisual()
         self._repr_params = ('vertices',)
 
     @property
@@ -112,14 +140,18 @@ class PolygonSkyRegion(SkyRegion):
     ----------
     vertices : `~astropy.coordinates.SkyCoord`
         The vertices of the polygon
+    meta : `~regions.RegionMeta` object, optional
+        A dictionary which stores the meta attributes of this region.
+    visual : `~regions.RegionVisual` object, optional
+        A dictionary which stores the visual meta attributes of this region.
     """
 
     vertices = OneDSky('vertices')
 
     def __init__(self, vertices, meta=None, visual=None):
         self.vertices = vertices
-        self.meta = meta or {}
-        self.visual = visual or {}
+        self.meta = meta or RegionMeta()
+        self.visual = visual or RegionVisual()
         self._repr_params = ('vertices',)
 
     def to_pixel(self, wcs):

@@ -11,7 +11,8 @@ from astropy.wcs.utils import pixel_to_skycoord
 from ..core import PixCoord, PixelRegion, SkyRegion, Mask, BoundingBox
 from .._geometry import elliptical_overlap_grid
 from .._utils.wcs_helpers import skycoord_to_pixel_scale_angle
-from ..core.attributes import ScalarPix, ScalarLength, QuantityLength, ScalarSky
+from ..core.attributes import (ScalarPix, ScalarLength, QuantityLength,
+                               ScalarSky, RegionMeta, RegionVisual)
 
 
 __all__ = ['EllipsePixelRegion', 'EllipseSkyRegion']
@@ -25,13 +26,17 @@ class EllipsePixelRegion(PixelRegion):
     ----------
     center : `~regions.PixCoord`
         The position of the center of the ellipse.
-    width : float
+    width : `float`
         The width of the ellipse (before rotation) in pixels
-    height : float
+    height : `float`
         The height of the ellipse (before rotation) in pixels
-    angle : `~astropy.units.Quantity`
+    angle : `~astropy.units.Quantity`, optional
         The rotation angle of the ellipse, measured anti-clockwise. If set to
         zero (the default), the width axis is lined up with the x axis.
+    meta : `~regions.RegionMeta` object, optional
+        A dictionary which stores the meta attributes of this region.
+    visual : `~regions.RegionVisual` object, optional
+        A dictionary which stores the visual meta attributes of this region.
 
     Examples
     --------
@@ -53,7 +58,7 @@ class EllipsePixelRegion(PixelRegion):
         ax.imshow(e(x, y), origin='lower', interpolation='none', cmap='Greys_r')
 
         center = PixCoord(x=x0, y=y0)
-        reg = EllipsePixelRegion(center=center, width=a, height=b, angle=theta)
+        reg = EllipsePixelRegion(center=center, width=2*a, height=2*b, angle=theta)
         patch = reg.as_patch(facecolor='none', edgecolor='red', lw=2)
         ax.add_patch(patch)
 
@@ -71,8 +76,8 @@ class EllipsePixelRegion(PixelRegion):
         self.width = width
         self.height = height
         self.angle = angle
-        self.meta = meta or {}
-        self.visual = visual or {}
+        self.meta = meta or RegionMeta()
+        self.visual = visual or RegionVisual()
         self._repr_params = ('width', 'height', 'angle')
 
     @property
@@ -202,10 +207,14 @@ class EllipseSkyRegion(SkyRegion):
         The width of the ellipse (before rotation) as an angle
     height : `~astropy.units.Quantity`
         The height of the ellipse (before rotation) as an angle
-    angle : `~astropy.units.Quantity`
+    angle : `~astropy.units.Quantity`, optional
         The rotation angle of the ellipse, measured anti-clockwise. If set to
         zero (the default), the width axis is lined up with the longitude axis
         of the celestial coordinates.
+    meta : `~regions.RegionMeta` object, optional
+        A dictionary which stores the meta attributes of this region.
+    visual : `~regions.RegionVisual` object, optional
+        A dictionary which stores the visual meta attributes of this region.
     """
 
     center = ScalarSky('center')
@@ -218,8 +227,8 @@ class EllipseSkyRegion(SkyRegion):
         self.width = width
         self.height = height
         self.angle = angle
-        self.meta = meta or {}
-        self.visual = visual or {}
+        self.meta = meta or RegionMeta()
+        self.visual = visual or RegionVisual()
         self._repr_params = ('width', 'height', 'angle')
 
     def to_pixel(self, wcs):

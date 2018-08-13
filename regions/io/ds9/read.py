@@ -37,22 +37,38 @@ regex_splitter = re.compile("[, ]")
 
 def read_ds9(filename, errors='strict'):
     """
-    Read a ds9 region file in as a list of region objects.
+    Read a DS9 region file in as a `list` of `~regions.Region` objects.
 
     Parameters
     ----------
-    filename : str
+    filename : `str`
         The file path
-    errors : ``warn``, ``ignore``, ``strict``
+    errors : ``warn``, ``ignore``, ``strict``, optional
       The error handling scheme to use for handling parsing errors.
-      The default is 'strict', which will raise a ``DS9RegionParserError``.
-      ``warn`` will raise a warning, and ``ignore`` will do nothing
-      (i.e., be silent).
+      The default is 'strict', which will raise a `~regions.DS9RegionParserError`.
+      ``warn`` will raise a `~regions.DS9RegionParserWarning`, and
+      ``ignore`` will do nothing (i.e., be silent).
 
     Returns
     -------
-    regions : list
-        Python list of `regions.Region` objects.
+    regions : `list`
+        Python list of `~regions.Region` objects.
+
+    Examples
+    --------
+    >>> from regions import read_ds9
+    >>> from astropy.utils.data import get_pkg_data_filename
+    >>> file = get_pkg_data_filename('data/physical_reference.reg', package='regions.io.ds9.tests')
+    >>> regs = read_ds9(file, errors='warn')
+    >>> print(regs[0])
+    Region: CirclePixelRegion
+    center: PixCoord(x=330.0, y=1090.0)
+    radius: 40.0
+    >>> print(regs[0].meta)
+    {'label': 'Circle', 'select': '1', 'highlite': '1', 'fixed': '0', 'edit': '1', 'move': '1', 'delete': '1', 'source': '1', 'tag': ['{foo}', '{foo bar}'], 'include': True}
+    >>> print(regs[0].visual)
+    {'dashlist': '8 3', 'dash': '0', 'color': 'pink', 'linewidth': '3', 'font': 'times', 'fontsize': '10', 'fontstyle': 'normal', 'fontweight': 'roman'}
+
     """
     with open(filename) as fh:
         region_string = fh.read()
@@ -130,13 +146,27 @@ class DS9Parser(object):
 
     Parameters
     ----------
-    region_string : str
+    region_string : `str`
         DS9 region string
-    errors : ``warn``, ``ignore``, ``strict``
+    errors : ``warn``, ``ignore``, ``strict``, optional
       The error handling scheme to use for handling parsing errors.
-      The default is 'strict', which will raise a ``DS9RegionParserError``.
-      ``warn`` will raise a warning, and ``ignore`` will do nothing
-      (i.e., be silent).
+      The default is 'strict', which will raise a `~regions.DS9RegionParserError`.
+      ``warn`` will raise a `~regions.DS9RegionParserWarning`, and
+      ``ignore`` will do nothing (i.e., be silent).
+
+    Examples
+    --------
+    >>> from regions import DS9Parser
+    >>> reg_str = 'image circle(331.00,1091.00,40.00) # dashlist=8 3 select=1 highlite=1 dash=0 fixed=0 edit=1 move=1 delete=1 source=1 text={Circle} tag={foo} tag={foo bar} This is a Comment color=pink width=3 font="times 10 normal roman"'
+    >>> regs = DS9Parser(reg_str, errors='warn').shapes.to_regions()
+    >>> print(regs[0])
+    Region: CirclePixelRegion
+    center: PixCoord(x=330.0, y=1090.0)
+    radius: 40.0
+    >>> print(regs[0].meta)
+    {'label': 'Circle', 'select': '1', 'highlite': '1', 'fixed': '0', 'edit': '1', 'move': '1', 'delete': '1', 'source': '1', 'tag': ['{foo}', '{foo bar}'], 'include': True}
+    >>> print(regs[0].visual)
+    {'dashlist': '8 3', 'dash': '0', 'color': 'pink', 'linewidth': '3', 'font': 'times', 'fontsize': '10', 'fontstyle': 'normal', 'fontweight': 'roman'}
     """
 
     # List of valid coordinate system
@@ -148,7 +178,6 @@ class DS9Parser(object):
                                 coordinates.frame_transform_graph.get_names()))
     coordsys_mapping['ecliptic'] = 'geocentrictrueecliptic'
     coordsys_mapping['J2000'] = 'fk5'
-
 
     def __init__(self, region_string, errors='strict'):
         if errors not in ('strict', 'ignore', 'warn'):
@@ -254,7 +283,7 @@ class DS9Parser(object):
 
         Parameters
         ----------
-        meta_str : str
+        meta_str : `str`
             Meta string, the metadata is everything after the close-paren of the
             region coordinate specification. All metadata is specified as
             key=value pairs separated by whitespace, but sometimes the values
@@ -323,18 +352,18 @@ class DS9RegionParser(object):
 
     Parameters
     ----------
-    coordsys : str
+    coordsys : `str`
         Coordinate system
-    include : str {'', '-'}
+    include : `str` {'', '-'}
         Flag at the beginning of the line
-    region_type : str
+    region_type : `str`
         Region type
-    region_end : int
+    region_end : `int`
         Coordinate of the end of the regions name, this is passed in order to
         handle whitespaces correctly
-    global_meta : dict
+    global_meta : `dict`
         Global meta data
-    line : str
+    line : `str`
         Line to parse
     """
 

@@ -5,7 +5,7 @@ import numpy as np
 from astropy.wcs.utils import pixel_to_skycoord, skycoord_to_pixel
 
 from ..core import PixCoord, PixelRegion, SkyRegion, BoundingBox
-from ..core.attributes import ScalarPix, ScalarSky
+from ..core.attributes import ScalarPix, ScalarSky, RegionMeta, RegionVisual
 
 __all__ = ['PointPixelRegion', 'PointSkyRegion']
 
@@ -18,14 +18,45 @@ class PointPixelRegion(PixelRegion):
     ----------
     center : `~regions.PixCoord`
         The position of the point
+    meta : `~regions.RegionMeta` object, optional
+        A dictionary which stores the meta attributes of this region.
+    visual : `~regions.RegionVisual` object, optional
+        A dictionary which stores the visual meta attributes of this region.
+
+    Examples
+    --------
+
+    .. plot::
+        :include-source:
+
+        from regions import PixCoord, PointPixelRegion, RegionVisual
+        import matplotlib.pyplot as plt
+
+        fig, ax = plt.subplots(1, 1)
+        regs = []
+        regs.append(PointPixelRegion(PixCoord(2, 2), visual=RegionVisual(symbol='D')))
+        regs.append(PointPixelRegion(PixCoord(2, 3), visual=RegionVisual(symbol='*')))
+        regs.append(PointPixelRegion(PixCoord(3, 3), visual=RegionVisual(symbol='^')))
+        regs.append(PointPixelRegion(PixCoord(3, 2), visual=RegionVisual(symbol='*')))
+        regs.append(PointPixelRegion(PixCoord(2, 4), visual=RegionVisual(symbol='x')))
+        regs.append(PointPixelRegion(PixCoord(4, 2)))
+
+        for reg in regs:
+            reg.plot(ax)
+
+        plt.xlim(0, 6)
+        plt.ylim(0, 6)
+        ax.set_aspect('equal')
+        plt.show()
+
     """
 
     center = ScalarPix('center')
 
     def __init__(self, center, meta=None, visual=None):
         self.center = center
-        self.meta = meta or {}
-        self.visual = visual or {}
+        self.meta = meta or RegionMeta()
+        self.visual = visual or RegionVisual()
         self._repr_params = None
 
     @property
@@ -34,9 +65,14 @@ class PointPixelRegion(PixelRegion):
 
     def contains(self, pixcoord):
         if pixcoord.isscalar:
-            return False
+            in_reg = False
         else:
-            return np.zeros(pixcoord.x.shape, dtype=bool)
+            in_reg = np.zeros(pixcoord.x.shape, dtype=bool)
+
+        if self.meta.get('include', False):
+            return not in_reg
+        else:
+            return in_reg
 
     def to_shapely(self):
         return self.center.to_shapely()
@@ -68,10 +104,8 @@ class PointPixelRegion(PixelRegion):
         ----------
         ax: `~matplotlib.axes`, optional
                     Axis
-
         kwargs: dict
             All keywords that a ``Line2D`` object accepts
-
         """
         from matplotlib import pyplot as plt
         from matplotlib.lines import Line2D
@@ -96,18 +130,25 @@ class PointSkyRegion(SkyRegion):
     ----------
     center : `~astropy.coordinates.SkyCoord`
         The position of the point
+    meta : `regions.RegionMeta` object, optional
+        A dictionary which stores the meta attributes of this region.
+    visual : `~regions.RegionVisual` object, optional
+        A dictionary which stores the visual meta attributes of this region.
     """
 
     center = ScalarSky('center')
 
     def __init__(self, center, meta=None, visual=None):
         self.center = center
-        self.meta = meta or {}
-        self.visual = visual or {}
+        self.meta = meta or RegionMeta()
+        self.visual = visual or RegionVisual()
         self._repr_params = None
 
     def contains(self, skycoord, wcs):
-        return False
+        if self.meta.get('include', False):
+            return True
+        else:
+            return False
 
     def to_pixel(self, wcs):
         center_x, center_y = skycoord_to_pixel(self.center, wcs=wcs)

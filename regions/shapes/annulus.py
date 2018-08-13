@@ -33,10 +33,39 @@ class CircleAnnulusPixelRegion(CompoundPixelRegion):
     ----------
     center : :class:`~regions.core.pixcoord.PixCoord`
         The position of the center of the annulus.
-    inner_radius : float
+    inner_radius : `float`
         The inner radius of the annulus
-    outer_radius : float
+    outer_radius : `float`
         The outer radius of the annulus
+    meta : `~regions.RegionMeta` object, optional
+        A dictionary which stores the meta attributes of this region.
+    visual : `~regions.RegionVisual` object, optional
+        A dictionary which stores the visual meta attributes of this region.
+
+    Examples
+    --------
+
+    .. plot::
+        :include-source:
+
+        from regions import PixCoord, CircleAnnulusPixelRegion
+        import matplotlib.pyplot as plt
+
+        x, y = 6, 6
+        inner_radius = 5.5
+        outer_radius = 8
+        fig, ax = plt.subplots(1, 1)
+
+        center = PixCoord(x=x, y=y)
+        reg = CircleAnnulusPixelRegion(center=center, inner_radius=inner_radius,
+                                       outer_radius=outer_radius)
+        patch = reg.as_patch(facecolor='none', edgecolor='red', lw=2)
+        ax.add_patch(patch)
+
+        plt.xlim(-5, 20)
+        plt.ylim(-5, 20)
+        ax.set_aspect('equal')
+        plt.show()
     """
 
     center = AnnulusCenterPix()
@@ -82,6 +111,10 @@ class CircleAnnulusSkyRegion(CompoundSkyRegion):
         The inner radius of the annulus in angular units
     outer_radius : :class:`~astropy.units.Quantity`
         The outer radius of the annulus in angular units
+    meta : `~regions.RegionMeta` object, optional
+        A dictionary which stores the meta attributes of this region.
+    visual : `~regions.RegionVisual` object, optional
+        A dictionary which stores the visual meta attributes of this region.
     """
 
     center = AnnulusCenterSky()
@@ -113,14 +146,14 @@ class AsymmetricAnnulusPixelRegion(CompoundPixelRegion):
     """
     An asymmetrical annulus in pixel coordinates.
 
-    region1: `~regions.PixelRegion` object
+    region1 : `~regions.PixelRegion` object
         The inner asymmetric region
-    region2: `~regions.PixelRegion` object
+    region2 : `~regions.PixelRegion` object
         The outer asymmetric region
-    meta: `region.RegionMeta` object
-        The meta attributes of the region.
-    visual: `region.RegionVisual` object
-        The visual meta attributes of the region.
+    meta : `~regions.RegionMeta` object, optional
+        A dictionary which stores the meta attributes of this region.
+    visual : `~regions.RegionVisual` object, optional
+        A dictionary which stores the visual meta attributes of this region.
     """
 
     center = AnnulusCenterPix()
@@ -170,14 +203,14 @@ class AsymmetricAnnulusSkyRegion(CompoundSkyRegion):
 
     Parameters
     ----------
-    region1: `~regions.SkyRegion` object
+    region1 : `~regions.SkyRegion` object
         The inner asymmetric region
-    region2: `~regions.SkyRegion` object
+    region2 : `~regions.SkyRegion` object
         The outer asymmetric region
-    meta: `region.RegionMeta` object
-        The meta attributes of the region.
-    visual: `region.RegionVisual` object
-        The visual meta attributes of the region.
+    meta : `~regions.RegionMeta` object, optional
+        A dictionary which stores the meta attributes of this region.
+    visual : `~regions.RegionVisual` object, optional
+        A dictionary which stores the visual meta attributes of this region.
     """
 
     center = AnnulusCenterSky()
@@ -217,19 +250,55 @@ class EllipseAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
 
     Parameters
     ----------
-    center: `~regions.PixCoord`
+    center : `~regions.PixCoord`
         The position of the center of the elliptical annulus.
-    inner_width: float
+    inner_width : `float`
         The inner width of the elliptical annulus (before rotation) in pixels
-    inner_height: float
+    inner_height : `float`
         The inner height of the elliptical annulus (before rotation) in pixels
-    outer_width: float
+    outer_width : `float`
         The outer width of the elliptical annulus (before rotation) in pixels
-    outer_height: float
+    outer_height : `float`
         The outer height of the elliptical annulus (before rotation) in pixels
-    angle: `~astropy.units.Quantity`
+    angle : `~astropy.units.Quantity`, optional
         The rotation angle of the elliptical annulus, measured anti-clockwise.
         If set to zero (the default), the width axis is lined up with the x axis.
+    meta : `~regions.RegionMeta` object, optional
+        A dictionary which stores the meta attributes of this region.
+    visual : `~regions.RegionVisual` object, optional
+        A dictionary which stores the visual meta attributes of this region.
+
+
+    Examples
+    --------
+
+    .. plot::
+        :include-source:
+
+        from astropy.coordinates import Angle
+        from regions import PixCoord, EllipseAnnulusPixelRegion
+        import matplotlib.pyplot as plt
+
+        x, y = 6, 6
+        inner_width = 5.5
+        inner_height = 3.5
+        outer_width = 8.5
+        outer_height = 6.5
+        angle = Angle("45deg")
+
+        fig, ax = plt.subplots(1, 1)
+
+        center = PixCoord(x=x, y=y)
+        reg = EllipseAnnulusPixelRegion(center=center, inner_width=inner_width,
+                                        inner_height=inner_height, outer_width=outer_width,
+                                        outer_height=outer_height, angle=angle)
+        patch = reg.as_patch(facecolor='none', edgecolor='red', lw=2)
+        ax.add_patch(patch)
+
+        plt.xlim(-5, 20)
+        plt.ylim(-5, 20)
+        ax.set_aspect('equal')
+        plt.show()
     """
 
     def __init__(self, center, inner_width, inner_height, outer_width,
@@ -253,20 +322,24 @@ class EllipseAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
 
     Parameters
     ----------
-    center: `~astropy.coordinates.SkyCoord`
+    center : `~astropy.coordinates.SkyCoord`
         The position of the center of the elliptical annulus.
-    inner_width: `~astropy.units.Quantity`
+    inner_width : `~astropy.units.Quantity`
         The inner width of the elliptical annulus (before rotation) as angle
-    inner_height: `~astropy.units.Quantity`
+    inner_height : `~astropy.units.Quantity`
         The inner height of the elliptical annulus (before rotation) as angle
-    outer_width: `~astropy.units.Quantity`
+    outer_width : `~astropy.units.Quantity`
         The outer width of the elliptical annulus (before rotation) as angle
-    outer_height: `~astropy.units.Quantity`
+    outer_height : `~astropy.units.Quantity`
         The outer height of the elliptical annulus (before rotation) as angle
-    angle: `~astropy.units.Quantity`, optional
+    angle : `~astropy.units.Quantity`, optional
         The rotation angle of the elliptical annulus, measured anti-clockwise.
         If set to zero (the default), the width axis is lined up with the
         longitude axis of the celestial coordinates
+    meta : `~regions.RegionMeta` object, optional
+        A dictionary which stores the meta attributes of this region.
+    visual : `~regions.RegionVisual` object, optional
+        A dictionary which stores the visual meta attributes of this region.
     """
 
     def __init__(self, center, inner_width, inner_height, outer_width,
@@ -290,19 +363,55 @@ class RectangleAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
 
     Parameters
     ----------
-    center: `~regions.PixCoord`
+    center : `~regions.PixCoord`
         The position of the center of the rectangular annulus.
-    inner_width: float
+    inner_width : `float`
         The inner width of the rectangular annulus (before rotation) in pixels
-    inner_height: float
+    inner_height : `float`
         The inner height of the rectangular annulus (before rotation) in pixels
-    outer_width: float
+    outer_width : `float`
         The outer width of the rectangular annulus (before rotation) in pixels
-    outer_height: float
+    outer_height : `float`
         The outer height of the rectangular annulus (before rotation) in pixels
-    angle: `~astropy.units.Quantity`
+    angle : `~astropy.units.Quantity`, optional
         The rotation angle of the rectangular annulus, measured anti-clockwise.
         If set to zero (the default), the width axis is lined up with the x axis.
+    meta : `~regions.RegionMeta` object, optional
+        A dictionary which stores the meta attributes of this region.
+    visual : `~regions.RegionVisual` object, optional
+        A dictionary which stores the visual meta attributes of this region.
+
+
+    Examples
+    --------
+
+    .. plot::
+        :include-source:
+
+        from astropy.coordinates import Angle
+        from regions import PixCoord, RectangleAnnulusPixelRegion
+        import matplotlib.pyplot as plt
+
+        x, y = 6, 6
+        inner_width = 5.5
+        inner_height = 3.5
+        outer_width = 8.5
+        outer_height = 6.5
+        angle = Angle("45deg")
+
+        fig, ax = plt.subplots(1, 1)
+
+        center = PixCoord(x=x, y=y)
+        reg = RectangleAnnulusPixelRegion(center=center, inner_width=inner_width,
+                                          inner_height=inner_height, outer_width=outer_width,
+                                          outer_height=outer_height, angle=angle)
+        patch = reg.as_patch(facecolor='none', edgecolor='red', lw=2)
+        ax.add_patch(patch)
+
+        plt.xlim(-5, 20)
+        plt.ylim(-5, 20)
+        ax.set_aspect('equal')
+        plt.show()
     """
 
     def __init__(self, center, inner_width, inner_height, outer_width,
@@ -324,20 +433,24 @@ class RectangleAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
 
     Parameters
     ----------
-    center: `~astropy.coordinates.SkyCoord`
+    center : `~astropy.coordinates.SkyCoord`
         The position of the center of the rectangular annulus.
-    inner_width: `~astropy.units.Quantity`
+    inner_width : `~astropy.units.Quantity`
         The inner width of the rectangular annulus (before rotation) as angle
-    inner_height: `~astropy.units.Quantity`
+    inner_height : `~astropy.units.Quantity`
         The inner height of the rectangular annulus (before rotation) as angle
-    outer_width: `~astropy.units.Quantity`
+    outer_width : `~astropy.units.Quantity`
         The outer width of the rectangular annulus (before rotation) as angle
-    outer_height: `~astropy.units.Quantity`
+    outer_height : `~astropy.units.Quantity`
         The outer height of the rectangular annulus (before rotation) as angle
-    angle: `~astropy.units.Quantity`, optional
+    angle : `~astropy.units.Quantity`, optional
         The rotation angle of the rectangular annulus, measured anti-clockwise.
         If set to zero (the default), the width axis is lined up with the
         longitude axis of the celestial coordinates
+    meta : `~regions.RegionMeta` object, optional
+        A dictionary which stores the meta attributes of this region.
+    visual : `~regions.RegionVisual` object, optional
+        A dictionary which stores the visual meta attributes of this region.
     """
 
     def __init__(self, center, inner_width, inner_height, outer_width,

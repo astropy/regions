@@ -7,7 +7,7 @@ import astropy.units as u
 from astropy.wcs.utils import pixel_to_skycoord, skycoord_to_pixel
 
 from ..core import PixCoord, PixelRegion, SkyRegion, BoundingBox
-from ..core.attributes import ScalarPix, ScalarSky
+from ..core.attributes import ScalarPix, ScalarSky, RegionVisual, RegionMeta
 
 
 __all__ = ['LinePixelRegion', 'LineSkyRegion']
@@ -23,6 +23,35 @@ class LinePixelRegion(PixelRegion):
         Start position
     end : `~regions.PixCoord`
         End position
+    meta : `~regions.RegionMeta` object, optional
+        A dictionary which stores the meta attributes of this region.
+    visual : `~regions.RegionVisual` object, optional
+        A dictionary which stores the visual meta attributes of this region.
+
+    Examples
+    --------
+
+    .. plot::
+        :include-source:
+
+        from regions import PixCoord, LinePixelRegion
+        import matplotlib.pyplot as plt
+
+        x1, y1 = 15, 10
+        x2, y2 = 20, 25
+
+        fig, ax = plt.subplots(1, 1)
+
+        start = PixCoord(x=x1, y=y1)
+        end = PixCoord(x=x2, y=y2)
+        reg = LinePixelRegion(start=start, end=end)
+        patch = reg.as_patch(facecolor='none', edgecolor='red', lw=2)
+        ax.add_patch(patch)
+
+        plt.xlim(0, 30)
+        plt.ylim(0, 30)
+        ax.set_aspect('equal')
+        plt.show()
     """
 
     start = ScalarPix('start')
@@ -31,8 +60,8 @@ class LinePixelRegion(PixelRegion):
     def __init__(self, start, end, meta=None, visual=None):
         self.start = start
         self.end = end
-        self.meta = meta or {}
-        self.visual = visual or {}
+        self.meta = meta or RegionMeta()
+        self.visual = visual or RegionVisual()
         self._repr_params = ('start', 'end')
 
     @property
@@ -42,9 +71,14 @@ class LinePixelRegion(PixelRegion):
 
     def contains(self, pixcoord):
         if pixcoord.isscalar:
-            return False
+            in_reg = False
         else:
-            return np.zeros(pixcoord.x.shape, dtype=bool)
+            in_reg = np.zeros(pixcoord.x.shape, dtype=bool)
+
+        if self.meta.get('include', False):
+            return not in_reg
+        else:
+            return in_reg
 
     def to_shapely(self):
         from shapely.geometry import LineString
@@ -97,6 +131,10 @@ class LineSkyRegion(SkyRegion):
         Start position
     end : `~astropy.coordinates.SkyCoord`
         End position
+    meta : `~regions.RegionMeta` object, optional
+        A dictionary which stores the meta attributes of this region.
+    visual : `~regions.RegionVisual` object, optional
+        A dictionary which stores the visual meta attributes of this region.
     """
 
     start = ScalarSky('start')
@@ -105,12 +143,15 @@ class LineSkyRegion(SkyRegion):
     def __init__(self, start, end, meta=None, visual=None):
         self.start = start
         self.end = end
-        self.meta = meta or {}
-        self.visual = visual or {}
+        self.meta = meta or RegionMeta()
+        self.visual = visual or RegionVisual()
         self._repr_params = ('start', 'end')
 
     def contains(self, skycoord, wcs):
-        return False
+        if self.meta.get('include', False):
+            return True
+        else:
+            return False
 
     def to_pixel(self, wcs):
         start_x, start_y = skycoord_to_pixel(self.start, wcs=wcs)
