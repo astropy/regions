@@ -7,3 +7,7 @@ from .ds9.core import *
 from .crtf.read import *
 from .crtf.write import *
 from .crtf.core import *
+
+from .fits.core import *
+from .fits.read import *
+from .fits.write import *

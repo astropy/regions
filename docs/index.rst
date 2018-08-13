@@ -37,6 +37,7 @@ User guide
    plotting
    ds9
    crtf
+   fits_region
    shapely
 
 Advanced

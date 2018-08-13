@@ -3,11 +3,14 @@
 from __future__ import absolute_import, division, print_function
 from warnings import warn
 import string
+import numbers
+import numpy as np
 
 from astropy import units as u
 from astropy import coordinates
 from astropy.coordinates import Angle, SkyCoord
 from astropy import log
+from astropy.table import Table
 
 from .. import shapes
 from ..core import PixCoord, SkyRegion
@@ -28,24 +31,34 @@ regions_attributes = dict(circle=['center', 'radius'],
                           ellipse=['center', 'width', 'height', 'angle'],
                           rectangle=['center', 'width', 'height', 'angle'],
                           polygon=['vertices'],
-                          annulus=['center', 'inner_radius', 'outer_radius'],
+                          circleannulus=['center', 'inner_radius', 'outer_radius'],
+                          ellipseannulus=['center', 'inner_width',
+                                          'inner_height', 'outer_width',
+                                          'outer_height', 'angle'],
                           line=['start', 'end'],
                           point=['center'],
                           text=['center']
                           )
+regions_attributes['rectangleannulus'] = regions_attributes['ellipseannulus']
 
 # This helps to map the region names in the respective format to the ones
 # available in this package
 reg_mapping = {'DS9': {x: x for x in regions_attributes},
-               'CRTF': {x: x for x in regions_attributes}}
+               'CRTF': {x: x for x in regions_attributes},
+               'FITS_REGION': {x: x for x in regions_attributes}}
 reg_mapping['DS9']['box'] = 'rectangle'
 reg_mapping['CRTF']['rotbox'] = 'rectangle'
 reg_mapping['CRTF']['centerbox'] = 'rectangle'
 reg_mapping['CRTF']['poly'] = 'polygon'
 reg_mapping['CRTF']['symbol'] = 'point'
 reg_mapping['CRTF']['text'] = 'text'
+reg_mapping['CRTF']['annulus'] = 'circleannulus'
 reg_mapping['DS9']['text'] = 'text'
-
+reg_mapping['DS9']['annulus'] = 'circleannulus'
+reg_mapping['FITS_REGION']['annulus'] = 'circleannulus'
+reg_mapping['FITS_REGION']['box'] = 'rectangle'
+reg_mapping['FITS_REGION']['rotbox'] = 'rectangle'
+reg_mapping['FITS_REGION']['elliptannulus'] = 'ellipseannulus'
 
 # valid astropy coordinate frames in their respective formats.
 valid_coordsys = {'DS9': ['image', 'physical', 'fk4', 'fk5', 'icrs', 'galactic',
@@ -115,7 +128,7 @@ class ShapeList(list):
 
         crtf_strings = {
             'circle': '{0}circle[[{1:FMT}deg, {2:FMT}deg], {3:FMT}RAD]',
-            'annulus': '{0}annulus[[{1:FMT}deg, {2:FMT}deg], [{3:FMT}RAD, {4:FMT}RAD]]',
+            'circleannulus': '{0}annulus[[{1:FMT}deg, {2:FMT}deg], [{3:FMT}RAD, {4:FMT}RAD]]',
             'ellipse': '{0}ellipse[[{1:FMT}deg, {2:FMT}deg], [{3:FMT}RAD, {4:FMT}RAD], {5:FMT}deg]',
             'rectangle': '{0}rotbox[[{1:FMT}deg, {2:FMT}deg], [{3:FMT}RAD, {4:FMT}RAD], {5:FMT}deg]',
             'polygon': '{0}poly[{1}]',
@@ -245,7 +258,7 @@ class ShapeList(list):
 
         ds9_strings = {
             'circle': '{0}circle({1:FMT},{2:FMT},{3:FMT}RAD)',
-            'annulus': '{0}annulus({1:FMT},{2:FMT},{3:FMT}RAD,{4:FMT}RAD)',
+            'circleannulus': '{0}annulus({1:FMT},{2:FMT},{3:FMT}RAD,{4:FMT}RAD)',
             'ellipse': '{0}ellipse({1:FMT},{2:FMT},{3:FMT}RAD,{4:FMT}RAD,{5:FMT})',
             'rectangle': '{0}box({1:FMT},{2:FMT},{3:FMT}RAD,{4:FMT}RAD,{5:FMT})',
             'polygon': '{0}polygon({1})',
@@ -340,6 +353,76 @@ class ShapeList(list):
 
         return output
 
+    def to_fits(self):
+        """
+        Converts a `~regions.ShapeList` to a `~astropy.table.Table` object.
+        """
+
+        max_length_coord = 1
+        coord_x = []
+        coord_y = []
+        shapes = []
+        radius = []
+        rotangle_deg = []
+        components = []
+
+        reg_reverse_mapping = {value: key for key, value in
+                               reg_mapping['FITS_REGION'].items()}
+        reg_reverse_mapping['rectangle'] = 'ROTBOX'
+        reg_reverse_mapping['circleannulus'] = 'ANNULUS'
+        reg_reverse_mapping['ellipseannulus'] = 'ELLIPTANNULUS'
+
+        for num, shape in enumerate(self):
+            shapes.append(reg_reverse_mapping[shape.region_type])
+            if shape.region_type == 'polygon':
+                max_length_coord = max(len(shape.coord)/2, max_length_coord)
+                coord = [x.value for x in shape.coord]
+                coord_x.append(coord[::2])
+                coord_y.append(coord[1::2])
+                radius.append(0)
+                rotangle_deg.append(0)
+            else:
+                coord_x.append(shape.coord[0].value)
+                coord_y.append(shape.coord[1].value)
+                if shape.region_type in ['circle', 'circleannulus', 'point']:
+                    radius.append([float(val) for val in shape.coord[2:]])
+                    rotangle_deg.append(0)
+                else:
+                    radius.append([float(x) for x in shape.coord[2:-1]])
+                    rotangle_deg.append(shape.coord[-1].to('deg').value)
+
+            tag = shape.meta.get('tag', '')
+            if tag.isdigit():
+                components.append(int(tag))
+            else:
+                components.append(num + 1)
+
+        # padding every value with zeros at the end to make sure that all values
+        # in the column have same length.
+        for i in range(len(self)):
+            if np.isscalar(coord_x[i]):
+                coord_x[i] = np.array([coord_x[i]])
+            if np.isscalar(coord_y[i]):
+                coord_y[i] = np.array([coord_y[i]])
+            if np.isscalar(radius[i]):
+                radius[i] = np.array([radius[i]])
+
+            coord_x[i] = np.pad(coord_x[i], (0, int(max_length_coord - len(coord_x[i]))),
+                                'constant', constant_values=(0, 0))
+            coord_y[i] = np.pad(coord_y[i], (0, int(max_length_coord - len(coord_y[i]))),
+                                'constant', constant_values=(0, 0))
+            radius[i] = np.pad(radius[i], (0, 4 - len(radius[i])), 'constant',
+                               constant_values=(0, 0))
+
+        table = Table([coord_x, coord_y, shapes, radius, rotangle_deg, components],
+                       names=('X', 'Y', 'SHAPE', 'R', 'ROTANG', 'COMPONENT'))
+        table['X'].unit = 'pix'
+        table['Y'].unit = 'pix'
+        table['R'].unit = 'pix'
+        table['ROTANG'].unit = 'deg'
+
+        return table
+
 
 class Shape(object):
     """
@@ -367,7 +450,9 @@ class Shape(object):
                                ellipse=shapes.EllipseSkyRegion,
                                rectangle=shapes.RectangleSkyRegion,
                                polygon=shapes.PolygonSkyRegion,
-                               annulus=shapes.CircleAnnulusSkyRegion,
+                               circleannulus=shapes.CircleAnnulusSkyRegion,
+                               ellipseannulus=shapes.EllipseAnnulusSkyRegion,
+                               rectangleannulus=shapes.RectangleAnnulusSkyRegion,
                                line=shapes.LineSkyRegion,
                                point=shapes.PointSkyRegion,
                                text=shapes.TextSkyRegion
@@ -377,7 +462,9 @@ class Shape(object):
                                  ellipse=shapes.EllipsePixelRegion,
                                  rectangle=shapes.RectanglePixelRegion,
                                  polygon=shapes.PolygonPixelRegion,
-                                 annulus=shapes.CircleAnnulusPixelRegion,
+                                 circleannulus=shapes.CircleAnnulusPixelRegion,
+                                 ellipseannulus=shapes.EllipseAnnulusPixelRegion,
+                                 rectangleannulus=shapes.RectangleAnnulusPixelRegion,
                                  line=shapes.LinePixelRegion,
                                  point=shapes.PointPixelRegion,
                                  text=shapes.TextPixelRegion
@@ -477,7 +564,7 @@ class Shape(object):
         """
         Convert to pixel coordinates, `regions.PixCoord`
         """
-        if self.region_type in ['polygon', 'line', 'poly']:
+        if self.region_type in ['polygon', 'line']:
             # have to special-case polygon in the phys coord case
             # b/c can't typecheck when iterating as in sky coord case
             coords = [PixCoord(self.coord[0::2], self.coord[1::2])]
@@ -591,7 +678,10 @@ def to_shape_list(region_list, coordinate_system='fk5'):
     for region in region_list:
 
         coord = []
-        reg_type = str(type(region)).split(".")[2]
+        if isinstance(region, SkyRegion):
+            reg_type = region.__class__.__name__[:-9].lower()
+        else:
+            reg_type = region.__class__.__name__[:-11].lower()
 
         for val in regions_attributes[reg_type]:
             coord.append(getattr(region, val))
@@ -611,7 +701,7 @@ def to_shape_list(region_list, coordinate_system='fk5'):
 
         new_coord = []
         for val in coord:
-            if isinstance(val, Angle) or isinstance(val, u.Quantity) or isinstance(val, float):
+            if isinstance(val, Angle) or isinstance(val, u.Quantity) or isinstance(val, numbers.Number):
                 new_coord.append(val)
             elif isinstance(val, PixCoord):
                 new_coord.append(u.Quantity(val.x, u.dimensionless_unscaled))

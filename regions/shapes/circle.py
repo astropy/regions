@@ -57,7 +57,7 @@ class CirclePixelRegion(PixelRegion):
         center = pixel_to_skycoord(self.center.x, self.center.y, wcs)
         _, scale, _ = skycoord_to_pixel_scale_angle(center, wcs)
         radius = Angle(self.radius / scale, 'deg')
-        return CircleSkyRegion(center, radius)
+        return CircleSkyRegion(center, radius, self.meta, self.visual)
 
     @property
     def bounding_box(self):
