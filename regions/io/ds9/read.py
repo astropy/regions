@@ -88,7 +88,7 @@ class CoordinateParser(object):
         """
         # Any ds9 coordinate representation (sexagesimal or degrees)
         if string_rep[-1] == 'r':
-            return coordinates.Angle(string_rep[-1], unit=u.rad)
+            return coordinates.Angle(string_rep[:-1], unit=u.rad)
         elif string_rep[-1] in ['i', 'p']:
             return u.Quantity(string_rep[:-1]) - 1
         elif 'd' in string_rep or 'h' in string_rep:
@@ -124,6 +124,7 @@ class CoordinateParser(object):
         unit_mapping = {
             '"': u.arcsec,
             "'": u.arcmin,
+            'd': u.deg,
             'r': u.rad,
             'i': u.dimensionless_unscaled,
             'p': u.dimensionless_unscaled

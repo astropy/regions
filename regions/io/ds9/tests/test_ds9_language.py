@@ -10,7 +10,7 @@ import pytest
 from astropy.utils.data import get_pkg_data_filename, get_pkg_data_filenames
 import astropy.version as astrov
 from astropy.coordinates import Angle, SkyCoord
-from astropy.tests.helper import catch_warnings
+from astropy.tests.helper import catch_warnings, assert_quantity_allclose
 from astropy.utils.exceptions import AstropyUserWarning
 from astropy import units as u
 
@@ -227,3 +227,39 @@ def test_pixel_angle():
     reg = DS9Parser(reg_str).shapes.to_regions()[0]
 
     assert isinstance(reg.angle, u.quantity.Quantity)
+
+
+def test_expicit_formatting_directives():
+    """
+    Checks whether every explicit formatting directive is supported
+    """
+
+    reg_str = 'image\ncircle(1.5, 2, 2)'
+    valid_coord = DS9Parser(reg_str).shapes[0].coord
+
+    reg_str_explicit = 'image\ncircle(1.5p, 2p, 2p)'
+    coord = DS9Parser(reg_str_explicit).shapes[0].coord
+    assert_quantity_allclose(coord, valid_coord)
+
+    reg_str_explicit = 'image\ncircle(1.5i, 2i, 2i)'
+    coord = DS9Parser(reg_str_explicit).shapes[0].coord
+    assert_quantity_allclose(coord, valid_coord)
+
+    reg_str = 'fk5\ncircle(1.5, 2, 2)'
+    valid_coord = DS9Parser(reg_str).shapes[0].coord
+
+    reg_str_explicit = 'fk5\ncircle(1.5d, 2d, 2d)'
+    coord = DS9Parser(reg_str_explicit).shapes[0].coord
+    assert_quantity_allclose(coord, valid_coord)
+
+    reg_str_explicit = 'fk5\ncircle(1.5r, 2r, 2r)'
+    coord = DS9Parser(reg_str_explicit).shapes[0].coord
+    for val in coord:
+        assert val.unit == u.Unit('rad')
+
+    reg_str = 'fk5\ncircle(1:20:30, 2:3:7, 2)'
+    valid_coord = DS9Parser(reg_str).shapes[0].coord
+
+    reg_str_explicit = 'fk5\ncircle(1h20m30s, 2d3m7s, 2d)'
+    coord = DS9Parser(reg_str_explicit).shapes[0].coord
+    assert_quantity_allclose(u.Quantity(coord), u.Quantity(valid_coord))
