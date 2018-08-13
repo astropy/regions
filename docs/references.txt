@@ -5,3 +5,5 @@
 .. _shapely: http://toblerity.org/shapely/manual.html
 .. _Github repository: https://github.com/astropy/regions
 .. _Region documentation: http://astropy-regions.readthedocs.io/en/latest/
+.. _affiliated package: http://www.astropy.org/affiliated/index.html
+.. _get help: http://www.astropy.org/help.html

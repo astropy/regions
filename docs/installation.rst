@@ -10,7 +10,7 @@ The regions package requires the following packages:
 
 * Python 2.7 or 3.4 and above
 * `Numpy <http://www.numpy.org>`_ 1.9 or later
-* `Astropy <http://www.astropy.org>`__ 1.2 or later
+* `Astropy <http://www.astropy.org>`__ 1.3 or later
 
 In addition, the following packages are needed for optional functionality:
 

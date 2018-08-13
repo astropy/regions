@@ -25,13 +25,14 @@ To draw a matplotlib patch object, add it to an `matplotlib.axes.Axes` object.
     plt.show()
 
 
-The :meth:`~regions.PixelRegion.plot` convenience method just does these two
+The :meth:`~regions.PixelRegion.plot`, a convenience method just does these two
 steps at once (creating a matplotlib patch and adding it to an axis),
-and does call ``plt.gca()`` if no axis is passed in.
+and calls ``plt.gca()`` if no axis is passed in.
 
 Note that not all pixel regions have ``as_patch()`` methods, e.g.
-the `~regions.PointPixelRegion` or compound regions don't because there's
-no equivalent matplotlib object.
+the `~regions.CircleAnnulusRegion`, `~regions.PointPixelRegion` and
+`~regions.CompundPixelRegion` don't have because there are no equivalent classes
+in `matplotlib.patches`.
 
 Here's a full example how to plot a `~regions.CirclePixelRegion` on an image.
 
