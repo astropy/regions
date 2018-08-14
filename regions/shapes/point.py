@@ -69,7 +69,7 @@ class PointPixelRegion(PixelRegion):
         else:
             in_reg = np.zeros(pixcoord.x.shape, dtype=bool)
 
-        if self.meta.get('include', False):
+        if self.meta.get('include', True):
             # in_reg = False, always.  Points do not include anything
             return in_reg
         else:

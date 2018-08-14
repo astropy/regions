@@ -75,7 +75,7 @@ class LinePixelRegion(PixelRegion):
         else:
             in_reg = np.zeros(pixcoord.x.shape, dtype=bool)
 
-        if self.meta.get('include', False):
+        if self.meta.get('include', True):
             return np.logical_not(in_reg)
         else:
             return in_reg
