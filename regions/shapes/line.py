@@ -149,7 +149,7 @@ class LineSkyRegion(SkyRegion):
 
     def contains(self, skycoord, wcs):
         if self.meta.get('include', True):
-            # lines never contain anything 
+            # lines never contain anything
             return False
         else:
             return True
