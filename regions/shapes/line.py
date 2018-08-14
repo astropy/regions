@@ -76,9 +76,9 @@ class LinePixelRegion(PixelRegion):
             in_reg = np.zeros(pixcoord.x.shape, dtype=bool)
 
         if self.meta.get('include', True):
-            return np.logical_not(in_reg)
-        else:
             return in_reg
+        else:
+            return np.logical_not(in_reg)
 
     def to_shapely(self):
         from shapely.geometry import LineString

@@ -86,7 +86,7 @@ class TestLineSkyRegion(BaseTestSkyRegion):
         assert_quantity_allclose(skyline.end.data.lon, self.reg.end.data.lon)
         assert_quantity_allclose(skyline.end.data.lat, self.reg.end.data.lat)
 
-    def test_contains(self):
+    def test_contains(self, wcs):
         position = SkyCoord([1, 2] * u.deg, [3, 4] * u.deg)
         # lines do not contain things
-        assert self.reg.contains(position) == np.array([False, False], dtype='bool')
+        assert all(self.reg.contains(position, wcs) == np.array([False, False], dtype='bool'))

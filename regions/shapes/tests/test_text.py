@@ -45,3 +45,8 @@ class TestTextSkyRegion(BaseTestSkyRegion):
                              '    ( 3.,  4.)>, text=Sample Text)>')
         expected_str = ('Region: TextSkyRegion\ncenter: <SkyCoord (ICRS): '
                         '(ra, dec) in deg\n    ( 3.,  4.)>\ntext: Sample Text')
+
+    def test_contains(self, wcs):
+        position = SkyCoord([1, 2] * u.deg, [3, 4] * u.deg)
+        # Nothing is in a text region
+        assert all(self.reg.contains(position, wcs) == np.array([False, False], dtype='bool'))

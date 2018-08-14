@@ -9,12 +9,22 @@ import pytest
 import astropy.units as u
 from astropy.tests.helper import assert_quantity_allclose
 from astropy.coordinates import SkyCoord
+from astropy.utils.data import get_pkg_data_filename
+from astropy.io import fits
+from astropy.wcs import WCS
 
 from ...core import PixCoord
 from ...tests.helpers import make_simple_wcs
 from ..ellipse import EllipsePixelRegion, EllipseSkyRegion
 from .utils import ASTROPY_LT_13, HAS_MATPLOTLIB  # noqa
 from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
+
+
+@pytest.fixture(scope='session')
+def wcs():
+    filename = get_pkg_data_filename('data/example_header.fits')
+    header = fits.getheader(filename)
+    return WCS(header)
 
 
 class TestEllipsePixelRegion(BaseTestPixelRegion):
@@ -93,7 +103,7 @@ class TestEllipseSkyRegion(BaseTestSkyRegion):
             EllipseSkyRegion(center, width, height)
         assert 'The center must be a 0D SkyCoord object' in str(err)
 
-    def test_contains(self):
-        position = SkyCoord([1, 2] * u.deg, [3, 4] * u.deg)
+    def test_contains(self, wcs):
+        position = SkyCoord([1, 3] * u.deg, [2, 4] * u.deg)
         # 1,2 is outside, 3,4 is the center and is inside
-        assert self.reg.contains(position) == np.array([False, True], dtype='bool')
+        assert all(self.reg.contains(position, wcs) == np.array([False, True], dtype='bool'))
