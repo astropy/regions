@@ -75,9 +75,9 @@ class CirclePixelRegion(PixelRegion):
         pixcoord = PixCoord._validate(pixcoord, name='pixcoord')
         in_circle = self.center.separation(pixcoord) < self.radius
         if self.meta.get('include', False):
-            return np.logical_not(in_circle)
-        else:
             return in_circle
+        else:
+            return np.logical_not(in_circle)
 
     def to_shapely(self):
         return self.center.to_shapely().buffer(self.radius)

@@ -70,9 +70,10 @@ class PointPixelRegion(PixelRegion):
             in_reg = np.zeros(pixcoord.x.shape, dtype=bool)
 
         if self.meta.get('include', False):
-            return np.logical_not(in_reg)
-        else:
+            # in_reg = False, always.  Points do not include anything
             return in_reg
+        else:
+            return np.logical_not(in_reg)
 
     def to_shapely(self):
         return self.center.to_shapely()

@@ -149,9 +149,10 @@ class LineSkyRegion(SkyRegion):
 
     def contains(self, skycoord, wcs):
         if self.meta.get('include', False):
-            return True
-        else:
+            # lines never contain anything 
             return False
+        else:
+            return True
 
     def to_pixel(self, wcs):
         start_x, start_y = skycoord_to_pixel(self.start, wcs=wcs)
