@@ -75,7 +75,7 @@ class PolygonPixelRegion(PixelRegion):
         shape = x.shape
         mask = points_in_polygon(x.flatten(), y.flatten(), vx, vy).astype(bool)
         in_poly = mask.reshape(shape)
-        if self.meta.get('include', False):
+        if self.meta.get('include', True):
             return in_poly
         else:
             return np.logical_not(in_poly)

@@ -89,4 +89,4 @@ class TestLineSkyRegion(BaseTestSkyRegion):
     def test_contains(self):
         position = SkyCoord([1, 2] * u.deg, [3, 4] * u.deg)
         # lines do not contain things
-        assert reg.contains(position) == np.array([False,False], dtype='bool')
+        assert self.reg.contains(position) == np.array([False, False], dtype='bool')

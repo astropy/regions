@@ -148,7 +148,7 @@ class LineSkyRegion(SkyRegion):
         self._repr_params = ('start', 'end')
 
     def contains(self, skycoord, wcs):
-        if self.meta.get('include', False):
+        if self.meta.get('include', True):
             # lines never contain anything 
             return False
         else:

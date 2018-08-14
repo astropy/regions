@@ -74,7 +74,7 @@ class CirclePixelRegion(PixelRegion):
     def contains(self, pixcoord):
         pixcoord = PixCoord._validate(pixcoord, name='pixcoord')
         in_circle = self.center.separation(pixcoord) < self.radius
-        if self.meta.get('include', False):
+        if self.meta.get('include', True):
             return in_circle
         else:
             return np.logical_not(in_circle)

@@ -146,7 +146,7 @@ class PointSkyRegion(SkyRegion):
         self._repr_params = None
 
     def contains(self, skycoord, wcs):
-        if self.meta.get('include', False):
+        if self.meta.get('include', True):
             return True
         else:
             return False

@@ -94,4 +94,4 @@ class TestCircleSkyRegion(BaseTestSkyRegion):
     def test_contains(self):
         position = SkyCoord([1, 2] * u.deg, [3, 4] * u.deg)
         # 1,2 is outside, 3,4 is the center and is inside
-        assert reg.contains(position) == np.array([False,True], dtype='bool')
+        assert self.reg.contains(position) == np.array([False, True], dtype='bool')
