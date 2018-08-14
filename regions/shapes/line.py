@@ -75,10 +75,10 @@ class LinePixelRegion(PixelRegion):
         else:
             in_reg = np.zeros(pixcoord.x.shape, dtype=bool)
 
-        if self.meta.get('include', False):
-            return not in_reg
-        else:
+        if self.meta.get('include', True):
             return in_reg
+        else:
+            return np.logical_not(in_reg)
 
     def to_shapely(self):
         from shapely.geometry import LineString
@@ -148,10 +148,11 @@ class LineSkyRegion(SkyRegion):
         self._repr_params = ('start', 'end')
 
     def contains(self, skycoord, wcs):
-        if self.meta.get('include', False):
-            return True
-        else:
+        if self.meta.get('include', True):
+            # lines never contain anything
             return False
+        else:
+            return True
 
     def to_pixel(self, wcs):
         start_x, start_y = skycoord_to_pixel(self.start, wcs=wcs)

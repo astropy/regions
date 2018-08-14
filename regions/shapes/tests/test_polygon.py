@@ -127,3 +127,8 @@ class TestPolygonSkyRegion(BaseTestSkyRegion):
         poly = PolygonSkyRegion(vertices=poly.vertices.transform_to(self.reg.vertices))
         assert_quantity_allclose(poly.vertices.data.lon, self.reg.vertices.data.lon, atol=1e-3 * u.deg)
         assert_quantity_allclose(poly.vertices.data.lat, self.reg.vertices.data.lat, atol=1e-3 * u.deg)
+
+    def test_contains(self, wcs):
+        position = SkyCoord([1, 3.25] * u.deg, [2, 3.75] * u.deg)
+        # 1,2 is outside, 3.25,3.75 should be inside the triangle...
+        assert all(self.reg.contains(position, wcs) == np.array([False, True], dtype='bool'))

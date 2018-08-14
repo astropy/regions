@@ -110,6 +110,10 @@ def test_pix_to_mask(region, mode):
 def test_sky_in(region):
     region.contains(SkyCoord(1 * u.deg, 1 * u.deg, frame='icrs'), COMMON_WCS)
 
+@pytest.mark.parametrize('region', SKY_REGIONS, ids=ids_func)
+def test_sky_in_array(region):
+    region.contains(SkyCoord([1,2,3] * u.deg, [3,2,1] * u.deg, frame='icrs'), COMMON_WCS)
+
 
 @pytest.mark.parametrize('region', SKY_REGIONS, ids=ids_func)
 def test_sky_to_pix(region):

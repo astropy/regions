@@ -90,3 +90,8 @@ class TestCircleSkyRegion(BaseTestSkyRegion):
         with pytest.raises(ValueError) as err:
             CircleSkyRegion(center, radius)
         assert 'The center must be a 0D SkyCoord object' in str(err)
+
+    def test_contains(self, wcs):
+        position = SkyCoord([1, 3] * u.deg, [2, 4] * u.deg)
+        # 1,2 is outside, 3,4 is the center and is inside
+        assert all(self.reg.contains(position, wcs) == np.array([False, True], dtype='bool'))

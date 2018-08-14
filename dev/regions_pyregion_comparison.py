@@ -9,7 +9,7 @@ pyregion in two regards.
   in the file) that survives the parsing process
 
 The test files are the ones used since PyAstro16, see
-https://zenodo.org/record/5679://zenodo.org/record/56793 
+https://zenodo.org/record/5679://zenodo.org/record/56793
 
 """
 from pathlib import Path

@@ -74,7 +74,11 @@ class PolygonPixelRegion(PixelRegion):
 
         shape = x.shape
         mask = points_in_polygon(x.flatten(), y.flatten(), vx, vy).astype(bool)
-        return mask.reshape(shape)
+        in_poly = mask.reshape(shape)
+        if self.meta.get('include', True):
+            return in_poly
+        else:
+            return np.logical_not(in_poly)
 
     def to_shapely(self):
         from shapely.geometry import Polygon

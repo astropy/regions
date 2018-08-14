@@ -69,10 +69,11 @@ class PointPixelRegion(PixelRegion):
         else:
             in_reg = np.zeros(pixcoord.x.shape, dtype=bool)
 
-        if self.meta.get('include', False):
-            return not in_reg
-        else:
+        if self.meta.get('include', True):
+            # in_reg = False, always.  Points do not include anything
             return in_reg
+        else:
+            return np.logical_not(in_reg)
 
     def to_shapely(self):
         return self.center.to_shapely()
@@ -145,10 +146,11 @@ class PointSkyRegion(SkyRegion):
         self._repr_params = None
 
     def contains(self, skycoord, wcs):
-        if self.meta.get('include', False):
-            return True
-        else:
+        if self.meta.get('include', True):
+            # points never include anything
             return False
+        else:
+            return True
 
     def to_pixel(self, wcs):
         center_x, center_y = skycoord_to_pixel(self.center, wcs=wcs)

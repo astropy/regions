@@ -1,18 +1,29 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import numpy as np
 from numpy.testing import assert_allclose
 import pytest
 
 import astropy.units as u
 from astropy.coordinates import SkyCoord
 from astropy.tests.helper import assert_quantity_allclose
+from astropy.utils.data import get_pkg_data_filename
+from astropy.io import fits
+from astropy.wcs import WCS
 
 from ...core import PixCoord
 from ..rectangle import RectanglePixelRegion, RectangleSkyRegion
 from ...tests.helpers import make_simple_wcs
 from .utils import ASTROPY_LT_13, HAS_MATPLOTLIB  # noqa
 from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
+
+
+@pytest.fixture(scope='session')
+def wcs():
+    filename = get_pkg_data_filename('data/example_header.fits')
+    header = fits.getheader(filename)
+    return WCS(header)
 
 
 class TestRectanglePixelRegion(BaseTestPixelRegion):
@@ -108,3 +119,8 @@ class TestRectangleSkyRegion(BaseTestSkyRegion):
         expected_str = ('Region: RectangleSkyRegion\ncenter: <SkyCoord '
                    '(ICRS): (ra, dec) in deg\n    ( 3.,  4.)>\nwidth: '
                    '4.0 deg\nheight: 3.0 deg\nangle: 5.0 deg')
+
+    def test_contains(self, wcs):
+        position = SkyCoord([1, 3] * u.deg, [2, 4] * u.deg)
+        # 1,2 is outside, 3,4 is the center and is inside
+        assert all(self.reg.contains(position, wcs) == np.array([False, True], dtype='bool'))

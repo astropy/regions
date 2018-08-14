@@ -91,7 +91,11 @@ class RectanglePixelRegion(PixelRegion):
         dy = pixcoord.y - self.center.y
         dx_rot = cos_angle * dx + sin_angle * dy
         dy_rot = sin_angle * dx - cos_angle * dy
-        return (np.abs(dx_rot) < self.width * 0.5) & (np.abs(dy_rot) < self.height * 0.5)
+        in_rect = (np.abs(dx_rot) < self.width * 0.5) & (np.abs(dy_rot) < self.height * 0.5)
+        if self.meta.get('include', True):
+            return in_rect
+        else:
+            return np.logical_not(in_rect)
 
     def to_shapely(self):
 

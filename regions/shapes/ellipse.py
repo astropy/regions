@@ -91,8 +91,12 @@ class EllipsePixelRegion(PixelRegion):
         sin_angle = np.sin(self.angle)
         dx = pixcoord.x - self.center.x
         dy = pixcoord.y - self.center.y
-        return ((2 * (cos_angle * dx + sin_angle * dy) / self.width) ** 2 +
-                (2 * (sin_angle * dx - cos_angle * dy) / self.height) ** 2 <= 1.)
+        in_ell = ((2 * (cos_angle * dx + sin_angle * dy) / self.width) ** 2 +
+                  (2 * (sin_angle * dx - cos_angle * dy) / self.height) ** 2 <= 1.)
+        if self.meta.get('include', True):
+            return in_ell
+        else:
+            return np.logical_not(in_ell)
 
     def to_shapely(self):
         from shapely import affinity

@@ -717,7 +717,7 @@ def to_shape_list(region_list, coordinate_system='fk5'):
             meta['text'] = meta.get('text', meta.pop('label', ''))
 
         shape_list.append(Shape(coordsys, reg_type, new_coord, meta, False,
-                                region.meta.get('include', False)))
+                                region.meta.get('include', True)))
 
     return shape_list
 

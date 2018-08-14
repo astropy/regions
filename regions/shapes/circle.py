@@ -1,6 +1,7 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import numpy as np
 import math
 
 from astropy.coordinates import Angle, SkyCoord
@@ -73,10 +74,10 @@ class CirclePixelRegion(PixelRegion):
     def contains(self, pixcoord):
         pixcoord = PixCoord._validate(pixcoord, name='pixcoord')
         in_circle = self.center.separation(pixcoord) < self.radius
-        if self.meta.get('include', False):
-            return not in_circle
-        else:
+        if self.meta.get('include', True):
             return in_circle
+        else:
+            return np.logical_not(in_circle)
 
     def to_shapely(self):
         return self.center.to_shapely().buffer(self.radius)
