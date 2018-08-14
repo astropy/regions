@@ -147,9 +147,10 @@ class PointSkyRegion(SkyRegion):
 
     def contains(self, skycoord, wcs):
         if self.meta.get('include', True):
-            return True
-        else:
+            # points never include anything
             return False
+        else:
+            return True
 
     def to_pixel(self, wcs):
         center_x, center_y = skycoord_to_pixel(self.center, wcs=wcs)
