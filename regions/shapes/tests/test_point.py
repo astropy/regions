@@ -2,16 +2,28 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import numpy as np
 from numpy.testing import assert_allclose
+import pytest
 
 from astropy import units as u
 from astropy.coordinates import SkyCoord
+from astropy.utils.data import get_pkg_data_filename
+from astropy.io import fits
+from astropy.wcs import WCS
 
 from ...core import PixCoord
 from ...tests.helpers import make_simple_wcs
 from ..point import PointPixelRegion, PointSkyRegion
 from .utils import ASTROPY_LT_13
 from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
+
+
+@pytest.fixture(scope='session')
+def wcs():
+    filename = get_pkg_data_filename('data/example_header.fits')
+    header = fits.getheader(filename)
+    return WCS(header)
 
 
 class TestPointPixelRegion(BaseTestPixelRegion):
@@ -46,7 +58,7 @@ class TestPointSkyRegion(BaseTestSkyRegion):
         expected_str = ('Region: PointSkyRegion\ncenter: <SkyCoord (ICRS): '
                    '(ra, dec) in deg\n    ( 3.,  4.)>')
 
-    def test_contains(self):
+    def test_contains(self, wcs):
         position = SkyCoord([1, 2] * u.deg, [3, 4] * u.deg)
         # points do not contain things
-        assert reg.contains(position) == np.array([False,False], dtype='bool')
+        assert all(self.reg.contains(position, wcs) == np.array([False,False], dtype='bool'))

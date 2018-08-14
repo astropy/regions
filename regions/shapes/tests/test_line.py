@@ -3,6 +3,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 from numpy.testing import assert_allclose
+import numpy as np
 import pytest
 
 from astropy import units as u
