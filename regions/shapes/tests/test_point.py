@@ -45,3 +45,8 @@ class TestPointSkyRegion(BaseTestSkyRegion):
                     '    ( 3.,  4.)>)>')
         expected_str = ('Region: PointSkyRegion\ncenter: <SkyCoord (ICRS): '
                    '(ra, dec) in deg\n    ( 3.,  4.)>')
+
+    def test_contains(self):
+        position = SkyCoord([1, 2] * u.deg, [3, 4] * u.deg)
+        # points do not contain things
+        assert reg.contains(position) == np.array([False,False], dtype='bool')
