@@ -1,18 +1,29 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import numpy as np
 from numpy.testing import assert_allclose
 import pytest
 
 import astropy.units as u
 from astropy.coordinates import SkyCoord
 from astropy.tests.helper import assert_quantity_allclose
+from astropy.utils.data import get_pkg_data_filename
+from astropy.io import fits
+from astropy.wcs import WCS
 
 from ...core import PixCoord
 from ..rectangle import RectanglePixelRegion, RectangleSkyRegion
 from ...tests.helpers import make_simple_wcs
 from .utils import ASTROPY_LT_13, HAS_MATPLOTLIB  # noqa
 from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
+
+
+@pytest.fixture(scope='session')
+def wcs():
+    filename = get_pkg_data_filename('data/example_header.fits')
+    header = fits.getheader(filename)
+    return WCS(header)
 
 
 class TestRectanglePixelRegion(BaseTestPixelRegion):
