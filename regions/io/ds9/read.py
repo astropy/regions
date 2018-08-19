@@ -86,11 +86,13 @@ class CoordinateParser(object):
         """
         Parse a single coordinate
         """
-        # Any ds9 coordinate representation (sexagesimal or degrees)
+        # explicit radian ('r') value
         if string_rep[-1] == 'r':
             return coordinates.Angle(string_rep[:-1], unit=u.rad)
+        # explicit image ('i') and physical ('p') pixels
         elif string_rep[-1] in ['i', 'p']:
             return u.Quantity(string_rep[:-1]) - 1
+        # Any ds9 coordinate representation (sexagesimal or degrees)
         elif 'd' in string_rep or 'h' in string_rep:
             return coordinates.Angle(string_rep)
         elif unit is 'hour_or_deg':
@@ -472,7 +474,6 @@ class DS9RegionParser(object):
         element_parsers = self.language_spec[self.region_type]
         for ii, (element, element_parser) in enumerate(zip(elements,
                                                            element_parsers)):
-            print(element, element_parser)
             if element_parser is coordinate:
                 unit = self.coordinate_units[self.coordsys][ii % 2]
                 coord_list.append(element_parser(element, unit))
