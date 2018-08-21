@@ -4,6 +4,7 @@ python:
     - 2.7
     - 3.5
     - 3.6
+    - 3.7
 
 # Setting sudo to false opts in to Travis-CI container-based builds.
 sudo: false
@@ -39,39 +40,39 @@ matrix:
     include:
 
         # Do a coverage test in Python 3.
-        - python: 3.6
+        - python: 3.7
           env: SETUP_CMD='test --coverage'
                CONDA_CHANNELS='conda-forge astropy'
         # Check for sphinx doc build warnings - we do this first because it
         # may run for a long time
         - python: 2.7
           env: SETUP_CMD='build_docs -w'
-        - python: 3.6
+        - python: 3.7
           env: SETUP_CMD='build_docs -w'
                CONDA_CHANNELS='conda-forge astropy'
         # Do a test without the optional dependencies
-        - python: 3.6
+        - python: 3.7
           env: SETUP_CMD='test'
                CONDA_DEPENDENCIES='Cython pytest-arraydiff'
 
 
         # Try Astropy development version
-        - python: 3.6
+        - python: 3.7
           env: ASTROPY_VERSION=development
                CONDA_CHANNELS='conda-forge astropy'
 
         # Try older numpy versions
-        - python: 3.5
+        - python: 3.6
           env: NUMPY_VERSION=1.11
         - python: 3.5
           env: NUMPY_VERSION=1.10
 
         # Try numpy pre-release
-        - python: 3.6
+        - python: 3.7
           env: NUMPY_VERSION=prerelease
 
         # Do a PEP8 test with pycodestyle
-        - python: 3.6
+        - python: 3.7
           env: MAIN_CMD='pycodestyle regions --count' SETUP_CMD=''
 
 install:
