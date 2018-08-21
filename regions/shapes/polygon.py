@@ -62,8 +62,7 @@ class PolygonPixelRegion(PixelRegion):
     @property
     def area(self):
         """Region area (float)."""
-        # FIXME: for now we use shapely, but could try and avoid the dependency in future
-        return self.to_shapely().area
+        raise NotImplementedError
 
     def contains(self, pixcoord):
         pixcoord = PixCoord._validate(pixcoord, 'pixcoord')
@@ -79,10 +78,6 @@ class PolygonPixelRegion(PixelRegion):
             return in_poly
         else:
             return np.logical_not(in_poly)
-
-    def to_shapely(self):
-        from shapely.geometry import Polygon
-        return Polygon(list(zip(self.vertices.x, self.vertices.y)))
 
     def to_sky(self, wcs):
         vertices_sky = pixel_to_skycoord(self.vertices.x, self.vertices.y, wcs)

@@ -142,9 +142,6 @@ class CompoundPixelRegion(PixelRegion):
         else:
             raise NotImplementedError
 
-    def to_shapely(self, **kwargs):
-        raise NotImplementedError
-
     def bounding_box(self, **kwargs):
         raise NotImplementedError
 

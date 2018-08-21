@@ -1,45 +1,43 @@
 .. _gs-shapely:
 
-Exporting regions to shapely objects
-====================================
+Converting regions to shapely objects
+=====================================
 
 The `Shapely <http://toblerity.org/shapely/manual.html>`__ Python package is a
 generic package for the manipulation and analysis of geometric objects in the
 Cartesian plane. Concerning regions in the cartesian plane, it is more
-feature-complete, powerful and optimized than this ``regions`` package. It
-doesn't do everything astronomers need though, e.g. no sky regions, no use of
-Astropy classes like `~astropy.coordinates.SkyCoord` or
-`~astropy.coordinates.Angle`, and no region serialisation with the formats
-astronomers use (such as e.g. ds9 regions).
+feature-complete, powerful and optimized than this ``regions`` package.
 
-`~regions.PixelRegion` classes provide a method :meth:`~regions.PixelRegion.to_shapely` that allows creation
-of Shapely shape objects. At the moment there is no ``from_shapely`` method to convert Shapely objects
-back to ``regions`` objects. The future of the use of Shapely in ``regions`` is currently unclear, some options are:
+The use of Shapely or other Python regions packages that come from the geospatial domain
+in Astronomy is rare. However, if you have a complex pixel region analysis task,
+you can consider using Shapely. Either use it directly, by defining Shapely regions
+via Python code or one of the serialisation formats they support, or by writing
+some Python code to convert ``astropy-regions`` objects to Shapely objects.
 
-1. Add ``from_shapely`` and use it to implement e.g. `~regions.PolygonPixelRegion` operations
-   can "discretization" of other shapes to polygons.
-   This would make Shapely a required dependency to work with polygons.
-2. Keep ``to_shapely`` for the (small?) fraction of users that want to do this,
-   but don't expand or use it inside the ``regions`` package  to avoid the extra heavy dependency.
-3. Remove the use of Shapely completely from the API unless good use cases demonstrating a need come up.
-
-Here's an example how to create a Shapely object and do something that's not implemented in ``regions``,
-namely to buffer a rectangle, resulting in a polygon.
+Here we give one example how to do this: convert a circle to a Shapely object
+and polygonise it. That's one nice feature of Shapely, it can polygonise all shapes
+and do fast polygon-based computations like intersection and union. If you need to
+do this, that's a good reason to use Shapely.
 
 .. plot::
-   :include-source:
+    :include-source:
 
-    from regions import PixCoord, RectanglePixelRegion
+    import matplotlib.pyplot as plt
+    from regions import PixCoord, CirclePixelRegion
 
-    region = RectanglePixelRegion(center=PixCoord(3, 2), width=2, height=1)
+    # Make an example region
+    region = CirclePixelRegion(center=PixCoord(3, 2), radius=2)
 
-    # Get a `shapely.geometry.polygon.Polygon` object
-    shape = region.to_shapely()
+    # Convert to Shapely
+    from shapely.geometry import Point
+    point = Point(region.center.x, region.center.y)
+    circle = point.buffer(region.radius)
 
-    # Get a polygon that is buffered by 3 pixels compared to 'shape'
-    shape_poly = shape.buffer(distance=3)
+    # Actually, this is a polygon approximation of the circle!
+    print(circle)
 
     # Plot the result
-    x, y = shape_poly.exterior.xy
+    x, y = circle.exterior.xy
     ax = plt.subplot(1, 1, 1)
     ax.plot(x, y, 'g-')
+    plt.show()

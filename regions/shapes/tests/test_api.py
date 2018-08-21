@@ -24,7 +24,6 @@ from ..point import PointPixelRegion, PointSkyRegion
 from ..annulus import (CircleAnnulusPixelRegion, CircleAnnulusSkyRegion,
                        RectangleAnnulusPixelRegion, RectangleAnnulusSkyRegion,
                        EllipseAnnulusPixelRegion, EllipseAnnulusSkyRegion)
-from .utils import HAS_SHAPELY  # noqa
 
 PIXEL_REGIONS = [
     CirclePixelRegion(PixCoord(3, 4), radius=5),
@@ -69,11 +68,12 @@ def test_pix_in(region):
 
 @pytest.mark.parametrize('region', PIXEL_REGIONS, ids=ids_func)
 def test_pix_area(region):
-    try:
-        area = region.area
-        assert not isinstance(area, u.Quantity)
-    except ImportError:  # for shapely
+    # TODO: remove the pytest.skip once polygon area is implemented
+    if isinstance(region, PolygonPixelRegion):
         pytest.skip()
+
+    area = region.area
+    assert not isinstance(area, u.Quantity)
 
 
 @pytest.mark.parametrize(('region'), PIXEL_REGIONS, ids=ids_func)
@@ -84,16 +84,6 @@ def test_pix_to_sky(region):
     except NotImplementedError:
         pytest.xfail()
 
-
-@pytest.mark.skipif('not HAS_SHAPELY')
-@pytest.mark.parametrize('region', PIXEL_REGIONS, ids=ids_func)
-def test_pix_to_shapely(region):
-    from shapely.geometry.base import BaseGeometry
-    try:
-        shape = region.to_shapely()
-        assert isinstance(shape, BaseGeometry)
-    except NotImplementedError:
-        pytest.xfail()
 
 @pytest.mark.parametrize(('region', 'mode'),
                          itertools.product(PIXEL_REGIONS, MASK_MODES),
