@@ -86,8 +86,14 @@ class CoordinateParser(object):
         """
         Parse a single coordinate
         """
+        # explicit radian ('r') value
+        if string_rep[-1] == 'r':
+            return coordinates.Angle(string_rep[:-1], unit=u.rad)
+        # explicit image ('i') and physical ('p') pixels
+        elif string_rep[-1] in ['i', 'p']:
+            return u.Quantity(string_rep[:-1]) - 1
         # Any ds9 coordinate representation (sexagesimal or degrees)
-        if 'd' in string_rep or 'h' in string_rep:
+        elif 'd' in string_rep or 'h' in string_rep:
             return coordinates.Angle(string_rep)
         elif unit is 'hour_or_deg':
             if ':' in string_rep:
@@ -104,7 +110,7 @@ class CoordinateParser(object):
                 ang = float(string_rep)
             return coordinates.Angle(ang, u.deg)
         elif unit.is_equivalent(u.dimensionless_unscaled):
-            return u.Quantity(float(string_rep), unit)-1
+            return u.Quantity(float(string_rep), unit) - 1
         else:
             return u.Quantity(float(string_rep), unit)
 
@@ -120,8 +126,10 @@ class CoordinateParser(object):
         unit_mapping = {
             '"': u.arcsec,
             "'": u.arcmin,
+            'd': u.deg,
             'r': u.rad,
             'i': u.dimensionless_unscaled,
+            'p': u.dimensionless_unscaled
         }
         has_unit = string_rep[-1] not in string.digits
         if has_unit:
@@ -464,8 +472,8 @@ class DS9RegionParser(object):
         # We need to copy in order not to burn up the iterators
         elements = [x for x in regex_splitter.split(self.coord_str) if x]
         element_parsers = self.language_spec[self.region_type]
-        for ii, (element, element_parser) in enumerate(
-            zip(elements, element_parsers)):
+        for ii, (element, element_parser) in enumerate(zip(elements,
+                                                           element_parsers)):
             if element_parser is coordinate:
                 unit = self.coordinate_units[self.coordsys][ii % 2]
                 coord_list.append(element_parser(element, unit))
@@ -517,10 +525,9 @@ class DS9RegionParser(object):
 
         if 'font' in self.meta:
             fonts = self.meta['font'].split(" ")
-            self.meta['font'] = fonts[0]
-            self.meta['fontsize'] = fonts[1]
-            self.meta['fontstyle'] = fonts[2]
-            self.meta['fontweight'] = fonts[3]
+            keys = ['font', 'fontsize', 'fontstyle', 'fontweight']
+            for i, val in enumerate(fonts):
+                self.meta[keys[i]] = val
 
         self.meta.pop('coord', None)
 
