@@ -21,3 +21,6 @@ symbol[[32.1423deg, 12.1412deg], D], linewidth=2, coord=J2000, symsize=2
 
 # Text region
 text[[32.1423deg, 12.1412deg], 'my text'], linewidth=2, coord=J2000
+
+# Box region
+box[[1deg, 2deg], [3deg, 4deg]]

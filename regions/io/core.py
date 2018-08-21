@@ -48,6 +48,7 @@ reg_mapping = {'DS9': {x: x for x in regions_attributes},
                'FITS_REGION': {x: x for x in regions_attributes}}
 reg_mapping['DS9']['box'] = 'rectangle'
 reg_mapping['CRTF']['rotbox'] = 'rectangle'
+reg_mapping['CRTF']['box'] = 'rectangle'
 reg_mapping['CRTF']['centerbox'] = 'rectangle'
 reg_mapping['CRTF']['poly'] = 'polygon'
 reg_mapping['CRTF']['symbol'] = 'point'
@@ -163,7 +164,7 @@ class ShapeList(list):
             shape.meta = to_crtf_meta(shape.meta)
 
             # if unspecified, include is True.
-            include = "-" if shape.meta.get('include') in (False, '-') else "+"
+            include = "-" if shape.include in (False, '-') else "+"
             include += "ann " if shape.meta.get('type', 'reg') == 'ann' else ""
 
             if shape.meta.get('label', "") != "":
@@ -289,7 +290,7 @@ class ShapeList(list):
             shape.meta = to_ds9_meta(shape.meta)
 
             # if unspecified, include is True.
-            include = "-" if shape.meta.get('include') in (False, '-') else ""
+            include = "-" if shape.include in (False, '-') else ""
 
             if 'point' in shape.meta:
                 shape.meta['point'] = valid_symbols_reverse[shape.meta['point']]
@@ -716,8 +717,10 @@ def to_shape_list(region_list, coordinate_system='fk5'):
         if reg_type == 'text':
             meta['text'] = meta.get('text', meta.pop('label', ''))
 
+        include = region.meta.pop('include', True)
+
         shape_list.append(Shape(coordsys, reg_type, new_coord, meta, False,
-                                region.meta.get('include', True)))
+                                include))
 
     return shape_list
 
