@@ -79,9 +79,6 @@ class CirclePixelRegion(PixelRegion):
         else:
             return np.logical_not(in_circle)
 
-    def to_shapely(self):
-        return self.center.to_shapely().buffer(self.radius)
-
     def to_sky(self, wcs):
         # TODO: write a pixel_to_skycoord_scale_angle
         center = pixel_to_skycoord(self.center.x, self.center.y, wcs)

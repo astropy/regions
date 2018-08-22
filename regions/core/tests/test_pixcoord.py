@@ -6,13 +6,6 @@ import pytest
 from ..._utils.examples import make_example_dataset
 from ..pixcoord import PixCoord
 
-try:
-    import shapely
-
-    HAS_SHAPELY = True
-except:
-    HAS_SHAPELY = False
-
 
 @pytest.fixture(scope='session')
 def wcs():
@@ -187,27 +180,6 @@ def test_pixcoord_separation_array_2d():
     assert isinstance(sep, np.ndarray)
     assert sep.shape == (1, 2)
     assert_allclose(sep, [[5, 5]])
-
-
-@pytest.mark.skipif('not HAS_SHAPELY')
-def test_pixcoord_shapely_scalar():
-    from shapely.geometry.point import Point
-    p = PixCoord(x=1, y=2)
-    s = p.to_shapely()
-    assert isinstance(s, Point)
-    assert s.x == 1
-    assert s.y == 2
-
-    p2 = PixCoord.from_shapely(point=s)
-    assert p2.x == 1
-    assert p2.y == 2
-
-
-@pytest.mark.skipif('not HAS_SHAPELY')
-def test_pixcoord_shapely_array():
-    p = PixCoord(x=[1, 2, 3], y=[11, 22, 33])
-    with pytest.raises(TypeError):
-        p.to_shapely()
 
 
 def test_equality():

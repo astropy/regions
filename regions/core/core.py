@@ -236,13 +236,6 @@ class PixelRegion(Region):
                                  " a strictly positive integer)".format(subpixels))
 
     @abc.abstractmethod
-    def to_shapely(self):
-        """
-        Convert this region to a Shapely object.
-        """
-        raise NotImplementedError
-
-    @abc.abstractmethod
     def as_patch(self, **kwargs):
         """
         Convert to mpl patch

@@ -141,21 +141,6 @@ class PixCoord(object):
         x, y = skycoord.to_pixel(wcs=wcs, origin=origin, mode=mode)
         return cls(x=x, y=y)
 
-    def to_shapely(self):
-        """Convert this coord object to a `shapely.geometry.Point` object.
-        """
-        if not self.isscalar:
-            raise TypeError('Non-scalar PixCoord cannot be converted to Shapely.')
-
-        from shapely.geometry import Point
-        return Point(self.x, self.y)
-
-    @classmethod
-    def from_shapely(cls, point):
-        """Create `PixCoord` from `shapely.geometry.Point` object.
-        """
-        return cls(x=point.x, y=point.y)
-
     def separation(self, other):
         r"""Separation to another pixel coordinate.
 

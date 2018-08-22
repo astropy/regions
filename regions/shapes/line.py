@@ -80,10 +80,6 @@ class LinePixelRegion(PixelRegion):
         else:
             return np.logical_not(in_reg)
 
-    def to_shapely(self):
-        from shapely.geometry import LineString
-        return LineString([(self.start.x, self.start.y), (self.end.x, self.end.y)])
-
     def to_sky(self, wcs, mode='local', tolerance=None):
         start = pixel_to_skycoord(self.start.x, self.start.y, wcs)
         end = pixel_to_skycoord(self.end.x, self.end.y, wcs)

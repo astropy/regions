@@ -97,24 +97,6 @@ class RectanglePixelRegion(PixelRegion):
         else:
             return np.logical_not(in_rect)
 
-    def to_shapely(self):
-
-        from shapely import affinity
-        from shapely.geometry import Polygon
-
-        x1 = self.center.x - self.width * 0.5
-        y1 = self.center.y - self.height * 0.5
-        x2 = self.center.x + self.width * 0.5
-        y2 = self.center.y - self.height * 0.5
-        x3 = self.center.x + self.width * 0.5
-        y3 = self.center.y + self.height * 0.5
-        x4 = self.center.x - self.width * 0.5
-        y4 = self.center.y + self.height * 0.5
-
-        rectangle = Polygon([(x1, y1), (x2, y2), (x3, y3), (x4, y4)])
-
-        return affinity.rotate(rectangle, self.angle.to(u.deg).value)
-
     def to_sky(self, wcs):
         # TODO: write a pixel_to_skycoord_scale_angle
         center = pixel_to_skycoord(self.center.x, self.center.y, wcs)

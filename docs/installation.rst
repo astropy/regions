@@ -15,7 +15,6 @@ The regions package requires the following packages:
 In addition, the following packages are needed for optional functionality:
 
 * `Matplotlib <https://matplotlib.org>`__ 1.5 or later
-* `Shapely <http://toblerity.org/shapely/manual.html>`__
 
 Stable version
 ==============
