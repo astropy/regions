@@ -48,9 +48,7 @@ matrix:
         # may run for a long time
         - python: 2.7
           env: SETUP_CMD='build_docs -w'
-        - python: 3.7
-          dist: xenial
-          sudo: true
+        - python: 3.6
           env: SETUP_CMD='build_docs -w'
                CONDA_CHANNELS='conda-forge astropy'
         # Do a test without the optional dependencies
