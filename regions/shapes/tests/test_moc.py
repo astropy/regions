@@ -1,16 +1,15 @@
 import pytest
 import tempfile
 import numpy as np
+import copy
 import os
 
 from astropy.utils.data import get_pkg_data_filename
 from astropy.coordinates import SkyCoord
 import astropy.units as u
 from astropy.coordinates import ICRS
-from astroquery.vizier import Vizier
 from astropy.io import fits
 from astropy_healpix import HEALPix
-import copy
 
 from ..moc import MOC
 
