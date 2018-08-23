@@ -26,8 +26,8 @@ env:
         - SETUP_CMD='test'
         - MAIN_CMD='python setup.py'
         - PIP_DEPENDENCIES=''
-        - CONDA_DEPENDENCIES='Cython shapely pytest-arraydiff'
-        - CONDA_CHANNELS='astropy'
+        - CONDA_DEPENDENCIES='Cython shapely pytest-arraydiff astropy-healpix'
+        - CONDA_CHANNELS='astropy conda-forge'
         - SETUP_XVFB=True
         - ASTROPY_USE_SYSTEM_PYTEST=1
 
