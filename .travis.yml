@@ -89,6 +89,12 @@ install:
 
     - git clone git://github.com/astropy/ci-helpers.git
     - source ci-helpers/travis/setup_conda.sh
+    # Add the current dev version of astropy-healpix waiting for the
+    # new release to support Python 3.7
+    - git clone git://github.com/astropy/astropy-healpix.git
+    - cd astropy-healpix
+    - pip install .
+    - cd ..
 
 script:
    - $MAIN_CMD $SETUP_CMD

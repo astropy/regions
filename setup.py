@@ -107,7 +107,7 @@ setup(name=PACKAGENAME,
       description=DESCRIPTION,
       scripts=scripts,
       setup_requires=['numpy'],
-      install_requires=['numpy', 'astropy'],
+      install_requires=['numpy', 'astropy', 'astropy-healpix'],
       extras_require=dict(
           plot=[
               'matplotlib',
