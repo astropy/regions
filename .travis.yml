@@ -1,12 +1,21 @@
-language: python
+# We set the language to c because python isn't supported on the MacOS X nodes
+# on Travis. However, the language ends up being irrelevant anyway, since we
+# install Python ourselves using conda.
+language: c
 
-python:
-    - 2.7
-    - 3.5
-    - 3.6
+compiler: gcc
 
-# Setting sudo to false opts in to Travis-CI container-based builds.
-sudo: false
+# Cache can be cleared from the travis settings menu, see docs currently at
+# https://docs.travis-ci.com/user/caching#Clearing-Caches
+cache:
+  - ccache
+
+os:
+    - linux
+
+dist: xenial
+
+sudo: true
 
 addons:
     apt:
@@ -21,6 +30,7 @@ env:
         # The following versions are the 'default' for tests, unless
         # overridden underneath. They are defined here in order to save having
         # to repeat them for all configurations.
+        - PYTHON_VERSION=3.7
         - NUMPY_VERSION=stable
         - ASTROPY_VERSION=stable
         - SETUP_CMD='test'
@@ -38,41 +48,42 @@ env:
 matrix:
     include:
 
-        # Do a coverage test in Python 3.
-        - python: 3.6
-          env: SETUP_CMD='test --coverage'
+        # Do a coverage test in Python 3.7
+        - env: SETUP_CMD='test --coverage'
                CONDA_CHANNELS='conda-forge astropy'
+
         # Check for sphinx doc build warnings - we do this first because it
         # may run for a long time
-        - python: 2.7
-          env: SETUP_CMD='build_docs -w'
-        - python: 3.6
-          env: SETUP_CMD='build_docs -w'
+        - env: PYTHON_VERSION=2.7
+               SETUP_CMD='build_docs -w'
+        - env: PYTHON_VERSION=3.6
+               SETUP_CMD='build_docs -w'
                CONDA_CHANNELS='conda-forge astropy'
+
         # Do a test without the optional dependencies
-        - python: 3.6
-          env: SETUP_CMD='test'
+        - env: SETUP_CMD='test'
                CONDA_DEPENDENCIES='Cython pytest-arraydiff'
 
 
         # Try Astropy development version
-        - python: 3.6
-          env: ASTROPY_VERSION=development
+        - env: ASTROPY_VERSION=development
                CONDA_CHANNELS='conda-forge astropy'
 
         # Try older numpy versions
-        - python: 3.5
-          env: NUMPY_VERSION=1.11
-        - python: 3.5
-          env: NUMPY_VERSION=1.10
+        - env: PYTHON_VERSION=3.6
+               NUMPY_VERSION=1.11
+        - env: PYTHON_VERSION=3.5
+               NUMPY_VERSION=1.10
 
         # Try numpy pre-release
-        - python: 3.6
-          env: NUMPY_VERSION=prerelease
+        - env: NUMPY_VERSION=prerelease
 
         # Do a PEP8 test with pycodestyle
-        - python: 3.6
-          env: MAIN_CMD='pycodestyle regions --count' SETUP_CMD=''
+        - env: MAIN_CMD='pycodestyle regions --count' SETUP_CMD=''
+
+        # Try MacOS X
+        - os: osx
+          env: SETUP_CMD='test'
 
 install:
 
