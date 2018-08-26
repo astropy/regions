@@ -124,7 +124,7 @@ class PointPixelRegion(PixelRegion):
             The ``(x, y)`` pixel position of the origin of the displayed image.
             Default is (0, 0).
         ax: `~matplotlib.axes`, optional
-                    Axis
+            Axes on which the point is added
         kwargs: dict
             All keywords that a ``Line2D`` object accepts
         """

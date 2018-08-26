@@ -79,7 +79,7 @@ class TextPixelRegion(PointPixelRegion):
         Returns
         -------
         ax : `~matplotlib.axes`
-            The axis with the patch.
+            The axes with the text.
         """
         import matplotlib.pyplot as plt
         from matplotlib.text import Text

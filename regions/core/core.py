@@ -306,7 +306,7 @@ class PixelRegion(Region):
         Returns
         -------
         ax: `~matplotlib.axes`
-            Axis on which the patch is added.
+            Axes on which the patch is added.
         """
         import matplotlib.pyplot as plt
 
