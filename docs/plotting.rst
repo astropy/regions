@@ -32,8 +32,8 @@ steps at once (creating a matplotlib patch and adding it to an axis),
 and calls ``plt.gca()`` if no axis is passed in.
 
 You can shift the origin of the region very conveniently while plotting by simply
-supplying the ``origin`` pixel coordinates to :meth:`~regions.PixelRegion.plot`,
-:meth:`~regions.PixelRegion.as_patch`. The ``**kwargs`` argument takes any
+supplying the ``origin`` pixel coordinates to :meth:`~regions.PixelRegion.plot`
+and :meth:`~regions.PixelRegion.as_patch`. The ``**kwargs`` argument takes any
 keyword argument that the `~matplotlib.patches.Patch` object accepts. For Ex:
 
 .. plot::
@@ -43,9 +43,8 @@ keyword argument that the `~matplotlib.patches.Patch` object accepts. For Ex:
     import matplotlib.pyplot as plt
 
     bbox = BoundingBox(ixmin=-1, ixmax=1, iymin=-2, iymax=2)
-    region = bbox.to_region()
     # shifting the origin to (1, 1) pixel position
-    ax = region.plot(origin=(1, 1), edgecolor='yellow', facecolor='red', fill=True)
+    ax = bbox.plot(origin=(1, 1), edgecolor='yellow', facecolor='red', fill=True)
     ax.set_xlim([-4, 2])
     ax.set_ylim([-4, 2])
     plt.show()
