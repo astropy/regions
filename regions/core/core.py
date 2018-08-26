@@ -240,6 +240,15 @@ class PixelRegion(Region):
         """
         Convert to mpl patch
 
+        Parameters
+        ----------
+        origin : array_like, optional
+            The ``(x, y)`` pixel position of the origin of the displayed image.
+            Default is (0, 0).
+
+        kwargs: `dict`
+            keywords that a `~matplotlib.patches.Patch` accepts
+
         Returns
         -------
         patch : `~matplotlib.patches.Patch`
@@ -287,7 +296,7 @@ class PixelRegion(Region):
         Parameters
         ----------
         origin : array_like, optional
-            The ``(x, y)`` position of the origin of the displayed image.
+            The ``(x, y)`` pixel position of the origin of the displayed image.
             Default is (0, 0).
         ax : `~matplotlib.axes`, optional
             Axis

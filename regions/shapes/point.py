@@ -88,7 +88,23 @@ class PointPixelRegion(PixelRegion):
         # TODO: needs to be implemented
         raise NotImplementedError
 
-    def as_patch(self, **kwargs):
+    def as_patch(self, origin=(0, 0), **kwargs):
+        """
+        Matplotlib patch object for this region (`matplotlib.patches.Circle`).
+
+        Parameters:
+        -----------
+        origin : array_like, optional
+            The ``(x, y)`` pixel position of the origin of the displayed image.
+            Default is (0, 0).
+        kwargs: dict
+            All keywords that a `~matplotlib.patches.Circle` object accepts
+
+        Returns
+        -------
+        patch : `~matplotlib.patches.Circle`
+            Matplotlib circle patch
+        """
         # FIXME: need to make radius constant
         from matplotlib.patches import Circle
         return Circle((self.center.x, self.center.y), radius=2, **kwargs)
@@ -101,7 +117,7 @@ class PointPixelRegion(PixelRegion):
         Parameters
         ----------
         origin : array_like, optional
-            The ``(x, y)`` position of the origin of the displayed image.
+            The ``(x, y)`` pixel position of the origin of the displayed image.
             Default is (0, 0).
         ax: `~matplotlib.axes`, optional
                     Axis

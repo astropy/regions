@@ -129,13 +129,29 @@ class CompoundPixelRegion(PixelRegion):
 
         return mpath.Path(verts, codes)
 
-    def as_patch(self, **kwargs):
+    def as_patch(self, origin=(0, 0), **kwargs):
+        """
+        Matplotlib patch object for annulus region (`matplotlib.patches.PathPatch`).
+
+        Parameters:
+        -----------
+        origin : array_like, optional
+            The ``(x, y)`` pixel position of the origin of the displayed image.
+            Default is (0, 0).
+        kwargs: dict
+            All keywords that a `~matplotlib.patches.PathPatch` object accepts
+
+        Returns
+        -------
+        patch : `~matplotlib.patches.PathPatch`
+            Matplotlib patch object
+        """
 
         if self.region1.center == self.region2.center and self.operator == op.xor:
             import matplotlib.patches as mpatches
 
-            patch_inner = self.region1.as_patch()
-            patch_outer = self.region2.as_patch()
+            patch_inner = self.region1.as_patch(origin=origin)
+            patch_outer = self.region2.as_patch(origin=origin)
             path = self._make_annulus_path(patch_inner, patch_outer)
             patch = mpatches.PathPatch(path, **kwargs)
             return patch

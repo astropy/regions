@@ -173,7 +173,7 @@ class RectanglePixelRegion(PixelRegion):
         Parameters:
         -----------
         origin : array_like, optional
-            The ``(x, y)`` position of the origin of the displayed image.
+            The ``(x, y)`` pixel position of the origin of the displayed image.
             Default is (0, 0).
         kwargs: dict
             All keywords that a `~matplotlib.patches.Rectangle` object accepts
