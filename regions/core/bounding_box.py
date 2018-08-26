@@ -248,7 +248,12 @@ class BoundingBox(object):
             is used.
         kwargs
             Any keyword arguments accepted by `matplotlib.patches.Patch`.
+
+        Returns
+        -------
+        ax: `~matplotlib.axes`
+            Axes on which the patch is added.
         """
 
         reg = self.to_region()
-        reg.plot(origin=origin, ax=ax, **kwargs)
+        return reg.plot(origin=origin, ax=ax, **kwargs)
