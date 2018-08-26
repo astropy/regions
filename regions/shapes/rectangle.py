@@ -190,8 +190,12 @@ class RectanglePixelRegion(PixelRegion):
         height = self.height
         # From the docstring: MPL expects "rotation in degrees (anti-clockwise)"
         angle = self.angle.to('deg').value
+
+        mpl_params = self.mpl_properties_default('patch')
+        mpl_params.update(kwargs)
+
         return Rectangle(xy=xy, width=width, height=height,
-                         angle=angle, **kwargs)
+                         angle=angle, **mpl_params)
 
     def _lower_left_xy(self):
         """

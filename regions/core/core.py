@@ -301,7 +301,7 @@ class PixelRegion(Region):
         ax : `~matplotlib.axes`, optional
             Axis
         kwargs: `dict`
-            keywords that a `~matplotlib.text.Text` accepts
+            keywords that a `~matplotlib.patches.Patch` accepts
 
         Returns
         -------
@@ -313,9 +313,7 @@ class PixelRegion(Region):
         if ax is None:
             ax = plt.gca()
 
-        mpl_params = self.mpl_properties_default('patch')
-        mpl_params.update(kwargs)
-        patch = self.as_patch(**mpl_params)
+        patch = self.as_patch(origin=origin, **kwargs)
         ax.add_patch(patch)
 
         return ax

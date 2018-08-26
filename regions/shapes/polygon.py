@@ -144,7 +144,11 @@ class PolygonPixelRegion(PixelRegion):
         from matplotlib.patches import Polygon
         xy = np.vstack([self.vertices.x - origin[0],
                         self.vertices.y - origin[1]]).transpose()
-        return Polygon(xy=xy, **kwargs)
+
+        mpl_params = self.mpl_properties_default('patch')
+        mpl_params.update(kwargs)
+
+        return Polygon(xy=xy, **mpl_params)
 
 
 class PolygonSkyRegion(SkyRegion):

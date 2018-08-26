@@ -107,7 +107,11 @@ class PointPixelRegion(PixelRegion):
         """
         # FIXME: need to make radius constant
         from matplotlib.patches import Circle
-        return Circle((self.center.x, self.center.y), radius=2, **kwargs)
+
+        mpl_params = self.mpl_properties_default('patch')
+        mpl_params.update(kwargs)
+
+        return Circle((self.center.x, self.center.y), radius=2, **mpl_params)
 
     def plot(self, origin=(0, 0), ax=None, **kwargs):
         """

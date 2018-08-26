@@ -40,7 +40,7 @@ class TextPixelRegion(PointPixelRegion):
         center = PixCoord(x=x, y=y)
         reg = TextPixelRegion(center=center, text="Hello World!",
                               visual=RegionVisual(textangle=textangle))
-        reg.plot(ax)
+        reg.plot(ax=ax)
 
         plt.xlim(10, 30)
         plt.ylim(2.5, 20)

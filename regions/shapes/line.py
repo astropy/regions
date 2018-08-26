@@ -129,7 +129,10 @@ class LinePixelRegion(PixelRegion):
         if not 'width' in kwargs:
             kwargs['width'] = .1  # Let the default width be .1 instead of 1.
 
-        return Arrow(x, y, dx, dy, **kwargs)
+        mpl_params = self.mpl_properties_default('patch')
+        mpl_params.update(kwargs)
+
+        return Arrow(x, y, dx, dy, **mpl_params)
 
 
 class LineSkyRegion(SkyRegion):

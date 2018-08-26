@@ -206,7 +206,12 @@ class EllipsePixelRegion(PixelRegion):
         height = self.height
         # From the docstring: MPL expects "rotation in degrees (anti-clockwise)"
         angle = self.angle.to('deg').value
-        return Ellipse(xy=xy, width=width, height=height, angle=angle, **kwargs)
+
+        mpl_params = self.mpl_properties_default('patch')
+        mpl_params.update(kwargs)
+
+        return Ellipse(xy=xy, width=width, height=height, angle=angle,
+                       **mpl_params)
 
 
 class EllipseSkyRegion(SkyRegion):

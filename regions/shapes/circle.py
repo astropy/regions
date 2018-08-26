@@ -143,7 +143,11 @@ class CirclePixelRegion(PixelRegion):
         from matplotlib.patches import Circle
         xy = self.center.x - origin[0], self.center.y - origin[1]
         radius = self.radius
-        return Circle(xy=xy, radius=radius, **kwargs)
+
+        mpl_params = self.mpl_properties_default('patch')
+        mpl_params.update(kwargs)
+
+        return Circle(xy=xy, radius=radius, **mpl_params)
 
 
 class CircleSkyRegion(SkyRegion):
