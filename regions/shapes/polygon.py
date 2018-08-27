@@ -5,7 +5,7 @@ import numpy as np
 
 from astropy.wcs.utils import skycoord_to_pixel, pixel_to_skycoord
 
-from ..core import PixelRegion, SkyRegion, Mask, BoundingBox, PixCoord
+from ..core import PixelRegion, SkyRegion, RegionMask, BoundingBox, PixCoord
 from .._geometry import polygonal_overlap_grid
 from .._geometry.pnpoly import points_in_polygon
 from ..core.attributes import OneDPix, OneDSky, RegionMeta, RegionVisual
@@ -122,13 +122,33 @@ class PolygonPixelRegion(PixelRegion):
             nx, ny, vx, vy, use_exact, subpixels,
         )
 
-        return Mask(fraction, bbox=bbox)
+        return RegionMask(fraction, bbox=bbox)
 
-    def as_patch(self, **kwargs):
-        """Matplotlib patch object for this region (`matplotlib.patches.Polygon`)."""
+    def as_patch(self, origin=(0, 0), **kwargs):
+        """
+        Matplotlib patch object for this region (`matplotlib.patches.Polygon`).
+
+        Parameters:
+        -----------
+        origin : array_like, optional
+            The ``(x, y)`` pixel position of the origin of the displayed image.
+            Default is (0, 0).
+        kwargs: dict
+            All keywords that a `~matplotlib.patches.Polygon` object accepts
+
+        Returns
+        -------
+        patch : `~matplotlib.patches.Polygon`
+            Matplotlib polygon patch
+        """
         from matplotlib.patches import Polygon
-        xy = np.vstack([self.vertices.x, self.vertices.y]).transpose()
-        return Polygon(xy=xy, **kwargs)
+        xy = np.vstack([self.vertices.x - origin[0],
+                        self.vertices.y - origin[1]]).transpose()
+
+        mpl_params = self.mpl_properties_default('patch')
+        mpl_params.update(kwargs)
+
+        return Polygon(xy=xy, **mpl_params)
 
 
 class PolygonSkyRegion(SkyRegion):

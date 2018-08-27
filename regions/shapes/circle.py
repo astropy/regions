@@ -7,7 +7,7 @@ import math
 from astropy.coordinates import Angle, SkyCoord
 from astropy.wcs.utils import pixel_to_skycoord
 
-from ..core import PixCoord, PixelRegion, SkyRegion, Mask, BoundingBox
+from ..core import PixCoord, PixelRegion, SkyRegion, RegionMask, BoundingBox
 from .._utils.wcs_helpers import skycoord_to_pixel_scale_angle
 from .._geometry import circular_overlap_grid
 from ..core.attributes import (ScalarSky, ScalarPix, QuantityLength,
@@ -121,14 +121,33 @@ class CirclePixelRegion(PixelRegion):
         fraction = circular_overlap_grid(xmin, xmax, ymin, ymax, nx, ny,
                                          self.radius, use_exact, subpixels)
 
-        return Mask(fraction, bbox=bbox)
+        return RegionMask(fraction, bbox=bbox)
 
-    def as_patch(self, **kwargs):
-        """Matplotlib patch object for this region (`matplotlib.patches.Circle`)"""
+    def as_patch(self, origin=(0, 0), **kwargs):
+        """
+        Matplotlib patch object for this region (`matplotlib.patches.Circle`)
+
+        Parameters:
+        -----------
+        origin : array_like, optional
+            The ``(x, y)`` pixel position of the origin of the displayed image.
+            Default is (0, 0).
+        kwargs: dict
+            All keywords that a `~matplotlib.patches.Circle` object accepts
+
+        Returns
+        -------
+        patch : `~matplotlib.patches.Circle`
+            Matplotlib circle patch
+        """
         from matplotlib.patches import Circle
-        xy = self.center.x, self.center.y
+        xy = self.center.x - origin[0], self.center.y - origin[1]
         radius = self.radius
-        return Circle(xy=xy, radius=radius, **kwargs)
+
+        mpl_params = self.mpl_properties_default('patch')
+        mpl_params.update(kwargs)
+
+        return Circle(xy=xy, radius=radius, **mpl_params)
 
 
 class CircleSkyRegion(SkyRegion):

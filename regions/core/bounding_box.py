@@ -188,7 +188,7 @@ class BoundingBox(object):
 
         Parameters
         ----------
-        kwargs
+        kwargs : `dict`
             Any keyword arguments accepted by
             `matplotlib.patches.Patch`.
 
@@ -216,3 +216,44 @@ class BoundingBox(object):
 
         return Rectangle(xy=(self.extent[0], self.extent[2]),
                          width=self.shape[1], height=self.shape[0], **kwargs)
+
+    def to_region(self):
+        """
+        Return a `~regions.RectanglePixelRegion` that
+        represents the bounding box.
+        """
+
+        from ..shapes import RectanglePixelRegion
+        from .pixcoord import PixCoord
+
+        xpos = (self.extent[1] + self.extent[0]) / 2.
+        ypos = (self.extent[3] + self.extent[2]) / 2.
+        xypos = PixCoord(xpos, ypos)
+        h, w = self.shape
+
+        return RectanglePixelRegion(center=xypos, width=w, height=h)
+
+    def plot(self, origin=(0, 0), ax=None, **kwargs):
+        """
+        Plot the `BoundingBox` on a matplotlib `~matplotlib.axes.Axes`
+        instance.
+
+        Parameters
+        ----------
+        origin : array_like, optional
+            The ``(x, y)`` position of the origin of the displayed
+            image.
+        ax : `matplotlib.axes.Axes` instance, optional
+            If `None`, then the current `~matplotlib.axes.Axes` instance
+            is used.
+        kwargs : `dict`
+            Any keyword arguments accepted by `matplotlib.patches.Patch`.
+
+        Returns
+        -------
+        ax : `~matplotlib.axes.Axes`
+            Axes on which the patch is added.
+        """
+
+        reg = self.to_region()
+        return reg.plot(origin=origin, ax=ax, **kwargs)

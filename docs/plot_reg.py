@@ -19,6 +19,6 @@ ax.set_ylim([-0.5, 892.5])
 regs = read_ds9('plot_image.reg')
 
 for i, reg in enumerate(regs):
-    reg.plot(ax)
+    reg.plot(ax=ax)
 
 plt.show()

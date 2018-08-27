@@ -9,5 +9,5 @@ region = CirclePixelRegion(center=PixCoord(x=3, y=5), radius=3)
 
 data = np.arange(10 * 15).reshape((10, 15))
 ax.imshow(data, cmap='gray', interpolation='nearest', origin='lower')
-region.plot(ax, color='red')
+region.plot(ax=ax, color='red')
 plt.show()

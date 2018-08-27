@@ -88,20 +88,43 @@ class PointPixelRegion(PixelRegion):
         # TODO: needs to be implemented
         raise NotImplementedError
 
-    def as_patch(self, **kwargs):
+    def as_patch(self, origin=(0, 0), **kwargs):
+        """
+        Matplotlib patch object for this region (`matplotlib.patches.Circle`).
+
+        Parameters:
+        -----------
+        origin : array_like, optional
+            The ``(x, y)`` pixel position of the origin of the displayed image.
+            Default is (0, 0).
+        kwargs: dict
+            All keywords that a `~matplotlib.patches.Circle` object accepts
+
+        Returns
+        -------
+        patch : `~matplotlib.patches.Circle`
+            Matplotlib circle patch
+        """
         # FIXME: need to make radius constant
         from matplotlib.patches import Circle
-        return Circle((self.center.x, self.center.y), radius=2, **kwargs)
 
-    def plot(self, ax=None, **kwargs):
+        mpl_params = self.mpl_properties_default('patch')
+        mpl_params.update(kwargs)
+
+        return Circle((self.center.x, self.center.y), radius=2, **mpl_params)
+
+    def plot(self, origin=(0, 0), ax=None, **kwargs):
         """
         Forwards all kwargs to `Line2D` object and adds the line
         to given axis.
 
         Parameters
         ----------
+        origin : array_like, optional
+            The ``(x, y)`` pixel position of the origin of the displayed image.
+            Default is (0, 0).
         ax: `~matplotlib.axes`, optional
-                    Axis
+            Axes on which the point is added
         kwargs: dict
             All keywords that a ``Line2D`` object accepts
         """

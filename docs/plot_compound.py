@@ -56,8 +56,8 @@ ax.scatter(skycoords_xor.l.value, skycoords_xor.b.value, color='orange',
 ax.scatter(skycoords_and.l.value, skycoords_and.b.value, color='magenta',
            label='and', transform=ax.get_transform('galactic'))
 
-circle1.to_pixel(wcs=wcs).plot(ax, edgecolor='green', facecolor='none', alpha=0.8, lw=3)
-circle2.to_pixel(wcs=wcs).plot(ax, edgecolor='red', facecolor='none', alpha=0.8, lw=3)
+circle1.to_pixel(wcs=wcs).plot(ax=ax, edgecolor='green', facecolor='none', alpha=0.8, lw=3)
+circle2.to_pixel(wcs=wcs).plot(ax=ax, edgecolor='red', facecolor='none', alpha=0.8, lw=3)
 
 ax.legend(loc='lower right')
 

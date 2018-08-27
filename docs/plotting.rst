@@ -21,6 +21,8 @@ To draw a matplotlib patch object, add it to an `matplotlib.axes.Axes` object.
     axes = plt.gca()
     axes.set_aspect('equal')
     axes.add_patch(patch)
+    axes.set_xlim([-0.5, 1])
+    axes.set_ylim([-0.5, 1])
 
     plt.show()
 
@@ -29,10 +31,27 @@ The :meth:`~regions.PixelRegion.plot`, a convenience method just does these two
 steps at once (creating a matplotlib patch and adding it to an axis),
 and calls ``plt.gca()`` if no axis is passed in.
 
-Note that not all pixel regions have ``as_patch()`` methods, e.g.
-the `~regions.CircleAnnulusRegion`, `~regions.PointPixelRegion` and
-`~regions.CompundPixelRegion` don't have because there are no equivalent classes
-in `matplotlib.patches`.
+You can shift the origin of the region very conveniently while plotting by simply
+supplying the ``origin`` pixel coordinates to :meth:`~regions.PixelRegion.plot`
+and :meth:`~regions.PixelRegion.as_patch`. The ``**kwargs`` argument takes any
+keyword argument that the `~matplotlib.patches.Patch` object accepts. For example:
+
+.. plot::
+   :include-source:
+
+    from regions import PixCoord, BoundingBox
+    import matplotlib.pyplot as plt
+
+    bbox = BoundingBox(ixmin=-1, ixmax=1, iymin=-2, iymax=2)
+    # shifting the origin to (1, 1) pixel position
+    ax = bbox.plot(origin=(1, 1), edgecolor='yellow', facecolor='red', fill=True)
+    ax.set_xlim([-4, 2])
+    ax.set_ylim([-4, 2])
+    plt.show()
+
+Pixel regions such as `~regions.TextPixelRegion` and
+`~regions.CompoundPixelRegion` don't have ``as_patch()`` method as
+there are no equivalent classes in `matplotlib.patches`.
 
 Here's a full example how to plot a `~regions.CirclePixelRegion` on an image.
 

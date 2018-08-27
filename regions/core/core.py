@@ -236,9 +236,18 @@ class PixelRegion(Region):
                                  " a strictly positive integer)".format(subpixels))
 
     @abc.abstractmethod
-    def as_patch(self, **kwargs):
+    def as_patch(self, origin=(0, 0), **kwargs):
         """
         Convert to mpl patch
+
+        Parameters
+        ----------
+        origin : array_like, optional
+            The ``(x, y)`` pixel position of the origin of the displayed image.
+            Default is (0, 0).
+
+        kwargs: `dict`
+            keywords that a `~matplotlib.patches.Patch` accepts
 
         Returns
         -------
@@ -279,31 +288,32 @@ class PixelRegion(Region):
 
         return kwargs
 
-    def plot(self, ax=None, **kwargs):
+    def plot(self, origin=(0, 0), ax=None, **kwargs):
         """
         Calls ``as_patch`` method forwarding all kwargs and adds patch
         to given axis.
 
         Parameters
         ----------
+        origin : array_like, optional
+            The ``(x, y)`` pixel position of the origin of the displayed image.
+            Default is (0, 0).
         ax : `~matplotlib.axes`, optional
             Axis
         kwargs: `dict`
-            keywords that a `~matplotlib.text.Text` accepts
+            keywords that a `~matplotlib.patches.Patch` accepts
 
         Returns
         -------
         ax: `~matplotlib.axes`
-            Axis on which the patch is added.
+            Axes on which the patch is added.
         """
         import matplotlib.pyplot as plt
 
         if ax is None:
             ax = plt.gca()
 
-        mpl_params = self.mpl_properties_default('patch')
-        mpl_params.update(kwargs)
-        patch = self.as_patch(**mpl_params)
+        patch = self.as_patch(origin=origin, **kwargs)
         ax.add_patch(patch)
 
         return ax

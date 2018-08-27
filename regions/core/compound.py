@@ -5,9 +5,9 @@ import operator as op
 
 import numpy as np
 
-from . import PixelRegion, SkyRegion, BoundingBox, Mask
+from . import PixelRegion, SkyRegion, BoundingBox, RegionMask
 from ..core.attributes import (CompoundRegionPix, CompoundRegionSky,
-                               RegionVisual, RegionMeta)
+                               RegionMeta, RegionVisual)
 
 __all__ = ['CompoundPixelRegion', 'CompoundSkyRegion']
 
@@ -91,7 +91,7 @@ class CompoundPixelRegion(PixelRegion):
                                       'constant'))
 
         data = self.operator(*np.array(padded_data, dtype=np.int))
-        return Mask(data=data, bbox=bbox)
+        return RegionMask(data=data, bbox=bbox)
 
     def to_sky(self, wcs):
         skyreg1 = self.region1.to_sky(wcs=wcs)
@@ -129,13 +129,29 @@ class CompoundPixelRegion(PixelRegion):
 
         return mpath.Path(verts, codes)
 
-    def as_patch(self, **kwargs):
+    def as_patch(self, origin=(0, 0), **kwargs):
+        """
+        Matplotlib patch object for annulus region (`matplotlib.patches.PathPatch`).
+
+        Parameters
+        ----------
+        origin : array_like, optional
+            The ``(x, y)`` pixel position of the origin of the displayed image.
+            Default is (0, 0).
+        kwargs : `dict`
+            All keywords that a `~matplotlib.patches.PathPatch` object accepts
+
+        Returns
+        -------
+        patch : `~matplotlib.patches.PathPatch`
+            Matplotlib patch object
+        """
 
         if self.region1.center == self.region2.center and self.operator == op.xor:
             import matplotlib.patches as mpatches
 
-            patch_inner = self.region1.as_patch()
-            patch_outer = self.region2.as_patch()
+            patch_inner = self.region1.as_patch(origin=origin)
+            patch_outer = self.region2.as_patch(origin=origin)
             path = self._make_annulus_path(patch_inner, patch_outer)
             patch = mpatches.PathPatch(path, **kwargs)
             return patch

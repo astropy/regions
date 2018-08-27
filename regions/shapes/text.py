@@ -40,7 +40,7 @@ class TextPixelRegion(PointPixelRegion):
         center = PixCoord(x=x, y=y)
         reg = TextPixelRegion(center=center, text="Hello World!",
                               visual=RegionVisual(textangle=textangle))
-        reg.plot(ax)
+        reg.plot(ax=ax)
 
         plt.xlim(10, 30)
         plt.ylim(2.5, 20)
@@ -61,13 +61,16 @@ class TextPixelRegion(PointPixelRegion):
     def as_patch(self, **kwargs):
         raise NotImplementedError
 
-    def plot(self, ax=None, **kwargs):
+    def plot(self, origin=(0, 0), ax=None, **kwargs):
         """
         Forwarding all kwargs to `~matplotlib.text.Text` object and add it
         to given axis.
 
         Parameters
         ----------
+        origin : array_like, optional
+            The ``(x, y)`` pixel position of the origin of the displayed image.
+            Default is (0, 0).
         ax : `~matplotlib.axes`, optional
             Axes
         kwargs: `dict`
@@ -76,7 +79,7 @@ class TextPixelRegion(PointPixelRegion):
         Returns
         -------
         ax : `~matplotlib.axes`
-            The axis with the patch.
+            The axes with the text.
         """
         import matplotlib.pyplot as plt
         from matplotlib.text import Text
@@ -86,7 +89,8 @@ class TextPixelRegion(PointPixelRegion):
 
         mpl_params = self.mpl_properties_default('text')
         mpl_params.update(kwargs)
-        text = Text(self.center.x, self.center.y, self.text, **mpl_params)
+        text = Text(self.center.x - origin[0], self.center.y - origin[1],
+                    self.text, **mpl_params)
 
         ax.add_artist(text)
 

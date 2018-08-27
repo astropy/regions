@@ -7,7 +7,7 @@ from astropy import units as u
 from astropy.coordinates import Angle
 from astropy.wcs.utils import pixel_to_skycoord
 
-from ..core import PixCoord, PixelRegion, SkyRegion, Mask, BoundingBox
+from ..core import PixCoord, PixelRegion, SkyRegion, RegionMask, BoundingBox
 from .._geometry import rectangular_overlap_grid
 from .._utils.wcs_helpers import skycoord_to_pixel_scale_angle
 from ..core.attributes import ScalarPix, ScalarLength, QuantityLength, ScalarSky
@@ -164,19 +164,38 @@ class RectanglePixelRegion(PixelRegion):
             use_exact, subpixels,
         )
 
-        return Mask(fraction, bbox=bbox)
+        return RegionMask(fraction, bbox=bbox)
 
-    def as_patch(self, **kwargs):
+    def as_patch(self, origin=(0, 0), **kwargs):
         """
         Matplotlib patch object for this region (`matplotlib.patches.Rectangle`).
+
+        Parameters:
+        -----------
+        origin : array_like, optional
+            The ``(x, y)`` pixel position of the origin of the displayed image.
+            Default is (0, 0).
+        kwargs: dict
+            All keywords that a `~matplotlib.patches.Rectangle` object accepts
+
+        Returns
+        -------
+        patch : `~matplotlib.patches.Rectangle`
+            Matplotlib circle patch
         """
         from matplotlib.patches import Rectangle
         xy = self._lower_left_xy()
+        xy = xy[0] - origin[0], xy[1] - origin[1]
         width = self.width
         height = self.height
         # From the docstring: MPL expects "rotation in degrees (anti-clockwise)"
         angle = self.angle.to('deg').value
-        return Rectangle(xy=xy, width=width, height=height, angle=angle, **kwargs)
+
+        mpl_params = self.mpl_properties_default('patch')
+        mpl_params.update(kwargs)
+
+        return Rectangle(xy=xy, width=width, height=height,
+                         angle=angle, **mpl_params)
 
     def _lower_left_xy(self):
         """
