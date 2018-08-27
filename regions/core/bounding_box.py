@@ -188,7 +188,7 @@ class BoundingBox(object):
 
         Parameters
         ----------
-        kwargs
+        kwargs : `dict`
             Any keyword arguments accepted by
             `matplotlib.patches.Patch`.
 
@@ -246,12 +246,12 @@ class BoundingBox(object):
         ax : `matplotlib.axes.Axes` instance, optional
             If `None`, then the current `~matplotlib.axes.Axes` instance
             is used.
-        kwargs
+        kwargs : `dict`
             Any keyword arguments accepted by `matplotlib.patches.Patch`.
 
         Returns
         -------
-        ax: `~matplotlib.axes`
+        ax : `~matplotlib.axes.Axes`
             Axes on which the patch is added.
         """
 

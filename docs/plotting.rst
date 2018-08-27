@@ -34,7 +34,7 @@ and calls ``plt.gca()`` if no axis is passed in.
 You can shift the origin of the region very conveniently while plotting by simply
 supplying the ``origin`` pixel coordinates to :meth:`~regions.PixelRegion.plot`
 and :meth:`~regions.PixelRegion.as_patch`. The ``**kwargs`` argument takes any
-keyword argument that the `~matplotlib.patches.Patch` object accepts. For Ex:
+keyword argument that the `~matplotlib.patches.Patch` object accepts. For e.g.:
 
 .. plot::
    :include-source:
@@ -49,9 +49,9 @@ keyword argument that the `~matplotlib.patches.Patch` object accepts. For Ex:
     ax.set_ylim([-4, 2])
     plt.show()
 
-Note that not all pixel regions have ``as_patch()`` methods, e.g.
-the `~regions.TextPixelRegion` and `~regions.CompoundPixelRegion`
-don't have because there are no equivalent classes in `matplotlib.patches`.
+Pixel regions such as `~regions.TextPixelRegion` and
+`~regions.CompoundPixelRegion` don't have ``as_patch()`` method as
+there are no equivalent classes in `matplotlib.patches`.
 
 Here's a full example how to plot a `~regions.CirclePixelRegion` on an image.
 
