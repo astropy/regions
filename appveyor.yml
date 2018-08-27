@@ -12,7 +12,8 @@ environment:
                         # to the matrix section.
       # For this package-template, we include examples of Cython modules,
       # so Cython is required for testing. If your package does not include
-      # Cython code, you can set CONDA_DEPENDENCIES=''
+      # Cython code, you can set PIP_DEPENDENCIES='' and CONDA_DEPENDENCIES=''
+      PIP_DEPENDENCIES: 'Cython git+http://github.com/astropy/astropy-healpix.git#egg=astropy-healpix'
       CONDA_CHANNELS: "defaults conda-forge astropy"
       CONDA_DEPENDENCIES: "Cython pytest-arraydiff pytest=3.6.4"
       ASTROPY_USE_SYSTEM_PYTEST: 1
@@ -37,10 +38,6 @@ install:
     - "git clone git://github.com/astropy/ci-helpers.git"
     - "powershell ci-helpers/appveyor/install-miniconda.ps1"
     - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
-
-    # Install the dev version of astropy-healpix supporting Python 3.7
-    - "pip install git+http://github.com/astropy/astropy-healpix.git#egg=astropy-healpix"
-
     - "activate test"
 
 # Not a .NET project, we build the package in the install step instead
