@@ -34,7 +34,7 @@ and calls ``plt.gca()`` if no axis is passed in.
 You can shift the origin of the region very conveniently while plotting by simply
 supplying the ``origin`` pixel coordinates to :meth:`~regions.PixelRegion.plot`
 and :meth:`~regions.PixelRegion.as_patch`. The ``**kwargs`` argument takes any
-keyword argument that the `~matplotlib.patches.Patch` object accepts. For e.g.:
+keyword argument that the `~matplotlib.patches.Patch` object accepts. For example:
 
 .. plot::
    :include-source:
