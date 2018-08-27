@@ -35,7 +35,10 @@ env:
         - ASTROPY_VERSION=stable
         - SETUP_CMD='test'
         - MAIN_CMD='python setup.py'
-        - PIP_DEPENDENCIES=''
+        # Add the current dev version of astropy-healpix waiting for the
+        # new release to support Python 3.7.
+        # Cython is necessary for pip installing the dev version of astropy-healpix.
+        - PIP_DEPENDENCIES='Cython git+http://github.com/astropy/astropy-healpix.git#egg=astropy-healpix'
         - CONDA_DEPENDENCIES='Cython shapely pytest-arraydiff'
         - CONDA_CHANNELS='astropy'
         - SETUP_XVFB=True
