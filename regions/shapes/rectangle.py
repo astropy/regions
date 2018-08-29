@@ -210,11 +210,21 @@ class RectanglePixelRegion(PixelRegion):
         dd1 = np.abs(radius * sint)
         dd2 = np.abs(radius * cost)
 
-        return [(self.center.x - dd1, self.center.y - dd1),
-                (self.center.x + dd1, self.center.y + dd1),
-                (self.center.x - dd2, self.center.y - dd2),
-                (self.center.x + dd2, self.center.y + dd2),
-               ]
+        if (self.angle % 180*u.deg) < 90*u.deg and self.height > self.width:
+            corners = [(self.center.x - dd1, self.center.y - dd2),
+                       (self.center.x - dd2, self.center.y - dd1),
+                       (self.center.x + dd2, self.center.y + dd1),
+                       (self.center.x + dd1, self.center.y + dd2),
+                      ]
+        else:
+            corners = [(self.center.x - dd1, self.center.y + dd2),
+                       (self.center.x - dd2, self.center.y + dd1),
+                       (self.center.x + dd2, self.center.y - dd1),
+                       (self.center.x + dd1, self.center.y - dd2),
+                      ]
+
+        return corners
+
 
     def _lower_left_xy(self):
         """
