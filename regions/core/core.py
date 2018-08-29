@@ -246,7 +246,7 @@ class PixelRegion(Region):
             The ``(x, y)`` pixel position of the origin of the displayed image.
             Default is (0, 0).
 
-        kwargs: `dict`
+        kwargs : `dict`
             keywords that a `~matplotlib.patches.Patch` accepts
 
         Returns
@@ -299,14 +299,14 @@ class PixelRegion(Region):
         origin : array_like, optional
             The ``(x, y)`` pixel position of the origin of the displayed image.
             Default is (0, 0).
-        ax : `~matplotlib.axes`, optional
+        ax : `~matplotlib.axes.Axes`, optional
             Axis
-        kwargs: `dict`
+        kwargs : `dict`
             keywords that a `~matplotlib.patches.Patch` accepts
 
         Returns
         -------
-        ax: `~matplotlib.axes`
+        ax : `~matplotlib.axes.Axes`
             Axes on which the patch is added.
         """
         import matplotlib.pyplot as plt

@@ -73,7 +73,7 @@ class TextPixelRegion(PointPixelRegion):
             Default is (0, 0).
         ax : `~matplotlib.axes`, optional
             Axes
-        kwargs: `dict`
+        kwargs : `dict`
             keywords that a `~matplotlib.text.Text` accepts
 
         Returns
