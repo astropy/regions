@@ -11,7 +11,7 @@ from ..core import PixCoord, PixelRegion, SkyRegion, RegionMask, BoundingBox
 from .._geometry import rectangular_overlap_grid
 from .._utils.wcs_helpers import skycoord_to_pixel_scale_angle
 from ..core.attributes import ScalarPix, ScalarLength, QuantityLength, ScalarSky
-from .polygon import PixelPolygonRegion
+from .polygon import PolygonPixelRegion
 
 
 __all__ = ['RectanglePixelRegion', 'RectangleSkyRegion']

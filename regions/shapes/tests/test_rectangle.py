@@ -25,6 +25,21 @@ def wcs():
     header = fits.getheader(filename)
     return WCS(header)
 
+def test_corners():
+
+    xc,yc = 2,2
+    angle = 30*u.deg
+    width = 2
+    height = 1
+    reg = RectanglePixelRegion(center=PixCoord(xc, yc),
+                               width=width, height=height, angle=angle)
+
+    y1 = yc + np.cos(angle) * height/2 + np.sin(angle) * width/2
+    x1 = xc + np.cos(angle) * width/2 - np.sin(angle) * height/2
+
+    assert (x1, y1) in reg.corners
+
+    
 
 class TestRectanglePixelRegion(BaseTestPixelRegion):
 
