@@ -203,15 +203,15 @@ class RectanglePixelRegion(PixelRegion):
         Return the x, y coordinate pairs that define the corners
         """
 
-        corners = np.array([(self.center.x-self.width/2, self.center.y-self.height/2),
-                            (self.center.x+self.width/2, self.center.y-self.height/2),
-                            (self.center.x+self.width/2, self.center.y+self.height/2),
-                            (self.center.x-self.width/2, self.center.y+self.height/2),
+        corners = np.array([(-self.width/2, -self.height/2),
+                            ( self.width/2, -self.height/2),
+                            ( self.width/2,  self.height/2),
+                            (-self.width/2,  self.height/2),
                            ])
         rotmat = np.array([[np.cos(self.angle), np.sin(self.angle)],
-                           [-np.sin(self.angle), np.cos(self.angle)])
+                           [-np.sin(self.angle), np.cos(self.angle)]])
 
-        return np.dot(corners, rotmat)
+        return np.dot(corners, rotmat) + np.array([self.center.x, self.center.y])
 
 
     def _lower_left_xy(self):
