@@ -203,27 +203,15 @@ class RectanglePixelRegion(PixelRegion):
         Return the x, y coordinate pairs that define the corners
         """
 
-        radius = ((self.width / 2.)**2 + (self.height/2.)**2)**0.5
-        ang2 = np.arctan2(self.width, self.height)*u.rad
-        sint = np.sin(self.angle + ang2)
-        cost = np.cos(self.angle + ang2)
-        dd1 = np.abs(radius * sint)
-        dd2 = np.abs(radius * cost)
+        corners = np.array([(self.center.x-self.width/2, self.center.y-self.height/2),
+                            (self.center.x+self.width/2, self.center.y-self.height/2),
+                            (self.center.x+self.width/2, self.center.y+self.height/2),
+                            (self.center.x-self.width/2, self.center.y+self.height/2),
+                           ])
+        rotmat = np.array([[np.cos(self.angle), np.sin(self.angle)],
+                           [-np.sin(self.angle), np.cos(self.angle)])
 
-        if (self.angle % 180*u.deg) < 90*u.deg and self.height > self.width:
-            corners = [(self.center.x - dd1, self.center.y - dd2),
-                       (self.center.x - dd2, self.center.y - dd1),
-                       (self.center.x + dd2, self.center.y + dd1),
-                       (self.center.x + dd1, self.center.y + dd2),
-                      ]
-        else:
-            corners = [(self.center.x - dd1, self.center.y + dd2),
-                       (self.center.x - dd2, self.center.y + dd1),
-                       (self.center.x + dd2, self.center.y - dd1),
-                       (self.center.x + dd1, self.center.y - dd2),
-                      ]
-
-        return corners
+        return np.dot(corners, rotmat)
 
 
     def _lower_left_xy(self):
