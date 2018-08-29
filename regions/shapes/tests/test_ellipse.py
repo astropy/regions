@@ -48,8 +48,8 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
         assert_quantity_allclose(reg_new.angle, self.reg.angle)
 
     @pytest.mark.skipif('not HAS_MATPLOTLIB')
-    def test_as_patch(self):
-        patch = self.reg.as_patch()
+    def test_as_artist(self):
+        patch = self.reg.as_artist()
         assert_allclose(patch.center, (3, 4))
         assert_allclose(patch.width, 4)
         assert_allclose(patch.height, 3)

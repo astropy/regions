@@ -88,7 +88,7 @@ class PointPixelRegion(PixelRegion):
         # TODO: needs to be implemented
         raise NotImplementedError
 
-    def as_patch(self, origin=(0, 0), **kwargs):
+    def as_artist(self, origin=(0, 0), **kwargs):
         """
         Matplotlib patch object for this region (`matplotlib.patches.Circle`).
 
@@ -134,7 +134,7 @@ class PointPixelRegion(PixelRegion):
         if ax is None:
             ax = plt.gca()
 
-        # We can move this to a method like `as_patch`
+        # We can move this to a method like `as_artist`
         mpl_params = self.mpl_properties_default('Line2D')
         mpl_params.update(kwargs)
         point = Line2D([self.center.x], [self.center.y], **mpl_params)

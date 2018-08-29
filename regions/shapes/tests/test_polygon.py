@@ -87,8 +87,8 @@ class TestPolygonPixelRegion(BaseTestPixelRegion):
             self.reg.to_mask(mode='exact')
 
     @pytest.mark.skipif('not HAS_MATPLOTLIB')
-    def test_as_patch(self):
-        patch = self.reg.as_patch()
+    def test_as_artist(self):
+        patch = self.reg.as_artist()
         expected = [[1, 1], [3, 1], [1, 4], [1, 1]]
         assert_allclose(patch.xy, expected)
 

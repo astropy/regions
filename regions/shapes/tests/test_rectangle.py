@@ -77,8 +77,8 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
         assert_quantity_allclose(reg_new.angle, self.reg.angle)
 
     @pytest.mark.skipif('not HAS_MATPLOTLIB')
-    def test_as_patch(self):
-        patch = self.reg.as_patch()
+    def test_as_artist(self):
+        patch = self.reg.as_artist()
         # Note: `reg.center` is the center, `patch.xy` is the lower-left corner
         assert_allclose(patch.xy, (1.138344, 2.331396), atol=1e-3)
 

@@ -45,8 +45,8 @@ class TestCirclePixelRegion(BaseTestPixelRegion):
         assert_allclose(reg_new.radius, self.reg.radius)
 
     @pytest.mark.skipif('not HAS_MATPLOTLIB')
-    def test_as_patch(self):
-        patch = self.reg.as_patch()
+    def test_as_artist(self):
+        patch = self.reg.as_artist()
         assert_allclose(patch.center, (3, 4))
         assert_allclose(patch.radius, 2)
 

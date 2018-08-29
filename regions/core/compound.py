@@ -129,7 +129,7 @@ class CompoundPixelRegion(PixelRegion):
 
         return mpath.Path(verts, codes)
 
-    def as_patch(self, origin=(0, 0), **kwargs):
+    def as_artist(self, origin=(0, 0), **kwargs):
         """
         Matplotlib patch object for annulus region (`matplotlib.patches.PathPatch`).
 
@@ -150,8 +150,8 @@ class CompoundPixelRegion(PixelRegion):
         if self.region1.center == self.region2.center and self.operator == op.xor:
             import matplotlib.patches as mpatches
 
-            patch_inner = self.region1.as_patch(origin=origin)
-            patch_outer = self.region2.as_patch(origin=origin)
+            patch_inner = self.region1.as_artist(origin=origin)
+            patch_outer = self.region2.as_artist(origin=origin)
             path = self._make_annulus_path(patch_inner, patch_outer)
             patch = mpatches.PathPatch(path, **kwargs)
             return patch
@@ -223,5 +223,5 @@ class CompoundSkyRegion(SkyRegion):
                                    operator=self.operator,
                                    region2=pixreg2, meta=self.meta, visual=self.visual)
 
-    def as_patch(self, ax, **kwargs):
+    def as_artist(self, ax, **kwargs):
         raise NotImplementedError
