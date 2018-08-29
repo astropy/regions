@@ -204,8 +204,9 @@ class RectanglePixelRegion(PixelRegion):
         """
 
         radius = ((self.width / 2.)**2 + (self.height/2.)**2)**0.5
-        sint = np.sin(self.angle)
-        cost = np.cos(self.angle)
+        ang2 = np.arctan2(self.width, self.height)*u.rad
+        sint = np.sin(self.angle + ang2)
+        cost = np.cos(self.angle + ang2)
         dd1 = np.abs(radius * sint)
         dd2 = np.abs(radius * cost)
 
