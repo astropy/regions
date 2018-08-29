@@ -90,31 +90,56 @@ class PointPixelRegion(PixelRegion):
 
     def as_artist(self, origin=(0, 0), **kwargs):
         """
-        Matplotlib patch object for this region (`matplotlib.patches.Circle`).
+        Matplotlib Line2D object for this region (`matplotlib.lines.Line2D`).
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         origin : array_like, optional
             The ``(x, y)`` pixel position of the origin of the displayed image.
             Default is (0, 0).
-        kwargs: dict
-            All keywords that a `~matplotlib.patches.Circle` object accepts
+        kwargs : `dict`
+            All keywords that a `~matplotlib.lines.Line2D` object accepts
 
         Returns
         -------
-        patch : `~matplotlib.patches.Circle`
-            Matplotlib circle patch
+        patch : `~matplotlib.lines.Line2D`
+            Matplotlib Line2D object.
         """
+
         from matplotlib.lines import Line2D
 
-        # We can move this to a method like `as_artist`
-        mpl_params = self.mpl_properties_default('Line2D')
+        mpl_params = self.mpl_properties_default('LINE2D')
         mpl_params.update(kwargs)
-        point = Line2D([self.center.x + origin[0]],
-                       [self.center.y + origin[1]],
+
+        point = Line2D([self.center.x - origin[0]], [self.center.y - origin[1]],
                        **mpl_params)
 
         return point
+
+    def plot(self, origin=(0, 0), ax=None, **kwargs):
+        """
+        Forwards all kwargs to `~matplotlib.lines.Line2D` object and adds the
+        line to the given axes.
+
+        Parameters
+        ----------
+        origin : array_like, optional
+            The ``(x, y)`` pixel position of the origin of the displayed image.
+            Default is (0, 0).
+        ax : `~matplotlib.axes.Axes`, optional
+            Axes on which the point is added
+        kwargs : dict
+            All keywords that a `~matplotlib.lines.Line2D` object accepts
+        """
+        from matplotlib import pyplot as plt
+
+        if ax is None:
+            ax = plt.gca()
+
+        point = self.as_artist(origin=origin, kwargs=kwargs)
+        ax.add_line(point)
+
+        return ax
 
 
 class PointSkyRegion(SkyRegion):
