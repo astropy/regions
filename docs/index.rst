@@ -40,6 +40,7 @@ User Documentation
    crtf
    fits_region
    shapely
+   changelog
 
 These plots are made using :download:`plot_image.reg`.
 
