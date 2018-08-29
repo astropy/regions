@@ -197,6 +197,24 @@ class RectanglePixelRegion(PixelRegion):
         return Rectangle(xy=xy, width=width, height=height,
                          angle=angle, **mpl_params)
 
+    @property
+    def corners(self):
+        """
+        Return the x, y coordinate pairs that define the corners
+        """
+
+        radius = ((self.width / 2.)**2 + (self.height/2.)**2)**0.5
+        sint = np.sin(self.angle)
+        cost = np.cos(self.angle)
+        dd1 = np.abs(radius * sint)
+        dd2 = np.abs(radius * cost)
+
+        return [(self.center.x - dd1, self.center.y - dd1),
+                (self.center.x + dd1, self.center.y + dd1),
+                (self.center.x - dd2, self.center.y - dd2),
+                (self.center.x + dd2, self.center.y + dd2),
+               ]
+
     def _lower_left_xy(self):
         """
         Compute lower left `xy` position.
