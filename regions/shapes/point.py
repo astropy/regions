@@ -105,15 +105,22 @@ class PointPixelRegion(PixelRegion):
         patch : `~matplotlib.patches.Circle`
             Matplotlib circle patch
         """
-        # FIXME: need to make radius constant
-        from matplotlib.patches import Circle
+        from matplotlib import pyplot as plt
+        from matplotlib.lines import Line2D
 
-        mpl_params = self.mpl_properties_default('patch')
+        if ax is None:
+            ax = plt.gca()
+
+        # We can move this to a method like `as_artist`
+        mpl_params = self.mpl_properties_default('Line2D')
         mpl_params.update(kwargs)
+        point = Line2D([self.center.x + origin[0]],
+                       [self.center.y + origin[1]],
+                       **mpl_params)
 
-        return Circle((self.center.x, self.center.y), radius=2, **mpl_params)
+        return point
 
-    def plot(self, origin=(0, 0), ax=None, **kwargs):
+    def plot(self, ax=None, origin=(0, 0), **kwargs):
         """
         Forwards all kwargs to `Line2D` object and adds the line
         to given axis.
@@ -128,17 +135,8 @@ class PointPixelRegion(PixelRegion):
         kwargs: dict
             All keywords that a ``Line2D`` object accepts
         """
-        from matplotlib import pyplot as plt
-        from matplotlib.lines import Line2D
-
-        if ax is None:
-            ax = plt.gca()
-
-        # We can move this to a method like `as_artist`
-        mpl_params = self.mpl_properties_default('Line2D')
-        mpl_params.update(kwargs)
-        point = Line2D([self.center.x], [self.center.y], **mpl_params)
-        ax.add_line(point)
+        artist = self.as_artist(origin=origin, **kwargs)
+        ax.add_artist(artist)
 
         return ax
 
