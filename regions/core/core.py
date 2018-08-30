@@ -256,25 +256,6 @@ class PixelRegion(Region):
         """
         raise NotImplementedError
 
-    def plot(self, ax=None, origin=(0, 0), **kwargs):
-        """
-        Create an artist and add it to the specified plot
-
-        Parameters
-        ----------
-        origin : array_like, optional
-            The ``(x, y)`` pixel position of the origin of the displayed image.
-            Default is (0, 0).
-        ax: `~matplotlib.axes`, optional
-            Axes on which the point is added
-        kwargs: dict
-            All keywords that the artist accepts
-        """
-        artist = self.as_artist(origin=origin, **kwargs)
-        ax.add_artist(artist)
-
-        return ax
-
 
     def mpl_properties_default(self, shape='patch'):
         """
@@ -333,8 +314,8 @@ class PixelRegion(Region):
         if ax is None:
             ax = plt.gca()
 
-        patch = self.as_artist(origin=origin, **kwargs)
-        ax.add_patch(patch)
+        artist = self.as_artist(origin=origin, **kwargs)
+        ax.add_artist(artist)
 
         return ax
 
