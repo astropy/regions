@@ -120,26 +120,6 @@ class PointPixelRegion(PixelRegion):
 
         return point
 
-    def plot(self, ax=None, origin=(0, 0), **kwargs):
-        """
-        Forwards all kwargs to `Line2D` object and adds the line
-        to given axis.
-
-        Parameters
-        ----------
-        origin : array_like, optional
-            The ``(x, y)`` pixel position of the origin of the displayed image.
-            Default is (0, 0).
-        ax: `~matplotlib.axes`, optional
-            Axes on which the point is added
-        kwargs: dict
-            All keywords that a ``Line2D`` object accepts
-        """
-        artist = self.as_artist(origin=origin, **kwargs)
-        ax.add_artist(artist)
-
-        return ax
-
 
 class PointSkyRegion(SkyRegion):
     """
