@@ -54,7 +54,7 @@ def test_corners():
     poly = reg.to_polygon()
     assert len(poly.vertices) == 4
 
-    
+
 
 class TestRectanglePixelRegion(BaseTestPixelRegion):
 
