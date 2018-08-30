@@ -46,11 +46,11 @@ class TestPointPixelRegion(BaseTestPixelRegion):
     def test_as_artist(self):
         artist = self.reg.as_artist()
 
-        assert artist.get_data() == ([0], [0])
+        assert artist.get_data() == ([3], [4])
 
         artist = self.reg.as_artist(origin=(1, 1))
 
-        assert artist.get_data() == ([1], [1])
+        assert artist.get_data() == ([4], [5])
 
 
 class TestPointSkyRegion(BaseTestSkyRegion):
