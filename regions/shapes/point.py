@@ -108,9 +108,6 @@ class PointPixelRegion(PixelRegion):
         from matplotlib import pyplot as plt
         from matplotlib.lines import Line2D
 
-        if ax is None:
-            ax = plt.gca()
-
         # We can move this to a method like `as_artist`
         mpl_params = self.mpl_properties_default('Line2D')
         mpl_params.update(kwargs)
