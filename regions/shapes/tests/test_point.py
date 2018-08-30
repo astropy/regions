@@ -15,7 +15,7 @@ from astropy.wcs import WCS
 from ...core import PixCoord
 from ...tests.helpers import make_simple_wcs
 from ..point import PointPixelRegion, PointSkyRegion
-from .utils import ASTROPY_LT_13
+from .utils import ASTROPY_LT_13, HAS_MATPLOTLIB  # noqa
 from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
 
 
