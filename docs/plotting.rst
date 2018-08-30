@@ -16,11 +16,11 @@ To draw a matplotlib patch object, add it to an `matplotlib.axes.Axes` object.
     import matplotlib.pyplot as plt
 
     region = CirclePixelRegion(PixCoord(x=0.3, y=0.42), radius=0.5)
-    patch = region.as_artist()
+    artist = region.as_artist()
 
     axes = plt.gca()
     axes.set_aspect('equal')
-    axes.add_patch(patch)
+    axes.add_artist(artist)
     axes.set_xlim([-0.5, 1])
     axes.set_ylim([-0.5, 1])
 
@@ -28,13 +28,15 @@ To draw a matplotlib patch object, add it to an `matplotlib.axes.Axes` object.
 
 
 The :meth:`~regions.PixelRegion.plot`, a convenience method just does these two
-steps at once (creating a matplotlib patch and adding it to an axis),
+steps at once (creating a matplotlib patch artist and adding it to an axis),
 and calls ``plt.gca()`` if no axis is passed in.
 
 You can shift the origin of the region very conveniently while plotting by simply
 supplying the ``origin`` pixel coordinates to :meth:`~regions.PixelRegion.plot`
 and :meth:`~regions.PixelRegion.as_artist`. The ``**kwargs`` argument takes any
-keyword argument that the `~matplotlib.patches.Patch` object accepts. For example:
+keyword argument that the `~matplotlib.patches.Patch` object accepts for those
+regions represented as patches, or arguments `~matplotlib.lines.Line2D` accepts
+for point regions. For example:
 
 .. plot::
    :include-source:
@@ -48,10 +50,6 @@ keyword argument that the `~matplotlib.patches.Patch` object accepts. For exampl
     ax.set_xlim([-4, 2])
     ax.set_ylim([-4, 2])
     plt.show()
-
-Pixel regions such as `~regions.TextPixelRegion` and
-`~regions.CompoundPixelRegion` don't have ``as_artist()`` method as
-there are no equivalent classes in `matplotlib.patches`.
 
 Here's a full example how to plot a `~regions.CirclePixelRegion` on an image.
 
