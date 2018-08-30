@@ -42,7 +42,7 @@ class PointPixelRegion(PixelRegion):
         regs.append(PointPixelRegion(PixCoord(4, 2)))
 
         for reg in regs:
-            reg.plot(axis=ax)
+            reg.plot(ax=ax)
 
         plt.xlim(0, 6)
         plt.ylim(0, 6)
