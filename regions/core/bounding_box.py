@@ -49,7 +49,7 @@ class BoundingBox(object):
     >>> # "extent" is useful when plotting the BoundingBox with matplotlib
     >>> bbox.extent  # matplotlib order: (x, y)
     (0.5, 9.5, 1.5, 19.5)
-    >>> print(bbox.as_patch())
+    >>> print(bbox.as_artist())
     Rectangle(0.5,1.5;9x18)
     """
 
@@ -181,7 +181,7 @@ class BoundingBox(object):
             self.iymax - 0.5,
         )
 
-    def as_patch(self, **kwargs):
+    def as_artist(self, **kwargs):
         """
         Return a `matplotlib.patches.Rectangle` that represents the
         bounding box.
@@ -209,7 +209,7 @@ class BoundingBox(object):
             ax = fig.add_subplot(1, 1, 1)
             np.random.seed(12345)
             ax.imshow(np.random.random((10, 10)), interpolation='nearest', cmap='viridis')
-            ax.add_patch(bbox.as_patch(facecolor='none', edgecolor='white', lw=2.))
+            ax.add_patch(bbox.as_artist(facecolor='none', edgecolor='white', lw=2.))
         """
 
         from matplotlib.patches import Rectangle

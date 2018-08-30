@@ -15,7 +15,7 @@ from astropy.wcs import WCS
 from ...core import PixCoord
 from ...tests.helpers import make_simple_wcs
 from ..point import PointPixelRegion, PointSkyRegion
-from .utils import ASTROPY_LT_13
+from .utils import ASTROPY_LT_13, HAS_MATPLOTLIB  # noqa
 from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
 
 
@@ -42,6 +42,16 @@ class TestPointPixelRegion(BaseTestPixelRegion):
         assert_allclose(reg_new.center.x, self.reg.center.x)
         assert_allclose(reg_new.center.y, self.reg.center.y)
 
+    @pytest.mark.skipif('not HAS_MATPLOTLIB')
+    def test_as_artist(self):
+        artist = self.reg.as_artist()
+
+        assert artist.get_data() == ([3], [4])
+
+        artist = self.reg.as_artist(origin=(1, 1))
+
+        assert artist.get_data() == ([4], [5])
+
 
 class TestPointSkyRegion(BaseTestSkyRegion):
 
@@ -49,14 +59,14 @@ class TestPointSkyRegion(BaseTestSkyRegion):
 
     if ASTROPY_LT_13:
         expected_repr = ('<PointSkyRegion(<SkyCoord (ICRS): (ra, dec) in deg\n'
-                    '    (3.0, 4.0)>)>')
+                         '    (3.0, 4.0)>)>')
         expected_str = ('Region: PointSkyRegion\ncenter: <SkyCoord (ICRS): '
-                   '(ra, dec) in deg\n    (3.0, 4.0)>')
+                        '(ra, dec) in deg\n    (3.0, 4.0)>')
     else:
         expected_repr = ('<PointSkyRegion(<SkyCoord (ICRS): (ra, dec) in deg\n'
-                    '    ( 3.,  4.)>)>')
+                         '    ( 3.,  4.)>)>')
         expected_str = ('Region: PointSkyRegion\ncenter: <SkyCoord (ICRS): '
-                   '(ra, dec) in deg\n    ( 3.,  4.)>')
+                        '(ra, dec) in deg\n    ( 3.,  4.)>')
 
     def test_contains(self, wcs):
         position = SkyCoord([1, 2] * u.deg, [3, 4] * u.deg)

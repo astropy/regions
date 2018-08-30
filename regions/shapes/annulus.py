@@ -59,7 +59,7 @@ class CircleAnnulusPixelRegion(CompoundPixelRegion):
         center = PixCoord(x=x, y=y)
         reg = CircleAnnulusPixelRegion(center=center, inner_radius=inner_radius,
                                        outer_radius=outer_radius)
-        patch = reg.as_patch(facecolor='none', edgecolor='red', lw=2)
+        patch = reg.as_artist(facecolor='none', edgecolor='red', lw=2)
         ax.add_patch(patch)
 
         plt.xlim(-5, 20)
@@ -292,7 +292,7 @@ class EllipseAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
         reg = EllipseAnnulusPixelRegion(center=center, inner_width=inner_width,
                                         inner_height=inner_height, outer_width=outer_width,
                                         outer_height=outer_height, angle=angle)
-        patch = reg.as_patch(facecolor='none', edgecolor='red', lw=2)
+        patch = reg.as_artist(facecolor='none', edgecolor='red', lw=2)
         ax.add_patch(patch)
 
         plt.xlim(-5, 20)
@@ -405,7 +405,7 @@ class RectangleAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
         reg = RectangleAnnulusPixelRegion(center=center, inner_width=inner_width,
                                           inner_height=inner_height, outer_width=outer_width,
                                           outer_height=outer_height, angle=angle)
-        patch = reg.as_patch(facecolor='none', edgecolor='red', lw=2)
+        patch = reg.as_artist(facecolor='none', edgecolor='red', lw=2)
         ax.add_patch(patch)
 
         plt.xlim(-5, 20)

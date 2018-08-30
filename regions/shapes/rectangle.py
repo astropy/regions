@@ -57,7 +57,7 @@ class RectanglePixelRegion(PixelRegion):
         center = PixCoord(x=x, y=y)
         reg = RectanglePixelRegion(center=center, width=width,
                                    height=height, angle=angle)
-        patch = reg.as_patch(facecolor='none', edgecolor='red', lw=2)
+        patch = reg.as_artist(facecolor='none', edgecolor='red', lw=2)
         ax.add_patch(patch)
 
         plt.xlim(0, 30)
@@ -167,7 +167,7 @@ class RectanglePixelRegion(PixelRegion):
 
         return RegionMask(fraction, bbox=bbox)
 
-    def as_patch(self, origin=(0, 0), **kwargs):
+    def as_artist(self, origin=(0, 0), **kwargs):
         """
         Matplotlib patch object for this region (`matplotlib.patches.Rectangle`).
 
@@ -229,7 +229,7 @@ class RectanglePixelRegion(PixelRegion):
         """
         Compute lower left `xy` position.
 
-        This is used for the conversion to matplotlib in ``as_patch``
+        This is used for the conversion to matplotlib in ``as_artist``
 
         Taken from http://photutils.readthedocs.io/en/latest/_modules/photutils/aperture/rectangle.html#RectangularAperture.plot
         """

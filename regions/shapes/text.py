@@ -58,7 +58,7 @@ class TextPixelRegion(PointPixelRegion):
         center = pixel_to_skycoord(self.center.x, self.center.y, wcs=wcs)
         return TextSkyRegion(center, self.text)
 
-    def as_patch(self, **kwargs):
+    def as_artist(self, **kwargs):
         raise NotImplementedError
 
     def plot(self, origin=(0, 0), ax=None, **kwargs):

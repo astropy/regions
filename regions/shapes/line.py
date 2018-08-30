@@ -45,7 +45,7 @@ class LinePixelRegion(PixelRegion):
         start = PixCoord(x=x1, y=y1)
         end = PixCoord(x=x2, y=y2)
         reg = LinePixelRegion(start=start, end=end)
-        patch = reg.as_patch(facecolor='none', edgecolor='red', lw=2)
+        patch = reg.as_artist(facecolor='none', edgecolor='red', lw=2)
         ax.add_patch(patch)
 
         plt.xlim(0, 30)
@@ -99,7 +99,7 @@ class LinePixelRegion(PixelRegion):
         # TODO: needs to be implemented
         raise NotImplementedError
 
-    def as_patch(self, origin=(0, 0), **kwargs):
+    def as_artist(self, origin=(0, 0), **kwargs):
         """
         Matplotlib patch object for this region (`matplotlib.patches.Arrow`).
 

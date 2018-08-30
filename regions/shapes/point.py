@@ -42,7 +42,7 @@ class PointPixelRegion(PixelRegion):
         regs.append(PointPixelRegion(PixCoord(4, 2)))
 
         for reg in regs:
-            reg.plot(ax)
+            reg.plot(ax=ax)
 
         plt.xlim(0, 6)
         plt.ylim(0, 6)
@@ -88,7 +88,7 @@ class PointPixelRegion(PixelRegion):
         # TODO: needs to be implemented
         raise NotImplementedError
 
-    def as_patch(self, origin=(0, 0), **kwargs):
+    def as_artist(self, origin=(0, 0), **kwargs):
         """
         Matplotlib patch object for this region (`matplotlib.patches.Circle`).
 
@@ -105,42 +105,16 @@ class PointPixelRegion(PixelRegion):
         patch : `~matplotlib.patches.Circle`
             Matplotlib circle patch
         """
-        # FIXME: need to make radius constant
-        from matplotlib.patches import Circle
-
-        mpl_params = self.mpl_properties_default('patch')
-        mpl_params.update(kwargs)
-
-        return Circle((self.center.x, self.center.y), radius=2, **mpl_params)
-
-    def plot(self, origin=(0, 0), ax=None, **kwargs):
-        """
-        Forwards all kwargs to `Line2D` object and adds the line
-        to given axis.
-
-        Parameters
-        ----------
-        origin : array_like, optional
-            The ``(x, y)`` pixel position of the origin of the displayed image.
-            Default is (0, 0).
-        ax: `~matplotlib.axes`, optional
-            Axes on which the point is added
-        kwargs: dict
-            All keywords that a ``Line2D`` object accepts
-        """
-        from matplotlib import pyplot as plt
         from matplotlib.lines import Line2D
 
-        if ax is None:
-            ax = plt.gca()
-
-        # We can move this to a method like `as_patch`
+        # We can move this to a method like `as_artist`
         mpl_params = self.mpl_properties_default('Line2D')
         mpl_params.update(kwargs)
-        point = Line2D([self.center.x], [self.center.y], **mpl_params)
-        ax.add_line(point)
+        point = Line2D([self.center.x + origin[0]],
+                       [self.center.y + origin[1]],
+                       **mpl_params)
 
-        return ax
+        return point
 
 
 class PointSkyRegion(SkyRegion):

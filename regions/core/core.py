@@ -236,7 +236,7 @@ class PixelRegion(Region):
                                  " a strictly positive integer)".format(subpixels))
 
     @abc.abstractmethod
-    def as_patch(self, origin=(0, 0), **kwargs):
+    def as_artist(self, origin=(0, 0), **kwargs):
         """
         Convert to mpl patch
 
@@ -255,6 +255,7 @@ class PixelRegion(Region):
             Matplotlib patch
         """
         raise NotImplementedError
+
 
     def mpl_properties_default(self, shape='patch'):
         """
@@ -290,7 +291,7 @@ class PixelRegion(Region):
 
     def plot(self, origin=(0, 0), ax=None, **kwargs):
         """
-        Calls ``as_patch`` method forwarding all kwargs and adds patch
+        Calls ``as_artist`` method forwarding all kwargs and adds patch
         to given axis.
 
         Parameters
@@ -313,8 +314,8 @@ class PixelRegion(Region):
         if ax is None:
             ax = plt.gca()
 
-        patch = self.as_patch(origin=origin, **kwargs)
-        ax.add_patch(patch)
+        artist = self.as_artist(origin=origin, **kwargs)
+        ax.add_artist(artist)
 
         return ax
 

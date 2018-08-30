@@ -59,7 +59,7 @@ class EllipsePixelRegion(PixelRegion):
 
         center = PixCoord(x=x0, y=y0)
         reg = EllipsePixelRegion(center=center, width=2*a, height=2*b, angle=theta)
-        patch = reg.as_patch(facecolor='none', edgecolor='red', lw=2)
+        patch = reg.as_artist(facecolor='none', edgecolor='red', lw=2)
         ax.add_patch(patch)
 
         plt.show()
@@ -182,7 +182,7 @@ class EllipsePixelRegion(PixelRegion):
 
         return RegionMask(fraction, bbox=bbox)
 
-    def as_patch(self, origin=(0, 0), **kwargs):
+    def as_artist(self, origin=(0, 0), **kwargs):
         """
         Matplotlib patch object for this region (`matplotlib.patches.Ellipse`).
 

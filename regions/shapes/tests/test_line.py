@@ -46,8 +46,8 @@ class TestLinePixelRegion(BaseTestPixelRegion):
         assert_allclose(reg_new.end.y, self.reg.end.y)
 
     @pytest.mark.skipif('not HAS_MATPLOTLIB')
-    def test_as_patch(self):
-        patch = self.reg.as_patch()
+    def test_as_artist(self):
+        patch = self.reg.as_artist()
         assert 'Arrow' in str(patch)
 
 

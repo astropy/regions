@@ -47,7 +47,7 @@ class CirclePixelRegion(PixelRegion):
 
         center = PixCoord(x=x, y=y)
         reg = CirclePixelRegion(center=center, radius=radius)
-        patch = reg.as_patch(facecolor='none', edgecolor='red', lw=2)
+        patch = reg.as_artist(facecolor='none', edgecolor='red', lw=2)
         ax.add_patch(patch)
 
         plt.xlim(0, 15)
@@ -123,7 +123,7 @@ class CirclePixelRegion(PixelRegion):
 
         return RegionMask(fraction, bbox=bbox)
 
-    def as_patch(self, origin=(0, 0), **kwargs):
+    def as_artist(self, origin=(0, 0), **kwargs):
         """
         Matplotlib patch object for this region (`matplotlib.patches.Circle`)
 
