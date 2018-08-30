@@ -200,8 +200,8 @@ of the mask in the image:
     >>> ax = plt.subplot(1, 1, 1)
     >>> ax.imshow(hdu.data, cmap=plt.cm.viridis,
     ...            interpolation='nearest', origin='lower')
-    >>> ax.add_patch(mask.bbox.as_patch(facecolor='none', edgecolor='white'))
-    >>> ax.add_patch(aperture.as_patch(facecolor='none', edgecolor='orange'))
+    >>> ax.add_patch(mask.bbox.as_artist(facecolor='none', edgecolor='white'))
+    >>> ax.add_patch(aperture.as_artist(facecolor='none', edgecolor='orange'))
     >>> ax.set_xlim(120, 180)
     >>> ax.set_ylim(1020, 1080)
 

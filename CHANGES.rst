@@ -4,6 +4,8 @@
 NEW FEATURES
 ------------
 
+- Changed ``as_patch`` to ``as_artist`` to accommodate non-patch artists [#218]
+
 - Implemented ``to_pixel`` for ``regions.CompoundSkyRegions``,
   ``to_mask`` for ``regions.CompoundPixelRegion`` and ``to_pixel`` for
   ``regions.CircleSkyRegion``. [#137]

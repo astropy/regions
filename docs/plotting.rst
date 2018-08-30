@@ -3,8 +3,8 @@
 Plotting regions with Matplotlib
 ================================
 
-Some `~regions.PixelRegion` objects have an ``as_patch()`` method that returns an
-equivalent `matplotlib.patches` object. For example :meth:`regions.CirclePixelRegion.as_patch`
+Some `~regions.PixelRegion` objects have an ``as_artist()`` method that returns an
+equivalent `matplotlib.patches` object. For example :meth:`regions.CirclePixelRegion.as_artist`
 returns a `matplotlib.patches.Circle` object.
 
 To draw a matplotlib patch object, add it to an `matplotlib.axes.Axes` object.
@@ -16,7 +16,7 @@ To draw a matplotlib patch object, add it to an `matplotlib.axes.Axes` object.
     import matplotlib.pyplot as plt
 
     region = CirclePixelRegion(PixCoord(x=0.3, y=0.42), radius=0.5)
-    patch = region.as_patch()
+    patch = region.as_artist()
 
     axes = plt.gca()
     axes.set_aspect('equal')
@@ -33,7 +33,7 @@ and calls ``plt.gca()`` if no axis is passed in.
 
 You can shift the origin of the region very conveniently while plotting by simply
 supplying the ``origin`` pixel coordinates to :meth:`~regions.PixelRegion.plot`
-and :meth:`~regions.PixelRegion.as_patch`. The ``**kwargs`` argument takes any
+and :meth:`~regions.PixelRegion.as_artist`. The ``**kwargs`` argument takes any
 keyword argument that the `~matplotlib.patches.Patch` object accepts. For example:
 
 .. plot::
@@ -50,7 +50,7 @@ keyword argument that the `~matplotlib.patches.Patch` object accepts. For exampl
     plt.show()
 
 Pixel regions such as `~regions.TextPixelRegion` and
-`~regions.CompoundPixelRegion` don't have ``as_patch()`` method as
+`~regions.CompoundPixelRegion` don't have ``as_artist()`` method as
 there are no equivalent classes in `matplotlib.patches`.
 
 Here's a full example how to plot a `~regions.CirclePixelRegion` on an image.
@@ -61,7 +61,7 @@ Here's a full example how to plot a `~regions.CirclePixelRegion` on an image.
 The `~regions.RectanglePixelRegion` and `~regions.EllipsePixelRegion` docstrings also
 contain plot examples.
 
-`~regions.SkyRegion` objects currently don't have an ``as_patch()`` or ``plot()``
+`~regions.SkyRegion` objects currently don't have an ``as_artist()`` or ``plot()``
 method. To plot them, convert them to a pixel region first:
 
 .. code-block:: python
