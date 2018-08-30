@@ -11,6 +11,7 @@ from ..core import PixCoord, PixelRegion, SkyRegion, RegionMask, BoundingBox
 from .._geometry import rectangular_overlap_grid
 from .._utils.wcs_helpers import skycoord_to_pixel_scale_angle
 from ..core.attributes import ScalarPix, ScalarLength, QuantityLength, ScalarSky
+from .polygon import PolygonPixelRegion
 
 
 __all__ = ['RectanglePixelRegion', 'RectangleSkyRegion']
@@ -196,6 +197,33 @@ class RectanglePixelRegion(PixelRegion):
 
         return Rectangle(xy=xy, width=width, height=height,
                          angle=angle, **mpl_params)
+
+    @property
+    def corners(self):
+        """
+        Return the x, y coordinate pairs that define the corners
+        """
+
+        corners = [(-self.width/2, -self.height/2),
+                   ( self.width/2, -self.height/2),
+                   ( self.width/2,  self.height/2),
+                   (-self.width/2,  self.height/2),
+                  ]
+        rotmat = [[np.cos(self.angle), np.sin(self.angle)],
+                  [-np.sin(self.angle), np.cos(self.angle)]]
+
+        return np.dot(corners, rotmat) + np.array([self.center.x,
+                                                   self.center.y])
+
+    def to_polygon(self):
+        """
+        Return a 4-cornered polygon equivalent to this rectangle
+        """
+        x,y = self.corners.T
+        vertices = PixCoord(x=x, y=y)
+        return PolygonPixelRegion(vertices=vertices, meta=self.meta,
+                                  visual=self.visual)
+
 
     def _lower_left_xy(self):
         """

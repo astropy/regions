@@ -25,6 +25,36 @@ def wcs():
     header = fits.getheader(filename)
     return WCS(header)
 
+def test_corners():
+
+    xc,yc = 2,2
+    angle = 30*u.deg
+    width = 2
+    height = 1
+    reg = RectanglePixelRegion(center=PixCoord(xc, yc),
+                               width=width, height=height, angle=angle)
+
+    y1 = yc + np.cos(angle) * height/2 + np.sin(angle) * width/2
+    x1 = xc + np.cos(angle) * width/2 - np.sin(angle) * height/2
+
+    assert (x1, y1) in reg.corners
+
+    reg = RectanglePixelRegion(center=PixCoord(xc, yc),
+                               width=width, height=height, angle=90*u.deg)
+    # simple case: rotate by 90
+    np.testing.assert_array_equal([(2.5, 1.), (2.5, 3.), (1.5, 3.), (1.5,1.)],
+                                  reg.corners)
+
+    reg = RectanglePixelRegion(center=PixCoord(xc, yc),
+                               width=width, height=height, angle=0*u.deg)
+    # simpler case: rotate by 0
+    np.testing.assert_array_equal([(1, 1.5), (3, 1.5), (3, 2.5), (1, 2.5)],
+                                  reg.corners)
+
+    poly = reg.to_polygon()
+    assert len(poly.vertices) == 4
+
+
 
 class TestRectanglePixelRegion(BaseTestPixelRegion):
 
