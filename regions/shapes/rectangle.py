@@ -219,8 +219,8 @@ class RectanglePixelRegion(PixelRegion):
         """
         Return a 4-cornered polygon equivalent to this rectangle
         """
-        vertices = PixCoord(x=[c[0] for c in self.corners],
-                            y=[c[1] for c in self.corners])
+        x,y = self.corners.T
+        vertices = PixCoord(x=x, y=y)
         return PolygonPixelRegion(vertices=vertices, meta=self.meta,
                                   visual=self.visual)
 
