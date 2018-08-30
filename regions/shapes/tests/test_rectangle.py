@@ -42,14 +42,14 @@ def test_corners():
     reg = RectanglePixelRegion(center=PixCoord(xc, yc),
                                width=width, height=height, angle=90*u.deg)
     # simple case: rotate by 90
-    assert {(2.5, 3), (1.5, 3), (2.5, 1), (1.5,1)} == set(map(tuple,
-                                                              reg.corners.tolist()))
+    np.testing.assert_array_equal([(2.5, 1.), (2.5, 3.), (1.5, 3.), (1.5,1.)],
+                                  reg.corners)
 
     reg = RectanglePixelRegion(center=PixCoord(xc, yc),
                                width=width, height=height, angle=0*u.deg)
     # simpler case: rotate by 0
-    assert {(3, 2.5), (3, 1.5), (1, 2.5), (1, 1.5)} == set(map(tuple,
-                                                               reg.corners.tolist()))
+    np.testing.assert_array_equal([(1, 1.5), (3, 1.5), (3, 2.5), (1, 2.5)],
+                                  reg.corners)
 
     poly = reg.to_polygon()
     assert len(poly.vertices) == 4
