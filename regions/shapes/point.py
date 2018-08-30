@@ -105,7 +105,6 @@ class PointPixelRegion(PixelRegion):
         patch : `~matplotlib.patches.Circle`
             Matplotlib circle patch
         """
-        from matplotlib import pyplot as plt
         from matplotlib.lines import Line2D
 
         # We can move this to a method like `as_artist`
