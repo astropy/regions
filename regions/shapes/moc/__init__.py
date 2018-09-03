@@ -4,6 +4,7 @@ from .interval_set import IntervalSet
 from .core import MOCSkyRegion, MOCPixelRegion
 
 __all__ = [
+    'IntervalSet',
     'MOCSkyRegion',
     'MOCPixelRegion',
 ]

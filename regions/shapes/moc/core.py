@@ -18,8 +18,8 @@ from astropy_healpix import HEALPix
 from astropy_healpix import lonlat_to_healpix
 from astropy_healpix.healpy import nside2npix
 
-from .moc import IntervalSet
-from .moc import uniq2orderipix, trailing_zeros
+from .interval_set import IntervalSet
+from .utils import uniq2orderipix, trailing_zeros
 
 from ...core import PixCoord, PixelRegion, SkyRegion, BoundingBox, Mask
 from ...core.attributes import RegionMeta, RegionVisual
