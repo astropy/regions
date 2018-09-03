@@ -118,6 +118,31 @@ class MOCPixelRegion(PixelRegion):
 
         return vx, vy
 
+    def as_patch(self, origin=(0, 0), **kw_mpl_pathpatch):
+        from matplotlib.path import Path
+        from matplotlib.patches import PathPatch
+
+        # Only the HEALPix cells facing the camera are used
+        vx, vy = self.vertices_culled
+
+        # The border of each HEALPix cells is drawn one at a time
+        path_vertices_l = []
+        codes = []
+
+        for i in range(vx.shape[0]):
+            # Appending to a list is faster that is why we keep
+            path_vertices_l += [(vx[i][0], vy[i][0]), (vx[i][1], vy[i][1]), (vx[i][2], vy[i][2]), (vx[i][3], vy[i][3]), (0, 0)]
+            codes += [Path.MOVETO] + [Path.LINETO]*3 + [Path.CLOSEPOLY]
+
+        # Cast to a numpy array
+        path_vertices_arr = np.array(path_vertices_l)
+        # Add the origin to the path constructed
+        path_vertices_arr += origin
+
+        path = Path(path_vertices_arr, codes)
+        pathpatch = PathPatch(path, **kw_mpl_pathpatch)
+
+        return pathpatch
 
     def to_sky(self, wcs):
         return self.sky_region

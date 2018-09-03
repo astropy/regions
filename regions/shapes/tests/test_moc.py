@@ -212,3 +212,19 @@ class TestMOC(object):
         reg_cast_back_sky = reg_px.to_sky(wcs)
 
         assert reg_cast_back_sky == self.moc_from_fits
+
+
+    def test_as_patch_moc(self, wcs):
+        # wcs = make_simple_wcs(SkyCoord([0, 50, 50, 0], [50, 50, 0, 0], "icrs", unit="deg"), 0.1 * u.deg, 20)
+        reg = self.moc_from_fits.to_pixel(wcs)
+
+        import matplotlib.pyplot as plt
+        fig, ax = plt.subplots(1, 1)
+
+        reg.plot(ax=ax, edgecolor='red', lw=1)
+
+        #plt.xlim(-20, 20)
+        #plt.ylim(-20, 20)
+        #ax.set_aspect('equal')
+        #plt.show()
+
