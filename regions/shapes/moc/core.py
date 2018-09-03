@@ -159,6 +159,46 @@ class MOCPixelRegion(PixelRegion):
     def area(self):
         raise NotImplementedError
 
+    def to_mask(self, mode='center', subpixels=5):
+        self._validate_mode(mode, subpixels)
+
+        if mode == 'center':
+            mode = 'subpixels'
+            subpixels = 1
+
+        if mode == 'subpixels':
+            use_exact = 0
+        else:
+            use_exact = 1
+
+        # Find bounding box and mask size
+        bbox = self.bounding_box
+        ny, nx = bbox.shape
+
+        # Find position of pixel edges and recenter so that circle is at origin
+        xmin = float(bbox.ixmin) - 0.5
+        xmax = float(bbox.ixmax) - 0.5
+        ymin = float(bbox.iymin) - 0.5
+        ymax = float(bbox.iymax) - 0.5
+
+        vx, vy = self.vertices_culled
+
+        # Loop over all the projeted HEALPix cells to get their overlap grids
+        fraction_sum = np.zeros(shape=(ny, nx))
+        for i in range(vx.shape[0]):
+            fraction = polygonal_overlap_grid(
+                xmin, xmax, ymin, ymax,
+                nx, ny, vx[i], vy[i],
+                use_exact, subpixels,
+            )
+            # Add the overlap grid of the HEALPix cells to get the
+            # overlap area of the total MOC
+            fraction_sum += fraction
+
+        # Clip its values to the interval (0, 1)
+        fraction_clipped = np.clip(a=fraction_sum, a_min=0, a_max=1)
+        return Mask(fraction_clipped, bbox=bbox)
+
 class MOCSkyRegion(SkyRegion):
     """
     A MOC (Multi-Order Coverage map)

@@ -228,3 +228,9 @@ class TestMOC(object):
         #ax.set_aspect('equal')
         #plt.show()
 
+
+    def test_to_mask(self, wcs):
+        reg_px = self.moc_from_fits.to_pixel(wcs)
+        mask = reg_px.to_mask()
+
+        assert mask.shape == (33, 65)
