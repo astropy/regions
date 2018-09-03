@@ -147,6 +147,13 @@ class MOCPixelRegion(PixelRegion):
     def to_sky(self, wcs):
         return self.sky_region
 
+    @property
+    def bounding_box(self):
+        xmin = self.vertices.x.min()
+        xmax = self.vertices.x.max()
+        ymin = self.vertices.y.min()
+        ymax = self.vertices.y.max()
+        return BoundingBox.from_float(xmin, xmax, ymin, ymax)
 
     @property
     def area(self):
