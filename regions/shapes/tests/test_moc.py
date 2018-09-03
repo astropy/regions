@@ -205,3 +205,10 @@ class TestMOC(object):
     def test_complement(self):
         assert self.moc_from_fits.complement().complement() == self.moc_from_fits
 
+
+
+    def test_to_sky(self, wcs):
+        reg_px = self.moc_from_fits.to_pixel(wcs)
+        reg_cast_back_sky = reg_px.to_sky(wcs)
+
+        assert reg_cast_back_sky == self.moc_from_fits

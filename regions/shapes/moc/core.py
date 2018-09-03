@@ -28,7 +28,104 @@ from ..._geometry import polygonal_overlap_grid
 
 __all__ = [
     'MOCSkyRegion',
+    'MOCPixelRegion',
 ]
+
+class MOCPixelRegion(PixelRegion):
+    """
+    A MOC (Multi-Order Coverage map) in pixel coordinates.
+
+    MOC stands for Multi-Order Coverage. It is a spatial and hierarchical description of a region on a sphere.
+    MOC is an IVOA standard which was first introduced in the following
+    `paper <http://www.ivoa.net/documents/MOCSkyRegion.>`__ .
+    MOC are based on the HEALPix sky tessellation using the NESTED numbering scheme. A MOC is a set of
+    HEALPix cells at different orders with a maximum resolution corresponding to the order 29 i.e. a cell
+    resolution of ~393.2μas.
+
+    * MOCs are usually stored as FITS file containing a list of UNIQ numbers describing the HEALPix cells at \
+      different orders. This class aims at creating MOC maps from FITS/json formatted files, FITS images associated with a mask numpy array, \
+      an `astropy.coordinates.SkyCoord` object and lon, lat expressed as `astropy.units.Quantity` objects.
+
+    * Basic operations on MOCs are available such as the intersection, union, difference and complement of a MOC.
+
+    * A :meth:`~regions.MOCSkyRegion.contains` method filters positions expressed as \
+      `~astropy.units.Quantity` to only keep those lying inside/outside the MOC.
+
+    * A MOC can be serialized to FITS (i.e. a list of UNIQ numbers stored in a \
+      binary HDU table) and JSON formats. An optional parameter allows the user to write it to a file.
+
+    Parameters
+    ----------
+    vertices : `~regions.core.PixCoord` object
+        A list of pixel coordinates describing the vertice boundaries of all the HEALPix cells (i.e. 4 pixels for each HEALPix cells).
+        Contains two Nx4 numpy arrays, one storing the x coordinates of the HEALPix cell vertices (4 for each cell) and the other for the y coordinates.
+    sky_region: `~regions.MOCSkyRegion` object
+        The sky region linked to this pixel region object. A MOC is always defined by a MOCSkyRegion first before applying a WCS to it.
+    meta : `~regions.RegionMeta` object, optional
+        A dictionary which stores the meta attributes of this region.
+    visual : `~regions.RegionVisual` object, optional
+        A dictionary which stores the visual meta attributes of this region.
+    """
+
+    def __init__(self, vertices, sky_region, meta=None, visual=None):
+        self.vertices = vertices
+
+        # The backfacing HEALPix cells are culled before plotting the MOC.
+        self.vertices_culled = self._backface_culling(self.vertices)
+        self.sky_region = sky_region
+        self.meta = meta or RegionMeta()
+        self.visual = visual or RegionVisual()
+        self._repr_params = ('_interval_set',)
+
+    def _backface_culling(self, vertices):
+        # Remove cells crossing the MOC after projection
+        # The remaining HEALPix cells are used for computing the patch of the MOC
+        vx = self.vertices.x
+        vy = self.vertices.y
+
+        def cross_product(vx, vy, i):
+            cur = i
+            prev = (i - 1) % 4
+            next = (i + 1) % 4
+
+            # Construct the first vector from A to B
+            x1 = vx[:, cur] - vx[:, prev]
+            y1 = vy[:, cur] - vy[:, prev]
+            z1 = np.zeros(x1.shape)
+
+            v1 = np.vstack((x1, y1, z1)).T
+            # Construct the second vector from B to C
+            x2 = vx[:, next] - vx[:, cur]
+            y2 = vy[:, next] - vy[:, cur]
+            z2 = np.zeros(x2.shape)
+
+            v2 = np.vstack((x2, y2, z2)).T
+            # Compute the cross product between the two
+            return np.cross(v1, v2)
+
+        # A ----- B
+        #  \      |
+        #   D-----C
+        # Compute the cross product between AB and BC
+        # and the cross product between BC and CD
+        ABC = cross_product(vx, vy, 1)
+        CDA = cross_product(vx, vy, 3)
+
+        frontface_cells  = (ABC[:, 2] < 0) & (CDA[:, 2] < 0)
+
+        vx = vx[frontface_cells]
+        vy = vy[frontface_cells]
+
+        return vx, vy
+
+
+    def to_sky(self, wcs):
+        return self.sky_region
+
+
+    @property
+    def area(self):
+        raise NotImplementedError
 
 class MOCSkyRegion(SkyRegion):
     """
@@ -101,6 +198,32 @@ class MOCSkyRegion(SkyRegion):
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
         self._repr_params = ('_interval_set',)
+
+    def to_pixel(self, wcs):
+        healpix_cells_d = self.write(format='json')
+
+        X = np.array([])
+        Y = np.array([])
+        for order_str, ipix_l in healpix_cells_d.items():
+            order = int(order_str)
+            # Compute the skycoord boundaries of the HEALPix cells from one order at a time.
+            hp = HEALPix(nside=(1 << order), order='nested', frame=ICRS())
+            vertices_boundaries = hp.boundaries_skycoord(ipix_l, step=1)
+
+            x, y = skycoord_to_pixel(vertices_boundaries, wcs=wcs)
+            if X.size > 1:
+                X = np.vstack((X, x))
+                Y = np.vstack((Y, y))
+            else:
+                X = x
+                Y = y
+
+        # Convert them to pixel coordinates
+        vertices = PixCoord(X, Y)
+        return MOCPixelRegion(vertices=vertices,
+                              sky_region=self,
+                              meta=self.meta,
+                              visual=self.visual)
 
     def plot(self):
         raise NotImplementedError
