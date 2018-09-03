@@ -206,6 +206,17 @@ class TestMOC(object):
         assert self.moc_from_fits.complement().complement() == self.moc_from_fits
 
 
+    @pytest.mark.parametrize("pos_x, pos_y, expected_result", [
+        (-6, 4, True),
+        (0, 0, False),
+        (0.6, 3.4, False),
+    ])
+    def test_contains_pix_moc(self, wcs, pos_x, pos_y, expected_result):
+        pixel = PixCoord(pos_x, pos_y)
+
+        reg = self.moc_from_fits.to_pixel(wcs)
+        assert reg.contains(pixel) == expected_result
+
 
     def test_to_sky(self, wcs):
         reg_px = self.moc_from_fits.to_pixel(wcs)

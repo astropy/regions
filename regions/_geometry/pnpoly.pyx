@@ -69,6 +69,36 @@ cimport numpy as np
 DTYPE_BOOL = np.bool
 ctypedef np.uint8_t DTYPE_BOOL_t
 
+def points_in_polygons(np.ndarray[DTYPE_t, ndim=1] x,
+                       np.ndarray[DTYPE_t, ndim=1] y,
+                       np.ndarray[DTYPE_t, ndim=2] vx,
+                       np.ndarray[DTYPE_t, ndim=2] vy):
+    cdef int i, n
+    cdef np.ndarray[np.uint8_t, ndim=1, cast=True] result
+
+    n = x.shape[0]
+
+    result = np.zeros(n, DTYPE_BOOL)
+
+    for i in range(n):
+        result[i] = point_in_polygons(x[i], y[i], vx, vy)
+
+    return result
+
+cdef int point_in_polygons(double x, double y,
+                           np.ndarray[DTYPE_t, ndim=2] vx,
+                           np.ndarray[DTYPE_t, ndim=2] vy):
+    cdef int i, j, num_poly
+    cdef np.uint8_t in_poly
+
+    num_poly = vx.shape[0]
+
+    for i in range(num_poly):
+        in_poly = point_in_polygon(x, y, vx[i], vy[i])
+        if in_poly:
+            return 1
+
+    return 0
 
 def points_in_polygon(np.ndarray[DTYPE_t, ndim=1] x,
                       np.ndarray[DTYPE_t, ndim=1] y,

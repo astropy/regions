@@ -199,6 +199,28 @@ class MOCPixelRegion(PixelRegion):
         fraction_clipped = np.clip(a=fraction_sum, a_min=0, a_max=1)
         return Mask(fraction_clipped, bbox=bbox)
 
+    def contains(self, pixcoord):
+        """
+        Checks whether a position or positions fall inside the region.
+
+        Parameters
+        ----------
+        pixcoord : `~regions.PixCoord`
+            The position or positions to check.
+        """
+        pixcoord = PixCoord._validate(pixcoord, 'pixcoord')
+        x = np.atleast_1d(np.asarray(pixcoord.x, dtype=float))
+        y = np.atleast_1d(np.asarray(pixcoord.y, dtype=float))
+
+        shape = x.shape
+        vx, vy = self.vertices_culled
+        mask = points_in_polygons(x.flatten(), y.flatten(), vx, vy).astype(bool)
+        in_poly = mask.reshape(shape)
+        if self.meta.get('include', True):
+            return in_poly
+        else:
+            return np.logical_not(in_poly)
+
 class MOCSkyRegion(SkyRegion):
     """
     A MOC (Multi-Order Coverage map)
