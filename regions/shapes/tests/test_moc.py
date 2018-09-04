@@ -17,6 +17,11 @@ from ...tests.helpers import make_simple_wcs
 
 from ..moc import MOCSkyRegion
 
+try:
+    import matplotlib.pyplot as plt
+    HAS_MPL = True
+except ImportError:
+    HAS_MPL = False
 
 @pytest.fixture()
 def get_random_skycoords():
@@ -225,8 +230,8 @@ class TestMOC(object):
         assert reg_cast_back_sky == self.moc_from_fits
 
 
+    @pytest.mark.skipif('not HAS_MPL')
     def test_as_artist_moc(self, wcs):
-        # wcs = make_simple_wcs(SkyCoord([0, 50, 50, 0], [50, 50, 0, 0], "icrs", unit="deg"), 0.1 * u.deg, 20)
         reg = self.moc_from_fits.to_pixel(wcs)
 
         import matplotlib.pyplot as plt
