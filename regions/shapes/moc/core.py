@@ -121,7 +121,7 @@ class MOCPixelRegion(PixelRegion):
 
         Parameters:
         -----------
-        origin : array_like, optional
+        origin : (float, float), optional
             The ``(x, y)`` pixel position of the origin of the displayed image.
             Default is (0, 0).
         kw_mpl_pathpatch: dict
@@ -929,7 +929,7 @@ class MOCSkyRegion(SkyRegion):
         Degrade a `~regions.MOCSkyRegion` object.
 
         The degraded MOC has an order equals to ``new_order``. ``new_order`` must be smaller
-		than the current order of the MOC.
+        than the current order of the MOC.
 
         Parameters
         ----------
@@ -939,7 +939,7 @@ class MOCSkyRegion(SkyRegion):
         Returns
         -------
         moc : `~regions.MOCSkyRegion`
-			The degraded MOC
+            The degraded MOC
         """
         shift = 2 * (MOCSkyRegion.HPY_MAX_NORDER - new_order)
         ofs = (int(1) << shift) - 1

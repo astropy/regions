@@ -7,13 +7,6 @@ import numpy as np
 
 from .utils import uniq2orderipix
 
-__author__ = "Thomas Boch"
-__copyright__ = "CDS, Centre de Données astronomiques de Strasbourg"
-
-__license__ = "BSD 3-Clause License"
-__email__ = "thomas.boch@astro.unistra.fr"
-
-
 class IntervalSet:
     """Internal data structure for representing a MOC using the NESTED numbering scheme.
 
