@@ -17,4 +17,3 @@ if PY2:
 else:
     int = int
     range = range
-

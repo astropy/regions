@@ -1,7 +1,4 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-# TODO : try removing this line
-# -*- coding: utf-8 -*-
-
 from __future__ import absolute_import, division, print_function, unicode_literals
 from .py23_compat import range, int
 
