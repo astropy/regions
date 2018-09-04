@@ -11,7 +11,7 @@ from astropy.coordinates import ICRS
 from astropy.io import fits
 from astropy_healpix import HEALPix
 
-from ...core import PixCoord, Mask
+from ...core import PixCoord, RegionMask
 from ..._utils.examples import make_example_dataset
 from ...tests.helpers import make_simple_wcs
 
@@ -225,7 +225,7 @@ class TestMOC(object):
         assert reg_cast_back_sky == self.moc_from_fits
 
 
-    def test_as_patch_moc(self, wcs):
+    def test_as_artist_moc(self, wcs):
         # wcs = make_simple_wcs(SkyCoord([0, 50, 50, 0], [50, 50, 0, 0], "icrs", unit="deg"), 0.1 * u.deg, 20)
         reg = self.moc_from_fits.to_pixel(wcs)
 

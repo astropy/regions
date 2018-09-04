@@ -21,7 +21,7 @@ from astropy_healpix.healpy import nside2npix
 from .interval_set import IntervalSet
 from .utils import uniq2orderipix, trailing_zeros
 
-from ...core import PixCoord, PixelRegion, SkyRegion, BoundingBox, Mask
+from ...core import PixCoord, PixelRegion, SkyRegion, BoundingBox, RegionMask
 from ...core.attributes import RegionMeta, RegionVisual
 from ..._geometry.pnpoly import points_in_polygons
 from ..._geometry import polygonal_overlap_grid
@@ -118,7 +118,23 @@ class MOCPixelRegion(PixelRegion):
 
         return vx, vy
 
-    def as_patch(self, origin=(0, 0), **kw_mpl_pathpatch):
+    def as_artist(self, origin=(0, 0), **kw_mpl_pathpatch):
+        """
+        Matplotlib patch object for this region (`matplotlib.patches.PathPatch`)
+
+        Parameters:
+        -----------
+        origin : array_like, optional
+            The ``(x, y)`` pixel position of the origin of the displayed image.
+            Default is (0, 0).
+        kw_mpl_pathpatch: dict
+            All keywords that a `~matplotlib.patches.PathPatch` object accepts
+
+        Returns
+        -------
+        patch : `~matplotlib.patches.PathPatch`
+            Matplotlib path patch
+        """
         from matplotlib.path import Path
         from matplotlib.patches import PathPatch
 
@@ -197,7 +213,7 @@ class MOCPixelRegion(PixelRegion):
 
         # Clip its values to the interval (0, 1)
         fraction_clipped = np.clip(a=fraction_sum, a_min=0, a_max=1)
-        return Mask(fraction_clipped, bbox=bbox)
+        return RegionMask(fraction_clipped, bbox=bbox)
 
     def contains(self, pixcoord):
         """
