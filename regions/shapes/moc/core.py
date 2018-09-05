@@ -37,7 +37,7 @@ class MOCPixelRegion(PixelRegion):
     `paper <http://www.ivoa.net/documents/MOCSkyRegion.>`__ .
     MOC are based on the HEALPix sky tessellation using the NESTED numbering scheme. A MOC is a set of
     HEALPix cells at different orders with a maximum resolution corresponding to the order 29 i.e. a cell
-    resolution of ~393.2μas.
+    resolution of ~393.2uas.
 
     * MOCs are usually stored as FITS file containing a list of UNIQ numbers describing the HEALPix cells at \
       different orders. This class aims at creating MOC maps from FITS/json formatted files, FITS images associated with a mask numpy array, \
@@ -227,7 +227,7 @@ class MOCSkyRegion(SkyRegion):
     `paper <http://www.ivoa.net/documents/MOCSkyRegion.>`__ .
     MOC are based on the HEALPix sky tessellation using the NESTED numbering scheme. A MOC is a set of
     HEALPix cells at different orders with a maximum resolution corresponding to the order 29 i.e. a cell
-    resolution of ~393.2μas.
+    resolution of ~393.2uas.
 
     * MOCs are usually stored as FITS file containing a list of UNIQ numbers describing the HEALPix cells at \
       different orders. This class aims at creating MOC maps from FITS/json formatted files, FITS images associated with a mask numpy array, \
