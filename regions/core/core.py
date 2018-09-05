@@ -256,7 +256,6 @@ class PixelRegion(Region):
         """
         raise NotImplementedError
 
-
     def mpl_properties_default(self, shape='patch'):
         """
         This sets the default values of the visual attributes as specified
