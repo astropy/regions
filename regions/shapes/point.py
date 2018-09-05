@@ -102,7 +102,7 @@ class PointPixelRegion(PixelRegion):
 
         Returns
         -------
-        patch : `~matplotlib.lines.Line2D`
+        point : `~matplotlib.lines.Line2D`
             Matplotlib Line2D object.
         """
 
@@ -115,31 +115,6 @@ class PointPixelRegion(PixelRegion):
                        **mpl_params)
 
         return point
-
-    def plot(self, origin=(0, 0), ax=None, **kwargs):
-        """
-        Forwards all kwargs to `~matplotlib.lines.Line2D` object and adds the
-        line to the given axes.
-
-        Parameters
-        ----------
-        origin : array_like, optional
-            The ``(x, y)`` pixel position of the origin of the displayed image.
-            Default is (0, 0).
-        ax : `~matplotlib.axes.Axes`, optional
-            Axes on which the point is added
-        kwargs : dict
-            All keywords that a `~matplotlib.lines.Line2D` object accepts
-        """
-        from matplotlib import pyplot as plt
-
-        if ax is None:
-            ax = plt.gca()
-
-        point = self.as_artist(origin=origin, kwargs=kwargs)
-        ax.add_line(point)
-
-        return ax
 
 
 class PointSkyRegion(SkyRegion):
