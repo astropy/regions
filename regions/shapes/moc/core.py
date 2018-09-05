@@ -134,7 +134,7 @@ class MOCPixelRegion(PixelRegion):
         # Cast to a numpy array
         path_vertices_arr = np.array(path_vertices_l)
         # Add the origin to the path constructed
-        path_vertices_arr += origin
+        path_vertices_arr += np.array(origin)
 
         path = Path(path_vertices_arr, codes)
         pathpatch = PathPatch(path, **kw_mpl_pathpatch)
