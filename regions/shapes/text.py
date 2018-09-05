@@ -58,43 +58,31 @@ class TextPixelRegion(PointPixelRegion):
         center = pixel_to_skycoord(self.center.x, self.center.y, wcs=wcs)
         return TextSkyRegion(center, self.text)
 
-    def as_artist(self, **kwargs):
-        raise NotImplementedError
-
-    def plot(self, origin=(0, 0), ax=None, **kwargs):
+    def as_artist(self, origin=(0, 0), **kwargs):
         """
-        Forwarding all kwargs to `~matplotlib.text.Text` object and add it
-        to given axis.
+        Matplotlib Text object for this region (`matplotlib.text.Text`).
 
         Parameters
         ----------
         origin : array_like, optional
             The ``(x, y)`` pixel position of the origin of the displayed image.
             Default is (0, 0).
-        ax : `~matplotlib.axes`, optional
-            Axes
-        kwargs: `dict`
-            keywords that a `~matplotlib.text.Text` accepts
+        kwargs : `dict`
+            All keywords that a `~matplotlib.text.Text` object accepts
 
         Returns
         -------
-        ax : `~matplotlib.axes`
-            The axes with the text.
+        text : `~matplotlib.text.Text`
+            Matplotlib Text object.
         """
-        import matplotlib.pyplot as plt
         from matplotlib.text import Text
-
-        if ax is None:
-            ax = plt.gca()
 
         mpl_params = self.mpl_properties_default('text')
         mpl_params.update(kwargs)
         text = Text(self.center.x - origin[0], self.center.y - origin[1],
                     self.text, **mpl_params)
 
-        ax.add_artist(text)
-
-        return ax
+        return text
 
 
 class TextSkyRegion(PointSkyRegion):

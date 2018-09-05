@@ -90,28 +90,28 @@ class PointPixelRegion(PixelRegion):
 
     def as_artist(self, origin=(0, 0), **kwargs):
         """
-        Matplotlib patch object for this region (`matplotlib.patches.Circle`).
+        Matplotlib Line2D object for this region (`matplotlib.lines.Line2D`).
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         origin : array_like, optional
             The ``(x, y)`` pixel position of the origin of the displayed image.
             Default is (0, 0).
-        kwargs: dict
-            All keywords that a `~matplotlib.patches.Circle` object accepts
+        kwargs : `dict`
+            All keywords that a `~matplotlib.lines.Line2D` object accepts
 
         Returns
         -------
-        patch : `~matplotlib.patches.Circle`
-            Matplotlib circle patch
+        point : `~matplotlib.lines.Line2D`
+            Matplotlib Line2D object.
         """
+
         from matplotlib.lines import Line2D
 
-        # We can move this to a method like `as_artist`
-        mpl_params = self.mpl_properties_default('Line2D')
+        mpl_params = self.mpl_properties_default('LINE2D')
         mpl_params.update(kwargs)
-        point = Line2D([self.center.x + origin[0]],
-                       [self.center.y + origin[1]],
+
+        point = Line2D([self.center.x - origin[0]], [self.center.y - origin[1]],
                        **mpl_params)
 
         return point
