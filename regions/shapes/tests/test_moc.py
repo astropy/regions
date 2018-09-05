@@ -107,14 +107,10 @@ class TestMOC(object):
 
 
     def test_write_and_from_json(self):
-        tmp_file = tempfile.NamedTemporaryFile()
-        self.moc_from_fits.write(tmp_file.name, format='json', write_to_file=True)
-
-        with open(tmp_file.name, 'r') as moc_file:
-            import json
-            moc_d = json.load(moc_file)
-            moc2 = MOCSkyRegion.from_json(json_moc=moc_d)
-            assert self.moc_from_fits == moc2
+        # A dictionary of ('order', [ipix]) key-value pairs
+        moc_serialized_d = self.moc_from_fits.write(format='json')
+        moc_from_serialization = MOCSkyRegion.from_json(moc_serialized_d)
+        assert self.moc_from_fits == moc_from_serialization
 
 
     def test_write_to_fits(self):
