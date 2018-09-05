@@ -116,22 +116,6 @@ class MOCPixelRegion(PixelRegion):
         return vx, vy
 
     def as_artist(self, origin=(0, 0), **kw_mpl_pathpatch):
-        """
-        Matplotlib patch object for this region (`matplotlib.patches.PathPatch`)
-
-        Parameters:
-        -----------
-        origin : (float, float), optional
-            The ``(x, y)`` pixel position of the origin of the displayed image.
-            Default is (0, 0).
-        kw_mpl_pathpatch: dict
-            All keywords that a `~matplotlib.patches.PathPatch` object accepts
-
-        Returns
-        -------
-        patch : `~matplotlib.patches.PathPatch`
-            Matplotlib path patch
-        """
         from matplotlib.path import Path
         from matplotlib.patches import PathPatch
 
@@ -318,7 +302,7 @@ class MOCSkyRegion(SkyRegion):
             vertices_boundaries = hp.boundaries_skycoord(ipix_l, step=1)
 
             x, y = skycoord_to_pixel(vertices_boundaries, wcs=wcs)
-            if X.size > 1:
+            if X.size >= 1:
                 X = np.vstack((X, x))
                 Y = np.vstack((Y, y))
             else:
@@ -374,10 +358,10 @@ class MOCSkyRegion(SkyRegion):
         moc : `~regions.MOCSkyRegion`
             A new `~regions.MOCSkyRegion` object.
         """
-        intervals_arr = np.array([])
+        intervals_arr = np.array([], dtype=np.int64)
 
         for order, pix_l in json_moc.items():
-            pix_arr = np.array(pix_l)
+            pix_arr = np.array(pix_l, dtype=np.int64)
             p1 = pix_arr
             p2 = pix_arr + 1
             shift = 2 * (MOCSkyRegion.HPY_MAX_NORDER - int(order))
@@ -586,7 +570,7 @@ class MOCSkyRegion(SkyRegion):
 
         Returns
         -------
-        array : `~numpy.darray`
+        array : `~numpy.ndarray`
             A boolean numpy array telling which positions are inside/outside of the MOC depending on the
             value of ``self.meta['include']``.
         """
@@ -641,7 +625,7 @@ class MOCSkyRegion(SkyRegion):
             for uniq in range(uniq_iv[0], uniq_iv[1]):
                 uniq_l.append(uniq)
 
-        uniq_arr = np.asarray(uniq_l)
+        uniq_arr = np.asarray(uniq_l, dtype=np.int64)
 
         if format == 'fits':
             result = self.__class__._to_fits(uniq_arr=uniq_arr,
@@ -817,7 +801,7 @@ class MOCSkyRegion(SkyRegion):
         if last < max_pix_order:
             res.append((last, max_pix_order))
 
-        return self.__class__(IntervalSet(np.asarray(res)))
+        return self.__class__(IntervalSet(np.asarray(res, dtype=np.int64)))
 
     def add_neighbours(self):
         """
@@ -922,7 +906,7 @@ class MOCSkyRegion(SkyRegion):
             for val in range(iv[0] >> factor, iv[1] >> factor):
                 pix_l.append(val)
 
-        return np.asarray(pix_l)
+        return np.asarray(pix_l, dtype=np.int64)
 
     def degrade_to_order(self, new_order):
         """
@@ -954,4 +938,4 @@ class MOCSkyRegion(SkyRegion):
             if b > a:
                 iv_set.append((a, b))
 
-        return self.__class__(IntervalSet.from_numpy_array(np.asarray(iv_set)))
+        return self.__class__(IntervalSet.from_numpy_array(np.asarray(iv_set, dtype=np.int64)))

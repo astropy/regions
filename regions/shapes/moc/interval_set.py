@@ -39,7 +39,7 @@ class IntervalSet:
             True by default. Remove the overlapping intervals that makes
             a valid MOC (i.e. can be plot, serialized, manipulated).
         """
-        intervals = np.array([]) if intervals is None else intervals
+        intervals = np.array([], dtype=np.int64) if intervals is None else intervals
         self._intervals = intervals
         if make_consistent:
             self._merge_intervals()
@@ -105,19 +105,19 @@ class IntervalSet:
                 start, stop = itv
                 continue
 
-            #  gap between intervals
+            # gap between intervals
             if itv[0] > stop:
                 ret.append((start, stop))
                 start, stop = itv
             else:
-                #  merge intervals
+                # merge intervals
                 if itv[1] > stop:
                     stop = itv[1]
 
         if start is not None and stop is not None:
             ret.append((start, stop))
 
-        self._intervals = np.asarray(ret)
+        self._intervals = np.asarray(ret, dtype=np.int64)
 
     def union(self, another_is):
         """
@@ -226,12 +226,12 @@ class IntervalSet:
                     res.append((a + ofs2, b + ofs2))
 
             if len(r4) > 0:
-                r4_is = IntervalSet.from_numpy_array(np.asarray(r4))
+                r4_is = IntervalSet.from_numpy_array(np.asarray(r4, dtype=np.int64))
                 r2 = r2.difference(r4_is)
 
             order += 1
 
-        return IntervalSet.from_numpy_array(np.asarray(res))
+        return IntervalSet.from_numpy_array(np.asarray(res, dtype=np.int64))
 
     @classmethod
     def from_nuniq_interval_set(cls, nuniq_is):
@@ -262,7 +262,7 @@ class IntervalSet:
                 order, i_pix = uniq2orderipix(j)
 
                 if order != last_order:
-                    nested_is = nested_is.union(IntervalSet.from_numpy_array(np.asarray(rtmp)))
+                    nested_is = nested_is.union(IntervalSet.from_numpy_array(np.asarray(rtmp, dtype=np.int64)))
                     rtmp = []
                     last_order = order
                     diff_order = IntervalSet.HPY_MAX_ORDER - order
@@ -270,7 +270,7 @@ class IntervalSet:
 
                 rtmp.append((i_pix << shift_order, (i_pix + 1) << shift_order))
 
-        nested_is = nested_is.union(IntervalSet.from_numpy_array(np.asarray(rtmp)))
+        nested_is = nested_is.union(IntervalSet.from_numpy_array(np.asarray(rtmp, dtype=np.int64)))
         return nested_is
 
     @staticmethod
@@ -327,4 +327,4 @@ class IntervalSet:
 
             scan = min(a_endpoints[a_index], b_endpoints[b_index])
 
-        return np.asarray(res).reshape((-1, 2))
+        return np.asarray(res, dtype=np.int64).reshape((-1, 2))
