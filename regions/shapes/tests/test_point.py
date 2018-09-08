@@ -50,7 +50,7 @@ class TestPointPixelRegion(BaseTestPixelRegion):
 
         artist = self.reg.as_artist(origin=(1, 1))
 
-        assert artist.get_data() == ([4], [5])
+        assert artist.get_data() == ([2], [3])
 
 
 class TestPointSkyRegion(BaseTestSkyRegion):
