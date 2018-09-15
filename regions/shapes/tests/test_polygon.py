@@ -13,7 +13,7 @@ from ..._utils.examples import make_example_dataset
 from ...core import PixCoord, BoundingBox
 from ...tests.helpers import make_simple_wcs
 from ..polygon import PolygonPixelRegion, PolygonSkyRegion
-from .utils import ASTROPY_LT_13, HAS_MATPLOTLIB  # noqa
+from .utils import HAS_MATPLOTLIB  # noqa
 from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
 
 
@@ -97,20 +97,12 @@ class TestPolygonSkyRegion(BaseTestSkyRegion):
 
     reg = PolygonSkyRegion(SkyCoord([3, 4, 3] * u.deg, [3, 4, 4] * u.deg))
 
-    if ASTROPY_LT_13:
-        expected_repr = ('<PolygonSkyRegion(vertices=<SkyCoord (ICRS): (ra, '
-                    'dec) in deg\n    [(3.0, 3.0), (4.0, 4.0), (3.0, '
-                    '4.0)]>)>')
-        expected_str = ('Region: PolygonSkyRegion\nvertices: <SkyCoord (ICRS):'
-                   ' (ra, dec) in deg\n    [(3.0, 3.0), (4.0, 4.0), (3.0,'
-                   ' 4.0)]>')
-    else:
-        expected_repr = ('<PolygonSkyRegion(vertices=<SkyCoord (ICRS): (ra, '
-                    'dec) in deg\n    [( 3.,  3.), ( 4.,  4.), ( 3.,  '
-                    '4.)]>)>')
-        expected_str = ('Region: PolygonSkyRegion\nvertices: <SkyCoord (ICRS):'
-                   ' (ra, dec) in deg\n    [( 3.,  3.), ( 4.,  4.), ( 3.,'
-                   '  4.)]>')
+    expected_repr = ('<PolygonSkyRegion(vertices=<SkyCoord (ICRS): (ra, '
+                'dec) in deg\n    [( 3.,  3.), ( 4.,  4.), ( 3.,  '
+                '4.)]>)>')
+    expected_str = ('Region: PolygonSkyRegion\nvertices: <SkyCoord (ICRS):'
+               ' (ra, dec) in deg\n    [( 3.,  3.), ( 4.,  4.), ( 3.,'
+               '  4.)]>')
 
     def test_transformation(self, wcs):
 

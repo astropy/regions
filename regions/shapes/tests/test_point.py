@@ -15,7 +15,7 @@ from astropy.wcs import WCS
 from ...core import PixCoord
 from ...tests.helpers import make_simple_wcs
 from ..point import PointPixelRegion, PointSkyRegion
-from .utils import ASTROPY_LT_13, HAS_MATPLOTLIB  # noqa
+from .utils import HAS_MATPLOTLIB  # noqa
 from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
 
 
@@ -57,16 +57,10 @@ class TestPointSkyRegion(BaseTestSkyRegion):
 
     reg = PointSkyRegion(SkyCoord(3, 4, unit='deg'))
 
-    if ASTROPY_LT_13:
-        expected_repr = ('<PointSkyRegion(<SkyCoord (ICRS): (ra, dec) in deg\n'
-                         '    (3.0, 4.0)>)>')
-        expected_str = ('Region: PointSkyRegion\ncenter: <SkyCoord (ICRS): '
-                        '(ra, dec) in deg\n    (3.0, 4.0)>')
-    else:
-        expected_repr = ('<PointSkyRegion(<SkyCoord (ICRS): (ra, dec) in deg\n'
-                         '    ( 3.,  4.)>)>')
-        expected_str = ('Region: PointSkyRegion\ncenter: <SkyCoord (ICRS): '
-                        '(ra, dec) in deg\n    ( 3.,  4.)>')
+    expected_repr = ('<PointSkyRegion(<SkyCoord (ICRS): (ra, dec) in deg\n'
+                     '    ( 3.,  4.)>)>')
+    expected_str = ('Region: PointSkyRegion\ncenter: <SkyCoord (ICRS): '
+                    '(ra, dec) in deg\n    ( 3.,  4.)>')
 
     def test_contains(self, wcs):
         position = SkyCoord([1, 2] * u.deg, [3, 4] * u.deg)

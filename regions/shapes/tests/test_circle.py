@@ -16,7 +16,7 @@ from astropy.wcs import WCS
 from ...core import PixCoord
 from ...tests.helpers import make_simple_wcs
 from ..circle import CirclePixelRegion, CircleSkyRegion
-from .utils import ASTROPY_LT_13, HAS_MATPLOTLIB  # noqa
+from .utils import HAS_MATPLOTLIB  # noqa
 from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
 
 
@@ -55,18 +55,11 @@ class TestCircleSkyRegion(BaseTestSkyRegion):
 
     reg = CircleSkyRegion(SkyCoord(3 * u.deg, 4 * u.deg), 2 * u.arcsec)
 
-    if ASTROPY_LT_13:
-        expected_repr = ('<CircleSkyRegion(<SkyCoord (ICRS): (ra, dec) in '
-                         'deg\n    (3.0, 4.0)>, radius=2.0 arcsec)>')
-        expected_str = ('Region: CircleSkyRegion\ncenter: <SkyCoord (ICRS): '
-                        '(ra, dec) in deg\n    (3.0, 4.0)>\nradius: 2.0 '
-                        'arcsec')
-    else:
-        expected_repr = ('<CircleSkyRegion(<SkyCoord (ICRS): (ra, dec) in '
-                         'deg\n    ( 3.,  4.)>, radius=2.0 arcsec)>')
-        expected_str = ('Region: CircleSkyRegion\ncenter: <SkyCoord (ICRS): '
-                        '(ra, dec) in deg\n    ( 3.,  4.)>\nradius: 2.0 '
-                        'arcsec')
+    expected_repr = ('<CircleSkyRegion(<SkyCoord (ICRS): (ra, dec) in '
+                     'deg\n    ( 3.,  4.)>, radius=2.0 arcsec)>')
+    expected_str = ('Region: CircleSkyRegion\ncenter: <SkyCoord (ICRS): '
+                    '(ra, dec) in deg\n    ( 3.,  4.)>\nradius: 2.0 '
+                    'arcsec')
 
     def test_transformation(self, wcs):
         skycoord = SkyCoord(3 * u.deg, 4 * u.deg, frame='galactic')

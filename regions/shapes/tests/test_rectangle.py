@@ -15,7 +15,7 @@ from astropy.wcs import WCS
 from ...core import PixCoord
 from ..rectangle import RectanglePixelRegion, RectangleSkyRegion
 from ...tests.helpers import make_simple_wcs
-from .utils import ASTROPY_LT_13, HAS_MATPLOTLIB  # noqa
+from .utils import HAS_MATPLOTLIB  # noqa
 from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
 
 
@@ -135,20 +135,12 @@ class TestRectangleSkyRegion(BaseTestSkyRegion):
         angle=5 * u.deg,
     )
 
-    if ASTROPY_LT_13:
-        expected_repr = ('<RectangleSkyRegion(<SkyCoord (ICRS): (ra, dec) in '
-                    'deg\n    (3.0, 4.0)>, width=4.0 deg, height=3.0 '
-                    'deg, angle=5.0 deg)>')
-        expected_str = ('Region: RectangleSkyRegion\ncenter: <SkyCoord '
-                   '(ICRS): (ra, dec) in deg\n    (3.0, 4.0)>\nwidth: '
-                   '4.0 deg\nheight: 3.0 deg\nangle: 5.0 deg')
-    else:
-        expected_repr = ('<RectangleSkyRegion(<SkyCoord (ICRS): (ra, dec) in '
-                    'deg\n    ( 3.,  4.)>, width=4.0 deg, height=3.0 '
-                    'deg, angle=5.0 deg)>')
-        expected_str = ('Region: RectangleSkyRegion\ncenter: <SkyCoord '
-                   '(ICRS): (ra, dec) in deg\n    ( 3.,  4.)>\nwidth: '
-                   '4.0 deg\nheight: 3.0 deg\nangle: 5.0 deg')
+    expected_repr = ('<RectangleSkyRegion(<SkyCoord (ICRS): (ra, dec) in '
+                'deg\n    ( 3.,  4.)>, width=4.0 deg, height=3.0 '
+                'deg, angle=5.0 deg)>')
+    expected_str = ('Region: RectangleSkyRegion\ncenter: <SkyCoord '
+               '(ICRS): (ra, dec) in deg\n    ( 3.,  4.)>\nwidth: '
+               '4.0 deg\nheight: 3.0 deg\nangle: 5.0 deg')
 
     def test_contains(self, wcs):
         position = SkyCoord([1, 3] * u.deg, [2, 4] * u.deg)
