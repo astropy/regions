@@ -15,7 +15,6 @@ from astropy.wcs import WCS
 from ...core import PixCoord
 from ...tests.helpers import make_simple_wcs
 from ..text import TextPixelRegion, TextSkyRegion
-from .utils import ASTROPY_LT_13
 from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
 
 
@@ -47,16 +46,10 @@ class TestTextSkyRegion(BaseTestSkyRegion):
 
     reg = TextSkyRegion(SkyCoord(3, 4, unit='deg'), "Sample Text")
 
-    if ASTROPY_LT_13:
-        expected_repr = ('<TextSkyRegion(<SkyCoord (ICRS): (ra, dec) in deg\n'
-                            '    (3.0, 4.0)>, text=Sample Text)>')
-        expected_str = ('Region: TextSkyRegion\ncenter: <SkyCoord (ICRS): '
-                          '(ra, dec) in deg\n    (3.0, 4.0)>\ntext: Sample Text')
-    else:
-        expected_repr = ('<TextSkyRegion(<SkyCoord (ICRS): (ra, dec) in deg\n'
-                             '    ( 3.,  4.)>, text=Sample Text)>')
-        expected_str = ('Region: TextSkyRegion\ncenter: <SkyCoord (ICRS): '
-                        '(ra, dec) in deg\n    ( 3.,  4.)>\ntext: Sample Text')
+    expected_repr = ('<TextSkyRegion(<SkyCoord (ICRS): (ra, dec) in deg\n'
+                         '    ( 3.,  4.)>, text=Sample Text)>')
+    expected_str = ('Region: TextSkyRegion\ncenter: <SkyCoord (ICRS): '
+                    '(ra, dec) in deg\n    ( 3.,  4.)>\ntext: Sample Text')
 
     def test_contains(self, wcs):
         position = SkyCoord([1, 2] * u.deg, [3, 4] * u.deg)

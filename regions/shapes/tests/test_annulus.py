@@ -10,7 +10,6 @@ from ...core import PixCoord
 from ...tests.helpers import make_simple_wcs
 from ..annulus import *
 from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
-from .utils import ASTROPY_LT_13
 
 
 class TestCircleAnnulusPixelRegion(BaseTestPixelRegion):
@@ -42,18 +41,11 @@ class TestCircleAnnulusSkyRegion(BaseTestSkyRegion):
     skycoord = SkyCoord(3 * u.deg, 4 * u.deg, frame='icrs')
     wcs = make_simple_wcs(skycoord, 5 * u.arcsec, 20)
 
-    if ASTROPY_LT_13:
-        expected_repr = ('<CircleAnnulusSkyRegion(<SkyCoord (ICRS): (ra, dec) in '
-                         'deg\n    (3.0, 4.0)>, inner radius=20.0 arcsec, outer radius=30.0 arcsec)>')
-        expected_str = ('Region: CircleAnnulusSkyRegion\ncenter: <SkyCoord (ICRS): '
-                        '(ra, dec) in deg\n    (3.0, 4.0)>\ninner radius: 20.0 '
-                        'arcsec\nouter radius: 30.0 arcsec')
-    else:
-        expected_repr = ('<CircleAnnulusSkyRegion(<SkyCoord (ICRS): (ra, dec) in '
-                         'deg\n    ( 3.,  4.)>, inner radius=20.0 arcsec, outer radius=30.0 arcsec)>')
-        expected_str = ('Region: CircleAnnulusSkyRegion\ncenter: <SkyCoord (ICRS): '
-                        '(ra, dec) in deg\n    ( 3.,  4.)>\ninner radius: 20.0 '
-                        'arcsec\nouter radius: 30.0 arcsec')
+    expected_repr = ('<CircleAnnulusSkyRegion(<SkyCoord (ICRS): (ra, dec) in '
+                     'deg\n    ( 3.,  4.)>, inner radius=20.0 arcsec, outer radius=30.0 arcsec)>')
+    expected_str = ('Region: CircleAnnulusSkyRegion\ncenter: <SkyCoord (ICRS): '
+                    '(ra, dec) in deg\n    ( 3.,  4.)>\ninner radius: 20.0 '
+                    'arcsec\nouter radius: 30.0 arcsec')
 
     def test_init(self):
         assert_quantity_allclose(self.reg.center.ra, self.skycoord.ra)
@@ -106,24 +98,14 @@ class TestEllipseAnnulusSkyRegion(BaseTestSkyRegion):
                                   50 * u.arcsec, 80 * u.arcsec)
     wcs = make_simple_wcs(skycoord, 5 * u.arcsec, 20)
 
-    if ASTROPY_LT_13:
-        expected_repr = ('<EllipseAnnulusSkyRegion(<SkyCoord (ICRS): (ra, dec) in '
-                         'deg\n    (3.0, 4.0)>, inner width=20.0 arcsec, '
-                         'inner height=50.0 arcsec, outer width=50.0 arcsec, '
-                         'outer height=80.0 arcsec, angle=0.0 deg)>')
-        expected_str = ('Region: EllipseAnnulusSkyRegion\ncenter: <SkyCoord (ICRS): '
-                        '(ra, dec) in deg\n    (3.0, 4.0)>\ninner width: 20.0 arcsec\n'
-                        'inner height: 50.0 arcsec\nouter width: 50.0 arcsec\n'
-                        'outer height: 80.0 arcsec\nangle: 0.0 deg')
-    else:
-        expected_repr = ('<EllipseAnnulusSkyRegion(<SkyCoord (ICRS): (ra, dec) in '
-                         'deg\n    (3., 4.)>, inner width=20.0 arcsec, '
-                         'inner height=50.0 arcsec, outer width=50.0 arcsec, '
-                         'outer height=80.0 arcsec, angle=0.0 deg)>')
-        expected_str = ('Region: EllipseAnnulusSkyRegion\ncenter: <SkyCoord (ICRS): '
-                        '(ra, dec) in deg\n    (3., 4.)>\ninner width: 20.0 arcsec\n'
-                        'inner height: 50.0 arcsec\nouter width: 50.0 arcsec\n'
-                        'outer height: 80.0 arcsec\nangle: 0.0 deg')
+    expected_repr = ('<EllipseAnnulusSkyRegion(<SkyCoord (ICRS): (ra, dec) in '
+                     'deg\n    (3., 4.)>, inner width=20.0 arcsec, '
+                     'inner height=50.0 arcsec, outer width=50.0 arcsec, '
+                     'outer height=80.0 arcsec, angle=0.0 deg)>')
+    expected_str = ('Region: EllipseAnnulusSkyRegion\ncenter: <SkyCoord (ICRS): '
+                    '(ra, dec) in deg\n    (3., 4.)>\ninner width: 20.0 arcsec\n'
+                    'inner height: 50.0 arcsec\nouter width: 50.0 arcsec\n'
+                    'outer height: 80.0 arcsec\nangle: 0.0 deg')
 
     def test_init(self):
         assert_quantity_allclose(self.reg.center.ra, self.skycoord.ra)
@@ -176,24 +158,14 @@ class TestRectangleAnnulusSkyRegion(BaseTestSkyRegion):
                                   50 * u.arcsec, 80 * u.arcsec)
     wcs = make_simple_wcs(skycoord, 5 * u.arcsec, 20)
 
-    if ASTROPY_LT_13:
-        expected_repr = ('<RectangleAnnulusSkyRegion(<SkyCoord (ICRS): (ra, dec) in '
-                         'deg\n    (3.0, 4.0)>, inner width=20.0 arcsec, '
-                         'inner height=50.0 arcsec, outer width=50.0 arcsec, '
-                         'outer height=80.0 arcsec, angle=0.0 deg)>')
-        expected_str = ('Region: RectangleAnnulusSkyRegion\ncenter: <SkyCoord (ICRS): '
-                        '(ra, dec) in deg\n    (3.0, 4.0)>\ninner width: 20.0 arcsec\n'
-                        'inner height: 50.0 arcsec\nouter width: 50.0 arcsec\n'
-                        'outer height: 80.0 arcsec\nangle: 0.0 deg')
-    else:
-        expected_repr = ('<RectangleAnnulusSkyRegion(<SkyCoord (ICRS): (ra, dec) in '
-                         'deg\n    (3., 4.)>, inner width=20.0 arcsec, '
-                         'inner height=50.0 arcsec, outer width=50.0 arcsec, '
-                         'outer height=80.0 arcsec, angle=0.0 deg)>')
-        expected_str = ('Region: RectangleAnnulusSkyRegion\ncenter: <SkyCoord (ICRS): '
-                        '(ra, dec) in deg\n    (3., 4.)>\ninner width: 20.0 arcsec\n'
-                        'inner height: 50.0 arcsec\nouter width: 50.0 arcsec\n'
-                        'outer height: 80.0 arcsec\nangle: 0.0 deg')
+    expected_repr = ('<RectangleAnnulusSkyRegion(<SkyCoord (ICRS): (ra, dec) in '
+                     'deg\n    (3., 4.)>, inner width=20.0 arcsec, '
+                     'inner height=50.0 arcsec, outer width=50.0 arcsec, '
+                     'outer height=80.0 arcsec, angle=0.0 deg)>')
+    expected_str = ('Region: RectangleAnnulusSkyRegion\ncenter: <SkyCoord (ICRS): '
+                    '(ra, dec) in deg\n    (3., 4.)>\ninner width: 20.0 arcsec\n'
+                    'inner height: 50.0 arcsec\nouter width: 50.0 arcsec\n'
+                    'outer height: 80.0 arcsec\nangle: 0.0 deg')
 
     def test_init(self):
         assert_quantity_allclose(self.reg.center.ra, self.skycoord.ra)

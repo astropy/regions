@@ -16,7 +16,7 @@ from astropy.wcs import WCS
 from ...core import PixCoord
 from ...tests.helpers import make_simple_wcs
 from ..ellipse import EllipsePixelRegion, EllipseSkyRegion
-from .utils import ASTROPY_LT_13, HAS_MATPLOTLIB  # noqa
+from .utils import HAS_MATPLOTLIB  # noqa
 from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
 
 
@@ -80,20 +80,12 @@ class TestEllipseSkyRegion(BaseTestSkyRegion):
         angle=5 * u.deg,
     )
 
-    if ASTROPY_LT_13:
-        expected_repr = ('<EllipseSkyRegion(<SkyCoord (ICRS): (ra, dec) in '
-                    'deg\n    (3.0, 4.0)>, width=4.0 deg, height=3.0 deg,'
-                    ' angle=5.0 deg)>')
-        expected_str = ('Region: EllipseSkyRegion\ncenter: <SkyCoord (ICRS): '
-                   '(ra, dec) in deg\n    (3.0, 4.0)>\nwidth: 4.0 deg\n'
-                   'height: 3.0 deg\nangle: 5.0 deg')
-    else:
-        expected_repr = ('<EllipseSkyRegion(<SkyCoord (ICRS): (ra, dec) in '
-                    'deg\n    ( 3.,  4.)>, width=4.0 deg, height=3.0 deg,'
-                    ' angle=5.0 deg)>')
-        expected_str = ('Region: EllipseSkyRegion\ncenter: <SkyCoord (ICRS): '
-                   '(ra, dec) in deg\n    ( 3.,  4.)>\nwidth: 4.0 deg\n'
-                   'height: 3.0 deg\nangle: 5.0 deg')
+    expected_repr = ('<EllipseSkyRegion(<SkyCoord (ICRS): (ra, dec) in '
+                     'deg\n    ( 3.,  4.)>, width=4.0 deg, height=3.0 deg,'
+                     ' angle=5.0 deg)>')
+    expected_str = ('Region: EllipseSkyRegion\ncenter: <SkyCoord (ICRS): '
+                    '(ra, dec) in deg\n    ( 3.,  4.)>\nwidth: 4.0 deg\n'
+                    'height: 3.0 deg\nangle: 5.0 deg')
 
     def test_dimension_center(self):
         center = SkyCoord([1, 2] * u.deg, [3, 4] * u.deg)
