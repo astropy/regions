@@ -791,6 +791,7 @@ class MOCSkyRegion(SkyRegion):
         # Compute the neighbours of the ipixels retrieved
         hp = HEALPix(nside=nside, order='nested')
         ipix_neigh = hp.neighbours(ipix)[[0, 2, 4, 6], :]
+        ipix_neigh = ipix_neigh.reshape((1, -1))[0]
 
         # Get the union of the ipixels with their neighbours
         res = np.union1d(ipix, ipix_neigh)
@@ -818,7 +819,14 @@ class MOCSkyRegion(SkyRegion):
         # Retrieve the ipixels being at the border
         hp = HEALPix(nside=nside, order='nested')
         ipix_neigh = hp.neighbours(ipix)[[0, 2, 4, 6], :]
-        mask = np.isin(ipix_neigh, ipix)
+
+        r1 = np.in1d(ipix_neigh[0, :], ipix)
+        r2 = np.in1d(ipix_neigh[1, :], ipix)
+        r3 = np.in1d(ipix_neigh[2, :], ipix)
+        r4 = np.in1d(ipix_neigh[3, :], ipix)
+
+        mask = np.vstack((r1, r2, r3, r4))
+
         num_neigh = mask.sum(axis=0)
         border = num_neigh < 4
 
