@@ -180,17 +180,15 @@ currently supported.
 
     >>> from astropy.coordinates import SkyCoord
     >>> from regions import MOCSkyRegion
-
-    >>> # from a list of skycoords or astropy quantities at a given resolution max_norder
-    >>> skycoords = SkyCoord([1, 2, 2], [1, 1, 2], unit='deg')
-    >>> moc_sky = MOCSkyRegion.from_skycoords(skycoords=skycoords, max_norder=5)
-    >>> moc_lonlat = MOCSkyRegion.from_skycoords(lon=skycoords.icrs.ra, lat=skycoords.icrs.dec, max_norder=5)
-
-    >>> # from a FITS file containing a binary HDU table storing a list of NUNIQ integers describing the MOC
-    >>> moc_fits = MOCSkyRegion.from_fits(filename=<path>)
-
-    >>> # from a python dict of (order, [ipix]) key-value pairs.
-    >>> moc_json = MOCSkyRegion.from_json({'2': [0, 6], '5': [1, 3, 5, ...], ...})
+    >>> # From an astropy skycoord
+    ... skycoord = SkyCoord([1, 2, 2], [1, 1, 2], unit='deg')
+    ... moc = MOCSkyRegion.from_skycoord(skycoord=skycoord, max_level=5)
+    >>> # From astropy lon and lat quantities
+    ... moc = MOCSkyRegion.from_lonlat(lon=skycoord.icrs.ra, lat=skycoord.icrs.dec, max_level=5)
+    >>> # From a FITS file
+    ... moc = MOCSkyRegion.from_fits(<path>)
+    >>> # From a python dict storing the HEALPix cell indexes
+    >>> moc = MOCSkyRegion.from_json(data={'2': [0, 6], '5': [1, 3, 5, ...], ...})
 
 Transformations
 ---------------
