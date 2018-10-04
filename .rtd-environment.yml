@@ -8,7 +8,7 @@ dependencies:
   - python=3.5
   - numpy
   - cython
-  - matplotlib
+  - matplotlib=2.2.2
   - sphinx
   - astropy
   - shapely
