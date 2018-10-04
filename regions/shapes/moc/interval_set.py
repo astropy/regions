@@ -238,7 +238,7 @@ class IntervalSet:
         uniq_itvs = uniq_itv_s._data
         shift = 2 * IntervalSet.HPY_MAX_LVL
         for uniq_itv in uniq_itvs:
-            for j in range(uniq_itv[0], uniq_itv[1]):
+            for j in np.arange(uniq_itv[0], uniq_itv[1], dtype=np.int64):
                 level, ipix = uniq_to_level_ipix(j)
 
                 if level != last_level:

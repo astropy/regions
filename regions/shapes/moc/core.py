@@ -601,7 +601,7 @@ class MOCSkyRegion(SkyRegion):
         uniq_itvs = uniq_itv_s._data
         uniq_pix_l = []
         for uniq_itv in uniq_itvs:
-            for uniq in range(uniq_itv[0], uniq_itv[1]):
+            for uniq in np.arange(uniq_itv[0], uniq_itv[1], dtype=np.int64):
                 uniq_pix_l.append(uniq)
 
         uniq_pix = np.asarray(uniq_pix_l, dtype=np.int64)
@@ -843,7 +843,7 @@ class MOCSkyRegion(SkyRegion):
         factor = 2 * (MOCSkyRegion.HPY_MAX_LVL - self.max_level)
         ipix = []
         for iv in self._itv_s._data:
-            for val in range(iv[0] >> factor, iv[1] >> factor):
+            for val in np.arange(iv[0] >> factor, iv[1] >> factor, dtype=np.int64):
                 ipix.append(val)
 
         return np.asarray(ipix, dtype=np.int64)
