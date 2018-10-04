@@ -811,91 +811,60 @@ class MOCSkyRegion(SkyRegion):
 
     def add_neighbours(self):
         """
-        Add all the pixels at max order in the neighbourhood of self.
-
-        The algorithm for adding HEALPix cell neighbors follows the steps:
-
-        1. Get the HEALPix cell array of self at its max order.
-        2. Get the HEALPix cell array containing the neighbors of the first array (i.e. an ``extended`` HEALPix
-           cell array containing the first one).
-        3. Subtract the first from the second HEALPix cell array to get only the HEALPix cells
-           located at the border of self.
-        4. This last HEALPix cell array is added to self.
+        Add the HEALPix cell indexes located at the border
 
         Returns
         -------
         moc : `~regions.MOCSkyRegion`
-            Self which has been augmented.
+            The augmented MOC
         """
-        pix_id_arr = self._best_res_pixels()
+        # Retrieve the ipixels at the deepest level
+        ipix = self._best_res_pixels()
+        max_level = self.max_level
+        nside = level_to_nside(max_level)
 
-        hp = HEALPix(nside=(1 << self.max_order), order='nested')
-        neighbour_pix_arr = MOCSkyRegion._get_neighbour_pix(hp, pix_id_arr)
+        # Compute the neighbours of the ipixels retrieved
+        hp = HEALPix(nside=nside, order='nested')
+        ipix_neigh = hp.neighbours(ipix)[[0, 2, 4, 6], :]
 
-        augmented_pix_arr = np.setdiff1d(neighbour_pix_arr, pix_id_arr)
+        # Get the union of the ipixels with their neighbours
+        res = np.union1d(ipix, ipix_neigh)
 
-        shift = 2 * (MOCSkyRegion.HPY_MAX_NORDER - self.max_order)
-        intervals_arr = np.vstack((augmented_pix_arr << shift, (augmented_pix_arr + 1) << shift)).T
+        shift = 2 * (MOCSkyRegion.HPY_MAX_LVL - max_level)
+        itvs = np.vstack((res << shift, (res + 1) << shift)).T
 
-        self._interval_set = self._interval_set.union(IntervalSet.from_numpy_array(intervals_arr))
-        return self
+        itv_s = IntervalSet(itvs)
+        return MOCSkyRegion(itv_s)
 
     def remove_neighbours(self):
         """
-        Remove all the pixels at max order located at the bound of self.
-
-        The algorithm for removing the HEALPix cells located at the border of self follows the steps:
-
-        1. Get the HEALPix cell array of self at its max order.
-        2. Get the HEALPix cell array containing the neighbors of the first array (i.e. an ``extended`` HEALPix
-           cell array containing the first one).
-        3. Subtract the first from the second HEALPix cell array to get only the HEALPix cells
-           located at the border of self.
-        4. Same as step 2. to get the HEALPix cell array containing the neighbors of the last computed array (i.e. we get the HEALPix cell neighbors
-           of the HEALPix neighbors of self).
-        5. This last HEALPix cell array is subtracted from the HEALPix cell array describing self.
+        Remove the HEALPix cell indexes located at the border
 
         Returns
         -------
         moc : `~regions.MOCSkyRegion`
-            Self whose HEALPix cells located at its border have been removed.
+            The diminished MOC
         """
-        pix_id_arr = self._best_res_pixels()
+        # Retrieve the ipixels at the deepest level
+        ipix = self._best_res_pixels()
+        max_level = self.max_level
+        nside = level_to_nside(max_level)
 
-        hp = HEALPix(nside=(1 << self.max_order), order='nested')
-        neighbour_pix_arr = MOCSkyRegion._get_neighbour_pix(hp, pix_id_arr)
+        # Retrieve the ipixels being at the border
+        hp = HEALPix(nside=nside, order='nested')
+        ipix_neigh = hp.neighbours(ipix)[[0, 2, 4, 6], :]
+        mask = np.isin(ipix_neigh, ipix)
+        num_neigh = mask.sum(axis=0)
+        border = num_neigh < 4
 
-        only_neighbour_arr = np.setxor1d(neighbour_pix_arr, pix_id_arr)
+        # Get the ipixels which are not at the border
+        res = ipix[~border]
 
-        bound_pix_arr = MOCSkyRegion._get_neighbour_pix(hp, only_neighbour_arr)
+        shift = 2 * (MOCSkyRegion.HPY_MAX_LVL - max_level)
+        itvs = np.vstack((res << shift, (res + 1) << shift)).T
 
-        diminished_pix_arr = np.setdiff1d(pix_id_arr, bound_pix_arr)
-
-        shift = 2 * (MOCSkyRegion.HPY_MAX_NORDER - self.max_order)
-        intervals_arr = np.vstack((diminished_pix_arr << shift, (diminished_pix_arr + 1) << shift)).T
-        self._interval_set = IntervalSet.from_numpy_array(intervals_arr)
-        return self
-
-    @staticmethod
-    def _get_neighbour_pix(hp, pix_arr):
-        """
-        Get the HEALPix cells located in the neighborhood of ``pix_arr``.
-
-        Parameters
-        ----------
-        hp : `~astropy_healpix.HEALPix`
-            The astropy-healpix context.
-        pix_arr : `~numpy.ndarray`
-            Array of HEALPix cells at a specific order -- linked to ``hp``.
-
-        Returns
-        -------
-        neighbors_pix_arr : `~numpy.ndarray`
-            The HEALPix cells located in the neighborhood of ``pix_arr``.
-        """
-        neighbors_pix_arr = np.unique(hp.neighbours(pix_arr).ravel())
-        # Remove negative HEALPix cell values returned by `~astropy_healpix.HEALPix.neighbours`
-        return neighbors_pix_arr[np.where(neighbors_pix_arr >= 0)]
+        itv_s = IntervalSet(itvs)
+        return MOCSkyRegion(itv_s)
 
     def _best_res_pixels(self):
         """
