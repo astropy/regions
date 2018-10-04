@@ -39,34 +39,15 @@ __all__ = [
 
 class MOCPixelRegion(PixelRegion):
     """
-    A MOC (Multi-Order Coverage map) in pixel coordinates.
-
-    MOC stands for Multi-Order Coverage. It is a spatial and hierarchical description of a region on a sphere.
-    MOC is an IVOA standard which was first introduced in the following
-    `paper <http://www.ivoa.net/documents/MOCSkyRegion.>`__ .
-    MOC are based on the HEALPix sky tessellation using the NESTED numbering scheme. A MOC is a set of
-    HEALPix cells at different orders with a maximum resolution corresponding to the order 29 i.e. a cell
-    resolution of ~393.2uas.
-
-    * MOCs are usually stored as FITS file containing a list of UNIQ numbers describing the HEALPix cells at \
-      different orders. This class aims at creating MOC maps from FITS/json formatted files, FITS images associated with a mask numpy array, \
-      an `astropy.coordinates.SkyCoord` object and lon, lat expressed as `astropy.units.Quantity` objects.
-
-    * Basic operations on MOCs are available such as the intersection, union, difference and complement of a MOC.
-
-    * A :meth:`~regions.MOCSkyRegion.contains` method filters positions expressed as \
-      `~astropy.units.Quantity` to only keep those lying inside/outside the MOC.
-
-    * A MOC can be serialized to FITS (i.e. a list of UNIQ numbers stored in a \
-      binary HDU table) and JSON formats. An optional parameter allows the user to write it to a file.
+    A MOC (Multi-Order Coverage) map in pixel coordinates.
 
     Parameters
     ----------
     vertices : `~regions.core.PixCoord` object
-        A list of pixel coordinates describing the vertice boundaries of all the HEALPix cells (i.e. 4 pixels for each HEALPix cells).
-        Contains two Nx4 numpy arrays, one storing the x coordinates of the HEALPix cell vertices (4 for each cell) and the other for the y coordinates.
+        A list of pixel coordinates describing the 4 boundary vertices of all the HEALPix cells.
+        Contains two Nx4 numpy arrays, one storing the X coordinates of the HEALPix cell vertices and the other storing the Y coordinates.
     sky_region: `~regions.MOCSkyRegion` object
-        The sky region linked to this pixel region object. A MOC is always defined by a MOCSkyRegion first before applying a WCS to it.
+        The `~regions.MOCSkyRegion` object
     meta : `~regions.RegionMeta` object, optional
         A dictionary which stores the meta attributes of this region.
     visual : `~regions.RegionVisual` object, optional
@@ -78,7 +59,7 @@ class MOCPixelRegion(PixelRegion):
 
         # The backfacing HEALPix cells are culled before plotting the MOC.
         self.vertices_culled = self._backface_culling(self.vertices)
-        self.sky_region = sky_region
+        self.moc = sky_region
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
         self._repr_params = ('_interval_set',)
@@ -125,33 +106,54 @@ class MOCPixelRegion(PixelRegion):
         return vx, vy
 
     def as_artist(self, origin=(0, 0), **kw_mpl_pathpatch):
+        """
+        Matplotlib patch object for this region (`matplotlib.patches.PathPatch`)
+
+        Parameters:
+        -----------
+        origin : `~numpy.ndarray`, optional
+            The ``(x, y)`` pixel position of the origin of the displayed image.
+            Default is (0, 0).
+        kwargs: dict
+            All keywords that a `~matplotlib.patches.PathPatch` object accepts
+
+        Returns
+        -------
+        patch : `~matplotlib.patches.PathPatch`
+            Matplotlib path patch
+        """
         from matplotlib.path import Path
         from matplotlib.patches import PathPatch
 
         # Only the HEALPix cells facing the camera are used
         vx, vy = self.vertices_culled
 
-        # The border of each HEALPix cells is drawn one at a time
-        path_vertices_l = []
-        codes = []
+        # Build the patch using numpy's broadcasting feature
+        # as much as possible
+        c1=np.vstack((vx[:, 0], vy[:, 0])).T
+        c2=np.vstack((vx[:, 1], vy[:, 1])).T
+        c3=np.vstack((vx[:, 2], vy[:, 2])).T
+        c4=np.vstack((vx[:, 3], vy[:, 3])).T
 
-        for i in range(vx.shape[0]):
-            # Appending to a list is faster that is why we keep
-            path_vertices_l += [(vx[i][0], vy[i][0]), (vx[i][1], vy[i][1]), (vx[i][2], vy[i][2]), (vx[i][3], vy[i][3]), (0, 0)]
-            codes += [Path.MOVETO] + [Path.LINETO]*3 + [Path.CLOSEPOLY]
+        cells=np.hstack((c1, c2, c3, c4, np.zeros((c1.shape[0], 2))))
 
-        # Cast to a numpy array
-        path_vertices_arr = np.array(path_vertices_l)
+        path_vertices = cells.reshape((5*c1.shape[0], 2))
+
+        single_code = np.array([Path.MOVETO, Path.LINETO, Path.LINETO, Path.LINETO, Path.CLOSEPOLY])
+        codes = np.tile(single_code, c1.shape[0])
+
         # Add the origin to the path constructed
-        path_vertices_arr += np.array(origin)
+        path_vertices += origin
 
-        path = Path(path_vertices_arr, codes)
+        path = Path(path_vertices, codes)
+        # Build the patch and pass the optional keyword arguments to the
+        # matplotlib PathPatch constructor
         pathpatch = PathPatch(path, **kw_mpl_pathpatch)
 
         return pathpatch
 
     def to_sky(self, wcs):
-        return self.sky_region
+        return self.moc
 
     @property
     def bounding_box(self):
@@ -190,20 +192,19 @@ class MOCPixelRegion(PixelRegion):
         vx, vy = self.vertices_culled
 
         # Loop over all the projeted HEALPix cells to get their overlap grids
-        fraction_sum = np.zeros(shape=(ny, nx))
+        buffer = np.zeros(shape=(ny, nx))
         for i in range(vx.shape[0]):
-            fraction = polygonal_overlap_grid(
+            ovlp_grid = polygonal_overlap_grid(
                 xmin, xmax, ymin, ymax,
                 nx, ny, vx[i], vy[i],
                 use_exact, subpixels,
             )
-            # Add the overlap grid of the HEALPix cells to get the
-            # overlap area of the total MOC
-            fraction_sum += fraction
+            # Sum this overlap grid to the buffer
+            buffer += ovlp_grid
 
         # Clip its values to the interval (0, 1)
-        fraction_clipped = np.clip(a=fraction_sum, a_min=0, a_max=1)
-        return RegionMask(fraction_clipped, bbox=bbox)
+        mask = np.clip(a=buffer, a_min=0, a_max=1)
+        return RegionMask(mask, bbox=bbox)
 
     def contains(self, pixcoord):
         """
@@ -254,17 +255,18 @@ class MOCSkyRegion(SkyRegion):
         self._repr_params = ('_interval_set',)
 
     def to_pixel(self, wcs):
-        healpix_cells_d = self.write(format='json')
+        data = self.serialize(format='json')
 
         X = np.array([])
         Y = np.array([])
-        for order_str, ipix_l in healpix_cells_d.items():
-            order = int(order_str)
-            # Compute the skycoord boundaries of the HEALPix cells from one order at a time.
-            hp = HEALPix(nside=(1 << order), order='nested', frame=ICRS())
-            vertices_boundaries = hp.boundaries_skycoord(ipix_l, step=1)
+        for level_str, ipix in data.items():
+            level = int(level_str)
+            nside = level_to_nside(level)
+            # Get the 4 vertices of the ipixels of each level.
+            hp = HEALPix(nside=nside, order='nested', frame=ICRS())
+            vertices = hp.boundaries_skycoord(ipix, step=1)
 
-            x, y = skycoord_to_pixel(vertices_boundaries, wcs=wcs)
+            x, y = skycoord_to_pixel(vertices, wcs=wcs)
             if X.size >= 1:
                 X = np.vstack((X, x))
                 Y = np.vstack((Y, y))
@@ -273,8 +275,8 @@ class MOCSkyRegion(SkyRegion):
                 Y = y
 
         # Convert them to pixel coordinates
-        vertices = PixCoord(X, Y)
-        return MOCPixelRegion(vertices=vertices,
+        pix = PixCoord(X, Y)
+        return MOCPixelRegion(vertices=pix,
                               sky_region=self,
                               meta=self.meta,
                               visual=self.visual)
