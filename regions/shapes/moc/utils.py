@@ -1,20 +1,6 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import numpy as np
-
-def uniq2orderipix(uniq):
-    """
-    convert a HEALPix pixel coded as an NUNIQ number
-    to a (norder, ipix) tuple
-    """
-    order = ((np.log2(uniq//4)) // 2)
-    order = order.astype(np.int64)
-    ipix = uniq - 4 * (4**order)
-
-    return order, ipix
-
-
 def trailing_zeros(x):
     """
     Count the number of trailing bit set to zero in ``x``
