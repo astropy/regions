@@ -406,17 +406,17 @@ class MOCSkyRegion(SkyRegion):
         return cls(interval_set, meta, visual)
 
     @classmethod
-    def from_image(cls, header, max_norder, mask_arr=None, meta=None, visual=None):
+    def from_image(cls, header, max_level, mask=None, meta=None, visual=None):
         """
-        Create a `~regions.MOCSkyRegion` from an image stored as a FITS file.
+        Create a `~regions.MOCSkyRegion` from an image stored as a FITS file
 
         Parameters
         ----------
         header : `~astropy.io.fits.Header`
             The FITS header of the image.
-        max_norder : int
-            The maximum order that we want for the new `~regions.MOCSkyRegion`.
-        mask_arr : `~numpy.ndarray`, optional
+        max_level : int
+            The level indicating the maximum resolution of the MOC. Must be <= 29.
+        mask : `~numpy.ndarray`, optional
             A 2D boolean numpy array of the same size of the image where pixels evaluated to True are part of
             the new MOC and pixels evaluated to False are not.
         meta : `~regions.RegionMeta` object, optional
@@ -427,59 +427,47 @@ class MOCSkyRegion(SkyRegion):
         Returns
         -------
         moc : `~regions.MOCSkyRegion`
-            A new `~regions.MOCSkyRegion` object created from the image.
+            A `~regions.MOCSkyRegion` object.
         """
-        # load the image data
+        # Get the image dimensions
         height = header['NAXIS2']
         width = header['NAXIS1']
 
-        # use wcs from astropy to locate the image in the world coordinates
+        # Get the image WCS to retrieve back its world coordinates
         w = wcs.WCS(header)
 
-        if mask_arr is not None:
-            # We have an array of pixels that are part of of survey
-            y, x = np.where(mask_arr)
-            pix_crd = np.dstack((x, y))[0]
+        # Get the pixels coordinates
+        if mask is not None:
+            # Get the pixels in the mask if available
+            y, x = np.where(mask)
+            pix = np.dstack((x, y))[0]
         else:
-            # If we do not have a mask array we create the moc of all the image
-            step_pix = 1
-            """
-            Coords returned by wcs_pix2world method correspond to pixel centers. We want to retrieve the moc pix
-            crossing the borders of the image so we have to add 1/2 to the pixels coords before computing the lonlat.
+            # Get a uniform grid of pixels whose boundaries are the dimensions of the image.
+            step = 1
+            x, y = np.mgrid[0.5:(width + 0.5 + step):step, 0.5:(height + 0.5 + step):step]
+            pix = np.dstack((x.ravel(), y.ravel()))[0]
 
-            The step between two pix_crd is set to `step_pix` but can be diminished to have a better precision at the
-            borders so that all the image is covered (a too big step does not retrieve al
-            the moc pix crossing the borders of the image).
-            """
-            x, y = np.mgrid[0.5:(width + 0.5 + step_pix):step_pix, 0.5:(height + 0.5 + step_pix):step_pix]
-            pix_crd = np.dstack((x.ravel(), y.ravel()))[0]
+        # Retrieve back the world coordinates using the image WCS
+        world_pix = w.wcs_pix2world(pix, 1)
 
-        world_pix_crd = w.wcs_pix2world(pix_crd, 1)
-
-        hp = HEALPix(nside=(1 << max_norder), order='nested', frame=ICRS())
-        ipix = hp.lonlat_to_healpix(lon=world_pix_crd[:, 0] * u.deg, lat=world_pix_crd[:, 1] * u.deg)
-        # remove doubles
-        ipix = np.unique(ipix)
-
-        shift = 2 * (MOCSkyRegion.HPY_MAX_NORDER - max_norder)
-        intervals_arr = np.vstack((ipix << shift, (ipix + 1) << shift)).T
-
-        # This MOCSkyRegion.will be consistent when one will do operations on the moc (union, inter, ...) or
-        # simply write it to a fits or json file
-        interval_set = IntervalSet.from_numpy_array(intervals_arr)
-        return cls(interval_set, meta, visual)
+        # Call the from_lonlat method to create the MOC from the world coordinates.
+        return MOCSkyRegion.from_lonlat(lon=world_pix[:, 0] * u.deg,
+         lat=world_pix[:, 1] * u.deg,
+         max_level=max_level,
+         meta=meta,
+         visual=visual)
 
     @classmethod
-    def from_skycoords(cls, skycoords, max_norder, meta=None, visual=None):
+    def from_skycoord(cls, skycoord, max_level, meta=None, visual=None):
         """
-        Create a `~regions.MOCSkyRegion` from a `astropy.coordinates.SkyCoord` object.
+        Create a `~regions.MOCSkyRegion` from a `~astropy.coordinates.SkyCoord` object
 
         Parameters
         ----------
-        skycoords : `astropy.coordinates.SkyCoord`
-            A set of astropy formatted skycoords.
-        max_norder : int
-            The maximum order that we want for the new `~regions.MOCSkyRegion`.
+        skycoord : `~astropy.coordinates.SkyCoord`
+            An astropy `~astropy.coordinates.SkyCoord` object.
+        max_level : int
+            The level indicating the maximum resolution of the MOC. Must be <= 29.
         meta : `~regions.RegionMeta` object, optional
             A dictionary which stores the meta attributes of this region.
         visual : `~regions.RegionVisual` object, optional
@@ -488,19 +476,20 @@ class MOCSkyRegion(SkyRegion):
         Returns
         -------
         moc : `~regions.MOCSkyRegion`
-            A new `~regions.MOCSkyRegion` object created from a `astropy.coordinates.SkyCoord`
+            A `~regions.MOCSkyRegion` object
         """
-        hp = HEALPix(nside=(1 << max_norder), order='nested')
-        ipix = hp.lonlat_to_healpix(skycoords.icrs.ra, skycoords.icrs.dec)
+        nside = level_to_nside(max_level)
+        hp = HEALPix(nside=nside, order='nested')
+        ipix = hp.lonlat_to_healpix(skycoord.icrs.ra, skycoord.icrs.dec)
 
-        shift = 2 * (MOCSkyRegion.HPY_MAX_NORDER - max_norder)
-        intervals_arr = np.vstack((ipix << shift, (ipix + 1) << shift)).T
+        shift = 2 * (MOCSkyRegion.HPY_MAX_LVL - max_level)
+        itvs = np.vstack((ipix << shift, (ipix + 1) << shift)).T
 
-        interval_set = IntervalSet.from_numpy_array(intervals_arr)
-        return cls(interval_set, meta, visual)
+        itv_s = IntervalSet(itvs)
+        return cls(itv_s, meta, visual)
 
     @classmethod
-    def from_lonlat(cls, lon, lat, max_norder, meta=None, visual=None):
+    def from_lonlat(cls, lon, lat, max_level, meta=None, visual=None):
         """
         Create a `~regions.MOCSkyRegion` from ``lon``, ``lat`` `astropy.units.Quantity`.
 
@@ -510,8 +499,8 @@ class MOCSkyRegion(SkyRegion):
             A set of astropy formatted ra quantities.
         lat : `astropy.units.Quantity`
             A set of astropy formatted dec quantities.
-        max_norder : int
-            The maximum order that we want for the new `~regions.MOCSkyRegion`.
+        max_level : int
+            The level indicating the maximum resolution of the MOC. Must be <= 29.
         meta : `~regions.RegionMeta` object, optional
             A dictionary which stores the meta attributes of this region.
         visual : `~regions.RegionVisual` object, optional
@@ -520,16 +509,17 @@ class MOCSkyRegion(SkyRegion):
         Returns
         -------
         moc : `~regions.MOCSkyRegion`
-            A new `~regions.MOCSkyRegion` object created from lon, lat `astropy.units.Quantity`.
+            A `~regions.MOCSkyRegion` object
         """
-        hp = HEALPix(nside=(1 << max_norder), order='nested')
+        nside = level_to_nside(max_level)
+        hp = HEALPix(nside=nside, order='nested')
         ipix = hp.lonlat_to_healpix(lon, lat)
 
-        shift = 2 * (MOCSkyRegion.HPY_MAX_NORDER - max_norder)
-        intervals_arr = np.vstack((ipix << shift, (ipix + 1) << shift)).T
+        shift = 2 * (MOCSkyRegion.HPY_MAX_LVL - max_level)
+        itvs = np.vstack((ipix << shift, (ipix + 1) << shift)).T
 
-        interval_set = IntervalSet.from_numpy_array(intervals_arr)
-        return cls(interval_set, meta, visual)
+        itv_s = IntervalSet(itvs)
+        return cls(itv_s, meta, visual)
 
     @property
     def max_order(self):
