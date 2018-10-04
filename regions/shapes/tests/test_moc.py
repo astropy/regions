@@ -1,5 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function
 
 import pytest
 import tempfile
@@ -45,9 +45,9 @@ def get_random_lonlat():
 @pytest.fixture()
 def mocs():
     moc1 = {'1': [0]}
-    moc1_increased = {'0': [0], '1': [17, 19, 22, 23, 35]}
+    moc1_increased = {'1': [0, 1, 2, 17, 22]}
     moc2 = {'1': [30]}
-    moc2_increased = {'0': [7], '1': [8, 9, 25, 43, 41]}
+    moc2_increased = {'1': [8, 30, 31, 28, 43]}
 
     return dict(moc1=MOCSkyRegion.from_json(moc1),
                 moc1_increased=MOCSkyRegion.from_json(moc1_increased),
@@ -79,7 +79,7 @@ class TestMOC(object):
     """Test involving the manipulation of MOC objects"""
 
     def setup_class(self):
-        self.moc_from_fits = MOCSkyRegion.from_fits(get_pkg_data_filename('data/P-GALEXGR6-AIS-FUV.fits'))
+        self.galex = MOCSkyRegion.from_fits(get_pkg_data_filename('data/P-GALEXGR6-AIS-FUV.fits'))
 
 
     @pytest.mark.parametrize("size", [
@@ -87,9 +87,9 @@ class TestMOC(object):
         10000,
         50000
     ])
-    def test_from_skycoords(self, get_random_skycoords, size):
-        skycoords = get_random_skycoords(size)
-        moc = MOCSkyRegion.from_skycoords(skycoords, max_norder=7)
+    def test_from_skycoord(self, get_random_skycoords, size):
+        skycoord = get_random_skycoords(size)
+        moc = MOCSkyRegion.from_skycoord(skycoord, max_level=7)
 
 
     @pytest.mark.parametrize("size", [
@@ -99,28 +99,28 @@ class TestMOC(object):
     ])
     def test_from_lonlat(self, get_random_lonlat, size):
         lon, lat = get_random_lonlat(size)
-        moc = MOCSkyRegion.from_lonlat(lon=lon, lat=lat, max_norder=7)
+        moc = MOCSkyRegion.from_lonlat(lon=lon, lat=lat, max_level=7)
 
 
     def test_from_fits(self):
-        assert self.moc_from_fits
+        assert self.galex
 
 
     def test_write_and_from_json(self):
         # A dictionary of ('order', [ipix]) key-value pairs
-        moc_serialized_d = self.moc_from_fits.write(format='json')
-        moc_from_serialization = MOCSkyRegion.from_json(moc_serialized_d)
-        assert self.moc_from_fits == moc_from_serialization
+        data = self.galex.serialize(format='json')
+        moc_from_serialization = MOCSkyRegion.from_json(data)
+        assert self.galex == moc_from_serialization
 
 
     def test_write_to_fits(self):
-        hdulist = self.moc_from_fits.write(format='fits')
+        hdulist = self.galex.serialize(format='fits')
         assert isinstance(hdulist, fits.hdu.hdulist.HDUList)
 
 
     def test_write_to_json(self):
-        moc_json = self.moc_from_fits.write(format='json')
-        assert isinstance(moc_json, dict)
+        data = self.galex.serialize(format='json')
+        assert isinstance(data, dict)
 
 
     def test_contains(self):
@@ -128,46 +128,39 @@ class TestMOC(object):
         # from the start
         wcs = make_simple_wcs(SkyCoord(2 * u.deg, 3 * u.deg), 0.1 * u.deg, 20)
 
-        order = 4
+        level = 4
         size = 20
-        healpix_arr = np.random.randint(0, 12*4**order, size)
-        all_healpix_arr = np.arange(12*4**order)
-        healpix_outside_arr = np.setdiff1d(all_healpix_arr, healpix_arr)
+        ipix = np.random.randint(0, 12*4**level, size)
+        npix = np.arange(12*4**level)
+        ipix_out = np.setdiff1d(npix, ipix)
 
-        moc = MOCSkyRegion.from_json(json_moc={str(order): list(healpix_arr)})
+        moc = MOCSkyRegion.from_json({str(level): list(ipix)})
 
-        hp = HEALPix(nside=(1 << order), order='nested', frame=ICRS())
-        lon, lat = hp.healpix_to_lonlat(healpix_arr)
-        lon_out, lat_out = hp.healpix_to_lonlat(healpix_outside_arr)
+        hp = HEALPix(nside=(1 << level), order='nested', frame=ICRS())
+        lon, lat = hp.healpix_to_lonlat(ipix)
+        lon_out, lat_out = hp.healpix_to_lonlat(ipix_out)
 
-        should_be_inside_arr = moc.contains(ra=lon, dec=lat)
-        assert should_be_inside_arr.all()
-        should_be_outside_arr = moc.contains(ra=lon_out, dec=lat_out)
-        assert not should_be_outside_arr.any()
+        test_in = moc.contains(ra=lon, dec=lat)
+        assert test_in.all()
+        test_out = moc.contains(ra=lon_out, dec=lat_out)
+        assert not test_out.any()
 
 
     def test_add_neighbours(self, mocs):
-        mocs['moc1'].add_neighbours()
-        assert mocs['moc1'] == mocs['moc1_increased']
-
-        mocs['moc2'].add_neighbours()
-        assert mocs['moc2'] == mocs['moc2_increased']
+        assert mocs['moc1'].add_neighbours() == mocs['moc1_increased']
+        assert mocs['moc2'].add_neighbours() == mocs['moc2_increased']
 
 
     def test_remove_neighbours(self, mocs):
-        mocs['moc1_increased'].remove_neighbours()
-        mocs['moc2_increased'].remove_neighbours()
-        assert mocs['moc1_increased'] == mocs['moc1']
-        assert mocs['moc2_increased'] == mocs['moc2']
+        assert mocs['moc1_increased'].remove_neighbours() == mocs['moc1']
+        assert mocs['moc2_increased'].remove_neighbours() == mocs['moc2']
 
 
     def test_neighbours(self, mocs):
         moc1 = copy.deepcopy(mocs['moc1'])
         moc2 = copy.deepcopy(mocs['moc2'])
-        moc1.add_neighbours().remove_neighbours()
-        moc2.add_neighbours().remove_neighbours()
-        assert moc1 == mocs['moc1']
-        assert moc2 == mocs['moc2']
+        assert moc1.add_neighbours().remove_neighbours() == mocs['moc1']
+        assert moc2.add_neighbours().remove_neighbours() == mocs['moc2']
 
 
     def test_sky_fraction(self):
@@ -199,12 +192,12 @@ class TestMOC(object):
         precise_moc = MOCSkyRegion.from_json({
             '1': [4, 21]
         })
-        degraded_moc = MOCSkyRegion.degrade_to_order(precise_moc, new_order=0)
+        degraded_moc = MOCSkyRegion.degrade_to_order(precise_moc, 0)
         assert degraded_moc == MOCSkyRegion.from_json({'0': [1, 5]})
 
 
     def test_complement(self):
-        assert self.moc_from_fits.complement().complement() == self.moc_from_fits
+        assert self.galex.complement().complement() == self.galex
 
 
     @pytest.mark.parametrize("pos_x, pos_y, expected_result", [
@@ -215,34 +208,36 @@ class TestMOC(object):
     def test_contains_pix_moc(self, wcs, pos_x, pos_y, expected_result):
         pixel = PixCoord(pos_x, pos_y)
 
-        reg = self.moc_from_fits.to_pixel(wcs)
+        reg = self.galex.to_pixel(wcs)
         assert reg.contains(pixel) == expected_result
 
 
     def test_to_sky(self, wcs):
-        reg_px = self.moc_from_fits.to_pixel(wcs)
+        reg_px = self.galex.to_pixel(wcs)
         reg_cast_back_sky = reg_px.to_sky(wcs)
 
-        assert reg_cast_back_sky == self.moc_from_fits
+        assert reg_cast_back_sky == self.galex
 
 
     @pytest.mark.skipif('not HAS_MATPLOTLIB')
     def test_as_artist_moc(self, wcs):
-        reg = self.moc_from_fits.to_pixel(wcs)
+        reg = self.galex.to_pixel(wcs)
 
         import matplotlib.pyplot as plt
-        fig, ax = plt.subplots(1, 1)
+        fig, ax = plt.subplots(1, 1, subplot_kw={'projection': wcs})
 
-        reg.plot(ax=ax, edgecolor='red', lw=1)
+        reg.plot(ax=ax, alpha=0.5, fill=True, color='r')
 
-        #plt.xlim(-20, 20)
-        #plt.ylim(-20, 20)
-        #ax.set_aspect('equal')
-        #plt.show()
+        plt.axis('equal')
+        plt.xlabel('lon')
+        plt.ylabel('lat')
+        plt.xlim([0, 20])
+        plt.ylim([0, 20])
+        plt.grid(color="black", linestyle="dotted")
 
 
     def test_to_mask(self, wcs):
-        reg_px = self.moc_from_fits.to_pixel(wcs)
+        reg_px = self.galex.to_pixel(wcs)
         mask = reg_px.to_mask()
 
         assert mask.shape == (33, 65)

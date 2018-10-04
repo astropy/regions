@@ -303,14 +303,16 @@ class MOCSkyRegion(SkyRegion):
         return self._itv_s == other._itv_s
 
     @classmethod
-    def from_json(cls, json_moc, meta=None, visual=None):
+    def from_json(cls, data, meta=None, visual=None):
         """
-        Create a `~regions.MOCSkyRegion` from a dictionary of HEALPix cell arrays indexed by their order (i.e. in json format).
+        Create a `~regions.MOCSkyRegion` from a python dictionary
 
         Parameters
         ----------
-        json_moc : dict
-            A dictionary of (order, [ipix]) key-value pairs representing the set of HEALPix cells defining the MOC map.
+        data : dict
+            A dictionary of (str(level), [ipix]) key-value items.
+            In the following example, we refer to the MOC containing the [2, 3] HEALPix cells of the level '0'
+            plus the [6, 9, 22] cells of the level '5': ``data = {'0': [2, 3], '5': [6, 9, 22]}``
         meta : `~regions.RegionMeta` object, optional
             A dictionary which stores the meta attributes of this region.
         visual : `~regions.RegionVisual` object, optional
@@ -319,37 +321,34 @@ class MOCSkyRegion(SkyRegion):
         Returns
         -------
         moc : `~regions.MOCSkyRegion`
-            A new `~regions.MOCSkyRegion` object.
+            A `~regions.MOCSkyRegion` object.
         """
-        intervals_arr = np.array([], dtype=np.int64)
+        itvs = np.array([], dtype=np.int64)
 
-        for order, pix_l in json_moc.items():
-            pix_arr = np.array(pix_l, dtype=np.int64)
-            p1 = pix_arr
-            p2 = pix_arr + 1
-            shift = 2 * (MOCSkyRegion.HPY_MAX_NORDER - int(order))
+        for level, ipix_l in data.items():
+            ipix = np.array(ipix_l, dtype=np.int64)
+            p1 = ipix
+            p2 = ipix + 1
+            shift = 2 * (MOCSkyRegion.HPY_MAX_LVL - int(level))
 
-            itv_arr = np.vstack((p1 << shift, p2 << shift)).T
-            if intervals_arr.size == 0:
-                intervals_arr = itv_arr
+            itv_batch = np.vstack((p1 << shift, p2 << shift)).T
+            if itvs.size == 0:
+                itvs = itv_batch
             else:
-                intervals_arr = np.vstack((intervals_arr, itv_arr))
+                itvs = np.vstack((itvs, itv_batch))
 
-        return cls(IntervalSet.from_numpy_array(intervals_arr), meta, visual)
+        itv_set = IntervalSet(itvs)
+        return cls(itv_set, meta, visual)
 
     @classmethod
     def from_fits(cls, filename, meta=None, visual=None):
         """
-        Create a `~regions.MOCSkyRegion` from a FITS file.
-
-        Works for FITS file in which HEALPix cells are stored as a list of
-        UNIQ HEALPix numbers in a binary HDU table. See the `IVOA standard publication part 2.3.1
-        <http://www.ivoa.net/documents/MOCSkyRegion.20140602/REC-MOCSkyRegion.1.0-20140602.pdf>`__ for more explanations about NUINQ packing.
+        Create a `~regions.MOCSkyRegion` from a FITS file
 
         Parameters
         ----------
         filename : str
-            The path to FITS file.
+            The path to the FITS file.
         meta : `~regions.RegionMeta` object, optional
             A dictionary which stores the meta attributes of this region.
         visual : `~regions.RegionVisual` object, optional
@@ -358,15 +357,15 @@ class MOCSkyRegion(SkyRegion):
         Returns
         -------
         moc : `~regions.MOCSkyRegion`
-            A new `~regions.MOCSkyRegion` object loaded from the FITS file.
+            A `~regions.MOCSkyRegion` object.
         """
         table = Table.read(filename)
 
-        intervals = np.vstack((table['UNIQ'], table['UNIQ']+1)).T
+        itvs = np.vstack((table['UNIQ'], table['UNIQ']+1)).T
 
-        nuniq_interval_set = IntervalSet.from_numpy_array(intervals)
-        interval_set = IntervalSet.from_nuniq_interval_set(nuniq_interval_set)
-        return cls(interval_set, meta, visual)
+        uniq_itv_s = IntervalSet(itvs)
+        itv_s = IntervalSet.from_uniq_itv_s(uniq_itv_s)
+        return cls(itv_s, meta, visual)
 
     @classmethod
     def from_image(cls, header, max_level, mask=None, meta=None, visual=None):
@@ -502,16 +501,22 @@ class MOCSkyRegion(SkyRegion):
     @property
     def sky_fraction(self):
         """
-        Returns the sky fraction percentage covered by the MOC (between 0 and 1).
+        Returns the sky fraction coverage percentage
         """
-        pix_id_arr = self._best_res_pixels()
-        nb_pix_filled = pix_id_arr.size
-        return nb_pix_filled / float(3 << (2*(self.max_order + 1)))
+        # Get the number of ipixels at the deepest level
+        ipix = self._best_res_pixels()
+        num_ipix = ipix.size
+
+        # Get the maximum number of ipixels for the level of the deepest ipixels
+        npix = 3 << (2*(self.max_level + 1))
+
+        return num_ipix / float(npix)
 
     def contains(self, ra, dec):
         """
-        Check whether (ra, dec) positions fall inside or outside the MOC region.
-        The size of ``ra`` must be the same as the size of ``dec``.
+        Check whether some sky positions fall inside the MOC
+
+        The size of ``ra`` and ``dec`` must be equal.
 
         Parameters
         ----------
@@ -523,22 +528,26 @@ class MOCSkyRegion(SkyRegion):
         Returns
         -------
         array : `~numpy.ndarray`
-            A boolean numpy array telling which positions are inside/outside of the MOC depending on the
+            A boolean numpy array telling which positions are inside the MOC depending on the
             value of ``self.meta['include']``.
         """
-        max_order = self.max_order
-        m = np.zeros(nside2npix(1 << max_order), dtype=bool)
+        # Build the mask boolean array of the ipixels from the MOC
+        # at the deepest level.
+        nside = level_to_nside(self.max_level)
+        npix = nside_to_npix(nside)
+        mask = np.zeros(npix, dtype=bool)
 
-        pix_id_arr = self._best_res_pixels()
-        m[pix_id_arr] = True
+        ipix = self._best_res_pixels()
+        mask[ipix] = True
 
         if self.meta.get('include', False):
-            m = np.logical_not(m)
+            mask = np.logical_not(mask)
 
-        hp = HEALPix(nside=(1 << self.max_order), order='nested')
-        pix_arr = hp.lonlat_to_healpix(ra, dec)
+        # Retrieve the ipixels containing the sky positions
+        hp = HEALPix(nside=nside, order='nested')
+        ipix = hp.lonlat_to_healpix(ra, dec)
 
-        return m[pix_arr]
+        return mask[ipix]
 
     def write(self, path, format='fits', fits_optional_kw=None):
         """
