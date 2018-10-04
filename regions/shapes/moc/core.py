@@ -588,124 +588,130 @@ class MOCSkyRegion(SkyRegion):
 
         return m[pix_arr]
 
-    def write(self, path=None, format='fits', optional_kw_dict=None, write_to_file=False):
+    def write(self, path, format='fits', fits_optional_kw=None):
         """
-        Serialize self to a FITS/JSON format.
-
-        Possibility to write it to a new file located at ``path``. Format can be 'fits' or 'json',
-        though only the FITS format is officially supported by the IVOA.
+        Write to a FITS/JSON file.
 
         Parameters
         ----------
-        path : str, optional
-            The path where to save the serialization of self. The serialization is written to ``path`` only if
-            ``write_to_file`` is set to True. None by default.
+        path : str
+            The path where to save the file.
         format : str, optional
             The format of the serialization. Must have its value in ('fits', 'json'). By default, ``format`` is set to
-             'fits'.
-        optional_kw_dict : dict, optional
-            Optional keyword arguments added to the FITS header. Only used if ``format`` is set to 'fits'.
-        write_to_file : bool, optional
-            Set to False by default. In this case, this method does not write to a file but returns the serialized form
-            of self.
+             'fits' as FITS is the one officially supported by the IVOA.
+        fits_optional_kw : dict, optional
+            Optional arguments added to the FITS header. Only used if ``format`` is set to 'fits'.
+        """
+        serialization = self.serialize(format=format, fits_optional_kw=fits_optional_kw)
+
+        if format == 'fits':
+            serialization.writeto(path, overwrite=True)
+        else:
+            # json format serialization
+            import json
+            with open(path, 'w') as h:
+                h.write(json.dumps(serialization, sort_keys=True, indent=2))
+
+    def serialize(self, format='fits', fits_optional_kw=None):
+        """
+        Serialize to a FITS/JSON format
+
+        Parameters
+        ----------
+        format : str, optional
+            The format of the serialization. Must have its value in ('fits', 'json'). By default, ``format`` is set to
+             'fits' as FITS is the one officially supported by the IVOA.
+        fits_optional_kw : dict, optional
+            Optional arguments added to the FITS header. Only used if ``format`` is set to 'fits'.
 
         Returns
         -------
         result : `astropy.io.fits.HDUList`/dict
-            Depending on the value of ``format``.
+            Depending whether the specified format is FITS (resp. JSON).
         """
-        formats = ('fits', 'json')
-        if format not in formats:
-            raise ValueError('format should be one of %s' % (str(formats)))
+        fmts = ('fits', 'json')
+        if format not in fmts:
+            raise ValueError('format should be one of %s' % (str(fmts)))
 
         # Get all the uniq number from the nuniq intervals
-        intervals_uniq_l = IntervalSet.to_nuniq_interval_set(self._interval_set)._intervals
-        uniq_l = []
-        for uniq_iv in intervals_uniq_l:
-            for uniq in range(uniq_iv[0], uniq_iv[1]):
-                uniq_l.append(uniq)
+        uniq_itv_s = IntervalSet.to_uniq_itv_s(self._itv_s)
+        uniq_itvs = uniq_itv_s._data
+        uniq_pix_l = []
+        for uniq_itv in uniq_itvs:
+            for uniq in range(uniq_itv[0], uniq_itv[1]):
+                uniq_pix_l.append(uniq)
 
-        uniq_arr = np.asarray(uniq_l, dtype=np.int64)
+        uniq_pix = np.asarray(uniq_pix_l, dtype=np.int64)
 
         if format == 'fits':
-            result = self.__class__._to_fits(uniq_arr=uniq_arr,
-                                             moc_order=self.max_order,
-                                             optional_kw_dict=optional_kw_dict)
-            if write_to_file:
-                result.writeto(path, overwrite=True)
+            result = self._to_fits(uniq_pix=uniq_pix,
+                                   fits_optional_kw=fits_optional_kw)
         else:
-            # json format serialization
-            result = self.__class__._to_json(uniq_arr=uniq_arr)
-            if write_to_file:
-                import json
-                with open(path, 'w') as h:
-                    h.write(json.dumps(result, sort_keys=True, indent=2))
+            # JSON format serialization
+            result = self._to_json(uniq_pix=uniq_pix)
 
         return result
 
-    @staticmethod
-    def _to_json(uniq_arr):
+    def _to_json(self, uniq_pix):
         """
-        Serialize a NUNIQ numpy array to json.
+        Serialize a numpy array of uniq numbers to JSON
 
         Parameters
         ----------
-        uniq_arr : `~numpy.ndarray`
-            An array of uniq numbers corresponding to self.
+        uniq_pix : `~numpy.ndarray`
+            A numpy array of uniq numbers.
         Returns
         -------
-        result : dict
-            A dictionary of HEALPix cells list each indexed by its order.
+        res : dict
+            A python dict containing (level, [ipix]) key-value items
         """
-        result_json = {}
+        res = {}
 
-        order_arr, ipix_arr = uniq2orderipix(uniq_arr)
-        min_order = order_arr[0]
-        max_order = order_arr[-1]
+        levels, ipix = uniq_to_level_ipix(uniq_pix)
+        min_lvl = levels[0]
+        max_lvl = levels[-1]
 
-        for order in range(min_order, max_order+1):
-            pix_index = np.where(order_arr == order)[0]
-            if pix_index.size:
-                # there are pixels belonging to the current order
-                ipix_order_arr = ipix_arr[pix_index]
-                result_json[str(order)] = ipix_order_arr.tolist()
+        for lvl in range(min_lvl, max_lvl+1):
+            index = np.where(levels == lvl)[0]
+            if ipix.size:
+                # There are ipixels of this specific level
+                ipix_lvl = ipix[index]
+                res[str(lvl)] = ipix_lvl.tolist()
 
-        return result_json
+        return res
 
-    @staticmethod
-    def _to_fits(uniq_arr, moc_order, optional_kw_dict=None):
+    def _to_fits(self, uniq_pix, fits_optional_kw=None):
         """
-        Serialize a NUNIQ numpy array to a FITS file.
+        Serialize a numpy array of uniq numbers to FITS
 
         Parameters
         ----------
-        uniq_arr : `numpy.ndarray`
-            An array of uniq numbers corresponding to self.
-        moc_order : int
-            The maximum order of self.
-        optional_kw_dict : dict
-            Optional keyword arguments added to the FITS header.
+        uniq_pix : `numpy.ndarray`
+            A numpy array of uniq numbers.
+        fits_optional_kw : dict
+            Optional arguments added to the FITS header.
 
         Returns
         -------
         thdulist : `astropy.io.fits.HDUList`
-            The FITS serialization of self.
+            The FITS serialization of self
         """
-        if moc_order <= 13:
+        max_level = self.max_level
+        if max_level <= 13:
             fits_format = '1J'
         else:
             fits_format = '1K'
 
         tbhdu = fits.BinTableHDU.from_columns(
-            fits.ColDefs([fits.Column(name='UNIQ', format=fits_format, array=uniq_arr)]))
+            fits.ColDefs([fits.Column(name='UNIQ', format=fits_format, array=uniq_pix)]))
         tbhdu.header['PIXTYPE'] = 'HEALPIX'
         tbhdu.header['ORDERING'] = 'NUNIQ'
         tbhdu.header['COORDSYS'] = ('C', 'reference frame (C=ICRS)')
-        tbhdu.header['MOCORDER'] = moc_order
+        tbhdu.header['MOCORDER'] = max_level
         tbhdu.header['MOCTOOL'] = 'astropy.regions'
-        if optional_kw_dict:
-            for key in optional_kw_dict:
-                tbhdu.header[key] = optional_kw_dict[key]
+        if fits_optional_kw:
+            for key in fits_optional_kw:
+                tbhdu.header[key] = fits_optional_kw[key]
 
         thdulist = fits.HDUList([fits.PrimaryHDU(), tbhdu])
         return thdulist
