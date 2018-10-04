@@ -48,22 +48,22 @@ def isets2():
 
 
 def test_to_nuinq_interval_set(isets2):
-    assert IntervalSet.to_nuniq_interval_set(isets2['nested1']) == isets2['nuniq1']
-    assert IntervalSet.to_nuniq_interval_set(isets2['nested2']) == isets2['nuniq2']
+    assert IntervalSet.to_uniq_itv_s(isets2['nested1']) == isets2['nuniq1']
+    assert IntervalSet.to_uniq_itv_s(isets2['nested2']) == isets2['nuniq2']
     # empty nested interval set
-    assert IntervalSet.to_nuniq_interval_set(IntervalSet()) == IntervalSet()
+    assert IntervalSet.to_uniq_itv_s(IntervalSet()) == IntervalSet()
 
 
 def test_from_nuinq_interval_set(isets2):
-    assert IntervalSet.from_nuniq_interval_set(isets2['nuniq1']) == isets2['nested1']
-    assert IntervalSet.from_nuniq_interval_set(isets2['nuniq2']) == isets2['nested2']
+    assert IntervalSet.from_uniq_itv_s(isets2['nuniq1']) == isets2['nested1']
+    assert IntervalSet.from_uniq_itv_s(isets2['nuniq2']) == isets2['nested2']
     # empty nuniq interval set
-    assert IntervalSet.from_nuniq_interval_set(IntervalSet()) == IntervalSet()
+    assert IntervalSet.from_uniq_itv_s(IntervalSet()) == IntervalSet()
 
 
 def test_from_to_interval_set(isets2):
-    assert IntervalSet.from_nuniq_interval_set(
-        IntervalSet.to_nuniq_interval_set(isets2['nested1'])
+    assert IntervalSet.from_uniq_itv_s(
+        IntervalSet.to_uniq_itv_s(isets2['nested1'])
     ) == isets2['nested1']
 
 

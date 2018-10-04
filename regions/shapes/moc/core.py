@@ -1,5 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-from __future__ import absolute_import, division, print_function, unicode_literals
+from __future__ import absolute_import, division, print_function
 from .py23_compat import range, int
 
 import numpy as np
@@ -9,17 +9,26 @@ from astropy import wcs
 from astropy.io import fits
 from astropy.coordinates import ICRS, SkyCoord
 from astropy.table import Table
-from astropy.wcs.utils import pixel_to_skycoord, skycoord_to_pixel
+from astropy.wcs.utils import pixel_to_skycoord, \
+                              skycoord_to_pixel
 
-from astropy_healpix import HEALPix
-from astropy_healpix import lonlat_to_healpix
-from astropy_healpix.healpy import nside2npix
+from astropy_healpix import HEALPix, \
+                            lonlat_to_healpix, \
+                            nside_to_npix, \
+                            level_to_nside, \
+                            uniq_to_level_ipix
 
 from .interval_set import IntervalSet
-from .utils import uniq2orderipix, trailing_zeros
+from .utils import trailing_zeros
 
-from ...core import PixCoord, PixelRegion, SkyRegion, BoundingBox, RegionMask
-from ...core.attributes import RegionMeta, RegionVisual
+from ...core import PixCoord, \
+                    PixelRegion, \
+                    SkyRegion, \
+                    BoundingBox, \
+                    RegionMask
+from ...core.attributes import RegionMeta, \
+                               RegionVisual
+
 from ..._geometry.pnpoly import points_in_polygons
 from ..._geometry import polygonal_overlap_grid
 
@@ -220,72 +229,26 @@ class MOCPixelRegion(PixelRegion):
 
 class MOCSkyRegion(SkyRegion):
     """
-    A MOC (Multi-Order Coverage map)
+    A MOC (Multi-Order Coverage) map.
 
-    MOC stands for Multi-Order Coverage. It is a spatial and hierarchical description of a region on a sphere.
-    MOC is an IVOA standard which was first introduced in the following
-    `paper <http://www.ivoa.net/documents/MOCSkyRegion.>`__ .
-    MOC are based on the HEALPix sky tessellation using the NESTED numbering scheme. A MOC is a set of
-    HEALPix cells at different orders with a maximum resolution corresponding to the order 29 i.e. a cell
-    resolution of ~393.2uas.
-
-    * MOCs are usually stored as FITS file containing a list of UNIQ numbers describing the HEALPix cells at \
-      different orders. This class aims at creating MOC maps from FITS/json formatted files, FITS images associated with a mask numpy array, \
-      an `astropy.coordinates.SkyCoord` object and lon, lat expressed as `astropy.units.Quantity` objects.
-
-    * Basic operations on MOCs are available such as the intersection, union, difference and complement of a MOC.
-
-    * A :meth:`~regions.MOCSkyRegion.contains` method filters positions expressed as \
-      `~astropy.units.Quantity` to only keep those lying inside/outside the MOC.
-
-    * A MOC can be serialized to FITS (i.e. a list of UNIQ numbers stored in a \
-      binary HDU table) and JSON formats. An optional parameter allows the user to write it to a file.
+    Please refer to the doc example page explaining the basic features
+    of this class: :ref:`moc`.
 
     Parameters
     ----------
-    interval_set : `~regions.IntervalSet` object, optional
+    itv_s : `~regions.IntervalSet` object, optional
         A N rows by 2 columns `~numpy.ndarray` storing the set of intervals
-        representing the data structure of the MOCSkyRegion.
+        representing the ranges of HEALPix cell indexes of the MOC.
     meta : `~regions.RegionMeta` object, optional
         A dictionary which stores the meta attributes of this region.
     visual : `~regions.RegionVisual` object, optional
         A dictionary which stores the visual meta attributes of this region.
-
-    Examples
-    --------
-    .. plot::
-        :include-source:
-
-        from regions import MOCSkyRegion
-
-        # Load a MOCSkyRegion from a FITS file including the MOC of the P-GALEXGR6-AIS-FUV survey
-        from astropy.utils.data import get_pkg_data_filename
-        moc_sky_reg = MOCSkyRegion.from_fits(get_pkg_data_filename('shapes/tests/data/P-GALEXGR6-AIS-FUV.fits',
-                                                                   package='regions'))
-
-        # Configure a WCS
-        from regions._utils.examples import make_example_dataset
-        config = dict(crpix=(0, 0), crval=(0, 0), cdelt=(-5, 5), shape=(18, 36))
-        dataset = make_example_dataset(config=config)
-
-        # Convert the MOCSkyRegion to a MOCPixelRegion for plotting it
-        moc_px_reg = moc_sky_reg.to_pixel(dataset.wcs)
-
-        # Define matplotlib to plot the MOCPixelRegion
-        import matplotlib.pyplot as plt
-
-        fig, ax = plt.subplots(1, 1, figsize=(10, 10))
-        moc_px_reg.plot(ax, edgecolor='red', lw=1)
-
-        plt.xlim(0, 4)
-        plt.ylim(4, 8)
-        plt.show()
     """
-    HPY_MAX_NORDER = 29
+    HPY_MAX_LVL = 29
 
-    def __init__(self, interval_set=None, meta=None, visual=None):
-        interval = IntervalSet() if interval_set is None else interval_set
-        self._interval_set = interval
+    def __init__(self, itv_s=None, meta=None, visual=None):
+        itv_s = IntervalSet() if itv_s is None else itv_s
+        self._itv_s = itv_s
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
         self._repr_params = ('_interval_set',)
@@ -319,25 +282,25 @@ class MOCSkyRegion(SkyRegion):
     def plot(self):
         raise NotImplementedError
 
-    def __eq__(self, another_moc):
+    def __eq__(self, other):
         """
-        Test equality between self and ``another_moc``
+        Test equality between two `~regions.MOCSkyRegion`
 
         Parameters
         ----------
-        another_moc : `~regions.MOCSkyRegion`
-            The moc object to test the equality with.
+        other : `~regions.MOCSkyRegion`
+            The `~regions.MOCSkyRegion` object to test the equality with.
 
         Returns
         -------
         result : bool
-            True if the interval sets of self and ``another_moc`` are equal.
+            True is the two `~regions.MOCSkyRegion` are equal.
         """
-        if not isinstance(another_moc, MOCSkyRegion):
+        if not isinstance(other, MOCSkyRegion):
             raise TypeError('The object you want to test the equality with is not a MOC but a {0}'
-                            .format(type(another_moc)))
+                            .format(type(other)))
 
-        return self._interval_set == another_moc._interval_set
+        return self._itv_s == other._itv_s
 
     @classmethod
     def from_json(cls, json_moc, meta=None, visual=None):
@@ -522,16 +485,15 @@ class MOCSkyRegion(SkyRegion):
         return cls(itv_s, meta, visual)
 
     @property
-    def max_order(self):
+    def max_level(self):
         """
-        Returns the deepest order needed to describe self's interval set.
+        Returns the level of the smallest HEALPix cells
         """
-        # TODO: cache value
         combo = int(0)
-        for iv in self._interval_set._intervals:
+        for iv in self._itv_s._data:
             combo |= iv[0] | iv[1]
 
-        ret = MOCSkyRegion.HPY_MAX_NORDER - (trailing_zeros(combo) // 2)
+        ret = MOCSkyRegion.HPY_MAX_LVL - (trailing_zeros(combo) // 2)
         if ret < 0:
             ret = 0
 
@@ -706,13 +668,13 @@ class MOCSkyRegion(SkyRegion):
         thdulist = fits.HDUList([fits.PrimaryHDU(), tbhdu])
         return thdulist
 
-    def intersection(self, another_moc, *args):
+    def intersection(self, other, *args):
         """
-        Intersection between self and other `~regions.MOCSkyRegion` objects.
+        Intersection with other `~regions.MOCSkyRegion` objects
 
         Parameters
         ----------
-        another_moc : `~regions.MOCSkyRegion`
+        other : `~regions.MOCSkyRegion`
             Another mandatory MOC
         args : `~regions.MOCSkyRegion`, optional
             More MOCs
@@ -720,21 +682,21 @@ class MOCSkyRegion(SkyRegion):
         Returns
         -------
         result : `~regions.MOCSkyRegion`
-            A new `~regions.MOCSkyRegion` object resulting from the intersection of self with the MOCs passed to the method.
+            A `~regions.MOCSkyRegion` object
         """
-        interval_set = self._interval_set.intersection(another_moc._interval_set)
+        itv = self._itv_s.intersection(other._itv_s)
         for moc in args:
-            interval_set = interval_set.intersection(moc._interval_set)
+            itv = itv.intersection(moc._itv_s)
 
-        return self.__class__(interval_set)
+        return self.__class__(itv)
 
-    def union(self, another_moc, *args):
+    def union(self, other, *args):
         """
-        Union between self and other `~regions.MOCSkyRegion` objects.
+        Union with other `~regions.MOCSkyRegion` objects
 
         Parameters
         ----------
-        another_moc : `~regions.MOCSkyRegion`
+        other : `~regions.MOCSkyRegion`
             Another mandatory MOC
         args : `~regions.MOCSkyRegion`, optional
             More MOCs
@@ -742,62 +704,64 @@ class MOCSkyRegion(SkyRegion):
         Returns
         -------
         result : `~regions.MOCSkyRegion`
-            A new `~regions.MOCSkyRegion` object resulting from the union of self with the MOCs passed to the method.
+            A `~regions.MOCSkyRegion` object
         """
-        interval_set = self._interval_set.union(another_moc._interval_set)
+        itv = self._itv_s.union(other._itv_s)
         for moc in args:
-            interval_set = interval_set.union(moc._interval_set)
+            itv = itv.union(moc._itv_s)
 
-        return self.__class__(interval_set)
+        return self.__class__(itv)
 
-    def difference(self, another_moc, *args):
+    def difference(self, other, *args):
         """
-        Difference between self and other MOCs.
+        Difference with other `~regions.MOCSkyRegion` objects
 
         Parameters
         ----------
-        another_moc : `~regions.MOCSkyRegion`
+        other : `~regions.MOCSkyRegion`
             Another mandatory MOC
         args : `~regions.MOCSkyRegion`, optional
             More MOCs
         Returns
         -------
         result : `~regions.MOCSkyRegion`
-            A new `~regions.MOCSkyRegion` object resulting from the difference of self with the MOCs passed to the method.
+            A `~regions.MOCSkyRegion` object
         """
-        interval_set = self._interval_set.difference(another_moc._interval_set)
+        itv = self._itv_s.difference(other._itv_s)
         for moc in args:
-            interval_set = interval_set.difference(moc._interval_set)
+            itv = itv.difference(moc._itv_s)
 
-        return self.__class__(interval_set)
+        return self.__class__(itv)
 
     def complement(self):
         """
-        Compute the complement of self.
+        Return the MOC complement
 
         Returns
         -------
         complement : `~regions.MOCSkyRegion`
-            A new `~regions.MOCSkyRegion` object corresponding to the complement of self.
+            The complement given as a `~regions.MOCSkyRegion` object
         """
         res = []
-        intervals_l = sorted(self._interval_set._intervals.tolist())
+        itvs_l = sorted(self._itv_s._data.tolist())
 
-        if intervals_l[0][0] > 0:
-            res.append((0, intervals_l[0][0]))
+        if itvs_l[0][0] > 0:
+            res.append((0, itvs_l[0][0]))
 
-        last = intervals_l[0][1]
+        last = itvs_l[0][1]
 
-        for itv in intervals_l[1:]:
+        for itv in itvs_l[1:]:
             res.append((last, itv[0]))
             last = itv[1]
 
-        max_pix_order = 3 << 60
+        max_npix = 3 << 60
 
-        if last < max_pix_order:
-            res.append((last, max_pix_order))
+        if last < max_npix:
+            res.append((last, max_npix))
 
-        return self.__class__(IntervalSet(np.asarray(res, dtype=np.int64)))
+        itvs = np.asarray(res, dtype=np.int64)
+        itv_s = IntervalSet(itvs)
+        return self.__class__(itv_s)
 
     def add_neighbours(self):
         """
@@ -858,49 +822,51 @@ class MOCSkyRegion(SkyRegion):
 
     def _best_res_pixels(self):
         """
-        Get the HEALPix cells of self at its maximum order.
+        Return the HEALPix cell indexes at its deepest level.
 
         Returns
         -------
         array : `~numpy.ndarray`
-            The HEALPix cells of self at its maximum order.
+            A numpy array containing the HEALPix cell indexes at the deepest level.
         """
-        factor = 2 * (MOCSkyRegion.HPY_MAX_NORDER - self.max_order)
-        pix_l = []
-        for iv in self._interval_set._intervals:
+        factor = 2 * (MOCSkyRegion.HPY_MAX_LVL - self.max_level)
+        ipix = []
+        for iv in self._itv_s._data:
             for val in range(iv[0] >> factor, iv[1] >> factor):
-                pix_l.append(val)
+                ipix.append(val)
 
-        return np.asarray(pix_l, dtype=np.int64)
+        return np.asarray(ipix, dtype=np.int64)
 
-    def degrade_to_order(self, new_order):
+    def degrade_to_order(self, new_level):
         """
-        Degrade a `~regions.MOCSkyRegion` object.
+        Degrade to a shallower level
 
-        The degraded MOC has an order equals to ``new_order``. ``new_order`` must be smaller
-        than the current order of the MOC.
+        The degraded MOC will have a maximum level equal to ``new_level``. ``new_level`` must be smaller
+        than the current max level of the MOC.
 
         Parameters
         ----------
-        new_order : int
-            The new maximum order for the degraded MOC
+        new_level : int
+            The new maximum level for the degraded MOC
 
         Returns
         -------
         moc : `~regions.MOCSkyRegion`
-            The degraded MOC
+            A `~regions.MOCSkyRegion` object
         """
-        shift = 2 * (MOCSkyRegion.HPY_MAX_NORDER - new_order)
+        shift = 2 * (MOCSkyRegion.HPY_MAX_LVL - new_level)
         ofs = (int(1) << shift) - 1
         mask = ~ofs
         adda = int(0)
         addb = ofs
-        iv_set = []
+        itvs = []
 
-        for iv in self._interval_set._intervals:
+        for iv in self._itv_s._data:
             a = (iv[0] + adda) & mask
             b = (iv[1] + addb) & mask
             if b > a:
-                iv_set.append((a, b))
+                itvs.append((a, b))
 
-        return self.__class__(IntervalSet.from_numpy_array(np.asarray(iv_set, dtype=np.int64)))
+        itvs = np.asarray(itvs, dtype=np.int64)
+        itv_s = IntervalSet(itvs)
+        return self.__class__(itv_s)
