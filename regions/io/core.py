@@ -154,9 +154,11 @@ class ShapeList(list):
 
         for key, val in crtf_strings.items():
             crtf_strings[key] = val.replace("FMT", fmt).replace("RAD",
-                                                               radunitstr)
+                                                                radunitstr)
 
-        output += 'global coord={}\n'.format(coordsys)
+        # CASA does not support global coordinate specification, even though the
+        # documentation for the specification explicitly states that it does.
+        # output += 'global coord={}\n'.format(coordsys)
 
         for shape in self:
 
@@ -164,7 +166,10 @@ class ShapeList(list):
             shape.meta = to_crtf_meta(shape.meta)
 
             # if unspecified, include is True.
-            include = "-" if shape.include in (False, '-') else "+"
+            # Despite the specification, CASA does *not* support a preceding
+            # "+".  If you want a region included, leave the opening character
+            # blank.
+            include = "-" if shape.include in (False, '-') else ""
             include += "ann " if shape.meta.get('type', 'reg') == 'ann' else ""
 
             if shape.meta.get('label', "") != "":
@@ -174,6 +179,11 @@ class ShapeList(list):
                                 key not in ('include', 'comment', 'symbol',
                                             'coord', 'text', 'range', 'corr',
                                             'type', 'text'))
+
+            # the first item should be the coordinates, since CASA cannot
+            # recognize a region without an inline coordinate specification
+            # It can be, but does not need to be, comma-separated at the start
+            meta_str = "coord={0}, ".format(coordsys.upper()) + meta_str
 
             if 'comment' in shape.meta:
                 meta_str += ", " + shape.meta['comment']
