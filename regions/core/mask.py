@@ -99,10 +99,17 @@ class RegionMask(object):
 
         return slices_large, slices_small
 
-    def _to_image_partial_overlap(self, image):
+    def to_image_partial_overlap(self, image):
         """
-        Return an image of the mask in a 2D array, where the mask
-        is not fully within the image (i.e. partial or no overlap).
+        Return an image of the mask in a 2D array, where the mask is not fully
+        within the image (i.e. partial or no overlap).  This can be used, for
+        example, to convert a region to a boolean array mask of an image.
+
+        Parameters
+        ----------
+        image : np.array
+            An ndarray image whose values will be modified inplace to be the
+            values of the mask.
         """
 
         # find the overlap of the mask on the output image shape
@@ -138,12 +145,12 @@ class RegionMask(object):
         image = np.zeros(shape)
 
         if self.bbox.ixmin < 0 or self.bbox.iymin < 0:
-            return self._to_image_partial_overlap(image)
+            return self.to_image_partial_overlap(image)
 
         try:
             image[self.bbox.slices] = self.data
         except ValueError:    # partial or no overlap
-            image = self._to_image_partial_overlap(image)
+            image = self.to_image_partial_overlap(image)
 
         return image
 
