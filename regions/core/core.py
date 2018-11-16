@@ -4,6 +4,7 @@ from __future__ import (absolute_import, division, print_function,
 import abc
 import operator
 import inspect
+import numpy as np
 
 from astropy.extern import six
 
@@ -378,3 +379,24 @@ class SkyRegion(Region):
         pixel_region : `~regions.PixelRegion` object.
         """
         raise NotImplementedError
+
+
+class PixelRegionList(list):
+    """
+    A list of regions defined in some common pixel space
+    """
+
+    def to_boolean_mask(self, shape):
+        """
+        Create a boolean array mask from all of the contained regions given a
+        shape
+        """
+
+        mask_array = np.zeros(shape, dtype='bool')
+
+        for reg in self:
+            mask = reg.to_mask()
+
+            mask.to_image_partial_overlap(mask_array)
+
+        return mask_array
