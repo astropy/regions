@@ -613,7 +613,10 @@ class Shape(object):
         reg.visual = RegionVisual()
         reg.meta = RegionMeta()
 
-        label = self.meta.pop('text', self.meta.get('label', ""))
+        # both 'text' and 'label' should be set to the same value, where we
+        # default to the 'text' value since that is the one used by ds9 regions
+        label = self.meta.get('text',
+                              self.meta.get('label', ""))
         if label != '':
             reg.meta['label'] = label
         for key in self.meta:
