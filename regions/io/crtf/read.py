@@ -1,13 +1,13 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 from __future__ import absolute_import, division, print_function
 import re
+import six
 import copy
 import itertools
 from warnings import warn
 
 from astropy import units as u
 from astropy import coordinates
-from astropy.extern import six
 
 from .core import CRTFRegionParserError, CRTFRegionParserWarning, valid_symbols
 from ..core import Shape, ShapeList, reg_mapping

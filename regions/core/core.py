@@ -2,10 +2,10 @@
 from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 import abc
+import six
 import operator
 import inspect
 
-from astropy.extern import six
 
 __all__ = ['Region', 'PixelRegion', 'SkyRegion']
 
