@@ -239,8 +239,8 @@ class DS9Parser:
             return
 
         # Special case / header: parse global parameters into metadata
-        if line.lstrip()[:6] == 'global':
-            self.global_meta = self.parse_meta(line)
+        if line.lstrip()[:6].lower() == 'global':
+            self.global_meta = self.parse_meta(line.lower())
             # global_meta can specify "include=1"; never seen other options
             # used but presumably =0 means false
             self.global_meta['include'] = (False if
@@ -249,7 +249,7 @@ class DS9Parser:
             return
 
         # Try to parse the line
-        region_type_search = regex_global.search(line)
+        region_type_search = regex_global.search(line.lower())
         if region_type_search:
             include = region_type_search.groups()[0]
             region_type = region_type_search.groups()[1]
@@ -295,7 +295,8 @@ class DS9Parser:
         meta : dict
             A dictionary containing the metadata.
         """
-        keys_vals = [(x, y) for x, _, y in regex_meta.findall(meta_str.strip())]
+        # keys must be lower-casae, but data can be any case
+        keys_vals = [(x.lower(), y) for x, _, y in regex_meta.findall(meta_str.strip())]
         extra_text = regex_meta.split(meta_str.strip())[-1]
         result = {}
         for key, val in keys_vals:
@@ -453,7 +454,8 @@ class DS9RegionParser:
         # coordinate of the # symbol or end of the line (-1) if not found
         hash_or_end = self.line.find("#")
         temp = self.line[self.region_end:hash_or_end].strip(" |")
-        self.coord_str = regex_paren.sub("", temp)
+        # force all coordinate names (circle, etc) to be lower-case
+        self.coord_str = regex_paren.sub("", temp).lower()
 
         # don't want any meta_str if there is no metadata found
         if hash_or_end >= 0:
