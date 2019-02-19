@@ -20,7 +20,7 @@ class IntervalSet:
     make_consistent : bool, optional
         True by default. Remove the overlapping intervals from the data.
     """
-    HPY_MAX_LVL = 29
+    HPY_MAX_DEPTH = 29
 
     def __init__(self, data=None, make_consistent=True):
         data = np.array([], dtype=np.int64) if data is None else data
@@ -78,11 +78,12 @@ class IntervalSet:
         """
         Merge overlapping intervals.
 
-        This method is called only once at the end of the constructor.
+        This method is called only one time at the end of the constructor.
         """
         res = []
         start = stop = None
         itvs_l = self._data.tolist()
+        
         for itv in sorted(itvs_l):
             if start is None:
                 start, stop = itv
@@ -104,16 +105,16 @@ class IntervalSet:
 
     def union(self, other):
         """
-        Return the union between two `IntervalSet` objects.
+        Returns the union between two `IntervalSet` instances.
 
         Parameters
         ----------
         other : `IntervalSet`
-            The other `IntervalSet` object.
+            The other `IntervalSet` instance.
         Returns
         -------
         res : `IntervalSet`
-            An `IntervalSet` object.
+            A new `IntervalSet` instance.
         """
         res = IntervalSet()
         if other.empty():
@@ -129,16 +130,16 @@ class IntervalSet:
 
     def difference(self, other):
         """
-        Return the difference between self and ``another_is``.
+        Returns the difference between two `IntervalSet` instances.
 
         Parameters
         ----------
         other : `IntervalSet`
-            The other `IntervalSet` object.
+            The other `IntervalSet` instance.
         Returns
         -------
         res : `IntervalSet`
-            An `IntervalSet` object.
+            A new `IntervalSet` instance.
         """
         res = IntervalSet()
         if other.empty() or self.empty():
@@ -160,7 +161,7 @@ class IntervalSet:
         Returns
         -------
         res : `IntervalSet`
-            An `IntervalSet` object.
+            A new `IntervalSet` instance.
         """
         res = IntervalSet()
         if not other.empty() and not self.empty():
@@ -172,17 +173,17 @@ class IntervalSet:
     @classmethod
     def to_uniq_itv_s(cls, itv_s):
         """
-        Convert default invervals (i.e. using the nested numbering scheme) to intervals using uniq numbers.
+        Convert invervals (i.e. using the nested numbering scheme) to intervals of uniq numbers.
 
         Parameters
         ----------
         itv_s : `IntervalSet`
-            An `IntervalSet` object.
+            A `IntervalSet` instance.
 
         Returns
         -------
-        uniq_itv_s : `IntervalSet`
-            An `IntervalSet` object containing intervals of uniq numbers.
+        result : `IntervalSet`
+            A new `IntervalSet` instance containing intervals in the uniq format.
         """
         r2 = itv_s.copy()
         uniq_itvs_l = []
@@ -190,11 +191,11 @@ class IntervalSet:
         if r2.empty():
             return IntervalSet()
 
-        level = 0
+        depth = 0
         while not r2.empty():
-            shift = int(2 * (IntervalSet.HPY_MAX_LVL - level))
+            shift = int(2 * (IntervalSet.HPY_MAX_DEPTH - depth))
             ofs = (int(1) << shift) - 1
-            ofs2 = int(1) << (2 * level + 2)
+            ofs2 = int(1) << (2 * depth + 2)
 
             r4 = []
             for iv in r2._data:
@@ -211,7 +212,7 @@ class IntervalSet:
                 r4_is = IntervalSet(np.asarray(r4, dtype=np.int64))
                 r2 = r2.difference(r4_is)
 
-            level += 1
+            depth += 1
 
         uniq_itvs = np.asarray(uniq_itvs_l, dtype=np.int64)
         return IntervalSet(uniq_itvs)
@@ -219,24 +220,24 @@ class IntervalSet:
     @classmethod
     def from_uniq_itv_s(cls, uniq_itv_s):
         """
-        Convert invervals of uniq numbers to default intervals (i.e. using the nested numbering scheme).
+        Convert uniq numbers intervals to nested intervals.
 
         Parameters
         ----------
         uniq_itv_s : `IntervalSet`
-            An `IntervalSet` object containing uniq numbers intervals.
+            A uniq formatted `IntervalSet` instance.
 
         Returns
         -------
         itv_s : `IntervalSet`
-            An `IntervalSet` object.
+            A `IntervalSet` instance containing nested indices.
         """
         itv_s = IntervalSet()
         # Appending a list is faster than appending a numpy array
         rtmp = []
         last_level = 0
         uniq_itvs = uniq_itv_s._data
-        shift = 2 * IntervalSet.HPY_MAX_LVL
+        shift = 2 * IntervalSet.HPY_MAX_DEPTH
         for uniq_itv in uniq_itvs:
             for j in np.arange(uniq_itv[0], uniq_itv[1], dtype=np.int64):
                 level, ipix = uniq_to_level_ipix(j)
@@ -245,7 +246,7 @@ class IntervalSet:
                     itv_s = itv_s.union(IntervalSet(np.asarray(rtmp, dtype=np.int64)))
                     rtmp = []
                     last_level = level
-                    shift = 2 * (IntervalSet.HPY_MAX_LVL - level)
+                    shift = 2 * (IntervalSet.HPY_MAX_DEPTH - level)
 
                 rtmp.append((ipix << shift, (ipix + 1) << shift))
 

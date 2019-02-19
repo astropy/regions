@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from ..moc import IntervalSet
+from ..moc.interval_set import IntervalSet
 
 
 @pytest.fixture()

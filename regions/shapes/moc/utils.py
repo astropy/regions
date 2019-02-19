@@ -1,20 +1,4 @@
-# Licensed under a 3-clause BSD style license - see LICENSE.rst
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 def trailing_zeros(x):
-    """
-    Count the number of trailing bit set to zero in ``x``
-
-    Parameters
-    ----------
-    x : int
-        64 bit signed integer
-
-    Returns
-    -------
-    bits: int
-        number of trailing bits set to zero.
-    """
     bits = 0
     # convention for x == 0 => return 0
     if x == 0:
