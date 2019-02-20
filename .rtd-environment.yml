@@ -9,6 +9,7 @@ dependencies:
   - numpy
   - cython
   - matplotlib
+  - spherical-geometry
   - sphinx
   - astropy
   - shapely

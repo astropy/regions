@@ -107,7 +107,7 @@ setup(name=PACKAGENAME,
       description=DESCRIPTION,
       scripts=scripts,
       setup_requires=['numpy'],
-      install_requires=['numpy', 'astropy', 'astropy-healpix', 'six'],
+      install_requires=['numpy', 'astropy', 'astropy-healpix', 'six', 'networkx', 'spherical-geometry'],
       extras_require=dict(
           plot=[
               'matplotlib',
