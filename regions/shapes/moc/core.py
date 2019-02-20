@@ -24,6 +24,7 @@ from .boundaries import Boundaries
 from .plot import fill
 from .plot import border
 from .plot import axis_viewport
+from .plot import culling_backfacing_cells
 
 from ...core import PixCoord, \
                     PixelRegion, \
@@ -57,38 +58,48 @@ class MOCPixelRegion(PixelRegion):
 
     def __init__(self, wcs, sky_region, meta=None, visual=None):
         self.moc = sky_region
-        # Simplify the MOC for plotting purposes:
-        # 1. Degrade the MOC if the FOV is enough big so that we cannot see the smallest HEALPix cells.
-        # 2. For small FOVs, plot the MOC & POLYGONAL_MOC_FROM_FOV
-        moc_to_plot = fill.build_plotting_moc(moc=sky_region, wcs=wcs)
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
         self._repr_params = ('_interval_set',)
         self.wcs = wcs
+        self.vertices = self._compute_vertices()
 
-        self.vertices = np.array([])
-        self.patches = []
+    def _compute_vertices(self):
+        # Simplify the MOC for plotting purposes:
+        # 1. Degrade the MOC if the FOV is enough big so that we cannot see the smallest HEALPix cells.
+        # 2. For small FOVs, plot the MOC & POLYGONAL_MOC_FROM_FOV
+        moc = fill.build_plotting_moc(moc=self.moc, wcs=self.wcs)
         # If the FOV contains no cells, then moc_to_plot (i.e. the intersection between the moc
         # and the MOC created from the FOV polygon) will be empty.
         # If it is the case, we exit the method without doing anything.
-        if moc_to_plot.empty():
-            return self
+        vertices = np.array([])
+        if moc.empty():
+            return vertices
 
-        depths, self.patches = fill.compute_the_patches(moc=moc_to_plot, wcs=wcs)
-        # Get the coordinates from the patches
-        for depth, patch in zip(depths, self.patches):
-            vertices, _ = patch
+        depth_ipix_d = moc.serialize(format="json")
+        depth_ipix_clean_d = culling_backfacing_cells.from_moc(depth_ipix_d=depth_ipix_d, wcs=self.wcs)
 
-            if int(depth) < 3:
-                vertices = np.reshape(vertices, (-1, 9, 2))
+        for depth, ipix in depth_ipix_clean_d.items():
+            step = 1
+            depth = int(depth)
+            if depth < 3:
+                step = 2
+
+            nside = level_to_nside(depth)
+            hp = HEALPix(order="nested", nside=nside, frame=ICRS())
+            ipix_boundaries = hp.boundaries_skycoord(ipix, step=step)
+            # Projection on the given WCS
+            xp, yp = skycoord_to_pixel(ipix_boundaries, wcs=self.wcs)
+
+            patches = np.vstack((xp.flatten(), yp.flatten())).T
+            patches = patches.reshape((-1, step*4, 2))
+
+            if vertices.size == 0:
+                vertices = patches
             else:
-                vertices = np.reshape(vertices, (-1, 5, 2))
+                vertices = np.append(vertices, patches, axis=0)
 
-            vertices = vertices[:, :-1, :]
-            if self.vertices.size == 0:
-                self.vertices = vertices
-            else:
-                self.vertices = np.append(self.vertices, vertices, axis=0)
+        return vertices
 
     def as_artist(self, origin=(0, 0), **kw_mpl_pathpatch):
         """
@@ -107,7 +118,7 @@ class MOCPixelRegion(PixelRegion):
         patch : `~matplotlib.patches.PathPatch`
             Matplotlib path patch
         """
-        pathpatch_mpl = fill.build_mpl_pathpatch(patches=self.patches, wcs=wcs, **kw_mpl_pathpatch)
+        pathpatch_mpl = fill.fill(moc=self.moc, wcs=self.wcs, origin=origin, **kw_mpl_pathpatch)
         return pathpatch_mpl
 
     def plot(self, ax=None, origin=(0, 0), **kwargs):
