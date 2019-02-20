@@ -11,7 +11,7 @@ def build_plotting_moc(moc, wcs):
     cdelt = wcs.wcs.cdelt
     # Convert in rad.px^(-1)
     cdelt = np.abs((2*np.pi/360)*cdelt[0])
-    # Get the minimum depth such as the resolution of a cell is contained in 1px. 
+    # Get the minimum depth such as the resolution of a cell is contained in 1px.
     depth_res = int(np.floor(np.log2(np.sqrt(np.pi/3)/cdelt)))
     depth_res = max(depth_res, 0)
     # Degrade the moc to that depth for plotting purposes. It is not necessary to plot pixels
@@ -62,4 +62,3 @@ def build_plotting_moc(moc, wcs):
     # a lot the time to draw the MOC along with its borders.
     moc_plot = moc_plot.intersection(moc_viewport)
     return moc_plot
-

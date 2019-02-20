@@ -208,7 +208,7 @@ class TestMOC(object):
         plt.title('Coverage of GALEX')
         plt.grid(color="black", linestyle="dotted")
         plt.clf()
-    
+
     @pytest.mark.skipif('not HAS_MATPLOTLIB')
     def test_plot(self):
         import matplotlib.pyplot as plt

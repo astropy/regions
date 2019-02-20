@@ -9,7 +9,7 @@ from matplotlib.pyplot import figure
 
 class WCS:
     """
-    Create a WCS for vizualizing a MOC in a matplotlib axis.
+    Creates a WCS for vizualizing a `~regions.MOCSkyRegion` in a matplotlib axis.
 
     Parameters
     ----------
@@ -30,21 +30,22 @@ class WCS:
     Returns
     -------
     wcs : `~astropy.wcs.WCS`
-        The WCS that can be passed to mocpy.MOC.fill/border.
+        The WCS that can be passed to `regions.MOCSkyRegion.fill` and `regions.MOCSkyRegion.border`.
 
     Examples
     --------
-    >>> from mocpy import MOC, WCS
+    >>> from astropy.utils.data import get_pkg_data_filename
+    >>> from regions import MOCSkyRegion, WCS
     >>> from astropy.coordinates import Angle, SkyCoord
     >>> import astropy.units as u
     >>> # Load a MOC
-    >>> filename = './../resources/P-GALEXGR6-AIS-FUV.fits'
-    >>> moc = MOC.from_fits(filename)
+    >>> filename = get_pkg_data_filename('shapes/tests/data/P-GALEXGR6-AIS-FUV.fits', package='regions')
+    >>> moc = MOCSkyRegion.from_fits(filename)
     >>> # Plot the MOC using matplotlib
     >>> import matplotlib.pyplot as plt
     >>> fig = plt.figure(111, figsize=(15, 15))
     >>> # Define a WCS as a context
-    >>> with WCS(fig, 
+    >>> with WCS(fig,
     ...         fov=200 * u.deg,
     ...         center=SkyCoord(0, 20, unit='deg', frame='icrs'),
     ...         coordsys="icrs",
@@ -66,7 +67,7 @@ class WCS:
                  projection="AIT",
                  rotation=coordinates.Angle(0, u.radian)):
         self.w = wcs.WCS(naxis=2)
-        
+
         width_px, height_px = fig.get_size_inches() * float(fig.dpi)
 
         cdelt_x = fov.to_value("deg")/float(width_px)
@@ -93,4 +94,3 @@ class WCS:
 
     def __exit__(self, exception_type, exception_value, traceback):
         pass
-

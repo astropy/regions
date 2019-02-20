@@ -83,7 +83,7 @@ class IntervalSet:
         res = []
         start = stop = None
         itvs_l = self._data.tolist()
-        
+
         for itv in sorted(itvs_l):
             if start is None:
                 start, stop = itv

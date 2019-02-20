@@ -5,15 +5,14 @@ from astropy.coordinates import ICRS
 
 from astropy.wcs.utils import skycoord_to_pixel
 
-from matplotlib.path import Path
-from matplotlib.patches import PathPatch
-
 from .utils import build_plotting_moc
 from . import culling_backfacing_cells
 
 from astropy_healpix import level_to_nside
 
 def compute_healpix_vertices(depth, ipix, wcs, origin):
+    from matplotlib.path import Path
+
     path_vertices = np.array([])
     codes = np.array([])
 
@@ -73,6 +72,9 @@ def compute_the_patches(moc, wcs, origin=(0, 0)):
     return depth_ipix_clean_d.keys(), patches
 
 def build_mpl_pathpatch(patches, wcs, **kw_mpl_pathpatch):
+    from matplotlib.path import Path
+    from matplotlib.patches import PathPatch
+
     first_patch = patches[0]
     vertices_first_patch, codes_first_patch = first_patch
     path_vertices = np.array(vertices_first_patch)
@@ -102,4 +104,3 @@ def fill(moc, wcs, origin, **kw_mpl_pathpatch):
     _, patches = compute_the_patches(moc=moc_to_plot, wcs=wcs, origin=origin)
     pathpatch_mpl = build_mpl_pathpatch(patches=patches, wcs=wcs, **kw_mpl_pathpatch)
     return pathpatch_mpl
-

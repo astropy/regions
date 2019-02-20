@@ -77,7 +77,7 @@ def from_moc(depth_ipix_d, wcs):
             ipixels = []
             if next_depth in depth_ipix_d:
                 ipixels = depth_ipix_d[next_depth]
-            
+
             for bf_ipix in backfacing_ipix:
                 child_bf_ipix = bf_ipix << 2
                 ipixels.extend([child_bf_ipix,

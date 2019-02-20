@@ -83,7 +83,7 @@ class MOCPixelRegion(PixelRegion):
                 vertices = np.reshape(vertices, (-1, 9, 2))
             else:
                 vertices = np.reshape(vertices, (-1, 5, 2))
-            
+
             vertices = vertices[:, :-1, :]
             if self.vertices.size == 0:
                 self.vertices = vertices
@@ -215,12 +215,12 @@ class MOCPixelRegion(PixelRegion):
 class MOCSkyRegion(SkyRegion):
     """
     Multi-order spatial coverage class
-    
+
     A MOC describes the coverage of an arbitrary region on the unit sphere.
     MOCs are usually used for describing the global coverage of catalog/image surveys such as GALEX or SDSS.
     A MOC corresponds to a list of `HEALPix <https://healpix.sourceforge.io/>`__ cells at different depths.
     This class gives you the possibility to:
-    
+
     1. Define `regions.MOCSkyRegion` objects:
 
     - From a FITS file that stores HEALPix cells (see `from_fits`).
@@ -262,7 +262,7 @@ class MOCSkyRegion(SkyRegion):
         self._itv = interval
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
-        
+
     def to_pixel(self, wcs):
         """
         Convert the `~regions.MOCSkyRegion` instance to a `~regions.MOCPixelRegion`
@@ -428,7 +428,7 @@ class MOCSkyRegion(SkyRegion):
         itv = IntervalSet(itvs)
         return self.__class__(itv)
 
-    
+
     @classmethod
     def from_cells(cls, cells, meta=None, visual=None):
         """
@@ -745,7 +745,7 @@ class MOCSkyRegion(SkyRegion):
             value of ``self.meta['include']``.
         """
         depth = self.max_depth
-        
+
         nside = level_to_nside(depth)
         npix = nside_to_npix(nside)
         mask = np.zeros(npix, dtype=bool)
@@ -761,7 +761,7 @@ class MOCSkyRegion(SkyRegion):
         ipix = hp.lonlat_to_healpix(ra, dec)
 
         return mask[ipix]
-    
+
     def add_neighbours(self):
         """
         Extends the MOC instance so that it includes the HEALPix cells touching its border.
@@ -848,7 +848,7 @@ class MOCSkyRegion(SkyRegion):
             WCS defining the World system <-> Image system projection.
         kw_mpl_pathpatch
             Plotting arguments for `matplotlib.patches.PathPatch`.
-        
+
         Examples
         --------
         >>> from astropy.utils.data import get_pkg_data_filename
@@ -862,7 +862,7 @@ class MOCSkyRegion(SkyRegion):
         >>> import matplotlib.pyplot as plt
         >>> fig = plt.figure(111, figsize=(15, 15))
         >>> # Define a WCS as a context
-        >>> with WCS(fig, 
+        >>> with WCS(fig,
         ...         fov=50 * u.deg,
         ...         center=SkyCoord(0, 20, unit='deg', frame='icrs'),
         ...         coordsys="icrs",
@@ -887,7 +887,7 @@ class MOCSkyRegion(SkyRegion):
         Draws the MOC border(s) on a matplotlib axis.
 
         This performs the projection of the sky coordinates defining the perimeter of the MOC to the pixel image coordinate system.
-        You are able to specify various styling kwargs for `matplotlib.patches.PathPatch` 
+        You are able to specify various styling kwargs for `matplotlib.patches.PathPatch`
         (see the `list of valid keywords <https://matplotlib.org/api/_as_gen/matplotlib.patches.PathPatch.html#matplotlib.patches.PathPatch>`__).
 
         Parameters
@@ -895,7 +895,7 @@ class MOCSkyRegion(SkyRegion):
         ax : `matplotlib.axes.Axes`
             Matplotlib axis.
         wcs : `astropy.wcs.WCS`
-            WCS defining the World system <-> Image system projection. 
+            WCS defining the World system <-> Image system projection.
         kw_mpl_pathpatch
             Plotting arguments for `matplotlib.patches.PathPatch`
 
@@ -912,7 +912,7 @@ class MOCSkyRegion(SkyRegion):
         >>> import matplotlib.pyplot as plt
         >>> fig = plt.figure(111, figsize=(15, 15))
         >>> # Define a WCS as a context
-        >>> with WCS(fig, 
+        >>> with WCS(fig,
         ...         fov=50 * u.deg,
         ...         center=SkyCoord(0, 20, unit='deg', frame='icrs'),
         ...         coordsys="icrs",
@@ -932,7 +932,7 @@ class MOCSkyRegion(SkyRegion):
         Returns the sky coordinates defining the border(s) of the MOC.
 
         The border(s) are expressed as a list of SkyCoord.
-        Each SkyCoord refers to the coordinates of one border of the MOC (i.e. 
+        Each SkyCoord refers to the coordinates of one border of the MOC (i.e.
         either a border of a connexe MOC part or a border of a hole
         located in a connexe MOC part).
 
@@ -1063,7 +1063,7 @@ class MOCSkyRegion(SkyRegion):
     def from_lonlat(cls, lon, lat, max_depth):
         """
         Creates a MOC from astropy lon, lat `astropy.units.Quantity`.
-        
+
         Parameters
         ----------
         lon : `astropy.units.Quantity`
@@ -1072,7 +1072,7 @@ class MOCSkyRegion(SkyRegion):
             The latitudes of the sky coordinates belonging to the MOC.
         max_depth : int
             The depth of the smallest HEALPix cells contained in the MOC.
-        
+
         Returns
         -------
         result : `regions.MOCSkyRegion`
@@ -1092,7 +1092,7 @@ class MOCSkyRegion(SkyRegion):
         """
         Creates a MOC from a polygon.
 
-        The polygon is given as an `astropy.coordinates.SkyCoord` that contains the 
+        The polygon is given as an `astropy.coordinates.SkyCoord` that contains the
         vertices of the polygon. Concave and convex polygons are accepted but
         self-intersecting ones are currently not properly handled.
 
@@ -1102,12 +1102,12 @@ class MOCSkyRegion(SkyRegion):
             The sky coordinates defining the vertices of a polygon. It can describe a convex or
             concave polygon but not a self-intersecting one.
         inside : `astropy.coordinates.SkyCoord`, optional
-            A point that will be inside the MOC is needed as it is not possible to determine the inside area of a polygon 
+            A point that will be inside the MOC is needed as it is not possible to determine the inside area of a polygon
             on the unit sphere (there is no infinite area that can be considered as the outside because on the sphere,
             a closed polygon delimits two finite areas).
             Possible improvement: take the inside area as the one covering the smallest region on the sphere.
 
-            If inside=None (default behavior), the mean of all the vertices is taken as lying inside the polygon. That approach may not work for 
+            If inside=None (default behavior), the mean of all the vertices is taken as lying inside the polygon. That approach may not work for
             concave polygons.
         max_depth : int, optional
             The resolution of the MOC. Set to 10 by default.
@@ -1125,7 +1125,7 @@ class MOCSkyRegion(SkyRegion):
         """
         Creates a MOC from a polygon
 
-        The polygon is given as lon and lat `astropy.units.Quantity` that define the 
+        The polygon is given as lon and lat `astropy.units.Quantity` that define the
         vertices of the polygon. Concave and convex polygons are accepted but
         self-intersecting ones are currently not properly handled.
 
@@ -1138,12 +1138,12 @@ class MOCSkyRegion(SkyRegion):
             The latitudes defining the polygon. Can describe convex and concave
             polygons but not self-intersecting ones.
         inside : `astropy.coordinates.SkyCoord`, optional
-            A point that will be inside the MOC is needed as it is not possible to determine the inside area of a polygon 
+            A point that will be inside the MOC is needed as it is not possible to determine the inside area of a polygon
             on the unit sphere (there is no infinite area that can be considered as the outside because on the sphere,
             a closed polygon delimits two finite areas).
             Possible improvement: take the inside area as the one covering the smallest region on the sphere.
 
-            If inside=None (default behavior), the mean of all the vertices is taken as lying inside the polygon. That approach may not work for 
+            If inside=None (default behavior), the mean of all the vertices is taken as lying inside the polygon. That approach may not work for
             concave polygons.
         max_depth : int, optional
             The resolution of the MOC. Set to 10 by default.
