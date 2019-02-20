@@ -18,7 +18,7 @@ def build_plotting_moc(moc, wcs):
     # that we will not see because they are contained in 1px.
     moc_plot = moc
     if moc.max_depth > depth_res:
-        moc_plot = moc.degrade_to_order(depth_res)
+        moc_plot = moc.degrade_to_depth(depth_res)
 
     # Get the MOC delimiting the FOV polygon
     width_px = int(wcs.wcs.crpix[0]*2.) # Supposing the wcs is centered in the axis

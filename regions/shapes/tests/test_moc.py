@@ -74,7 +74,8 @@ class TestMOC(object):
     """Test involving the manipulation of MOC objects"""
 
     def setup_class(self):
-        self.galex = MOCSkyRegion.from_fits(get_pkg_data_filename('data/P-GALEXGR6-AIS-FUV.fits'))
+        filename = get_pkg_data_filename('shapes/tests/data/P-GALEXGR6-AIS-FUV.fits', package='regions')
+        self.galex = MOCSkyRegion.from_fits(filename)
 
     @pytest.mark.parametrize("size", [
         1000, 10000, 50000
@@ -169,7 +170,7 @@ class TestMOC(object):
         precise_moc = MOCSkyRegion.from_json({
             '1': [4, 21]
         })
-        degraded_moc = MOCSkyRegion.degrade_to_order(precise_moc, 0)
+        degraded_moc = precise_moc.degrade_to_depth(0)
         assert degraded_moc == MOCSkyRegion.from_json({'0': [1, 5]})
 
     def test_complement(self):
@@ -230,7 +231,7 @@ class TestMOC(object):
         plt.clf()
 
     def test_boundaries(self):
-        moc = self.galex.degrade_to_order(6)
+        moc = self.galex.degrade_to_depth(6)
         boundaries_l = moc.get_boundaries()
 
     def test_to_mask(self):

@@ -47,11 +47,11 @@ class MOCPixelRegion(PixelRegion):
 
     Parameters
     ----------
-    sky_region: `~regions.MOCSkyRegion` object
-        The `~regions.MOCSkyRegion` object
-    meta : `~regions.RegionMeta` object, optional
+    sky_region : `~regions.MOCSkyRegion`
+        The `~regions.MOCSkyRegion` instance.
+    meta : `~regions.RegionMeta`, optional
         A dictionary which stores the meta attributes of this region.
-    visual : `~regions.RegionVisual` object, optional
+    visual : `~regions.RegionVisual`, optional
         A dictionary which stores the visual meta attributes of this region.
     """
 
@@ -59,7 +59,7 @@ class MOCPixelRegion(PixelRegion):
         self.moc = sky_region
         # Simplify the MOC for plotting purposes:
         # 1. Degrade the MOC if the FOV is enough big so that we cannot see the smallest HEALPix cells.
-        # 2. For small FOVs, plot the MOC & POLYGONAL_MOC_FROM_FOV.
+        # 2. For small FOVs, plot the MOC & POLYGONAL_MOC_FROM_FOV
         moc_to_plot = fill.build_plotting_moc(moc=sky_region, wcs=wcs)
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
@@ -249,8 +249,7 @@ class MOCSkyRegion(SkyRegion):
     Parameters
     ----------
     itv_s : `~regions.IntervalSet` object, optional
-        A N rows by 2 columns `~numpy.ndarray` storing the set of intervals
-        representing the ranges of HEALPix cell indexes of the MOC.
+        A N rows by 2 columns `~numpy.ndarray` storing the ranges of HEALPix cells contained in the MOC.
     meta : `~regions.RegionMeta` object, optional
         A dictionary which stores the meta attributes of this region.
     visual : `~regions.RegionVisual` object, optional
@@ -266,7 +265,7 @@ class MOCSkyRegion(SkyRegion):
         
     def to_pixel(self, wcs):
         """
-        Convert the MOCSkyRegion instance to a MOCPixelRegion
+        Convert the `~regions.MOCSkyRegion` instance to a `~regions.MOCPixelRegion`
 
         The MOC is projected into the image coordinates system using an `~astropy.wcs.WCS` instance.
         The HEALPix cells that backface the projection are removed.
@@ -293,7 +292,7 @@ class MOCSkyRegion(SkyRegion):
         Parameters
         ----------
         other : `~regions.MOCSkyRegion`
-            The `~regions.MOCSkyRegion` object to test the equality with.
+            The `~regions.MOCSkyRegion` instance to test the equality with.
 
         Returns
         -------
@@ -309,7 +308,7 @@ class MOCSkyRegion(SkyRegion):
         """
         Checks whether the `~regions.MOCSkyRegion` instance is empty
 
-        A MOC is empty when its list of HEALPix cell ranges is empty.
+        A MOC is empty when it contains no ranges of HEALPix cell indexes.
 
         Returns
         -------
@@ -485,7 +484,7 @@ class MOCSkyRegion(SkyRegion):
         Examples
         --------
         >>> from regions import MOCSkyRegion
-        >>> moc = MOCSkyRegion({
+        >>> moc = MOCSkyRegion.from_json({
         ...     "0": [0, 3, 4],
         ...     "1": [5, 6],
         ... })
@@ -680,23 +679,23 @@ class MOCSkyRegion(SkyRegion):
             with open(path, 'w') as h:
                 h.write(json.dumps(serialization, sort_keys=True, indent=2))
 
-    def degrade_to_order(self, new_order):
+    def degrade_to_depth(self, new_depth):
         """
         Degrades the MOC instance to a new, less precise, MOC.
 
         The maximum depth (i.e. the depth of the smallest HEALPix cells that can be found in the MOC) of the
-        degraded MOC is set to ``new_order``. 
+        degraded MOC is set to ``new_depth``.
 
         Parameters
         ----------
-        new_order : int
+        new_depth : int
 
         Returns
         -------
         moc : `regions.MOCSkyRegion`
             The degraded MOC.
         """
-        shift = 2 * (MOCSkyRegion.HPY_MAX_DEPTH - new_order)
+        shift = 2 * (MOCSkyRegion.HPY_MAX_DEPTH - new_depth)
         ofs = (int(1) << shift) - 1
         mask = ~ofs
         adda = int(0)
@@ -713,7 +712,7 @@ class MOCSkyRegion(SkyRegion):
 
     def _best_res_pixels(self):
         """
-        Returns a numpy array of all the HEALPix indexes contained in the MOC at its max order.
+        Returns a numpy array of all the HEALPix indexes contained in the MOC at its max depth.
 
         Returns
         -------
@@ -741,7 +740,7 @@ class MOCSkyRegion(SkyRegion):
 
         Returns
         -------
-        array : `~np.ndarray`
+        array : `~numpy.ndarray`
             A boolean numpy array telling which positions are inside the MOC depending on the
             value of ``self.meta['include']``.
         """
@@ -852,11 +851,12 @@ class MOCSkyRegion(SkyRegion):
         
         Examples
         --------
+        >>> from astropy.utils.data import get_pkg_data_filename
         >>> from regions import MOCSkyRegion, WCS
         >>> from astropy.coordinates import Angle, SkyCoord
         >>> import astropy.units as u
         >>> # Load a MOC, e.g. the MOC of GALEXGR6-AIS-FUV
-        >>> filename = './../resources/P-GALEXGR6-AIS-FUV.fits'
+        >>> filename = get_pkg_data_filename('shapes/tests/data/P-GALEXGR6-AIS-FUV.fits', package='regions')
         >>> moc = MOCSkyRegion.from_fits(filename)
         >>> # Plot the MOC using matplotlib
         >>> import matplotlib.pyplot as plt
@@ -901,11 +901,12 @@ class MOCSkyRegion(SkyRegion):
 
         Examples
         --------
+        >>> from astropy.utils.data import get_pkg_data_filename
         >>> from regions import MOCSkyRegion, WCS
         >>> from astropy.coordinates import Angle, SkyCoord
         >>> import astropy.units as u
         >>> # Load a MOC, e.g. the MOC of GALEXGR6-AIS-FUV
-        >>> filename = './../resources/P-GALEXGR6-AIS-FUV.fits'
+        >>> filename = get_pkg_data_filename('shapes/tests/data/P-GALEXGR6-AIS-FUV.fits', package='regions')
         >>> moc = MOCSkyRegion.from_fits(filename)
         >>> # Plot the MOC using matplotlib
         >>> import matplotlib.pyplot as plt
@@ -926,7 +927,7 @@ class MOCSkyRegion(SkyRegion):
         """
         border.border(self, ax, wcs, **kw_mpl_pathpatch)
 
-    def get_boundaries(self, order=None):
+    def get_boundaries(self, depth=None):
         """
         Returns the sky coordinates defining the border(s) of the MOC.
 
@@ -937,7 +938,7 @@ class MOCSkyRegion(SkyRegion):
 
         Parameters
         ----------
-        order : int
+        depth : int
             The depth of the MOC before computing its boundaries.
             A shallow depth leads to a faster computation.
             By default the maximum depth of the MOC is taken.
@@ -947,7 +948,7 @@ class MOCSkyRegion(SkyRegion):
         coords: [`~astropy.coordinates.SkyCoord`]
             A list of `~astropy.coordinates.SkyCoord` each describing one border.
         """
-        return Boundaries.get(self, order)
+        return Boundaries.get(self, depth)
 
     @classmethod
     def from_image(cls, header, max_depth, mask=None, meta=None, visual=None):
@@ -957,7 +958,7 @@ class MOCSkyRegion(SkyRegion):
         Parameters
         ----------
         header : `astropy.io.fits.Header`
-            FITS header containing all the info of where the image is located (position, size, etc...)
+            FITS header containing all the infos of where the image is located (position, size, etc...)
         max_depth : int
             The moc resolution.
         mask : `numpy.ndarray`, optional
@@ -1030,7 +1031,7 @@ class MOCSkyRegion(SkyRegion):
     @classmethod
     def from_skycoord(cls, skycoord, max_depth, meta=None, visual=None):
         """
-        Create a `~regions.MOCSkyRegion` from a `~astropy.coordinates.SkyCoord` object
+        Creates a `~regions.MOCSkyRegion` from a `~astropy.coordinates.SkyCoord`.
 
         Parameters
         ----------
@@ -1160,7 +1161,7 @@ class MOCSkyRegion(SkyRegion):
         moc = MOCSkyRegion.from_json(polygon_computer.ipix)
         # We degrade it to the user-requested order
         if polygon_computer.degrade_to_max_depth:
-            moc = moc.degrade_to_order(max_depth)
+            moc = moc.degrade_to_depth(max_depth)
 
         return moc
 

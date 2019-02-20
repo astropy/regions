@@ -28,7 +28,7 @@ class Boundaries():
         moc = m
         if depth:
             if m.max_depth > depth:
-                moc = m.degrade_to_order(depth)
+                moc = m.degrade_to_depth(depth)
 
         max_depth = moc.max_depth
         nside = level_to_nside(max_depth)
