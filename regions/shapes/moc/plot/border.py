@@ -27,7 +27,7 @@ def border(moc, ax, wcs, **kw_mpl_pathpatch):
     sky_fraction = ipixels_open.shape[0] / float(num_ipixels)
 
     if sky_fraction > 0.5:
-        ipixels_all = np.arange(num_ipixels, dtype=np.uint64)
+        ipixels_all = np.arange(num_ipixels, dtype=np.int64)
         ipixels_open = np.setdiff1d(ipixels_all, ipixels_open, assume_unique=True)
 
     neighbors = hp.neighbours(ipixels_open)

@@ -23,7 +23,7 @@ class IntervalSet:
     HPY_MAX_DEPTH = 29
 
     def __init__(self, data=None, make_consistent=True):
-        data = np.array([], dtype=np.uint64) if data is None else data
+        data = np.array([], dtype=np.int64) if data is None else data
         self._data = data
         # Merging of the overlapping intervals
         if make_consistent:
@@ -101,7 +101,7 @@ class IntervalSet:
         if start is not None and stop is not None:
             res.append((start, stop))
 
-        self._data = np.asarray(res, dtype=np.uint64)
+        self._data = np.asarray(res, dtype=np.int64)
 
     def union(self, other):
         """
@@ -209,12 +209,12 @@ class IntervalSet:
                     uniq_itvs_l.append((a + ofs2, b + ofs2))
 
             if len(r4) > 0:
-                r4_is = IntervalSet(np.asarray(r4, dtype=np.uint64))
+                r4_is = IntervalSet(np.asarray(r4, dtype=np.int64))
                 r2 = r2.difference(r4_is)
 
             depth += 1
 
-        uniq_itvs = np.asarray(uniq_itvs_l, dtype=np.uint64)
+        uniq_itvs = np.asarray(uniq_itvs_l, dtype=np.int64)
         return IntervalSet(uniq_itvs)
 
     @classmethod
@@ -239,18 +239,18 @@ class IntervalSet:
         uniq_itvs = uniq_itv_s._data
         shift = 2 * IntervalSet.HPY_MAX_DEPTH
         for uniq_itv in uniq_itvs:
-            for j in np.arange(uniq_itv[0], uniq_itv[1], dtype=np.uint64):
+            for j in np.arange(uniq_itv[0], uniq_itv[1], dtype=np.int64):
                 level, ipix = uniq_to_level_ipix(j)
 
                 if level != last_level:
-                    itv_s = itv_s.union(IntervalSet(np.asarray(rtmp, dtype=np.uint64)))
+                    itv_s = itv_s.union(IntervalSet(np.asarray(rtmp, dtype=np.int64)))
                     rtmp = []
                     last_level = level
                     shift = 2 * (IntervalSet.HPY_MAX_DEPTH - level)
 
                 rtmp.append((ipix << shift, (ipix + 1) << shift))
 
-        itv_s = itv_s.union(IntervalSet(np.asarray(rtmp, dtype=np.uint64)))
+        itv_s = itv_s.union(IntervalSet(np.asarray(rtmp, dtype=np.int64)))
         return itv_s
 
     @staticmethod
@@ -307,4 +307,4 @@ class IntervalSet:
             scan = min(a_endpoints[a_index], b_endpoints[b_index])
 
         # Reshape the resulting list of intervals to a Nx2 numpy array
-        return np.asarray(res, dtype=np.uint64).reshape((-1, 2))
+        return np.asarray(res, dtype=np.int64).reshape((-1, 2))

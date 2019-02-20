@@ -435,7 +435,7 @@ class MOCSkyRegion(SkyRegion):
         if last < max_npix:
             res.append((last, max_npix))
 
-        itvs = np.asarray(res, dtype=np.uint64)
+        itvs = np.asarray(res, dtype=np.int64)
         itv = IntervalSet(itvs)
         return self.__class__(itv)
 
@@ -529,7 +529,7 @@ class MOCSkyRegion(SkyRegion):
         """
         itvs_uniq_l = IntervalSet.to_uniq_itv_s(self._itv)._data
         for uniq_iv in itvs_uniq_l:
-            for uniq in np.arange(uniq_iv[0], uniq_iv[1], dtype=np.uint64):
+            for uniq in np.arange(uniq_iv[0], uniq_iv[1], dtype=np.int64):
                 yield uniq
 
     @classmethod
@@ -733,7 +733,7 @@ class MOCSkyRegion(SkyRegion):
         factor = 2 * (MOCSkyRegion.HPY_MAX_DEPTH - self.max_depth)
         pix_l = []
         for iv in self._itv._data:
-            for val in np.arange(iv[0] >> factor, iv[1] >> factor, np.uint64):
+            for val in np.arange(iv[0] >> factor, iv[1] >> factor, dtype=np.int64):
                 pix_l.append(val)
 
         return np.asarray(pix_l)
