@@ -1,5 +1,3 @@
-from matplotlib.pyplot import figure, axis
-
 def set(ax, wcs):
     fig = ax.get_figure()
     width_px, height_px = fig.get_size_inches() * fig.dpi

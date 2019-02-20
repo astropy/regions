@@ -5,8 +5,6 @@ from astropy import wcs
 
 import astropy.units as u
 
-from matplotlib.pyplot import figure
-
 class WCS:
     """
     Creates a WCS for vizualizing a `~regions.MOCSkyRegion` in a matplotlib axis.
