@@ -1,7 +1,11 @@
 0.4 (Unreleased)
 ================
 
-- No changes yet.
+- Add a ``regions.MOCSkyRegion`` and ``regions.MOCPixelRegion`` regions.
+  ``regions.MOCSkyRegion`` allows to define a coverage map of the sky.
+  It relies on what has been done in `mocpy <https://github.com/cds-astro/mocpy/>`__. It
+  offers plotting, logical operations between MOCs features. MOCs can be stored
+  and loaded from FITS files and can be serialized in JSON. [#219]
 
 0.3 (2018-09-09)
 ================
