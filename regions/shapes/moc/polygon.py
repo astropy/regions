@@ -214,4 +214,4 @@ class PolygonComputer:
                                                         child_ipix + 3])
 
             self.ipix_d.update({str(depth): ipix_in_polygon_l})
-            ipixels = np.asarray(ipix_inter_polygon_l)
+            ipixels = np.asarray(ipix_inter_polygon_l, dtype=np.int64)

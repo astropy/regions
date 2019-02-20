@@ -72,7 +72,7 @@ class MOCPixelRegion(PixelRegion):
         # If the FOV contains no cells, then moc_to_plot (i.e. the intersection between the moc
         # and the MOC created from the FOV polygon) will be empty.
         # If it is the case, we exit the method without doing anything.
-        vertices = np.array([])
+        vertices = np.array([], dtype=float)
         if moc.empty():
             return vertices
 
@@ -500,11 +500,11 @@ class MOCSkyRegion(SkyRegion):
         ...     "1": [5, 6],
         ... })
         """
-        itvs = np.array([])
+        itvs = np.array([], dtype=np.int64)
         for order, pix_l in data.items():
             if len(pix_l) == 0:
                 continue
-            pix = np.array(pix_l)
+            pix = np.array(pix_l, dtype=np.int64)
             p1 = pix
             p2 = pix + 1
             shift = 2 * (MOCSkyRegion.HPY_MAX_DEPTH - int(order))
@@ -655,7 +655,7 @@ class MOCSkyRegion(SkyRegion):
         for uniq in self._uniq_pixels_iterator():
             uniq_l.append(uniq)
 
-        uniq = np.array(uniq_l)
+        uniq = np.array(uniq_l, dtype=np.int64)
 
         if format == 'fits':
             result = self._to_fits(uniq_pix=uniq,
@@ -719,7 +719,7 @@ class MOCSkyRegion(SkyRegion):
             if b > a:
                 iv_set.append((a, b))
 
-        return self.__class__(IntervalSet(np.asarray(iv_set)))
+        return self.__class__(IntervalSet(np.asarray(iv_set, dtype=np.int64)))
 
     def _best_res_pixels(self):
         """
@@ -736,7 +736,7 @@ class MOCSkyRegion(SkyRegion):
             for val in np.arange(iv[0] >> factor, iv[1] >> factor, dtype=np.int64):
                 pix_l.append(val)
 
-        return np.asarray(pix_l)
+        return np.asarray(pix_l, dtype=np.int64)
 
     def contains(self, ra, dec, keep_inside=True):
         """
