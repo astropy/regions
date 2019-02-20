@@ -32,7 +32,7 @@ User Documentation
    installation
    getting_started
    shapes
-   moc
+   moc/moc
    contains
    compound
    masks
