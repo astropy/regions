@@ -990,7 +990,7 @@ class MOCSkyRegion(SkyRegion):
         width = header['NAXIS1']
 
         # Get the image WCS to retrieve back its world coordinates
-        wcs = wcs.WCS(header)
+        w = wcs.WCS(header)
 
         # Get the pixels coordinates
         if mask is not None:
@@ -1004,7 +1004,7 @@ class MOCSkyRegion(SkyRegion):
             pix = np.dstack((x.ravel(), y.ravel()))[0]
 
         # Retrieve back the world coordinates using the image WCS
-        world_pix = wcs.wcs_pix2world(pix, 1)
+        world_pix = w.wcs_pix2world(pix, 1)
 
         # Call the from_lonlat method to create the MOC from the world coordinates.
         return MOCSkyRegion.from_lonlat(
@@ -1015,7 +1015,7 @@ class MOCSkyRegion(SkyRegion):
             visual=visual)
 
     @classmethod
-    def from_fits_images(cls, path_l, max_depth):
+    def from_fits_images(cls, path_l, max_depth, meta=None, visual=None):
         """
         Loads a MOC from a set of FITS file images.
 
@@ -1025,6 +1025,10 @@ class MOCSkyRegion(SkyRegion):
             A list of path where the fits image are located.
         max_depth : int
             The MOC resolution.
+        meta : `~regions.RegionMeta` object, optional
+            A dictionary which stores the meta attributes of this region.
+        visual : `~regions.RegionVisual` object, optional
+            A dictionary which stores the visual meta attributes of this region.
 
         Returns
         -------
@@ -1034,7 +1038,7 @@ class MOCSkyRegion(SkyRegion):
         moc = MOCSkyRegion()
         for path in path_l:
             header = fits.getheader(path)
-            current_moc = MOCSkyRegion.from_image(header=header, max_depth=max_depth)
+            current_moc = MOCSkyRegion.from_image(header=header, max_depth=max_depth, meta=meta, visual=meta)
             moc = moc.union(current_moc)
 
         return moc
@@ -1071,7 +1075,7 @@ class MOCSkyRegion(SkyRegion):
         return cls(itv, meta, visual)
 
     @classmethod
-    def from_lonlat(cls, lon, lat, max_depth):
+    def from_lonlat(cls, lon, lat, max_depth, meta=None, visual=None):
         """
         Creates a MOC from astropy lon, lat `astropy.units.Quantity`.
 
@@ -1083,6 +1087,10 @@ class MOCSkyRegion(SkyRegion):
             The latitudes of the sky coordinates belonging to the MOC.
         max_depth : int
             The depth of the smallest HEALPix cells contained in the MOC.
+        meta : `~regions.RegionMeta` object, optional
+            A dictionary which stores the meta attributes of this region.
+        visual : `~regions.RegionVisual` object, optional
+            A dictionary which stores the visual meta attributes of this region.
 
         Returns
         -------
@@ -1096,10 +1104,10 @@ class MOCSkyRegion(SkyRegion):
         itvs = np.vstack((ipix << shift, (ipix + 1) << shift)).T
 
         itv = IntervalSet(itvs)
-        return cls(itv)
+        return cls(itv, meta, visual)
 
     @classmethod
-    def from_polygon_skycoord(cls, skycoord, inside=None, max_depth=10):
+    def from_polygon_skycoord(cls, skycoord, inside=None, max_depth=10, meta=None, visual=None):
         """
         Creates a MOC from a polygon.
 
@@ -1122,6 +1130,10 @@ class MOCSkyRegion(SkyRegion):
             concave polygons.
         max_depth : int, optional
             The resolution of the MOC. Set to 10 by default.
+        meta : `~regions.RegionMeta` object, optional
+            A dictionary which stores the meta attributes of this region.
+        visual : `~regions.RegionVisual` object, optional
+            A dictionary which stores the visual meta attributes of this region.
 
         Returns
         -------
@@ -1129,10 +1141,10 @@ class MOCSkyRegion(SkyRegion):
             The resulting MOC
         """
         return MOCSkyRegion.from_polygon(lon=skycoord.icrs.ra, lat=skycoord.icrs.dec,
-                                inside=inside, max_depth=max_depth)
+                                inside=inside, max_depth=max_depth, meta=meta, visual=visual)
 
     @classmethod
-    def from_polygon(cls, lon, lat, inside=None, max_depth=10):
+    def from_polygon(cls, lon, lat, inside=None, max_depth=10, meta=None, visual=None):
         """
         Creates a MOC from a polygon
 
@@ -1158,6 +1170,10 @@ class MOCSkyRegion(SkyRegion):
             concave polygons.
         max_depth : int, optional
             The resolution of the MOC. Set to 10 by default.
+        meta : `~regions.RegionMeta` object, optional
+            A dictionary which stores the meta attributes of this region.
+        visual : `~regions.RegionVisual` object, optional
+            A dictionary which stores the visual meta attributes of this region.
 
         Returns
         -------
@@ -1169,7 +1185,7 @@ class MOCSkyRegion(SkyRegion):
         polygon_computer = PolygonComputer(lon, lat, inside, max_depth)
         # Create the moc from the python dictionary
 
-        moc = MOCSkyRegion.from_json(polygon_computer.ipix)
+        moc = MOCSkyRegion.from_json(polygon_computer.ipix, meta=meta, visual=visual)
         # We degrade it to the user-requested order
         if polygon_computer.degrade_to_max_depth:
             moc = moc.degrade_to_depth(max_depth)

@@ -74,9 +74,12 @@ class TestMOC(object):
     """Test involving the manipulation of MOC objects"""
 
     def setup_class(self):
-        filename = get_pkg_data_filename('shapes/tests/data/P-GALEXGR6-AIS-FUV.fits', package='regions')
-        self.galex = MOCSkyRegion.from_fits(filename)
-
+        # Load from fits file
+        filename_galex = get_pkg_data_filename('shapes/tests/data/P-GALEXGR6-AIS-FUV.fits', package='regions')
+        self.galex = MOCSkyRegion.from_fits(filename_galex)
+        filename_sdss = get_pkg_data_filename('shapes/tests/data/P-SDSS9-r.fits', package='regions')
+        self.sdss = MOCSkyRegion.from_fits(filename_sdss)
+        
     @pytest.mark.parametrize("size", [
         1000, 10000, 50000
     ])
@@ -91,6 +94,22 @@ class TestMOC(object):
         lon, lat = random_lonlat(size)
         moc = MOCSkyRegion.from_lonlat(lon=lon, lat=lat, max_depth=7)
 
+    def test_from_cells(self):
+        num_ipix = 1000
+        cells = np.zeros(num_ipix, dtype={
+            'names':('ipix', 'depth', 'fully_covered'),
+            'formats':(np.uint64, np.uint32, np.uint8),
+        })
+        depth = 12
+        npix = 12 * (4 ** depth)
+
+        for i in range(num_ipix):
+            cells["ipix"][i] = np.random.randint(npix, size=1)
+            cells["depth"][i] = depth
+            cells["fully_covered"] = 1
+
+        MOCSkyRegion.from_cells(cells)
+
     def test_from_fits(self):
         assert self.galex
 
@@ -99,17 +118,24 @@ class TestMOC(object):
         moc = MOCSkyRegion.from_json(ipix_d)
         assert self.galex == moc
 
-    def test_write_and_from_json(self):
-        # A dictionary of ('order', [ipix]) key-value pairs
-        data = self.galex.serialize(format='json')
-        moc_from_serialization = MOCSkyRegion.from_json(data)
-        assert self.galex == moc_from_serialization
+    def test_write_to_json(self):
+        data = self.galex.write("to_json.txt", format='json')
+        import json
+        with open('to_json.txt', 'r') as f_in:
+            data = json.load(f_in)
+            moc_from_file = MOCSkyRegion.from_json(data)
+            assert self.galex == moc_from_file
 
     def test_write_to_fits(self):
+        data = self.galex.write("galex.fits", format='fits')
+        moc_from_file = MOCSkyRegion.from_fits("galex.fits")
+        assert self.galex == moc_from_file
+
+    def test_serialize_to_fits(self):
         hdulist = self.galex.serialize(format='fits')
         assert isinstance(hdulist, fits.hdu.hdulist.HDUList)
 
-    def test_write_to_json(self):
+    def test_serialize_to_json(self):
         data = self.galex.serialize(format='json')
         assert isinstance(data, dict)
 
