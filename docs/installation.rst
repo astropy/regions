@@ -66,8 +66,8 @@ Install the latest development version from https://github.com/astropy/regions :
     python setup.py install
 
 To run the tests, you will need to make sure the `pytest-arraydiff
-<https://pypi.python.org/pypi/pytest-arraydiff>`_ package is installed. Then,
-run the tests with:
+<https://pypi.python.org/pypi/pytest-arraydiff>`_ package is installed
+(version v0.3 or newer). Then, run the tests with:
 
 .. code-block:: bash
 
