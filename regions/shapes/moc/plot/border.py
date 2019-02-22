@@ -30,10 +30,16 @@ def border(moc, ax, wcs, **kw_mpl_pathpatch):
         ipixels_all = np.arange(num_ipixels, dtype=np.int64)
         ipixels_open = np.setdiff1d(ipixels_all, ipixels_open, assume_unique=True)
 
-    neighbors = hp.neighbours(ipixels_open)
+    ipix_neigh = hp.neighbours(ipixels_open)
     # Select the direct neighbors (i.e. those in WEST, NORTH, EAST and SOUTH directions)
-    neighbors = neighbors[[0, 2, 4, 6], :]
-    ipix_moc = np.isin(neighbors, ipixels_open)
+    ipix_neigh = ipix_neigh[[0, 2, 4, 6], :]
+
+    r1 = np.in1d(ipix_neigh[0, :], ipixels_open)
+    r2 = np.in1d(ipix_neigh[1, :], ipixels_open)
+    r3 = np.in1d(ipix_neigh[2, :], ipixels_open)
+    r4 = np.in1d(ipix_neigh[3, :], ipixels_open)
+
+    ipix_moc = np.vstack((r1, r2, r3, r4))
 
     west_edge = ipix_moc[0, :]
     south_edge = ipix_moc[1, :]
