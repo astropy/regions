@@ -79,7 +79,7 @@ class TestMOC(object):
         self.galex = MOCSkyRegion.from_fits(filename_galex)
         filename_sdss = get_pkg_data_filename('shapes/tests/data/P-SDSS9-r.fits', package='regions')
         self.sdss = MOCSkyRegion.from_fits(filename_sdss)
-        
+
     @pytest.mark.parametrize("size", [
         1000, 10000, 50000
     ])
