@@ -32,12 +32,10 @@ with WCS(fig,
     reg = moc.to_pixel(wcs)
     # Call the plot method of MOC pixel region
     reg.plot(ax=ax, alpha=0.5, fill=True, linewidth=0, color='r')
-
     # Project the sky coordinates to the image system
     from astropy.wcs.utils import skycoord_to_pixel
     x_in, y_in = skycoord_to_pixel(coords_inside, wcs=wcs)
     x_out, y_out = skycoord_to_pixel(coords_outside, wcs=wcs)
-
     plt.scatter(x_out, y_out, s=16, c='black', alpha=0.5, marker='^', zorder=2, label='outside')
     plt.scatter(x_in, y_in, s=16, c='green', alpha=0.5, marker='^', zorder=3, label='inside')
 

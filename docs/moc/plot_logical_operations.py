@@ -20,7 +20,6 @@ with WCS(fig,
         rotation=Angle(0, u.degree),
         projection="AIT") as wcs:
     ax = fig.add_subplot(1, 1, 1, projection=wcs)
-
     union.fill(ax=ax, wcs=wcs, alpha=0.5, fill=True, linewidth=0, color='r', label="Union")
     union.border(ax=ax, wcs=wcs, color='r')
     intersection.fill(ax=ax, wcs=wcs, alpha=0.5, fill=True, linewidth=0, color='g', label="Intersection")
