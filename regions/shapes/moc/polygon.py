@@ -4,7 +4,8 @@ from astropy import units as u
 from astropy.coordinates import ICRS, Galactic
 from astropy.coordinates import SkyCoord
 
-from astropy_healpix import HEALPix
+from astropy_healpix import HEALPix, \
+                            level_to_nside
 from astropy_healpix.core import boundaries_lonlat
 
 try:
@@ -69,7 +70,7 @@ class PolygonComputer:
             return np.array([x, y, z], dtype=np.float64)
 
         def max_distance_center_to_vertex(depth):
-            nside = 1 << depth
+            nside = level_to_nside(depth)
 
             lat1 = np.arcsin(2 / 3.0)
             lat2 = np.arcsin(1 - ((1 - 1.0/nside)**2 / 3.0))
@@ -117,7 +118,8 @@ class PolygonComputer:
 
         # Get the ipixels from astropy_healpix covering the cone of (center, radius) = (center, max_d)
         lon_center, lat_center = vector.vector_to_lonlat(x=center[0], y=center[1], z=center[2], degrees=False)
-        hp = HEALPix(nside=(1 << depth), order='nested', frame=ICRS())
+        nside = level_to_nside(depth)
+        hp = HEALPix(nside=nside, order='nested', frame=ICRS())
         starting_iter_ipix = hp.cone_search_lonlat(lon=lon_center * u.rad, lat=lat_center * u.rad, radius=max_d * u.rad)
 
         return depth, starting_iter_ipix
@@ -167,7 +169,8 @@ class PolygonComputer:
         ## Iterative version of the algorithm: seems a bit faster than the recursive one
         for depth in range(start_depth, end_depth + 1):
             # Define a HEALPix at the current depth
-            hp = HEALPix(nside=(1 << depth), order='nested', frame=ICRS())
+            nside = level_to_nside(depth)
+            hp = HEALPix(nside=nside, order='nested', frame=ICRS())
 
             # Get the lon and lat of the corners of the pixels
             # intersecting the polygon

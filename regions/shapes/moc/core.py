@@ -1104,7 +1104,7 @@ class MOCSkyRegion(SkyRegion):
             The MOC instance.
         """
         nside = level_to_nside(max_depth)
-        hp = HEALPix(nside=(1 << max_depth), order='nested')
+        hp = HEALPix(nside=nside, order='nested')
         ipix = hp.lonlat_to_healpix(skycoord.icrs.ra, skycoord.icrs.dec)
 
         shift = 2 * (MOCSkyRegion.HPY_MAX_DEPTH - max_depth)
@@ -1136,7 +1136,8 @@ class MOCSkyRegion(SkyRegion):
         result : `regions.MOCSkyRegion`
             The resulting MOC
         """
-        hp = HEALPix(nside=(1 << max_depth), order='nested')
+        nside = level_to_nside(max_depth)
+        hp = HEALPix(nside=nside, order='nested')
         ipix = hp.lonlat_to_healpix(lon, lat)
 
         shift = 2 * (MOCSkyRegion.HPY_MAX_DEPTH - max_depth)
