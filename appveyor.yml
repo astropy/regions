@@ -7,9 +7,6 @@ environment:
       PYTHON: "C:\\conda"
       MINICONDA_VERSION: "latest"
       CMD_IN_ENV: "cmd /E:ON /V:ON /C .\\ci-helpers\\appveyor\\windows_sdk.cmd"
-      # We need to use VS 2017 for compiling spherical-geometry
-      # in the build using python 3.7
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
       PYTHON_ARCH: "64" # needs to be set for CMD_IN_ENV to succeed. If a mix
                         # of 32 bit and 64 bit builds are needed, move this
                         # to the matrix section.
@@ -33,6 +30,9 @@ environment:
       - PYTHON_VERSION: "3.7"
         ASTROPY_VERSION: "stable"
         NUMPY_VERSION: "stable"
+        # We need to use VS 2017 for compiling spherical-geometry
+        # in the build using python 3.7
+        APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
 
 platform:
     -x64
