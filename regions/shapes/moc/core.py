@@ -1013,6 +1013,16 @@ class MOCSkyRegion(SkyRegion):
         -------
         moc : `~regions.MOCSkyRegion`
             The MOC instance.
+
+        Examples
+        --------
+        >>> from regions import MOCSkyRegion
+        >>> from astropy.io import fits
+        >>> image_path = "path/to/image.fits"
+        >>> with fits.open(image_path) as hdulist:
+        >>>     moc = MOCSkyRegion.from_image(header=hdulist[0].header,
+                                              max_depth=10,
+                                              mask=hdulist[0].data)
         """
         # Get the image dimensions
         height = header['NAXIS2']
