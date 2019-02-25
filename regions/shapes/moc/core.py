@@ -547,20 +547,6 @@ class MOCSkyRegion(SkyRegion):
         itv_s = IntervalSet(itvs)
         return cls(itv_s, meta, visual)
 
-    def _uniq_pixels_iterator(self):
-        """
-        Generator giving the NUNIQ HEALPix pixels of the MOC.
-
-        Returns
-        -------
-        uniq :
-            the NUNIQ HEALPix pixels iterator
-        """
-        itvs_uniq_l = IntervalSet.to_uniq_itv_s(self._itv)._data
-        for uniq_iv in itvs_uniq_l:
-            for uniq in np.arange(uniq_iv[0], uniq_iv[1], dtype=np.int64):
-                yield uniq
-
     @classmethod
     def from_fits(cls, filename, meta=None, visual=None):
         """
@@ -657,6 +643,20 @@ class MOCSkyRegion(SkyRegion):
 
         thdulist = fits.HDUList([fits.PrimaryHDU(), tbhdu])
         return thdulist
+
+    def _uniq_pixels_iterator(self):
+        """
+        Generator giving the NUNIQ HEALPix pixels of the MOC.
+
+        Returns
+        -------
+        uniq :
+            the NUNIQ HEALPix pixels iterator
+        """
+        itvs_uniq_l = IntervalSet.to_uniq_itv_s(self._itv)._data
+        for uniq_iv in itvs_uniq_l:
+            for uniq in np.arange(uniq_iv[0], uniq_iv[1], dtype=np.int64):
+                yield uniq
 
     def serialize(self, format='fits', optional_kw_dict=None):
         """
