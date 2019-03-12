@@ -86,6 +86,7 @@ Here are what the different modes look like:
     plt.title("mode='subpixels', subpixels=20", size=9)
     plt.imshow(mask4.data, cmap=plt.cm.viridis,
                interpolation='nearest', origin='lower')
+    plt.show()
 
 As we've seen above, the :class:`~regions.Mask` objects have a ``data``
 attribute that contains a Numpy array with the mask values. However, if you
@@ -116,6 +117,7 @@ boundary effects:
     plt.figure(figsize=(4, 4))
     plt.imshow(mask.to_image((10, 10)), cmap=plt.cm.viridis,
                interpolation='nearest', origin='lower')
+    plt.show()
 
 The :meth:`~regions.Mask.cutout` method can be used to create a cutout from
 the input data over the mask bounding box, and the
