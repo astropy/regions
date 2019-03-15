@@ -5,7 +5,7 @@ import itertools
 import copy
 from collections import OrderedDict
 from warnings import warn
-from regions import re
+import re
 from astropy import units as u
 from astropy import coordinates
 from astropy import log
