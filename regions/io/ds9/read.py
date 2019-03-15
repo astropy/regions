@@ -2,11 +2,10 @@
 from __future__ import absolute_import, division, print_function
 import string
 import itertools
-import re
 import copy
 from collections import OrderedDict
 from warnings import warn
-
+from regions import re
 from astropy import units as u
 from astropy import coordinates
 from astropy import log
@@ -15,13 +14,7 @@ from ..core import reg_mapping
 from ..core import Shape, ShapeList
 from .core import DS9RegionParserError, DS9RegionParserWarning, valid_symbols_ds9
 
-__all__ = [
-    'read_ds9',
-    'DS9Parser',
-    'DS9RegionParser',
-    'CoordinateParser'
-]
-
+__all__ = ['read_ds9','DS9Parser','DS9RegionParser','CoordinateParser']
 # Regular expression to extract region type or coodinate system
 regex_global = re.compile("^#? *(-?)([a-zA-Z0-9]+)")
 
@@ -247,8 +240,8 @@ class DS9Parser(object):
             return
 
         # Special case / header: parse global parameters into metadata
-        if line.lstrip()[:6] == 'global':
-            self.global_meta = self.parse_meta(line)
+        if line.lstrip()[:6].islower() == 'global':
+            self.global_meta = self.parse_meta(line.lower())
             # global_meta can specify "include=1"; never seen other options
             # used but presumably =0 means false
             self.global_meta['include'] = (False if
@@ -257,7 +250,7 @@ class DS9Parser(object):
             return
 
         # Try to parse the line
-        region_type_search = regex_global.search(line)
+        region_type_search = regex_global.search(line.lower())
         if region_type_search:
             include = region_type_search.groups()[0]
             region_type = region_type_search.groups()[1]
@@ -302,7 +295,8 @@ class DS9Parser(object):
         meta : `~collections.OrderedDict`
             Dictionary containing the meta data
         """
-        keys_vals = [(x, y) for x, _, y in regex_meta.findall(meta_str.strip())]
+        keys_vals = [(x.lower(), y.lower()) for x, _, y in regex_meta.findall(meta_str.strip())]
+        # keys must be lower-casae, but data may be any case
         extra_text = regex_meta.split(meta_str.strip())[-1]
         result = OrderedDict()
         for key, val in keys_vals:
@@ -385,8 +379,9 @@ class DS9RegionParser(object):
                         'image': (u.dimensionless_unscaled, u.dimensionless_unscaled),
                         'wcs': (u.dimensionless_unscaled, u.dimensionless_unscaled),
                         }
+    set_coordsys(coordinate_units)
     for letter in string.ascii_lowercase:
-        coordinate_units['wcs{0}'.format(letter)] = (u.dimensionless_unscaled, u.dimensionless_unscaled)
+        coordinate_units['wcs{0}'.format(letter.lower())] = (u.dimensionless_unscaled, u.dimensionless_unscaled)
 
     # DS9 language specification. This defines how a certain region is read.
     language_spec = {'point': (coordinate, coordinate),
