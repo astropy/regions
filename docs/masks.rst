@@ -4,14 +4,16 @@
 Computing overlap masks
 =======================
 
-For aperture photometry, a common operation is to compute, for a given image and
-region, a mask or array of pixel indices defining which pixels (in the whole
-image or a minimal rectangular bounding box) are inside and outside the region.
+For aperture photometry, a common operation is to compute, for a given
+image and region, a mask or array of pixel indices defining which
+pixels (in the whole image or a minimal rectangular bounding box) are
+inside and outside the region.
 
 All :class:`~regions.PixelRegion` objects have a
 :meth:`~regions.PixelRegion.to_mask` method that returns a
-:class:`~regions.Mask` object that contains information about whether
-pixels are inside the region, and can be used to mask data arrays:
+:class:`~regions.RegionMask` object that contains information about
+whether pixels are inside the region, and can be used to mask data
+arrays:
 
     >>> from regions.core import PixCoord
     >>> from regions.shapes.circle import CirclePixelRegion
@@ -29,9 +31,9 @@ pixels are inside the region, and can be used to mask data arrays:
            [ 0.,  0.,  1.,  1.,  1.,  0.,  0.],
            [ 0.,  0.,  0.,  0.,  0.,  0.,  0.]])
 
-The mask data contains floating point that are between 0 (no overlap) and 1
-(overlap). By default, this is determined by looking only at the central position
-in each pixel, and::
+The mask data contains floating point that are between 0 (no overlap)
+and 1 (overlap). By default, this is determined by looking only at the
+central position in each pixel, and::
 
     >>> reg.to_mask()
 
@@ -41,13 +43,14 @@ is equivalent to::
 
 but other modes are available:
 
-* ``mode='exact'``: the overlap is determined using the exact geometrical
-  overlap between pixels and the region. This is slower than using the central
-  position, but allows partial overlap to be treated correctly.
+* ``mode='exact'``: the overlap is determined using the exact
+  geometrical overlap between pixels and the region. This is slower than
+  using the central position, but allows partial overlap to be treated
+  correctly.
 
-* ``mode='subpixels'``: the overlap is determined by sub-sampling the pixel
-  using a grid of sub-pixels. The number of sub-pixels to use in this mode
-  should be given using the ``subpixels`` argument.
+* ``mode='subpixels'``: the overlap is determined by sub-sampling the
+  pixel using a grid of sub-pixels. The number of sub-pixels to use in
+  this mode should be given using the ``subpixels`` argument.
 
 Here are what the different modes look like:
 
@@ -87,19 +90,21 @@ Here are what the different modes look like:
     plt.imshow(mask4.data, cmap=plt.cm.viridis,
                interpolation='nearest', origin='lower')
 
-As we've seen above, the :class:`~regions.Mask` objects have a ``data``
-attribute that contains a Numpy array with the mask values. However, if you
-have for example a circular region with a radius of 3 pixels at a pixel position
-of (1000, 1000), it would be inefficient to store a mask that has a size larger
-than this, so instead we store the mask using the minimal array that contains
-the mask, and the :class:`~regions.Mask` objects also include a ``bbox``
-attribute that is a :class:`~regions.BoundingBox` object used to indicate where
+As we've seen above, the :class:`~regions.RegionMask` objects have a
+``data`` attribute that contains a Numpy array with the mask values.
+However, if you have for example a circular region with a radius of 3
+pixels at a pixel position of (1000, 1000), it would be inefficient to
+store a mask that has a size larger than this, so instead we store the
+mask using the minimal array that contains the mask, and the
+:class:`~regions.RegionMask` objects also include a ``bbox`` attribute
+that is a :class:`~regions.BoundingBox` object used to indicate where
 the mask should be applied in an image.
 
-:class:`~regions.Mask` objects also have a number of methods to make it
-easy to use the masks with data. The :meth:`~regions.Mask.to_image` method
-can be used to obtain an image of the mask in a 2D array of the given shape.
-This places the mask in the correct place in the image and deals properly with
+:class:`~regions.RegionMask` objects also have a number of methods to
+make it easy to use the masks with data. The
+:meth:`~regions.RegionMask.to_image` method can be used to obtain an
+image of the mask in a 2D array of the given shape.  This places the
+mask in the correct place in the image and deals properly with
 boundary effects:
 
 .. plot::
@@ -117,15 +122,16 @@ boundary effects:
     plt.imshow(mask.to_image((10, 10)), cmap=plt.cm.viridis,
                interpolation='nearest', origin='lower')
 
-The :meth:`~regions.Mask.cutout` method can be used to create a cutout from
-the input data over the mask bounding box, and the
-:meth:`~regions.Mask.multiply` method can be used to multiply the aperture
-mask with the input data to create a mask-weighted data cutout. All of these
-methods properly handle the cases of partial or no overlap of the aperture mask
-with the data.
+The :meth:`~regions.RegionMask.cutout` method can be used to create a
+cutout from the input data over the mask bounding box, and the
+:meth:`~regions.RegionMask.multiply` method can be used to multiply
+the aperture mask with the input data to create a mask-weighted data
+cutout. All of these methods properly handle the cases of partial or
+no overlap of the aperture mask with the data.
 
-These masks can be used as the building blocks for photometry, which we
-demonstrate with a simple example. We start off by getting an example image:
+These masks can be used as the building blocks for photometry, which
+we demonstrate with a simple example. We start off by getting an
+example image:
 
 .. plot::
    :context: reset
@@ -151,8 +157,8 @@ We then define the aperture:
     >>> center = PixCoord(158.5, 1053.5)
     >>> aperture = CirclePixelRegion(center, 4.)
 
-We convert the aperture to a mask and extract a cutout from the data, as well
-as a cutout with the data multiplied by the mask:
+We convert the aperture to a mask and extract a cutout from the data,
+as well as a cutout with the data multiplied by the mask:
 
 .. plot::
    :context:
@@ -164,8 +170,8 @@ as a cutout with the data multiplied by the mask:
     >>> data = mask.cutout(hdu.data)
     >>> weighted_data = mask.multiply(hdu.data)
 
-We can take a look at the results to make sure the source overlaps with the
-aperture:
+We can take a look at the results to make sure the source overlaps
+with the aperture:
 
 .. plot::
    :context:
@@ -189,8 +195,8 @@ aperture:
     ...            interpolation='nearest', origin='lower',
     ...            extent=mask.bbox.extent)
 
-We can also use the ``Mask.bbox`` attribute to look at the extent
-of the mask in the image:
+We can also use the `~regions.RegionMask` ``bbox`` attribute to look
+at the extent of the mask in the image:
 
 .. plot::
    :context:
@@ -205,7 +211,8 @@ of the mask in the image:
     >>> ax.set_xlim(120, 180)
     >>> ax.set_ylim(1020, 1080)
 
-Finally, we can use the mask and data values to compute weighted statistics:
+Finally, we can use the mask and data values to compute weighted
+statistics:
 
 .. plot::
    :context:
