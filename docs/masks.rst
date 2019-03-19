@@ -4,6 +4,9 @@
 Computing overlap masks
 =======================
 
+Defining a region mask within its bounding box
+----------------------------------------------
+
 For aperture photometry, a common operation is to compute, for a given
 image and region, a mask or array of pixel indices defining which
 pixels (in the whole image or a minimal rectangular bounding box) are
@@ -61,7 +64,7 @@ Here are what the different modes look like:
     from regions.core import PixCoord
     from regions.shapes.circle import CirclePixelRegion
 
-    center = PixCoord(6.6, 7.2)
+    center = PixCoord(26.6, 27.2)
     reg = CirclePixelRegion(center, 5.2)
 
     plt.figure(figsize=(6, 6))
@@ -100,12 +103,17 @@ mask using the minimal array that contains the mask, and the
 that is a :class:`~regions.BoundingBox` object used to indicate where
 the mask should be applied in an image.
 
+
+Defining a region mask within an image
+--------------------------------------
+
 :class:`~regions.RegionMask` objects also have a number of methods to
 make it easy to use the masks with data. The
 :meth:`~regions.RegionMask.to_image` method can be used to obtain an
 image of the mask in a 2D array of the given shape.  This places the
 mask in the correct place in the image and deals properly with
-boundary effects:
+boundary effects.  For this example, let's place the mask in an image
+with shape (50, 50):
 
 .. plot::
    :include-source:
@@ -114,13 +122,18 @@ boundary effects:
     from regions.core import PixCoord
     from regions.shapes.circle import CirclePixelRegion
 
-    center = PixCoord(6.6, 7.2)
+    center = PixCoord(26.6, 27.2)
     reg = CirclePixelRegion(center, 5.2)
 
     mask = reg.to_mask(mode='exact')
     plt.figure(figsize=(4, 4))
-    plt.imshow(mask.to_image((10, 10)), cmap=plt.cm.viridis,
+    shape = (50, 50)
+    plt.imshow(mask.to_image(shape), cmap=plt.cm.viridis,
                interpolation='nearest', origin='lower')
+
+
+Making image cutouts and multiplying the region mask
+----------------------------------------------------
 
 The :meth:`~regions.RegionMask.cutout` method can be used to create a
 cutout from the input data over the mask bounding box, and the
@@ -209,7 +222,7 @@ at the extent of the mask in the image:
     >>> ax.add_artist(mask.bbox.as_artist(facecolor='none', edgecolor='white'))
     >>> ax.add_artist(aperture.as_artist(facecolor='none', edgecolor='orange'))
     >>> ax.set_xlim(120, 180)
-    >>> ax.set_ylim(1020, 1080)
+    >>> ax.set_ylim(1000, 1059)
 
 Finally, we can use the mask and data values to compute weighted
 statistics:
