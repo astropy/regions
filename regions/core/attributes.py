@@ -397,7 +397,8 @@ class RegionMeta(Meta):
     valid_keys = ['label', 'include', 'frame', 'range', 'veltype',
                   'restfreq', 'tag', 'comment', 'line', 'name',
                   'select', 'highlite', 'fixed', 'edit', 'move', 'rotate',
-                  'delete', 'source', 'background', 'corr', 'type'
+                  'delete', 'source', 'background', 'corr', 'type',
+                  'text'
                   ]
 
     key_mapping = {}

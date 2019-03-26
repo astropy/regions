@@ -178,7 +178,7 @@ class ShapeList(list):
                                 shape.meta.items() if
                                 key not in ('include', 'comment', 'symbol',
                                             'coord', 'text', 'range', 'corr',
-                                            'type', 'text'))
+                                            'type'))
 
             # the first item should be the coordinates, since CASA cannot
             # recognize a region without an inline coordinate specification
