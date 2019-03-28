@@ -37,7 +37,7 @@ class PixCoord(object):
         x, y = np.broadcast_arrays(x, y)
 
         if x.shape == ():
-            self.x, self.y = np.asscalar(x), np.asscalar(y)
+            self.x, self.y = x.item(), y.item()
         else:
             self.x, self.y = x, y
 
