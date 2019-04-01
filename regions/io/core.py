@@ -178,7 +178,7 @@ class ShapeList(list):
                                 shape.meta.items() if
                                 key not in ('include', 'comment', 'symbol',
                                             'coord', 'text', 'range', 'corr',
-                                            'type', 'text'))
+                                            'type'))
 
             # the first item should be the coordinates, since CASA cannot
             # recognize a region without an inline coordinate specification
@@ -613,7 +613,10 @@ class Shape(object):
         reg.visual = RegionVisual()
         reg.meta = RegionMeta()
 
-        label = self.meta.pop('text', self.meta.get('label', ""))
+        # both 'text' and 'label' should be set to the same value, where we
+        # default to the 'text' value since that is the one used by ds9 regions
+        label = self.meta.get('text',
+                              self.meta.get('label', ""))
         if label != '':
             reg.meta['label'] = label
         for key in self.meta:

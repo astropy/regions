@@ -263,3 +263,20 @@ def test_expicit_formatting_directives():
     reg_str_explicit = 'fk5\ncircle(1h20m30s, 2d3m7s, 2d)'
     coord = DS9Parser(reg_str_explicit).shapes[0].coord
     assert_quantity_allclose(u.Quantity(coord), u.Quantity(valid_coord))
+
+def test_text_metadata():
+    """
+    Regression test for issue #233: make sure that text metadata is parsed and
+    stored appropriately.
+    """
+
+    reg_str = 'image\ncircle(1.5, 2, 2) # text={this_is_text}'
+    parsed_reg = DS9Parser(reg_str)
+
+    assert len(parsed_reg.shapes) == 1
+    assert parsed_reg.shapes[0].meta['text'] == 'this_is_text'
+
+    regs = parsed_reg.shapes.to_regions()
+
+    assert regs[0].meta['label'] == 'this_is_text'
+    assert regs[0].meta['text'] == 'this_is_text'
