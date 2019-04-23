@@ -203,3 +203,11 @@ def test_equality():
 
     assert a == b
     assert a == a
+
+
+def test_pixcoord_xy():
+    a = np.array([1, 2])
+    pc = PixCoord(a[0], a[1])
+
+    assert pc.xy[0] == pc.x
+    assert pc.xy[1] == pc.y

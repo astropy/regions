@@ -162,3 +162,10 @@ class PixCoord(object):
         dx = other.x - self.x
         dy = other.y - self.y
         return np.hypot(dx, dy)
+
+    @property
+    def xy(self):
+        """
+        A 2-tuple ``(x, y)`` for this coordinate.
+        """
+        return (self.x, self.y)
