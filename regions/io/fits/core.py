@@ -23,7 +23,7 @@ class FITSRegionParserError(ValueError):
 
 language_spec = {'CIRCLE': ['X0', 'Y0', 'R0'],
                  'POINT': ['X0', 'Y0'],
-                 'BOX': ['X0', 'Y0', 'R0', 'R1', 'ROTANG0'],
+                 'BOX': ['X0', 'Y0', 'R0', 'R1'],
                  'ANNULUS': ['X0', 'Y0', 'R0', 'R1'],
                  'ELLIPSE': ['X0', 'Y0', 'R0', 'R1', 'ROTANG0'],
                  'ELLIPTANNULUS': ['X0', 'Y0', 'R0', 'R1', 'R2', 'R3', 'ROTANG0'],
