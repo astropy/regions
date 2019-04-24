@@ -38,8 +38,9 @@ def test_file_fits(filename):
     assert shapes[5].region_type == 'point'
     assert shapes[6].region_type == 'point'
     assert shapes[7].region_type == 'polygon'
+    assert shapes[8].region_type == 'rectangle'
 
-    for x in range(7):
+    for x in range(8):
         assert_allclose(shapes[x].coord[:2],
                         [table['X'][x][0], table['Y'][x][0]])
 
