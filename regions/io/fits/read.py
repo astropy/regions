@@ -165,7 +165,7 @@ class FITSRegionRowParser():
             if np.isscalar(val):
                 val = np.array(val).reshape(1, )
             if index is not None:
-                if index < len(val) and val[index] != 0:
+                if index < len(val) and val[index] is not None:
                     return val[index], unit
                 else:
                     raise ValueError("The column: {0} must have more than {1} value for the "
