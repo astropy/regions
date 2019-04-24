@@ -201,6 +201,9 @@ class FITSRegionRowParser():
             for x, y in zip(coords[0], coords[1]):
                 coords_new += [x, y]
             coords = coords_new
+        elif self.region_type == 'BOX':
+            # Add a 0 rotation to turn it into ROTBOX
+            coords.append(0.0*u.deg)
 
         region_type = self.region_type.lower()
         if region_type in reg_mapping['FITS_REGION']:
