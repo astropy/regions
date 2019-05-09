@@ -1,0 +1,7 @@
+Cython
+numpy
+matplotlib
+astropy
+shapely
+Sphinx
+Sphinx-astropy
