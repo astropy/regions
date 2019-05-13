@@ -165,7 +165,7 @@ class FITSRegionRowParser():
             if np.isscalar(val):
                 val = np.array(val).reshape(1, )
             if index is not None:
-                if index < len(val) and val[index] != 0:
+                if index < len(val) and val[index] is not None:
                     return val[index], unit
                 else:
                     raise ValueError("The column: {0} must have more than {1} value for the "
@@ -201,6 +201,9 @@ class FITSRegionRowParser():
             for x, y in zip(coords[0], coords[1]):
                 coords_new += [x, y]
             coords = coords_new
+        elif self.region_type == 'BOX':
+            # Add a 0 rotation to turn it into ROTBOX
+            coords.append(0.0*u.deg)
 
         region_type = self.region_type.lower()
         if region_type in reg_mapping['FITS_REGION']:
