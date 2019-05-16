@@ -103,8 +103,8 @@ class LinePixelRegion(PixelRegion):
         """
         Matplotlib patch object for this region (`matplotlib.patches.Arrow`).
 
-        Parameters:
-        -----------
+        Parameters
+        ----------
         origin : array_like, optional
             The ``(x, y)`` pixel position of the origin of the displayed image.
             Default is (0, 0).
