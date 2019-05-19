@@ -49,7 +49,6 @@ from astropy.tests.helper import enable_deprecations_as_exceptions
 try:
     PYTEST_HEADER_MODULES['Cython'] = 'Cython'    # noqa
     PYTEST_HEADER_MODULES['Astropy'] = 'astropy'    # noqa
-    PYTEST_HEADER_MODULES['Astropy-healpix'] = 'astropy_healpix'    # noqa
     del PYTEST_HEADER_MODULES['h5py']    # noqa
     del PYTEST_HEADER_MODULES['Pandas']    # noqa
 except (NameError, KeyError):  # NameError is needed to support Astropy < 1.0
