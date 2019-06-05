@@ -378,3 +378,26 @@ class SkyRegion(Region):
         pixel_region : `~regions.PixelRegion` object.
         """
         raise NotImplementedError
+
+    def plot(self, ax=None, **kwargs):
+        """
+        Plot region using matplotlib.
+
+        TODO: describe once we know what API we want.
+        """
+        import matplotlib.pyplot as plt
+
+        if ax is None:
+            ax = plt.gca()
+
+        if not hasattr(ax, 'wcs'):
+            raise TypeError(
+                'SkyRegion plot only works on WCSAxes. '
+                'Consider using WCSAxes or use sky_region.to_pixel(wcs).plot(...).'
+            )
+
+        pix_region = self.to_pixel(ax.wcs)
+        artist = pix_region.as_artist(**kwargs)
+        ax.add_artist(artist)
+
+        return ax

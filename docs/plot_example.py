@@ -28,5 +28,6 @@ for source in dataset.source_table:
     pix_region = region.to_pixel(wcs=wcs)
 
     pix_region.plot(ax=ax, edgecolor='yellow', facecolor='yellow', alpha=0.5, lw=3)
+    region.plot(edgecolor='red', lw=1)
 
 plt.show()
