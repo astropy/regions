@@ -144,26 +144,14 @@ no overlap of the aperture mask with the data.
 
 These masks can be used as the building blocks for photometry, which
 we demonstrate with a simple example. We start off by getting an
-example image:
-
-.. plot::
-   :context: reset
-   :include-source:
-   :align: center
-   :nofigs:
+example image::
 
     >>> from astropy.io import fits
     >>> from astropy.utils.data import get_pkg_data_filename
     >>> filename = get_pkg_data_filename('photometry/M6707HH.fits')
     >>> hdu = fits.open(filename)[0]
 
-We then define the aperture:
-
-.. plot::
-   :context:
-   :include-source:
-   :align: center
-   :nofigs:
+We then define the aperture::
 
     >>> from regions.core import PixCoord
     >>> from regions.shapes.circle import CirclePixelRegion
@@ -171,26 +159,48 @@ We then define the aperture:
     >>> aperture = CirclePixelRegion(center, 4.)
 
 We convert the aperture to a mask and extract a cutout from the data,
-as well as a cutout with the data multiplied by the mask:
-
-.. plot::
-   :context:
-   :include-source:
-   :align: center
-   :nofigs:
+as well as a cutout with the data multiplied by the mask::
 
     >>> mask = aperture.to_mask(mode='exact')
     >>> data = mask.cutout(hdu.data)
     >>> weighted_data = mask.multiply(hdu.data)
 
 We can take a look at the results to make sure the source overlaps
-with the aperture:
+with the aperture::
+
+    >>> import matplotlib.pyplot as plt
+    >>> plt.subplot(1,3,1)
+    >>> plt.title("Mask", size=9)
+    >>> plt.imshow(mask.data, cmap=plt.cm.viridis,
+    ...            interpolation='nearest', origin='lower',
+    ...            extent=mask.bbox.extent)
+    >>> plt.subplot(1,3,2)
+    >>> plt.title("Data cutout", size=9)
+    >>> plt.imshow(data, cmap=plt.cm.viridis,
+    ...            interpolation='nearest', origin='lower',
+    ...            extent=mask.bbox.extent)
+    >>> plt.subplot(1,3,3)
+    >>> plt.title("Data cutout multiplied by mask", size=9)
+    >>> plt.imshow(weighted_data, cmap=plt.cm.viridis,
+    ...            interpolation='nearest', origin='lower',
+    ...            extent=mask.bbox.extent)
+
 
 .. plot::
-   :context:
-   :include-source:
+   :context: reset
    :align: center
 
+    >>> from astropy.io import fits
+    >>> from astropy.utils.data import get_pkg_data_filename
+    >>> filename = get_pkg_data_filename('photometry/M6707HH.fits')
+    >>> hdu = fits.open(filename)[0]
+    >>> from regions.core import PixCoord
+    >>> from regions.shapes.circle import CirclePixelRegion
+    >>> center = PixCoord(158.5, 1053.5)
+    >>> aperture = CirclePixelRegion(center, 4.)
+    >>> mask = aperture.to_mask(mode='exact')
+    >>> data = mask.cutout(hdu.data)
+    >>> weighted_data = mask.multiply(hdu.data)
     >>> import matplotlib.pyplot as plt
     >>> plt.subplot(1,3,1)
     >>> plt.title("Mask", size=9)
@@ -225,13 +235,7 @@ at the extent of the mask in the image:
     >>> ax.set_ylim(1000, 1059)
 
 Finally, we can use the mask and data values to compute weighted
-statistics:
-
-.. plot::
-   :context:
-   :include-source:
-   :align: center
-   :nofigs:
+statistics::
 
     >>> np.average(data, weights=mask)
     9364.0126748880211
