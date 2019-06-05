@@ -1,5 +1,10 @@
 .. include:: references.txt
 
+.. testsetup:
+    >>> from regions import make_example_dataset
+    >>> dataset = make_example_dataset(data='simulated')
+    >>> wcs = dataset.wcs
+
 .. _sh:
 
 .. _sh-shapes:
@@ -96,8 +101,8 @@ currently supported.
     >>> from regions import PixCoord, TextSkyRegion, TextPixelRegion
 
     >>> center_sky = SkyCoord(42, 43, unit='deg', frame='fk5')
-    >>> point_sky = TextSkyRegion(center=center_sky, 'Demo Text')
-    >>> point_pix = TextPixelRegion(center=PixCoord(x=42, y=43), 'Demo Text')
+    >>> point_sky = TextSkyRegion(center=center_sky, text='Demo Text')
+    >>> point_pix = TextPixelRegion(center=PixCoord(x=42, y=43), text='Demo Text')
 
 * `~regions.LineSkyRegion` and `~regions.LinePixelRegion`
 
@@ -202,8 +207,8 @@ To convert it to a :class:`~regions.PixelRegion`, call the
 .. code-block:: python
 
     >>> pix_reg = sky_reg.to_pixel(wcs)
-    >>> print(pix_reg)
-    CirclePixelRegion
+    >>> print(pix_reg)  # doctest: +FLOAT_CMP
+    Region: CirclePixelRegion
     center: PixCoord(x=55.35205711214607, y=40.0958313892697)
     radius: 36.93290808340659
 
@@ -213,11 +218,11 @@ Also to convert a :class:`~regions.PixelRegion` to a
 .. code-block:: python
 
     >>> sky_reg = pix_reg.to_sky(wcs)
-    >>> print(sky_reg)
+    >>> print(sky_reg)  # doctest: +FLOAT_CMP
     Region: CircleSkyRegion
-    center: <SkyCoord (ICRS): (ra, dec) in deg
-        (50., 10.)>
-    radius: 30.0 deg
+    center: <SkyCoord (Galactic): (l, b) in deg
+        (172.17231545, -38.27972337)>
+    radius: 18.55481729935556 deg
 
 .. _sh-meta:
 
@@ -443,12 +448,6 @@ list comprehensions.
     ...    CirclePixelRegion(center=PixCoord(x, y), radius=4.2)
     ...    for x, y in [(1, 2), (3, 4)]
     ... ]
-    >>> regions
-    [CirclePixelRegion
-     center: PixCoord(x=1, y=2)
-     radius: 4.2, CirclePixelRegion
-     center: PixCoord(x=3, y=4)
-     radius: 4.2]
     >>> for region in regions:
     ...    print(region.center)
     PixCoord(x=1, y=2)
