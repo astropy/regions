@@ -81,7 +81,6 @@ def test_only_pixel_regions():
     with pytest.raises(TypeError) as err:
         fits_region_objects_to_table([reg_sky])
 
-    print(str(err))
     assert 'Every region must be a pixel region' in str(err)
 
 
