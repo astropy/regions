@@ -50,7 +50,7 @@ class BoundingBox(object):
     >>> bbox.extent  # matplotlib order: (x, y)
     (0.5, 9.5, 1.5, 19.5)
     >>> print(bbox.as_artist())
-    Rectangle(0.5,1.5;9x18)
+    Rectangle(xy=(0.5, 1.5), width=9, height=18, angle=0)
     """
 
     def __init__(self, ixmin, ixmax, iymin, iymax):

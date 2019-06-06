@@ -35,25 +35,14 @@ class FITSRegionParser(object):
     >>> from regions import FITSRegionParser
     >>> from astropy.table import Table
     >>> from astropy.utils.data import get_pkg_data_filename
-    >>> filename = get_pkg_data_filename('data/regions.fits',
+    >>> filename = get_pkg_data_filename('data/fits_region.fits',
     ...                                  package='regions.io.fits.tests')
     >>> table = Table.read(filename)
-    >>> print(table)
-        X         Y      SHAPE          R [2]            ROTANG  COMPONENT
-      pix       pix                     pix              deg
-    --------- --------- ------- ---------------------- --------- ---------
-       2896.5    5056.5  CIRCLE        381.9716 .. 0.0       0.0         1
-    5282.0541 4854.5699     BOX 1303.4597 .. 655.09466 28.395178         2
-       2944.5    3472.5 ELLIPSE         288.0 .. 512.0  337.4048         3
-        341.0     345.0  ROTBOX           56.0 .. 78.0      65.0         4
-        341.0     345.0 ANNULUS           56.0 .. 78.0       0.0         5
-        341.0     345.0   POINT             0.0 .. 0.0       0.0         6
-        341.0     345.0                     0.0 .. 0.0       0.0         7
-
     >>> parser = FITSRegionParser(table)
     >>> shapes = parser.shapes
     >>> regions = shapes.to_regions()
-
+    >>> regions[5]
+    <PointPixelRegion(PixCoord(x=341.0, y=345.0))>
     """
 
     valid_columns = ['X', 'Y', 'SHAPE', 'COMPONENT', 'R', 'ROTANG']
@@ -253,7 +242,7 @@ def read_fits_region(filename, errors='strict'):
 
     >>> from astropy.utils.data import get_pkg_data_filename
     >>> from regions import read_fits_region
-    >>> file_read = get_pkg_data_filename('data/region.fits',
+    >>> file_read = get_pkg_data_filename('data/fits_region.fits',
     ...                                   package='regions.io.fits.tests')
     >>> regions = read_fits_region(file_read)
 

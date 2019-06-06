@@ -39,8 +39,7 @@ def crtf_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
     >>> reg_sky = CircleSkyRegion(SkyCoord(1 * u.deg, 2 * u.deg), 5 * u.deg)
     >>> print(crtf_objects_to_string([reg_sky]))
     #CRTF
-    global coord=fk5
-    +circle[[1.000007deg, 2.000002deg], 5.000000deg]
+    circle[[1.000007deg, 2.000002deg], 5.000000deg], coord=FK5,
 
     """
 
@@ -77,8 +76,8 @@ def write_crtf(regions, filename, coordsys='fk5', fmt='.6f', radunit='deg'):
     >>> with open('test_write.crtf') as f:
     ...      print(f.read())
     #CRTF
-    global coord=fk5
-    +circle[[1.000007deg, 2.000002deg], 5.000000deg]
+    circle[[1.000007deg, 2.000002deg], 5.000000deg], coord=FK5,
+
     """
 
     output = crtf_objects_to_string(regions, coordsys, fmt, radunit)

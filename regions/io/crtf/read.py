@@ -111,7 +111,7 @@ class CRTFParser(object):
     --------
     >>> from regions import CRTFParser
     >>> reg_str = "ann circle[[18h12m24s, -23d11m00s], 2.3arcsec], coord=B1950, frame=BARY, corr=[I, Q], color=blue"
-    >>> regs = CRTFParser(reg_str, errors='warn')
+    >>> regs = CRTFParser(reg_str, errors='warn').shapes.to_regions()
     >>> print(regs[0])
     Region: CircleSkyRegion
     center: <SkyCoord (FK4: equinox=B1950.000, obstime=B1950.000): (ra, dec) in deg
