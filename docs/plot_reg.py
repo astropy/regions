@@ -1,5 +1,3 @@
-import os
-
 from matplotlib import pyplot as plt
 
 from astropy.utils.data import get_pkg_data_filename
@@ -16,7 +14,8 @@ plt.imshow(image_data, cmap='gray')
 
 print(ax.get_xlim(), ax.get_ylim())
 ax.set_ylim([-0.5, 892.5])
-regs = read_ds9(os.path.join(os.path.dirname(__file__), 'plot_image.reg'))
+regs = read_ds9(get_pkg_data_filename('data/plot_image.reg',
+                                      package='regions.io.ds9.tests'))
 
 for i, reg in enumerate(regs):
     reg.plot(ax=ax)
