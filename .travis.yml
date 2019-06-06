@@ -33,7 +33,7 @@ env:
         - ASTROPY_VERSION=stable
         - SETUP_CMD='test'
         - MAIN_CMD='python setup.py'
-        - CONDA_DEPENDENCIES='Cython shapely pytest-arraydiff'
+        - CONDA_DEPENDENCIES='Cython shapely pytest-arraydiff matplotlib'
         - CONDA_CHANNELS='astropy'
         - SETUP_XVFB=True
         - ASTROPY_USE_SYSTEM_PYTEST=1
@@ -55,7 +55,7 @@ matrix:
 
         # Do a test without the optional dependencies
         - env: SETUP_CMD='test'
-               CONDA_DEPENDENCIES='Cython pytest-arraydiff'
+               CONDA_DEPENDENCIES='Cython pytest-arraydiff matplotlib'
 
         # Try Astropy development version
         - env: ASTROPY_VERSION=development
