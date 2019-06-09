@@ -59,9 +59,6 @@ package.
     center: PixCoord(x=2896.5, y=5056.5)
     radius: 381.9716
 
-    >>> print(regions[0].meta)
-    {'tag': '1', 'include': False}
-
 Serialisation is done using the `~regions.fits_region_objects_to_table` function
 
 .. code-block:: python

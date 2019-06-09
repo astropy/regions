@@ -144,7 +144,7 @@ example image::
 
     >>> from astropy.io import fits
     >>> from astropy.utils.data import get_pkg_data_filename
-    >>> filename = get_pkg_data_filename('photometry/M6707HH.fits')
+    >>> filename = get_pkg_data_filename('photometry/M6707HH.fits')   # doctest: +IGNORE_OUTPUT
     >>> hdu = fits.open(filename)[0]
 
 We then define the aperture::
@@ -236,5 +236,5 @@ Finally, we can use the mask and data values to compute weighted
 statistics::
 
     >>> import numpy as np
-    >>> np.average(data, weights=mask)
+    >>> np.average(data, weights=mask)   # doctest: +FLOAT_CMP
     9364.012674888021

@@ -64,10 +64,6 @@ def read_ds9(filename, errors='strict'):
     Region: CirclePixelRegion
     center: PixCoord(x=330.0, y=1090.0)
     radius: 40.0
-    >>> print(regs[0].meta)
-    {'label': 'Circle', 'select': '1', 'highlite': '1', 'fixed': '0', 'edit': '1', 'move': '1', 'delete': '1', 'source': '1', 'text': 'Circle', 'tag': ['{foo}', '{foo bar}'], 'include': True}
-    >>> print(regs[0].visual)
-    {'dashlist': '8 3', 'dash': '0', 'color': 'pink', 'linewidth': '3', 'font': 'times', 'fontsize': '10', 'fontstyle': 'normal', 'fontweight': 'roman'}
 
     """
     with open(filename) as fh:
@@ -171,10 +167,7 @@ class DS9Parser(object):
     Region: CirclePixelRegion
     center: PixCoord(x=330.0, y=1090.0)
     radius: 40.0
-    >>> print(regs[0].meta)
-    {'label': 'Circle', 'select': '1', 'highlite': '1', 'fixed': '0', 'edit': '1', 'move': '1', 'delete': '1', 'source': '1', 'text': 'Circle', 'tag': ['{foo}', '{foo bar}'], 'include': True}
-    >>> print(regs[0].visual)
-    {'dashlist': '8 3', 'dash': '0', 'color': 'pink', 'linewidth': '3', 'font': 'times', 'fontsize': '10', 'fontstyle': 'normal', 'fontweight': 'roman'}
+
     """
 
     # List of valid coordinate system

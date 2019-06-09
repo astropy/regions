@@ -14,7 +14,7 @@ environment:
       # so Cython is required for testing. If your package does not include
       # Cython code, you can set PIP_DEPENDENCIES='' and CONDA_DEPENDENCIES=''
       CONDA_CHANNELS: "defaults conda-forge astropy"
-      CONDA_DEPENDENCIES: "Cython pytest-arraydiff pytest=3.6.4"
+      CONDA_DEPENDENCIES: "Cython pytest-arraydiff pytest=3.6.4 matplotlib"
       ASTROPY_USE_SYSTEM_PYTEST: 1
 
   matrix:
@@ -24,7 +24,7 @@ environment:
 
       - PYTHON_VERSION: "2.7"
         ASTROPY_VERSION: "stable"
-        NUMPY_VERSION: "stable"
+        NUMPY_VERSION: "1.15"
 
       - PYTHON_VERSION: "3.7"
         ASTROPY_VERSION: "stable"

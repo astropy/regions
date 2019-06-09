@@ -105,7 +105,7 @@ transform back and forth between sky and pixel coordinates:
 
     >>> skycoord = SkyCoord(42, 43, unit='deg', frame='galactic')
     >>> pixcoord = PixCoord.from_sky(skycoord=skycoord, wcs=wcs)
-    >>> pixcoord
+    >>> pixcoord   # doctest: +FLOAT_CMP
     PixCoord(x=146.2575703393558, y=131.5998051082584)
     >>> pixcoord.to_sky(wcs=wcs)
     <SkyCoord (Galactic): (l, b) in deg
