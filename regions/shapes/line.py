@@ -51,7 +51,6 @@ class LinePixelRegion(PixelRegion):
         plt.xlim(0, 30)
         plt.ylim(0, 30)
         ax.set_aspect('equal')
-        plt.show()
     """
 
     start = ScalarPix('start')

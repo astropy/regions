@@ -19,5 +19,3 @@ regs = read_ds9(get_pkg_data_filename('data/plot_image.reg',
 
 for i, reg in enumerate(regs):
     reg.plot(ax=ax)
-
-plt.show()

@@ -24,8 +24,6 @@ To draw a matplotlib patch object, add it to an `matplotlib.axes.Axes` object.
     axes.set_xlim([-0.5, 1])
     axes.set_ylim([-0.5, 1])
 
-    plt.show()
-
 
 The :meth:`~regions.PixelRegion.plot`, a convenience method just does these two
 steps at once (creating a matplotlib patch artist and adding it to an axis),
@@ -49,7 +47,7 @@ for point regions. For example:
     ax = bbox.plot(origin=(1, 1), edgecolor='yellow', facecolor='red', fill=True)
     ax.set_xlim([-4, 2])
     ax.set_ylim([-4, 2])
-    plt.show()
+
 
 Here's a full example how to plot a `~regions.CirclePixelRegion` on an image.
 

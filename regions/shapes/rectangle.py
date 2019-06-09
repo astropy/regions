@@ -63,7 +63,6 @@ class RectanglePixelRegion(PixelRegion):
         plt.xlim(0, 30)
         plt.ylim(0, 20)
         ax.set_aspect('equal')
-        plt.show()
     """
 
     center = ScalarPix('center')

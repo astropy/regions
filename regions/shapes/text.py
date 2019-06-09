@@ -45,7 +45,6 @@ class TextPixelRegion(PointPixelRegion):
         plt.xlim(10, 30)
         plt.ylim(2.5, 20)
         ax.set_aspect('equal')
-        plt.show()
     """
 
     def __init__(self, center, text, meta=None, visual=None):
