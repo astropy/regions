@@ -13,7 +13,7 @@ environment:
       # For this package-template, we include examples of Cython modules,
       # so Cython is required for testing. If your package does not include
       # Cython code, you can set PIP_DEPENDENCIES='' and CONDA_DEPENDENCIES=''
-      CONDA_CHANNELS: "defaults conda-forge astropy"
+      CONDA_CHANNELS: "defaults astropy"
       CONDA_DEPENDENCIES: "Cython pytest-arraydiff pytest=3.6.4 matplotlib"
       ASTROPY_USE_SYSTEM_PYTEST: 1
 
