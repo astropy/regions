@@ -1,9 +1,6 @@
-
-import distutils.version as vers
 import pytest
 
 from numpy.testing import assert_allclose
-import astropy.version as astrov
 from astropy.utils.data import get_pkg_data_filename
 from astropy.table import Table
 from astropy.coordinates import SkyCoord
@@ -64,10 +61,11 @@ def test_file_fits(filename):
 
     # Reading the regions directly from file and converting to sky regions.
     regs_sky = read_fits_region(filename)
-    header = fits.open(filename)[1].header
-    wcs = WCS(header, keysel=['image', 'binary', 'pixel'])
-    regs_pix = [reg.to_pixel(wcs) for reg in regs_sky]
-    shapes_roundtrip = to_shape_list(regs_pix, 'image')
+    with fits.open(filename) as pf:
+        header = pf[1].header
+        wcs = WCS(header, keysel=['image', 'binary', 'pixel'])
+        regs_pix = [reg.to_pixel(wcs) for reg in regs_sky]
+        shapes_roundtrip = to_shape_list(regs_pix, 'image')
 
     for i in range(len(shapes)):
         assert shapes[i].region_type == shapes_roundtrip[i].region_type
