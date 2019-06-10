@@ -26,7 +26,7 @@ package.
     >>> from regions import FITSRegionParser
     >>> from astropy.table import Table
     >>> from astropy.utils.data import get_pkg_data_filename
-    >>> filename = get_pkg_data_filename('data/fits_regions.fits',
+    >>> filename = get_pkg_data_filename('data/fits_region.fits',
     ...                                  package='regions.io.fits.tests')
     >>> table = Table.read(filename)
     >>> print(table)
@@ -41,6 +41,7 @@ package.
         341.0 .. 0.0     345.0 .. 0.0   point       0.0 .. 0.0       0.0         6
         341.0 .. 0.0     345.0 .. 0.0   point       0.0 .. 0.0       0.0         7
           1.0 .. 4.0       5.0 .. 8.0 polygon       0.0 .. 0.0       0.0         8
+         10.0 .. 0.0       5.5 .. 0.0     BOX      10.0 .. 0.0       0.0         9
 
     >>> parser = FITSRegionParser(table)
     >>> print(parser.shapes[0])
@@ -57,9 +58,6 @@ package.
     Region: CirclePixelRegion
     center: PixCoord(x=2896.5, y=5056.5)
     radius: 381.9716
-
-    >>> print(regions[0].meta)
-    {'tag': '1', 'include': False}
 
 Serialisation is done using the `~regions.fits_region_objects_to_table` function
 
@@ -79,6 +77,7 @@ Serialisation is done using the `~regions.fits_region_objects_to_table` function
         341.0 .. 0.0     345.0 .. 0.0   point       0.0 .. 0.0       0.0         6
         341.0 .. 0.0     345.0 .. 0.0   point       0.0 .. 0.0       0.0         7
           1.0 .. 4.0       5.0 .. 8.0 polygon       0.0 .. 0.0       0.0         8
+         10.0 .. 0.0       5.5 .. 0.0  ROTBOX      10.0 .. 0.0       0.0         9
 
 The `~regions.write_fits_region` and `~regions.read_fits_region` functions
 write as well as read from a file in addition to doing the region serialisation
@@ -86,18 +85,6 @@ and parsing.
 
 .. code-block:: python
 
-    >>> from astropy.io import fits
-    >>> from astropy.utils.data import get_pkg_data_filename
-    >>> from regions import read_fits_region, write_fits_region
-    >>> file_read = get_pkg_data_filename('data/fits_region.fits',
-    ...                                   package='regions.io.fits.tests')
-    >>> hdul = fits.open(file_read)
-    >>> regions = read_fits_region(file_read) # sky regions
-    >>> print(regions[0])
-    Region: CircleSkyRegion
-    center: <SkyCoord (ICRS): (ra, dec) in deg
-        (211.06231757, 54.49779926)>
-    radius: 0.052202298340895036 deg
-
-    >>> filename = 'region_ouput.fits'
-    >>> write_fits_region(filename, regions, hdul[1].header)
+    >>> from regions import CirclePixelRegion, PixCoord, write_fits_region
+    >>> reg_pixel = CirclePixelRegion(PixCoord(1, 2), 5)
+    >>> write_fits_region('regions_output.fits', regions=[reg_pixel])

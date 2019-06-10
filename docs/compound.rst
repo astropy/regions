@@ -26,18 +26,28 @@ i.e. a `~regions.CompoundPixelRegion` or `~regions.CompoundSkyRegion` object.
     ...    center=SkyCoord(-4,3, unit='deg', frame='galactic'),
     ...    radius=Angle('3 deg'),
     ...    )
-    >>> type(circle1 & circle2)
-    regions.core.compound.CompoundSkyRegion
-    >>> print(circle1 ^ circle2)
-    (CircleSkyRegion
+    >>> print(circle1 & circle2)
+    Region: CompoundSkyRegion
+    region1: Region: CircleSkyRegion
     center: <SkyCoord (Galactic): (l, b) in deg
-    (1.0, 2.0)>
+        (1., 2.)>
     radius: 5.0 deg
-    <built-in function xor>
-    CircleSkyRegion
+    region2: Region: CircleSkyRegion
     center: <SkyCoord (Galactic): (l, b) in deg
-    (356.0, 3.0)>
-    radius: 3.0 deg)
+        (356., 3.)>
+    radius: 3.0 deg
+    operator: <built-in function and_>
+    >>> print(circle1 ^ circle2)
+    Region: CompoundSkyRegion
+    region1: Region: CircleSkyRegion
+    center: <SkyCoord (Galactic): (l, b) in deg
+        (1., 2.)>
+    radius: 5.0 deg
+    region2: Region: CircleSkyRegion
+    center: <SkyCoord (Galactic): (l, b) in deg
+        (356., 3.)>
+    radius: 3.0 deg
+    operator: <built-in function xor>
 
 .. plot:: plot_compound.py
     :include-source: false

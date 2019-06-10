@@ -47,7 +47,6 @@ class PointPixelRegion(PixelRegion):
         plt.xlim(0, 6)
         plt.ylim(0, 6)
         ax.set_aspect('equal')
-        plt.show()
 
     """
 

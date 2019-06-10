@@ -48,7 +48,6 @@ class PolygonPixelRegion(PixelRegion):
         plt.xlim(30, 80)
         plt.ylim(50, 80)
         ax.set_aspect('equal')
-        plt.show()
     """
 
     vertices = OneDPix('vertices')

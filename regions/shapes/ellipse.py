@@ -62,7 +62,6 @@ class EllipsePixelRegion(PixelRegion):
         patch = reg.as_artist(facecolor='none', edgecolor='red', lw=2)
         ax.add_patch(patch)
 
-        plt.show()
     """
 
     center = ScalarPix('center')

@@ -65,13 +65,6 @@ def read_crtf(filename, errors='strict'):
     >>> from astropy.utils.data import get_pkg_data_filename
     >>> file = get_pkg_data_filename('data/CRTFgeneral.crtf', package='regions.io.crtf.tests')
     >>> regs = read_crtf(file, errors='warn')
-    >>> print(regs[0])
-    Region: CircleSkyRegion
-    center: <SkyCoord (FK4: equinox=B1950.000, obstime=B1950.000): (ra, dec) in deg
-    (273.1, -23.18333333)>
-    radius: 2.3 arcsec
-    >>> print(regs[0].meta)
-    {'frame': 'BARY', 'corr': ['I', 'Q'], 'include': True, 'type': 'ann'}
     >>> print(regs[0].visual)
     {'color': 'blue'}
 
@@ -111,14 +104,7 @@ class CRTFParser(object):
     --------
     >>> from regions import CRTFParser
     >>> reg_str = "ann circle[[18h12m24s, -23d11m00s], 2.3arcsec], coord=B1950, frame=BARY, corr=[I, Q], color=blue"
-    >>> regs = CRTFParser(reg_str, errors='warn')
-    >>> print(regs[0])
-    Region: CircleSkyRegion
-    center: <SkyCoord (FK4: equinox=B1950.000, obstime=B1950.000): (ra, dec) in deg
-    (273.1, -23.18333333)>
-    radius: 2.3 arcsec
-    >>> print(regs[0].meta)
-    {'frame': 'BARY', 'corr': ['I', 'Q'], 'include': True, 'type': 'ann'}
+    >>> regs = CRTFParser(reg_str, errors='warn').shapes.to_regions()
     >>> print(regs[0].visual)
     {'color': 'blue'}
 

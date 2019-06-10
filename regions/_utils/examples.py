@@ -50,11 +50,11 @@ def make_example_dataset(data='simulated', config=None):
 
     Access properties of the ``dataset`` object:
 
-    >>> dataset.source_table
-    >>> dataset.event_table
-    >>> ExampleDataset.wcs
-    >>> ExampleDataset.image
-    >>> ExampleDataset.hdu_list
+    >>> dataset.source_table   # doctest: +IGNORE_OUTPUT
+    >>> dataset.event_table   # doctest: +IGNORE_OUTPUT
+    >>> dataset.wcs   # doctest: +IGNORE_OUTPUT
+    >>> dataset.image   # doctest: +IGNORE_OUTPUT
+    >>> dataset.hdu_list   # doctest: +IGNORE_OUTPUT
     """
     if data == 'simulated':
         return ExampleDatasetSimulated(config=config)

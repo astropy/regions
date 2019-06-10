@@ -74,7 +74,7 @@ represent sky coordinates.
     >>> skycoord = SkyCoord(42, 43, unit='deg', frame='galactic')
     >>> skycoord
     <SkyCoord (Galactic): (l, b) in deg
-    (42.0, 43.0)>
+        (42., 43.)>
 
 To represent pixel coordinates, :class:`~regions.PixCoord` objects are used.
 
@@ -105,11 +105,11 @@ transform back and forth between sky and pixel coordinates:
 
     >>> skycoord = SkyCoord(42, 43, unit='deg', frame='galactic')
     >>> pixcoord = PixCoord.from_sky(skycoord=skycoord, wcs=wcs)
-    >>> pixcoord
+    >>> pixcoord   # doctest: +FLOAT_CMP
     PixCoord(x=146.2575703393558, y=131.5998051082584)
     >>> pixcoord.to_sky(wcs=wcs)
     <SkyCoord (Galactic): (l, b) in deg
-        (42.0, 43.0)>
+        (42., 43.)>
 
 This is an object-oriented thin wrapper around the functionality provided by
 `~astropy.wcs.WCS` and `astropy.wcs.utils`.
@@ -156,22 +156,22 @@ This is how to create a sky region:
 
 .. code-block:: python
 
-    from astropy.coordinates import Angle, SkyCoord
-    from regions import CircleSkyRegion
+    >>> from astropy.coordinates import Angle, SkyCoord
+    >>> from regions import CircleSkyRegion
 
-    center = SkyCoord(42, 43, unit='deg')
-    radius = Angle(3, 'deg')
-    region = CircleSkyRegion(center, radius)
+    >>> center = SkyCoord(42, 43, unit='deg')
+    >>> radius = Angle(3, 'deg')
+    >>> region = CircleSkyRegion(center, radius)
 
 You can print the regions to get some info about its properties:
 
 .. code-block:: python
 
     >>> print(region)
-    CircleSkyRegion
-    center:<SkyCoord (ICRS): (ra, dec) in deg
-        (42.0, 43.0)>
-    radius:3.0 deg
+    Region: CircleSkyRegion
+    center: <SkyCoord (ICRS): (ra, dec) in deg
+        (42., 43.)>
+    radius: 3.0 deg
 
 To see a list of all available sky regions, you can go to the API docs or in
 IPython print the list using:
@@ -193,19 +193,19 @@ point, and a set of "pixel region" classes. One example is
 
 .. code-block:: python
 
-    from astropy.coordinates import Angle, SkyCoord
-    from regions import PixCoord, CirclePixelRegion
+    >>> from astropy.coordinates import Angle, SkyCoord
+    >>> from regions import PixCoord, CirclePixelRegion
 
-    center = PixCoord(x=42, y=43)
-    radius = 4.2
-    region = CirclePixelRegion(center, radius)
+    >>> center = PixCoord(x=42, y=43)
+    >>> radius = 4.2
+    >>> region = CirclePixelRegion(center, radius)
 
 You can print the regions to get some info about its properties:
 
 .. code-block:: python
 
     >>> print(region)
-    CirclePixelRegion
+    Region: CirclePixelRegion
     center: PixCoord(x=42, y=43)
     radius: 4.2
 

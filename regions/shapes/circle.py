@@ -4,7 +4,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import numpy as np
 import math
 
-from astropy.coordinates import Angle, SkyCoord
+from astropy.coordinates import Angle
 from astropy.wcs.utils import pixel_to_skycoord
 
 from ..core import PixCoord, PixelRegion, SkyRegion, RegionMask, BoundingBox
@@ -53,7 +53,6 @@ class CirclePixelRegion(PixelRegion):
         plt.xlim(0, 15)
         plt.ylim(0, 15)
         ax.set_aspect('equal')
-        plt.show()
     """
 
     center = ScalarPix('center')

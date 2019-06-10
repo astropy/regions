@@ -42,8 +42,6 @@ User Documentation
    shapely
    changelog
 
-These plots are made using :download:`plot_image.reg`.
-
 +----------------------------------------+----------------------------------------+
 | ds9                                    | regions + matplotlib                   |
 +========================================+========================================+

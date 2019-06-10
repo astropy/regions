@@ -65,7 +65,7 @@ class CircleAnnulusPixelRegion(CompoundPixelRegion):
         plt.xlim(-5, 20)
         plt.ylim(-5, 20)
         ax.set_aspect('equal')
-        plt.show()
+
     """
 
     center = AnnulusCenterPix()
@@ -298,7 +298,6 @@ class EllipseAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
         plt.xlim(-5, 20)
         plt.ylim(-5, 20)
         ax.set_aspect('equal')
-        plt.show()
     """
 
     def __init__(self, center, inner_width, inner_height, outer_width,
@@ -411,7 +410,6 @@ class RectangleAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
         plt.xlim(-5, 20)
         plt.ylim(-5, 20)
         ax.set_aspect('equal')
-        plt.show()
     """
 
     def __init__(self, center, inner_width, inner_height, outer_width,

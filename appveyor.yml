@@ -13,9 +13,10 @@ environment:
       # For this package-template, we include examples of Cython modules,
       # so Cython is required for testing. If your package does not include
       # Cython code, you can set PIP_DEPENDENCIES='' and CONDA_DEPENDENCIES=''
-      CONDA_CHANNELS: "defaults conda-forge astropy"
-      CONDA_DEPENDENCIES: "Cython pytest-arraydiff pytest=3.6.4"
+      CONDA_CHANNELS: "defaults astropy"
+      CONDA_DEPENDENCIES: "Cython pytest-arraydiff pytest=3.6.4 matplotlib"
       ASTROPY_USE_SYSTEM_PYTEST: 1
+      MPLBACKEND: "Agg"
 
   matrix:
 
@@ -24,7 +25,20 @@ environment:
 
       - PYTHON_VERSION: "2.7"
         ASTROPY_VERSION: "stable"
+        NUMPY_VERSION: "1.15"
+
+      - PYTHON_VERSION: "3.7"
+        ASTROPY_VERSION: "stable"
         NUMPY_VERSION: "stable"
+
+
+matrix:
+  allow_failures:
+      # Tests pass but there are some PermissionError as the process cannot
+      # access a file being used. Allow jobs to fail until it's worked around.
+      - PYTHON_VERSION: "2.7"
+        ASTROPY_VERSION: "stable"
+        NUMPY_VERSION: "1.15"
 
       - PYTHON_VERSION: "3.7"
         ASTROPY_VERSION: "stable"

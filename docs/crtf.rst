@@ -47,7 +47,7 @@ Serialisation is done using the `~regions.crtf_objects_to_string` function
 
     >>> from regions import crtf_objects_to_string
     >>> crtf_objects_to_string(regions, coordsys='galactic')
-    '#CRTF\nglobal coord=galactic\n+circle[[144.559169deg, -14.923593deg], 3.000000deg], color=green\n'
+    '#CRTF\ncircle[[144.559169deg, -14.923593deg], 3.000000deg], coord=GALACTIC, color=green\n'
 
 There's also `~regions.write_crtf` and `~regions.read_crtf` which write to and
 read from a file in addition to doing the region serialisation and parsing.
@@ -59,8 +59,5 @@ read from a file in addition to doing the region serialisation and parsing.
     >>> write_crtf(regions, filename)
     >>> regions = read_crtf(filename)
     >>> regions
-    [CircleSkyRegion
-     center: <SkyCoord (FK5: (equinox=J2000.000): (ra, dec) in deg
-         (245.3477, 24.4291)>
-     radius: 3.0 deg]
-
+    [<CircleSkyRegion(<SkyCoord (FK5: equinox=J2000.000): (ra, dec) in deg
+        (42., 43.)>, radius=3.0 deg)>]

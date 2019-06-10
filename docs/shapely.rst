@@ -40,4 +40,3 @@ do this, that's a good reason to use Shapely.
     x, y = circle.exterior.xy
     ax = plt.subplot(1, 1, 1)
     ax.plot(x, y, 'g-')
-    plt.show()

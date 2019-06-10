@@ -63,5 +63,3 @@ ax.legend(loc='lower right')
 
 ax.set_xlim(-0.5, dataset.config['shape'][1] - 0.5)
 ax.set_ylim(-0.5, dataset.config['shape'][0] - 0.5)
-
-plt.show()

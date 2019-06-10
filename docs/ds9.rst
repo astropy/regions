@@ -34,7 +34,7 @@ Serialisation is done using the `~regions.ds9_objects_to_string` function
 
     >>> from regions import ds9_objects_to_string
     >>> ds9_objects_to_string(regions, coordsys='galactic')
-    '# Region file format: DS9 astropy/regions\ngalactic\ncircle(42.0000,43.0000,3.0000)\n'
+    '# Region file format: DS9 astropy/regions\ngalactic\ncircle(42.000000,43.000000,3.000000) # color=green\n'
 
 There's also `~regions.write_ds9` and `~regions.read_ds9` which write to and
 read from a file in addition to doing the region serialisation and parsing.
@@ -46,10 +46,8 @@ read from a file in addition to doing the region serialisation and parsing.
     >>> write_ds9(regions, filename)
     >>> regions = read_ds9(filename)
     >>> regions
-    [CircleSkyRegion
-     center: <SkyCoord (FK5: (equinox=J2000.000): (ra, dec) in deg
-         (245.3477, 24.4291)>
-     radius: 3.0 deg]
+    [<CircleSkyRegion(<SkyCoord (FK5: equinox=J2000.000): (ra, dec) in deg
+        (245.347655, 24.429081)>, radius=3.0 deg)>]
 
 The ``visual`` metadata includes items used for display, e.g.:
 
