@@ -37,6 +37,13 @@ class TestCirclePixelRegion(BaseTestPixelRegion):
     expected_repr = '<CirclePixelRegion(PixCoord(x=3, y=4), radius=2)>'
     expected_str = 'Region: CirclePixelRegion\ncenter: PixCoord(x=3, y=4)\nradius: 2'
 
+    def test_copy(self):
+        reg = self.reg.copy()
+        assert reg.center.xy == (3, 4)
+        assert reg.radius == 2
+        assert reg.visual == {}
+        assert reg.meta == {}
+
     def test_pix_sky_roundtrip(self):
         wcs = make_simple_wcs(SkyCoord(2 * u.deg, 3 * u.deg), 0.1 * u.deg, 20)
         reg_new = self.reg.to_sky(wcs).to_pixel(wcs)
