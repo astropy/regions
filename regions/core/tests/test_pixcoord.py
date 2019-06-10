@@ -14,6 +14,12 @@ def wcs():
     return dataset.wcs
 
 
+def test_pixcoord_copy():
+    p = PixCoord(x=1, y=2)
+    p2 = p.copy()
+    assert p2.xy == (1, 2)
+
+
 def test_pixcoord_basic_dimension():
     with pytest.raises(ValueError):
         PixCoord(np.array([1, 2]), [3, 4, 5, 6])

@@ -1,6 +1,6 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 from __future__ import absolute_import, division, print_function, unicode_literals
-import numbers
+import copy
 import numpy as np
 from astropy.coordinates import SkyCoord
 from .core import _DEFAULT_WCS_ORIGIN, _DEFAULT_WCS_MODE
@@ -40,6 +40,9 @@ class PixCoord(object):
             self.x, self.y = x.item(), y.item()
         else:
             self.x, self.y = x, y
+
+    def copy(self):
+        return self.__class__(copy.copy(self.x), copy.copy(self.y))
 
     @staticmethod
     def _validate(val, name, expected='any'):
