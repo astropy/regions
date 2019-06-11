@@ -249,14 +249,13 @@ def read_fits_region(filename, errors='strict'):
     """
     regions = []
 
-    hdul = fits.open(filename)
-
-    for hdu in hdul:
-        if hdu.name == 'REGION':
-            table = Table.read(hdu)
-            wcs = WCS(hdu.header, keysel=['image', 'binary', 'pixel'])
-            regions_list = FITSRegionParser(table, errors).shapes.to_regions()
-            for reg in regions_list:
-                regions.append(reg.to_sky(wcs))
+    with fits.open(filename) as hdul:
+        for hdu in hdul:
+            if hdu.name == 'REGION':
+                table = Table.read(hdu)
+                wcs = WCS(hdu.header, keysel=['image', 'binary', 'pixel'])
+                regions_list = FITSRegionParser(table, errors).shapes.to_regions()  # noqa
+                for reg in regions_list:
+                    regions.append(reg.to_sky(wcs))
 
     return regions

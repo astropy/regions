@@ -65,11 +65,13 @@ def write_fits_region(filename, regions, header=None):
 
     >>> from astropy.utils.data import get_pkg_data_filename
     >>> from astropy.io import fits
-    >>> file_sample = get_pkg_data_filename('data/fits_region.fits', package='regions.io.fits.tests')
+    >>> file_sample = get_pkg_data_filename(
+    ...     'data/fits_region.fits', package='regions.io.fits.tests')
     >>> from regions import CirclePixelRegion, PixCoord, write_fits_region
     >>> reg_pixel = CirclePixelRegion(PixCoord(1, 2), 5)
-    >>> hdul = fits.open(file_sample)
-    >>> write_fits_region('region_output.fits', regions=[reg_pixel], header=hdul[1].header)
+    >>> with fits.open(file_sample) as hdul:
+    ...     write_fits_region('region_output.fits', regions=[reg_pixel],
+    ...                       header=hdul[1].header)
 
     """
     output = fits_region_objects_to_table(regions)

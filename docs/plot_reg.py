@@ -7,7 +7,7 @@ from regions import read_ds9
 
 image_file = get_pkg_data_filename('tutorials/FITS-images/HorseHead.fits')
 print(image_file)
-image_data = fits.getdata(image_file, ext=0)
+image_data = fits.getdata(image_file, ext=0, memmap=False)
 
 ax = plt.gca()
 plt.imshow(image_data, cmap='gray')

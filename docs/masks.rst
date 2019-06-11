@@ -145,7 +145,8 @@ example image::
     >>> from astropy.io import fits
     >>> from astropy.utils.data import get_pkg_data_filename
     >>> filename = get_pkg_data_filename('photometry/M6707HH.fits')   # doctest: +IGNORE_OUTPUT
-    >>> hdu = fits.open(filename)[0]
+    >>> pf = fits.open(filename)
+    >>> hdu = pf[0]
 
 We then define the aperture::
 
@@ -160,6 +161,7 @@ as well as a cutout with the data multiplied by the mask::
     >>> mask = aperture.to_mask(mode='exact')
     >>> data = mask.cutout(hdu.data)
     >>> weighted_data = mask.multiply(hdu.data)
+    >>> pf.close()
 
 We can take a look at the results to make sure the source overlaps
 with the aperture::
@@ -191,7 +193,8 @@ with the aperture::
     from astropy.io import fits
     from astropy.utils.data import get_pkg_data_filename
     filename = get_pkg_data_filename('photometry/M6707HH.fits')
-    hdu = fits.open(filename)[0]
+    pf = fits.open(filename)
+    hdu = pf[0]
     from regions.core import PixCoord
     from regions.shapes.circle import CirclePixelRegion
     center = PixCoord(158.5, 1053.5)
@@ -231,6 +234,12 @@ at the extent of the mask in the image:
     ax.add_artist(aperture.as_artist(facecolor='none', edgecolor='orange'))
     ax.set_xlim(120, 180)
     ax.set_ylim(1000, 1059)
+
+.. plot::
+   :context:
+   :nofigs:
+
+    pf.close()
 
 Finally, we can use the mask and data values to compute weighted
 statistics::
