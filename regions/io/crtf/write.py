@@ -42,7 +42,6 @@ def crtf_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
     circle[[1.000007deg, 2.000002deg], 5.000000deg], coord=FK5,
 
     """
-
     shapelist = to_shape_list(regions, coordsys)
     return shapelist.to_crtf(coordsys, fmt, radunit)
 
@@ -50,6 +49,8 @@ def crtf_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
 def write_crtf(regions, filename, coordsys='fk5', fmt='.6f', radunit='deg'):
     """
     Converts a `list` of `~regions.Region` to CRTF string and write to file.
+
+    See :ref:`gs-crtf`
 
     Parameters
     ----------
@@ -65,21 +66,7 @@ def write_crtf(regions, filename, coordsys='fk5', fmt='.6f', radunit='deg'):
         which is accurate to 0.0036 arcseconds.
     radunit : `str`, optional
         This denotes the unit of the radius. Default is deg (degrees)
-
-    Examples
-    --------
-    >>> from astropy import units as u
-    >>> from astropy.coordinates import SkyCoord
-    >>> from regions import CircleSkyRegion, write_crtf
-    >>> reg_sky = CircleSkyRegion(SkyCoord(1 * u.deg, 2 * u.deg), 5 * u.deg)
-    >>> write_crtf([reg_sky], 'test_write.crtf')
-    >>> with open('test_write.crtf') as f:
-    ...      print(f.read())
-    #CRTF
-    circle[[1.000007deg, 2.000002deg], 5.000000deg], coord=FK5,
-
     """
-
     output = crtf_objects_to_string(regions, coordsys, fmt, radunit)
     with open(filename, 'w') as fh:
         fh.write(output)

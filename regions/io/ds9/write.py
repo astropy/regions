@@ -13,6 +13,8 @@ def ds9_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
     """
     Converts a `list` of `~regions.Region` to DS9 region string.
 
+    See :ref:`gs-ds9`
+
     Parameters
     ----------
     regions : `list`
@@ -30,17 +32,6 @@ def ds9_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
     -------
     region_string : `str`
         DS9 region string
-
-    Examples
-    --------
-    >>> from astropy import units as u
-    >>> from astropy.coordinates import SkyCoord
-    >>> from regions import CircleSkyRegion, ds9_objects_to_string
-    >>> reg_sky = CircleSkyRegion(SkyCoord(1 * u.deg, 2 * u.deg), 5 * u.deg)
-    >>> print(ds9_objects_to_string([reg_sky]))
-    # Region file format: DS9 astropy/regions
-    fk5
-    circle(1.000007,2.000002,5.000000)
     """
     shapelist = to_shape_list(regions, coordsys)
     return shapelist.to_ds9(coordsys, fmt, radunit)
@@ -49,6 +40,8 @@ def ds9_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
 def write_ds9(regions, filename, coordsys='fk5', fmt='.6f', radunit='deg'):
     """
     Converts a `list` of `~regions.Region` to DS9 string and write to file.
+
+    See :ref:`gs-ds9`
 
     Parameters
     ----------
@@ -64,19 +57,6 @@ def write_ds9(regions, filename, coordsys='fk5', fmt='.6f', radunit='deg'):
         which is accurate to 0.0036 arcseconds.
     radunit : `str`, optional
         This denotes the unit of the radius. Default is deg (degrees)
-
-    Examples
-    --------
-    >>> from astropy import units as u
-    >>> from astropy.coordinates import SkyCoord
-    >>> from regions import CircleSkyRegion, write_ds9
-    >>> reg_sky = CircleSkyRegion(SkyCoord(1 * u.deg, 2 * u.deg), 5 * u.deg)
-    >>> write_ds9([reg_sky], 'test_write.reg')
-    >>> with open('test_write.reg') as f:
-    ...      print(f.read())
-    # Region file format: DS9 astropy/regions
-    fk5
-    circle(1.000007,2.000002,5.000000)
     """
     output = ds9_objects_to_string(regions, coordsys, fmt, radunit)
     with open(filename, 'w') as fh:

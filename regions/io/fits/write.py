@@ -16,6 +16,8 @@ def fits_region_objects_to_table(regions):
     """
     Converts list of regions to FITS region table.
 
+    See :ref:`gs-ds9`
+
     Parameters
     ----------
     regions : list
@@ -25,19 +27,6 @@ def fits_region_objects_to_table(regions):
     -------
     region_string : `~astropy.table.Table`
         FITS region table
-
-    Examples
-    --------
-
-    >>> from regions import CirclePixelRegion, PixCoord
-    >>> reg_pixel = CirclePixelRegion(PixCoord(1, 2), 5)
-    >>> table = fits_region_objects_to_table([reg_pixel])
-    >>> print(table)
-    X [1] Y [1] SHAPE    R [4]    ROTANG COMPONENT
-    pix   pix            pix      deg
-    ----- ----- ------ ---------- ------ ---------
-      1.0   2.0 circle 5.0 .. 0.0      0         1
-
     """
     for reg in regions:
         if isinstance(reg, SkyRegion):
@@ -51,28 +40,16 @@ def write_fits_region(filename, regions, header=None):
     """
     Converts list of regions to FITS region table and write to a file.
 
+    See :ref:`gs-fits`
+
     Parameters
     ----------
-    filename: str
-        Filename in which the table is to be written. Default is 'new.fits'
-    regions: list
+    filename : str
+        Filename in which the table is to be written.
+    regions : list
         List of `regions.Region` objects
-    header: `~astropy.io.fits.header.Header` object
-        The FITS header.
-
-    Examples
-    --------
-
-    >>> from astropy.utils.data import get_pkg_data_filename
-    >>> from astropy.io import fits
-    >>> file_sample = get_pkg_data_filename(
-    ...     'data/fits_region.fits', package='regions.io.fits.tests')
-    >>> from regions import CirclePixelRegion, PixCoord, write_fits_region
-    >>> reg_pixel = CirclePixelRegion(PixCoord(1, 2), 5)
-    >>> with fits.open(file_sample) as hdul:
-    ...     write_fits_region('region_output.fits', regions=[reg_pixel],
-    ...                       header=hdul[1].header)
-
+    header : `~astropy.io.fits.Header`
+        The FITS header
     """
     output = fits_region_objects_to_table(regions)
 
