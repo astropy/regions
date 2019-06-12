@@ -14,10 +14,21 @@ def wcs():
     return dataset.wcs
 
 
-def test_pixcoord_copy():
+def test_pixcoord_copy_scalar():
     p = PixCoord(x=1, y=2)
     p2 = p.copy()
+    p.x = 99
+    p.y = 99
     assert p2.xy == (1, 2)
+
+
+def test_pixcoord_copy_array():
+    p = PixCoord(x=[1, 2], y=[3, 4])
+    p2 = p.copy()
+    p.x[0] = 99
+    p.y[0] = 99
+    assert_equal(p2.x, [1, 2])
+    assert_equal(p2.y, [3, 4])
 
 
 def test_pixcoord_basic_dimension():
@@ -137,7 +148,7 @@ def test_pixcoord_to_sky_array_1d(wcs):
 
     p2 = PixCoord.from_sky(skycoord=s, wcs=wcs)
     assert isinstance(p2.x, np.ndarray)
-    assert p2.x.shape == (2, )
+    assert p2.x.shape == (2,)
     assert not p2.isscalar
 
     assert p == p2
@@ -191,7 +202,7 @@ def test_pixcoord_separation_array_2d():
 def test_equality():
     a = np.array([1, 2])
     b = PixCoord(a[0], a[1])
-    c = PixCoord(a[0]+0.0000001, a[1])
+    c = PixCoord(a[0] + 0.0000001, a[1])
 
     assert not b == a
     assert b == b

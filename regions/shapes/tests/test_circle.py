@@ -28,7 +28,6 @@ def wcs():
 
 
 class TestCirclePixelRegion(BaseTestPixelRegion):
-
     reg = CirclePixelRegion(PixCoord(3, 4), radius=2)
     sample_box = [0, 6, 1, 7]
     inside = [(3, 4)]
@@ -59,7 +58,6 @@ class TestCirclePixelRegion(BaseTestPixelRegion):
 
 
 class TestCircleSkyRegion(BaseTestSkyRegion):
-
     reg = CircleSkyRegion(SkyCoord(3 * u.deg, 4 * u.deg), 2 * u.arcsec)
 
     expected_repr = ('<CircleSkyRegion(<SkyCoord (ICRS): (ra, dec) in '
@@ -67,6 +65,13 @@ class TestCircleSkyRegion(BaseTestSkyRegion):
     expected_str = ('Region: CircleSkyRegion\ncenter: <SkyCoord (ICRS): '
                     '(ra, dec) in deg\n    ( 3.,  4.)>\nradius: 2.0 '
                     'arcsec')
+
+    def test_copy(self):
+        reg = self.reg.copy()
+        assert_allclose(reg.center.ra.deg, 3)
+        assert_allclose(reg.radius.to_value("arcsec"), 2)
+        assert reg.visual == {}
+        assert reg.meta == {}
 
     def test_transformation(self, wcs):
         skycoord = SkyCoord(3 * u.deg, 4 * u.deg, frame='galactic')

@@ -42,7 +42,10 @@ class PixCoord(object):
             self.x, self.y = x, y
 
     def copy(self):
-        return self.__class__(copy.copy(self.x), copy.copy(self.y))
+        return self.__class__(
+            copy.deepcopy(self.x),
+            copy.deepcopy(self.y),
+        )
 
     @staticmethod
     def _validate(val, name, expected='any'):

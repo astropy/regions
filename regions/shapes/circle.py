@@ -70,7 +70,7 @@ class CirclePixelRegion(PixelRegion):
         """Make an independent (deep) copy."""
         return self.__class__(
             self.center.copy(),
-            copy.copy(self.radius),
+            copy.deepcopy(self.radius),
             copy.deepcopy(self.meta),
             copy.deepcopy(self.visual),
         )
@@ -179,12 +179,20 @@ class CircleSkyRegion(SkyRegion):
     radius = QuantityLength("radius")
 
     def __init__(self, center, radius, meta=None, visual=None):
-
         self.center = center
         self.radius = radius
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
         self._repr_params = ('radius',)
+
+    def copy(self):
+        """Make an independent (deep) copy."""
+        return self.__class__(
+            self.center.copy(),
+            copy.deepcopy(self.radius),
+            copy.deepcopy(self.meta),
+            copy.deepcopy(self.visual),
+        )
 
     def to_pixel(self, wcs):
         center, scale, _ = skycoord_to_pixel_scale_angle(self.center, wcs)
