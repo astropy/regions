@@ -90,3 +90,27 @@ def test_mask_cutout_partial_overlap(position):
 
     image = mask.to_image(data.shape)
     assert image.shape == data.shape
+
+
+def test_mask_nan_in_bbox():
+    """
+    Regression test that non-finite data values outside of the mask but
+    within the bounding box are set to zero.
+    """
+
+    data = np.ones((101, 101))
+    data[33, 33] = np.nan
+    data[67, 67] = np.inf
+    data[33, 67] = -np.inf
+    data[22, 22] = np.nan
+    data[22, 23] = np.inf
+
+    radius = 20.
+    reg1 = CirclePixelRegion(PixCoord(50, 50), radius)
+    reg2 = CirclePixelRegion(PixCoord(5, 5), radius)
+
+    wdata1 = reg1.to_mask(mode='exact').multiply(data)
+    assert_allclose(np.sum(wdata1), np.pi * radius**2)
+
+    wdata2 = reg2.to_mask(mode='exact').multiply(data)
+    assert_allclose(np.sum(wdata2), 561.6040111923013)
