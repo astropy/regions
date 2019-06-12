@@ -1,7 +1,12 @@
 0.4 (Unreleased)
 ================
 
-- No changes yet.
+New Features
+------------
+
+- Added ``union`` and ``intersection`` methods to the ``BoundingBox``
+  class. [#277]
+
 
 0.3 (2018-09-09)
 ================
