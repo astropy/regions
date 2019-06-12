@@ -7,6 +7,13 @@ New Features
 - Added ``union`` and ``intersection`` methods to the ``BoundingBox``
   class. [#277]
 
+Bug Fixes
+---------
+
+- Fixed a corner-case issue where ``RegionMask.multiply()`` would not set
+  non-finite data values outside of the mask but within the bounding box
+  to zero. [#278]
+
 
 0.3 (2018-09-09)
 ================

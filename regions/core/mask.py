@@ -36,6 +36,7 @@ class RegionMask(object):
             raise ValueError('data and bounding box must have the same '
                              'shape.')
         self.bbox = bbox
+        self._mask = (self.data == 0)
 
     def __array__(self):
         """
@@ -158,8 +159,8 @@ class RegionMask(object):
             A 2D array on which to apply the region mask.
 
         fill_value : float, optional
-            The value is used to fill pixels where the region mask
-            does not overlap with the input ``data``.  The default is 0.
+            The value used to fill pixels where the region mask does not
+            overlap with the input ``data``.  The default is 0.
 
         copy : bool, optional
             If `True` then the returned cutout array will always be hold
@@ -245,4 +246,10 @@ class RegionMask(object):
         if cutout is None:
             return None
         else:
-            return cutout * self.data
+            weighted_cutout = cutout * self.data
+
+            # needed to zero out non-finite data values outside of the
+            # mask but within the bounding box
+            weighted_cutout[self._mask] = 0.0
+
+            return weighted_cutout
