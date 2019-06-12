@@ -44,6 +44,13 @@ class TestPolygonPixelRegion(BaseTestPixelRegion):
     # (0,0) *---* (2, 0)
     #
 
+    def test_copy(self):
+        reg = self.reg.copy()
+        assert_allclose(reg.vertices.x, [1, 3, 1])
+        assert_allclose(reg.vertices.y, [1, 1, 4])
+        assert reg.visual == {}
+        assert reg.meta == {}
+
     def test_pix_sky_roundtrip(self):
         wcs = make_simple_wcs(SkyCoord(2 * u.deg, 3 * u.deg), 0.1 * u.deg, 20)
         reg_new = self.reg.to_sky(wcs).to_pixel(wcs)
@@ -103,6 +110,12 @@ class TestPolygonSkyRegion(BaseTestSkyRegion):
     expected_str = ('Region: PolygonSkyRegion\nvertices: <SkyCoord (ICRS):'
                ' (ra, dec) in deg\n    [( 3.,  3.), ( 4.,  4.), ( 3.,'
                '  4.)]>')
+
+    def test_copy(self):
+        reg = self.reg.copy()
+        assert_allclose(reg.vertices.ra.deg, [3, 4, 3])
+        assert reg.visual == {}
+        assert reg.meta == {}
 
     def test_transformation(self, wcs):
 
