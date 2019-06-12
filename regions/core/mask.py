@@ -159,8 +159,8 @@ class RegionMask(object):
             A 2D array on which to apply the region mask.
 
         fill_value : float, optional
-            The value is used to fill pixels where the region mask
-            does not overlap with the input ``data``.  The default is 0.
+            The value used to fill pixels where the region mask does not
+            overlap with the input ``data``.  The default is 0.
 
         copy : bool, optional
             If `True` then the returned cutout array will always be hold
