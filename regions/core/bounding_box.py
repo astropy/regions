@@ -132,6 +132,9 @@ class BoundingBox(object):
             (self.iymax == other.iymax)
         )
 
+    def __or__(self, other):
+        return self.union(other)
+
     def __repr__(self):
         data = self.__dict__
         data['name'] = self.__class__.__name__
@@ -255,3 +258,31 @@ class BoundingBox(object):
 
         reg = self.to_region()
         return reg.plot(origin=origin, ax=ax, **kwargs)
+
+    def union(self, other):
+        """
+        Return a `BoundingBox` representing the union of this
+        `BoundingBox` with another `BoundingBox`.
+
+        Parameters
+        ----------
+        other : `~photutils.BoundingBox`
+            The `BoundingBox` to join with this one.
+
+        Returns
+        -------
+        result : `~photutils.BoundingBox`
+            A `BoundingBox` representing the union of the input
+            `BoundingBox` with this one.
+        """
+
+        if not isinstance(other, BoundingBox):
+            raise TypeError('BoundingBox can be joined only with another '
+                            'BoundingBox.')
+
+        ixmin = min((self.ixmin, other.ixmin))
+        ixmax = max((self.ixmax, other.ixmax))
+        iymin = min((self.iymin, other.iymin))
+        iymax = max((self.iymax, other.iymax))
+
+        return BoundingBox(ixmin=ixmin, ixmax=ixmax, iymin=iymin, iymax=iymax)
