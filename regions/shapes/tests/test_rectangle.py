@@ -67,6 +67,15 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
     expected_str = ('Region: RectanglePixelRegion\ncenter: PixCoord(x=3, y=4)\n'
                     'width: 4\nheight: 3\nangle: 5.0 deg')
 
+    def test_copy(self):
+        reg = self.reg.copy()
+        assert reg.center.xy == (3, 4)
+        assert reg.width == 4
+        assert reg.height == 3
+        assert_allclose(reg.angle.to_value("deg"), 5)
+        assert reg.visual == {}
+        assert reg.meta == {}
+
     def test_pix_sky_roundtrip(self):
         wcs = make_simple_wcs(SkyCoord(2 * u.deg, 3 * u.deg), 0.1 * u.deg, 20)
         reg_new = self.reg.to_sky(wcs).to_pixel(wcs)
@@ -141,6 +150,15 @@ class TestRectangleSkyRegion(BaseTestSkyRegion):
     expected_str = ('Region: RectangleSkyRegion\ncenter: <SkyCoord '
                '(ICRS): (ra, dec) in deg\n    ( 3.,  4.)>\nwidth: '
                '4.0 deg\nheight: 3.0 deg\nangle: 5.0 deg')
+
+    def test_copy(self):
+        reg = self.reg.copy()
+        assert_allclose(reg.center.ra.deg, 3)
+        assert_allclose(reg.width.to_value("deg"),  4)
+        assert_allclose(reg.height.to_value("deg"), 3)
+        assert_allclose(reg.angle.to_value("deg"), 5)
+        assert reg.visual == {}
+        assert reg.meta == {}
 
     def test_contains(self, wcs):
         position = SkyCoord([1, 3] * u.deg, [2, 4] * u.deg)

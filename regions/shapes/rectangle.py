@@ -1,6 +1,6 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 from __future__ import absolute_import, division, print_function, unicode_literals
-
+import copy
 import numpy as np
 from astropy import units as u
 
@@ -12,7 +12,6 @@ from .._geometry import rectangular_overlap_grid
 from .._utils.wcs_helpers import skycoord_to_pixel_scale_angle
 from ..core.attributes import ScalarPix, ScalarLength, QuantityLength, ScalarSky
 from .polygon import PolygonPixelRegion
-
 
 __all__ = ['RectanglePixelRegion', 'RectangleSkyRegion']
 
@@ -80,6 +79,17 @@ class RectanglePixelRegion(PixelRegion):
         self.visual = visual or {}
         self._repr_params = ('width', 'height', 'angle')
 
+    def copy(self):
+        """Make an independent (deep) copy."""
+        return self.__class__(
+            self.center.copy(),
+            copy.deepcopy(self.width),
+            copy.deepcopy(self.height),
+            copy.deepcopy(self.angle),
+            copy.deepcopy(self.meta),
+            copy.deepcopy(self.visual),
+        )
+
     @property
     def area(self):
         """Region area (float)"""
@@ -117,8 +127,8 @@ class RectanglePixelRegion(PixelRegion):
 
         w2 = self.width / 2.
         h2 = self.height / 2.
-        cos_angle = np.cos(self.angle)    # self.angle is a Quantity
-        sin_angle = np.sin(self.angle)    # self.angle is a Quantity
+        cos_angle = np.cos(self.angle)  # self.angle is a Quantity
+        sin_angle = np.sin(self.angle)  # self.angle is a Quantity
         dx1 = abs(w2 * cos_angle - h2 * sin_angle)
         dy1 = abs(w2 * sin_angle + h2 * cos_angle)
         dx2 = abs(w2 * cos_angle + h2 * sin_angle)
@@ -204,11 +214,11 @@ class RectanglePixelRegion(PixelRegion):
         Return the x, y coordinate pairs that define the corners
         """
 
-        corners = [(-self.width/2, -self.height/2),
-                   ( self.width/2, -self.height/2),
-                   ( self.width/2,  self.height/2),
-                   (-self.width/2,  self.height/2),
-                  ]
+        corners = [(-self.width / 2, -self.height / 2),
+                   (self.width / 2, -self.height / 2),
+                   (self.width / 2, self.height / 2),
+                   (-self.width / 2, self.height / 2),
+                   ]
         rotmat = [[np.cos(self.angle), np.sin(self.angle)],
                   [-np.sin(self.angle), np.cos(self.angle)]]
 
@@ -219,11 +229,10 @@ class RectanglePixelRegion(PixelRegion):
         """
         Return a 4-cornered polygon equivalent to this rectangle
         """
-        x,y = self.corners.T
+        x, y = self.corners.T
         vertices = PixCoord(x=x, y=y)
         return PolygonPixelRegion(vertices=vertices, meta=self.meta,
                                   visual=self.visual)
-
 
     def _lower_left_xy(self):
         """
@@ -279,6 +288,17 @@ class RectangleSkyRegion(SkyRegion):
         self.meta = meta or {}
         self.visual = visual or {}
         self._repr_params = ('width', 'height', 'angle')
+
+    def copy(self):
+        """Make an independent (deep) copy."""
+        return self.__class__(
+            self.center.copy(),
+            copy.deepcopy(self.width),
+            copy.deepcopy(self.height),
+            copy.deepcopy(self.angle),
+            copy.deepcopy(self.meta),
+            copy.deepcopy(self.visual),
+        )
 
     def to_pixel(self, wcs):
         center, scale, north_angle = skycoord_to_pixel_scale_angle(self.center, wcs)
