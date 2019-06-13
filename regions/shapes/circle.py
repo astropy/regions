@@ -149,6 +149,26 @@ class CirclePixelRegion(PixelRegion):
 
         return Circle(xy=xy, radius=radius, **mpl_params)
 
+    def rotate(self, center, angle):
+        """Make a rotated region.
+
+        Rotates counter-clockwise for positive ``angle``.
+
+        Parameters
+        ----------
+        center : PixCoord
+            Rotation center point
+        angle : Angle
+            Rotation angle
+
+        Returns
+        -------
+        region : CircleSkyRegion
+            Rotated region (an independent copy)
+        """
+        center = self.center.rotate(center, angle)
+        return self.copy(center=center)
+
 
 class CircleSkyRegion(SkyRegion):
     """

@@ -3,6 +3,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import numpy as np
 from numpy.testing import assert_equal, assert_allclose
 import pytest
+from astropy import units as u
 from ..._utils.examples import make_example_dataset
 from ..pixcoord import PixCoord
 
@@ -228,3 +229,17 @@ def test_pixcoord_xy():
 
     assert pc.xy[0] == pc.x
     assert pc.xy[1] == pc.y
+
+
+def test_pixcoord_rotate_scalar():
+    point = PixCoord(3, 4)
+    center = PixCoord(2, 3)
+    point = point.rotate(center, 90 * u.deg)
+    assert_allclose(point.xy, (1, 4))
+
+
+def test_pixcoord_rotate_array():
+    point = PixCoord([3, 3], [4, 4])
+    center = PixCoord(2, 3)
+    point = point.rotate(center, 90 * u.deg)
+    assert_allclose(point.xy, ([1, 1], [4, 4]))

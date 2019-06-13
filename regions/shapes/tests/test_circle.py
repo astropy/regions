@@ -56,6 +56,10 @@ class TestCirclePixelRegion(BaseTestPixelRegion):
         assert_allclose(patch.center, (3, 4))
         assert_allclose(patch.radius, 2)
 
+    def test_rotate(self):
+        reg = self.reg.rotate(PixCoord(2, 3), 90 * u.deg)
+        assert_allclose(reg.center.xy, (1, 4))
+
 
 class TestCircleSkyRegion(BaseTestSkyRegion):
     reg = CircleSkyRegion(SkyCoord(3 * u.deg, 4 * u.deg), 2 * u.arcsec)

@@ -3,6 +3,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import copy
 import numpy as np
 from astropy.coordinates import SkyCoord
+
 from .core import _DEFAULT_WCS_ORIGIN, _DEFAULT_WCS_MODE
 
 __all__ = ['PixCoord']
@@ -175,3 +176,31 @@ class PixCoord(object):
         A 2-tuple ``(x, y)`` for this coordinate.
         """
         return (self.x, self.y)
+
+    def rotate(self, center, angle):
+        """Make a rotated pixel coordinate.
+
+        Rotates counter-clockwise for positive ``angle``.
+
+        Parameters
+        ----------
+        center : PixCoord
+            Rotation center point
+        angle : Angle
+            Rotation angle
+
+        Returns
+        -------
+        coord : PixCoord
+            Rotated coordinates (an independent copy)
+        """
+        dx = self.x - center.x
+        dy = self.y - center.y
+        vec = np.array([dx, dy])
+
+        c, s = np.cos(angle), np.sin(angle)
+        rotation_matrix = np.array([[c, -s], [s, c]])
+
+        vec = np.matmul(rotation_matrix, vec)
+
+        return self.__class__(center.x + vec[0], center.y + vec[1])
