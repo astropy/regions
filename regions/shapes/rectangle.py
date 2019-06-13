@@ -1,6 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 from __future__ import absolute_import, division, print_function, unicode_literals
-import copy
 import numpy as np
 from astropy import units as u
 
@@ -77,18 +76,8 @@ class RectanglePixelRegion(PixelRegion):
         self.angle = angle
         self.meta = meta or {}
         self.visual = visual or {}
+        self._fields = ("center", "width", "height", "angle", "meta", "visual")
         self._repr_params = ('width', 'height', 'angle')
-
-    def copy(self):
-        """Make an independent (deep) copy."""
-        return self.__class__(
-            self.center.copy(),
-            copy.deepcopy(self.width),
-            copy.deepcopy(self.height),
-            copy.deepcopy(self.angle),
-            copy.deepcopy(self.meta),
-            copy.deepcopy(self.visual),
-        )
 
     @property
     def area(self):
@@ -287,18 +276,8 @@ class RectangleSkyRegion(SkyRegion):
         self.angle = angle
         self.meta = meta or {}
         self.visual = visual or {}
+        self._fields = ("center", "width", "height", "angle", "meta", "visual")
         self._repr_params = ('width', 'height', 'angle')
-
-    def copy(self):
-        """Make an independent (deep) copy."""
-        return self.__class__(
-            self.center.copy(),
-            copy.deepcopy(self.width),
-            copy.deepcopy(self.height),
-            copy.deepcopy(self.angle),
-            copy.deepcopy(self.meta),
-            copy.deepcopy(self.visual),
-        )
 
     def to_pixel(self, wcs):
         center, scale, north_angle = skycoord_to_pixel_scale_angle(self.center, wcs)

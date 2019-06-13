@@ -1,6 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 from __future__ import absolute_import, division, print_function, unicode_literals
-import copy
 import numpy as np
 import math
 
@@ -64,16 +63,8 @@ class CirclePixelRegion(PixelRegion):
         self.radius = radius
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
+        self._fields = ('center', 'radius', 'meta', 'visual')
         self._repr_params = ('radius',)
-
-    def copy(self):
-        """Make an independent (deep) copy."""
-        return self.__class__(
-            self.center.copy(),
-            copy.deepcopy(self.radius),
-            copy.deepcopy(self.meta),
-            copy.deepcopy(self.visual),
-        )
 
     @property
     def area(self):
@@ -183,16 +174,8 @@ class CircleSkyRegion(SkyRegion):
         self.radius = radius
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
-        self._repr_params = ('radius',)
         self._fields = ('center', 'radius', 'meta', 'visual')
-
-    def copy(self, **changes):
-        """Make an independent (deep) copy."""
-        for field in self._fields:
-            if field not in changes:
-                changes[field] = copy.deepcopy(getattr(self, field))
-
-        return self.__class__(**changes)
+        self._repr_params = ('radius',)
 
     def to_pixel(self, wcs):
         center, scale, _ = skycoord_to_pixel_scale_angle(self.center, wcs)
