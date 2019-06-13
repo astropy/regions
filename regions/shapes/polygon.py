@@ -1,6 +1,6 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 from __future__ import absolute_import, division, print_function, unicode_literals
-
+import copy
 import numpy as np
 
 from astropy.wcs.utils import skycoord_to_pixel, pixel_to_skycoord
@@ -57,6 +57,14 @@ class PolygonPixelRegion(PixelRegion):
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
         self._repr_params = ('vertices',)
+
+    def copy(self):
+        """Make an independent (deep) copy."""
+        return self.__class__(
+            self.vertices.copy(),
+            copy.deepcopy(self.meta),
+            copy.deepcopy(self.visual),
+        )
 
     @property
     def area(self):
@@ -171,6 +179,14 @@ class PolygonSkyRegion(SkyRegion):
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
         self._repr_params = ('vertices',)
+
+    def copy(self):
+        """Make an independent (deep) copy."""
+        return self.__class__(
+            self.vertices.copy(),
+            copy.deepcopy(self.meta),
+            copy.deepcopy(self.visual),
+        )
 
     def to_pixel(self, wcs):
         x, y = skycoord_to_pixel(self.vertices, wcs)

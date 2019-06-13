@@ -28,7 +28,6 @@ def wcs():
 
 
 class TestCirclePixelRegion(BaseTestPixelRegion):
-
     reg = CirclePixelRegion(PixCoord(3, 4), radius=2)
     sample_box = [0, 6, 1, 7]
     inside = [(3, 4)]
@@ -36,6 +35,13 @@ class TestCirclePixelRegion(BaseTestPixelRegion):
     expected_area = 4 * np.pi
     expected_repr = '<CirclePixelRegion(PixCoord(x=3, y=4), radius=2)>'
     expected_str = 'Region: CirclePixelRegion\ncenter: PixCoord(x=3, y=4)\nradius: 2'
+
+    def test_copy(self):
+        reg = self.reg.copy()
+        assert reg.center.xy == (3, 4)
+        assert reg.radius == 2
+        assert reg.visual == {}
+        assert reg.meta == {}
 
     def test_pix_sky_roundtrip(self):
         wcs = make_simple_wcs(SkyCoord(2 * u.deg, 3 * u.deg), 0.1 * u.deg, 20)
@@ -52,7 +58,6 @@ class TestCirclePixelRegion(BaseTestPixelRegion):
 
 
 class TestCircleSkyRegion(BaseTestSkyRegion):
-
     reg = CircleSkyRegion(SkyCoord(3 * u.deg, 4 * u.deg), 2 * u.arcsec)
 
     expected_repr = ('<CircleSkyRegion(<SkyCoord (ICRS): (ra, dec) in '
@@ -60,6 +65,13 @@ class TestCircleSkyRegion(BaseTestSkyRegion):
     expected_str = ('Region: CircleSkyRegion\ncenter: <SkyCoord (ICRS): '
                     '(ra, dec) in deg\n    ( 3.,  4.)>\nradius: 2.0 '
                     'arcsec')
+
+    def test_copy(self):
+        reg = self.reg.copy()
+        assert_allclose(reg.center.ra.deg, 3)
+        assert_allclose(reg.radius.to_value("arcsec"), 2)
+        assert reg.visual == {}
+        assert reg.meta == {}
 
     def test_transformation(self, wcs):
         skycoord = SkyCoord(3 * u.deg, 4 * u.deg, frame='galactic')
