@@ -76,7 +76,6 @@ class RectanglePixelRegion(PixelRegion):
         self.angle = angle
         self.meta = meta or {}
         self.visual = visual or {}
-        self._fields = ("center", "width", "height", "angle", "meta", "visual")
         self._repr_params = ('width', 'height', 'angle')
 
     @property
@@ -276,7 +275,6 @@ class RectangleSkyRegion(SkyRegion):
         self.angle = angle
         self.meta = meta or {}
         self.visual = visual or {}
-        self._fields = ("center", "width", "height", "angle", "meta", "visual")
         self._repr_params = ('width', 'height', 'angle')
 
     def to_pixel(self, wcs):

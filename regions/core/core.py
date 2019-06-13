@@ -69,7 +69,15 @@ class Region(object):
 
     def copy(self, **changes):
         """Make an independent (deep) copy."""
-        for field in self._fields:
+        fields = []
+        if hasattr(self, "center"):
+            fields.append("center")
+        if hasattr(self, "vertices"):
+            fields.append("vertices")
+        fields.extend(self._repr_params)
+        fields.extend(["meta", "visual"])
+
+        for field in fields:
             if field not in changes:
                 changes[field] = copy.deepcopy(getattr(self, field))
 

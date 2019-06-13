@@ -78,7 +78,6 @@ class EllipsePixelRegion(PixelRegion):
         self.angle = angle
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
-        self._fields = ("center", "width", "height", "angle", "meta", "visual")
         self._repr_params = ('width', 'height', 'angle')
 
     @property
@@ -249,7 +248,6 @@ class EllipseSkyRegion(SkyRegion):
         self.angle = angle
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
-        self._fields = ("center", "width", "height", "angle", "meta", "visual")
         self._repr_params = ('width', 'height', 'angle')
 
     def to_pixel(self, wcs):

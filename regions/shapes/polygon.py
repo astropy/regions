@@ -56,7 +56,6 @@ class PolygonPixelRegion(PixelRegion):
         self.vertices = vertices
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
-        self._fields = ("vertices", "meta", "visual")
         self._repr_params = ('vertices',)
 
     @property
@@ -171,7 +170,6 @@ class PolygonSkyRegion(SkyRegion):
         self.vertices = vertices
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
-        self._fields = ("vertices", "meta", "visual")
         self._repr_params = ('vertices',)
 
     def to_pixel(self, wcs):
