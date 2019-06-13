@@ -155,14 +155,14 @@ class CirclePixelRegion(PixelRegion):
 
         Parameters
         ----------
-        center : PixCoord
+        center : `PixCoord`
             Rotation center point
-        angle : Angle
+        angle : `~astropy.coordinates.Angle`
             Rotation angle
 
         Returns
         -------
-        region : CircleSkyRegion
+        region : `CirclePixelRegion`
             Rotated region (an independent copy)
         """
         center = self.center.rotate(center, angle)
@@ -199,23 +199,3 @@ class CircleSkyRegion(SkyRegion):
         center, scale, _ = skycoord_to_pixel_scale_angle(self.center, wcs)
         radius = self.radius.to('deg').value * scale
         return CirclePixelRegion(center, radius, self.meta, self.visual)
-
-    def rotate(self, center, angle):
-        """Make a rotated region.
-
-        Rotates counter-clockwise for positive ``angle``.
-
-        Parameters
-        ----------
-        center : PixCoord
-            Rotation center point
-        angle : Angle
-            Rotation angle
-
-        Returns
-        -------
-        region : CircleSkyRegion
-            Rotated region (an independent copy)
-        """
-        center = self.center.rotate(center, angle)
-        return self.copy(center=center)

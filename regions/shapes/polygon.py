@@ -149,6 +149,26 @@ class PolygonPixelRegion(PixelRegion):
 
         return Polygon(xy=xy, **mpl_params)
 
+    def rotate(self, center, angle):
+        """Make a rotated region.
+
+        Rotates counter-clockwise for positive ``angle``.
+
+        Parameters
+        ----------
+        center : `PixCoord`
+            Rotation center point
+        angle : `~astropy.coordinates.Angle`
+            Rotation angle
+
+        Returns
+        -------
+        region : `PolygonPixelRegion`
+            Rotated region (an independent copy)
+        """
+        vertices = self.vertices.rotate(center, angle)
+        return self.copy(vertices=vertices)
+
 
 class PolygonSkyRegion(SkyRegion):
     """

@@ -213,6 +213,27 @@ class EllipsePixelRegion(PixelRegion):
         return Ellipse(xy=xy, width=width, height=height, angle=angle,
                        **mpl_params)
 
+    def rotate(self, center, angle):
+        """Make a rotated region.
+
+        Rotates counter-clockwise for positive ``angle``.
+
+        Parameters
+        ----------
+        center : `PixCoord`
+            Rotation center point
+        angle : `~astropy.coordinates.Angle`
+            Rotation angle
+
+        Returns
+        -------
+        region : `EllipsePixelRegion`
+            Rotated region (an independent copy)
+        """
+        center = self.center.rotate(center, angle)
+        angle = self.angle + angle
+        return self.copy(center=center, angle=angle)
+
 
 class EllipseSkyRegion(SkyRegion):
     """

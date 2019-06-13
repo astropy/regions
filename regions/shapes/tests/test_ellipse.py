@@ -28,7 +28,6 @@ def wcs():
 
 
 class TestEllipsePixelRegion(BaseTestPixelRegion):
-
     reg = EllipsePixelRegion(center=PixCoord(3, 4), width=4, height=3, angle=5 * u.deg)
     sample_box = [-2, 8, -1, 9]
     inside = [(4.5, 4)]
@@ -79,9 +78,13 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
                                  angle=90. * u.deg)
         assert reg.bounding_box.shape == (a, b)
 
+    def test_rotate(self):
+        reg = self.reg.rotate(PixCoord(2, 3), 90 * u.deg)
+        assert_allclose(reg.center.xy, (1, 4))
+        assert_allclose(reg.angle.to_value("deg"), 95)
+
 
 class TestEllipseSkyRegion(BaseTestSkyRegion):
-
     reg = EllipseSkyRegion(
         center=SkyCoord(3, 4, unit='deg'),
         width=4 * u.deg,
@@ -99,7 +102,7 @@ class TestEllipseSkyRegion(BaseTestSkyRegion):
     def test_copy(self):
         reg = self.reg.copy()
         assert_allclose(reg.center.ra.deg, 3)
-        assert_allclose(reg.width.to_value("deg"),  4)
+        assert_allclose(reg.width.to_value("deg"), 4)
         assert_allclose(reg.height.to_value("deg"), 3)
         assert_allclose(reg.angle.to_value("deg"), 5)
         assert reg.visual == {}
