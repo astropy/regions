@@ -184,17 +184,37 @@ class CircleSkyRegion(SkyRegion):
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
         self._repr_params = ('radius',)
+        self._fields = ('center', 'radius', 'meta', 'visual')
 
-    def copy(self):
+    def copy(self, **changes):
         """Make an independent (deep) copy."""
-        return self.__class__(
-            self.center.copy(),
-            copy.deepcopy(self.radius),
-            copy.deepcopy(self.meta),
-            copy.deepcopy(self.visual),
-        )
+        for field in self._fields:
+            if field not in changes:
+                changes[field] = copy.deepcopy(getattr(self, field))
+
+        return self.__class__(**changes)
 
     def to_pixel(self, wcs):
         center, scale, _ = skycoord_to_pixel_scale_angle(self.center, wcs)
         radius = self.radius.to('deg').value * scale
         return CirclePixelRegion(center, radius, self.meta, self.visual)
+
+    def rotate(self, center, angle):
+        """Make a rotated region.
+
+        Rotates counter-clockwise for positive ``angle``.
+
+        Parameters
+        ----------
+        center : PixCoord
+            Rotation center point
+        angle : Angle
+            Rotation angle
+
+        Returns
+        -------
+        region : CircleSkyRegion
+            Rotated region (an independent copy)
+        """
+        center = self.center.rotate(center, angle)
+        return self.copy(center=center)
