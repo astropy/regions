@@ -56,7 +56,7 @@ class PointPixelRegion(PixelRegion):
         self.center = center
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
-        self._repr_params = None
+        self._repr_params = tuple()
 
     @property
     def area(self):
@@ -136,7 +136,7 @@ class PointSkyRegion(SkyRegion):
         self.center = center
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
-        self._repr_params = None
+        self._repr_params = tuple()
 
     def contains(self, skycoord, wcs):
         if self.meta.get('include', True):
