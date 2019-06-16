@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 import numpy as np
+from numpy.testing import assert_allclose
 
 from astropy import units as u
 from astropy.coordinates import SkyCoord
@@ -30,13 +31,20 @@ class TestCircleAnnulusPixelRegion(BaseTestPixelRegion):
         assert_quantity_allclose(self.reg.inner_radius, 2)
         assert_quantity_allclose(self.reg.outer_radius, 3)
 
+    def test_copy(self):
+        reg = self.reg.copy()
+        assert reg.center.xy == (3, 4)
+        assert reg.inner_radius == 2
+        assert reg.outer_radius == 3
+        assert reg.visual == {}
+        assert reg.meta == {}
+
     def test_transformation(self):
         skyannulus = self.reg.to_sky(wcs=self.wcs)
         assert isinstance(skyannulus, CircleAnnulusSkyRegion)
 
 
 class TestCircleAnnulusSkyRegion(BaseTestSkyRegion):
-
     reg = CircleAnnulusSkyRegion(SkyCoord(3 * u.deg, 4 * u.deg), 20 * u.arcsec, 30 * u.arcsec)
     skycoord = SkyCoord(3 * u.deg, 4 * u.deg, frame='icrs')
     wcs = make_simple_wcs(skycoord, 5 * u.arcsec, 20)
@@ -49,8 +57,16 @@ class TestCircleAnnulusSkyRegion(BaseTestSkyRegion):
 
     def test_init(self):
         assert_quantity_allclose(self.reg.center.ra, self.skycoord.ra)
-        assert_quantity_allclose(self.reg.inner_radius, 20*u.arcsec)
-        assert_quantity_allclose(self.reg.outer_radius, 30*u.arcsec)
+        assert_quantity_allclose(self.reg.inner_radius, 20 * u.arcsec)
+        assert_quantity_allclose(self.reg.outer_radius, 30 * u.arcsec)
+
+    def test_copy(self):
+        reg = self.reg.copy()
+        assert_allclose(reg.center.ra.deg, 3)
+        assert_allclose(reg.inner_radius.to_value("arcsec"), 20)
+        assert_allclose(reg.outer_radius.to_value("arcsec"), 30)
+        assert reg.visual == {}
+        assert reg.meta == {}
 
     def test_contains(self):
         assert not self.reg.contains(self.skycoord, self.wcs)
@@ -71,9 +87,9 @@ class TestEllipseAnnulusPixelRegion(BaseTestPixelRegion):
     expected_repr = ('<EllipseAnnulusPixelRegion(PixCoord(x=3, y=4), '
                      'inner width=2, inner height=5, outer width=5, '
                      'outer height=8, angle=0.0 deg)>')
-    expected_str =  ('Region: EllipseAnnulusPixelRegion\ncenter: PixCoord(x=3, y=4)'
-                     '\ninner width: 2\ninner height: 5\nouter width: 5\n'
-                     'outer height: 8\nangle: 0.0 deg')
+    expected_str = ('Region: EllipseAnnulusPixelRegion\ncenter: PixCoord(x=3, y=4)'
+                    '\ninner width: 2\ninner height: 5\nouter width: 5\n'
+                    'outer height: 8\nangle: 0.0 deg')
 
     skycoord = SkyCoord(3 * u.deg, 4 * u.deg, frame='icrs')
     wcs = make_simple_wcs(skycoord, 5 * u.arcsec, 20)
@@ -86,13 +102,23 @@ class TestEllipseAnnulusPixelRegion(BaseTestPixelRegion):
         assert_quantity_allclose(self.reg.outer_width, 5)
         assert_quantity_allclose(self.reg.outer_height, 8)
 
+    def test_copy(self):
+        reg = self.reg.copy()
+        assert reg.center.xy == (3, 4)
+        assert reg.inner_width == 2
+        assert reg.inner_height == 5
+        assert reg.outer_width == 5
+        assert reg.outer_height == 8
+        assert_allclose(reg.angle.to_value("deg"), 0)
+        assert reg.visual == {}
+        assert reg.meta == {}
+
     def test_transformation(self):
         skyannulus = self.reg.to_sky(wcs=self.wcs)
         assert isinstance(skyannulus, EllipseAnnulusSkyRegion)
 
 
 class TestEllipseAnnulusSkyRegion(BaseTestSkyRegion):
-
     skycoord = SkyCoord(3 * u.deg, 4 * u.deg, frame='icrs')
     reg = EllipseAnnulusSkyRegion(skycoord, 20 * u.arcsec, 50 * u.arcsec,
                                   50 * u.arcsec, 80 * u.arcsec)
@@ -109,8 +135,19 @@ class TestEllipseAnnulusSkyRegion(BaseTestSkyRegion):
 
     def test_init(self):
         assert_quantity_allclose(self.reg.center.ra, self.skycoord.ra)
-        assert_quantity_allclose(self.reg.inner_width, 20*u.arcsec)
-        assert_quantity_allclose(self.reg.inner_height, 50*u.arcsec)
+        assert_quantity_allclose(self.reg.inner_width, 20 * u.arcsec)
+        assert_quantity_allclose(self.reg.inner_height, 50 * u.arcsec)
+
+    def test_copy(self):
+        reg = self.reg.copy()
+        assert_allclose(reg.center.ra.deg, 3)
+        assert_allclose(reg.inner_width.to_value("arcsec"), 20)
+        assert_allclose(reg.inner_height.to_value("arcsec"), 50)
+        assert_allclose(reg.outer_width.to_value("arcsec"), 50)
+        assert_allclose(reg.outer_height.to_value("arcsec"), 80)
+        assert_allclose(reg.angle.to_value("deg"), 0)
+        assert reg.visual == {}
+        assert reg.meta == {}
 
     def test_contains(self):
         assert not self.reg.contains(self.skycoord, self.wcs)
@@ -131,9 +168,9 @@ class TestRectangleAnnulusPixelRegion(BaseTestPixelRegion):
     expected_repr = ('<RectangleAnnulusPixelRegion(PixCoord(x=3, y=4), '
                      'inner width=2, inner height=5, outer width=5, '
                      'outer height=8, angle=0.0 deg)>')
-    expected_str =  ('Region: RectangleAnnulusPixelRegion\ncenter: PixCoord(x=3, y=4)'
-                     '\ninner width: 2\ninner height: 5\nouter width: 5\n'
-                     'outer height: 8\nangle: 0.0 deg')
+    expected_str = ('Region: RectangleAnnulusPixelRegion\ncenter: PixCoord(x=3, y=4)'
+                    '\ninner width: 2\ninner height: 5\nouter width: 5\n'
+                    'outer height: 8\nangle: 0.0 deg')
 
     skycoord = SkyCoord(3 * u.deg, 4 * u.deg, frame='icrs')
     wcs = make_simple_wcs(skycoord, 5 * u.arcsec, 20)
@@ -146,16 +183,24 @@ class TestRectangleAnnulusPixelRegion(BaseTestPixelRegion):
         assert_quantity_allclose(self.reg.outer_width, 5)
         assert_quantity_allclose(self.reg.outer_height, 8)
 
+    def test_copy(self):
+        reg = self.reg.copy()
+        assert_quantity_allclose(reg.center.x, 3)
+        assert_quantity_allclose(reg.center.y, 4)
+        assert_quantity_allclose(reg.inner_width, 2)
+        assert_quantity_allclose(reg.inner_height, 5)
+        assert_quantity_allclose(reg.outer_width, 5)
+        assert_quantity_allclose(reg.outer_height, 8)
+
     def test_transformation(self):
         skyannulus = self.reg.to_sky(wcs=self.wcs)
         assert isinstance(skyannulus, RectangleAnnulusSkyRegion)
 
 
 class TestRectangleAnnulusSkyRegion(BaseTestSkyRegion):
-
     skycoord = SkyCoord(3 * u.deg, 4 * u.deg, frame='icrs')
     reg = RectangleAnnulusSkyRegion(skycoord, 20 * u.arcsec, 50 * u.arcsec,
-                                  50 * u.arcsec, 80 * u.arcsec)
+                                    50 * u.arcsec, 80 * u.arcsec)
     wcs = make_simple_wcs(skycoord, 5 * u.arcsec, 20)
 
     expected_repr = ('<RectangleAnnulusSkyRegion(<SkyCoord (ICRS): (ra, dec) in '
@@ -169,8 +214,19 @@ class TestRectangleAnnulusSkyRegion(BaseTestSkyRegion):
 
     def test_init(self):
         assert_quantity_allclose(self.reg.center.ra, self.skycoord.ra)
-        assert_quantity_allclose(self.reg.inner_width, 20*u.arcsec)
-        assert_quantity_allclose(self.reg.inner_height, 50*u.arcsec)
+        assert_quantity_allclose(self.reg.inner_width, 20 * u.arcsec)
+        assert_quantity_allclose(self.reg.inner_height, 50 * u.arcsec)
+
+    def test_copy(self):
+        reg = self.reg.copy()
+        assert_allclose(reg.center.ra.deg, 3)
+        assert_allclose(reg.inner_width.to_value("arcsec"), 20)
+        assert_allclose(reg.inner_height.to_value("arcsec"), 50)
+        assert_allclose(reg.outer_width.to_value("arcsec"), 50)
+        assert_allclose(reg.outer_height.to_value("arcsec"), 80)
+        assert_allclose(reg.angle.to_value("deg"), 0)
+        assert reg.visual == {}
+        assert reg.meta == {}
 
     def test_contains(self):
         assert not self.reg.contains(self.skycoord, self.wcs)
