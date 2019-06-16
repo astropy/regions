@@ -78,32 +78,6 @@ class OneDPix(RegionAttr):
                              .format(self._name))
 
 
-class AnnulusCenterPix(object):
-    """
-    This descriptor class is for the ``center`` of an
-    ``annulus`` `~regions.PixelRegion`. It takes a scalar
-    `~regions.PixCoord` object. It also makes sure that ``region1`` and
-    ``region2`` are in sync in case of an update.
-    """
-
-    def __get__(self, instance, owner):
-        if instance is None:
-            return self
-        reg1 = getattr(instance, 'region1')
-        return getattr(reg1, 'center')
-
-    def __set__(self, instance, value):
-
-        reg1 = getattr(instance, 'region1')
-        reg2 = getattr(instance, 'region2')
-
-        if isinstance(value, PixCoord) and value.isscalar:
-            setattr(reg1, 'center', value)
-            setattr(reg2, 'center', value)
-        else:
-            raise ValueError('The center must be a 0D PixCoord object')
-
-
 class ScalarLength(RegionAttr):
     """
     Descriptor class for `~regions.PixelRegion` which takes a scalar
@@ -114,72 +88,6 @@ class ScalarLength(RegionAttr):
         if not np.isscalar(value):
             raise ValueError(
                 'The {} must be a scalar numpy/python number'.format(self._name))
-
-
-class AnnulusInnerScalarLength(object):
-    """
-    This descriptor class is for an inner length of an
-    ``annulus`` `~regions.PixelRegion`. It takes a scalar
-    python/numpy number and makes sure that it is less than the outer
-    length of the annulus.
-    """
-
-    def __init__(self, name):
-        self._name = name
-
-    def __get__(self, instance, owner):
-        if instance is None:
-            return self
-        reg1 = getattr(instance, 'region1')
-        return getattr(reg1, self._name)
-
-    def __set__(self, instance, value):
-        reg1 = getattr(instance, 'region1')
-        reg2 = getattr(instance, 'region2')
-
-        if np.isscalar(value):
-            if getattr(reg2, self._name) < value:
-                raise ValueError("The inner {0} must be less than the outer {0}"
-                                .format(self._name)
-                             )
-            else:
-                setattr(reg1, self._name, value)
-        else:
-            raise ValueError('The inner {} must be a scalar numpy/python number'
-                             .format(self._name))
-
-
-class AnnulusOuterScalarLength(object):
-    """
-    This descriptor class is for an outer length of an
-    ``annulus`` `~regions.PixelRegion`. It takes a scalar
-    python/numpy number and makes sure that it is greater than the inner
-    length of the annulus.
-    """
-
-    def __init__(self, name):
-        self._name = name
-
-    def __get__(self, instance, owner):
-        if instance is None:
-            return self
-        reg2 = getattr(instance, 'region2')
-        return getattr(reg2, self._name)
-
-    def __set__(self, instance, value):
-        reg1 = getattr(instance, 'region1')
-        reg2 = getattr(instance, 'region2')
-
-        if np.isscalar(value):
-            if getattr(reg1, self._name) > value:
-                raise ValueError("The outer {0} must be greater than the outer"
-                                 " {0}".format(self._name)
-                                 )
-            else:
-                setattr(reg2, self._name, value)
-        else:
-            raise ValueError('The outer {} must be a scalar numpy/python number'
-                             .format(self._name))
 
 
 class ScalarSky(RegionAttr):
@@ -206,32 +114,6 @@ class OneDSky(RegionAttr):
                              format(self._name))
 
 
-class AnnulusCenterSky(object):
-    """
-    This descriptor class is for the ``center`` of an
-    ``annulus`` `~regions.SkyRegion`. It takes a scalar
-    `~astropy.coordinates.SkyCoord` object. It also makes sure that ``region1``
-    and ``region2`` are in sync in case of an update.
-    """
-
-    def __get__(self, instance, owner):
-        if instance is None:
-            return self
-        reg1 = getattr(instance, 'region1')
-        return getattr(reg1, 'center')
-
-    def __set__(self, instance, value):
-
-        reg1 = getattr(instance, 'region1')
-        reg2 = getattr(instance, 'region2')
-
-        if isinstance(value, SkyCoord) and value.isscalar:
-            setattr(reg1, 'center', value)
-            setattr(reg2, 'center', value)
-        else:
-            raise ValueError('The center must be a 0D SkyCoord object')
-
-
 class QuantityLength(RegionAttr):
     """
     Descriptor class for `~regions.SkyRegion`  which takes a scalar
@@ -242,96 +124,6 @@ class QuantityLength(RegionAttr):
         if not(isinstance(value, Quantity) and value.isscalar):
             raise ValueError('The {} must be a scalar astropy Quantity object'
                              .format(self._name))
-
-
-class AnnulusInnerQuantityLength(object):
-    """
-    This descriptor class is for an inner length of an ``annulus``
-    `~regions.SkyRegion`. It takes a scalar `astropy.units.Quantity` object and
-    makes sure that it is less than the outer length of the annulus.
-    """
-
-    def __init__(self, name):
-        self._name = name
-
-    def __get__(self, instance, owner):
-        if instance is None:
-            return self
-        reg1 = getattr(instance, 'region1')
-        return getattr(reg1, self._name)
-
-    def __set__(self, instance, value):
-        reg1 = getattr(instance, 'region1')
-        reg2 = getattr(instance, 'region2')
-
-        if isinstance(value, Quantity) and value.isscalar:
-            if getattr(reg2, self._name) < value:
-                raise ValueError("The inner {0} must be less than the outer {0}"
-                                 .format(self._name)
-                                 )
-            else:
-                setattr(reg1, self._name, value)
-        else:
-            raise ValueError('The inner {} must be a scalar astropy Quantity '
-                             'object'.format(self._name))
-
-
-class AnnulusOuterQuantityLength(object):
-    """
-    This descriptor class is for an outer length of an ``annulus``
-    `~regions.SkyRegion`. It takes a scalar `astropy.units.Quantity` object
-    and makes sure that it is less than the inner length of the annulus.
-    """
-
-    def __init__(self, name):
-        self._name = name
-
-    def __get__(self, instance, owner):
-        if instance is None:
-            return self
-        reg2 = getattr(instance, 'region2')
-        return getattr(reg2, self._name)
-
-    def __set__(self, instance, value):
-        reg1 = getattr(instance, 'region1')
-        reg2 = getattr(instance, 'region2')
-
-        if isinstance(value, Quantity) and value.isscalar:
-            if getattr(reg1, self._name) > value:
-                raise ValueError("The inner {0} must be less than the outer {0}"
-                                 .format(self._name)
-                                 )
-            else:
-                setattr(reg2, self._name, value)
-        else:
-            raise ValueError('The outer {} must be a scalar astropy Quantity '
-                             'object'.format(self._name))
-
-
-class AnnulusAngle(object):
-    """
-    This descriptor class is for the ``center`` of an ``annulus``
-    `~regions.SkyRegion`. It takes a scalar `~astropy.units.Quantity` object.
-    It also makes sure that ``region1`` and ``region2`` are in sync in case of
-    an update.
-    """
-
-    def __get__(self, instance, owner):
-        if instance is None:
-            return self
-        reg1 = getattr(instance, 'region1')
-        return getattr(reg1, 'angle')
-
-    def __set__(self, instance, value):
-
-        reg1 = getattr(instance, 'region1')
-        reg2 = getattr(instance, 'region2')
-
-        if isinstance(value, Quantity) and value.isscalar:
-            setattr(reg1, 'angle', value)
-            setattr(reg2, 'angle', value)
-        else:
-            raise ValueError('The angle must be a scalar astropy quantity object')
 
 
 class CompoundRegionPix(RegionAttr):
