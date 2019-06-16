@@ -99,6 +99,11 @@ class TestPolygonPixelRegion(BaseTestPixelRegion):
         expected = [[1, 1], [3, 1], [1, 4], [1, 1]]
         assert_allclose(patch.xy, expected)
 
+    def test_rotate(self):
+        reg = self.reg.rotate(PixCoord(3, 1), -90 * u.deg)
+        assert_allclose(reg.vertices.x, [3, 3, 6])
+        assert_allclose(reg.vertices.y, [3, 1, 3])
+
 
 class TestPolygonSkyRegion(BaseTestSkyRegion):
 

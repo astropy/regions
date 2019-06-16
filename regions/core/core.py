@@ -3,6 +3,7 @@ from __future__ import (absolute_import, division, print_function,
                         unicode_literals)
 import abc
 import six
+import copy
 import operator
 import inspect
 
@@ -65,6 +66,22 @@ class Region(object):
     """
     Base class for all regions.
     """
+
+    def copy(self, **changes):
+        """Make an independent (deep) copy."""
+        fields = []
+        if hasattr(self, "center"):
+            fields.append("center")
+        if hasattr(self, "vertices"):
+            fields.append("vertices")
+        fields.extend(self._repr_params)
+        fields.extend(["meta", "visual"])
+
+        for field in fields:
+            if field not in changes:
+                changes[field] = copy.deepcopy(getattr(self, field))
+
+        return self.__class__(**changes)
 
     def __repr__(self):
         if hasattr(self, 'center'):

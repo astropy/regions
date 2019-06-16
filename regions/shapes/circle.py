@@ -1,6 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 from __future__ import absolute_import, division, print_function, unicode_literals
-import copy
 import numpy as np
 import math
 
@@ -64,15 +63,6 @@ class CirclePixelRegion(PixelRegion):
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
         self._repr_params = ('radius',)
-
-    def copy(self):
-        """Make an independent (deep) copy."""
-        return self.__class__(
-            self.center.copy(),
-            copy.deepcopy(self.radius),
-            copy.deepcopy(self.meta),
-            copy.deepcopy(self.visual),
-        )
 
     @property
     def area(self):
@@ -157,6 +147,26 @@ class CirclePixelRegion(PixelRegion):
 
         return Circle(xy=xy, radius=radius, **mpl_params)
 
+    def rotate(self, center, angle):
+        """Make a rotated region.
+
+        Rotates counter-clockwise for positive ``angle``.
+
+        Parameters
+        ----------
+        center : `PixCoord`
+            Rotation center point
+        angle : `~astropy.coordinates.Angle`
+            Rotation angle
+
+        Returns
+        -------
+        region : `CirclePixelRegion`
+            Rotated region (an independent copy)
+        """
+        center = self.center.rotate(center, angle)
+        return self.copy(center=center)
+
 
 class CircleSkyRegion(SkyRegion):
     """
@@ -183,15 +193,6 @@ class CircleSkyRegion(SkyRegion):
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
         self._repr_params = ('radius',)
-
-    def copy(self):
-        """Make an independent (deep) copy."""
-        return self.__class__(
-            self.center.copy(),
-            copy.deepcopy(self.radius),
-            copy.deepcopy(self.meta),
-            copy.deepcopy(self.visual),
-        )
 
     def to_pixel(self, wcs):
         center, scale, _ = skycoord_to_pixel_scale_angle(self.center, wcs)

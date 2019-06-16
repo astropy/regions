@@ -102,6 +102,11 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
         # correctly.
         # assert_allclose(patch._angle, 5)
 
+    def test_rotate(self):
+        reg = self.reg.rotate(PixCoord(2, 3), 90 * u.deg)
+        assert_allclose(reg.center.xy, (1, 4))
+        assert_allclose(reg.angle.to_value("deg"), 95)
+
 
 def test_rectangular_pixel_region_bbox():
     # odd sizes
