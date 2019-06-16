@@ -26,7 +26,6 @@ def wcs():
 
 
 class TestTextPixelRegion(BaseTestPixelRegion):
-
     reg = TextPixelRegion(PixCoord(3, 4), "Sample Text")
     sample_box = [-2, 8, -1, 9]
     inside = []
@@ -34,6 +33,13 @@ class TestTextPixelRegion(BaseTestPixelRegion):
     expected_area = 0
     expected_repr = '<TextPixelRegion(PixCoord(x=3, y=4), text=Sample Text)>'
     expected_str = 'Region: TextPixelRegion\ncenter: PixCoord(x=3, y=4)\ntext: Sample Text'
+
+    def test_copy(self):
+        reg = self.reg.copy()
+        assert reg.center.xy == (3, 4)
+        assert reg.text == "Sample Text"
+        assert reg.visual == {}
+        assert reg.meta == {}
 
     def test_pix_sky_roundtrip(self):
         wcs = make_simple_wcs(SkyCoord(2 * u.deg, 3 * u.deg), 0.1 * u.deg, 20)
@@ -43,13 +49,19 @@ class TestTextPixelRegion(BaseTestPixelRegion):
 
 
 class TestTextSkyRegion(BaseTestSkyRegion):
-
     reg = TextSkyRegion(SkyCoord(3, 4, unit='deg'), "Sample Text")
 
     expected_repr = ('<TextSkyRegion(<SkyCoord (ICRS): (ra, dec) in deg\n'
-                         '    ( 3.,  4.)>, text=Sample Text)>')
+                     '    ( 3.,  4.)>, text=Sample Text)>')
     expected_str = ('Region: TextSkyRegion\ncenter: <SkyCoord (ICRS): '
                     '(ra, dec) in deg\n    ( 3.,  4.)>\ntext: Sample Text')
+
+    def test_copy(self):
+        reg = self.reg.copy()
+        assert_allclose(reg.center.ra.deg, 3)
+        assert reg.text == "Sample Text"
+        assert reg.visual == {}
+        assert reg.meta == {}
 
     def test_contains(self, wcs):
         position = SkyCoord([1, 2] * u.deg, [3, 4] * u.deg)
