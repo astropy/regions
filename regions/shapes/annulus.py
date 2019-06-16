@@ -5,33 +5,66 @@ import operator
 import six
 import abc
 
-
 from astropy import units as u
 from astropy.wcs.utils import pixel_to_skycoord
 
+from regions import CompoundPixelRegion
+from regions import RegionMeta
+from regions import RegionVisual
+from regions.core.attributes import QuantityLength
+from regions.core.attributes import ScalarPix, ScalarLength
+from regions.core.attributes import ScalarSky
 from .._utils.wcs_helpers import skycoord_to_pixel_scale_angle
-from ..core import CompoundPixelRegion, CompoundSkyRegion, PixCoord
-from ..shapes.circle import CirclePixelRegion, CircleSkyRegion
+from ..core import PixelRegion, SkyRegion, PixCoord
+from ..shapes.circle import CirclePixelRegion
 from ..shapes.ellipse import EllipsePixelRegion, EllipseSkyRegion
 from ..shapes.rectangle import RectanglePixelRegion, RectangleSkyRegion
-from ..core.attributes import (AnnulusCenterPix, AnnulusInnerScalarLength,
-                         AnnulusOuterScalarLength, AnnulusCenterSky,
-                         AnnulusInnerQuantityLength, AnnulusOuterQuantityLength,
-                         AnnulusAngle)
 
-__all__ = ['CircleAnnulusPixelRegion', 'CircleAnnulusSkyRegion',
-           'EllipseAnnulusPixelRegion', 'EllipseAnnulusSkyRegion',
-           'RectangleAnnulusPixelRegion', 'RectangleAnnulusSkyRegion'
-           ]
+__all__ = [
+    "CircleAnnulusPixelRegion",
+    "CircleAnnulusSkyRegion",
+    "EllipseAnnulusPixelRegion",
+    "EllipseAnnulusSkyRegion",
+    "RectangleAnnulusPixelRegion",
+    "RectangleAnnulusSkyRegion",
+]
 
 
-class CircleAnnulusPixelRegion(CompoundPixelRegion):
+@six.add_metaclass(abc.ABCMeta)
+class AnnulusPixelRegion(PixelRegion):
+    """Annulus pixel region."""
+
+    @property
+    def _compound_region(self):
+        return CompoundPixelRegion(
+            self._inner_region, self._outer_region, operator.xor, self.meta, self.visual
+        )
+
+    @property
+    def area(self):
+        return self._outer_region.area - self._inner_region.area
+
+    @property
+    def bounding_box(self):
+        return self._outer_region.bounding_box
+
+    def contains(self, pixcoord):
+        return self._compound_region.contains(pixcoord)
+
+    def as_artist(self, origin=(0, 0), **kwargs):
+        return self._compound_region.as_artist(origin, **kwargs)
+
+    def to_mask(self, mode="center", subpixels=5):
+        return self._compound_region.to_mask(mode, subpixels)
+
+
+class CircleAnnulusPixelRegion(AnnulusPixelRegion):
     """
     A circular annulus in pixel coordinates.
 
     Parameters
     ----------
-    center : :class:`~regions.core.pixcoord.PixCoord`
+    center : `~regions.PixCoord`
         The position of the center of the annulus.
     inner_radius : `float`
         The inner radius of the annulus
@@ -65,51 +98,50 @@ class CircleAnnulusPixelRegion(CompoundPixelRegion):
         plt.xlim(-5, 20)
         plt.ylim(-5, 20)
         ax.set_aspect('equal')
-
     """
+    _component_class = CirclePixelRegion
 
-    center = AnnulusCenterPix()
-    inner_radius = AnnulusInnerScalarLength("radius")
-    outer_radius = AnnulusOuterScalarLength("radius")
+    center = ScalarPix("center")
+    inner_radius = ScalarLength("inner_radius")
+    outer_radius = ScalarLength("outer_radius")
 
     def __init__(self, center, inner_radius, outer_radius, meta=None, visual=None):
-        region1 = CirclePixelRegion(center, inner_radius)
-        region2 = CirclePixelRegion(center, outer_radius)
-        super(CircleAnnulusPixelRegion, self).__init__(region1=region1,
-                                                       region2=region2,
-                                                       operator=operator.xor,
-                                                       meta=meta,
-                                                       visual=visual)
-        self._repr_params = ('inner_radius', 'outer_radius')
+        self.center = center
+        self.inner_radius = inner_radius
+        self.outer_radius = outer_radius
+        self.meta = meta or RegionMeta()
+        self.visual = visual or RegionVisual()
+        self._repr_params = ("inner_radius", "outer_radius")
 
     @property
-    def area(self):
-        return self.region2.area - self.region1.area
+    def _inner_region(self):
+        return self._component_class(self.center, self.inner_radius, self.meta, self.visual)
 
     @property
-    def bounding_box(self):
-        return self.region2.bounding_box
+    def _outer_region(self):
+        return self._component_class(self.center, self.outer_radius, self.meta, self.visual)
 
     def to_sky(self, wcs):
         center = pixel_to_skycoord(self.center.x, self.center.y, wcs)
         _, scale, _ = skycoord_to_pixel_scale_angle(center, wcs)
         inner_radius = self.inner_radius / scale * u.deg
         outer_radius = self.outer_radius / scale * u.deg
-        return CircleAnnulusSkyRegion(center, inner_radius, outer_radius,
-                                      self.meta, self.visual)
+        return CircleAnnulusSkyRegion(
+            center, inner_radius, outer_radius, self.meta, self.visual
+        )
 
 
-class CircleAnnulusSkyRegion(CompoundSkyRegion):
+class CircleAnnulusSkyRegion(SkyRegion):
     """
     A circular annulus in sky coordinates.
 
     Parameters
     ----------
-    center : :class:`~astropy.coordinates.SkyCoord`
+    center : `~astropy.coordinates.SkyCoord`
         The position of the center of the annulus.
-    inner_radius : :class:`~astropy.units.Quantity`
+    inner_radius : `~astropy.units.Quantity`
         The inner radius of the annulus in angular units
-    outer_radius : :class:`~astropy.units.Quantity`
+    outer_radius : `~astropy.units.Quantity`
         The outer radius of the annulus in angular units
     meta : `~regions.RegionMeta` object, optional
         A dictionary which stores the meta attributes of this region.
@@ -117,73 +149,93 @@ class CircleAnnulusSkyRegion(CompoundSkyRegion):
         A dictionary which stores the visual meta attributes of this region.
     """
 
-    center = AnnulusCenterSky()
-    inner_radius = AnnulusInnerQuantityLength("radius")
-    outer_radius = AnnulusOuterQuantityLength("radius")
+    center = ScalarSky("center")
+    inner_radius = QuantityLength("inner_radius")
+    outer_radius = QuantityLength("outer_radius")
 
     def __init__(self, center, inner_radius, outer_radius, meta=None, visual=None):
-        region1 = CircleSkyRegion(center, inner_radius)
-        region2 = CircleSkyRegion(center, outer_radius)
-        super(CircleAnnulusSkyRegion, self).__init__(region1=region1,
-                                                     operator=operator.xor,
-                                                     region2=region2,
-                                                     meta=meta,
-                                                     visual=visual)
-        self._repr_params = ('inner_radius', 'outer_radius')
+        self.center = center
+        self.inner_radius = inner_radius
+        self.outer_radius = outer_radius
+        self.meta = meta or RegionMeta()
+        self.visual = visual or RegionVisual()
+        self._repr_params = ("inner_radius", "outer_radius")
 
     def to_pixel(self, wcs):
         center, scale, _ = skycoord_to_pixel_scale_angle(self.center, wcs)
         # FIXME: The following line is needed to get a scalar PixCoord
         center = PixCoord(float(center.x), float(center.y))
-        inner_radius = self.inner_radius.to('deg').value * scale
-        outer_radius = self.outer_radius.to('deg').value * scale
-        return CircleAnnulusPixelRegion(center, inner_radius, outer_radius,
-                                        self.meta, self.visual)
+        inner_radius = self.inner_radius.to("deg").value * scale
+        outer_radius = self.outer_radius.to("deg").value * scale
+        return CircleAnnulusPixelRegion(
+            center, inner_radius, outer_radius, self.meta, self.visual
+        )
 
 
 @six.add_metaclass(abc.ABCMeta)
-class AsymmetricAnnulusPixelRegion(CompoundPixelRegion):
-    """
-    An asymmetrical annulus in pixel coordinates.
+class AsymmetricAnnulusPixelRegion(AnnulusPixelRegion):
+    """Helper class for asymmetric annuli sky regions.
 
-    region1 : `~regions.PixelRegion` object
-        The inner asymmetric region
-    region2 : `~regions.PixelRegion` object
-        The outer asymmetric region
-    meta : `~regions.RegionMeta` object, optional
-        A dictionary which stores the meta attributes of this region.
-    visual : `~regions.RegionVisual` object, optional
-        A dictionary which stores the visual meta attributes of this region.
+    Used for ellipse and rectangle annuli below.
     """
 
-    center = AnnulusCenterPix()
-    inner_width = AnnulusInnerScalarLength('width')
-    outer_width = AnnulusOuterScalarLength('width')
-    inner_height = AnnulusInnerScalarLength('height')
-    outer_height = AnnulusOuterScalarLength('height')
-    angle = AnnulusAngle()
+    center = ScalarPix("center")
+    inner_width = ScalarLength("inner_width")
+    outer_width = ScalarLength("outer_width")
+    inner_height = ScalarLength("inner_height")
+    outer_height = ScalarLength("outer_height")
+    angle = QuantityLength("angle")
 
-    def __init__(self, region1, region2, meta=None, visual=None):
-
-        super(AsymmetricAnnulusPixelRegion, self).__init__(region1=region1,
-                                                           region2=region2,
-                                                           operator=operator.xor,
-                                                           meta=meta,
-                                                           visual=visual)
-
-        self._repr_params = ('inner_width', 'inner_height',
-                             'outer_width', 'outer_height', 'angle')
+    def __init__(
+        self,
+        center,
+        inner_width,
+        outer_width,
+        inner_height,
+        outer_height,
+        angle=0 * u.deg,
+        meta=None,
+        visual=None,
+    ):
+        self.center = center
+        self.inner_width = inner_width
+        self.outer_width = outer_width
+        self.inner_height = inner_height
+        self.outer_height = outer_height
+        self.angle = angle
+        self.meta = meta or RegionMeta()
+        self.visual = visual or RegionVisual()
+        self._repr_params = (
+            "inner_width",
+            "inner_height",
+            "outer_width",
+            "outer_height",
+            "angle",
+        )
 
     @property
-    def area(self):
-        return self.region2.area - self.region1.area
+    def _inner_region(self):
+        return self._component_class(
+            self.center,
+            self.inner_width,
+            self.inner_height,
+            self.angle,
+            self.meta,
+            self.visual,
+        )
 
     @property
-    def bounding_box(self):
-        return self.region2.bounding_box
+    def _outer_region(self):
+        return self._component_class(
+            self.center,
+            self.outer_width,
+            self.outer_height,
+            self.angle,
+            self.meta,
+            self.visual,
+        )
 
     def to_sky_args(self, wcs):
-
         center = pixel_to_skycoord(self.center.x, self.center.y, wcs)
         _, scale, north_angle = skycoord_to_pixel_scale_angle(center, wcs)
 
@@ -197,48 +249,53 @@ class AsymmetricAnnulusPixelRegion(CompoundPixelRegion):
 
 
 @six.add_metaclass(abc.ABCMeta)
-class AsymmetricAnnulusSkyRegion(CompoundSkyRegion):
-    """
-    A rectangular annulus in `~astropy.coordinates.SkyCoord` coordinates.
+class AsymmetricAnnulusSkyRegion(SkyRegion):
+    """Helper class for asymmetric annuli sky regions.
 
-    Parameters
-    ----------
-    region1 : `~regions.SkyRegion` object
-        The inner asymmetric region
-    region2 : `~regions.SkyRegion` object
-        The outer asymmetric region
-    meta : `~regions.RegionMeta` object, optional
-        A dictionary which stores the meta attributes of this region.
-    visual : `~regions.RegionVisual` object, optional
-        A dictionary which stores the visual meta attributes of this region.
+    Used for ellipse and rectangle annuli below.
     """
 
-    center = AnnulusCenterSky()
-    inner_width = AnnulusInnerQuantityLength('width')
-    outer_width = AnnulusOuterQuantityLength('width')
-    inner_height = AnnulusInnerQuantityLength('height')
-    outer_height = AnnulusOuterQuantityLength('height')
-    angle = AnnulusAngle()
+    center = ScalarSky("center")
+    inner_width = QuantityLength("inner_width")
+    outer_width = QuantityLength("outer_width")
+    inner_height = QuantityLength("inner_height")
+    outer_height = QuantityLength("outer_height")
+    angle = QuantityLength("angle")
 
-    def __init__(self, region1, region2, meta=None, visual=None):
-
-        super(AsymmetricAnnulusSkyRegion, self).__init__(region1=region1,
-                                                         region2=region2,
-                                                         operator=operator.xor,
-                                                         meta=meta,
-                                                         visual=visual)
-
-        self._repr_params = ('inner_width', 'inner_height',
-                             'outer_width', 'outer_height', 'angle')
+    def __init__(
+        self,
+        center,
+        inner_width,
+        outer_width,
+        inner_height,
+        outer_height,
+        angle=0 * u.deg,
+        meta=None,
+        visual=None,
+    ):
+        self.center = center
+        self.inner_width = inner_width
+        self.outer_width = outer_width
+        self.inner_height = inner_height
+        self.outer_height = outer_height
+        self.angle = angle
+        self.meta = meta or RegionMeta()
+        self.visual = visual or RegionVisual()
+        self._repr_params = (
+            "inner_width",
+            "inner_height",
+            "outer_width",
+            "outer_height",
+            "angle",
+        )
 
     def to_pixel_args(self, wcs):
-        center, scale, north_angle = skycoord_to_pixel_scale_angle(self.center,
-                                                                   wcs)
+        center, scale, north_angle = skycoord_to_pixel_scale_angle(self.center, wcs)
         center = PixCoord(center.x, center.y)
-        inner_width = self.inner_width.to('deg').value * scale
-        inner_height = self.inner_height.to('deg').value * scale
-        outer_width = self.outer_width.to('deg').value * scale
-        outer_height = self.outer_height.to('deg').value * scale
+        inner_width = self.inner_width.to("deg").value * scale
+        inner_height = self.inner_height.to("deg").value * scale
+        outer_width = self.outer_width.to("deg").value * scale
+        outer_height = self.outer_height.to("deg").value * scale
         angle = self.angle + (north_angle - 90 * u.deg)
 
         return center, inner_width, inner_height, outer_width, outer_height, angle
@@ -299,20 +356,12 @@ class EllipseAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
         plt.ylim(-5, 20)
         ax.set_aspect('equal')
     """
-
-    def __init__(self, center, inner_width, inner_height, outer_width,
-                 outer_height, angle=0 * u.deg, meta=None, visual=None):
-        region1 = EllipsePixelRegion(center, inner_width, inner_height, angle)
-        region2 = EllipsePixelRegion(center, outer_width, outer_height, angle)
-
-        super(EllipseAnnulusPixelRegion, self).__init__(region1=region1,
-                                                        region2=region2,
-                                                        meta=meta,
-                                                        visual=visual)
+    _component_class = EllipsePixelRegion
 
     def to_sky(self, wcs):
-        return EllipseAnnulusSkyRegion(*self.to_sky_args(wcs),
-                                       meta=self.meta, visual=self.visual)
+        return EllipseAnnulusSkyRegion(
+            *self.to_sky_args(wcs), meta=self.meta, visual=self.visual
+        )
 
 
 class EllipseAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
@@ -340,20 +389,12 @@ class EllipseAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
     visual : `~regions.RegionVisual` object, optional
         A dictionary which stores the visual meta attributes of this region.
     """
-
-    def __init__(self, center, inner_width, inner_height, outer_width,
-                 outer_height, angle=0 * u.deg, meta=None, visual=None):
-        region1 = EllipseSkyRegion(center, inner_width, inner_height, angle)
-        region2 = EllipseSkyRegion(center, outer_width, outer_height, angle)
-
-        super(EllipseAnnulusSkyRegion, self).__init__(region1=region1,
-                                                      region2=region2,
-                                                      meta=meta,
-                                                      visual=visual)
+    _component_class = EllipseSkyRegion
 
     def to_pixel(self, wcs):
-        return EllipseAnnulusPixelRegion(*self.to_pixel_args(wcs),
-                                         meta=self.meta, visual=self.visual)
+        return EllipseAnnulusPixelRegion(
+            *self.to_pixel_args(wcs), meta=self.meta, visual=self.visual
+        )
 
 
 class RectangleAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
@@ -411,18 +452,12 @@ class RectangleAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
         plt.ylim(-5, 20)
         ax.set_aspect('equal')
     """
-
-    def __init__(self, center, inner_width, inner_height, outer_width,
-                 outer_height, angle=0 * u.deg, meta=None, visual=None):
-        region1 = RectanglePixelRegion(center, inner_width, inner_height, angle)
-        region2 = RectanglePixelRegion(center, outer_width, outer_height, angle)
-
-        super(RectangleAnnulusPixelRegion, self).__init__(
-            region1=region1, region2=region2, meta=meta, visual=visual)
+    _component_class = RectanglePixelRegion
 
     def to_sky(self, wcs):
-        return RectangleAnnulusSkyRegion(*self.to_sky_args(wcs),
-                                         meta=self.meta, visual=self.visual)
+        return RectangleAnnulusSkyRegion(
+            *self.to_sky_args(wcs), meta=self.meta, visual=self.visual
+        )
 
 
 class RectangleAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
@@ -450,15 +485,9 @@ class RectangleAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
     visual : `~regions.RegionVisual` object, optional
         A dictionary which stores the visual meta attributes of this region.
     """
-
-    def __init__(self, center, inner_width, inner_height, outer_width,
-                 outer_height, angle=0 * u.deg, meta=None, visual=None):
-        region1 = RectangleSkyRegion(center, inner_width, inner_height, angle)
-        region2 = RectangleSkyRegion(center, outer_width, outer_height, angle)
-
-        super(RectangleAnnulusSkyRegion, self).__init__(
-            region1=region1, region2=region2, meta=meta, visual=visual)
+    _component_class = RectangleSkyRegion
 
     def to_pixel(self, wcs):
-        return RectangleAnnulusPixelRegion(*self.to_pixel_args(wcs),
-                                           meta=self.meta, visual=self.visual)
+        return RectangleAnnulusPixelRegion(
+            *self.to_pixel_args(wcs), meta=self.meta, visual=self.visual
+        )
