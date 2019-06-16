@@ -12,58 +12,60 @@ from ...core import PixCoord, CompoundPixelRegion
 from ...tests.helpers import make_simple_wcs
 
 
-def test_compound_pixel():
+class TestCompoundPixel(object):
     # Two circles that overlap in one column
-    pixcoord1 = PixCoord(5, 5)
-    c1 = CirclePixelRegion(pixcoord1, 4)
-    pixcoord2 = PixCoord(11, 5)
-    c2 = CirclePixelRegion(pixcoord2, 4)
+    c1 = CirclePixelRegion(PixCoord(5, 5), 4)
+    c2 = CirclePixelRegion(PixCoord(11, 5), 4)
 
-    union = c1 | c2
-    assert isinstance(union, CompoundPixelRegion)
-    mask = union.to_mask()
-    assert_allclose(mask.data[:,7], [0, 0, 1, 1, 1, 1, 1, 0, 0])
-    assert_allclose(mask.data[:,6], [0, 1, 1, 1, 1, 1, 1, 1, 0])
+    def test_union(self):
+        union = self.c1 | self.c2
+        assert isinstance(union, CompoundPixelRegion)
+        mask = union.to_mask()
+        assert_allclose(mask.data[:, 7], [0, 0, 1, 1, 1, 1, 1, 0, 0])
+        assert_allclose(mask.data[:, 6], [0, 1, 1, 1, 1, 1, 1, 1, 0])
 
-    intersection = c1 & c2
-    mask = intersection.to_mask()
-    assert_allclose(mask.data[:,7], [0, 0, 1, 1, 1, 1, 1, 0, 0])
-    assert_allclose(mask.data[:,6], [0, 0, 0, 0, 0, 0, 0, 0, 0])
+    def test_intersection(self):
+        intersection = self.c1 & self.c2
+        mask = intersection.to_mask()
+        assert_allclose(mask.data[:, 7], [0, 0, 1, 1, 1, 1, 1, 0, 0])
+        assert_allclose(mask.data[:, 6], [0, 0, 0, 0, 0, 0, 0, 0, 0])
 
-    symdiff = c1 ^ c2
-    mask = symdiff.to_mask()
-    assert_allclose(mask.data[:,7], [0, 0, 0, 0, 0, 0, 0, 0, 0])
-    assert_allclose(mask.data[:,6], [0, 1, 1, 1, 1, 1, 1, 1, 0])
+    def test_symdiff(self):
+        symdiff = self.c1 ^ self.c2
+        mask = symdiff.to_mask()
+        assert_allclose(mask.data[:, 7], [0, 0, 0, 0, 0, 0, 0, 0, 0])
+        assert_allclose(mask.data[:, 6], [0, 1, 1, 1, 1, 1, 1, 1, 0])
 
-    # fixes #168
-    pixcoord3 = PixCoord(1, 1)
-    c3 = CirclePixelRegion(pixcoord3, 4)
-    union2 = c1 | c3
-    mask1 = union2.to_mask()
+    def test_to_mask(self):
+        # fixes #168
+        pixcoord3 = PixCoord(1, 1)
+        c3 = CirclePixelRegion(pixcoord3, 4)
+        union2 = self.c1 | c3
+        mask1 = union2.to_mask()
 
-    pixcoord4 = PixCoord(9, 9)
-    c4 = CirclePixelRegion(pixcoord4, 4)
-    union3 = c1 | c4
-    mask2 = union3.to_mask()
+        pixcoord4 = PixCoord(9, 9)
+        c4 = CirclePixelRegion(pixcoord4, 4)
+        union3 = self.c1 | c4
+        mask2 = union3.to_mask()
 
-    # mask1 and mask2 should be equal
-    assert_allclose(mask1.data, mask2.data)
+        # mask1 and mask2 should be equal
+        assert_allclose(mask1.data, mask2.data)
 
-    ref_data = np.array([[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                         [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0],
-                         [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0],
-                         [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0],
-                         [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0],
-                         [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-                         [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-                         [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-                         [0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0],
-                         [0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0],
-                         [0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0],
-                         [0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0],
-                         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
-                        )
-    assert_allclose(mask1.data, ref_data)
+        ref_data = np.array([[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                             [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0],
+                             [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0],
+                             [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0],
+                             [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0],
+                             [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+                             [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+                             [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+                             [0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0],
+                             [0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0],
+                             [0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0],
+                             [0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0],
+                             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
+                            )
+        assert_allclose(mask1.data, ref_data)
 
 
 def test_compound_sky():
