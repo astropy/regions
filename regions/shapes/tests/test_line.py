@@ -37,6 +37,13 @@ class TestLinePixelRegion(BaseTestPixelRegion):
     expected_repr = '<LinePixelRegion(start=PixCoord(x=3, y=4), end=PixCoord(x=4, y=4))>'
     expected_str = 'Region: LinePixelRegion\nstart: PixCoord(x=3, y=4)\nend: PixCoord(x=4, y=4)'
 
+    def test_copy(self):
+        reg = self.reg.copy()
+        assert reg.start.xy == (3, 4)
+        assert reg.end.xy == (4, 4)
+        assert reg.visual == {}
+        assert reg.meta == {}
+
     def test_pix_sky_roundtrip(self):
         wcs = make_simple_wcs(SkyCoord(2 * u.deg, 3 * u.deg), 0.1 * u.deg, 20)
         reg_new = self.reg.to_sky(wcs).to_pixel(wcs)
@@ -63,6 +70,13 @@ class TestLineSkyRegion(BaseTestSkyRegion):
     expected_str = ('Region: LineSkyRegion\nstart: <SkyCoord (Galactic): (l, b) in deg\n'
                     '    ( 3.,  4.)>\nend: <SkyCoord (Galactic): (l, b) in deg\n'
                     '    ( 3.,  5.)>')
+
+    def test_copy(self):
+        reg = self.reg.copy()
+        assert_allclose(reg.start.b.deg, 4)
+        assert_allclose(reg.end.b.deg, 5)
+        assert reg.visual == {}
+        assert reg.meta == {}
 
     def test_transformation(self, wcs):
         pixline = self.reg.to_pixel(wcs)

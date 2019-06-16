@@ -33,7 +33,8 @@ PIXEL_REGIONS = [
     PolygonPixelRegion(PixCoord([1, 4, 3], [2, 4, 4])),
     RectanglePixelRegion(PixCoord(6, 5), width=3, height=5),
     RectangleAnnulusPixelRegion(PixCoord(6, 5), 3, 6, 5, 7),
-    PointPixelRegion(PixCoord(1, 2))]
+    PointPixelRegion(PixCoord(1, 2)),
+]
 
 SKY_REGIONS = [
     CircleSkyRegion(SkyCoord(3 * u.deg, 4 * u.deg), radius=5 * u.deg),
@@ -45,8 +46,9 @@ SKY_REGIONS = [
     PolygonSkyRegion(SkyCoord([1, 4, 3] * u.deg, [2, 4, 4] * u.deg)),
     RectangleSkyRegion(SkyCoord(6 * u.deg, 5 * u.deg), width=3 * u.deg, height=5 * u.deg),
     RectangleAnnulusSkyRegion(SkyCoord(6 * u.deg, 5 * u.deg), 3 * u.deg, 5 * u.deg,
-                       5 * u.deg, 7 * u.deg),
-    PointSkyRegion(SkyCoord(6 * u.deg, 5 * u.deg))]
+                              5 * u.deg, 7 * u.deg),
+    PointSkyRegion(SkyCoord(6 * u.deg, 5 * u.deg)),
+]
 
 MASK_MODES = ['center', 'exact', 'subpixels']
 COMMON_WCS = WCS(naxis=2)
@@ -62,7 +64,6 @@ def ids_func(arg):
 
 @pytest.mark.parametrize('region', PIXEL_REGIONS, ids=ids_func)
 def test_pix_in(region):
-    #TODO: needs to be implemented for some regions.
     PixCoord(1, 1) in region
 
 
@@ -76,7 +77,7 @@ def test_pix_area(region):
     assert not isinstance(area, u.Quantity)
 
 
-@pytest.mark.parametrize(('region'), PIXEL_REGIONS, ids=ids_func)
+@pytest.mark.parametrize('region', PIXEL_REGIONS, ids=ids_func)
 def test_pix_to_sky(region):
     try:
         sky_region = region.to_sky(COMMON_WCS)
@@ -100,9 +101,10 @@ def test_pix_to_mask(region, mode):
 def test_sky_in(region):
     region.contains(SkyCoord(1 * u.deg, 1 * u.deg, frame='icrs'), COMMON_WCS)
 
+
 @pytest.mark.parametrize('region', SKY_REGIONS, ids=ids_func)
 def test_sky_in_array(region):
-    region.contains(SkyCoord([1,2,3] * u.deg, [3,2,1] * u.deg, frame='icrs'), COMMON_WCS)
+    region.contains(SkyCoord([1, 2, 3] * u.deg, [3, 2, 1] * u.deg, frame='icrs'), COMMON_WCS)
 
 
 @pytest.mark.parametrize('region', SKY_REGIONS, ids=ids_func)
@@ -113,7 +115,6 @@ def test_sky_to_pix(region):
 
 @pytest.mark.parametrize('region', PIXEL_REGIONS, ids=ids_func)
 def test_attribute_validation_pixel_regions(region):
-
     invalid_values = dict(center=[PixCoord([1, 2], [2, 3]), 1,
                                   SkyCoord(1 * u.deg, 2 * u.deg)],
                           radius=[u.Quantity("1deg"), [1], PixCoord(1, 2)],
@@ -143,7 +144,6 @@ def test_attribute_validation_pixel_regions(region):
 
 @pytest.mark.parametrize('region', SKY_REGIONS, ids=ids_func)
 def test_attribute_validation_sky_regions(region):
-
     invalid_values = dict(center=[PixCoord([1, 2], [2, 3]), 1,
                                   SkyCoord([1 * u.deg], [2 * u.deg])],
                           radius=[u.Quantity([1 * u.deg, 5 * u.deg]),
