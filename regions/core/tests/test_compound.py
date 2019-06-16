@@ -1,6 +1,6 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 from __future__ import absolute_import, division, print_function, unicode_literals
-
+import operator
 import numpy as np
 from numpy.testing import assert_allclose
 
@@ -16,6 +16,23 @@ class TestCompoundPixel(object):
     # Two circles that overlap in one column
     c1 = CirclePixelRegion(PixCoord(5, 5), 4)
     c2 = CirclePixelRegion(PixCoord(11, 5), 4)
+
+    def test_copy(self):
+        reg = (self.c1 | self.c2).copy()
+        assert isinstance(reg, CompoundPixelRegion)
+        assert reg.operator == operator.or_
+
+        assert isinstance(reg.region1, CirclePixelRegion)
+        assert reg.region1.center.xy == (5, 5)
+        assert reg.region1.radius == 4
+        assert reg.region1.meta == {}
+        assert reg.region1.visual == {}
+
+        assert isinstance(reg.region2, CirclePixelRegion)
+        assert reg.region2.center.xy == (11, 5)
+        assert reg.region2.radius == 4
+        assert reg.region2.meta == {}
+        assert reg.region2.visual == {}
 
     def test_union(self):
         union = self.c1 | self.c2
