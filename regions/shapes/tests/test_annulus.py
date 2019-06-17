@@ -43,6 +43,10 @@ class TestCircleAnnulusPixelRegion(BaseTestPixelRegion):
         skyannulus = self.reg.to_sky(wcs=self.wcs)
         assert isinstance(skyannulus, CircleAnnulusSkyRegion)
 
+    def test_rotate(self):
+        reg = self.reg.rotate(PixCoord(2, 3), 90 * u.deg)
+        assert_allclose(reg.center.xy, (1, 4))
+
 
 class TestCircleAnnulusSkyRegion(BaseTestSkyRegion):
     reg = CircleAnnulusSkyRegion(SkyCoord(3 * u.deg, 4 * u.deg), 20 * u.arcsec, 30 * u.arcsec)
@@ -116,6 +120,11 @@ class TestEllipseAnnulusPixelRegion(BaseTestPixelRegion):
     def test_transformation(self):
         skyannulus = self.reg.to_sky(wcs=self.wcs)
         assert isinstance(skyannulus, EllipseAnnulusSkyRegion)
+
+    def test_rotate(self):
+        reg = self.reg.rotate(PixCoord(2, 3), 90 * u.deg)
+        assert_allclose(reg.center.xy, (1, 4))
+        assert_allclose(reg.angle.to_value("deg"), 90)
 
 
 class TestEllipseAnnulusSkyRegion(BaseTestSkyRegion):
@@ -195,6 +204,11 @@ class TestRectangleAnnulusPixelRegion(BaseTestPixelRegion):
     def test_transformation(self):
         skyannulus = self.reg.to_sky(wcs=self.wcs)
         assert isinstance(skyannulus, RectangleAnnulusSkyRegion)
+
+    def test_rotate(self):
+        reg = self.reg.rotate(PixCoord(2, 3), 90 * u.deg)
+        assert_allclose(reg.center.xy, (1, 4))
+        assert_allclose(reg.angle.to_value("deg"), 90)
 
 
 class TestRectangleAnnulusSkyRegion(BaseTestSkyRegion):

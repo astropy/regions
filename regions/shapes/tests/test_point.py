@@ -58,6 +58,10 @@ class TestPointPixelRegion(BaseTestPixelRegion):
 
         assert artist.get_data() == ([2], [3])
 
+    def test_rotate(self):
+        reg = self.reg.rotate(PixCoord(2, 3), 90 * u.deg)
+        assert_allclose(reg.center.xy, (1, 4))
+
 
 class TestPointSkyRegion(BaseTestSkyRegion):
 

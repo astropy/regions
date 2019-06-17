@@ -57,6 +57,11 @@ class TestLinePixelRegion(BaseTestPixelRegion):
         patch = self.reg.as_artist()
         assert 'Arrow' in str(patch)
 
+    def test_rotate(self):
+        reg = self.reg.rotate(PixCoord(2, 3), 90 * u.deg)
+        assert_allclose(reg.start.xy, (1, 4))
+        assert_allclose(reg.end.xy, (1, 5))
+
 
 class TestLineSkyRegion(BaseTestSkyRegion):
 
