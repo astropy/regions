@@ -57,6 +57,29 @@ class AnnulusPixelRegion(PixelRegion):
     def to_mask(self, mode="center", subpixels=5):
         return self._compound_region.to_mask(mode, subpixels)
 
+    def rotate(self, center, angle):
+        """Make a rotated region.
+
+        Rotates counter-clockwise for positive ``angle``.
+
+        Parameters
+        ----------
+        center : `PixCoord`
+            Rotation center point
+        angle : `~astropy.coordinates.Angle`
+            Rotation angle
+
+        Returns
+        -------
+        region : `PixelRegion`
+            Rotated region (an independent copy)
+        """
+        changes = {}
+        changes["center"] = self.center.rotate(center, angle)
+        if hasattr(self, "angle"):
+            changes["angle"] = self.angle + angle
+        return self.copy(**changes)
+
 
 class CircleAnnulusPixelRegion(AnnulusPixelRegion):
     """
@@ -187,15 +210,15 @@ class AsymmetricAnnulusPixelRegion(AnnulusPixelRegion):
     angle = QuantityLength("angle")
 
     def __init__(
-        self,
-        center,
-        inner_width,
-        outer_width,
-        inner_height,
-        outer_height,
-        angle=0 * u.deg,
-        meta=None,
-        visual=None,
+            self,
+            center,
+            inner_width,
+            outer_width,
+            inner_height,
+            outer_height,
+            angle=0 * u.deg,
+            meta=None,
+            visual=None,
     ):
         self.center = center
         self.inner_width = inner_width
@@ -263,15 +286,15 @@ class AsymmetricAnnulusSkyRegion(SkyRegion):
     angle = QuantityLength("angle")
 
     def __init__(
-        self,
-        center,
-        inner_width,
-        outer_width,
-        inner_height,
-        outer_height,
-        angle=0 * u.deg,
-        meta=None,
-        visual=None,
+            self,
+            center,
+            inner_width,
+            outer_width,
+            inner_height,
+            outer_height,
+            angle=0 * u.deg,
+            meta=None,
+            visual=None,
     ):
         self.center = center
         self.inner_width = inner_width

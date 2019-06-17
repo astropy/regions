@@ -165,6 +165,27 @@ class CompoundPixelRegion(PixelRegion):
     def area(self):
         raise NotImplementedError
 
+    def rotate(self, center, angle):
+        """Make a rotated region.
+
+        Rotates counter-clockwise for positive ``angle``.
+
+        Parameters
+        ----------
+        center : `PixCoord`
+            Rotation center point
+        angle : `~astropy.coordinates.Angle`
+            Rotation angle
+
+        Returns
+        -------
+        region : `CompoundPixelRegion`
+            Rotated region (an independent copy)
+        """
+        region1 = self.region1.rotate(center, angle)
+        region2 = self.region2.rotate(center, angle)
+        return self.copy(region1=region1, region2=region2)
+
 
 class CompoundSkyRegion(SkyRegion):
     """

@@ -133,6 +133,27 @@ class LinePixelRegion(PixelRegion):
 
         return Arrow(x, y, dx, dy, **mpl_params)
 
+    def rotate(self, center, angle):
+        """Make a rotated region.
+
+        Rotates counter-clockwise for positive ``angle``.
+
+        Parameters
+        ----------
+        center : `PixCoord`
+            Rotation center point
+        angle : `~astropy.coordinates.Angle`
+            Rotation angle
+
+        Returns
+        -------
+        region : `LinePixelRegion`
+            Rotated region (an independent copy)
+        """
+        start = self.start.rotate(center, angle)
+        end = self.end.rotate(center, angle)
+        return self.copy(start=start, end=end)
+
 
 class LineSkyRegion(SkyRegion):
     """

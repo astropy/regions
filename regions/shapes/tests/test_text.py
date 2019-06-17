@@ -47,6 +47,10 @@ class TestTextPixelRegion(BaseTestPixelRegion):
         assert_allclose(reg_new.center.x, self.reg.center.x)
         assert_allclose(reg_new.center.y, self.reg.center.y)
 
+    def test_rotate(self):
+        reg = self.reg.rotate(PixCoord(2, 3), 90 * u.deg)
+        assert_allclose(reg.center.xy, (1, 4))
+
 
 class TestTextSkyRegion(BaseTestSkyRegion):
     reg = TextSkyRegion(SkyCoord(3, 4, unit='deg'), "Sample Text")

@@ -34,6 +34,23 @@ class TestCompoundPixel(object):
         assert reg.region2.meta == {}
         assert reg.region2.visual == {}
 
+    def test_rotate(self):
+        reg = (self.c1 | self.c2).rotate(PixCoord(0, 0), 360 * u.deg)
+        assert isinstance(reg, CompoundPixelRegion)
+        assert reg.operator == operator.or_
+
+        assert isinstance(reg.region1, CirclePixelRegion)
+        assert_allclose(reg.region1.center.xy, (5, 5))
+        assert reg.region1.radius == 4
+        assert reg.region1.meta == {}
+        assert reg.region1.visual == {}
+
+        assert isinstance(reg.region2, CirclePixelRegion)
+        assert_allclose(reg.region2.center.xy, (11, 5))
+        assert reg.region2.radius == 4
+        assert reg.region2.meta == {}
+        assert reg.region2.visual == {}
+
     def test_union(self):
         union = self.c1 | self.c2
         assert isinstance(union, CompoundPixelRegion)

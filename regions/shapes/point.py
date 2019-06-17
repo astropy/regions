@@ -115,6 +115,26 @@ class PointPixelRegion(PixelRegion):
 
         return point
 
+    def rotate(self, center, angle):
+        """Make a rotated region.
+
+        Rotates counter-clockwise for positive ``angle``.
+
+        Parameters
+        ----------
+        center : `PixCoord`
+            Rotation center point
+        angle : `~astropy.coordinates.Angle`
+            Rotation angle
+
+        Returns
+        -------
+        region : `PointPixelRegion`
+            Rotated region (an independent copy)
+        """
+        center = self.center.rotate(center, angle)
+        return self.copy(center=center)
+
 
 class PointSkyRegion(SkyRegion):
     """
