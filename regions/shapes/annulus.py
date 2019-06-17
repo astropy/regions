@@ -276,7 +276,14 @@ class AsymmetricAnnulusSkyRegion(SkyRegion):
 
     Used for ellipse and rectangle annuli below.
     """
-
+    _fields = (
+        "center",
+        "inner_width",
+        "inner_height",
+        "outer_width",
+        "outer_height",
+        "angle",
+    )
     center = ScalarSky("center")
     inner_width = QuantityLength("inner_width")
     outer_width = QuantityLength("outer_width")
@@ -303,14 +310,6 @@ class AsymmetricAnnulusSkyRegion(SkyRegion):
         self.angle = angle
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
-        self._fields = (
-            "center",
-            "inner_width",
-            "inner_height",
-            "outer_width",
-            "outer_height",
-            "angle",
-        )
 
     def to_pixel_args(self, wcs):
         center, scale, north_angle = skycoord_to_pixel_scale_angle(self.center, wcs)
