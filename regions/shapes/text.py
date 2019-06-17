@@ -46,12 +46,11 @@ class TextPixelRegion(PointPixelRegion):
         plt.ylim(2.5, 20)
         ax.set_aspect('equal')
     """
+    _repr_params = ('text',)
 
     def __init__(self, center, text, meta=None, visual=None):
-
         super(TextPixelRegion, self).__init__(center, meta, visual)
         self.text = text
-        self._repr_params = ('text',)
 
     def to_sky(self, wcs):
         center = pixel_to_skycoord(self.center.x, self.center.y, wcs=wcs)
@@ -99,11 +98,11 @@ class TextSkyRegion(PointSkyRegion):
     visual : `~regions.RegionVisual` object, optional
         A dictionary which stores the visual meta attributes of this region.
     """
-    def __init__(self, center, text, meta=None, visual=None):
+    _repr_params = ('text',)
 
+    def __init__(self, center, text, meta=None, visual=None):
         super(TextSkyRegion, self).__init__(center,  meta, visual)
         self.text = text
-        self._repr_params = ('text',)
 
     def to_pixel(self, wcs):
         center_x, center_y = skycoord_to_pixel(self.center, wcs=wcs)

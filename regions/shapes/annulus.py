@@ -124,6 +124,7 @@ class CircleAnnulusPixelRegion(AnnulusPixelRegion):
     """
     _component_class = CirclePixelRegion
 
+    _repr_params = ("inner_radius", "outer_radius")
     center = ScalarPix("center")
     inner_radius = ScalarLength("inner_radius")
     outer_radius = ScalarLength("outer_radius")
@@ -134,7 +135,6 @@ class CircleAnnulusPixelRegion(AnnulusPixelRegion):
         self.outer_radius = outer_radius
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
-        self._repr_params = ("inner_radius", "outer_radius")
 
     @property
     def _inner_region(self):
@@ -171,7 +171,7 @@ class CircleAnnulusSkyRegion(SkyRegion):
     visual : `~regions.RegionVisual` object, optional
         A dictionary which stores the visual meta attributes of this region.
     """
-
+    _repr_params = ("inner_radius", "outer_radius")
     center = ScalarSky("center")
     inner_radius = QuantityLength("inner_radius")
     outer_radius = QuantityLength("outer_radius")
@@ -182,7 +182,6 @@ class CircleAnnulusSkyRegion(SkyRegion):
         self.outer_radius = outer_radius
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
-        self._repr_params = ("inner_radius", "outer_radius")
 
     def to_pixel(self, wcs):
         center, scale, _ = skycoord_to_pixel_scale_angle(self.center, wcs)
@@ -201,7 +200,13 @@ class AsymmetricAnnulusPixelRegion(AnnulusPixelRegion):
 
     Used for ellipse and rectangle annuli below.
     """
-
+    _repr_params = (
+        "inner_width",
+        "inner_height",
+        "outer_width",
+        "outer_height",
+        "angle",
+    )
     center = ScalarPix("center")
     inner_width = ScalarLength("inner_width")
     outer_width = ScalarLength("outer_width")
@@ -228,13 +233,6 @@ class AsymmetricAnnulusPixelRegion(AnnulusPixelRegion):
         self.angle = angle
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
-        self._repr_params = (
-            "inner_width",
-            "inner_height",
-            "outer_width",
-            "outer_height",
-            "angle",
-        )
 
     @property
     def _inner_region(self):

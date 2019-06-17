@@ -52,7 +52,7 @@ class LinePixelRegion(PixelRegion):
         plt.ylim(0, 30)
         ax.set_aspect('equal')
     """
-
+    _repr_params = ('start', 'end')
     start = ScalarPix('start')
     end = ScalarPix('end')
 
@@ -61,7 +61,6 @@ class LinePixelRegion(PixelRegion):
         self.end = end
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
-        self._repr_params = ('start', 'end')
 
     @property
     def area(self):
@@ -170,7 +169,7 @@ class LineSkyRegion(SkyRegion):
     visual : `~regions.RegionVisual` object, optional
         A dictionary which stores the visual meta attributes of this region.
     """
-
+    _repr_params = ('start', 'end')
     start = ScalarSky('start')
     end = ScalarSky('end')
 
@@ -179,7 +178,6 @@ class LineSkyRegion(SkyRegion):
         self.end = end
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
-        self._repr_params = ('start', 'end')
 
     def contains(self, skycoord, wcs):
         if self.meta.get('include', True):

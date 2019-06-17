@@ -62,7 +62,7 @@ class RectanglePixelRegion(PixelRegion):
         plt.ylim(0, 20)
         ax.set_aspect('equal')
     """
-
+    _repr_params = ('width', 'height', 'angle')
     center = ScalarPix('center')
     width = ScalarLength('width')
     height = ScalarLength('height')
@@ -75,7 +75,6 @@ class RectanglePixelRegion(PixelRegion):
         self.angle = angle
         self.meta = meta or {}
         self.visual = visual or {}
-        self._repr_params = ('width', 'height', 'angle')
 
     @property
     def area(self):
@@ -282,7 +281,7 @@ class RectangleSkyRegion(SkyRegion):
     visual : `~regions.RegionVisual` object, optional
         A dictionary which stores the visual meta attributes of this region.
     """
-
+    _repr_params = ('width', 'height', 'angle')
     center = ScalarSky('center')
     width = QuantityLength('width')
     height = QuantityLength('height')
@@ -295,7 +294,6 @@ class RectangleSkyRegion(SkyRegion):
         self.angle = angle
         self.meta = meta or {}
         self.visual = visual or {}
-        self._repr_params = ('width', 'height', 'angle')
 
     def to_pixel(self, wcs):
         center, scale, north_angle = skycoord_to_pixel_scale_angle(self.center, wcs)

@@ -49,14 +49,13 @@ class PointPixelRegion(PixelRegion):
         ax.set_aspect('equal')
 
     """
-
+    _repr_params = tuple()
     center = ScalarPix('center')
 
     def __init__(self, center, meta=None, visual=None):
         self.center = center
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
-        self._repr_params = tuple()
 
     @property
     def area(self):
@@ -149,14 +148,13 @@ class PointSkyRegion(SkyRegion):
     visual : `~regions.RegionVisual` object, optional
         A dictionary which stores the visual meta attributes of this region.
     """
-
+    _repr_params = tuple()
     center = ScalarSky('center')
 
     def __init__(self, center, meta=None, visual=None):
         self.center = center
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
-        self._repr_params = tuple()
 
     def contains(self, skycoord, wcs):
         if self.meta.get('include', True):

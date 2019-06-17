@@ -63,7 +63,7 @@ class EllipsePixelRegion(PixelRegion):
         ax.add_patch(patch)
 
     """
-
+    _repr_params = ('width', 'height', 'angle')
     center = ScalarPix('center')
     width = ScalarLength('width')
     height = ScalarLength('height')
@@ -77,7 +77,6 @@ class EllipsePixelRegion(PixelRegion):
         self.angle = angle
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
-        self._repr_params = ('width', 'height', 'angle')
 
     @property
     def area(self):
@@ -255,7 +254,7 @@ class EllipseSkyRegion(SkyRegion):
     visual : `~regions.RegionVisual` object, optional
         A dictionary which stores the visual meta attributes of this region.
     """
-
+    _repr_params = ('width', 'height', 'angle')
     center = ScalarSky('center')
     width = QuantityLength('width')
     height = QuantityLength('height')
@@ -268,7 +267,6 @@ class EllipseSkyRegion(SkyRegion):
         self.angle = angle
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
-        self._repr_params = ('width', 'height', 'angle')
 
     def to_pixel(self, wcs):
         center, scale, north_angle = skycoord_to_pixel_scale_angle(self.center, wcs)
