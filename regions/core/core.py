@@ -69,13 +69,7 @@ class Region(object):
 
     def copy(self, **changes):
         """Make an independent (deep) copy."""
-        fields = []
-        if hasattr(self, "center"):
-            fields.append("center")
-        if hasattr(self, "vertices"):
-            fields.append("vertices")
-        fields.extend(self._repr_params)
-        fields.extend(["meta", "visual"])
+        fields = list(self._repr_params) + ["meta", "visual"]
 
         for field in fields:
             if field not in changes:
@@ -84,10 +78,7 @@ class Region(object):
         return self.__class__(**changes)
 
     def __repr__(self):
-        if hasattr(self, 'center'):
-            params = [repr(self.center)]
-        else:
-            params = []
+        params = []
         if self._repr_params is not None:
             for key in self._repr_params:
                 params.append('{0}={1}'.format(key.replace("_", " "),
@@ -98,8 +89,6 @@ class Region(object):
 
     def __str__(self):
         cls_info = [('Region', self.__class__.__name__)]
-        if hasattr(self, 'center'):
-            cls_info.append(('center', self.center))
         if self._repr_params is not None:
             params_value = [(x.replace("_", " "), getattr(self, x))
                             for x in self._repr_params]

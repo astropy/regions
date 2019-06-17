@@ -63,7 +63,7 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
     inside = [(4.5, 4)]
     outside = [(5, 2.5)]
     expected_area = 12
-    expected_repr = '<RectanglePixelRegion(PixCoord(x=3, y=4), width=4, height=3, angle=5.0 deg)>'
+    expected_repr = '<RectanglePixelRegion(center=PixCoord(x=3, y=4), width=4, height=3, angle=5.0 deg)>'
     expected_str = ('Region: RectanglePixelRegion\ncenter: PixCoord(x=3, y=4)\n'
                     'width: 4\nheight: 3\nangle: 5.0 deg')
 
@@ -149,7 +149,7 @@ class TestRectangleSkyRegion(BaseTestSkyRegion):
         angle=5 * u.deg,
     )
 
-    expected_repr = ('<RectangleSkyRegion(<SkyCoord (ICRS): (ra, dec) in '
+    expected_repr = ('<RectangleSkyRegion(center=<SkyCoord (ICRS): (ra, dec) in '
                 'deg\n    ( 3.,  4.)>, width=4.0 deg, height=3.0 '
                 'deg, angle=5.0 deg)>')
     expected_str = ('Region: RectangleSkyRegion\ncenter: <SkyCoord '

@@ -49,7 +49,7 @@ class PointPixelRegion(PixelRegion):
         ax.set_aspect('equal')
 
     """
-    _repr_params = tuple()
+    _repr_params = ('center',)
     center = ScalarPix('center')
 
     def __init__(self, center, meta=None, visual=None):
@@ -148,7 +148,7 @@ class PointSkyRegion(SkyRegion):
     visual : `~regions.RegionVisual` object, optional
         A dictionary which stores the visual meta attributes of this region.
     """
-    _repr_params = tuple()
+    _repr_params = ('center',)
     center = ScalarSky('center')
 
     def __init__(self, center, meta=None, visual=None):

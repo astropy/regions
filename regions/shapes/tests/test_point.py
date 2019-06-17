@@ -33,7 +33,7 @@ class TestPointPixelRegion(BaseTestPixelRegion):
     inside = []
     outside = [(3.1, 4.2), (5, 4)]
     expected_area = 0
-    expected_repr = '<PointPixelRegion(PixCoord(x=3, y=4))>'
+    expected_repr = '<PointPixelRegion(center=PixCoord(x=3, y=4))>'
     expected_str = 'Region: PointPixelRegion\ncenter: PixCoord(x=3, y=4)'
 
     def test_copy(self):
@@ -67,7 +67,7 @@ class TestPointSkyRegion(BaseTestSkyRegion):
 
     reg = PointSkyRegion(SkyCoord(3, 4, unit='deg'))
 
-    expected_repr = ('<PointSkyRegion(<SkyCoord (ICRS): (ra, dec) in deg\n'
+    expected_repr = ('<PointSkyRegion(center=<SkyCoord (ICRS): (ra, dec) in deg\n'
                      '    ( 3.,  4.)>)>')
     expected_str = ('Region: PointSkyRegion\ncenter: <SkyCoord (ICRS): '
                     '(ra, dec) in deg\n    ( 3.,  4.)>')
