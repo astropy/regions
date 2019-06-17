@@ -1,11 +1,15 @@
-0.4 (Unreleased)
+0.4 (2019-06-17)
 ================
 
 New Features
 ------------
 
+- Add region copy methods [#269]
+- Add pixel region rotate method [#265]
 - Added ``union`` and ``intersection`` methods to the ``BoundingBox``
   class. [#277]
+- Add support for BOX in FITS regions [#255]
+- Add PixCoord.xy [#247]
 
 Bug Fixes
 ---------
@@ -13,12 +17,24 @@ Bug Fixes
 - Fixed a corner-case issue where ``RegionMask.multiply()`` would not set
   non-finite data values outside of the mask but within the bounding box
   to zero. [#278]
+- Fix 'text' renamed to 'label' [#234]
 
+
+Other
+-----
+
+- Remove astropy-healpix dependency [#258]
+- Use standalone six to avoid deprecation warnings [#235]
+- Change CRTF writer to match CASA implementation [#226]
+- Simplify annulus regions [#279]
+
+See also: `regions v0.4 merged pull requests list on Github <https://github.com/astropy/regions/pulls?q=is%3Apr+milestone%3A0.4+>`__.
 
 0.3 (2018-09-09)
 ================
 
-NEW FEATURES
+
+New features
 ------------
 
 - Changed ``as_patch`` to ``as_artist`` to accommodate non-patch artists [#218]
@@ -64,12 +80,18 @@ NEW FEATURES
 
 - Support for explicit formatting directives in ``DS9``. [#204]
 
+See also: `regions v0.3 merged pull requests list on Github <https://github.com/astropy/regions/pulls?q=is%3Apr+milestone%3A0.3+>`__.
 
-0.2 (16-02-17)
-==============
+0.2 (2017-02-16)
+================
 
+Changelog wasn't filled.
 
-0.1 (26-07-16)
-==============
+See also: `regions v0.2 merged pull requests list on Github <https://github.com/astropy/regions/pulls?q=is%3Apr+milestone%3A0.2+>`__.
 
-    -
+0.1 (2016-07-26)
+================
+
+Changelog wasn't filled.
+
+See also: `regions v0.1 merged pull requests list on Github <https://github.com/astropy/regions/pulls?q=is%3Apr+milestone%3A0.1+>`__.
