@@ -46,7 +46,7 @@ class TextPixelRegion(PointPixelRegion):
         plt.ylim(2.5, 20)
         ax.set_aspect('equal')
     """
-    _repr_params = ('center', 'text')
+    _fields = ('center', 'text')
 
     def __init__(self, center, text, meta=None, visual=None):
         super(TextPixelRegion, self).__init__(center, meta, visual)
@@ -98,7 +98,7 @@ class TextSkyRegion(PointSkyRegion):
     visual : `~regions.RegionVisual` object, optional
         A dictionary which stores the visual meta attributes of this region.
     """
-    _repr_params = ('center', 'text')
+    _fields = ('center', 'text')
 
     def __init__(self, center, text, meta=None, visual=None):
         super(TextSkyRegion, self).__init__(center,  meta, visual)

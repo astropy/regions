@@ -52,7 +52,7 @@ class LinePixelRegion(PixelRegion):
         plt.ylim(0, 30)
         ax.set_aspect('equal')
     """
-    _repr_params = ('start', 'end')
+    _fields = ('start', 'end')
     start = ScalarPix('start')
     end = ScalarPix('end')
 
@@ -169,7 +169,7 @@ class LineSkyRegion(SkyRegion):
     visual : `~regions.RegionVisual` object, optional
         A dictionary which stores the visual meta attributes of this region.
     """
-    _repr_params = ('start', 'end')
+    _fields = ('start', 'end')
     start = ScalarSky('start')
     end = ScalarSky('end')
 

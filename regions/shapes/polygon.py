@@ -48,7 +48,7 @@ class PolygonPixelRegion(PixelRegion):
         plt.ylim(50, 80)
         ax.set_aspect('equal')
     """
-    _repr_params = ('vertices',)
+    _fields = ('vertices',)
     vertices = OneDPix('vertices')
 
     def __init__(self, vertices, meta=None, visual=None):
@@ -181,7 +181,7 @@ class PolygonSkyRegion(SkyRegion):
     visual : `~regions.RegionVisual` object, optional
         A dictionary which stores the visual meta attributes of this region.
     """
-    _repr_params = ('vertices',)
+    _fields = ('vertices',)
     vertices = OneDSky('vertices')
 
     def __init__(self, vertices, meta=None, visual=None):
