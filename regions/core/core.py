@@ -69,7 +69,7 @@ class Region(object):
 
     def copy(self, **changes):
         """Make an independent (deep) copy."""
-        fields = list(self._fields) + ["meta", "visual"]
+        fields = list(self._params) + ["meta", "visual"]
 
         for field in fields:
             if field not in changes:
@@ -79,8 +79,8 @@ class Region(object):
 
     def __repr__(self):
         params = []
-        if self._fields is not None:
-            for key in self._fields:
+        if self._params is not None:
+            for key in self._params:
                 params.append('{0}={1}'.format(key.replace("_", " "),
                                                getattr(self, key)))
         params = ', '.join(params)
@@ -89,9 +89,9 @@ class Region(object):
 
     def __str__(self):
         cls_info = [('Region', self.__class__.__name__)]
-        if self._fields is not None:
+        if self._params is not None:
             params_value = [(x.replace("_", " "), getattr(self, x))
-                            for x in self._fields]
+                            for x in self._params]
             cls_info += params_value
         fmt = ['{0}: {1}'.format(key, val) for key, val in cls_info]
 

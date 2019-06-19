@@ -124,7 +124,7 @@ class CircleAnnulusPixelRegion(AnnulusPixelRegion):
     """
     _component_class = CirclePixelRegion
 
-    _fields = ("center", "inner_radius", "outer_radius")
+    _params = ("center", "inner_radius", "outer_radius")
     center = ScalarPix("center")
     inner_radius = ScalarLength("inner_radius")
     outer_radius = ScalarLength("outer_radius")
@@ -171,7 +171,7 @@ class CircleAnnulusSkyRegion(SkyRegion):
     visual : `~regions.RegionVisual` object, optional
         A dictionary which stores the visual meta attributes of this region.
     """
-    _fields = ("center", "inner_radius", "outer_radius")
+    _params = ("center", "inner_radius", "outer_radius")
     center = ScalarSky("center")
     inner_radius = QuantityLength("inner_radius")
     outer_radius = QuantityLength("outer_radius")
@@ -200,7 +200,7 @@ class AsymmetricAnnulusPixelRegion(AnnulusPixelRegion):
 
     Used for ellipse and rectangle annuli below.
     """
-    _fields = (
+    _params = (
         "center",
         "inner_width",
         "inner_height",
@@ -276,7 +276,7 @@ class AsymmetricAnnulusSkyRegion(SkyRegion):
 
     Used for ellipse and rectangle annuli below.
     """
-    _fields = (
+    _params = (
         "center",
         "inner_width",
         "inner_height",
