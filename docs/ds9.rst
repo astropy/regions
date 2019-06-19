@@ -46,7 +46,7 @@ read from a file in addition to doing the region serialisation and parsing.
     >>> write_ds9(regions, filename)
     >>> regions = read_ds9(filename)
     >>> regions
-    [<CircleSkyRegion(<SkyCoord (FK5: equinox=J2000.000): (ra, dec) in deg
+    [<CircleSkyRegion(center=<SkyCoord (FK5: equinox=J2000.000): (ra, dec) in deg
         (245.347655, 24.429081)>, radius=3.0 deg)>]
 
 The ``visual`` metadata includes items used for display, e.g.:

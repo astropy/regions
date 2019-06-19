@@ -59,5 +59,5 @@ read from a file in addition to doing the region serialisation and parsing.
     >>> write_crtf(regions, filename)
     >>> regions = read_crtf(filename)
     >>> regions
-    [<CircleSkyRegion(<SkyCoord (FK5: equinox=J2000.000): (ra, dec) in deg
+    [<CircleSkyRegion(center=<SkyCoord (FK5: equinox=J2000.000): (ra, dec) in deg
         (42., 43.)>, radius=3.0 deg)>]
