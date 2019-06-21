@@ -42,7 +42,7 @@ class FITSRegionParser(object):
     >>> shapes = parser.shapes
     >>> regions = shapes.to_regions()
     >>> regions[5]
-    <PointPixelRegion(PixCoord(x=341.0, y=345.0))>
+    <PointPixelRegion(center=PixCoord(x=341.0, y=345.0))>
     """
 
     valid_columns = ['X', 'Y', 'SHAPE', 'COMPONENT', 'R', 'ROTANG']

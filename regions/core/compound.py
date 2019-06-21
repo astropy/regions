@@ -29,7 +29,7 @@ class CompoundPixelRegion(PixelRegion):
     visual : `~regions.RegionVisual` object, optional
         A dictionary which stores the visual meta attributes of this region.
     """
-
+    _params = ('region1', 'region2', 'operator')
     region1 = CompoundRegionPix('region1')
     region2 = CompoundRegionPix('region2')
 
@@ -49,7 +49,6 @@ class CompoundPixelRegion(PixelRegion):
         else:
             self.visual = RegionVisual()
         self._operator = operator
-        self._repr_params = ('region1', 'region2', 'operator')
 
     @property
     def operator(self):
@@ -204,6 +203,7 @@ class CompoundSkyRegion(SkyRegion):
     visual : `~regions.RegionVisual` object, optional
         A dictionary which stores the visual meta attributes of this region.
     """
+    _params = ('region1', 'region2', 'operator')
     region1 = CompoundRegionSky('region1')
     region2 = CompoundRegionSky('region2')
 
@@ -222,8 +222,6 @@ class CompoundSkyRegion(SkyRegion):
         else:
             self.visual = RegionVisual()
         self._operator = operator
-
-        self._repr_params = ('region1', 'region2', 'operator')
 
     @property
     def operator(self):

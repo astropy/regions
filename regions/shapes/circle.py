@@ -53,7 +53,7 @@ class CirclePixelRegion(PixelRegion):
         plt.ylim(0, 15)
         ax.set_aspect('equal')
     """
-
+    _params = ('center', 'radius')
     center = ScalarPix('center')
     radius = ScalarLength('radius')
 
@@ -62,7 +62,6 @@ class CirclePixelRegion(PixelRegion):
         self.radius = radius
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
-        self._repr_params = ('radius',)
 
     @property
     def area(self):
@@ -183,7 +182,7 @@ class CircleSkyRegion(SkyRegion):
     visual : `~regions.RegionVisual` object, optional
         A dictionary which stores the visual meta attributes of this region.
     """
-
+    _params = ('center', 'radius')
     center = ScalarSky('center')
     radius = QuantityLength("radius")
 
@@ -192,7 +191,6 @@ class CircleSkyRegion(SkyRegion):
         self.radius = radius
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
-        self._repr_params = ('radius',)
 
     def to_pixel(self, wcs):
         center, scale, _ = skycoord_to_pixel_scale_angle(self.center, wcs)
