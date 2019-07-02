@@ -76,20 +76,20 @@ def test_only_pixel_regions():
 
     reg_sky = CircleSkyRegion(SkyCoord(1, 2, unit='deg'), 5 * u.deg)
 
-    with pytest.raises(TypeError) as err:
+    with pytest.raises(TypeError) as excinfo:
         fits_region_objects_to_table([reg_sky])
 
-    assert 'Every region must be a pixel region' in str(err)
+    assert 'Every region must be a pixel region' in str(excinfo.value)
 
 
 def test_valid_columns():
 
     t = Table([[1, 2, 3]], names=('a'))
 
-    with pytest.raises(FITSRegionParserError) as err:
+    with pytest.raises(FITSRegionParserError) as excinfo:
         FITSRegionParser(t)
 
-    assert "This table has an invalid column name: 'a'" in str(err)
+    assert "This table has an invalid column name: 'a'" in str(excinfo.value)
 
 
 def test_valid_row():
@@ -101,23 +101,23 @@ def test_valid_row():
     t['X'].unit = 'pix'
     t['Y'].unit = 'pix'
 
-    with pytest.raises(FITSRegionParserError) as err:
+    with pytest.raises(FITSRegionParserError) as excinfo:
         FITSRegionParser(t)
 
-    assert "The column: 'R' is missing in the table" in str(err)
+    assert "The column: 'R' is missing in the table" in str(excinfo.value)
 
     t[0]['SHAPE'] = 'PONT'
 
-    with pytest.raises(FITSRegionParserError) as err:
+    with pytest.raises(FITSRegionParserError) as excinfo:
         FITSRegionParser(t)
 
-    assert "'PONT' is not a valid FITS Region type" in str(err)
+    assert "'PONT' is not a valid FITS Region type" in str(excinfo.value)
 
     t['ROTANG'] = [[20, 30]]
     t['ROTANG'].unit = 'deg'
     t[0]['SHAPE'] = 'PIE'
 
-    with pytest.raises(FITSRegionParserError) as err:
+    with pytest.raises(FITSRegionParserError) as excinfo:
         FITSRegionParser(t)
 
-    assert "'PIE' is currently not supported in regions" in str(err)
+    assert "'PIE' is currently not supported in regions" in str(excinfo.value)
