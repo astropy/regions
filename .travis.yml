@@ -52,6 +52,7 @@ matrix:
         - env: PYTHON_VERSION=3.6
                SETUP_CMD='build_docs -w'
                CONDA_CHANNELS='conda-forge astropy'
+               PIP_DEPENDENCIES='sphinx-astropy'
 
         # Do a test without the optional dependencies
         - env: SETUP_CMD='test'
