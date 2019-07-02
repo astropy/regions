@@ -68,16 +68,16 @@ def test_valid_shape():
 
     shape = CRTFParser(reg_str).shapes[0]
 
-    with pytest.raises(ValueError) as err:
+    with pytest.raises(ValueError) as excinfo:
         shape.region_type = 'box'
 
-    assert "'box' is not a valid region type in this package" in str(err)
+    assert "'box' is not a valid region type in this package" in str(excinfo.value)
 
     shape = CRTFParser(reg_str).shapes[0]
-    with pytest.raises(ValueError) as err:
+    with pytest.raises(ValueError) as excinfo:
         shape.coordsys = 'hello'
 
-    assert "'hello' is not a valid coordinate reference frame in astropy" in str(err)
+    assert "'hello' is not a valid coordinate reference frame in astropy" in str(excinfo.value)
 
 
 def test_valid_ellipse_ds9():
