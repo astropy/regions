@@ -7,7 +7,6 @@ import numpy as np
 from numpy.testing import assert_equal, assert_allclose
 import pytest
 
-from ..polygon import PolygonPixelRegion
 from ...core import PixCoord, BoundingBox
 
 class BaseTestRegion(object):
@@ -22,10 +21,6 @@ class BaseTestRegion(object):
 class BaseTestPixelRegion(BaseTestRegion):
 
     def test_area(self):
-        # TODO: remove the pytest.skip once polygon area is implemented
-        if isinstance(self.reg, PolygonPixelRegion):
-            pytest.skip()
-
         assert_allclose(self.reg.area, self.expected_area)
 
     def test_mask_area(self):
