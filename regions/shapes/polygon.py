@@ -59,7 +59,17 @@ class PolygonPixelRegion(PixelRegion):
     @property
     def area(self):
         """Region area (float)."""
-        raise NotImplementedError
+        # See https://stackoverflow.com/questions/24467972
+
+        # Use offsets to improve numerical precision
+        x_ = self.vertices.x - self.vertices.x.mean()
+        y_ = self.vertices.y - self.vertices.y.mean()
+
+        # Shoelace formula, for our case where the start vertex
+        # isn't duplicated at the end, written to avoid an array copy
+        area_main = np.dot(x_[:-1], y_[1:]) - np.dot(y_[:-1], x_[1:])
+        area_last = x_[-1] * y_[0] - y_[-1] * x_[0]
+        return 0.5 * np.abs(area_main + area_last)
 
     def contains(self, pixcoord):
         pixcoord = PixCoord._validate(pixcoord, 'pixcoord')
