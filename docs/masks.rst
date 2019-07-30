@@ -167,7 +167,7 @@ Note that ``weighted_data`` will have zeros where the mask is zero; it therefore
 should not be used to compute statistics.  See `Masked Statistics` below.
 
 We can take a look at the results to make sure the source overlaps
-with the aperture
+with the aperture:
 
 .. doctest-skip::
 
