@@ -19,14 +19,6 @@ environment:
       MPLBACKEND: "Agg"
 
   matrix:
-
-      # We test Python 2.7 and 3.7 because 2.7 is the supported Python 2
-      # release of Astropy and Python 3.7 is the latest Python 3 release.
-
-      - PYTHON_VERSION: "2.7"
-        ASTROPY_VERSION: "stable"
-        NUMPY_VERSION: "1.15"
-
       - PYTHON_VERSION: "3.7"
         ASTROPY_VERSION: "stable"
         NUMPY_VERSION: "stable"
