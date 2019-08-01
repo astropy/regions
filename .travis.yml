@@ -15,8 +15,6 @@ os:
 
 dist: xenial
 
-sudo: true
-
 addons:
     apt:
         packages:
@@ -75,6 +73,9 @@ matrix:
         # Try MacOS X
         - os: osx
           env: SETUP_CMD='test'
+
+        # Test windows
+        - os: windows
 
 install:
 
