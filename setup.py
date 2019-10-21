@@ -104,8 +104,8 @@ setup(name=PACKAGENAME,
       version=VERSION,
       description=DESCRIPTION,
       scripts=scripts,
-      setup_requires=['numpy'],
-      install_requires=['numpy', 'astropy', 'six'],
+      setup_requires=['numpy>=1.16'],
+      install_requires=['numpy>=1.16', 'astropy>=2.0'],
       extras_require=dict(
           plot=[
               'matplotlib',
@@ -124,5 +124,5 @@ setup(name=PACKAGENAME,
       zip_safe=False,
       use_2to3=False,
       entry_points=entry_points,
-      python_requires='>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*',
+      python_requires='>=3.6',
       **package_info)

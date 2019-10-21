@@ -62,7 +62,7 @@ matrix:
 
         # Try older numpy versions
         - env: PYTHON_VERSION=3.6
-               NUMPY_VERSION=1.11
+               NUMPY_VERSION=1.16
         - env: PYTHON_VERSION=3.5
                NUMPY_VERSION=1.10
                ASTROPY_VERSION=3.0

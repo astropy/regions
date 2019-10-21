@@ -8,14 +8,13 @@ Installation
 
 The regions package requires the following packages:
 
-* Python 2.7 or 3.4 and above
-* `Numpy <http://www.numpy.org>`_ 1.9 or later
-* `Astropy <http://www.astropy.org>`__ 1.3 or later
-* `six <http://pypi.python.org/pypi/six/>`__
+* Python 3.6 or later
+* `Numpy <http://www.numpy.org>`_ 1.16 or later
+* `Astropy <http://www.astropy.org>`__ 2.0 or later
 
 In addition, the following packages are needed for optional functionality:
 
-* `Matplotlib <https://matplotlib.org>`__ 1.5 or later
+* `Matplotlib <https://matplotlib.org>`__ 2.0 or later
 
 Stable version
 ==============
