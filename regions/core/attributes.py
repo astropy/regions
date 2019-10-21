@@ -1,7 +1,6 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
 import abc
-import weakref
 
 from astropy.coordinates import SkyCoord
 from astropy.units import Quantity
@@ -50,8 +49,7 @@ class ScalarPix(RegionAttr):
 
     def _validate(self, value):
         if not (isinstance(value, PixCoord) and value.isscalar):
-            raise ValueError('The {} must be a 0D PixCoord object'
-                             .format(self.name))
+            raise ValueError(f'The {self.name} must be a 0D PixCoord object')
 
 
 class OneDPix(RegionAttr):
@@ -63,8 +61,7 @@ class OneDPix(RegionAttr):
     def _validate(self, value):
         if not (isinstance(value, PixCoord) and not value.isscalar
                 and value.x.ndim == 1):
-            raise ValueError('The {} must be a 1D PixCoord object'
-                             .format(self.name))
+            raise ValueError(f'The {self.name} must be a 1D PixCoord object')
 
 
 class ScalarLength(RegionAttr):
@@ -111,8 +108,7 @@ class QuantityLength(RegionAttr):
 
     def _validate(self, value):
         if not (isinstance(value, Quantity) and value.isscalar):
-            raise ValueError('The {} must be a scalar astropy Quantity object'
-                             .format(self.name))
+            raise ValueError(f'The {self.name} must be a scalar astropy Quantity object')
 
 
 class CompoundRegionPix(RegionAttr):
@@ -123,8 +119,7 @@ class CompoundRegionPix(RegionAttr):
 
     def _validate(self, value):
         if not isinstance(value, PixelRegion):
-            raise ValueError('The {} must be a PixelRegion object'
-                             .format(self.name))
+            raise ValueError(f'The {self.name} must be a PixelRegion object')
 
 
 class CompoundRegionSky(RegionAttr):
@@ -135,8 +130,7 @@ class CompoundRegionSky(RegionAttr):
 
     def _validate(self, value):
         if not isinstance(value, SkyRegion):
-            raise ValueError('The {} must be a SkyRegion object'
-                             .format(self.name))
+            raise ValueError(f'The {self.name} must be a SkyRegion object')
 
 
 class Meta(dict):

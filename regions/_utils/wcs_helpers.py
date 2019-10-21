@@ -76,8 +76,7 @@ def assert_angle_or_pixel(name, q):
         if q.unit.physical_type == 'angle' or q.unit is u.pixel:
             pass
         else:
-            raise ValueError("{} should have angular or pixel "
-                             "units".format(name))
+            raise ValueError(f"{name} should have angular or pixel units")
     else:
         raise TypeError(f"{name} should be a Quantity instance")
 
