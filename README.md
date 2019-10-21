@@ -1,4 +1,5 @@
-[![Build Status](https://travis-ci.org/astropy/regions.svg)](https://travis-ci.org/astropy/regions?branch=master)
+[![Travis Status](https://travis-ci.org/astropy/regions.svg)](https://travis-ci.org/astropy/regions)
+[![CircleCI Status](https://circleci.com/gh/astropy/regions.svg)](https://circleci.com/gh/astropy/regions)
 [![Coverage Status](https://coveralls.io/repos/astropy/regions/badge.svg)](https://coveralls.io/r/astropy/regions)
 
 About
