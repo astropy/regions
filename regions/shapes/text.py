@@ -49,7 +49,7 @@ class TextPixelRegion(PointPixelRegion):
     _params = ('center', 'text')
 
     def __init__(self, center, text, meta=None, visual=None):
-        super(TextPixelRegion, self).__init__(center, meta, visual)
+        super().__init__(center, meta, visual)
         self.text = text
 
     def to_sky(self, wcs):
@@ -101,7 +101,7 @@ class TextSkyRegion(PointSkyRegion):
     _params = ('center', 'text')
 
     def __init__(self, center, text, meta=None, visual=None):
-        super(TextSkyRegion, self).__init__(center,  meta, visual)
+        super().__init__(center,  meta, visual)
         self.text = text
 
     def to_pixel(self, wcs):

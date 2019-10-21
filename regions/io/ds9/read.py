@@ -72,7 +72,7 @@ def read_ds9(filename, errors='strict'):
     return parser.shapes.to_regions()
 
 
-class CoordinateParser(object):
+class CoordinateParser:
     """
     Helper class to structure coordinate parser
     """
@@ -90,7 +90,7 @@ class CoordinateParser(object):
         # Any ds9 coordinate representation (sexagesimal or degrees)
         elif 'd' in string_rep or 'h' in string_rep:
             return coordinates.Angle(string_rep)
-        elif unit is 'hour_or_deg':
+        elif unit == 'hour_or_deg':
             if ':' in string_rep:
                 spl = tuple([float(x) for x in string_rep.split(":")])
                 return coordinates.Angle(spl, u.hourangle)
@@ -134,7 +134,7 @@ class CoordinateParser(object):
             return u.Quantity(float(string_rep), unit=unit)
 
 
-class DS9Parser(object):
+class DS9Parser:
     """
     Parse a DS9 string
 
@@ -171,7 +171,7 @@ class DS9Parser(object):
 
     # List of valid coordinate system
     coordinate_systems = ['fk5', 'fk4', 'icrs', 'galactic', 'wcs', 'physical', 'image', 'ecliptic', 'J2000']
-    coordinate_systems += ['wcs{0}'.format(letter) for letter in string.ascii_lowercase]
+    coordinate_systems += [f'wcs{letter}' for letter in string.ascii_lowercase]
 
     # Map to convert coordinate system names
     coordsys_mapping = dict(zip(coordinates.frame_transform_graph.get_names(),
@@ -197,10 +197,10 @@ class DS9Parser(object):
 
     def __str__(self):
         ss = self.__class__.__name__
-        ss += '\nErrors: {}'.format(self.errors)
-        ss += '\nCoordsys: {}'.format(self.coordsys)
-        ss += '\nGlobal meta: {}'.format(self.global_meta)
-        ss += '\nShapes: {}'.format(self.shapes)
+        ss += f'\nErrors: {self.errors}'
+        ss += f'\nCoordsys: {self.coordsys}'
+        ss += f'\nGlobal meta: {self.global_meta}'
+        ss += f'\nShapes: {self.shapes}'
         ss += '\n'
         return ss
 
@@ -222,13 +222,13 @@ class DS9Parser(object):
         for line_ in self.region_string.split('\n'):
             for line in line_.split(";"):
                 self.parse_line(line)
-                log.debug('Global state: {}'.format(self))
+                log.debug(f'Global state: {self}')
 
     def parse_line(self, line):
         """
         Parse one line
         """
-        log.debug('Parsing {}'.format(line))
+        log.debug(f'Parsing {line}')
 
         # Skip blanks
         if line == '':
@@ -254,7 +254,7 @@ class DS9Parser(object):
             include = region_type_search.groups()[0]
             region_type = region_type_search.groups()[1]
         else:
-            self._raise_error("No region type found for line '{0}'.".format(line))
+            self._raise_error(f"No region type found for line '{line}'.")
             return
 
         if region_type in self.coordinate_systems:
@@ -262,7 +262,7 @@ class DS9Parser(object):
             self.set_coordsys(region_type)
             return
         if region_type not in DS9RegionParser.language_spec:
-            self._raise_error("Region type '{0}' was identified, but it is not one of "
+            self._raise_error("Region type '{}' was identified, but it is not one of "
                               "the known region types.".format(region_type))
             return
         else:
@@ -307,7 +307,7 @@ class DS9Parser(object):
                 if key == 'tag':
                     result[key].append(val)
                 else:
-                    raise ValueError("Duplicate key {0} found".format(key))
+                    raise ValueError(f"Duplicate key {key} found")
             else:
                 if key == 'tag':
                     result[key] = [val]
@@ -344,7 +344,7 @@ angle = CoordinateParser.parse_angular_length_quantity
 coordinate = CoordinateParser.parse_coordinate
 
 
-class DS9RegionParser(object):
+class DS9RegionParser:
     """
     Parse a DS9 region string
 
@@ -378,7 +378,7 @@ class DS9RegionParser(object):
                         'wcs': (u.dimensionless_unscaled, u.dimensionless_unscaled),
                         }
     for letter in string.ascii_lowercase:
-        coordinate_units['wcs{0}'.format(letter)] = (u.dimensionless_unscaled, u.dimensionless_unscaled)
+        coordinate_units[f'wcs{letter}'] = (u.dimensionless_unscaled, u.dimensionless_unscaled)
 
     # DS9 language specification. This defines how a certain region is read.
     language_spec = {'point': (coordinate, coordinate),
@@ -412,11 +412,11 @@ class DS9RegionParser(object):
 
     def __str__(self):
         ss = self.__class__.__name__
-        ss += '\nLine : {}'.format(self.line)
-        ss += '\nRegion end : {}'.format(self.region_end)
-        ss += '\nMeta string : {}'.format(self.meta_str)
-        ss += '\nCoord string: {}'.format(self.coord_str)
-        ss += '\nShape: {}'.format(self.shape)
+        ss += f'\nLine : {self.line}'
+        ss += f'\nRegion end : {self.region_end}'
+        ss += f'\nMeta string : {self.meta_str}'
+        ss += f'\nCoord string: {self.coord_str}'
+        ss += f'\nShape: {self.shape}'
         ss += '\n'
         return ss
 

@@ -6,7 +6,7 @@ import astropy.units as u
 __all__ = ['RegionMask']
 
 
-class RegionMask(object):
+class RegionMask:
     """
     Class for a region mask.
 

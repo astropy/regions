@@ -60,10 +60,10 @@ def make_example_dataset(data='simulated', config=None):
     elif data == 'fermi':
         return ExampleDatasetFermi(config=config)
     else:
-        raise ValueError('Invalid selection data: {}'.format(data))
+        raise ValueError(f'Invalid selection data: {data}')
 
 
-class ExampleDataset(object):
+class ExampleDataset:
     """Base class for example dataset.
     """
 

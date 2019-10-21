@@ -13,7 +13,7 @@ from ..core import Shape, ShapeList, reg_mapping
 __all__ = ['FITSRegionParser', 'read_fits_region', 'FITSRegionRowParser']
 
 
-class FITSRegionParser(object):
+class FITSRegionParser:
     """
     Parses a FITS Region table.
 
@@ -134,7 +134,7 @@ class FITSRegionRowParser():
         if region_type in language_spec:
             self.region_type = region_type
         else:
-            self._raise_error("'{0}' is not a valid FITS Region type"
+            self._raise_error("'{}' is not a valid FITS Region type"
                               .format(region_type))
 
         self.component = str(self.row['COMPONENT'])
@@ -155,14 +155,14 @@ class FITSRegionRowParser():
                 if index < len(val) and val[index] is not None:
                     return val[index], unit
                 else:
-                    raise ValueError("The column: {0} must have more than {1} value for the "
-                                     "region {2}".format(colname, index,
+                    raise ValueError("The column: {} must have more than {} value for the "
+                                     "region {}".format(colname, index,
                                                         self.region_type))
             else:
                 return val, unit
         except KeyError:
             if default is None:
-                self._raise_error("The column: '{0}' is missing in the table"
+                self._raise_error("The column: '{}' is missing in the table"
                                   .format(colname))
             else:
                 return default
@@ -196,7 +196,7 @@ class FITSRegionRowParser():
         if region_type in reg_mapping['FITS_REGION']:
             region_type = reg_mapping['FITS_REGION'][region_type]
         else:
-            self._raise_error("'{0}' is currently not supported in "
+            self._raise_error("'{}' is currently not supported in "
                               "regions".format(self.region_type))
 
         return self.component, Shape('physical', region_type,
@@ -212,7 +212,7 @@ class FITSRegionRowParser():
         if unit is not None:
             return val * units.get(str(unit), unit)
         else:
-            self._raise_error("The unit: {} is invalid".format(unit))
+            self._raise_error(f"The unit: {unit} is invalid")
 
 
 def read_fits_region(filename, errors='strict'):

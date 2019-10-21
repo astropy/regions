@@ -8,7 +8,7 @@ from .core import _DEFAULT_WCS_ORIGIN, _DEFAULT_WCS_MODE
 __all__ = ['PixCoord']
 
 
-class PixCoord(object):
+class PixCoord:
     """Pixel coordinates.
 
     This class can represent scalar or array pixel coordinates.
@@ -69,18 +69,18 @@ class PixCoord(object):
             The input object (at the moment unmodified, might do fix-ups here later)
         """
         if not isinstance(val, PixCoord):
-            raise TypeError('{} must be a PixCoord'.format(name))
+            raise TypeError(f'{name} must be a PixCoord')
 
         if expected == 'any':
             pass
         elif expected == 'scalar':
             if not val.isscalar:
-                raise ValueError('{} must be a scalar PixCoord'.format(name))
+                raise ValueError(f'{name} must be a scalar PixCoord')
         elif expected == 'not scalar':
             if val.isscalar:
-                raise ValueError('{} must be a non-scalar PixCoord'.format(name))
+                raise ValueError(f'{name} must be a non-scalar PixCoord')
         else:
-            raise ValueError('Invalid argument for `expected`: {}'.format(expected))
+            raise ValueError(f'Invalid argument for `expected`: {expected}')
 
         return val
 

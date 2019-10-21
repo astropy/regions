@@ -42,11 +42,11 @@ class Region(abc.ABC):
         params = []
         if self._params is not None:
             for key in self._params:
-                params.append('{0}={1}'.format(key.replace("_", " "),
+                params.append('{}={}'.format(key.replace("_", " "),
                                                getattr(self, key)))
         params = ', '.join(params)
 
-        return '<{0}({1})>'.format(self.__class__.__name__, params)
+        return f'<{self.__class__.__name__}({params})>'
 
     def __str__(self):
         cls_info = [('Region', self.__class__.__name__)]
@@ -54,7 +54,7 @@ class Region(abc.ABC):
             params_value = [(x.replace("_", " "), getattr(self, x))
                             for x in self._params]
             cls_info += params_value
-        fmt = ['{0}: {1}'.format(key, val) for key, val in cls_info]
+        fmt = [f'{key}: {val}' for key, val in cls_info]
 
         return '\n'.join(fmt)
 
@@ -133,7 +133,7 @@ class PixelRegion(Region):
 
     def __contains__(self, coord):
         if not coord.isscalar:
-            raise ValueError('coord must be scalar. coord={}'.format(coord))
+            raise ValueError(f'coord must be scalar. coord={coord}')
         return self.contains(coord)
 
     @abc.abstractmethod
@@ -195,11 +195,11 @@ class PixelRegion(Region):
     @staticmethod
     def _validate_mode(mode, subpixels):
         if mode not in VALID_MASK_MODES:
-            raise ValueError("Invalid mask mode: {0} (should be one "
-                             "of {1})".format(mode, '/'.join(VALID_MASK_MODES)))
+            raise ValueError("Invalid mask mode: {} (should be one "
+                             "of {})".format(mode, '/'.join(VALID_MASK_MODES)))
         if mode == 'subpixels':
             if not isinstance(subpixels, int) or subpixels <= 0:
-                raise ValueError("Invalid subpixels value: {0} (should be"
+                raise ValueError("Invalid subpixels value: {} (should be"
                                  " a strictly positive integer)".format(subpixels))
 
     @abc.abstractmethod

@@ -6,7 +6,7 @@ import pytest
 
 from ...core import PixCoord, BoundingBox
 
-class BaseTestRegion(object):
+class BaseTestRegion:
 
     def test_repr(self):
         assert repr(self.reg).replace(" ","") == self.expected_repr.replace(" ","")

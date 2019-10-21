@@ -76,7 +76,7 @@ def read_crtf(filename, errors='strict'):
             raise CRTFRegionParserError('Every CRTF Region must start with "#CRTF" ')
 
 
-class CRTFParser(object):
+class CRTFParser:
     """
     Parses a CRTF string.
 
@@ -136,9 +136,9 @@ class CRTFParser(object):
 
     def __str__(self):
         ss = self.__class__.__name__
-        ss += '\nErrors: {}'.format(self.errors)
-        ss += '\nGlobal meta: {}'.format(self.global_meta)
-        ss += '\nShapes: {}'.format(self.shapes)
+        ss += f'\nErrors: {self.errors}'
+        ss += f'\nGlobal meta: {self.global_meta}'
+        ss += f'\nShapes: {self.shapes}'
         ss += '\n'
         return ss
 
@@ -176,10 +176,10 @@ class CRTFParser(object):
                                           *crtf_line.group('region', 'parameters'))
                 self.shapes.append(helper.shape)
             else:
-                self._raise_error("Not a valid CRTF Region type: '{0}'.".format(region_type))
+                self._raise_error(f"Not a valid CRTF Region type: '{region_type}'.")
 
         else:
-            self._raise_error("Not a valid CRTF line: '{0}'.".format(line))
+            self._raise_error(f"Not a valid CRTF line: '{line}'.")
             return
 
     def _raise_error(self, msg):
@@ -205,7 +205,7 @@ class CRTFParser(object):
             global_meta_str = regex_meta.findall(global_meta_str + ',')
         if global_meta_str:
             for par in global_meta_str:
-                if par[0] is not '':
+                if par[0] != '':
                     val1 = par[0].lower()
                     val2 = par[1]
                 else:
@@ -219,10 +219,10 @@ class CRTFParser(object):
                         val2 = [x.strip() for x in val2 if x]
                     self.global_meta[val1] = val2
                 else:
-                    self._raise_error("'{0}' is not a valid global meta key".format(val1))
+                    self._raise_error(f"'{val1}' is not a valid global meta key")
 
 
-class CRTFRegionParser(object):
+class CRTFRegionParser:
     """
     Parse a CRTF region string
 
@@ -330,14 +330,14 @@ class CRTFRegionParser(object):
 
         if self.region_type == 'poly':
             if len(coord_list_str) < 4:
-                self._raise_error('Not in proper format: {} polygon should have > 4 coordinates'.format(self.reg_str))
+                self._raise_error(f'Not in proper format: {self.reg_str} polygon should have > 4 coordinates')
             if coord_list_str[0] != coord_list_str[-1]:
-                self._raise_error("Not in proper format: '{0}', "
+                self._raise_error("Not in proper format: '{}', "
                                   "In polygon, the last and first coordinates should be same".format(self.reg_str))
         else:
             if len(coord_list_str) != len(self.language_spec[self.region_type]):
-                self._raise_error("Not in proper format: '{0}', "
-                                  "Does not contain expected number of parameters for the region '{1}'"
+                self._raise_error("Not in proper format: '{}', "
+                                  "Does not contain expected number of parameters for the region '{}'"
                                   .format(self.reg_str, self.region_type))
 
         for attr_spec, val_str in zip(self.language_spec[self.region_type], coord_list_str):
@@ -347,24 +347,24 @@ class CRTFRegionParser(object):
                     coord_list.append(CoordinateParser.parse_coordinate(val_str[0]))
                     coord_list.append(CoordinateParser.parse_coordinate(val_str[1]))
                 else:
-                    self._raise_error("Not in proper format: {0} should be a coordinate".format(val_str))
+                    self._raise_error(f"Not in proper format: {val_str} should be a coordinate")
             if attr_spec == 'pl':
                 if len(val_str) == 2 and val_str[1] != '':
                     coord_list.append(CoordinateParser.parse_angular_length_quantity(val_str[0]))
                     coord_list.append(CoordinateParser.parse_angular_length_quantity(val_str[1]))
                 else:
-                    self._raise_error("Not in proper format: {0} should be a pair of length".format(val_str))
+                    self._raise_error(f"Not in proper format: {val_str} should be a pair of length")
             if attr_spec == 'l':
                 if isinstance(val_str, str):
                     coord_list.append(CoordinateParser.parse_angular_length_quantity(val_str))
                 else:
-                    self._raise_error("Not in proper format: {0} should be a single length".format(val_str))
+                    self._raise_error(f"Not in proper format: {val_str} should be a single length")
             if attr_spec == 's':
                 if self.region_type == 'symbol':
                     if val_str in valid_symbols:
                         self.meta['symbol'] = val_str
                     else:
-                        self._raise_error("Not in proper format: '{0}' should be a symbol".format(val_str))
+                        self._raise_error(f"Not in proper format: '{val_str}' should be a symbol")
                 elif self.region_type == 'text':
                     self.meta['text'] = val_str[1:-1]
 
@@ -378,7 +378,7 @@ class CRTFRegionParser(object):
             self.meta_str = regex_meta.findall(self.meta_str + ',')
         if self.meta_str:
             for par in self.meta_str:
-                if par[0] is not '':
+                if par[0] != '':
                     val1 = par[0]
                     val2 = par[1]
                 else:
@@ -392,7 +392,7 @@ class CRTFRegionParser(object):
                         val2 = [x.strip() for x in val2]
                     self.meta[val1] = val2
                 else:
-                    self._raise_error("'{0}' is not a valid meta key".format(val1))
+                    self._raise_error(f"'{val1}' is not a valid meta key")
 
         self.meta['include'] = self.include != '-'
         self.include = self.meta['include']
@@ -429,7 +429,7 @@ class CRTFRegionParser(object):
                            )
 
 
-class CoordinateParser(object):
+class CoordinateParser:
     """
     Helper class to structure coordinate parser
     """
@@ -474,4 +474,4 @@ class CoordinateParser(object):
                 return u.Quantity(str.group(1), unit=unit_mapping[unit])
             return u.Quantity(str.group(1))
         else:
-            raise CRTFRegionParserError('Units must be specified for {0} '.format(string_rep))
+            raise CRTFRegionParserError(f'Units must be specified for {string_rep} ')

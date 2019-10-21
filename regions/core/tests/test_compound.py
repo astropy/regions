@@ -11,7 +11,7 @@ from ...core import PixCoord, CompoundPixelRegion
 from ...tests.helpers import make_simple_wcs
 
 
-class TestCompoundPixel(object):
+class TestCompoundPixel:
     # Two circles that overlap in one column
     c1 = CirclePixelRegion(PixCoord(5, 5), 4)
     c2 = CirclePixelRegion(PixCoord(11, 5), 4)

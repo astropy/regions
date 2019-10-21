@@ -76,7 +76,7 @@ class ScalarLength(RegionAttr):
     def _validate(self, value):
         if not np.isscalar(value):
             raise ValueError(
-                'The {} must be a scalar numpy/python number'.format(self.name))
+                f'The {self.name} must be a scalar numpy/python number')
 
 
 class ScalarSky(RegionAttr):
@@ -143,7 +143,7 @@ class Meta(dict):
 
     def __init__(self, seq=None, **kwargs):
 
-        super(Meta, self).__init__()
+        super().__init__()
 
         if seq:
             if isinstance(seq, dict):
@@ -160,14 +160,14 @@ class Meta(dict):
     def __setitem__(self, key, value):
         key = self.key_mapping.get(key, key)
         if key in self.valid_keys:
-            super(Meta, self).__setitem__(key, value)
+            super().__setitem__(key, value)
         else:
             raise KeyError(
-                "{} is not a valid key for this class.".format(key))
+                f"{key} is not a valid key for this class.")
 
     def __getitem__(self, item):
         item = self.key_mapping.get(item, item)
-        return super(Meta, self).__getitem__(item)
+        return super().__getitem__(item)
 
 
 class RegionMeta(Meta):

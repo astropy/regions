@@ -65,7 +65,7 @@ valid_coordsys = {'DS9': ['image', 'physical', 'fk4', 'fk5', 'icrs', 'galactic',
                   'CRTF': ['image', 'fk5', 'fk4', 'galactic',
                            'geocentrictrueecliptic', 'supergalactic', 'icrs']
                   }
-valid_coordsys['DS9'] += ['wcs{}'.format(x) for x in string.ascii_lowercase]
+valid_coordsys['DS9'] += [f'wcs{x}' for x in string.ascii_lowercase]
 
 # Maps astropy's coordinate frame names with their respective name in the file format.
 coordsys_mapping = {'DS9': {x: x for x in valid_coordsys['DS9']},
@@ -86,11 +86,11 @@ class ShapeList(list):
         for shape in self:
             # Skip elliptical annulus for now
             if shape.region_type == 'ellipse' and len(shape.coord) > 5:
-                msg = 'Skipping elliptical annulus {}'.format(shape)
+                msg = f'Skipping elliptical annulus {shape}'
                 warn(msg, DS9RegionParserWarning)
                 continue
             if shape.region_type in ['box'] and shape.format_type == 'CRTF':
-                msg = 'Skipping {} {}'.format(shape.region_type, shape)
+                msg = f'Skipping {shape.region_type} {shape}'
                 warn(msg, CRTFRegionParserWarning)
                 continue
             log.debug(shape)
@@ -172,7 +172,7 @@ class ShapeList(list):
 
             if shape.meta.get('label', "") != "":
                 shape.meta['label'] = "'{}'".format(shape.meta['label'])
-            meta_str = ", ".join("{0}={1}".format(key, val) for key, val in
+            meta_str = ", ".join(f"{key}={val}" for key, val in
                                 shape.meta.items() if
                                 key not in ('include', 'comment', 'symbol',
                                             'coord', 'text', 'range', 'corr',
@@ -181,7 +181,7 @@ class ShapeList(list):
             # the first item should be the coordinates, since CASA cannot
             # recognize a region without an inline coordinate specification
             # It can be, but does not need to be, comma-separated at the start
-            meta_str = "coord={0}, ".format(coordsys.upper()) + meta_str
+            meta_str = "coord={}, ".format(coordsys.upper()) + meta_str
 
             if 'comment' in shape.meta:
                 meta_str += ", " + shape.meta['comment']
@@ -234,9 +234,9 @@ class ShapeList(list):
                 line = crtf_strings[shape.region_type].format(include, *coord)
 
             if meta_str.strip():
-                output += "{0}, {1}\n".format(line, meta_str)
+                output += f"{line}, {meta_str}\n"
             else:
-                output += "{0}\n".format(line)
+                output += f"{line}\n"
 
         return output
 
@@ -283,14 +283,14 @@ class ShapeList(list):
             if coordsys in coordsys_mapping['DS9'].values():
                 radunitstr = '"'
             else:
-                raise ValueError('Radius unit arcsec not valid for coordsys {}'.format(coordsys))
+                raise ValueError(f'Radius unit arcsec not valid for coordsys {coordsys}')
         else:
             radunitstr = ''
 
         for key, val in ds9_strings.items():
             ds9_strings[key] = val.replace("FMT", fmt).replace("RAD", radunitstr)
 
-        output += '{}\n'.format(coordsys)
+        output += f'{coordsys}\n'
 
         for shape in self:
 
@@ -306,12 +306,12 @@ class ShapeList(list):
             if 'symsize' in shape.meta:
                 shape.meta['point'] += " {}".format(shape.meta.pop('symsize'))
 
-            meta_str = " ".join("{0}={1}".format(key, val) for key, val in
+            meta_str = " ".join(f"{key}={val}" for key, val in
                                 shape.meta.items() if key not in ('include', 'tag', 'comment', 'font', 'text'))
             if 'tag' in shape.meta:
-                meta_str += " " + " ".join(["tag={0}".format(tag) for tag in shape.meta['tag']])
+                meta_str += " " + " ".join([f"tag={tag}" for tag in shape.meta['tag']])
             if 'font' in shape.meta:
-                meta_str += " " + 'font="{0}"'.format(shape.meta['font'])
+                meta_str += " " + 'font="{}"'.format(shape.meta['font'])
             if shape.meta.get('text', '') != '':
                 meta_str += " " + 'text={' + shape.meta['text'] + '}'
             if 'comment' in shape.meta:
@@ -356,9 +356,9 @@ class ShapeList(list):
                 line = ds9_strings[shape.region_type].format(include, *coord)
 
             if meta_str.strip():
-                output += "{0} # {1}\n".format(line, meta_str)
+                output += f"{line} # {meta_str}\n"
             else:
-                output += "{0}\n".format(line)
+                output += f"{line}\n"
 
         return output
 
@@ -433,7 +433,7 @@ class ShapeList(list):
         return table
 
 
-class Shape(object):
+class Shape:
     """
     Helper class to represent a DS9/CRTF Region.
 
@@ -510,15 +510,15 @@ class Shape(object):
     def __str__(self):
         ss = self.__class__.__name__
         ss += '\nType : {}'.format(self.meta.get('type', 'reg'))
-        ss += '\nCoord sys : {}'.format(self.coordsys)
-        ss += '\nRegion type : {}'.format(self.region_type)
+        ss += f'\nCoord sys : {self.coordsys}'
+        ss += f'\nRegion type : {self.region_type}'
         if self.region_type == 'symbol':
             ss += '\nSymbol : {}'.format(self.meta['symbol'])
         if self.region_type == 'text':
             ss += '\nText : {}'.format(self.meta['text'])
-        ss += '\nMeta: {}'.format(self.meta)
-        ss += '\nComposite: {}'.format(self.composite)
-        ss += '\nInclude: {}'.format(self.include)
+        ss += f'\nMeta: {self.meta}'
+        ss += f'\nComposite: {self.composite}'
+        ss += f'\nInclude: {self.include}'
         ss += '\n'
         return ss
 
@@ -633,11 +633,11 @@ class Shape(object):
         Checks for CRTF compatibility.
         """
         if self.region_type not in regions_attributes:
-            raise ValueError("'{0}' is not a valid region type in this package"
+            raise ValueError("'{}' is not a valid region type in this package"
                              "supported by CRTF".format(self.region_type))
 
         if self.coordsys not in valid_coordsys['CRTF']:
-            raise ValueError("'{0}' is not a valid coordinate reference frame in "
+            raise ValueError("'{}' is not a valid coordinate reference frame in "
                              "astropy supported by CRTF".format(self.coordsys))
 
     def check_ds9(self):
@@ -645,11 +645,11 @@ class Shape(object):
         Checks for DS9 compatibility.
         """
         if self.region_type not in regions_attributes:
-            raise ValueError("'{0}' is not a valid region type in this package"
+            raise ValueError("'{}' is not a valid region type in this package"
                              "supported by DS9".format(self.region_type))
 
         if self.coordsys not in valid_coordsys['DS9']:
-            raise ValueError("'{0}' is not a valid coordinate reference frame "
+            raise ValueError("'{}' is not a valid coordinate reference frame "
                              "in astropy supported by DS9".format(self.coordsys))
 
     def _validate(self):
@@ -657,11 +657,11 @@ class Shape(object):
         Checks whether all the attributes of this object is valid.
         """
         if self.region_type not in regions_attributes:
-            raise ValueError("'{0}' is not a valid region type in this package"
+            raise ValueError("'{}' is not a valid region type in this package"
                              .format(self.region_type))
 
         if self.coordsys not in valid_coordsys['DS9'] + valid_coordsys['CRTF']:
-            raise ValueError("'{0}' is not a valid coordinate reference frame "
+            raise ValueError("'{}' is not a valid coordinate reference frame "
                              "in astropy".format(self.coordsys))
 
 
@@ -766,7 +766,7 @@ def to_ds9_meta(shape_meta):
     meta = _to_io_meta(shape_meta, valid_keys, key_mappings)
 
     if 'font' in meta:
-        meta['font'] += " {0} {1} {2}".format(shape_meta.get('fontsize', 12),
+        meta['font'] += " {} {} {}".format(shape_meta.get('fontsize', 12),
                                               shape_meta.get('fontstyle', 'normal'),
                                               shape_meta.get('fontweight', 'roman'))
 
