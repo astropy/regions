@@ -1,15 +1,8 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 # cython: language_level=3
 """The functions here are the core geometry functions."""
-
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
-
 import numpy as np
 cimport numpy as np
-
-
-__all__ = ['elliptical_overlap_grid']
 
 
 cdef extern from "math.h":

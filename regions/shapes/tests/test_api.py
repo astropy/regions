@@ -3,9 +3,6 @@
 The tests in this file simply check what functionality is currently
 implemented and doesn't check anything about correctness.
 """
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import itertools
 import pytest
 

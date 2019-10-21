@@ -1,7 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-from __future__ import absolute_import, division, print_function
 import re
-import six
 import copy
 import itertools
 from warnings import warn
@@ -357,7 +355,7 @@ class CRTFRegionParser(object):
                 else:
                     self._raise_error("Not in proper format: {0} should be a pair of length".format(val_str))
             if attr_spec == 'l':
-                if isinstance(val_str, six.string_types):
+                if isinstance(val_str, str):
                     coord_list.append(CoordinateParser.parse_angular_length_quantity(val_str))
                 else:
                     self._raise_error("Not in proper format: {0} should be a single length".format(val_str))

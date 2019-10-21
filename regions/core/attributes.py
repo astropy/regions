@@ -1,7 +1,6 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
 import abc
-import six
 import weakref
 
 from astropy.coordinates import SkyCoord
@@ -21,8 +20,7 @@ Also, contains RegionMeta and RegionVisual classes to handle meta data of region
 """
 
 
-@six.add_metaclass(abc.ABCMeta)
-class RegionAttr(object):
+class RegionAttr(abc.ABC):
     """Descriptor base class"""
     def __init__(self, name):
         self.name = name
@@ -141,7 +139,6 @@ class CompoundRegionSky(RegionAttr):
                              .format(self.name))
 
 
-@six.add_metaclass(abc.ABCMeta)
 class Meta(dict):
 
     def __init__(self, seq=None, **kwargs):

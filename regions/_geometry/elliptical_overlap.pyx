@@ -7,10 +7,6 @@ The approach is to divide the rectangle into two triangles, and
 reproject these so that the ellipse is a unit circle, then compute the
 intersection of a triangle with a unit circle.
 """
-
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
-
 import numpy as np
 cimport numpy as np
 

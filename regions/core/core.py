@@ -1,8 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
 import abc
-import six
 import copy
 import operator
 import inspect
@@ -28,44 +25,8 @@ _DEFAULT_WCS_MODE = 'all'
 VALID_MASK_MODES = {'center', 'exact', 'subpixels'}
 
 
-class MetaRegion(abc.ABCMeta):
-    """
-    This is a sub metaclass of `abc.ABCMeta` that makes methods of a class
-    automatically have their docstrings filled in from the methods they override
-    in the base class.
-
-    If the class uses multiple inheritance, the docstring will be
-    chosen from the first class in the bases list, in the same way as
-    methods are normally resolved in Python.  If this results in
-    selecting the wrong docstring, the docstring will need to be
-    explicitly included on the method.
-
-    """
-
-    def __init__(cls, name, bases, dct):
-        def is_public_member(key):
-            return (
-                (key.startswith('__') and key.endswith('__')
-                 and len(key) > 4) or
-                not key.startswith('_'))
-
-        for key, val in six.iteritems(dct):
-            if (inspect.isfunction(val) and is_public_member(key)
-                    and val.__doc__ is None):
-                for base in cls.__mro__[1:]:
-                    super_method = getattr(base, key, None)
-                    if super_method is not None:
-                        val.__doc__ = super_method.__doc__
-                        break
-
-        super(MetaRegion, cls).__init__(name, bases, dct)
-
-
-@six.add_metaclass(MetaRegion)
-class Region(object):
-    """
-    Base class for all regions.
-    """
+class Region(abc.ABC):
+    """Base class for all regions."""
 
     def copy(self, **changes):
         """Make an independent (deep) copy."""
