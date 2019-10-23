@@ -3,7 +3,6 @@ import string
 import itertools
 import re
 import copy
-from collections import OrderedDict
 from warnings import warn
 
 from astropy import units as u
@@ -291,12 +290,12 @@ class DS9Parser:
 
         Returns
         -------
-        meta : `~collections.OrderedDict`
+        meta : `dict`
             Dictionary containing the meta data
         """
         keys_vals = [(x, y) for x, _, y in regex_meta.findall(meta_str.strip())]
         extra_text = regex_meta.split(meta_str.strip())[-1]
-        result = OrderedDict()
+        result = {}
         for key, val in keys_vals:
             # regex can include trailing whitespace or inverted commas
             # remove it
