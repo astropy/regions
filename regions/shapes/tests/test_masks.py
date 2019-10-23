@@ -2,8 +2,6 @@
 """
 This file sets up detailed tests for computing masks with reference images.
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import itertools
 import pytest
 
@@ -41,7 +39,7 @@ def label(value):
     elif isinstance(value, PolygonPixelRegion):
         return 'poly'
     else:
-        return '-'.join('{0}_{1}'.format(key, value) for key, value in sorted(value.items()))
+        return '-'.join(f'{key}_{value}' for key, value in sorted(value.items()))
 
 # There's a bug in numpy: `numpy.savetxt` doesn't accept unicode
 # on Python 2. Bytes works on Python 2 and 3, so we're using that here.

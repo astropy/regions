@@ -1,8 +1,6 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
 import abc
-import six
-import weakref
 
 from astropy.coordinates import SkyCoord
 from astropy.units import Quantity
@@ -21,8 +19,7 @@ Also, contains RegionMeta and RegionVisual classes to handle meta data of region
 """
 
 
-@six.add_metaclass(abc.ABCMeta)
-class RegionAttr(object):
+class RegionAttr(abc.ABC):
     """Descriptor base class"""
     def __init__(self, name):
         self.name = name
@@ -52,8 +49,7 @@ class ScalarPix(RegionAttr):
 
     def _validate(self, value):
         if not (isinstance(value, PixCoord) and value.isscalar):
-            raise ValueError('The {} must be a 0D PixCoord object'
-                             .format(self.name))
+            raise ValueError(f'The {self.name} must be a 0D PixCoord object')
 
 
 class OneDPix(RegionAttr):
@@ -65,8 +61,7 @@ class OneDPix(RegionAttr):
     def _validate(self, value):
         if not (isinstance(value, PixCoord) and not value.isscalar
                 and value.x.ndim == 1):
-            raise ValueError('The {} must be a 1D PixCoord object'
-                             .format(self.name))
+            raise ValueError(f'The {self.name} must be a 1D PixCoord object')
 
 
 class ScalarLength(RegionAttr):
@@ -78,7 +73,7 @@ class ScalarLength(RegionAttr):
     def _validate(self, value):
         if not np.isscalar(value):
             raise ValueError(
-                'The {} must be a scalar numpy/python number'.format(self.name))
+                f'The {self.name} must be a scalar numpy/python number')
 
 
 class ScalarSky(RegionAttr):
@@ -113,8 +108,7 @@ class QuantityLength(RegionAttr):
 
     def _validate(self, value):
         if not (isinstance(value, Quantity) and value.isscalar):
-            raise ValueError('The {} must be a scalar astropy Quantity object'
-                             .format(self.name))
+            raise ValueError(f'The {self.name} must be a scalar astropy Quantity object')
 
 
 class CompoundRegionPix(RegionAttr):
@@ -125,8 +119,7 @@ class CompoundRegionPix(RegionAttr):
 
     def _validate(self, value):
         if not isinstance(value, PixelRegion):
-            raise ValueError('The {} must be a PixelRegion object'
-                             .format(self.name))
+            raise ValueError(f'The {self.name} must be a PixelRegion object')
 
 
 class CompoundRegionSky(RegionAttr):
@@ -137,16 +130,14 @@ class CompoundRegionSky(RegionAttr):
 
     def _validate(self, value):
         if not isinstance(value, SkyRegion):
-            raise ValueError('The {} must be a SkyRegion object'
-                             .format(self.name))
+            raise ValueError(f'The {self.name} must be a SkyRegion object')
 
 
-@six.add_metaclass(abc.ABCMeta)
 class Meta(dict):
 
     def __init__(self, seq=None, **kwargs):
 
-        super(Meta, self).__init__()
+        super().__init__()
 
         if seq:
             if isinstance(seq, dict):
@@ -163,14 +154,14 @@ class Meta(dict):
     def __setitem__(self, key, value):
         key = self.key_mapping.get(key, key)
         if key in self.valid_keys:
-            super(Meta, self).__setitem__(key, value)
+            super().__setitem__(key, value)
         else:
             raise KeyError(
-                "{} is not a valid key for this class.".format(key))
+                f"{key} is not a valid key for this class.")
 
     def __getitem__(self, item):
         item = self.key_mapping.get(item, item)
-        return super(Meta, self).__getitem__(item)
+        return super().__getitem__(item)
 
 
 class RegionMeta(Meta):

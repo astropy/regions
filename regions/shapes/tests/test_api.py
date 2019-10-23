@@ -3,9 +3,6 @@
 The tests in this file simply check what functionality is currently
 implemented and doesn't check anything about correctness.
 """
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import itertools
 import pytest
 
@@ -139,7 +136,7 @@ def test_attribute_validation_pixel_regions(region):
             for val in invalid_values.get(attr, None):
                 with pytest.raises(ValueError) as excinfo:
                     setattr(region, attr, val)
-                assert 'The {} must be'.format(attr) in str(excinfo.value)
+                assert f'The {attr} must be' in str(excinfo.value)
 
 
 @pytest.mark.parametrize('region', SKY_REGIONS, ids=ids_func)
@@ -169,4 +166,4 @@ def test_attribute_validation_sky_regions(region):
             for val in invalid_values.get(attr, None):
                 with pytest.raises(ValueError) as excinfo:
                     setattr(region, attr, val)
-                assert 'The {} must be'.format(attr) in str(excinfo.value)
+                assert f'The {attr} must be' in str(excinfo.value)

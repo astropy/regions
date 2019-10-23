@@ -1,6 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 # (taken from photutils: should probably migrate into astropy.wcs)
-from __future__ import absolute_import, division, print_function, unicode_literals
 import numpy as np
 from astropy import units as u
 from astropy.coordinates import UnitSphericalRepresentation
@@ -77,10 +76,9 @@ def assert_angle_or_pixel(name, q):
         if q.unit.physical_type == 'angle' or q.unit is u.pixel:
             pass
         else:
-            raise ValueError("{0} should have angular or pixel "
-                             "units".format(name))
+            raise ValueError(f"{name} should have angular or pixel units")
     else:
-        raise TypeError("{0} should be a Quantity instance".format(name))
+        raise TypeError(f"{name} should be a Quantity instance")
 
 
 def assert_angle(name, q):
@@ -91,6 +89,6 @@ def assert_angle(name, q):
         if q.unit.physical_type == 'angle':
             pass
         else:
-            raise ValueError("{0} should have angular units".format(name))
+            raise ValueError(f"{name} should have angular units")
     else:
-        raise TypeError("{0} should be a Quantity instance".format(name))
+        raise TypeError(f"{name} should be a Quantity instance")

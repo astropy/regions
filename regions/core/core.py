@@ -1,8 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
 import abc
-import six
 import copy
 import operator
 import inspect
@@ -28,44 +25,8 @@ _DEFAULT_WCS_MODE = 'all'
 VALID_MASK_MODES = {'center', 'exact', 'subpixels'}
 
 
-class MetaRegion(abc.ABCMeta):
-    """
-    This is a sub metaclass of `abc.ABCMeta` that makes methods of a class
-    automatically have their docstrings filled in from the methods they override
-    in the base class.
-
-    If the class uses multiple inheritance, the docstring will be
-    chosen from the first class in the bases list, in the same way as
-    methods are normally resolved in Python.  If this results in
-    selecting the wrong docstring, the docstring will need to be
-    explicitly included on the method.
-
-    """
-
-    def __init__(cls, name, bases, dct):
-        def is_public_member(key):
-            return (
-                (key.startswith('__') and key.endswith('__')
-                 and len(key) > 4) or
-                not key.startswith('_'))
-
-        for key, val in six.iteritems(dct):
-            if (inspect.isfunction(val) and is_public_member(key)
-                    and val.__doc__ is None):
-                for base in cls.__mro__[1:]:
-                    super_method = getattr(base, key, None)
-                    if super_method is not None:
-                        val.__doc__ = super_method.__doc__
-                        break
-
-        super(MetaRegion, cls).__init__(name, bases, dct)
-
-
-@six.add_metaclass(MetaRegion)
-class Region(object):
-    """
-    Base class for all regions.
-    """
+class Region(abc.ABC):
+    """Base class for all regions."""
 
     def copy(self, **changes):
         """Make an independent (deep) copy."""
@@ -81,11 +42,11 @@ class Region(object):
         params = []
         if self._params is not None:
             for key in self._params:
-                params.append('{0}={1}'.format(key.replace("_", " "),
+                params.append('{}={}'.format(key.replace("_", " "),
                                                getattr(self, key)))
         params = ', '.join(params)
 
-        return '<{0}({1})>'.format(self.__class__.__name__, params)
+        return f'<{self.__class__.__name__}({params})>'
 
     def __str__(self):
         cls_info = [('Region', self.__class__.__name__)]
@@ -93,7 +54,7 @@ class Region(object):
             params_value = [(x.replace("_", " "), getattr(self, x))
                             for x in self._params]
             cls_info += params_value
-        fmt = ['{0}: {1}'.format(key, val) for key, val in cls_info]
+        fmt = [f'{key}: {val}' for key, val in cls_info]
 
         return '\n'.join(fmt)
 
@@ -172,7 +133,7 @@ class PixelRegion(Region):
 
     def __contains__(self, coord):
         if not coord.isscalar:
-            raise ValueError('coord must be scalar. coord={}'.format(coord))
+            raise ValueError(f'coord must be scalar. coord={coord}')
         return self.contains(coord)
 
     @abc.abstractmethod
@@ -234,11 +195,11 @@ class PixelRegion(Region):
     @staticmethod
     def _validate_mode(mode, subpixels):
         if mode not in VALID_MASK_MODES:
-            raise ValueError("Invalid mask mode: {0} (should be one "
-                             "of {1})".format(mode, '/'.join(VALID_MASK_MODES)))
+            raise ValueError("Invalid mask mode: {} (should be one "
+                             "of {})".format(mode, '/'.join(VALID_MASK_MODES)))
         if mode == 'subpixels':
             if not isinstance(subpixels, int) or subpixels <= 0:
-                raise ValueError("Invalid subpixels value: {0} (should be"
+                raise ValueError("Invalid subpixels value: {} (should be"
                                  " a strictly positive integer)".format(subpixels))
 
     @abc.abstractmethod

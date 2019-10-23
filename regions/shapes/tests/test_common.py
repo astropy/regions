@@ -1,15 +1,12 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 # Base class for all shape tests
-
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import numpy as np
 from numpy.testing import assert_equal, assert_allclose
 import pytest
 
 from ...core import PixCoord, BoundingBox
 
-class BaseTestRegion(object):
+class BaseTestRegion:
 
     def test_repr(self):
         assert repr(self.reg).replace(" ","") == self.expected_repr.replace(" ","")

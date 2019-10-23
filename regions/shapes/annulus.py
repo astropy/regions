@@ -1,10 +1,6 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-from __future__ import absolute_import, division, print_function, unicode_literals
-
 import operator
-import six
 import abc
-
 from astropy import units as u
 from astropy.wcs.utils import pixel_to_skycoord
 
@@ -30,8 +26,7 @@ __all__ = [
 ]
 
 
-@six.add_metaclass(abc.ABCMeta)
-class AnnulusPixelRegion(PixelRegion):
+class AnnulusPixelRegion(PixelRegion, abc.ABC):
     """Annulus pixel region."""
 
     @property
@@ -194,7 +189,6 @@ class CircleAnnulusSkyRegion(SkyRegion):
         )
 
 
-@six.add_metaclass(abc.ABCMeta)
 class AsymmetricAnnulusPixelRegion(AnnulusPixelRegion):
     """Helper class for asymmetric annuli sky regions.
 
@@ -270,7 +264,6 @@ class AsymmetricAnnulusPixelRegion(AnnulusPixelRegion):
         return center, inner_width, inner_height, outer_width, outer_height, angle
 
 
-@six.add_metaclass(abc.ABCMeta)
 class AsymmetricAnnulusSkyRegion(SkyRegion):
     """Helper class for asymmetric annuli sky regions.
 

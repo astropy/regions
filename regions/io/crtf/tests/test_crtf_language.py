@@ -1,4 +1,3 @@
-
 import distutils.version as vers
 import pytest
 
@@ -21,7 +20,7 @@ def test_global_parser():
     """
     Checks that the global_parser does what's expected.
     """
-    global_test_str = str("global coord=B1950_VLA, frame=BARY, corr=[I, Q], color=blue")
+    global_test_str = "global coord=B1950_VLA, frame=BARY, corr=[I, Q], color=blue"
     global_parser = CRTFParser(global_test_str)
     assert dict(global_parser.global_meta) == {'coord': 'B1950_VLA', 'frame': 'BARY',
                                                'corr': ['I', 'Q'], 'color': 'blue'}
@@ -56,7 +55,7 @@ def test_valid_global_meta_key():
     Checks whether the global key is valid or not.
     """
 
-    global_test_str = str("global label=B1950_VLA, frame=BARY, corr=[I, Q], color=blue")
+    global_test_str = "global label=B1950_VLA, frame=BARY, corr=[I, Q], color=blue"
 
     with pytest.raises(CRTFRegionParserError) as excinfo:
         CRTFParser(global_test_str)
@@ -69,7 +68,7 @@ def test_valid_meta_key():
     Checks whether the key is valid or not.
     """
 
-    meta_test_str = str("annulus[[17h51m03.2s, -45d17m50s], [0.10deg, 4.12deg]], hello='My label here'")
+    meta_test_str = "annulus[[17h51m03.2s, -45d17m50s], [0.10deg, 4.12deg]], hello='My label here'"
 
     with pytest.raises(CRTFRegionParserError) as excinfo:
         CRTFParser(meta_test_str)
