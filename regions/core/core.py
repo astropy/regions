@@ -153,6 +153,12 @@ class PixelRegion(Region):
 
     @property
     @abc.abstractmethod
+    def area(self):
+        """Region area (float)"""
+        raise NotImplementedError
+
+    @property
+    @abc.abstractmethod
     def bounding_box(self):
         """
         The minimal bounding box (in integer pixel coordinates) that contains
