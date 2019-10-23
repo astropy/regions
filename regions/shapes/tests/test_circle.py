@@ -12,7 +12,7 @@ from astropy.wcs import WCS
 
 from ...core import PixCoord
 from ...tests.helpers import make_simple_wcs
-from ..circle import CirclePixelRegion, CircleSkyRegion
+from ..circle import CirclePixelRegion, CircleSkyRegion, CircleSphericalRegion
 from .utils import HAS_MATPLOTLIB  # noqa
 from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
 
@@ -101,3 +101,14 @@ class TestCircleSkyRegion(BaseTestSkyRegion):
         position = SkyCoord([1, 3] * u.deg, [2, 4] * u.deg)
         # 1,2 is outside, 3,4 is the center and is inside
         assert all(self.reg.contains(position, wcs) == np.array([False, True], dtype='bool'))
+
+class TestCircleSphericalRegion:
+    @staticmethod
+    def test_contains(wcs):
+        # TODO: pick a wcs and point where sky and spherical differs
+        reg_sky = CircleSkyRegion(SkyCoord(0 * u.deg, 80 * u.deg), radius=12 * u.deg)
+        reg_sph = CircleSphericalRegion(SkyCoord(0 * u.deg, 80 * u.deg), radius=12 * u.deg)
+        point = SkyCoord(180 * u.deg, 89 * u.deg)
+        assert reg_sky.contains(point, wcs)
+        assert reg_sph.contains(point, wcs)
+        assert reg_sph.contains(point)

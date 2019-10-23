@@ -11,7 +11,7 @@ from .._geometry import circular_overlap_grid
 from ..core.attributes import (ScalarSky, ScalarPix, QuantityLength,
                                ScalarLength, RegionVisual, RegionMeta)
 
-__all__ = ['CirclePixelRegion', 'CircleSkyRegion']
+__all__ = ['CirclePixelRegion', 'CircleSkyRegion', 'CircleSphericalRegion']
 
 
 class CirclePixelRegion(PixelRegion):
@@ -195,3 +195,15 @@ class CircleSkyRegion(SkyRegion):
         center, scale, _ = skycoord_to_pixel_scale_angle(self.center, wcs)
         radius = self.radius.to('deg').value * scale
         return CirclePixelRegion(center, radius, self.meta, self.visual)
+
+
+class CircleSphericalRegion(CircleSkyRegion):
+    """Spherical circle sky region.
+
+    TODO: document
+    """
+
+    def contains(self, skycoord, wcs=None):
+        """Defined by spherical distance."""
+        separation = self.center.separation(skycoord)
+        return separation < self.radius
