@@ -6,6 +6,7 @@ from .ellipse import *
 from .point import *
 from .polygon import *
 from .rectangle import *
+from .range import *
 from .annulus import *
 from .line import *
 from .text import *
