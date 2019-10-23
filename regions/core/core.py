@@ -2,7 +2,6 @@
 import abc
 import copy
 import operator
-import inspect
 
 
 __all__ = ['Region', 'PixelRegion', 'SkyRegion']
@@ -152,7 +151,8 @@ class PixelRegion(Region):
         """
         raise NotImplementedError
 
-    @abc.abstractproperty
+    @property
+    @abc.abstractmethod
     def bounding_box(self):
         """
         The minimal bounding box (in integer pixel coordinates) that contains

@@ -121,8 +121,7 @@ class LinePixelRegion(PixelRegion):
         y = self.start.y - origin[1]
         dx = self.end.x - self.start.x
         dy = self.end.y - self.start.y
-        if not 'width' in kwargs:
-            kwargs['width'] = .1  # Let the default width be .1 instead of 1.
+        kwargs.setdefault("width", 0.1)
 
         mpl_params = self.mpl_properties_default('patch')
         mpl_params.update(kwargs)

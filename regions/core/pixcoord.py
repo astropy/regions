@@ -174,7 +174,7 @@ class PixCoord:
         """
         A 2-tuple ``(x, y)`` for this coordinate.
         """
-        return (self.x, self.y)
+        return self.x, self.y
 
     def rotate(self, center, angle):
         """Make a rotated pixel coordinate.
