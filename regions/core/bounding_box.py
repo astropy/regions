@@ -109,7 +109,6 @@ class BoundingBox:
         >>> BoundingBox.from_float(xmin=1.4, xmax=10.4, ymin=1.6, ymax=10.6)
         BoundingBox(ixmin=1, ixmax=11, iymin=2, iymax=12)
         """
-
         ixmin = int(np.floor(xmin + 0.5))
         ixmax = int(np.ceil(xmax + 0.5))
         iymin = int(np.floor(ymin + 0.5))
@@ -147,7 +146,6 @@ class BoundingBox:
         """
         The ``(ny, nx)`` shape of the bounding box.
         """
-
         return self.iymax - self.iymin, self.ixmax - self.ixmin
 
     @property
@@ -158,8 +156,7 @@ class BoundingBox:
         The slice tuple is in numpy axis order (i.e. ``(y, x)``) and
         therefore can be used to slice numpy arrays.
         """
-
-        return (slice(self.iymin, self.iymax), slice(self.ixmin, self.ixmax))
+        return slice(self.iymin, self.iymax), slice(self.ixmin, self.ixmax)
 
     @property
     def extent(self):
@@ -174,7 +171,6 @@ class BoundingBox:
         indexing.  This is useful for plotting the bounding box using
         Matplotlib.
         """
-
         return (
             self.ixmin - 0.5,
             self.ixmax - 0.5,
@@ -275,7 +271,6 @@ class BoundingBox:
             A `BoundingBox` representing the union of the input
             `BoundingBox` with this one.
         """
-
         if not isinstance(other, BoundingBox):
             raise TypeError('BoundingBox can be joined only with another '
                             'BoundingBox.')
@@ -303,7 +298,6 @@ class BoundingBox:
             A `BoundingBox` representing the intersection of the input
             `BoundingBox` with this one.
         """
-
         if not isinstance(other, BoundingBox):
             raise TypeError('BoundingBox can be intersected only with '
                             'another BoundingBox.')

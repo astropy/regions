@@ -62,7 +62,7 @@ class LinePixelRegion(PixelRegion):
     @property
     def area(self):
         """Region area (float)."""
-        return 0 * u.sr
+        return 0
 
     def contains(self, pixcoord):
         if pixcoord.isscalar:

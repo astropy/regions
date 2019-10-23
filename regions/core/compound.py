@@ -3,7 +3,7 @@ import operator as op
 
 import numpy as np
 
-from . import PixelRegion, SkyRegion, BoundingBox, RegionMask
+from . import PixelRegion, SkyRegion, RegionMask
 from ..core.attributes import (CompoundRegionPix, CompoundRegionSky,
                                RegionMeta, RegionVisual)
 
@@ -61,7 +61,6 @@ class CompoundPixelRegion(PixelRegion):
             return np.logical_not(in_reg)
 
     def to_mask(self, mode='center', subpixels=1):
-
         if mode != 'center':
             raise NotImplementedError
 
@@ -69,12 +68,7 @@ class CompoundPixelRegion(PixelRegion):
         mask2 = self.region2.to_mask(mode=mode, subpixels=subpixels)
 
         # Common bounding box
-        bbox = BoundingBox(
-            ixmin=min(mask1.bbox.ixmin, mask2.bbox.ixmin),
-            ixmax=max(mask1.bbox.ixmax, mask2.bbox.ixmax),
-            iymin=min(mask1.bbox.iymin, mask2.bbox.iymin),
-            iymax=max(mask1.bbox.iymax, mask2.bbox.iymax)
-        )
+        bbox = self.bounding_box
 
         # Pad mask1.data and mask2.data to get the same shape
         padded_data = list()
@@ -107,7 +101,6 @@ class CompoundPixelRegion(PixelRegion):
 
         # This is borrowed from photutils aperture.
         """
-
         import matplotlib.path as mpath
 
         path_inner = patch_inner.get_path()
@@ -143,7 +136,6 @@ class CompoundPixelRegion(PixelRegion):
         patch : `~matplotlib.patches.PathPatch`
             Matplotlib patch object
         """
-
         if self.region1.center == self.region2.center and self.operator == op.xor:
             import matplotlib.patches as mpatches
 
@@ -155,8 +147,9 @@ class CompoundPixelRegion(PixelRegion):
         else:
             raise NotImplementedError
 
-    def bounding_box(self, **kwargs):
-        raise NotImplementedError
+    @property
+    def bounding_box(self):
+        return self.region1.bounding_box | self.region2.bounding_box
 
     @property
     def area(self):

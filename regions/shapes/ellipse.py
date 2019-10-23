@@ -79,7 +79,7 @@ class EllipsePixelRegion(PixelRegion):
     @property
     def area(self):
         """Region area (float)"""
-        return math.pi * self.width * self.height * 0.25
+        return math.pi / 4 * self.width * self.height
 
     def contains(self, pixcoord):
         pixcoord = PixCoord._validate(pixcoord, name='pixcoord')
