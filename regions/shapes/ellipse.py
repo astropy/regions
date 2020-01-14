@@ -130,7 +130,10 @@ class EllipsePixelRegion(PixelRegion):
         if dx1 > dx2:
             dx1, dx2 = dx2, dx1
 
-        t1 = np.arctan(self.height / tan_angle / self.width)
+        if 0 in (self.height, tan_angle, self.width):
+            t1 = 0
+        else:
+            t1 = np.arctan(self.height / tan_angle / self.width)
         t2 = t1 + np.pi * u.rad
 
         dy1 = 0.5 * self.height * cos_angle * np.sin(t1) + 0.5 * self.width * sin_angle * np.cos(t1)
