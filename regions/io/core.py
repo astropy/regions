@@ -71,12 +71,12 @@ valid_coordsys['DS9'] += [f'wcs{x}' for x in string.ascii_lowercase]
 coordsys_mapping = {'DS9': {x: x for x in valid_coordsys['DS9']},
                     'CRTF': {x: x for x in valid_coordsys['CRTF']}
                     }
-coordsys_mapping['CRTF']['geocentrictrueecliptic'] = 'ecliptic'
-coordsys_mapping['CRTF']['fk5'] = 'j2000'
-coordsys_mapping['CRTF']['fk4'] = 'b1950'
-coordsys_mapping['CRTF']['supergalactic'] = 'supergal'
+coordsys_mapping['CRTF']['geocentrictrueecliptic'] = 'ECLIPTIC'
+coordsys_mapping['CRTF']['fk5'] = 'J2000'
+coordsys_mapping['CRTF']['fk4'] = 'B1950'
+coordsys_mapping['CRTF']['supergalactic'] = 'SUPERGAL'
 
-coordsys_mapping['DS9']['geocentrictrueecliptic'] = 'ecliptic'
+coordsys_mapping['DS9']['geocentrictrueecliptic'] = 'ECLIPTIC'
 
 
 class ShapeList(list):
@@ -137,7 +137,7 @@ class ShapeList(list):
             'line': '{0}line[[{1:FMT}deg, {2:FMT}deg], [{3:FMT}deg, {4:FMT}deg]]'
                         }
 
-        output = '#CRTF\n'
+        output = '#CRTFv0\n'
 
         if radunit == 'arcsec':
             # what's this for?
@@ -156,7 +156,7 @@ class ShapeList(list):
 
         # CASA does not support global coordinate specification, even though the
         # documentation for the specification explicitly states that it does.
-        # output += 'global coord={}\n'.format(coordsys)
+        output += 'global coord={}\n'.format(coordsys_mapping['CRTF'][coordsys])
 
         for shape in self:
 
@@ -177,11 +177,6 @@ class ShapeList(list):
                                 key not in ('include', 'comment', 'symbol',
                                             'coord', 'text', 'range', 'corr',
                                             'type'))
-
-            # the first item should be the coordinates, since CASA cannot
-            # recognize a region without an inline coordinate specification
-            # It can be, but does not need to be, comma-separated at the start
-            meta_str = "coord={}, ".format(coordsys.upper()) + meta_str
 
             if 'comment' in shape.meta:
                 meta_str += ", " + shape.meta['comment']
@@ -224,9 +219,9 @@ class ShapeList(list):
                 else:
                     line = crtf_strings['point'].format(include, *coord)
             elif shape.region_type == 'ellipse':
-                coord[2:] = [x / 2 for x in coord[2:]]
-                if len(coord) % 2 == 1:
-                    coord[-1] *= 2
+#               coord[2:] = [x / 2 for x in coord[2:]]
+#               if len(coord) % 2 == 1:
+#                   coord[-1] *= 2
                 line = crtf_strings['ellipse'].format(include, *coord)
             elif shape.region_type == 'text':
                 line = crtf_strings['text'].format(include, *coord, text=shape.meta['text'])
