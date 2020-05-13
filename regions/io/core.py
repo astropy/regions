@@ -76,7 +76,7 @@ coordsys_mapping['CRTF']['fk5'] = 'J2000'
 coordsys_mapping['CRTF']['fk4'] = 'B1950'
 coordsys_mapping['CRTF']['supergalactic'] = 'SUPERGAL'
 
-coordsys_mapping['DS9']['geocentrictrueecliptic'] = 'ecliptic'
+coordsys_mapping['DS9']['geocentrictrueecliptic'] = 'ECLIPTIC'
 
 
 class ShapeList(list):
@@ -137,7 +137,7 @@ class ShapeList(list):
             'line': '{0}line[[{1:FMT}deg, {2:FMT}deg], [{3:FMT}deg, {4:FMT}deg]]'
                         }
 
-        output = '#CRTF\n'
+        output = '#CRTFv0\n'
 
         if radunit == 'arcsec':
             # arcseconds are allowed for all but image coordinates
@@ -156,7 +156,7 @@ class ShapeList(list):
 
         # CASA does not support global coordinate specification, even though the
         # documentation for the specification explicitly states that it does.
-        # output += 'global coord={}\n'.format(coordsys)
+        output += 'global coord={}\n'.format(coordsys_mapping['CRTF'][coordsys])
 
         for shape in self:
 
@@ -228,9 +228,9 @@ class ShapeList(list):
                 else:
                     line = crtf_strings['point'].format(include, *coord)
             elif shape.region_type == 'ellipse':
-                coord[2:] = [x / 2 for x in coord[2:]]
-                if len(coord) % 2 == 1:
-                    coord[-1] *= 2
+#               coord[2:] = [x / 2 for x in coord[2:]]
+#               if len(coord) % 2 == 1:
+#                   coord[-1] *= 2
                 line = crtf_strings['ellipse'].format(include, *coord)
             elif shape.region_type == 'text':
                 line = crtf_strings['text'].format(include, *coord, text=shape.meta['text'])
