@@ -406,10 +406,10 @@ class CRTFRegionParser:
         """
         Make shape object
         """
-        if self.region_type == 'ellipse':
-            self.coord[2:] = [x * 2 for x in self.coord[2:]]
-            if len(self.coord) % 2 == 1:  # This checks if the angle is present.
-                self.coord[-1] /= 2
+#       if self.region_type == 'ellipse':
+#           self.coord[2:] = [x * 2 for x in self.coord[2:]]
+#           if len(self.coord) % 2 == 1:  # This checks if the angle is present.
+#               self.coord[-1] /= 2
 
         if self.region_type == 'box':
             x = (self.coord[0] + self.coord[2]) / 2
