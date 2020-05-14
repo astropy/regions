@@ -37,7 +37,7 @@ def crtf_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
     >>> reg_sky = CircleSkyRegion(SkyCoord(1 * u.deg, 2 * u.deg), 5 * u.deg)
     >>> print(crtf_objects_to_string([reg_sky]))
     #CRTF
-    circle[[1.000007deg, 2.000002deg], 5.000000deg], coord=FK5,
+    circle[[1.000007deg, 2.000002deg], 5.000000deg], coord=FK5
 
     """
     shapelist = to_shape_list(regions, coordsys)
