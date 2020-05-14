@@ -12,7 +12,7 @@ from ..read import CRTFParser, read_crtf
 from ..write import crtf_objects_to_string
 from ..core import CRTFRegionParserError
 
-from ..core import EllipseSkyRegion
+from ....shapes.ellipse import EllipseSkyRegion
 
 _ASTROPY_MINVERSION = vers.LooseVersion('1.1')
 _ASTROPY_VERSION = vers.LooseVersion(astrov.version)
