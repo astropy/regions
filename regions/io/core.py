@@ -242,7 +242,7 @@ class ShapeList(list):
             else:
                 output += f"{line}\n"
 
-        return output
+        return output.rstrip()
 
     def to_ds9(self, coordsys='fk5', fmt='.6f', radunit='deg'):
         """
