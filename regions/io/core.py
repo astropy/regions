@@ -173,15 +173,19 @@ class ShapeList(list):
             if shape.meta.get('label', "") != "":
                 shape.meta['label'] = "'{}'".format(shape.meta['label'])
             meta_str = ", ".join(f"{key}={val}" for key, val in
-                                shape.meta.items() if
-                                key not in ('include', 'comment', 'symbol',
-                                            'coord', 'text', 'range', 'corr',
-                                            'type'))
+                                 shape.meta.items() if
+                                 key not in ('include', 'comment', 'symbol',
+                                             'coord', 'text', 'range', 'corr',
+                                             'type'))
 
             # the first item should be the coordinates, since CASA cannot
             # recognize a region without an inline coordinate specification
             # It can be, but does not need to be, comma-separated at the start
-            meta_str = "coord={}, ".format(coordsys.upper()) + meta_str
+            if meta_str.strip():
+                meta_str = "coord={}, ".format(coordsys.upper()) + meta_str
+            else:
+                # if there is no metadata at all (above), the trailing comma is incorrect
+                meta_str = "coord={}".format(coordsys.upper())
 
             if 'comment' in shape.meta:
                 meta_str += ", " + shape.meta['comment']
