@@ -71,6 +71,7 @@ valid_coordsys['DS9'] += [f'wcs{x}' for x in string.ascii_lowercase]
 coordsys_mapping = {'DS9': {x: x for x in valid_coordsys['DS9']},
                     'CRTF': {x: x for x in valid_coordsys['CRTF']}
                     }
+# Coordinate frame names must be uppercase following the CASA CRTF syntax
 coordsys_mapping['CRTF']['geocentrictrueecliptic'] = 'ECLIPTIC'
 coordsys_mapping['CRTF']['fk5'] = 'J2000'
 coordsys_mapping['CRTF']['fk4'] = 'B1950'
@@ -219,9 +220,9 @@ class ShapeList(list):
                 else:
                     line = crtf_strings['point'].format(include, *coord)
             elif shape.region_type == 'ellipse':
-#               coord[2:] = [x / 2 for x in coord[2:]]
-#               if len(coord) % 2 == 1:
-#                   coord[-1] *= 2
+                coord[2:] = [x / 2 for x in coord[2:]]
+                if len(coord) % 2 == 1:
+                    coord[-1] *= 2
                 line = crtf_strings['ellipse'].format(include, *coord)
             elif shape.region_type == 'text':
                 line = crtf_strings['text'].format(include, *coord, text=shape.meta['text'])
