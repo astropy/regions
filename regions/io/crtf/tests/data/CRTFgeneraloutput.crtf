@@ -1,4 +1,4 @@
-#CRTF
+#CRTFv0
 ann circle[[273.100deg, -23.183deg], 0.001deg], coord=FK4, frame=BARY, color=blue, corr=[I, Q]
 rotbox[[180.392deg, 12.392deg], [0.050deg, 0.017deg], 12.000deg], coord=FK4, frame=BARY, color=blue, range=[-1240.0km/s, 1240.0km/s], corr=[I, Q]
 annulus[[267.763deg, -45.297deg], [0.100deg, 4.120deg]], coord=FK4, label='My label here', frame=BARY, color=red, corr=[I, Q, U, V]
