@@ -182,10 +182,10 @@ class ShapeList(list):
             # recognize a region without an inline coordinate specification
             # It can be, but does not need to be, comma-separated at the start
             if meta_str.strip():
-                meta_str = "coord={}, ".format(coordsys.upper()) + meta_str
+                meta_str = "coord={}, ".format(coordsys_mapping['CRTF'][coordsys]) + meta_str
             else:
                 # if there is no metadata at all (above), the trailing comma is incorrect
-                meta_str = "coord={}".format(coordsys.upper())
+                meta_str = "coord={}".format(coordsys_mapping['CRTF'][coordsys])
 
             if 'comment' in shape.meta:
                 meta_str += ", " + shape.meta['comment']
