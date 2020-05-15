@@ -129,7 +129,8 @@ class ShapeList(list):
         crtf_strings = {
             'circle': '{0}circle[[{1:FMT}deg, {2:FMT}deg], {3:FMT}RAD]',
             'circleannulus': '{0}annulus[[{1:FMT}deg, {2:FMT}deg], [{3:FMT}RAD, {4:FMT}RAD]]',
-            'ellipse': '{0}ellipse[[{1:FMT}deg, {2:FMT}deg], [{3:FMT}RAD, {4:FMT}RAD], {5:FMT}deg]',
+            # Make sure that width goes to minor axis and height to major axis
+            'ellipse': '{0}ellipse[[{1:FMT}deg, {2:FMT}deg], [{4:FMT}RAD, {3:FMT}RAD], {5:FMT}deg]',
             'rectangle': '{0}rotbox[[{1:FMT}deg, {2:FMT}deg], [{3:FMT}RAD, {4:FMT}RAD], {5:FMT}deg]',
             'polygon': '{0}poly[{1}]',
             'point': '{0}point[[{1:FMT}deg, {2:FMT}deg]]',
