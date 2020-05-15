@@ -17,7 +17,7 @@ def crtf_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
         List of `~regions.Region` objects
     coordsys : `str`, optional
         Astropy Coordinate system that overrides the coordinate system frame for
-        all regions. Default is 'fk5'.
+        all regions. Default is 'fk5' (which maps to J2000).
     fmt : `str`, optional
         A python string format defining the output precision. Default is .6f,
         which is accurate to 0.0036 arcseconds.
@@ -37,7 +37,7 @@ def crtf_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
     >>> reg_sky = CircleSkyRegion(SkyCoord(1 * u.deg, 2 * u.deg), 5 * u.deg)
     >>> print(crtf_objects_to_string([reg_sky]))
     #CRTF
-    circle[[1.000007deg, 2.000002deg], 5.000000deg], coord=FK5
+    circle[[1.000007deg, 2.000002deg], 5.000000deg], coord=J2000
 
     """
     shapelist = to_shape_list(regions, coordsys)
