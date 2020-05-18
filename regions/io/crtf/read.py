@@ -409,7 +409,7 @@ class CRTFRegionParser:
         if self.region_type == 'ellipse':
             self.coord[2:] = [x * 2 for x in self.coord[2:]]
             # Map major and minor axis to height and width respectively
-            self.coord[2], self.coord[3] = self.coord[3], self.coord[2] 
+            self.coord[2], self.coord[3] = self.coord[3], self.coord[2]
             if len(self.coord) % 2 == 1:  # This checks if the angle is present.
                 self.coord[-1] /= 2
 
