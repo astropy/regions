@@ -7,7 +7,6 @@ from astropy.utils.data import get_pkg_data_filename
 
 from astropy import coordinates, units as u
 
-
 from ..read import CRTFParser, read_crtf
 from ..write import crtf_objects_to_string
 from ..core import CRTFRegionParserError
