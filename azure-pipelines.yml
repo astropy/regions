@@ -32,15 +32,15 @@ jobs:
     # All platforms with all dependencies
     - macos: py36-test-alldeps-cov
     - linux: py36-test-alldeps-cov
-    - linux32: py36-test-alldeps-cov
     - windows: py36-test-alldeps-cov
 
     # Linux with developer version of dependencies
     - linux: py38-test-devdeps-cov
 
-    # Windows and MacOS X with minimal dependencies and older versions of Astropy
+    # Windows. Linux 32-bit and MacOS X with minimal dependencies and older versions of Astropy
     - macos: py36-test-astropy20-cov
-    - windows: py36-test-astropy30-cov
+    - linux32: py36-test-astropy30-cov
+    - windows: py36-test-astropy40-cov
 
     # Documentation builds
     - macos: build_docs
