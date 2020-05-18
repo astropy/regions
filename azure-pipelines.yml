@@ -26,24 +26,23 @@ jobs:
 
     envs:
 
+    # Code style checks
     # - linux: codestyle
 
-    - macos: py36-test-astropy30-cov
-    - macos: py37-test-alldeps-cov
-    - macos: py38-test-devdeps-cov
+    # All platforms with all dependencies
+    - macos: py36-test-alldeps-cov
+    - linux: py36-test-alldeps-cov
+    - linux32: py36-test-alldeps-cov
+    - windows: py36-test-alldeps-cov
 
-    - linux: py36-test-alldeps-astropy30-cov
-    - linux: py37-test-devdeps-cov
-    - linux: py38-test-cov
+    # Linux with developer version of dependencies
+    - linux: py38-test-devdeps-cov
 
-    - linux32: py36-test-astropy30-cov
-    - linux32: py37-test-devdeps-cov
-    - linux32: py38-test-alldeps-astropy40-cov
+    # Windows and MacOS X with minimal dependencies and older versions of Astropy
+    - macos: py36-test-astropy20-cov
+    - windows: py36-test-astropy30-cov
 
-    - windows: py36-test-cov-astropy30-cov
-    - windows: py37-test-devdeps-cov
-    - windows: py38-test-alldeps-cov
-
+    # Documentation builds
     - macos: build_docs
     - linux: build_docs
     - macos: build_docs
