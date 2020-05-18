@@ -38,14 +38,14 @@ jobs:
     - linux: py38-test-devdeps-cov
 
     # Windows. Linux 32-bit and MacOS X with minimal dependencies and older versions of Astropy
-    - macos: py36-test-astropy20-cov
+    - macos: py36-test-astropy30-cov
     - linux32: py36-test-astropy30-cov
     - windows: py36-test-astropy40-cov
 
     # Documentation builds
-    - macos: build_docs
     - linux: build_docs
     - macos: build_docs
+    - windows: build_docs
 
 - template: publish.yml@OpenAstronomy
   parameters:
