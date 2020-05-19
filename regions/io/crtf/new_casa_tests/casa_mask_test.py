@@ -79,8 +79,9 @@ def test_casa_masking():
         ia = image()
         ia.open(tmpdir+'/SIM.mask')
         mask_array = ia.getregion()
+        ia.close()
 
         with open('data/binary_mask.pkl', 'rb') as f:
             ref_mask = pickle.load(f)
 
-        assert mask_array == ref_mask
+        assert all(mask_array == ref_mask)
