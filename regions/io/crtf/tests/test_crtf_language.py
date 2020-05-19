@@ -5,10 +5,13 @@ import pytest
 import astropy.version as astrov
 from astropy.utils.data import get_pkg_data_filename
 
+from astropy import coordinates, units as u
 
 from ..read import CRTFParser, read_crtf
 from ..write import crtf_objects_to_string
 from ..core import CRTFRegionParserError
+
+from ....shapes.ellipse import EllipseSkyRegion
 
 _ASTROPY_MINVERSION = vers.LooseVersion('1.1')
 _ASTROPY_VERSION = vers.LooseVersion(astrov.version)
@@ -122,6 +125,18 @@ def test_valid_region_syntax():
         CRTFParser(reg_str6)
 
     assert "('3arcmin', '') should be a pair of length" in str(excinfo.value)
+
+def test_issue_312_regression():
+    """
+    Make sure there is no trailing comma when writing a CRTF string with no metadata
+    """
+    reg = EllipseSkyRegion(center=coordinates.SkyCoord(279.174990*u.deg,
+                                                       -21.257123*u.deg,
+                                                       frame='fk5'),
+                           width=0.001571*u.deg, height=0.001973*u.deg,
+                           angle=111.273322*u.deg)
+    crtfstr = crtf_objects_to_string([reg], 'fk5', '.6f', 'deg')
+    assert crtfstr.strip()[-1] != ','
 
 
 @pytest.mark.parametrize('filename', ['data/CRTFgeneral.crtf', 'data/CRTFgeneraloutput.crtf'])

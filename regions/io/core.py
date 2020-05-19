@@ -69,12 +69,12 @@ valid_coordsys['DS9'] += [f'wcs{x}' for x in string.ascii_lowercase]
 
 # Maps astropy's coordinate frame names with their respective name in the file format.
 coordsys_mapping = {'DS9': {x: x for x in valid_coordsys['DS9']},
-                    'CRTF': {x: x for x in valid_coordsys['CRTF']}
+                    'CRTF': {x: x.upper() for x in valid_coordsys['CRTF']}
                     }
-coordsys_mapping['CRTF']['geocentrictrueecliptic'] = 'ecliptic'
-coordsys_mapping['CRTF']['fk5'] = 'j2000'
-coordsys_mapping['CRTF']['fk4'] = 'b1950'
-coordsys_mapping['CRTF']['supergalactic'] = 'supergal'
+coordsys_mapping['CRTF']['geocentrictrueecliptic'] = 'ECLIPTIC'
+coordsys_mapping['CRTF']['fk5'] = 'J2000'
+coordsys_mapping['CRTF']['fk4'] = 'B1950'
+coordsys_mapping['CRTF']['supergalactic'] = 'SUPERGAL'
 
 coordsys_mapping['DS9']['geocentrictrueecliptic'] = 'ecliptic'
 
@@ -140,8 +140,8 @@ class ShapeList(list):
         output = '#CRTF\n'
 
         if radunit == 'arcsec':
-            # what's this for?
-            if coordsys in coordsys_mapping['CRTF'].values():
+            # arcseconds are allowed for all but image coordinates
+            if coordsys.lower() not in ('image',):
                 radunitstr = '"'
             else:
                 raise ValueError(
@@ -173,15 +173,19 @@ class ShapeList(list):
             if shape.meta.get('label', "") != "":
                 shape.meta['label'] = "'{}'".format(shape.meta['label'])
             meta_str = ", ".join(f"{key}={val}" for key, val in
-                                shape.meta.items() if
-                                key not in ('include', 'comment', 'symbol',
-                                            'coord', 'text', 'range', 'corr',
-                                            'type'))
+                                 shape.meta.items() if
+                                 key not in ('include', 'comment', 'symbol',
+                                             'coord', 'text', 'range', 'corr',
+                                             'type'))
 
             # the first item should be the coordinates, since CASA cannot
             # recognize a region without an inline coordinate specification
             # It can be, but does not need to be, comma-separated at the start
-            meta_str = "coord={}, ".format(coordsys.upper()) + meta_str
+            if meta_str.strip():
+                meta_str = "coord={}, ".format(coordsys_mapping['CRTF'][coordsys.lower()]) + meta_str
+            else:
+                # if there is no metadata at all (above), the trailing comma is incorrect
+                meta_str = "coord={}".format(coordsys_mapping['CRTF'][coordsys.lower()])
 
             if 'comment' in shape.meta:
                 meta_str += ", " + shape.meta['comment']
