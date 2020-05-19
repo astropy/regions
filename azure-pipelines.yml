@@ -44,7 +44,6 @@ jobs:
 
     # Documentation builds
     - linux: build_docs
-    - macos: build_docs
     - windows: build_docs
 
 - template: publish.yml@OpenAstronomy
