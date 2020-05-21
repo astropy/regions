@@ -5,6 +5,8 @@ from astropy import units as u
 from astropy.coordinates import Angle
 from astropy.wcs.utils import pixel_to_skycoord
 
+from matplotlib.widgets import RectangleSelector
+
 from ..core import PixCoord, PixelRegion, SkyRegion, RegionMask, BoundingBox
 from .._geometry import rectangular_overlap_grid
 from .._utils.wcs_helpers import skycoord_to_pixel_scale_angle
@@ -192,6 +194,25 @@ class RectanglePixelRegion(PixelRegion):
 
         return Rectangle(xy=xy, width=width, height=height,
                          angle=angle, **mpl_params)
+
+    def _update_from_mpl_selector(self, *args, **kwargs):
+        xmin, xmax, ymin, ymax = self._mpl_selector.extents
+        self.center = PixCoord(x=0.5 * (xmin + xmax),
+                               y=0.5 * (ymin + ymax))
+        self.width = (xmax - xmin)
+        self.height = (ymax - ymin)
+        self.angle = 0. * u.deg
+
+    @classmethod
+    def from_mpl_selector(cls, ax, origin=(0, 0), **kwargs):
+        """
+        Matplotlib editable widget for this region (`matplotlib.widgets.RectangleSelector`)
+        """
+        region = cls(PixCoord(0, 0), 0, 0)
+        selector = RectangleSelector(ax, region._update_from_mpl_selector, interactive=True)
+        selector.set_active(True)
+        region._mpl_selector = selector
+        return region
 
     @property
     def corners(self):
