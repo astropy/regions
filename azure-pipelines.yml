@@ -29,10 +29,13 @@ jobs:
     # Code style checks
     # - linux: codestyle
 
-    # All platforms with all dependencies
+    # All platforms with all dependencies (except CASA)
     - macos: py36-test-alldeps-cov
-    - linux: py36-test-alldeps-cov
-    - windows: py36-test-alldeps-cov
+    - linux: py37-test-alldeps-cov
+    - windows: py38-test-alldeps-cov
+
+    # Test with CASA
+    - linux: py36-test-alldeps-casa-cov
 
     # Linux with developer version of dependencies
     - linux: py38-test-devdeps-cov
