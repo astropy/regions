@@ -205,7 +205,7 @@ class RectanglePixelRegion(PixelRegion):
         if self._mpl_selector_callback is not None:
             self._mpl_selector_callback(self)
 
-    def as_mpl_selector(self, ax, sync=True, callback=None, **kwargs):
+    def as_mpl_selector(self, ax, active=True, sync=True, callback=None, **kwargs):
         """
         Matplotlib editable widget for this region (`matplotlib.widgets.RectangleSelector`)
 
@@ -213,6 +213,8 @@ class RectanglePixelRegion(PixelRegion):
         ----------
         ax : `~matplotlib.axes.Axes`
             The Matplotlib axes to add the selector to.
+        active : bool, optional
+            Whether the selector should be active by default.
         sync : bool, optional
             If `True` (the default), the region will be kept in sync with the
             selector. Otherwise, the selector will be initialized with the
@@ -224,6 +226,18 @@ class RectanglePixelRegion(PixelRegion):
             has been created.
         kwargs
             Additional keyword arguments are passed to matplotlib.widgets.RectangleSelector`
+
+        Returns
+        -------
+        selector : `matplotlib.widgets.RectangleSelector`
+            The Matplotlib selector.
+
+        Notes
+        -----
+        Once a selector has been created, you will need to keep a reference to
+        it until you no longer need it. In addition, you can enable/disable the
+        selector at any point by calling ``selector.set_active(True)`` or
+        ``selector.set_active(False)``.
         """
 
         if hasattr(self, '_mpl_selector'):
@@ -243,7 +257,7 @@ class RectanglePixelRegion(PixelRegion):
                                       self.center.x + self.width / 2,
                                       self.center.y - self.height / 2,
                                       self.center.y + self.height / 2)
-        self._mpl_selector.set_active(True)
+        self._mpl_selector.set_active(active)
         self._mpl_selector_callback = callback
 
         if sync and self._mpl_selector_callback is not None:
