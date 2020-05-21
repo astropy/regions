@@ -202,17 +202,54 @@ class RectanglePixelRegion(PixelRegion):
         self.width = (xmax - xmin)
         self.height = (ymax - ymin)
         self.angle = 0. * u.deg
+        if self._mpl_selector_callback is not None:
+            self._mpl_selector_callback(self)
 
-    @classmethod
-    def from_mpl_selector(cls, ax, origin=(0, 0), **kwargs):
+    def as_mpl_selector(self, ax, sync=True, callback=None, **kwargs):
         """
         Matplotlib editable widget for this region (`matplotlib.widgets.RectangleSelector`)
+
+        Parameters
+        ----------
+        ax : `~matplotlib.axes.Axes`
+            The Matplotlib axes to add the selector to.
+        sync : bool, optional
+            If `True` (the default), the region will be kept in sync with the
+            selector. Otherwise, the selector will be initialized with the
+            values from the region but the two will then be disconnected.
+        callback : func, optional
+            If specified, this function will be called every time the region is
+            updated. This only has an effect if ``sync`` is `True`. If a
+            callback is set, it is called for the first time once the selector
+            has been created.
+        kwargs
+            Additional keyword arguments are passed to matplotlib.widgets.RectangleSelector`
         """
-        region = cls(PixCoord(0, 0), 0, 0)
-        selector = RectangleSelector(ax, region._update_from_mpl_selector, interactive=True)
-        selector.set_active(True)
-        region._mpl_selector = selector
-        return region
+
+        if hasattr(self, '_mpl_selector'):
+            raise Exception("Cannot attach more than one selector to a region.")
+
+        if self.angle.value != 0:
+            raise NotImplementedError("Cannot create matplotlib selector for rotated rectangle.")
+
+        if sync:
+            sync_callback = self._update_from_mpl_selector
+        else:
+            def sync_callback(*args, **kwargs):
+                pass
+
+        self._mpl_selector = RectangleSelector(ax, sync_callback, interactive=True)
+        self._mpl_selector.extents = (self.center.x - self.width / 2,
+                                      self.center.x + self.width / 2,
+                                      self.center.y - self.height / 2,
+                                      self.center.y + self.height / 2)
+        self._mpl_selector.set_active(True)
+        self._mpl_selector_callback = callback
+
+        if sync and self._mpl_selector_callback is not None:
+            self._mpl_selector_callback(self)
+
+        return self._mpl_selector
 
     @property
     def corners(self):
