@@ -71,12 +71,13 @@ valid_coordsys['DS9'] += [f'wcs{x}' for x in string.ascii_lowercase]
 coordsys_mapping = {'DS9': {x: x for x in valid_coordsys['DS9']},
                     'CRTF': {x: x.upper() for x in valid_coordsys['CRTF']}
                     }
+# Coordinate frame names must be uppercase following the CASA CRTF syntax
 coordsys_mapping['CRTF']['geocentrictrueecliptic'] = 'ECLIPTIC'
 coordsys_mapping['CRTF']['fk5'] = 'J2000'
 coordsys_mapping['CRTF']['fk4'] = 'B1950'
 coordsys_mapping['CRTF']['supergalactic'] = 'SUPERGAL'
 
-coordsys_mapping['DS9']['geocentrictrueecliptic'] = 'ecliptic'
+coordsys_mapping['DS9']['geocentrictrueecliptic'] = 'ECLIPTIC'
 
 
 class ShapeList(list):
@@ -128,7 +129,8 @@ class ShapeList(list):
         crtf_strings = {
             'circle': '{0}circle[[{1:FMT}deg, {2:FMT}deg], {3:FMT}RAD]',
             'circleannulus': '{0}annulus[[{1:FMT}deg, {2:FMT}deg], [{3:FMT}RAD, {4:FMT}RAD]]',
-            'ellipse': '{0}ellipse[[{1:FMT}deg, {2:FMT}deg], [{3:FMT}RAD, {4:FMT}RAD], {5:FMT}deg]',
+            # Make sure that width goes to minor axis and height to major axis
+            'ellipse': '{0}ellipse[[{1:FMT}deg, {2:FMT}deg], [{4:FMT}RAD, {3:FMT}RAD], {5:FMT}deg]',
             'rectangle': '{0}rotbox[[{1:FMT}deg, {2:FMT}deg], [{3:FMT}RAD, {4:FMT}RAD], {5:FMT}deg]',
             'polygon': '{0}poly[{1}]',
             'point': '{0}point[[{1:FMT}deg, {2:FMT}deg]]',
@@ -137,7 +139,7 @@ class ShapeList(list):
             'line': '{0}line[[{1:FMT}deg, {2:FMT}deg], [{3:FMT}deg, {4:FMT}deg]]'
                         }
 
-        output = '#CRTF\n'
+        output = '#CRTFv0\n'
 
         if radunit == 'arcsec':
             # arcseconds are allowed for all but image coordinates
@@ -156,7 +158,7 @@ class ShapeList(list):
 
         # CASA does not support global coordinate specification, even though the
         # documentation for the specification explicitly states that it does.
-        # output += 'global coord={}\n'.format(coordsys)
+        output += 'global coord={}\n'.format(coordsys_mapping['CRTF'][coordsys.lower()])
 
         for shape in self:
 
@@ -181,11 +183,13 @@ class ShapeList(list):
             # the first item should be the coordinates, since CASA cannot
             # recognize a region without an inline coordinate specification
             # It can be, but does not need to be, comma-separated at the start
-            if meta_str.strip():
-                meta_str = "coord={}, ".format(coordsys_mapping['CRTF'][coordsys.lower()]) + meta_str
-            else:
-                # if there is no metadata at all (above), the trailing comma is incorrect
-                meta_str = "coord={}".format(coordsys_mapping['CRTF'][coordsys.lower()])
+            shape_coordsys = getattr(shape, 'coordsys')
+            if shape_coordsys.lower() != coordsys.lower():
+                if meta_str.strip():
+                    meta_str = "coord={}, ".format(coordsys_mapping['CRTF'][coordsys.lower()]) + meta_str
+                else:
+                    # if there is no metadata at all (above), the trailing comma is incorrect
+                    meta_str = "coord={}".format(coordsys_mapping['CRTF'][coordsys.lower()])
 
             if 'comment' in shape.meta:
                 meta_str += ", " + shape.meta['comment']

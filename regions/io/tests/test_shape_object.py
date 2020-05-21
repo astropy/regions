@@ -111,8 +111,8 @@ def test_valid_ellipse_crtf():
     assert_quantity_allclose(shape1.coord[:2], [1, 2])
     assert_quantity_allclose(shape2.coord[:2], [Quantity("1deg"), Quantity("2deg")])
 
-    assert_quantity_allclose(shape1.coord[2:-1], [6, 8])
-    assert_quantity_allclose(shape2.coord[2:-1], [Quantity("6deg"), Quantity("8deg")])
+    assert_quantity_allclose(shape1.coord[2:-1], [8, 6])
+    assert_quantity_allclose(shape2.coord[2:-1], [Quantity("8deg"), Quantity("6deg")])
 
     assert_quantity_allclose(shape1.coord[-1], Quantity("5deg"))
     assert_quantity_allclose(shape2.coord[-1], Quantity("5deg"))
