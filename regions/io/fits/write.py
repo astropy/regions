@@ -34,7 +34,7 @@ def fits_region_objects_to_table(regions):
     return shape_list.to_fits()
 
 
-def write_fits_region(filename, regions, header=None):
+def write_fits_region(filename, regions, header=None, overwrite=None):
     """
     Converts list of regions to FITS region table and write to a file.
 
@@ -52,4 +52,4 @@ def write_fits_region(filename, regions, header=None):
     output = fits_region_objects_to_table(regions)
 
     bin_table = fits.BinTableHDU(data=output, header=header)
-    bin_table.writeto(filename)
+    bin_table.writeto(filename, overwrite=overwrite)

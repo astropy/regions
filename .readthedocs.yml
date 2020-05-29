@@ -1,11 +1,15 @@
+version: 2
+
 build:
   image: latest
 
 python:
   version: 3.7
-  pip_install: true
+  install:
+    - method: pip
+      path: .
+      extra_requirements:
+        - docs
+        - all
 
-# Don't build any extra formats
 formats: []
-
-requirements_file: requirements.txt

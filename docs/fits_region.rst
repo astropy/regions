@@ -87,4 +87,4 @@ and parsing.
 
     >>> from regions import CirclePixelRegion, PixCoord, write_fits_region
     >>> reg_pixel = CirclePixelRegion(PixCoord(1, 2), 5)
-    >>> write_fits_region('regions_output.fits', regions=[reg_pixel])
+    >>> write_fits_region('regions_output.fits', regions=[reg_pixel], overwrite=True)
