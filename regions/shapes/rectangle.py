@@ -252,7 +252,11 @@ class RectanglePixelRegion(PixelRegion):
             def sync_callback(*args, **kwargs):
                 pass
 
-        self._mpl_selector = RectangleSelector(ax, sync_callback, interactive=True)
+        self._mpl_selector = RectangleSelector(ax, sync_callback, interactive=True,
+                                               rectprops={'edgecolor': self.visual.get('color', 'black'),
+                                                          'facecolor': 'none',
+                                                          'linewidth': self.visual.get('linewidth', 1),
+                                                          'linestyle': self.visual.get('linestyle', 'solid')})
         self._mpl_selector.extents = (self.center.x - self.width / 2,
                                       self.center.x + self.width / 2,
                                       self.center.y - self.height / 2,
