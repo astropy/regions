@@ -105,6 +105,39 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
         assert_allclose(reg.center.xy, (1, 4))
         assert_allclose(reg.angle.to_value("deg"), 95)
 
+    def test_as_mpl_selector(self):
+
+        plt = pytest.importorskip('matplotlib.pyplot')
+
+        data = np.random.random((16, 16))
+        mask = np.zeros_like(data)
+
+        ax = plt.subplot(1, 1, 1)
+        ax.imshow(data)
+
+        def update_mask(region):
+            mask[:] = self.reg.to_mask(mode='subpixels', subpixels=10).to_image(data.shape)
+
+        # For now this will only work with unrotated rectangles
+        region = self.reg.copy(angle=0 * u.deg)
+
+        selector = region.as_mpl_selector(ax, callback=update_mask, sync=True)  # noqa
+
+        x, y = ax.transData.transform([[7.3, 4.4]])[0]
+        ax.figure.canvas.button_press_event(x, y, 1)
+        x, y = ax.transData.transform([[9.3, 5.4]])[0]
+        ax.figure.canvas.motion_notify_event(x, y, 1)
+        x, y = ax.transData.transform([[9.3, 5.4]])[0]
+        ax.figure.canvas.button_release_event(x, y, 1)
+
+        ax.figure.canvas.draw()
+
+        assert_allclose(region.center.x, 8.3)
+        assert_allclose(region.center.y, 4.9)
+        assert_allclose(region.width, 2)
+        assert_allclose(region.height, 1)
+        assert_quantity_allclose(region.angle, 0 * u.deg)
+
 
 def test_rectangular_pixel_region_bbox():
     # odd sizes
