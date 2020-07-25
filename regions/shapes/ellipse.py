@@ -6,8 +6,6 @@ from astropy import units as u
 from astropy.coordinates import Angle
 from astropy.wcs.utils import pixel_to_skycoord
 
-from matplotlib.widgets import EllipseSelector
-
 from ..core import PixCoord, PixelRegion, SkyRegion, RegionMask, BoundingBox
 from .._geometry import elliptical_overlap_grid
 from .._utils.wcs_helpers import skycoord_to_pixel_scale_angle
@@ -256,11 +254,13 @@ class EllipsePixelRegion(PixelRegion):
         ``selector.set_active(False)``.
         """
 
+        from matplotlib.widgets import EllipseSelector
+
         if hasattr(self, '_mpl_selector'):
             raise Exception("Cannot attach more than one selector to a region.")
 
         if self.angle.value != 0:
-            raise NotImplementedError("Cannot create matplotlib selector for rotated rectangle.")
+            raise NotImplementedError("Cannot create matplotlib selector for rotated ellipse.")
 
         if sync:
             sync_callback = self._update_from_mpl_selector

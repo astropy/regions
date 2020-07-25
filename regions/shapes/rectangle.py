@@ -5,8 +5,6 @@ from astropy import units as u
 from astropy.coordinates import Angle
 from astropy.wcs.utils import pixel_to_skycoord
 
-from matplotlib.widgets import RectangleSelector
-
 from ..core import PixCoord, PixelRegion, SkyRegion, RegionMask, BoundingBox
 from .._geometry import rectangular_overlap_grid
 from .._utils.wcs_helpers import skycoord_to_pixel_scale_angle
@@ -239,6 +237,8 @@ class RectanglePixelRegion(PixelRegion):
         selector at any point by calling ``selector.set_active(True)`` or
         ``selector.set_active(False)``.
         """
+
+        from matplotlib.widgets import RectangleSelector
 
         if hasattr(self, '_mpl_selector'):
             raise Exception("Cannot attach more than one selector to a region.")

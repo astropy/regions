@@ -1,6 +1,6 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 import numpy as np
-from numpy.testing import assert_allclose
+from numpy.testing import assert_allclose, assert_equal
 import pytest
 
 import astropy.units as u
@@ -80,7 +80,6 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
         assert_allclose(reg.center.xy, (1, 4))
         assert_allclose(reg.angle.to_value("deg"), 95)
 
-
     def test_as_mpl_selector(self):
 
         plt = pytest.importorskip('matplotlib.pyplot')
@@ -91,10 +90,16 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
         ax = plt.subplot(1, 1, 1)
         ax.imshow(data)
 
-        def update_mask(region):
-            mask[:] = self.reg.to_mask(mode='subpixels', subpixels=10).to_image(data.shape)
+        def update_mask(reg):
+            mask[:] = reg.to_mask(mode='subpixels', subpixels=10).to_image(data.shape)
 
-        # For now this will only work with unrotated rectangles
+        # For now this will only work with unrotated ellipses. Once this works
+        # with rotated ellipses, the following exception check can be removed
+        # as well as the ``angle=0 * u.deg`` in the call to copy() below.
+        with pytest.raises(NotImplementedError,
+                           match='Cannot create matplotlib selector for rotated ellipse.'):
+            self.reg.as_mpl_selector(ax)
+
         region = self.reg.copy(angle=0 * u.deg)
 
         selector = region.as_mpl_selector(ax, callback=update_mask, sync=True)  # noqa
@@ -113,6 +118,36 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
         assert_allclose(region.width, 2)
         assert_allclose(region.height, 1)
         assert_quantity_allclose(region.angle, 0 * u.deg)
+
+        assert_equal(mask, region.to_mask(mode='subpixels', subpixels=10).to_image(data.shape))
+
+        with pytest.raises(Exception, match='Cannot attach more than one selector to a region.'):
+            region.as_mpl_selector(ax)
+
+        # Make sure the region doesn't change if sync=False
+
+        region2 = self.reg.copy(angle=0 * u.deg)
+        mask[:] = 0
+
+        selector = region2.as_mpl_selector(ax, callback=update_mask, sync=False)  # noqa
+
+        x, y = ax.transData.transform([[7.3, 4.4]])[0]
+        ax.figure.canvas.button_press_event(x, y, 1)
+        x, y = ax.transData.transform([[9.3, 5.4]])[0]
+        ax.figure.canvas.motion_notify_event(x, y, 1)
+        x, y = ax.transData.transform([[9.3, 5.4]])[0]
+        ax.figure.canvas.button_release_event(x, y, 1)
+
+        ax.figure.canvas.draw()
+
+        # The region parameters haven't changed and the mask is still empty
+        assert_allclose(region2.center.x, 3)
+        assert_allclose(region2.center.y, 4)
+        assert_allclose(region2.width, 4)
+        assert_allclose(region2.height, 3)
+        assert_quantity_allclose(region2.angle, 0 * u.deg)
+
+        assert_equal(mask, 0)
 
 
 class TestEllipseSkyRegion(BaseTestSkyRegion):
