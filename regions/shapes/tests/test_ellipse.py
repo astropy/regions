@@ -131,11 +131,11 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
 
         selector = region2.as_mpl_selector(ax, callback=update_mask, sync=False)  # noqa
 
-        x, y = ax.transData.transform([[7.3, 4.4]])[0]
+        x, y = ax.transData.transform([[5.3, 4.4]])[0]
         ax.figure.canvas.button_press_event(x, y, 1)
-        x, y = ax.transData.transform([[9.3, 5.4]])[0]
+        x, y = ax.transData.transform([[7.3, 5.4]])[0]
         ax.figure.canvas.motion_notify_event(x, y, 1)
-        x, y = ax.transData.transform([[9.3, 5.4]])[0]
+        x, y = ax.transData.transform([[7.3, 5.4]])[0]
         ax.figure.canvas.button_release_event(x, y, 1)
 
         ax.figure.canvas.draw()
