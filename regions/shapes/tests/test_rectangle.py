@@ -105,7 +105,8 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
         assert_allclose(reg.center.xy, (1, 4))
         assert_allclose(reg.angle.to_value("deg"), 95)
 
-    def test_as_mpl_selector(self):
+    @pytest.mark.parametrize('sync', (False, True))
+    def test_as_mpl_selector(self, sync):
 
         plt = pytest.importorskip('matplotlib.pyplot')
 
@@ -127,7 +128,7 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
 
         region = self.reg.copy(angle=0 * u.deg)
 
-        selector = region.as_mpl_selector(ax, callback=update_mask, sync=True)  # noqa
+        selector = region.as_mpl_selector(ax, callback=update_mask, sync=sync)  # noqa
 
         x, y = ax.transData.transform([[7.3, 4.4]])[0]
         ax.figure.canvas.button_press_event(x, y, 1)
@@ -138,41 +139,28 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
 
         ax.figure.canvas.draw()
 
-        assert_allclose(region.center.x, 8.3)
-        assert_allclose(region.center.y, 4.9)
-        assert_allclose(region.width, 2)
-        assert_allclose(region.height, 1)
-        assert_quantity_allclose(region.angle, 0 * u.deg)
+        if sync:
 
-        assert_equal(mask, region.to_mask(mode='subpixels', subpixels=10).to_image(data.shape))
+            assert_allclose(region.center.x, 8.3)
+            assert_allclose(region.center.y, 4.9)
+            assert_allclose(region.width, 2)
+            assert_allclose(region.height, 1)
+            assert_quantity_allclose(region.angle, 0 * u.deg)
+
+            assert_equal(mask, region.to_mask(mode='subpixels', subpixels=10).to_image(data.shape))
+
+        else:
+
+            assert_allclose(region.center.x, 3)
+            assert_allclose(region.center.y, 4)
+            assert_allclose(region.width, 4)
+            assert_allclose(region.height, 3)
+            assert_quantity_allclose(region.angle, 0 * u.deg)
+
+            assert_equal(mask, 0)
 
         with pytest.raises(Exception, match='Cannot attach more than one selector to a region.'):
             region.as_mpl_selector(ax)
-
-        # Make sure the region doesn't change if sync=False
-
-        region2 = self.reg.copy(angle=0 * u.deg)
-        mask[:] = 0
-
-        selector = region2.as_mpl_selector(ax, callback=update_mask, sync=False)  # noqa
-
-        x, y = ax.transData.transform([[7.3, 4.4]])[0]
-        ax.figure.canvas.button_press_event(x, y, 1)
-        x, y = ax.transData.transform([[9.3, 5.4]])[0]
-        ax.figure.canvas.motion_notify_event(x, y, 1)
-        x, y = ax.transData.transform([[9.3, 5.4]])[0]
-        ax.figure.canvas.button_release_event(x, y, 1)
-
-        ax.figure.canvas.draw()
-
-        # The region parameters haven't changed and the mask is still empty
-        assert_allclose(region2.center.x, 3)
-        assert_allclose(region2.center.y, 4)
-        assert_allclose(region2.width, 4)
-        assert_allclose(region2.height, 3)
-        assert_quantity_allclose(region2.angle, 0 * u.deg)
-
-        assert_equal(mask, 0)
 
 
 def test_rectangular_pixel_region_bbox():
