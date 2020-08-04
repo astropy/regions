@@ -105,12 +105,23 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
 
         selector = region.as_mpl_selector(ax, callback=update_mask, sync=sync)  # noqa
 
+        from matplotlib.backend_bases import MouseEvent, MouseButton
+
         x, y = ax.transData.transform([[7.3, 4.4]])[0]
-        ax.figure.canvas.button_press_event(x, y, 1)
+        ax.figure.canvas.callbacks.process('button_press_event',
+                                           MouseEvent('button_press_event',
+                                                      ax.figure.canvas, x, y,
+                                                      button=MouseButton.LEFT))
         x, y = ax.transData.transform([[9.3, 5.4]])[0]
-        ax.figure.canvas.motion_notify_event(x, y, 1)
+        ax.figure.canvas.callbacks.process('motion_notify_event',
+                                           MouseEvent('button_press_event',
+                                                      ax.figure.canvas, x, y,
+                                                      button=MouseButton.LEFT))
         x, y = ax.transData.transform([[9.3, 5.4]])[0]
-        ax.figure.canvas.button_release_event(x, y, 1)
+        ax.figure.canvas.callbacks.process('button_release_event',
+                                           MouseEvent('button_press_event',
+                                                      ax.figure.canvas, x, y,
+                                                      button=MouseButton.LEFT))
 
         ax.figure.canvas.draw()
 
