@@ -11,6 +11,10 @@
   ``pyproject.toml`` to opt in to isolated builds as described in PEP 517/518.
   [#315]
 
+- Added a ``as_mpl_selector`` method to the rectangular and ellipse
+  pixel-based regions. This method returns an interactive Matplotlib
+  selector widget. [#317]
+
 0.4 (2019-06-17)
 ================
 

@@ -209,6 +209,82 @@ class EllipsePixelRegion(PixelRegion):
         return Ellipse(xy=xy, width=width, height=height, angle=angle,
                        **mpl_params)
 
+    def _update_from_mpl_selector(self, *args, **kwargs):
+        xmin, xmax, ymin, ymax = self._mpl_selector.extents
+        self.center = PixCoord(x=0.5 * (xmin + xmax),
+                               y=0.5 * (ymin + ymax))
+        self.width = (xmax - xmin)
+        self.height = (ymax - ymin)
+        self.angle = 0. * u.deg
+        if self._mpl_selector_callback is not None:
+            self._mpl_selector_callback(self)
+
+    def as_mpl_selector(self, ax, active=True, sync=True, callback=None, **kwargs):
+        """
+        Matplotlib editable widget for this region (`matplotlib.widgets.EllipseSelector`)
+
+        Parameters
+        ----------
+        ax : `~matplotlib.axes.Axes`
+            The Matplotlib axes to add the selector to.
+        active : bool, optional
+            Whether the selector should be active by default.
+        sync : bool, optional
+            If `True` (the default), the region will be kept in sync with the
+            selector. Otherwise, the selector will be initialized with the
+            values from the region but the two will then be disconnected.
+        callback : func, optional
+            If specified, this function will be called every time the region is
+            updated. This only has an effect if ``sync`` is `True`. If a
+            callback is set, it is called for the first time once the selector
+            has been created.
+        kwargs
+            Additional keyword arguments are passed to matplotlib.widgets.EllipseSelector`
+
+        Returns
+        -------
+        selector : `matplotlib.widgets.EllipseSelector`
+            The Matplotlib selector.
+
+        Notes
+        -----
+        Once a selector has been created, you will need to keep a reference to
+        it until you no longer need it. In addition, you can enable/disable the
+        selector at any point by calling ``selector.set_active(True)`` or
+        ``selector.set_active(False)``.
+        """
+
+        from matplotlib.widgets import EllipseSelector
+
+        if hasattr(self, '_mpl_selector'):
+            raise Exception("Cannot attach more than one selector to a region.")
+
+        if self.angle.value != 0:
+            raise NotImplementedError("Cannot create matplotlib selector for rotated ellipse.")
+
+        if sync:
+            sync_callback = self._update_from_mpl_selector
+        else:
+            def sync_callback(*args, **kwargs):
+                pass
+
+        self._mpl_selector = EllipseSelector(ax, sync_callback, interactive=True,
+                                             rectprops={'edgecolor': self.visual.get('color', 'black'),
+                                                        'facecolor': 'none',
+                                                        'linewidth': self.visual.get('linewidth', 1),
+                                                        'linestyle': self.visual.get('linestyle', 'solid')})
+        self._mpl_selector.extents = (self.center.x - self.width / 2,
+                                      self.center.x + self.width / 2,
+                                      self.center.y - self.height / 2,
+                                      self.center.y + self.height / 2)
+        self._mpl_selector.set_active(active)
+        self._mpl_selector_callback = callback
+
+        if sync and self._mpl_selector_callback is not None:
+            self._mpl_selector_callback(self)
+
+        return self._mpl_selector
+
     def rotate(self, center, angle):
         """Make a rotated region.
 
