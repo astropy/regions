@@ -7,7 +7,7 @@ The goal is to merge the functionality from pyregion and photutils apertures
 and then after some time propose this package for inclusion in the Astropy core.
 
 * Code : https://github.com/astropy/regions
-* Docs : http://astropy-regions.readthedocs.io/en/latest/
+* Docs : https://astropy-regions.readthedocs.io/en/latest/
 """
 
 # Affiliated packages may add whatever they like to this file, but

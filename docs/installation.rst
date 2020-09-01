@@ -9,8 +9,8 @@ Installation
 The regions package requires the following packages:
 
 * Python 3.6 or later
-* `Numpy <http://www.numpy.org>`_ 1.16 or later
-* `Astropy <http://www.astropy.org>`__ 2.0 or later
+* `Numpy <https://numpy.org>`_ 1.16 or later
+* `Astropy <https://www.astropy.org>`__ 2.0 or later
 
 In addition, the following packages are needed for optional functionality:
 
