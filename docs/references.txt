@@ -2,7 +2,7 @@
 .. _spherical_geometry: http://spacetelescope.github.io/sphere/spherical_geometry/index.html
 .. _photutils: http://photutils.readthedocs.io/en/latest/aperture.html
 .. _matplotlib: https://matplotlib.org/
-.. _shapely: http://toblerity.org/shapely/manual.html
+.. _shapely: https://shapely.readthedocs.io/en/latest/
 .. _Github repository: https://github.com/astropy/regions
 .. _Region documentation: http://astropy-regions.readthedocs.io/en/latest/
 .. _affiliated package: http://www.astropy.org/affiliated/index.html
