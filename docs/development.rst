@@ -20,6 +20,5 @@ Dependencies
 
 Should we use these packages or start building functionality from scratch?
 
-* spherical_geometry https://github.com/spacetelescope/sphere
-* Shapely https://pypi.python.org/pypi/Shapely
-    
+* spherical_geometry https://github.com/spacetelescope/spherical_geometry
+* Shapely https://pypi.org/project/Shapely
