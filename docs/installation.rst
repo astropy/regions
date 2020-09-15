@@ -9,8 +9,8 @@ Installation
 The regions package requires the following packages:
 
 * Python 3.6 or later
-* `Numpy <http://www.numpy.org>`_ 1.16 or later
-* `Astropy <http://www.astropy.org>`__ 2.0 or later
+* `Numpy <https://numpy.org>`_ 1.16 or later
+* `Astropy <https://www.astropy.org>`__ 2.0 or later
 
 In addition, the following packages are needed for optional functionality:
 
@@ -25,7 +25,7 @@ Using pip
 ---------
 
 To install regions with `pip <https://pip.pypa.io/en/latest/>`_
-from `PyPI <https://pypi.python.org/pypi/regions>`_, run::
+from `PyPI <https://pypi.org/project/regions>`_, run::
 
     pip install regions --no-deps
 
@@ -38,7 +38,7 @@ from `PyPI <https://pypi.python.org/pypi/regions>`_, run::
 Using conda
 -----------
 
-To install regions with `Anaconda <https://www.anaconda.com/download/>`_
+To install regions with `Anaconda <https://www.anaconda.com/products/individual>`_
 from the `astropy channel on anaconda.org <https://anaconda.org/astropy/regions>`__
 simply run::
 
@@ -65,7 +65,7 @@ Install the latest development version from https://github.com/astropy/regions :
     python setup.py install
 
 To run the tests, you will need to make sure the `pytest-arraydiff
-<https://pypi.python.org/pypi/pytest-arraydiff>`_ package is installed
+<https://pypi.org/project/pytest-arraydiff>`_ package is installed
 (version v0.3 or newer). Then, run the tests with:
 
 .. code-block:: bash

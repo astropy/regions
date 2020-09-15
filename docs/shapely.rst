@@ -3,10 +3,11 @@
 Converting regions to shapely objects
 =====================================
 
-The `Shapely <http://toblerity.org/shapely/manual.html>`__ Python package is a
-generic package for the manipulation and analysis of geometric objects in the
-Cartesian plane. Concerning regions in the cartesian plane, it is more
-feature-complete, powerful and optimized than this ``regions`` package.
+The `Shapely <https://shapely.readthedocs.io/en/latest/>`__ Python
+package is a generic package for the manipulation and analysis of
+geometric objects in the Cartesian plane. Concerning regions in the
+cartesian plane, it is more feature-complete, powerful and optimized
+than this ``regions`` package.
 
 The use of Shapely or other Python regions packages that come from the geospatial domain
 in Astronomy is rare. However, if you have a complex pixel region analysis task,

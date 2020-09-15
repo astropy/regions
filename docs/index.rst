@@ -21,7 +21,7 @@ and then after some time propose this package for inclusion in the Astropy core.
 * Code : `Github repository`_
 * Docs : `Region documentation`_
 * Contributors : https://github.com/astropy/regions/graphs/contributors
-* Releases: https://pypi.python.org/pypi/regions
+* Releases: https://pypi.org/project/regions
 
 User Documentation
 ==================
@@ -89,7 +89,7 @@ users. We accept contributions at all levels, spanning the gamut from
 fixing a typo in the documentation to developing a major new feature.
 We welcome contributors who will abide by the `Python Software
 Foundation Code of Conduct
-<https://www.python.org/psf/codeofconduct/>`_.
+<https://www.python.org/psf/conduct/>`_.
 If you have a feature request or would like to contribute to ``regions``,
 please go here: https://github.com/astropy/regions/
 
@@ -98,13 +98,13 @@ Regions follows the same workflow and coding guidelines as
 contributing fixes, code, or documentation (no git or GitHub
 experience necessary):
 
-* `How to make a code contribution <http://astropy.readthedocs.io/en/stable/development/workflow/development_workflow.html>`_
+* `How to make a code contribution <https://docs.astropy.org/en/stable/development/workflow/development_workflow.html>`_
 
-* `Coding Guidelines <http://docs.astropy.org/en/latest/development/codeguide.html>`_
+* `Coding Guidelines <https://docs.astropy.org/en/latest/development/codeguide.html>`_
 
-* `Try the development version <http://astropy.readthedocs.io/en/stable/development/workflow/get_devel_version.html>`_
+* `Try the development version <https://docs.astropy.org/en/stable/development/workflow/get_devel_version.html>`_
 
-* `Developer Documentation <http://docs.astropy.org/en/latest/#developer-documentation>`_
+* `Developer Documentation <https://docs.astropy.org/en/latest/#developer-documentation>`_
 
 
 Get Help
