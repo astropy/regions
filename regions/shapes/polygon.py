@@ -55,20 +55,257 @@ class PolygonPixelRegion(PixelRegion):
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
 
+    @staticmethod
+    def _find_slope(point_1, point_2):
+        """
+        Finds the slope of a line that crosses point_1 and point_2
+
+        Parameters
+        ----------
+        point_1: PixCoord(x, y) -> contains pixel coordinates of point_1
+        point_2: PixCoord(x, y) -> contains pixel coordinates of point_2
+
+        Returns slope (Returns "None" if the slope is infinite)
+        -------
+
+        """
+
+        del_y = point_2.y - point_1.y
+        del_x = point_2.x - point_1.x
+
+        if float(del_x) == 0.0:
+            slope = None
+        else:
+            slope = del_y / del_x
+
+        return slope
+
+    @staticmethod
+    def _area_under_line(point_1, point_2):
+        """
+        Finds the area under a line. (The area between the line and the x-axis.)
+
+        Parameters
+        ----------
+        point_1: PixCoord(x, y) -> contains pixel coordinates of point_1
+        point_2: PixCoord(x, y) -> contains pixel coordinates of point_2
+
+        Returns: Area
+        -------
+
+        """
+
+        del_y = point_2.y - point_1.y
+        del_x = point_2.x - point_1.x
+
+        rectangle_part = point_1.y * del_x
+        triangle_part = del_x * del_y * 0.5
+
+        area = rectangle_part + triangle_part
+
+        return abs(area)
+
+    @staticmethod
+    def _find_intersection(line_1, line_2):
+        """
+        Finds the intersection coordinates of two given lines.
+        If the intersection point goes beyond the limits of the lines, returns (None, None)
+
+        line equation:
+        y = m*x + n
+
+        (m -> slope)
+        (n -> constant)
+
+        m and n values will be None in case of zero division.
+        (If the line is perpendicular to the x-axis there will be zero division.)
+
+        ----------
+        line_1
+        line_2
+
+        Returns: x, y
+        -------
+        """
+
+        # a "near zero" value for comparing float values
+        sensitivity = 1E-8
+
+        # line: 1, point: 1
+        l1x1, l1y1 = line_1[0].x, line_1[0].y
+        # line: 1, point: 2
+        l1x2, l1y2 = line_1[1].x, line_1[1].y
+
+        # slope (m) and constant (n) values for line 1;
+        if abs(float(l1x2 - l1x1)) > sensitivity:
+            m1 = (l1y2 - l1y1) / (l1x2 - l1x1)
+            n1 = -((l1y2 - l1y1) / (l1x2 - l1x1)) * l1x2 + l1y2
+        else:
+            m1 = None
+            n1 = None
+
+        # line: 2, point: 1
+        l2x1, l2y1 = line_2[0].x, line_2[0].y
+        # line: 2, point: 2
+        l2x2, l2y2 = line_2[1].x, line_2[1].y
+
+        # slope (m) and constant (n) values for line 2;
+        if abs(float(l2x2 - l2x1)) > sensitivity:
+            m2 = (l2y2 - l2y1) / (l2x2 - l2x1)
+            n2 = -((l2y2 - l2y1) / (l2x2 - l2x1)) * l2x2 + l2y2
+        else:
+            m2 = None
+            n2 = None
+
+        # initial values for x and y coordinates of intersection point
+        x, y = None, None
+
+        # if m1 and m2 are not perpendicular;
+        if (m1 is not None) and (m2 is not None):
+
+            # if they are not parallel;
+            if abs(float(m1 - m2)) > sensitivity:
+                # intersection coordinates would be:
+                x = (n2 - n1) / (m1 - m2)
+                y = m1 * x + n1
+
+        # if m1 is perpendicular and m2 is not;
+        if m1 is None and m2 is not None:
+            # In this case, the equation of the line 1 will be like this:
+            # x = constant
+            # So the constant x value will also be the x value of intersection point.
+            x = l1x1
+            y = m2 * x + n2
+
+        # if m2 is perpendicular and m1 is not;
+        if m2 is None and m1 is not None:
+            # In this case, the equation of the line 2 will be like this:
+            # x = constant
+            # So the constant x value will also be the x value of intersection point.
+            x = l2x1
+            y = m1 * x + n1
+
+        if x is not None and y is not None:
+            # These conditions ensures the (x,y) intersection point doesn't go beyond the line limits.
+            condition_1 = min(l1x1, l1x2) < x < max(l1x1, l1x2)
+            condition_2 = min(l1y1, l1y2) < y < max(l1y1, l1y2)
+            condition_3 = min(l2x1, l2x2) < x < max(l2x1, l2x2)
+            condition_4 = min(l2y1, l2y2) < y < max(l2y1, l2y2)
+
+            if (condition_1 and condition_2) and (condition_3 and condition_4):
+                return x, y
+            else:
+                return None, None
+        else:
+            return None, None
+
+    def _split_intersection(self, intersection_coords, line_indexes):
+        """
+        This method splits the intersecting lines into two parts from the intersection point
+        and creates a new polygon with these additional points.
+        Returns the new x and y values as separate lists.
+
+        Parameters
+        ----------
+        intersection_coords: (x, y) values of the intersection point
+        line_indexes: index values of intersecting lines. (Example: [1,3] -> 1. and 3. lines are intersecting.)
+
+        Returns: list_of_x_values, list_of_y_values
+        -------
+
+
+        Algorithm in example:
+
+        points_of_my_polygon: [p1, p2, p3, p4, p5, p6, p7, p8]
+
+        If the [p2,p3] line and  the [p5,p6] line are intersecting at point p';
+
+        -Step 1
+            Add p' between p2-p3 and p5-p6
+            [p1, p2, p', p3, p4, p5, p', p6, p7, p8]
+
+        -Step 2
+            Reverse the order of points between two p'
+            [p1, p2, p', p5, p4, p3, p', p6, p7, p8]
+
+
+        In case of multiple intersections, the method will be called separately for each.
+
+        """
+        x_list = self.vertices.x
+        y_list = self.vertices.y
+        p_count = len(x_list)
+
+        x_i, y_i = intersection_coords
+        index_1, index_2 = line_indexes
+
+        x_left, x_mid, x_right = x_list[:index_1 + 1], x_list[index_1 + 1:int(index_2 + 1 % p_count)], x_list[int(
+            index_2 + 1 % p_count):]
+        y_left, y_mid, y_right = y_list[:index_1 + 1], y_list[index_1 + 1:int(index_2 + 1 % p_count)], y_list[int(
+            index_2 + 1 % p_count):]
+
+        new_x_list = np.array([*x_left, x_i, *x_mid[::-1], x_i, *x_right])
+        new_y_list = np.array([*y_left, y_i, *y_mid[::-1], y_i, *y_right])
+
+        return new_x_list, new_y_list
+
     @property
     def area(self):
-        """Region area (float)."""
-        # See https://stackoverflow.com/questions/24467972
+        """
+        Calculates the area of a polygon.
+        The polygon can be concave or convex with multiple self intersecting lines.
 
-        # Use offsets to improve numerical precision
-        x_ = self.vertices.x - self.vertices.x.mean()
-        y_ = self.vertices.y - self.vertices.y.mean()
+        Returns: Area
+        -------
 
-        # Shoelace formula, for our case where the start vertex
-        # isn't duplicated at the end, written to avoid an array copy
-        area_main = np.dot(x_[:-1], y_[1:]) - np.dot(y_[:-1], x_[1:])
-        area_last = x_[-1] * y_[0] - y_[-1] * x_[0]
-        return 0.5 * np.abs(area_main + area_last)
+        """
+        initial_x_vertices = self.vertices.x.copy()
+        initial_y_vertices = self.vertices.y.copy()
+
+        search_done = False
+        while not search_done:
+            self.index_counter = 0
+
+            for i in range(self.index_counter, len(self.vertices)):
+                p1 = self.vertices[i]
+                p2 = self.vertices[int((i + 1) % len(self.vertices))]
+
+                for j in range(i + 1, len(self.vertices)):
+                    p3 = self.vertices[j]
+                    p4 = self.vertices[int((j + 1) % len(self.vertices))]
+
+                    x, y = self._find_intersection([p1, p2], [p3, p4])
+
+                    if x is not None and y is not None:
+                        self.vertices.x, self.vertices.y = self._split_intersection((x, y), (i, j))
+                        self.index_counter = i
+                        break
+
+                if (i + 1) == len(self.vertices):
+                    search_done = True
+                    del self.index_counter
+                    break
+
+        total_area = 0.0
+        p_count = len(self.vertices)
+        for i in range(p_count):
+            p1 = self.vertices[i]
+            p2 = self.vertices[int((i + 1) % p_count)]
+
+            slope = self._find_slope(p1, p2)
+
+            if slope is not None:
+                if p2.x > p1.x:
+                    total_area += self._area_under_line(p1, p2)
+                else:
+                    total_area -= self._area_under_line(p1, p2)
+
+        total_area = abs(total_area)
+
+        self.vertices.x = initial_x_vertices
+        self.vertices.y = initial_y_vertices
+
+        return total_area
 
     def contains(self, pixcoord):
         pixcoord = PixCoord._validate(pixcoord, 'pixcoord')
