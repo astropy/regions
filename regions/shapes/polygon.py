@@ -199,7 +199,7 @@ class PolygonPixelRegion(PixelRegion):
         else:
             return None, None
 
-    def _split_intersection(self, intersection_coords, line_indexes):
+    def _split_intersection(self, intersection_point, line_indexes):
         """
         This method splits the intersecting lines into two parts from the intersection point
         and creates a new polygon with these additional points.
@@ -207,7 +207,7 @@ class PolygonPixelRegion(PixelRegion):
 
         Parameters
         ----------
-        intersection_coords: (x, y) values of the intersection point
+        intersection_point: (x, y) values of the intersection point
         line_indexes: index values of intersecting lines. (Example: [1,3] -> 1. and 3. lines are intersecting.)
 
         Returns: list_of_x_values, list_of_y_values
@@ -236,7 +236,7 @@ class PolygonPixelRegion(PixelRegion):
         y_list = self.vertices.y
         p_count = len(x_list)
 
-        x_i, y_i = intersection_coords
+        x_i, y_i = intersection_point
         index_1, index_2 = line_indexes
 
         x_left, x_mid, x_right = x_list[:index_1 + 1], x_list[index_1 + 1:int(index_2 + 1 % p_count)], x_list[int(
@@ -259,9 +259,13 @@ class PolygonPixelRegion(PixelRegion):
         -------
 
         """
+
+        # The vertices will be changed if there is an intersection.
+        # The original values should be stored before the process.
         initial_x_vertices = self.vertices.x.copy()
         initial_y_vertices = self.vertices.y.copy()
 
+        # Searching for intersections
         search_done = False
         while not search_done:
             self.index_counter = 0
@@ -286,6 +290,7 @@ class PolygonPixelRegion(PixelRegion):
                     del self.index_counter
                     break
 
+        # start calculating area
         total_area = 0.0
         p_count = len(self.vertices)
         for i in range(p_count):
@@ -302,6 +307,7 @@ class PolygonPixelRegion(PixelRegion):
 
         total_area = abs(total_area)
 
+        # When the calculation finishes, original vertices are put back.
         self.vertices.x = initial_x_vertices
         self.vertices.y = initial_y_vertices
 
