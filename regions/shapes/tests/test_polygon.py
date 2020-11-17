@@ -102,6 +102,31 @@ class TestPolygonPixelRegion(BaseTestPixelRegion):
         assert_allclose(reg.vertices.x, [3, 3, 6])
         assert_allclose(reg.vertices.y, [3, 1, 3])
 
+    def test_area(self):
+        # simple polygon
+        poly1 = PolygonPixelRegion(PixCoord([0, 0, 10, 10],
+                                            [0, 10, 10, 0]))
+
+        assert poly1.area == 100.0
+
+        # concave polygon
+        poly2 = PolygonPixelRegion(PixCoord([0, 0, 10, 5, 10],
+                                            [0, 10, 10, 5, 0]))
+
+        assert poly2.area == 75.0
+
+        # self intersecting polygon
+        poly3 = PolygonPixelRegion(PixCoord([0, 0, 10, 10],
+                                            [0, 10, 0, 10]))
+
+        assert poly3.area == 50.0
+
+        # polygon with multiple self intersections
+        poly4 = PolygonPixelRegion(PixCoord([0, 0, 10, 10, 5, 5, 15, 15, 25, 25, 20, 20],
+                                            [0, 10, 10, 5, 5, 15, 15, 5, 5, 10, 10, 0]))
+
+        assert poly4.area == 225.0
+
 
 class TestPolygonSkyRegion(BaseTestSkyRegion):
 
