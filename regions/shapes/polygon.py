@@ -58,16 +58,18 @@ class PolygonPixelRegion(PixelRegion):
     @staticmethod
     def _find_slope(point_1, point_2):
         """
-        Finds the slope of a line that crosses point_1 and point_2
+        Finds the slope of a line between point_1 and point_2
 
         Parameters
         ----------
         point_1: PixCoord(x, y) -> contains pixel coordinates of point_1
         point_2: PixCoord(x, y) -> contains pixel coordinates of point_2
 
-        Returns slope (Returns "None" if the slope is infinite)
+        Returns
         -------
+        float: slope value of the line with
 
+        * Returns "None" if the line is perpendicular (Zero division)
         """
 
         del_y = point_2.y - point_1.y
@@ -90,9 +92,9 @@ class PolygonPixelRegion(PixelRegion):
         point_1: PixCoord(x, y) -> contains pixel coordinates of point_1
         point_2: PixCoord(x, y) -> contains pixel coordinates of point_2
 
-        Returns: Area
+        Returns
         -------
-
+        float: Area value
         """
 
         del_y = point_2.y - point_1.y
@@ -124,8 +126,9 @@ class PolygonPixelRegion(PixelRegion):
         line_1
         line_2
 
-        Returns: x, y
+        Returns
         -------
+        float, float: x and y coordinate of intersection point.
         """
 
         # a "near zero" value for comparing float values
@@ -210,11 +213,12 @@ class PolygonPixelRegion(PixelRegion):
         intersection_point: (x, y) values of the intersection point
         line_indexes: index values of intersecting lines. (Example: [1,3] -> 1. and 3. lines are intersecting.)
 
-        Returns: list_of_x_values, list_of_y_values
+        Returns:
         -------
+        list(float), list(float): list of x (float) values and list of y (float) values
 
-
-        Algorithm in example:
+        Example:
+        -------
 
         points_of_my_polygon: [p1, p2, p3, p4, p5, p6, p7, p8]
 
@@ -255,9 +259,9 @@ class PolygonPixelRegion(PixelRegion):
         Calculates the area of a polygon.
         The polygon can be concave or convex with multiple self intersecting lines.
 
-        Returns: Area
+        Returns:
         -------
-
+        float: Area of the polygon
         """
 
         # The vertices will be changed if there is an intersection.
