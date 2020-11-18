@@ -97,15 +97,9 @@ class PolygonPixelRegion(PixelRegion):
         float: Area value
         """
 
-        del_y = point_2.y - point_1.y
-        del_x = point_2.x - point_1.x
+        area = abs(point_2.x - point_1.x) * (point_2.y + point_1.y) * 0.5
 
-        rectangle_part = point_1.y * del_x
-        triangle_part = del_x * del_y * 0.5
-
-        area = rectangle_part + triangle_part
-
-        return abs(area)
+        return area
 
     @staticmethod
     def _find_intersection(line_1, line_2):
