@@ -62,14 +62,16 @@ class PolygonPixelRegion(PixelRegion):
 
         Parameters
         ----------
-        point_1: PixCoord(x, y) -> contains pixel coordinates of point_1
-        point_2: PixCoord(x, y) -> contains pixel coordinates of point_2
+        point_1: PixCoord
+            Contains pixel coordinates of point_1
+        point_2: PixCoord
+            Contains pixel coordinates of point_2
 
         Returns
         -------
-        float: slope value of the line with
-
-        * Returns "None" if the line is perpendicular (Zero division)
+        slope: float
+            Slope value of the line with
+            Returns "None" if the line is perpendicular (Zero division)
         """
 
         del_y = point_2.y - point_1.y
@@ -89,12 +91,15 @@ class PolygonPixelRegion(PixelRegion):
 
         Parameters
         ----------
-        point_1: PixCoord(x, y) -> contains pixel coordinates of point_1
-        point_2: PixCoord(x, y) -> contains pixel coordinates of point_2
+        point_1: PixCoord
+            Contains pixel coordinates of point_1
+        point_2: PixCoord
+            Contains pixel coordinates of point_2
 
         Returns
         -------
-        float: Area value
+        area: float
+            Area value
         """
 
         area = abs(point_2.x - point_1.x) * (point_2.y + point_1.y) * 0.5
@@ -116,13 +121,17 @@ class PolygonPixelRegion(PixelRegion):
         m and n values will be None in case of zero division.
         (If the line is perpendicular to the x-axis there will be zero division.)
 
+        Parameters
         ----------
-        line_1
-        line_2
+        line_1: [PixCoord, PixCoord]
+            List of 2 PixCoord objects for two points of line_1
+        line_2: [PixCoord, PixCoord]
+            List of 2 PixCoord objects for two points of line_2
 
         Returns
         -------
-        float, float: x and y coordinate of intersection point.
+        x, y: float, float
+            x and y coordinate of intersection point.
         """
 
         # a "near zero" value for comparing float values
@@ -204,16 +213,19 @@ class PolygonPixelRegion(PixelRegion):
 
         Parameters
         ----------
-        intersection_point: (x, y) values of the intersection point
-        line_indexes: index values of intersecting lines. (Example: [1,3] -> 1. and 3. lines are intersecting.)
+        intersection_point: (float, float)
+            (x, y) coordinate values of the intersection point
+        line_indexes: (int, int)
+            Index values of intersecting lines. (Indexing starts from zero)
 
         Returns:
         -------
-        list(float), list(float): list of x (float) values and list of y (float) values
+        new_x_list, new_y_list: list(float), list(float)
+            new_x_list is the list of new x (float) coordinate values
+            new_y_list is the list of new y (float) coordinate values
 
         Example:
         -------
-
         points_of_my_polygon: [p1, p2, p3, p4, p5, p6, p7, p8]
 
         If the [p2,p3] line and  the [p5,p6] line are intersecting at point p';
@@ -226,9 +238,7 @@ class PolygonPixelRegion(PixelRegion):
             Reverse the order of points between two p'
             [p1, p2, p', p5, p4, p3, p', p6, p7, p8]
 
-
-        In case of multiple intersections, the method will be called separately for each.
-
+        Note: In case of multiple intersections, the method will be called separately for each.
         """
         x_list = self.vertices.x
         y_list = self.vertices.y
@@ -255,7 +265,8 @@ class PolygonPixelRegion(PixelRegion):
 
         Returns:
         -------
-        float: Area of the polygon
+        area: float
+            Area of the polygon
         """
 
         # The vertices will be changed if there is an intersection.
