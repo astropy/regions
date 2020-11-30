@@ -38,11 +38,9 @@ from `PyPI <https://pypi.org/project/regions>`_, run::
 Using conda
 -----------
 
-To install regions with `Anaconda <https://www.anaconda.com/products/individual>`_
-from the `astropy channel on anaconda.org <https://anaconda.org/astropy/regions>`__
-simply run::
+To install regions with `Anaconda <https://www.anaconda.com/products/individual>`_, simply run::
 
-    conda install -c astropy regions
+    conda install -c conda-forge regions
 
 Testing installation
 --------------------
