@@ -1,5 +1,5 @@
 variables:
-  CIBW_BUILD: cp36-* cp37-* cp38-*
+  CIBW_BUILD: cp36-* cp37-* cp38-* cp39-*
 
 resources:
   repositories:
@@ -33,6 +33,7 @@ jobs:
     - macos: py36-test-alldeps-cov
     - linux: py37-test-alldeps-cov
     - windows: py38-test-alldeps-cov
+    - linux: py39-test-alldeps-cov
 
     # Test with CASA
     - linux: py36-test-alldeps-casa-cov
