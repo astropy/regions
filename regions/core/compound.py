@@ -78,7 +78,7 @@ class CompoundPixelRegion(PixelRegion):
             ptop = abs(bbox.iymax - mask.bbox.iymax)
             pbottom = abs(mask.bbox.iymin - bbox.iymin)
             padded_data.append(np.pad(mask.data,
-                                      ((ptop, pbottom), (pleft, pright)),
+                                      ((pbottom, ptop), (pleft, pright)),
                                       'constant'))
 
         data = self.operator(*np.array(padded_data, dtype=np.int))
