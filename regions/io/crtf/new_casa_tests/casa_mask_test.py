@@ -4,9 +4,9 @@ import pytest
 
 from astropy import coordinates, units as u
 
-from regions.io.crtf.write import write_crtf
+from ..write import write_crtf
 
-from regions.shapes.ellipse import EllipseSkyRegion
+from ....shapes.ellipse import EllipseSkyRegion
 
 try:
     from casatools import image, simulator
