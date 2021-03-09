@@ -197,7 +197,7 @@ class ExampleDatasetFermi(ExampleDataset):
 
         Columns: GLON, GLAT, COUNTS
         """
-        url = 'https://github.com/gammapy/gammapy-extra/raw/main/datasets/fermi_2fhl/gll_psch_v08.fit.gz'
+        url = 'https://github.com/gammapy/gammapy-extra/raw/master/datasets/fermi_2fhl/gll_psch_v08.fit.gz'
         table = Table.read(url, hdu='2FHL Source Catalog')
         table.rename_column('Npred', 'COUNTS')
         table.keep_columns(['GLON', 'GLAT', 'COUNTS'])
@@ -210,7 +210,7 @@ class ExampleDatasetFermi(ExampleDataset):
 
         Columns: GLON, GLAT
         """
-        url = 'https://github.com/gammapy/gammapy-extra/raw/main/datasets/fermi_2fhl/2fhl_events.fits.gz'
+        url = 'https://github.com/gammapy/gammapy-extra/raw/master/datasets/fermi_2fhl/2fhl_events.fits.gz'
         table = Table.read(url, hdu='EVENTS')
         table.rename_column('L', 'GLON')
         table.rename_column('B', 'GLAT')
