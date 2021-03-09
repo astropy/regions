@@ -20,7 +20,7 @@ License
 
 Regions is licensed under a 3-clause BSD license.  Please see the
 `LICENSE
-<https://github.com/astropy/regions/blob/master/LICENSE.rst>`_ file
+<https://github.com/astropy/regions/blob/main/LICENSE.rst>`_ file
 for details.
 
 
@@ -36,8 +36,8 @@ for details.
     :target: https://www.astropy.org/
     :alt: Powered by Astropy
 
-.. |AzurePipelines Status| image:: https://dev.azure.com/astropy-project/regions/_apis/build/status/astropy.regions?branchName=master
-    :target: https://dev.azure.com/astropy-project/regions/_build/latest?definitionId=7&branchName=master
+.. |AzurePipelines Status| image:: https://dev.azure.com/astropy-project/regions/_apis/build/status/astropy.regions?branchName=main
+    :target: https://dev.azure.com/astropy-project/regions/_build/latest?definitionId=7&branchName=main
     :alt: Azure Pipelines Statue
 
 .. |Codecov Status| image:: https://img.shields.io/codecov/c/github/astropy/regions?logo=codecov
