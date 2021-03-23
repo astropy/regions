@@ -84,6 +84,23 @@ class TestCompoundPixel:
         # mask1 and mask2 should be equal
         assert_allclose(mask1.data, mask2.data)
 
+        # check that "union" really works
+        shape = [15,15]
+        mask_c1 = self.c1.to_mask()
+        mask_c2 = self.c2.to_mask()
+        mask_c3 = c3.to_mask()
+        mask_c4 = c4.to_mask()
+        maskim_c1 = mask_c1.to_image(shape)
+        maskim_c2 = mask_c2.to_image(shape)
+        maskim_c3 = mask_c3.to_image(shape)
+        maskim_c4 = mask_c4.to_image(shape)
+
+        assert_allclose((maskim_c1 * maskim_c4)>0,
+                        mask1.to_image(shape))
+
+        assert_allclose((maskim_c2 * maskim_c3)>0,
+                        mask2.to_image(shape))
+
         ref_data = np.array([[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                              [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0],
                              [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0],
