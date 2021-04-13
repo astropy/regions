@@ -16,9 +16,7 @@ and then after some time propose this package for inclusion in the Astropy core.
 from ._astropy_init import *
 # ----------------------------------------------------------------------------
 
-# For egg_info test builds to pass, put package imports here.
-if not _ASTROPY_SETUP_:
-    from ._utils.examples import *
-    from .core import *
-    from .shapes import *
-    from .io import *
+from ._utils.examples import *  # noqa
+from .core import *  # noqa
+from .shapes import *  # noqa
+from .io import *  # noqa
