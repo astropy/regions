@@ -17,9 +17,9 @@ region file.
     >>> filename = get_pkg_data_filename('data/fits_region.fits',
     ...                                  package='regions.io.fits.tests')
     >>> regions = ShapeList.read(filename)
-    >>> print(regions[0])
+    >>> print(regions[0])  # doctest: +FLOAT_CMP
     Region: CircleSkyRegion
     center: <SkyCoord (ICRS): (ra, dec) in deg
         (211.06231757, 54.49779926)>
-    radius: 0.05220229834087168 deg
+    radius: 0.05220229834 deg
     >>> regions.write('regions.reg')
