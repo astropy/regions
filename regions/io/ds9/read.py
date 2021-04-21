@@ -7,6 +7,7 @@ from warnings import warn
 
 from astropy import units as u
 from astropy import coordinates
+from astropy.utils.data import get_readable_fileobj
 from astropy import log
 
 from ..core import reg_mapping
@@ -64,7 +65,7 @@ def read_ds9(filename, errors='strict'):
     radius: 40.0
 
     """
-    with open(filename) as fh:
+    with get_readable_fileobj(filename) as fh:
         region_string = fh.read()
 
     parser = DS9Parser(region_string, errors=errors)

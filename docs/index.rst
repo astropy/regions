@@ -39,6 +39,7 @@ User Documentation
    ds9
    crtf
    fits_region
+   unified
    shapely
    changelog
 

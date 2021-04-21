@@ -7,12 +7,14 @@ import numpy as np
 from astropy import units as u
 from astropy import coordinates
 from astropy.coordinates import Angle, SkyCoord
+from astropy.io.registry import UnifiedReadWriteMethod
 from astropy import log
 from astropy.table import Table
 
 from .. import shapes
 from ..core import PixCoord, SkyRegion
 from ..core.attributes import RegionMeta, RegionVisual
+from .connect import ShapeListRead, ShapeListWrite
 from .ds9.core import DS9RegionParserWarning, valid_symbols_ds9
 from .crtf.core import CRTFRegionParserWarning
 
@@ -82,6 +84,11 @@ coordsys_mapping['DS9']['geocentrictrueecliptic'] = 'ECLIPTIC'
 
 class ShapeList(list):
     """List of Shape"""
+
+    # Unified I/O read and write methods from .connect
+    read = UnifiedReadWriteMethod(ShapeListRead)
+    write = UnifiedReadWriteMethod(ShapeListWrite)
+
     def to_regions(self):
         regions = list()
         for shape in self:

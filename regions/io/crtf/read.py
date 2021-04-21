@@ -5,6 +5,7 @@ import itertools
 from warnings import warn
 
 from astropy import units as u
+from astropy.utils.data import get_readable_fileobj
 from astropy import coordinates
 
 from .core import CRTFRegionParserError, CRTFRegionParserWarning, valid_symbols
@@ -67,7 +68,7 @@ def read_crtf(filename, errors='strict'):
     {'color': 'blue'}
 
     """
-    with open(filename) as fh:
+    with get_readable_fileobj(filename) as fh:
         if regex_begin.search(fh.readline()):
             region_string = fh.read()
             parser = CRTFParser(region_string, errors)

@@ -1,7 +1,7 @@
 Cython
 numpy
 matplotlib
-astropy
+astropy>=3.2
 shapely
 Sphinx
 Sphinx-astropy
