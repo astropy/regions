@@ -15,6 +15,11 @@
   pixel-based regions. This method returns an interactive Matplotlib
   selector widget. [#317]
 
+- Add a unified read-write interface for all region formats, inspired by and
+  using the same infrastructure as astropy.table. [#307]
+
+- Bump the minimum required version of Astropy to 3.2.
+
 0.4 (2019-06-17)
 ================
 
