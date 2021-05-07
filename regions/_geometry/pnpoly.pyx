@@ -67,7 +67,7 @@
 import numpy as np
 cimport numpy as np
 
-DTYPE_BOOL = np.bool
+DTYPE_BOOL = bool
 ctypedef np.uint8_t DTYPE_BOOL_t
 
 

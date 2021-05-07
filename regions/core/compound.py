@@ -81,7 +81,7 @@ class CompoundPixelRegion(PixelRegion):
                                       ((pbottom, ptop), (pleft, pright)),
                                       'constant'))
 
-        data = self.operator(*np.array(padded_data, dtype=np.int))
+        data = self.operator(*np.array(padded_data, dtype=int))
         return RegionMask(data=data, bbox=bbox)
 
     def to_sky(self, wcs):
