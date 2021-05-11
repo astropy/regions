@@ -163,8 +163,10 @@ def test_pixcoord_to_sky_array_2d(wcs):
 
     s1 = p1.to_sky(wcs=wcs)
     assert s.name == 'galactic'
-    assert_allclose(s1.data.lon.deg, [[0, 0, 0], [349.88094, 349.88094, 349.88094]])
-    assert_allclose(s1.data.lat.deg, [[0, 0, 0], [10.003028, 10.003028, 10.003028]])
+    assert_allclose(s1.data.lon.deg, [[0, 0, 0],
+                                      [349.88094, 349.88094, 349.88094]])
+    assert_allclose(s1.data.lat.deg, [[0, 0, 0],
+                                      [10.003028, 10.003028, 10.003028]])
     assert_allclose(s.data.lon.deg, [[0, 349.88094]])
     assert_allclose(s.data.lat.deg, [[0, 10.003028]])
 

@@ -5,7 +5,7 @@ import pytest
 from ..bounding_box import BoundingBox
 
 try:
-    import matplotlib
+    import matplotlib  # noqa
     HAS_MATPLOTLIB = True
 except ImportError:
     HAS_MATPLOTLIB = False
@@ -103,6 +103,7 @@ def test_bounding_box_as_artist():
     assert_allclose(patch.get_width(), 9)
     assert_allclose(patch.get_height(), 18)
 
+
 def test_bounding_box_union():
     bbox1 = BoundingBox(1, 10, 2, 20)
     bbox2 = BoundingBox(5, 21, 7, 32)
@@ -115,6 +116,7 @@ def test_bounding_box_union():
 
     with pytest.raises(TypeError):
         bbox1.union((5, 21, 7, 32))
+
 
 def test_bounding_box_intersect():
     bbox1 = BoundingBox(1, 10, 2, 20)
