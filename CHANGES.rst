@@ -26,6 +26,10 @@ New Features
 - Added a unified read-write interface for all region formats, inspired
   by and using the same infrastructure as astropy.table. [#307]
 
+- Added a ``get_overlap_slices`` method to ``BoundingBox``. [#348]
+
+- Added a ``center`` attribute to ``BoundingBox``. [#348]
+
 Bug Fixes
 ---------
 
@@ -39,6 +43,11 @@ Bug Fixes
 
 - A ``ValueError`` is now raised when calling ``BoundingBox.slices``
   when ``ixmin`` or ``iymin`` is negative. [#347]
+
+API Changes
+-----------
+
+- Deprecated the ``BoundingBox`` ``slices`` attribute. [#348]
 
 
 0.4 (2019-06-17)
