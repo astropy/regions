@@ -29,6 +29,14 @@ New Features
 Bug Fixes
 ---------
 
+- Fixed an issue where ``RegionMask.multiply`` ``fill_value`` was not
+  applied to pixels outside of the mask, but within the region bounding
+  box. [#346]
+
+- Fixed an issue where ``RegionMask.cutout`` would raise an error if
+  ``fill_value`` was non-finite and the input array was integer type.
+  [#346]
+
 
 0.4 (2019-06-17)
 ================
