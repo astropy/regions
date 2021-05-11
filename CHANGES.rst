@@ -37,6 +37,9 @@ Bug Fixes
   ``fill_value`` was non-finite and the input array was integer type.
   [#346]
 
+- A ``ValueError`` is now raised when calling ``BoundingBox.slices``
+  when ``ixmin`` or ``iymin`` is negative. [#347]
+
 
 0.4 (2019-06-17)
 ================
