@@ -1,24 +1,42 @@
 0.5 (unreleased)
 ================
 
+General
+-------
+
 - The infrastructure of the package has been updated in line with the
-  APE 17 guidelines. The main changes are that the ``python setup.py test`` and
-  ``python setup.py build_docs`` commands will no longer work. The easiest way
-  to replicate these commands is to install the tox (https://tox.readthedocs.io)
-  package and run ``tox -e test`` and ``tox -e build_docs``. It is also possible
-  to run pytest and sphinx directly. Other significant changes include switching
-  to setuptools_scm to manage the version number, and adding a
-  ``pyproject.toml`` to opt in to isolated builds as described in PEP 517/518.
-  [#315]
+  APE 17 guidelines. The main changes are that the ``python setup.py
+  test`` and ``python setup.py build_docs`` commands will no longer
+  work. The easiest way to replicate these commands is to install the
+  tox (https://tox.readthedocs.io) package and run ``tox -e test`` and
+  ``tox -e build_docs``. It is also possible to run pytest and sphinx
+  directly. Other significant changes include switching to setuptools_scm
+  to manage the version number, and adding a ``pyproject.toml`` to opt in
+  to isolated builds as described in PEP 517/518. [#315]
+
+- Bump the minimum required version of Astropy to 3.2.
+
+New Features
+------------
 
 - Added a ``as_mpl_selector`` method to the rectangular and ellipse
   pixel-based regions. This method returns an interactive Matplotlib
   selector widget. [#317]
 
-- Add a unified read-write interface for all region formats, inspired by and
-  using the same infrastructure as astropy.table. [#307]
+- Added a unified read-write interface for all region formats, inspired
+  by and using the same infrastructure as astropy.table. [#307]
 
-- Bump the minimum required version of Astropy to 3.2.
+Bug Fixes
+---------
+
+- Fixed an issue where ``RegionMask.multiply`` ``fill_value`` was not
+  applied to pixels outside of the mask, but within the region bounding
+  box. [#346]
+
+- Fixed an issue where ``RegionMask.cutout`` would raise an error if
+  ``fill_value`` was non-finite and the input array was integer type.
+  [#346]
+
 
 0.4 (2019-06-17)
 ================
@@ -41,7 +59,6 @@ Bug Fixes
   to zero. [#278]
 - Fix 'text' renamed to 'label' [#234]
 
-
 Other
 -----
 
@@ -52,9 +69,9 @@ Other
 
 See also: `regions v0.4 merged pull requests list on Github <https://github.com/astropy/regions/pulls?q=is%3Apr+milestone%3A0.4+>`__.
 
+
 0.3 (2018-09-09)
 ================
-
 
 New features
 ------------
@@ -104,12 +121,14 @@ New features
 
 See also: `regions v0.3 merged pull requests list on Github <https://github.com/astropy/regions/pulls?q=is%3Apr+milestone%3A0.3+>`__.
 
+
 0.2 (2017-02-16)
 ================
 
 Changelog wasn't filled.
 
 See also: `regions v0.2 merged pull requests list on Github <https://github.com/astropy/regions/pulls?q=is%3Apr+milestone%3A0.2+>`__.
+
 
 0.1 (2016-07-26)
 ================

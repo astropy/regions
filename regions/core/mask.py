@@ -30,7 +30,7 @@ class RegionMask:
     def __init__(self, data, bbox):
         self.data = np.asanyarray(data)
         if self.data.shape != bbox.shape:
-            raise ValueError('data and bounding box must have the same '
+            raise ValueError('mask data and bounding box must have the same '
                              'shape.')
         self.bbox = bbox
         self._mask = (self.data == 0)
@@ -40,7 +40,6 @@ class RegionMask:
         Array representation of the mask data array (e.g., for
         matplotlib).
         """
-
         return self.data
 
     @property
@@ -48,7 +47,6 @@ class RegionMask:
         """
         The shape of the mask data array.
         """
-
         return self.data.shape
 
     def _overlap_slices(self, shape):
@@ -74,7 +72,6 @@ class RegionMask:
             such that ``small_array[slices_small]`` extracts the region
             of the small array that is inside the large array.
         """
-
         if len(shape) != 2:
             raise ValueError('input shape must have 2 elements.')
 
@@ -102,7 +99,6 @@ class RegionMask:
         Return an image of the mask in a 2D array, where the mask
         is not fully within the image (i.e. partial or no overlap).
         """
-
         # find the overlap of the mask on the output image shape
         slices_large, slices_small = self._overlap_slices(image.shape)
 
@@ -129,7 +125,6 @@ class RegionMask:
         result : `~numpy.ndarray`
             A 2D array of the mask.
         """
-
         if len(shape) != 2:
             raise ValueError('input shape must have 2 elements.')
 
@@ -179,7 +174,6 @@ class RegionMask:
             ``fill_value``.  `None` is returned if there is no overlap
             of the region with the input ``data``.
         """
-
         data = np.asanyarray(data)
         if data.ndim != 2:
             raise ValueError('data must be a 2D array.')
@@ -202,8 +196,12 @@ class RegionMask:
             if slices_small is None:
                 return None    # no overlap
 
-            # cutout is a copy
-            cutout = np.zeros(self.shape, dtype=data.dtype)
+            # cutout is always a copy for partial overlap
+            if ~np.isfinite(fill_value):
+                dtype = float
+            else:
+                dtype = data.dtype
+            cutout = np.zeros(self.shape, dtype=dtype)
             cutout[:] = fill_value
             cutout[slices_small] = data[slices_large]
 
@@ -238,7 +236,6 @@ class RegionMask:
             is returned if there is no overlap of the region with the
             input ``data``.
         """
-
         cutout = self.cutout(data, fill_value=fill_value)
         if cutout is None:
             return None
@@ -247,6 +244,6 @@ class RegionMask:
 
             # needed to zero out non-finite data values outside of the
             # mask but within the bounding box
-            weighted_cutout[self._mask] = 0.0
+            weighted_cutout[self._mask] = fill_value
 
             return weighted_cutout
