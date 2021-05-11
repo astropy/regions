@@ -78,13 +78,19 @@ def test_bounding_box_shape():
 
 def test_bounding_box_slices():
     bbox = BoundingBox(1, 10, 2, 20)
-
     assert bbox.slices == (slice(2, 20), slice(1, 10))
+
+    with pytest.raises(ValueError):
+        bbox = BoundingBox(-1, 10, 2, 20)
+        bbox.slices
+
+    with pytest.raises(ValueError):
+        bbox = BoundingBox(1, 10, -2, 20)
+        bbox.slices
 
 
 def test_bounding_box_extent():
     bbox = BoundingBox(1, 10, 2, 20)
-
     assert_allclose(bbox.extent, (0.5, 9.5, 1.5, 19.5))
 
 
