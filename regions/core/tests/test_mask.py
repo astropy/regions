@@ -6,7 +6,7 @@ import pytest
 from ..bounding_box import BoundingBox
 from ..mask import RegionMask
 from ..pixcoord import PixCoord
-from ...shapes import CirclePixelRegion
+from ...shapes import CirclePixelRegion, CircleAnnulusPixelRegion
 
 try:
     import matplotlib    # noqa
@@ -111,3 +111,20 @@ def test_mask_nan_in_bbox():
 
     wdata2 = reg2.to_mask(mode='exact').multiply(data)
     assert_allclose(np.sum(wdata2), 561.6040111923013)
+
+
+@pytest.mark.parametrize('value', (np.nan, np.inf))
+def test_mask_nonfinite_fill_value(value):
+    region = CircleAnnulusPixelRegion(PixCoord(0, 0), 10, 20)
+    data = np.ones((101, 101)).astype(int)
+    cutout = region.to_mask().cutout(data, fill_value=value)
+    assert ~np.isfinite(cutout[0, 0])
+
+
+def test_mask_multiply_fill_value():
+    region = CircleAnnulusPixelRegion(PixCoord(0, 0), 10, 20)
+    data = np.ones((101, 101)).astype(int)
+    cutout = region.to_mask().multiply(data, fill_value=np.nan)
+    xypos = ((20, 20), (5, 5), (5, 35), (35, 5), (35, 35))
+    for x, y in xypos:
+        assert np.isnan(cutout[y, x])
