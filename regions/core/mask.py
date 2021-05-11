@@ -196,8 +196,12 @@ class RegionMask:
             if slices_small is None:
                 return None    # no overlap
 
-            # cutout is a copy
-            cutout = np.zeros(self.shape, dtype=data.dtype)
+            # cutout is always a copy for partial overlap
+            if ~np.isfinite(fill_value):
+                dtype = float
+            else:
+                dtype = data.dtype
+            cutout = np.zeros(self.shape, dtype=dtype)
             cutout[:] = fill_value
             cutout[slices_small] = data[slices_large]
 
