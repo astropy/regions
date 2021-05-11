@@ -1,4 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
+from astropy.utils.exceptions import AstropyDeprecationWarning
 from numpy.testing import assert_allclose
 import pytest
 
@@ -93,7 +94,8 @@ def test_bounding_box_get_overlap_slices():
 
 def test_bounding_box_slices():
     bbox = BoundingBox(1, 10, 2, 20)
-    assert bbox.slices == (slice(2, 20), slice(1, 10))
+    with pytest.warns(AstropyDeprecationWarning):
+        assert bbox.slices == (slice(2, 20), slice(1, 10))
 
     with pytest.raises(ValueError):
         bbox = BoundingBox(-1, 10, 2, 20)

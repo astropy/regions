@@ -1,7 +1,7 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 import numpy as np
 from astropy.io.fits.util import _is_int
-
+from astropy.utils import deprecated
 
 __all__ = ['BoundingBox']
 
@@ -37,11 +37,9 @@ class BoundingBox:
     >>> bbox == BoundingBox(ixmin=7, ixmax=10, iymin=2, iymax=20)
     False
 
-    >>> # "shape" and "slices" can be useful when working with numpy arrays
+    >>> # "shape" can be useful when working with numpy arrays
     >>> bbox.shape  # numpy order: (y, x)
     (18, 9)
-    >>> bbox.slices  # numpy order: (y, x)
-    (slice(2, 20, None), slice(1, 10, None))
 
     >>> # "extent" is useful when plotting the BoundingBox with matplotlib
     >>> bbox.extent  # matplotlib order: (x, y)
@@ -149,6 +147,7 @@ class BoundingBox:
         return self.iymax - self.iymin, self.ixmax - self.ixmin
 
     @property
+    @deprecated('0.5', alternative='get_overlap_slices')
     def slices(self):
         """
         The bounding box as a tuple of `slice` objects.
