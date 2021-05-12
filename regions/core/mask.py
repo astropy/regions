@@ -49,67 +49,6 @@ class RegionMask:
         """
         return self.data.shape
 
-    def _overlap_slices(self, shape):
-        """
-        Calculate the slices for the overlapping part of the bounding
-        box and an array of the given shape.
-
-        Parameters
-        ----------
-        shape : tuple of int
-            The ``(ny, nx)`` shape of array where the slices are to be
-            applied.
-
-        Returns
-        -------
-        slices_large : tuple of slices
-            A tuple of slice objects for each axis of the large array,
-            such that ``large_array[slices_large]`` extracts the region
-            of the large array that overlaps with the small array.
-
-        slices_small : slice
-            A tuple of slice objects for each axis of the small array,
-            such that ``small_array[slices_small]`` extracts the region
-            of the small array that is inside the large array.
-        """
-        if len(shape) != 2:
-            raise ValueError('input shape must have 2 elements.')
-
-        xmin = self.bbox.ixmin
-        xmax = self.bbox.ixmax
-        ymin = self.bbox.iymin
-        ymax = self.bbox.iymax
-
-        if xmin >= shape[1] or ymin >= shape[0] or xmax <= 0 or ymax <= 0:
-            # no overlap of the region with the data
-            return None, None
-
-        slices_large = (slice(max(ymin, 0), min(ymax, shape[0])),
-                        slice(max(xmin, 0), min(xmax, shape[1])))
-
-        slices_small = (slice(max(-ymin, 0),
-                              min(ymax - ymin, shape[0] - ymin)),
-                        slice(max(-xmin, 0),
-                              min(xmax - xmin, shape[1] - xmin)))
-
-        return slices_large, slices_small
-
-    def _to_image_partial_overlap(self, image):
-        """
-        Return an image of the mask in a 2D array, where the mask
-        is not fully within the image (i.e. partial or no overlap).
-        """
-        # find the overlap of the mask on the output image shape
-        slices_large, slices_small = self._overlap_slices(image.shape)
-
-        if slices_small is None:
-            return None    # no overlap
-
-        # insert the mask into the output image
-        image[slices_large] = self.data[slices_small]
-
-        return image
-
     def get_overlap_slices(self, shape):
         """
         Get slices for the overlapping part of the aperture mask and a
@@ -156,16 +95,15 @@ class RegionMask:
         if len(shape) != 2:
             raise ValueError('input shape must have 2 elements.')
 
+        # find the overlap of the mask on the output image shape
+        slices_large, slices_small = self.get_overlap_slices(shape)
+
+        if slices_small is None:
+            return None  # no overlap
+
+        # insert the mask into the output image
         image = np.zeros(shape)
-
-        if self.bbox.ixmin < 0 or self.bbox.iymin < 0:
-            return self._to_image_partial_overlap(image)
-
-        try:
-            image[self.bbox.slices] = self.data
-        except ValueError:    # partial or no overlap
-            image = self._to_image_partial_overlap(image)
-
+        image[slices_large] = self.data[slices_small]
         return image
 
     def cutout(self, data, fill_value=0., copy=False):
@@ -206,35 +144,32 @@ class RegionMask:
         if data.ndim != 2:
             raise ValueError('data must be a 2D array.')
 
-        partial_overlap = False
-        if self.bbox.ixmin < 0 or self.bbox.iymin < 0:
-            partial_overlap = True
+        # find the overlap of the mask on the output image shape
+        slices_large, slices_small = self.bbox.get_overlap_slices(data.shape)
 
-        if not partial_overlap:
-            # try this for speed -- the result may still be a partial
-            # overlap, in which case the next block will be triggered
+        if slices_small is None:
+            return None  # no overlap
+
+        cutout_shape = (slices_small[0].stop - slices_small[0].start,
+                        slices_small[1].stop - slices_small[1].start)
+
+        if cutout_shape == self.shape:
+            cutout = data[slices_large]
             if copy:
-                cutout = np.copy(data[self.bbox.slices])
-            else:
-                cutout = data[self.bbox.slices]
+                cutout = np.copy(cutout)
+            return cutout
 
-        if partial_overlap or (cutout.shape != self.shape):
-            slices_large, slices_small = self._overlap_slices(data.shape)
+        # cutout is always a copy for partial overlap
+        if ~np.isfinite(fill_value):
+            dtype = float
+        else:
+            dtype = data.dtype
+        cutout = np.zeros(self.shape, dtype=dtype)
+        cutout[:] = fill_value
+        cutout[slices_small] = data[slices_large]
 
-            if slices_small is None:
-                return None    # no overlap
-
-            # cutout is always a copy for partial overlap
-            if ~np.isfinite(fill_value):
-                dtype = float
-            else:
-                dtype = data.dtype
-            cutout = np.zeros(self.shape, dtype=dtype)
-            cutout[:] = fill_value
-            cutout[slices_small] = data[slices_large]
-
-            if isinstance(data, u.Quantity):
-                cutout = u.Quantity(cutout, unit=data.unit)
+        if isinstance(data, u.Quantity):
+            cutout <<= data.unit
 
         return cutout
 
