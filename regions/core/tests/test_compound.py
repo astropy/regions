@@ -103,6 +103,7 @@ class TestCompoundPixel:
         bbox = (self.c1 | self.c2).bounding_box
         assert bbox == BoundingBox(1, 16, 1, 10)
 
+
 def test_compound_sky():
     skycoord1 = SkyCoord(0 * u.deg, 0 * u.deg, frame='galactic')
     c1 = CircleSkyRegion(skycoord1, 1 * u.deg)
@@ -120,15 +121,18 @@ def test_compound_sky():
     assert c2.contains(test_coord1, wcs) and not c1.contains(test_coord1, wcs)
     assert not c2.contains(test_coord2, wcs) and c1.contains(test_coord2, wcs)
     assert c1.contains(test_coord3, wcs) and c2.contains(test_coord3, wcs)
-    assert not c2.contains(test_coord4, wcs) and not c1.contains(test_coord4, wcs)
+    assert (not c2.contains(test_coord4, wcs)
+            and not c1.contains(test_coord4, wcs))
 
-    coords = SkyCoord([test_coord1, test_coord2, test_coord3, test_coord4], frame='galactic')
+    coords = SkyCoord([test_coord1, test_coord2, test_coord3, test_coord4],
+                      frame='galactic')
 
     union = c1 | c2
     assert (union.contains(coords, wcs) == [True, True, True, False]).all()
 
     intersection = c1 & c2
-    assert (intersection.contains(coords, wcs) == [False, False, True, False]).all()
+    assert ((intersection.contains(coords, wcs)
+             == [False, False, True, False]).all())
 
     diff = c1 ^ c2
     assert (diff.contains(coords, wcs) == [True, True, False, False]).all()
@@ -139,7 +143,8 @@ def test_compound_sky():
     assert (union.contains(coords, wcs) == [True, True, True, True]).all()
 
     intersection = c1 & c2 & c3
-    assert (intersection.contains(coords, wcs) == [False, False, False, False]).all()
+    assert ((intersection.contains(coords, wcs)
+             == [False, False, False, False]).all())
 
     diff = c1 ^ c2 ^ c3
     assert (diff.contains(coords, wcs) == [True, True, False, True]).all()

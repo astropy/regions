@@ -5,9 +5,9 @@ import pytest
 from ..bounding_box import BoundingBox
 
 try:
-    import matplotlib
+    import matplotlib  # noqa
     HAS_MATPLOTLIB = True
-except:
+except ImportError:
     HAS_MATPLOTLIB = False
 
 
@@ -78,13 +78,19 @@ def test_bounding_box_shape():
 
 def test_bounding_box_slices():
     bbox = BoundingBox(1, 10, 2, 20)
-
     assert bbox.slices == (slice(2, 20), slice(1, 10))
+
+    with pytest.raises(ValueError):
+        bbox = BoundingBox(-1, 10, 2, 20)
+        bbox.slices
+
+    with pytest.raises(ValueError):
+        bbox = BoundingBox(1, 10, -2, 20)
+        bbox.slices
 
 
 def test_bounding_box_extent():
     bbox = BoundingBox(1, 10, 2, 20)
-
     assert_allclose(bbox.extent, (0.5, 9.5, 1.5, 19.5))
 
 
@@ -96,6 +102,7 @@ def test_bounding_box_as_artist():
     assert_allclose(patch.get_xy(), (0.5, 1.5))
     assert_allclose(patch.get_width(), 9)
     assert_allclose(patch.get_height(), 18)
+
 
 def test_bounding_box_union():
     bbox1 = BoundingBox(1, 10, 2, 20)
@@ -109,6 +116,7 @@ def test_bounding_box_union():
 
     with pytest.raises(TypeError):
         bbox1.union((5, 21, 7, 32))
+
 
 def test_bounding_box_intersect():
     bbox1 = BoundingBox(1, 10, 2, 20)
