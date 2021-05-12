@@ -166,21 +166,15 @@ def test_mask_nonfinite_in_bbox():
     assert_allclose(np.sum(wdata2), 561.6040111923013)
 
 
-def test_mask_get_values():
-    x = (0, 50, 100)
-    y = (0, 50, 100)
+@pytest.mark.parametrize('x, y, exp_shape',
+                         [(0, 0, 245), (50, 50, 940), (100, 100, 245)])
+def test_mask_get_values(x, y, exp_shape):
     aper = CircleAnnulusPixelRegion(PixCoord(x, y), inner_radius=10,
                                     outer_radius=20)
     data = np.ones((101, 101))
-    values = [mask.get_values(data) for mask in
-              aper.to_mask(mode='exact')]
-    shapes = [val.shape for val in values]
-    sums = [np.sum(val) for val in values]
-    assert shapes[0] == (278,)
-    assert shapes[1] == (1068,)
-    assert shapes[2] == (278,)
-    sums_expected = (245.621534, 942.477796, 245.621534)
-    assert_allclose(sums, sums_expected)
+    values = aper.to_mask(mode='center').get_values(data)
+    assert values.shape == (exp_shape,)
+    assert_allclose(np.sum(values), exp_shape)
 
 
 def test_mask_get_values_no_overlap():
