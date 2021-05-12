@@ -1,7 +1,11 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-import numpy as np
-from astropy.io.fits.util import _is_int
+"""
+This module defines a class for a rectangular bounding box.
+"""
 
+from astropy.io.fits.util import _is_int
+from astropy.utils import deprecated
+import numpy as np
 
 __all__ = ['BoundingBox']
 
@@ -37,11 +41,11 @@ class BoundingBox:
     >>> bbox == BoundingBox(ixmin=7, ixmax=10, iymin=2, iymax=20)
     False
 
-    >>> # "shape" and "slices" can be useful when working with numpy arrays
+    >>> # "center" and "shape" can be useful when working with numpy arrays
+    >>> bbox.center  # numpy order: (y, x)
+    (10.5, 5.0)
     >>> bbox.shape  # numpy order: (y, x)
     (18, 9)
-    >>> bbox.slices  # numpy order: (y, x)
-    (slice(2, 20, None), slice(1, 10, None))
 
     >>> # "extent" is useful when plotting the BoundingBox with matplotlib
     >>> bbox.extent  # matplotlib order: (x, y)
@@ -121,12 +125,10 @@ class BoundingBox:
             raise TypeError('Can compare BoundingBox only to another '
                             'BoundingBox.')
 
-        return (
-            (self.ixmin == other.ixmin) and
-            (self.ixmax == other.ixmax) and
-            (self.iymin == other.iymin) and
-            (self.iymax == other.iymax)
-        )
+        return ((self.ixmin == other.ixmin)
+                and (self.ixmax == other.ixmax)
+                and (self.iymin == other.iymin)
+                and (self.iymax == other.iymax))
 
     def __or__(self, other):
         return self.union(other)
@@ -142,6 +144,14 @@ class BoundingBox:
         return fmt.format(**data)
 
     @property
+    def center(self):
+        """
+        The ``(y, x)`` center of the bounding box.
+        """
+        return (0.5 * (self.iymax - 1 + self.iymin),
+                0.5 * (self.ixmax - 1 + self.ixmin))
+
+    @property
     def shape(self):
         """
         The ``(ny, nx)`` shape of the bounding box.
@@ -149,17 +159,65 @@ class BoundingBox:
         return self.iymax - self.iymin, self.ixmax - self.ixmin
 
     @property
+    @deprecated('0.5', alternative='get_overlap_slices')
     def slices(self):
         """
         The bounding box as a tuple of `slice` objects.
 
-        The slice tuple is in numpy axis order (i.e. ``(y, x)``) and
+        The slice tuple is in numpy axis order (i.e., ``(y, x)``) and
         therefore can be used to slice numpy arrays.
         """
         if self.iymin < 0 or self.ixmin < 0:
             raise ValueError('cannot create slices when ixmin or iymin is '
                              'negative')
         return slice(self.iymin, self.iymax), slice(self.ixmin, self.ixmax)
+
+    def get_overlap_slices(self, shape):
+        """
+        Get slices for the overlapping part of the bounding box and an
+        2D array.
+
+        Parameters
+        ----------
+        shape : 2-tuple of int
+            The shape of the 2D array.
+
+        Returns
+        -------
+        slices_large : tuple of slices or `None`
+            A tuple of slice objects for each axis of the large array,
+            such that ``large_array[slices_large]`` extracts the region
+            of the large array that overlaps with the small array.
+            `None` is returned if there is no overlap of the bounding
+            box with the given image shape.
+
+        slices_small : tuple of slices or `None`
+            A tuple of slice objects for each axis of an array enclosed
+            by the bounding box such that ``small_array[slices_small]``
+            extracts the region that is inside the large array. `None`
+            is returned if there is no overlap of the bounding box with
+            the given image shape.
+        """
+        if len(shape) != 2:
+            raise ValueError('input shape must have 2 elements.')
+
+        xmin = self.ixmin
+        xmax = self.ixmax
+        ymin = self.iymin
+        ymax = self.iymax
+
+        if xmin >= shape[1] or ymin >= shape[0] or xmax <= 0 or ymax <= 0:
+            # no overlap of the bounding box with the input shape
+            return None, None
+
+        slices_large = (slice(max(ymin, 0), min(ymax, shape[0])),
+                        slice(max(xmin, 0), min(xmax, shape[1])))
+        slices_small = (slice(max(-ymin, 0),
+                              min(ymax - ymin, shape[0] - ymin)),
+                        slice(max(-xmin, 0),
+                              min(xmax - xmin, shape[1] - xmin)))
+
+        return slices_large, slices_small
 
     @property
     def extent(self):
@@ -170,16 +228,12 @@ class BoundingBox:
         pixel.
 
         The upper edges here are the actual pixel positions of the
-        edges, i.e. they are not "exclusive" indices used for python
-        indexing.  This is useful for plotting the bounding box using
+        edges, i.e., they are not "exclusive" indices used for python
+        indexing. This is useful for plotting the bounding box using
         Matplotlib.
         """
-        return (
-            self.ixmin - 0.5,
-            self.ixmax - 0.5,
-            self.iymin - 0.5,
-            self.iymax - 0.5,
-        )
+        return (self.ixmin - 0.5, self.ixmax - 0.5,
+                self.iymin - 0.5, self.iymax - 0.5)
 
     def as_artist(self, **kwargs):
         """
@@ -188,7 +242,7 @@ class BoundingBox:
 
         Parameters
         ----------
-        kwargs : `dict`
+        **kwargs : `dict`
             Any keyword arguments accepted by
             `matplotlib.patches.Patch`.
 
@@ -207,11 +261,12 @@ class BoundingBox:
             bbox = BoundingBox(2, 7, 3, 8)
             fig = plt.figure()
             ax = fig.add_subplot(1, 1, 1)
-            np.random.seed(12345)
-            ax.imshow(np.random.random((10, 10)), interpolation='nearest', cmap='viridis')
-            ax.add_patch(bbox.as_artist(facecolor='none', edgecolor='white', lw=2.))
+            rng = np.random.default_rng(0)
+            ax.imshow(rng.random((10, 10)), interpolation='nearest',
+                      cmap='viridis')
+            ax.add_patch(bbox.as_artist(facecolor='none', edgecolor='white',
+                         lw=2.))
         """
-
         from matplotlib.patches import Rectangle
 
         return Rectangle(xy=(self.extent[0], self.extent[2]),
@@ -222,16 +277,12 @@ class BoundingBox:
         Return a `~regions.RectanglePixelRegion` that
         represents the bounding box.
         """
-
         from ..shapes import RectanglePixelRegion
         from .pixcoord import PixCoord
 
-        xpos = (self.extent[1] + self.extent[0]) / 2.
-        ypos = (self.extent[3] + self.extent[2]) / 2.
-        xypos = PixCoord(xpos, ypos)
-        h, w = self.shape
-
-        return RectanglePixelRegion(center=xypos, width=w, height=h)
+        xypos = PixCoord(*self.center[::-1])
+        height, width = self.shape
+        return RectanglePixelRegion(center=xypos, width=width, height=height)
 
     def plot(self, origin=(0, 0), ax=None, **kwargs):
         """
@@ -246,7 +297,7 @@ class BoundingBox:
         ax : `matplotlib.axes.Axes` instance, optional
             If `None`, then the current `~matplotlib.axes.Axes` instance
             is used.
-        kwargs : `dict`
+        **kwargs : `dict`
             Any keyword arguments accepted by `matplotlib.patches.Patch`.
 
         Returns
@@ -254,7 +305,6 @@ class BoundingBox:
         ax : `~matplotlib.axes.Axes`
             Axes on which the patch is added.
         """
-
         reg = self.to_region()
         return reg.plot(origin=origin, ax=ax, **kwargs)
 
