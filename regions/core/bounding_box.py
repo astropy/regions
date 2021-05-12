@@ -1,7 +1,11 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-import numpy as np
+"""
+This module defines a class for a rectangular bounding box.
+"""
+
 from astropy.io.fits.util import _is_int
 from astropy.utils import deprecated
+import numpy as np
 
 __all__ = ['BoundingBox']
 
@@ -119,12 +123,10 @@ class BoundingBox:
             raise TypeError('Can compare BoundingBox only to another '
                             'BoundingBox.')
 
-        return (
-            (self.ixmin == other.ixmin) and
-            (self.ixmax == other.ixmax) and
-            (self.iymin == other.iymin) and
-            (self.iymax == other.iymax)
-        )
+        return ((self.ixmin == other.ixmin)
+                and (self.ixmax == other.ixmax)
+                and (self.iymin == other.iymin)
+                and (self.iymax == other.iymax))
 
     def __or__(self, other):
         return self.union(other)
@@ -152,7 +154,7 @@ class BoundingBox:
         """
         The bounding box as a tuple of `slice` objects.
 
-        The slice tuple is in numpy axis order (i.e. ``(y, x)``) and
+        The slice tuple is in numpy axis order (i.e., ``(y, x)``) and
         therefore can be used to slice numpy arrays.
         """
         if self.iymin < 0 or self.ixmin < 0:
@@ -213,16 +215,12 @@ class BoundingBox:
         pixel.
 
         The upper edges here are the actual pixel positions of the
-        edges, i.e. they are not "exclusive" indices used for python
-        indexing.  This is useful for plotting the bounding box using
+        edges, i.e., they are not "exclusive" indices used for python
+        indexing. This is useful for plotting the bounding box using
         Matplotlib.
         """
-        return (
-            self.ixmin - 0.5,
-            self.ixmax - 0.5,
-            self.iymin - 0.5,
-            self.iymax - 0.5,
-        )
+        return (self.ixmin - 0.5, self.ixmax - 0.5,
+                self.iymin - 0.5, self.iymax - 0.5)
 
     def as_artist(self, **kwargs):
         """
@@ -231,7 +229,7 @@ class BoundingBox:
 
         Parameters
         ----------
-        kwargs : `dict`
+        **kwargs : `dict`
             Any keyword arguments accepted by
             `matplotlib.patches.Patch`.
 
@@ -254,7 +252,6 @@ class BoundingBox:
             ax.imshow(np.random.random((10, 10)), interpolation='nearest', cmap='viridis')
             ax.add_patch(bbox.as_artist(facecolor='none', edgecolor='white', lw=2.))
         """
-
         from matplotlib.patches import Rectangle
 
         return Rectangle(xy=(self.extent[0], self.extent[2]),
@@ -265,7 +262,6 @@ class BoundingBox:
         Return a `~regions.RectanglePixelRegion` that
         represents the bounding box.
         """
-
         from ..shapes import RectanglePixelRegion
         from .pixcoord import PixCoord
 
@@ -289,7 +285,7 @@ class BoundingBox:
         ax : `matplotlib.axes.Axes` instance, optional
             If `None`, then the current `~matplotlib.axes.Axes` instance
             is used.
-        kwargs : `dict`
+        **kwargs : `dict`
             Any keyword arguments accepted by `matplotlib.patches.Patch`.
 
         Returns
@@ -297,7 +293,6 @@ class BoundingBox:
         ax : `~matplotlib.axes.Axes`
             Axes on which the patch is added.
         """
-
         reg = self.to_region()
         return reg.plot(origin=origin, ax=ax, **kwargs)
 
