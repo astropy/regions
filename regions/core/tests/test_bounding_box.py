@@ -77,6 +77,11 @@ def test_bounding_box_shape():
     assert bbox.shape == (18, 9)
 
 
+def test_bounding_box_center():
+    bbox = BoundingBox(1, 10, 2, 20)
+    assert bbox.center == (10.5, 5)
+
+
 def test_bounding_box_get_overlap_slices():
     bbox = BoundingBox(1, 10, 2, 20)
     slc = ((slice(2, 20, None), slice(1, 10, None)),
