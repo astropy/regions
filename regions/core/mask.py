@@ -1,7 +1,9 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
+"""
+This module defines a class for region masks.
+"""
 import numpy as np
 import astropy.units as u
-
 
 __all__ = ['RegionMask']
 
@@ -13,13 +15,14 @@ class RegionMask:
     Parameters
     ----------
     data : array_like
-        A 2D array of a region mask representing the fractional overlap
-        of the region on the pixel grid.  This should be the full-sized
-        (i.e. not truncated) array that is the direct output of one of
-        the low-level "geometry" functions.
+        A 2D array representing the fractional overlap of a region
+        on the pixel grid. This should be the full-sized (i.e., not
+        truncated) array that is the direct output of one of the
+        low-level "geometry" functions.
 
     bbox : `regions.BoundingBox`
-        The bounding box for the region.
+        The bounding box object defining the region minimal bounding
+        box.
 
     Examples
     --------
@@ -31,7 +34,7 @@ class RegionMask:
         self.data = np.asanyarray(data)
         if self.data.shape != bbox.shape:
             raise ValueError('mask data and bounding box must have the same '
-                             'shape.')
+                             'shape')
         self.bbox = bbox
         self._mask = (self.data == 0)
 
@@ -127,7 +130,7 @@ class RegionMask:
             array will be a view into the input ``data``.  In cases
             where the mask partially overlaps or has no overlap with the
             input ``data``, the returned cutout array will always hold a
-            copy of the input ``data`` (i.e. this keyword has no
+            copy of the input ``data`` (i.e., this keyword has no
             effect).
 
         Returns
@@ -145,7 +148,7 @@ class RegionMask:
             raise ValueError('data must be a 2D array.')
 
         # find the overlap of the mask on the output image shape
-        slices_large, slices_small = self.bbox.get_overlap_slices(data.shape)
+        slices_large, slices_small = self.get_overlap_slices(data.shape)
 
         if slices_small is None:
             return None  # no overlap
@@ -205,8 +208,7 @@ class RegionMask:
         else:
             weighted_cutout = cutout * self.data
 
-            # needed to zero out non-finite data values outside of the
-            # mask but within the bounding box
+            # fill values outside of the mask but within the bounding box
             weighted_cutout[self._mask] = fill_value
 
             return weighted_cutout
