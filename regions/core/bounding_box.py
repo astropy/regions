@@ -41,7 +41,9 @@ class BoundingBox:
     >>> bbox == BoundingBox(ixmin=7, ixmax=10, iymin=2, iymax=20)
     False
 
-    >>> # "shape" can be useful when working with numpy arrays
+    >>> # "center" and "shape" can be useful when working with numpy arrays
+    >>> bbox.center  # numpy order: (y, x)
+    (10.5, 5.0)
     >>> bbox.shape  # numpy order: (y, x)
     (18, 9)
 
@@ -142,6 +144,14 @@ class BoundingBox:
         return fmt.format(**data)
 
     @property
+    def center(self):
+        """
+        The ``(y, x)`` center of the bounding box.
+        """
+        return (0.5 * (self.iymax - 1 + self.iymin),
+                0.5 * (self.ixmax - 1 + self.ixmin))
+
+    @property
     def shape(self):
         """
         The ``(ny, nx)`` shape of the bounding box.
@@ -180,6 +190,7 @@ class BoundingBox:
             of the large array that overlaps with the small array.
             `None` is returned if there is no overlap of the bounding
             box with the given image shape.
+
         slices_small : tuple of slices or `None`
             A tuple of slice objects for each axis of an array enclosed
             by the bounding box such that ``small_array[slices_small]``
@@ -194,6 +205,7 @@ class BoundingBox:
         xmax = self.ixmax
         ymin = self.iymin
         ymax = self.iymax
+
         if xmin >= shape[1] or ymin >= shape[0] or xmax <= 0 or ymax <= 0:
             # no overlap of the bounding box with the input shape
             return None, None
@@ -204,6 +216,7 @@ class BoundingBox:
                               min(ymax - ymin, shape[0] - ymin)),
                         slice(max(-xmin, 0),
                               min(xmax - xmin, shape[1] - xmin)))
+
         return slices_large, slices_small
 
     @property
@@ -265,12 +278,9 @@ class BoundingBox:
         from ..shapes import RectanglePixelRegion
         from .pixcoord import PixCoord
 
-        xpos = (self.extent[1] + self.extent[0]) / 2.
-        ypos = (self.extent[3] + self.extent[2]) / 2.
-        xypos = PixCoord(xpos, ypos)
-        h, w = self.shape
-
-        return RectanglePixelRegion(center=xypos, width=w, height=h)
+        xypos = PixCoord(*self.center[::-1])
+        height, width = self.shape
+        return RectanglePixelRegion(center=xypos, width=width, height=height)
 
     def plot(self, origin=(0, 0), ax=None, **kwargs):
         """
