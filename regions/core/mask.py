@@ -159,7 +159,9 @@ class RegionMask:
         if cutout_shape == self.shape:
             cutout = data[slices_large]
             if copy:
-                cutout = np.copy(cutout)
+                # NOTE: np.copy() doesn't work with Quantity for
+                # astropy 3.2.3
+                cutout = cutout.copy()
             return cutout
 
         # cutout is always a copy for partial overlap
