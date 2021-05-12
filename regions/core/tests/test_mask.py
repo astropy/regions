@@ -128,3 +128,11 @@ def test_mask_multiply_fill_value():
     xypos = ((20, 20), (5, 5), (5, 35), (35, 5), (35, 35))
     for x, y in xypos:
         assert np.isnan(cutout[y, x])
+
+
+def test_mask_get_overlap_slices():
+    aper = CirclePixelRegion(PixCoord(5, 5), radius=10.)
+    mask = aper.to_mask()
+    slc = ((slice(0, 16, None), slice(0, 16, None)),
+           (slice(5, 21, None), slice(5, 21, None)))
+    assert mask.get_overlap_slices((25, 25)) == slc
