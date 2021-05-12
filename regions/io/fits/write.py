@@ -34,7 +34,7 @@ def fits_region_objects_to_table(regions):
     return shape_list.to_fits()
 
 
-def write_fits_region(filename, regions, header=None, overwrite=None):
+def write_fits_region(filename, regions, header=None, overwrite=False):
     """
     Converts list of regions to FITS region table and write to a file.
 
@@ -45,9 +45,12 @@ def write_fits_region(filename, regions, header=None, overwrite=None):
     filename : str
         Filename in which the table is to be written.
     regions : list
-        List of `regions.Region` objects
-    header : `~astropy.io.fits.Header`
-        The FITS header
+        List of `regions.Region` objects.
+    header : `~astropy.io.fits.Header`, optional
+        The FITS header.
+    overwrite : bool, optional
+        If True, overwrite the output file if it exists. Raises an
+        OSError if False and the output file exists. Default is False.
     """
     output = fits_region_objects_to_table(regions)
 
