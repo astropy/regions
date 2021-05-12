@@ -32,6 +32,8 @@ New Features
 
 - Added ``get_overlap_slices`` method to ``RegionMask``. [#350]
 
+- Added ``get_values`` method to ``RegionMask``. [#351]
+
 Bug Fixes
 ---------
 
