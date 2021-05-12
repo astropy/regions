@@ -30,6 +30,8 @@ New Features
 
 - Added a ``center`` attribute to ``BoundingBox``. [#348]
 
+- Added ``get_overlap_slices`` method to ``RegionMask``. [#350]
+
 Bug Fixes
 ---------
 

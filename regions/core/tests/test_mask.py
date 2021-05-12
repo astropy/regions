@@ -1,19 +1,17 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
+"""
+Tests for the mask module.
+"""
+
+import astropy.units as u
 import numpy as np
-from numpy.testing import assert_allclose
+from numpy.testing import assert_allclose, assert_almost_equal
 import pytest
 
 from ..bounding_box import BoundingBox
 from ..mask import RegionMask
 from ..pixcoord import PixCoord
 from ...shapes import CirclePixelRegion, CircleAnnulusPixelRegion
-
-try:
-    import matplotlib    # noqa
-    HAS_MATPLOTLIB = True
-except ImportError:
-    HAS_MATPLOTLIB = False
-
 
 POSITIONS = [(-20, -20), (-20, 20), (20, -20), (60, 60)]
 
@@ -33,6 +31,14 @@ def test_mask_array():
     assert_allclose(data, mask.data)
 
 
+def test_mask_get_overlap_slices():
+    aper = CirclePixelRegion(PixCoord(5, 5), radius=10.)
+    mask = aper.to_mask()
+    slc = ((slice(0, 16, None), slice(0, 16, None)),
+           (slice(5, 21, None), slice(5, 21, None)))
+    assert mask.get_overlap_slices((25, 25)) == slc
+
+
 def test_mask_cutout_shape():
     mask_data = np.ones((10, 10))
     bbox = BoundingBox(5, 15, 5, 15)
@@ -40,9 +46,6 @@ def test_mask_cutout_shape():
 
     with pytest.raises(ValueError):
         mask.cutout(np.arange(10))
-
-    with pytest.raises(ValueError):
-        mask._overlap_slices((10,))
 
     with pytest.raises(ValueError):
         mask.to_image((10,))
@@ -55,6 +58,13 @@ def test_mask_cutout_copy():
     cutout = mask.cutout(data, copy=True)
     data[25, 25] = 100.
     assert cutout[10, 10] == 1.
+
+    # test quantity data
+    data2 = np.ones((50, 50)) * u.adu
+    cutout2 = mask.cutout(data2, copy=True)
+    assert cutout2.unit == data2.unit
+    data2[25, 25] = 100. * u.adu
+    assert cutout2[10, 10].value == 1.
 
 
 @pytest.mark.parametrize('position', POSITIONS)
@@ -89,28 +99,31 @@ def test_mask_cutout_partial_overlap(position):
     assert image.shape == data.shape
 
 
-def test_mask_nan_in_bbox():
-    """
-    Regression test that non-finite data values outside of the mask but
-    within the bounding box are set to zero.
-    """
+def test_mask_multiply():
+    radius = 10.
+    data = np.ones((50, 50))
+    region = CirclePixelRegion(PixCoord(25, 25), radius=radius)
+    mask = region.to_mask(mode='exact')
+    data_weighted = mask.multiply(data)
+    assert_almost_equal(np.sum(data_weighted), np.pi * radius**2)
 
-    data = np.ones((101, 101))
-    data[33, 33] = np.nan
-    data[67, 67] = np.inf
-    data[33, 67] = -np.inf
-    data[22, 22] = np.nan
-    data[22, 23] = np.inf
+    # test that multiply() returns a copy
+    data[25, 25] = 100.
+    assert data_weighted[10, 10] == 1.
 
-    radius = 20.
-    reg1 = CirclePixelRegion(PixCoord(50, 50), radius)
-    reg2 = CirclePixelRegion(PixCoord(5, 5), radius)
 
-    wdata1 = reg1.to_mask(mode='exact').multiply(data)
-    assert_allclose(np.sum(wdata1), np.pi * radius**2)
+def test_mask_multiply_quantity():
+    radius = 10.
+    data = np.ones((50, 50)) * u.adu
+    region = CirclePixelRegion(PixCoord(25, 25), radius=radius)
+    mask = region.to_mask(mode='exact')
+    data_weighted = mask.multiply(data)
+    assert data_weighted.unit == u.adu
+    assert_almost_equal(np.sum(data_weighted.value), np.pi * radius**2)
 
-    wdata2 = reg2.to_mask(mode='exact').multiply(data)
-    assert_allclose(np.sum(wdata2), 561.6040111923013)
+    # test that multiply() returns a copy
+    data[25, 25] = 100. * u.adu
+    assert data_weighted[10, 10].value == 1.
 
 
 @pytest.mark.parametrize('value', (np.nan, np.inf))
@@ -128,3 +141,26 @@ def test_mask_multiply_fill_value():
     xypos = ((20, 20), (5, 5), (5, 35), (35, 5), (35, 35))
     for x, y in xypos:
         assert np.isnan(cutout[y, x])
+
+
+def test_mask_nonfinite_in_bbox():
+    """
+    Regression test that non-finite data values outside of the mask but
+    within the bounding box are set to zero.
+    """
+    data = np.ones((101, 101))
+    data[33, 33] = np.nan
+    data[67, 67] = np.inf
+    data[33, 67] = -np.inf
+    data[22, 22] = np.nan
+    data[22, 23] = np.inf
+
+    radius = 20.
+    reg1 = CirclePixelRegion(PixCoord(50, 50), radius)
+    reg2 = CirclePixelRegion(PixCoord(5, 5), radius)
+
+    wdata1 = reg1.to_mask(mode='exact').multiply(data)
+    assert_allclose(np.sum(wdata1), np.pi * radius**2)
+
+    wdata2 = reg2.to_mask(mode='exact').multiply(data)
+    assert_allclose(np.sum(wdata2), 561.6040111923013)
