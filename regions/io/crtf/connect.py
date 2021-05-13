@@ -25,11 +25,11 @@ def is_crtf(origin, path, fileobj, *args, **kwargs):
         An open file object to read the file's contents, or `None` if
         the file could not be opened.
 
-     *args :
-         Positional arguments for the ``read`` or ``write`` function.
+    *args : tuple
+        Positional arguments for the ``read`` or ``write`` function.
 
-      **kwargs :
-          Keyword arguments for the ``read`` or ``write`` function.
+    **kwargs : dict
+        Keyword arguments for the ``read`` or ``write`` function.
 
     Returns
     -------
