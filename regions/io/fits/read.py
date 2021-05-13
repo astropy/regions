@@ -19,17 +19,18 @@ class FITSRegionParser:
 
     Parameters
     ----------
-    table: `~astropy.table.Table` object
-        A fits region table
-    errors : ``warn``, ``ignore``, ``strict``
-        The error handling scheme to use for handling parsing errors.
-        The default is 'strict', which will raise a `FITSRegionParserError`.
-        `warn`` will raise a `FITSRegionParserWarning`, and ``ignore`` will
-        do nothing (i.e., be silent).
+    table: `~astropy.table.Table`
+        A FITS region table.
+
+    errors : {'strict', 'warn', 'ignore'}, optional
+        The error handling scheme to use for handling parsing
+        errors. The default is 'strict', which will raise
+        a `FITSRegionParserError`. 'warn' will raise a
+        `FITSRegionParserWarning`, and 'ignore' will do nothing (i.e.,
+        be silent).
 
     Examples
     --------
-
     >>> from regions import FITSRegionParser
     >>> from astropy.table import Table
     >>> from astropy.utils.data import get_pkg_data_filename
@@ -46,9 +47,8 @@ class FITSRegionParser:
     valid_columns = ['X', 'Y', 'SHAPE', 'COMPONENT', 'R', 'ROTANG']
 
     def __init__(self, table, errors='strict'):
-
         if errors not in ('strict', 'ignore', 'warn'):
-            msg = "``errors`` must be one of strict, ignore, or warn; is {}"
+            msg = "'errors' must be one of strict, ignore, or warn; is {}"
             raise ValueError(msg.format(errors))
         if not isinstance(table, Table):
             raise TypeError("The table should be an astropy table object")
@@ -97,21 +97,24 @@ class FITSRegionParser:
 
 class FITSRegionRowParser():
     """
-    Parses a single row of the FITS region table
+    Parse a single row of a FITS region table.
 
     Parameters
     ----------
-    row: `~astropy.table.row.Row` object
-        Single row of the region table that is to be parsed.
-    unit: `dict`
-        Units of each column in the row.
-    errors : ``warn``, ``ignore``, ``strict``
-        The error handling scheme to use for handling parsing errors.
-        The default is 'strict', which will raise a ``FITSRegionParserError``.
-        `warn`` will raise a ``FITSRegionParserWarning``, and ``ignore`` will
-        do nothing (i.e., be silent).
+    row: `~astropy.table.row.Row`
+        A row of the region table that is to be parsed.
 
+    unit: dict
+        The units of each column in the row.
+
+    errors : {'strict', 'warn', 'ignore'}, optional
+        The error handling scheme to use for handling parsing
+        errors. The default is 'strict', which will raise
+        a ``FITSRegionParserError``. 'warn' will raise a
+        ``FITSRegionParserWarning``, and 'ignore' will do nothing (i.e.,
+        be silent).
     """
+
     def __init__(self, row, unit, errors='strict'):
         self.errors = errors
         self.unit = unit
@@ -217,33 +220,33 @@ class FITSRegionRowParser():
 
 def read_fits_region(filename, errors='strict'):
     """
-    Reads a FITS region file and scans for any fits regions table and
-    converts them into `Region` objects.
+    Read a FITS region file, converting a FITS regions table to a list
+    of `~regions.Region` objects.
 
     Parameters
     ----------
     filename : str
-        The file path
-    errors : ``warn``, ``ignore``, ``strict``
-      The error handling scheme to use for handling parsing errors.
-      The default is 'strict', which will raise a `FITSRegionParserError`.
-      ``warn`` will raise a `FITSRegionParserWarning`, and ``ignore`` will do nothing
-      (i.e., be silent).
+        The file path.
+
+    errors : {'strict', 'warn', 'ignore'}, optional
+        The error handling scheme to use for handling parsing
+        errors. The default is 'strict', which will raise
+        a `FITSRegionParserError`. 'warn' will raise a
+        `FITSRegionParserWarning`, and 'ignore' will do nothing (i.e.,
+        be silent).
 
     Returns
     -------
     regions : list
-        Python list of `regions.Region` objects.
+        A list of `~regions.Region` objects.
 
     Examples
     --------
-
     >>> from astropy.utils.data import get_pkg_data_filename
     >>> from regions import read_fits_region
     >>> file_read = get_pkg_data_filename('data/fits_region.fits',
     ...                                   package='regions.io.fits.tests')
     >>> regions = read_fits_region(file_read)
-
     """
     regions = []
 
