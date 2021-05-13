@@ -31,7 +31,7 @@ regex_splitter = re.compile("[, ]")
 
 def read_ds9(filename, errors='strict'):
     """
-    Read a DS9 region file in as a `list` of `~regions.Region` objects.
+    Read a DS9 region file in as a list of `~regions.Region` objects.
 
     Parameters
     ----------
