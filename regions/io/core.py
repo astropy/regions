@@ -18,14 +18,14 @@ from .connect import ShapeListRead, ShapeListWrite
 from .ds9.core import DS9RegionParserWarning, valid_symbols_ds9
 from .crtf.core import CRTFRegionParserWarning
 
-__all__ = ['ShapeList', 'Shape', 'to_shape_list', 'to_crtf_meta', 'to_ds9_meta']
+__all__ = ['ShapeList', 'Shape', 'to_shape_list', 'to_crtf_meta',
+           'to_ds9_meta']
 
 
 class RegionConversionError(ValueError):
     """
     A generic error class for Shape to Region conversion.
     """
-
 
 regions_attributes = dict(circle=['center', 'radius'],
                           ellipse=['center', 'width', 'height', 'angle'],
@@ -83,14 +83,19 @@ coordsys_mapping['DS9']['geocentrictrueecliptic'] = 'ECLIPTIC'
 
 
 class ShapeList(list):
-    """List of Shape"""
+    """
+    A class to hold a list of `~regions.Shape` objects.
+    """
 
     # Unified I/O read and write methods from .connect
     read = UnifiedReadWriteMethod(ShapeListRead)
     write = UnifiedReadWriteMethod(ShapeListWrite)
 
     def to_regions(self):
-        regions = list()
+        """
+        Convert to a list of `~regions.Region` objects.
+        """
+        regions = []
         for shape in self:
             # Skip elliptical annulus for now
             if shape.region_type == 'ellipse' and len(shape.coord) > 5:
@@ -107,32 +112,28 @@ class ShapeList(list):
             regions.append(region)
         return regions
 
-    def to_crtf(self,  coordsys='fk5', fmt='.6f', radunit='deg'):
+    def to_crtf(self, coordsys='fk5', fmt='.6f', radunit='deg'):
         """
-        Converts a list of ``regions.Shape`` objects to crtf region strings.
+        Convert to CRTF (CASA Region Text Format) region strings.
 
         Parameters
         ----------
         coordsys : str
-            This overrides the coordinate system frame for all regions.
+            An Astropy coordinate system that overrides the coordinate
+            system frame for all regions.
 
         fmt : str
             A python string format defining the output precision.
-            Default is .6f, which is accurate to 0.0036 arcseconds.
+            Default is '.6f', which is accurate to 0.0036 arcseconds.
 
         radunit : str
-            This denotes the unit of the radius.
+            The unit of the radius.
 
         Returns
         -------
         region_string : str
-            crtf region string
-
-        Examples
-        --------
-        TODO
+            A CRFT region string.
         """
-
         crtf_strings = {
             'circle': '{0}circle[[{1:FMT}deg, {2:FMT}deg], {3:FMT}RAD]',
             'circleannulus': '{0}annulus[[{1:FMT}deg, {2:FMT}deg], [{3:FMT}RAD, {4:FMT}RAD]]',
@@ -257,26 +258,25 @@ class ShapeList(list):
 
     def to_ds9(self, coordsys='fk5', fmt='.6f', radunit='deg'):
         """
-        Converts a list of ``regions.Shape`` objects to ds9 region strings.
+        Convert to DS9 region strings.
 
         Parameters
         ----------
         coordsys : str
-            This overrides the coordinate system frame for all regions.
+            An Astropy coordinate system that overrides the coordinate
+            system frame for all regions.
+
         fmt : str
             A python string format defining the output precision.
-            Default is .6f, which is accurate to 0.0036 arcseconds.
+            Default is '.6f', which is accurate to 0.0036 arcseconds.
+
         radunit : str
-            This denotes the unit of the radius.
+            The unit of the radius.
 
         Returns
         -------
         region_string : str
-            ds9 region string
-
-        Examples
-        --------
-        TODO
+            A DS9 region string.
         """
         valid_symbols_reverse = {y: x for x, y in valid_symbols_ds9.items()}
 
@@ -379,9 +379,8 @@ class ShapeList(list):
 
     def to_fits(self):
         """
-        Converts a `~regions.ShapeList` to a `~astropy.table.Table` object.
+        Convert to a `~astropy.table.Table` object.
         """
-
         max_length_coord = 1
         coord_x = []
         coord_y = []
@@ -457,17 +456,22 @@ class Shape:
     Parameters
     ----------
     coordsys : str
-        Astropy Coordinate system frame used in the region.
+        An Astropy Coordinate system frame used in the region.
+
     region_type : str
-        Type of the region (as defined in this package).
+        The type of the region (as defined in this package).
+
     coord : list of `~astropy.coordinates.Angle` or `~astropy.units.Quantity`
-        Coordinates
+        The region coordinates.
+
     meta : dict
-        Meta attributes
+        The meta attributes.
+
     composite : bool
-        Composite region
+        Flag indicting wheter the region is a Composite region.
+
     include : bool
-        Include/exclude region
+        Flag indicating where to include or exclude the region.
     """
 
     shape_to_sky_region = dict(circle=shapes.CircleSkyRegion,
@@ -539,12 +543,13 @@ class Shape:
 
     def convert_coords(self):
         """
-        Process list of coordinates
+        Process a list of coordinates.
 
-        This mainly searches for tuple of coordinates in the coordinate list and
-        creates a SkyCoord or PixCoord object from them if appropriate for a
-        given region type. This involves again some coordinate transformation,
-        so this step could be moved to the parsing process
+        This mainly searches for a tuple of coordinates in the
+        coordinate list and creates a SkyCoord or PixCoord object from
+        them if appropriate for a given region type. This involves again
+        some coordinate transformation, so this step could be moved to
+        the parsing process.
         """
         if self.coordsys in ['image', 'physical']:
             coords = self._convert_pix_coords()
@@ -561,7 +566,7 @@ class Shape:
 
     def _convert_sky_coords(self):
         """
-        Convert to sky coordinates
+        Convert to sky coordinates.
         """
         parsed_angles = [(x, y)
                          for x, y in zip(self.coord[:-1:2], self.coord[1::2])
@@ -586,7 +591,7 @@ class Shape:
 
     def _convert_pix_coords(self):
         """
-        Convert to pixel coordinates, `regions.PixCoord`
+        Convert to pixel coordinates.
         """
         if self.region_type in ['polygon', 'line']:
             # have to special-case polygon in the phys coord case
@@ -606,9 +611,8 @@ class Shape:
 
     def to_region(self):
         """
-        Converts to region, ``regions.Region`` object
+        Convert to a `~regions.Region` object.
         """
-
         coords = self.convert_coords()
         log.debug(coords)
         viz_keywords = ['color', 'dash', 'dashlist', 'width', 'font', 'symsize',
@@ -645,7 +649,7 @@ class Shape:
 
     def check_crtf(self):
         """
-        Checks for CRTF compatibility.
+        Check for CRTF compatibility.
         """
         if self.region_type not in regions_attributes:
             raise ValueError("'{}' is not a valid region type in this package"
@@ -657,7 +661,7 @@ class Shape:
 
     def check_ds9(self):
         """
-        Checks for DS9 compatibility.
+        Check for DS9 compatibility.
         """
         if self.region_type not in regions_attributes:
             raise ValueError("'{}' is not a valid region type in this package"
@@ -669,7 +673,7 @@ class Shape:
 
     def _validate(self):
         """
-        Checks whether all the attributes of this object is valid.
+        Check whether all the attributes of this object is valid.
         """
         if self.region_type not in regions_attributes:
             raise ValueError("'{}' is not a valid region type in this package"
@@ -682,24 +686,23 @@ class Shape:
 
 def to_shape_list(region_list, coordinate_system='fk5'):
     """
-    Converts a list of regions into a `regions.ShapeList` object.
+    Convert a list of regions into a `~regions.ShapeList` object.
 
     Parameters
     ----------
-    region_list: python list
-        Lists of `regions.Region` objects
-    format_type: str ('DS9' or 'CRTF')
-        The format type of the Shape object. Default is 'DS9'.
-    coordinate_system: str
-        The astropy coordinate system frame in which all the coordinates present
-        in the `region_list` will be converted. Default is 'fk5'.
+    region_list : list
+        A list of `regions.Region` objects.
+
+    coordinate_system : str, optional
+        The Astropy coordinate system frame in which all the coordinates
+        present in the ``region_list`` will be converted. Default is
+        'fk5'.
 
     Returns
     -------
-    shape_list: `regions.ShapeList` object
-        list of `regions.Shape` objects.
+    shape_list: `regions.ShapeList`
+        A `~regions.ShapeList` object.
     """
-
     shape_list = ShapeList()
 
     for region in region_list:
@@ -753,19 +756,19 @@ def to_shape_list(region_list, coordinate_system='fk5'):
 
 def to_ds9_meta(shape_meta):
     """
-    Makes the meta data DS9 compatible by filtering and mapping the valid keys
+    Make the metadata DS9 compatible by filtering and mapping the valid
+    keys.
 
     Parameters
     ----------
-    shape_meta: dict
-        meta attribute of a `regions.Shape` object
+    shape_meta : dict
+        The meta attribute of a `regions.Shape` object.
 
     Returns
     -------
     meta : dict
-        DS9 compatible meta dictionary
+        A DS9 compatible meta dictionary.
     """
-
     # meta keys allowed in DS9.
     valid_keys = ['symbol', 'include', 'tag', 'line', 'comment',
                   'name', 'select', 'highlite', 'fixed', 'label', 'text',
@@ -790,18 +793,18 @@ def to_ds9_meta(shape_meta):
 
 def to_crtf_meta(shape_meta):
     """
-    Makes the meta data CRTF compatible by filtering and mapping the valid keys
+    Make the metadata CRTF compatible by filtering and mapping the valid
+    keys.
 
     Parameters
     ----------
-    shape_meta: dict
-        meta attribute of a `regions.Region` object
+    shape_meta : dict
+        A meta attribute of a `regions.Region` object.
 
     Returns
     -------
     meta : dict
-        CRTF compatible meta dictionary
-
+        A CRTF compatible meta dictionary.
     """
     # please refer : https://casaguides.nrao.edu/index.php/CASA_Region_Format
 
@@ -821,24 +824,27 @@ def to_crtf_meta(shape_meta):
 
 def _to_io_meta(shape_meta, valid_keys, key_mappings):
     """
-    This is used to make meta data compatible with a specific io
-    by filtering and mapping to it's valid keys
+    Make metadata compatible with a specific IO by filtering and mapping
+    to its valid keys.
 
     Parameters
     ----------
-    shape_meta: dict
-        meta attribute of a `regions.Region` object
-    valid_keys : python list
-        Contains all the valid keys of a particular file format.
-    key_mappings : python dict
-        Maps to the actual name of the key in the format.
+    shape_meta : dict
+        A meta attribute of a `regions.Region` object.
+
+    valid_keys : list
+        The valid keys of a particular file format.
+
+    key_mappings : dict
+        A dictionary mapping of the actual name of the key in the
+        format.
 
     Returns
     -------
     meta : dict
-        io compatible meta dictionary according to valid_keys and key_mappings
+        An IO compatible meta dictionary according to ``valid_keys`` and
+        ``key_mappings``.
     """
-
     meta = dict()
 
     for key in shape_meta:
