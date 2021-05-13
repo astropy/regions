@@ -241,12 +241,12 @@ class RegionMask:
         result : `~numpy.ndarray`
             A 1D array of mask-weighted pixel values from the input
             ``data``. If there is no overlap of the region with the
-            input ``data``, the result will be a 1-element array of
-            ``numpy.nan``.
+            input ``data``, the result will be an empty array with shape
+            (0,).
         """
         slc_large, slc_small = self.get_overlap_slices(data.shape)
         if slc_large is None:
-            return np.array([np.nan])
+            return np.array([])
         cutout = data[slc_large]
         region_mask = self.data[slc_small]
         pixel_mask = (region_mask > 0)  # good pixels
