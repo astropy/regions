@@ -6,7 +6,7 @@ __all__ = ['write_crtf', 'crtf_objects_to_string']
 
 def crtf_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
     """
-    Convert a `list` of `~regions.Region` objects to a CRTF region string.
+    Convert a list of `~regions.Region` objects to a CRTF region string.
 
     Parameters
     ----------
@@ -46,7 +46,7 @@ def crtf_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
 
 def write_crtf(regions, filename, coordsys='fk5', fmt='.6f', radunit='deg'):
     """
-    Convert a list of `~regions.Region` to a CRTF string and write to
+    Convert a list of `~regions.Region` to a CRTF string and write to a
     file.
 
     See :ref:`gs-crtf`
@@ -57,8 +57,7 @@ def write_crtf(regions, filename, coordsys='fk5', fmt='.6f', radunit='deg'):
         A list of `~regions.Region` objects.
 
     filename : str
-        The filename in which the string is to be written. Default is
-        'new.crtf'.
+        The filename in which the string is to be written.
 
     coordsys : str, optional
         An Astropy coordinate system that overrides the coordinate

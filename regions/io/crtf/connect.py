@@ -10,7 +10,7 @@ CRTF_SIGNATURE = '#CRTF'
 
 def is_crtf(origin, path, fileobj, *args, **kwargs):
     """
-    Identify a CRTF file.
+    Identify a CRTF region file.
 
     Parameters
     ----------
@@ -34,7 +34,7 @@ def is_crtf(origin, path, fileobj, *args, **kwargs):
     Returns
     -------
     result : bool
-        Returns `True` if the given file is a CRTF file.
+        Returns `True` if the given file is a CRTF region file.
     """
     if fileobj is not None:
         pos = fileobj.tell()

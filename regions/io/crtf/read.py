@@ -114,6 +114,7 @@ class CRTFParser:
     >>> print(regs[0].visual)
     {'color': 'blue'}
     """
+
     # It contains a tuple of valid definition (region, annotation) type.
     valid_definition = ('box', 'centerbox', 'rotbox', 'poly', 'circle', 'annulus', 'ellipse',
                         'line', 'vector', 'text', 'symbol')
@@ -231,7 +232,7 @@ class CRTFParser:
 
 class CRTFRegionParser:
     """
-    Parse a CRTF region string
+    Parse a CRTF region string.
 
     This will turn a line containing a CRTF region into a
     `~regions.Shape` object.
@@ -264,6 +265,7 @@ class CRTFRegionParser:
         `~regions.CRTFRegionParserWarning`, and 'ignore' will do nothing
         (i.e., be silent).
     """
+
     # List of valid coordinate system
     # TODO : There are still many reference systems to support
 
@@ -475,7 +477,7 @@ class CoordinateParser:
         Given a string that is a number and a unit, return a Quantity of
         that string. An error is raised if there is no unit, e.g.:
 
-        * 50" -> 50*u.arcsec
+        * 50" -> 50 * u.arcsec
         * 50 -> CRTFRegionParserError : Units must be specified for 50
         """
         unit_mapping = {
