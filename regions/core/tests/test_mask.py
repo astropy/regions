@@ -181,8 +181,7 @@ def test_mask_get_values_no_overlap():
     aper = CirclePixelRegion(PixCoord(-100, -100), radius=3)
     data = np.ones((51, 51))
     values = aper.to_mask().get_values(data)
-    assert values.size == 1
-    assert np.isnan(values[0])
+    assert values.shape == (0,)
 
 
 def test_mask_get_values_mask():
