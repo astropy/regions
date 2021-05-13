@@ -187,7 +187,7 @@ class EllipsePixelRegion(PixelRegion):
         origin : array_like, optional
             The ``(x, y)`` pixel position of the origin of the displayed image.
             Default is (0, 0).
-        kwargs : `dict`
+        **kwargs : `dict`
             All keywords that a `~matplotlib.patches.Ellipse` object accepts
 
         Returns
@@ -238,7 +238,7 @@ class EllipsePixelRegion(PixelRegion):
             updated. This only has an effect if ``sync`` is `True`. If a
             callback is set, it is called for the first time once the selector
             has been created.
-        kwargs
+        **kwargs
             Additional keyword arguments are passed to matplotlib.widgets.EllipseSelector`
 
         Returns

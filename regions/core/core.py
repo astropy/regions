@@ -219,7 +219,7 @@ class PixelRegion(Region):
             The ``(x, y)`` pixel position of the origin of the displayed image.
             Default is (0, 0).
 
-        kwargs : `dict`
+        **kwargs : `dict`
             keywords that a `~matplotlib.patches.Patch` accepts
 
         Returns
@@ -273,7 +273,7 @@ class PixelRegion(Region):
             Default is (0, 0).
         ax : `~matplotlib.axes.Axes`, optional
             Axis
-        kwargs : `dict`
+        **kwargs : `dict`
             keywords that a `~matplotlib.patches.Patch` accepts
 
         Returns

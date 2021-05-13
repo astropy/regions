@@ -40,7 +40,6 @@ def make_example_dataset(data='simulated', config=None):
 
     Examples
     --------
-
     Make an example dataset:
 
     >>> from regions import make_example_dataset
