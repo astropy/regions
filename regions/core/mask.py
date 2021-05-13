@@ -2,6 +2,8 @@
 """
 This module defines a class for region masks.
 """
+import warnings
+
 import numpy as np
 import astropy.units as u
 
@@ -54,7 +56,7 @@ class RegionMask:
 
     def get_overlap_slices(self, shape):
         """
-        Get slices for the overlapping part of the aperture mask and a
+        Get slices for the overlapping part of the region mask and a
         2D array.
 
         Parameters
@@ -72,7 +74,7 @@ class RegionMask:
             box with the given image shape.
 
         slices_small : tuple of slices or `None`
-            A tuple of slice objects for each axis of the aperture mask
+            A tuple of slice objects for each axis of the region mask
             array such that ``small_array[slices_small]`` extracts the
             region that is inside the large array. `None` is returned if
             there is no overlap of the bounding box with the given image
@@ -214,3 +216,47 @@ class RegionMask:
             weighted_cutout[self._mask] = fill_value
 
             return weighted_cutout
+
+    def get_values(self, data, mask=None):
+        """
+        Get the mask-weighted pixel values from the data as a 1D array.
+
+        If the `~regions.core.RegionMask` was created with
+        ``mode='center'``, (where the mask weights are only 1 or 0),
+        then the returned values will simply be pixel values extracted
+        from the data.
+
+        Parameters
+        ----------
+        data : array_like or `~astropy.units.Quantity`
+            The 2D array from which to get mask-weighted values.
+
+        mask : array_like (bool), optional
+            A boolean mask with the same shape as ``data`` where a
+            `True` value indicates the corresponding element of ``data``
+            is not returned in the result.
+
+        Returns
+        -------
+        result : `~numpy.ndarray`
+            A 1D array of mask-weighted pixel values from the input
+            ``data``. If there is no overlap of the region with the
+            input ``data``, the result will be a 1-element array of
+            ``numpy.nan``.
+        """
+        slc_large, slc_small = self.get_overlap_slices(data.shape)
+        if slc_large is None:
+            return np.array([np.nan])
+        cutout = data[slc_large]
+        region_mask = self.data[slc_small]
+        pixel_mask = (region_mask > 0)  # good pixels
+
+        if mask is not None:
+            if mask.shape != data.shape:
+                raise ValueError('mask and data must have the same shape')
+            pixel_mask &= ~mask[slc_large]
+
+        # ignore multiplication with inf data values
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', RuntimeWarning)
+            return (cutout * region_mask)[pixel_mask]

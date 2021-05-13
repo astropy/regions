@@ -164,3 +164,38 @@ def test_mask_nonfinite_in_bbox():
 
     wdata2 = reg2.to_mask(mode='exact').multiply(data)
     assert_allclose(np.sum(wdata2), 561.6040111923013)
+
+
+@pytest.mark.parametrize('x, y, exp_shape',
+                         [(0, 0, 245), (50, 50, 940), (100, 100, 245)])
+def test_mask_get_values(x, y, exp_shape):
+    aper = CircleAnnulusPixelRegion(PixCoord(x, y), inner_radius=10,
+                                    outer_radius=20)
+    data = np.ones((101, 101))
+    values = aper.to_mask(mode='center').get_values(data)
+    assert values.shape == (exp_shape,)
+    assert_allclose(np.sum(values), exp_shape)
+
+
+def test_mask_get_values_no_overlap():
+    aper = CirclePixelRegion(PixCoord(-100, -100), radius=3)
+    data = np.ones((51, 51))
+    values = aper.to_mask().get_values(data)
+    assert values.size == 1
+    assert np.isnan(values[0])
+
+
+def test_mask_get_values_mask():
+    aper = CirclePixelRegion(PixCoord(24.5, 24.5), radius=10.)
+    data = np.ones((51, 51))
+    mask = aper.to_mask(mode='exact')
+    with pytest.raises(ValueError):
+        mask.get_values(data, mask=np.ones(3))
+
+    arr = mask.get_values(data, mask=None)
+    assert_allclose(np.sum(arr), 100. * np.pi)
+
+    data_mask = np.zeros(data.shape, dtype=bool)
+    data_mask[25:] = True
+    arr2 = mask.get_values(data, mask=data_mask)
+    assert_allclose(np.sum(arr2), 100. * np.pi / 2.)
