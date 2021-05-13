@@ -153,11 +153,11 @@ class DS9Parser:
         A DS9 region string.
 
     errors : {'strict', 'warn', 'ignore'}, optional
-      The error handling scheme to use for handling parsing
-      errors. The default is 'strict', which will raise a
-      `~regions.DS9RegionParserError`. 'warn' will raise a
-      `~regions.DS9RegionParserWarning`, and 'ignore' will do nothing
-      (i.e., be silent).
+        The error handling scheme to use for handling parsing
+        errors. The default is 'strict', which will raise a
+        `~regions.DS9RegionParserError`. 'warn' will raise a
+        `~regions.DS9RegionParserWarning`, and 'ignore' will do nothing
+        (i.e., be silent).
 
     Examples
     --------
@@ -208,9 +208,8 @@ class DS9Parser:
     def set_coordsys(self, coordsys):
         """
         Transform coordinate system
-
-        # TODO: needs expert attention
         """
+        # TODO: needs expert attention
         if coordsys in self.coordsys_mapping:
             self.coordsys = self.coordsys_mapping[coordsys]
         else:

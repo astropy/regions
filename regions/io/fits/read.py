@@ -24,10 +24,10 @@ class FITSRegionParser:
 
     errors : {'strict', 'warn', 'ignore'}, optional
         The error handling scheme to use for handling parsing
-        errors. The default is 'strict', which will raise
-        a `FITSRegionParserError`. 'warn' will raise a
-        `FITSRegionParserWarning`, and 'ignore' will do nothing (i.e.,
-        be silent).
+        errors. The default is 'strict', which will raise a
+        `~regions.FITSRegionParserError`. 'warn' will raise a
+        `~regions.FITSRegionParserWarning`, and 'ignore' will do nothing
+        (i.e., be silent).
 
     Examples
     --------
@@ -109,10 +109,10 @@ class FITSRegionRowParser():
 
     errors : {'strict', 'warn', 'ignore'}, optional
         The error handling scheme to use for handling parsing
-        errors. The default is 'strict', which will raise
-        a ``FITSRegionParserError``. 'warn' will raise a
-        ``FITSRegionParserWarning``, and 'ignore' will do nothing (i.e.,
-        be silent).
+        errors. The default is 'strict', which will raise a
+        `~regions.FITSRegionParserError`. 'warn' will raise a
+        `~regions.FITSRegionParserWarning`, and 'ignore' will do
+        nothing (i.e., be silent).
     """
 
     def __init__(self, row, unit, errors='strict'):
@@ -230,10 +230,10 @@ def read_fits_region(filename, errors='strict'):
 
     errors : {'strict', 'warn', 'ignore'}, optional
         The error handling scheme to use for handling parsing
-        errors. The default is 'strict', which will raise
-        a `FITSRegionParserError`. 'warn' will raise a
-        `FITSRegionParserWarning`, and 'ignore' will do nothing (i.e.,
-        be silent).
+        errors. The default is 'strict', which will raise a
+        `~regions.FITSRegionParserError`. 'warn' will raise a
+        `~regions.FITSRegionParserWarning`, and 'ignore' will do
+        nothing (i.e., be silent).
 
     Returns
     -------
