@@ -17,9 +17,9 @@ representing one DS9 region. The `~regions.Shape` objects can be converted to
     >>> parser = DS9Parser(reg_string)
     >>> print(parser.shapes[0])
     Shape
-    Type : reg
-    Coord sys : galactic
-    Region type : circle
+    Type: reg
+    Coord sys: galactic
+    Region type: circle
     Meta: {'color': 'green', 'include': True}
     Composite: False
     Include: True

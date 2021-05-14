@@ -46,9 +46,9 @@ package.
     >>> parser = FITSRegionParser(table)
     >>> print(parser.shapes[0])
     Shape
-    Type : reg
-    Coord sys : physical
-    Region type : circle
+    Type: reg
+    Coord sys: physical
+    Region type: circle
     Meta: {'tag': '1'}
     Composite: False
     Include: False
