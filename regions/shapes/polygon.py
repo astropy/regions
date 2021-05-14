@@ -18,15 +18,15 @@ class PolygonPixelRegion(PixelRegion):
     Parameters
     ----------
     vertices : `~regions.PixCoord`
-        The vertices of the polygon
-    meta : `~regions.RegionMeta` object, optional
-        A dictionary which stores the meta attributes of this region.
-    visual : `~regions.RegionVisual` object, optional
-        A dictionary which stores the visual meta attributes of this region.
+        The vertices of the polygon.
+    meta : `~regions.RegionMeta`, optional
+        A dictionary that stores the meta attributes of this region.
+    visual : `~regions.RegionVisual`, optional
+        A dictionary that stores the visual meta attributes of this
+        region.
 
     Examples
     --------
-
     .. plot::
         :include-source:
 
@@ -47,6 +47,7 @@ class PolygonPixelRegion(PixelRegion):
         plt.ylim(50, 80)
         ax.set_aspect('equal')
     """
+
     _params = ('vertices',)
     vertices = OneDPix('vertices')
 
@@ -57,7 +58,6 @@ class PolygonPixelRegion(PixelRegion):
 
     @property
     def area(self):
-        """Region area (float)."""
         # See https://stackoverflow.com/questions/24467972
 
         # Use offsets to improve numerical precision
@@ -98,7 +98,6 @@ class PolygonPixelRegion(PixelRegion):
         return BoundingBox.from_float(xmin, xmax, ymin, ymax)
 
     def to_mask(self, mode='center', subpixels=5):
-
         self._validate_mode(mode, subpixels)
 
         if mode == 'center':
@@ -132,20 +131,23 @@ class PolygonPixelRegion(PixelRegion):
 
     def as_artist(self, origin=(0, 0), **kwargs):
         """
-        Matplotlib patch object for this region (`matplotlib.patches.Polygon`).
+        Return a matplotlib patch object for this region
+        (`matplotlib.patches.Polygon`).
 
         Parameters
         ----------
         origin : array_like, optional
-            The ``(x, y)`` pixel position of the origin of the displayed image.
-            Default is (0, 0).
-        **kwargs : `dict`
-            All keywords that a `~matplotlib.patches.Polygon` object accepts
+            The ``(x, y)`` pixel position of the origin of the displayed
+            image.
+
+        **kwargs : dict
+            Any keyword arguments accepted by
+            `~matplotlib.patches.Polygon`.
 
         Returns
         -------
         patch : `~matplotlib.patches.Polygon`
-            Matplotlib polygon patch
+            A matplotlib polygon patch.
         """
         from matplotlib.patches import Polygon
         xy = np.vstack([self.vertices.x - origin[0],
@@ -157,21 +159,22 @@ class PolygonPixelRegion(PixelRegion):
         return Polygon(xy=xy, **mpl_params)
 
     def rotate(self, center, angle):
-        """Make a rotated region.
+        """
+        Rotate the region.
 
-        Rotates counter-clockwise for positive ``angle``.
+        Postive ``angle`` corresponds to counter-clockwise rotation.
 
         Parameters
         ----------
-        center : `PixCoord`
-            Rotation center point
+        center : `~regions.PixCoord`
+            The rotation center point.
         angle : `~astropy.coordinates.Angle`
-            Rotation angle
+            The rotation angle.
 
         Returns
         -------
         region : `PolygonPixelRegion`
-            Rotated region (an independent copy)
+            The rotated region (which is an independent copy).
         """
         vertices = self.vertices.rotate(center, angle)
         return self.copy(vertices=vertices)
@@ -184,12 +187,14 @@ class PolygonSkyRegion(SkyRegion):
     Parameters
     ----------
     vertices : `~astropy.coordinates.SkyCoord`
-        The vertices of the polygon
-    meta : `~regions.RegionMeta` object, optional
-        A dictionary which stores the meta attributes of this region.
-    visual : `~regions.RegionVisual` object, optional
-        A dictionary which stores the visual meta attributes of this region.
+        The vertices of the polygon.
+    meta : `~regions.RegionMeta`, optional
+        A dictionary that stores the meta attributes of this region.
+    visual : `~regions.RegionVisual`, optional
+        A dictionary that stores the visual meta attributes of this
+        region.
     """
+
     _params = ('vertices',)
     vertices = OneDSky('vertices')
 
