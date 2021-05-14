@@ -17,17 +17,17 @@ class LinePixelRegion(PixelRegion):
     Parameters
     ----------
     start : `~regions.PixCoord`
-        Start position
+        The start position.
     end : `~regions.PixCoord`
-        End position
-    meta : `~regions.RegionMeta` object, optional
-        A dictionary which stores the meta attributes of this region.
-    visual : `~regions.RegionVisual` object, optional
-        A dictionary which stores the visual meta attributes of this region.
+        The end position.
+    meta : `~regions.RegionMeta`, optional
+        A dictionary that stores the meta attributes of this region.
+    visual : `~regions.RegionVisual`, optional
+        A dictionary that stores the visual meta attributes of this
+        region.
 
     Examples
     --------
-
     .. plot::
         :include-source:
 
@@ -49,6 +49,7 @@ class LinePixelRegion(PixelRegion):
         plt.ylim(0, 30)
         ax.set_aspect('equal')
     """
+
     _params = ('start', 'end')
     start = ScalarPix('start')
     end = ScalarPix('end')
@@ -61,7 +62,6 @@ class LinePixelRegion(PixelRegion):
 
     @property
     def area(self):
-        """Region area (float)."""
         return 0
 
     def contains(self, pixcoord):
@@ -82,7 +82,6 @@ class LinePixelRegion(PixelRegion):
 
     @property
     def bounding_box(self):
-        """Bounding box (`~regions.BoundingBox`)."""
         xmin = min(self.start.x, self.end.x)
         xmax = max(self.start.x, self.end.x)
         ymin = min(self.start.y, self.end.y)
@@ -96,20 +95,23 @@ class LinePixelRegion(PixelRegion):
 
     def as_artist(self, origin=(0, 0), **kwargs):
         """
-        Matplotlib patch object for this region (`matplotlib.patches.Arrow`).
+        Return a matplotlib patch object for this region
+        (`matplotlib.patches.Arrow`).
 
         Parameters
         ----------
         origin : array_like, optional
-            The ``(x, y)`` pixel position of the origin of the displayed image.
-            Default is (0, 0).
-        **kwargs : `dict`
-            All keywords that a `~matplotlib.patches.Arrow` object accepts
+            The ``(x, y)`` pixel position of the origin of the displayed
+            image.
+
+        **kwargs : dict
+            Any keyword arguments accepted by
+            `~matplotlib.patches.Arrow`.
 
         Returns
         -------
         patch : `~matplotlib.patches.Arrow`
-            Matplotlib line patch
+            A matplotlib line patch.
         """
         # Long term we want to support DS9 lines with arrow heads
 
@@ -129,21 +131,22 @@ class LinePixelRegion(PixelRegion):
         return Arrow(x, y, dx, dy, **mpl_params)
 
     def rotate(self, center, angle):
-        """Make a rotated region.
+        """
+        Rotate the region.
 
-        Rotates counter-clockwise for positive ``angle``.
+        Postive ``angle`` corresponds to counter-clockwise rotation.
 
         Parameters
         ----------
-        center : `PixCoord`
-            Rotation center point
+        center : `~regions.PixCoord`
+            The rotation center point.
         angle : `~astropy.coordinates.Angle`
-            Rotation angle
+            The rotation angle.
 
         Returns
         -------
         region : `LinePixelRegion`
-            Rotated region (an independent copy)
+            The rotated region (which is an independent copy).
         """
         start = self.start.rotate(center, angle)
         end = self.end.rotate(center, angle)
@@ -157,14 +160,16 @@ class LineSkyRegion(SkyRegion):
     Parameters
     ----------
     start : `~astropy.coordinates.SkyCoord`
-        Start position
+        The start position.
     end : `~astropy.coordinates.SkyCoord`
-        End position
-    meta : `~regions.RegionMeta` object, optional
-        A dictionary which stores the meta attributes of this region.
-    visual : `~regions.RegionVisual` object, optional
-        A dictionary which stores the visual meta attributes of this region.
+        The end position.
+    meta : `~regions.RegionMeta`, optional
+        A dictionary that stores the meta attributes of this region.
+    visual : `~regions.RegionVisual`, optional
+        A dictionary that stores the visual meta attributes of this
+        region.
     """
+
     _params = ('start', 'end')
     start = ScalarSky('start')
     end = ScalarSky('end')
