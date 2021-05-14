@@ -99,11 +99,9 @@ Regions follows the same workflow and coding guidelines as
 contributing fixes, code, or documentation (no git or GitHub
 experience necessary):
 
-* `How to make a code contribution <https://docs.astropy.org/en/stable/development/workflow/development_workflow.html>`_
+* `How to make a code contribution <https://docs.astropy.org/en/latest/development/workflow/development_workflow.html>`_
 
 * `Coding Guidelines <https://docs.astropy.org/en/latest/development/codeguide.html>`_
-
-* `Try the development version <https://docs.astropy.org/en/stable/development/workflow/get_devel_version.html>`_
 
 * `Developer Documentation <https://docs.astropy.org/en/latest/#developer-documentation>`_
 
