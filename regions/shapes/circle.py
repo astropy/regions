@@ -21,17 +21,17 @@ class CirclePixelRegion(PixelRegion):
     Parameters
     ----------
     center : `~regions.PixCoord`
-        Center position
-    radius : `float`
-        Radius
-    meta : `~regions.RegionMeta` object, optional
-        A dictionary which stores the meta attributes of this region.
-    visual : `~regions.RegionVisual` object, optional
-        A dictionary which stores the visual meta attributes of this region.
+        The center position.
+    radius : float
+        The radius.
+    meta : `~regions.RegionMeta`, optional
+        A dictionary that stores the meta attributes of this region.
+    visual : `~regions.RegionVisual`, optional
+        A dictionary that stores the visual meta attributes of this
+        region.
 
     Examples
     --------
-
     .. plot::
         :include-source:
 
@@ -52,6 +52,7 @@ class CirclePixelRegion(PixelRegion):
         plt.ylim(0, 15)
         ax.set_aspect('equal')
     """
+
     _params = ('center', 'radius')
     center = ScalarPix('center')
     radius = ScalarLength('radius')
@@ -64,7 +65,6 @@ class CirclePixelRegion(PixelRegion):
 
     @property
     def area(self):
-        """Region area (`float`)."""
         return math.pi * self.radius ** 2
 
     def contains(self, pixcoord):
@@ -121,20 +121,23 @@ class CirclePixelRegion(PixelRegion):
 
     def as_artist(self, origin=(0, 0), **kwargs):
         """
-        Matplotlib patch object for this region (`matplotlib.patches.Circle`)
+        Return a matplotlib patch object for this region
+        (`matplotlib.patches.Circle`).
 
         Parameters
         ----------
         origin : array_like, optional
-            The ``(x, y)`` pixel position of the origin of the displayed image.
-            Default is (0, 0).
-        **kwargs : `dict`
-            All keywords that a `~matplotlib.patches.Circle` object accepts
+            The ``(x, y)`` pixel position of the origin of the displayed
+            image.
+
+        **kwargs : dict
+            Any keyword arguments accepted by
+            `~matplotlib.patches.Circle`.
 
         Returns
         -------
         patch : `~matplotlib.patches.Circle`
-            Matplotlib circle patch
+            A matplotlib circle patch.
         """
         from matplotlib.patches import Circle
         xy = self.center.x - origin[0], self.center.y - origin[1]
@@ -146,21 +149,22 @@ class CirclePixelRegion(PixelRegion):
         return Circle(xy=xy, radius=radius, **mpl_params)
 
     def rotate(self, center, angle):
-        """Make a rotated region.
+        """
+        Rotate the region.
 
-        Rotates counter-clockwise for positive ``angle``.
+        Postive ``angle`` corresponds to counter-clockwise rotation.
 
         Parameters
         ----------
-        center : `PixCoord`
-            Rotation center point
+        center : `~regions.PixCoord`
+            The rotation center point.
         angle : `~astropy.coordinates.Angle`
-            Rotation angle
+            The rotation angle.
 
         Returns
         -------
         region : `CirclePixelRegion`
-            Rotated region (an independent copy)
+            The rotated region (which is an independent copy).
         """
         center = self.center.rotate(center, angle)
         return self.copy(center=center)
@@ -173,14 +177,16 @@ class CircleSkyRegion(SkyRegion):
     Parameters
     ----------
     center : `~astropy.coordinates.SkyCoord`
-        Center position
+        The center position.
     radius : `~astropy.units.Quantity`
-        Radius in angular units
+        The radius in angular units.
     meta : `~regions.RegionMeta` object, optional
-        A dictionary which stores the meta attributes of this region.
+        A dictionary that stores the meta attributes of this region.
     visual : `~regions.RegionVisual` object, optional
-        A dictionary which stores the visual meta attributes of this region.
+        A dictionary that stores the visual meta attributes of this
+        region.
     """
+
     _params = ('center', 'radius')
     center = ScalarSky('center')
     radius = QuantityLength("radius")
