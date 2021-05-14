@@ -228,9 +228,9 @@ class ShapeList(list):
                 coord[-1] = float(shape.coord[-1].to('deg').value)
 
             if shape.region_type == 'polygon':
-                val = '[{0:' + fmt + '}deg, {1:' + fmt + '}deg]'
-                temp = [val.format(x, y) for x, y in zip(coord[::2], coord[1::2])]
-                coord = ", ".join(temp)
+                vals = [f'[{x:{fmt}}deg, {y:{fmt}}deg]'
+                        for x, y in zip(coord[::2], coord[1::2])]
+                coord = ", ".join(vals)
                 line = crtf_strings['polygon'].format(include, coord)
             elif shape.region_type == 'point':
                 if 'symbol' in shape.meta:
@@ -357,9 +357,7 @@ class ShapeList(list):
                     coord[1] += 1
 
             if shape.region_type == 'polygon':
-                val = "{0:" + fmt + "}"
-                temp = [val.format(x) for x in coord]
-                coord = ",".join(temp)
+                coord = ",".join([f'{x:{fmt}}' for x in coord])
                 line = ds9_strings['polygon'].format(include, coord)
             elif shape.region_type == 'ellipse':
                 coord[2:] = [x / 2 for x in coord[2:]]
@@ -651,36 +649,36 @@ class Shape:
         Check for CRTF compatibility.
         """
         if self.region_type not in regions_attributes:
-            raise ValueError("'{}' is not a valid region type in this package"
-                             "supported by CRTF".format(self.region_type))
+            raise ValueError(f"'{self.region_type}' is not a valid region "
+                             "type")
 
         if self.coordsys not in valid_coordsys['CRTF']:
-            raise ValueError("'{}' is not a valid coordinate reference frame in "
-                             "astropy supported by CRTF".format(self.coordsys))
+            raise ValueError(f"'{self.coordsys}' is not a valid coordinate "
+                             "reference frame")
 
     def check_ds9(self):
         """
         Check for DS9 compatibility.
         """
         if self.region_type not in regions_attributes:
-            raise ValueError("'{}' is not a valid region type in this package"
-                             "supported by DS9".format(self.region_type))
+            raise ValueError(f"'{self.region_type}' is not a valid region "
+                             "type")
 
         if self.coordsys not in valid_coordsys['DS9']:
-            raise ValueError("'{}' is not a valid coordinate reference frame "
-                             "in astropy supported by DS9".format(self.coordsys))
+            raise ValueError(f"'{self.coordsys}' is not a valid coordinate "
+                             "reference frame")
 
     def _validate(self):
         """
         Check whether all the attributes of this object is valid.
         """
         if self.region_type not in regions_attributes:
-            raise ValueError("'{}' is not a valid region type in this package"
-                             .format(self.region_type))
+            raise ValueError(f"'{self.region_type}' is not a valid region "
+                             "type")
 
         if self.coordsys not in valid_coordsys['DS9'] + valid_coordsys['CRTF']:
-            raise ValueError("'{}' is not a valid coordinate reference frame "
-                             "in astropy".format(self.coordsys))
+            raise ValueError(f"'{self.coordsys}' is not a valid coordinate "
+                             "reference frame")
 
 
 def to_shape_list(region_list, coordinate_system='fk5'):
@@ -783,9 +781,9 @@ def to_ds9_meta(shape_meta):
     meta = _to_io_meta(shape_meta, valid_keys, key_mappings)
 
     if 'font' in meta:
-        meta['font'] += " {} {} {}".format(shape_meta.get('fontsize', 12),
-                                              shape_meta.get('fontstyle', 'normal'),
-                                              shape_meta.get('fontweight', 'roman'))
+        meta['font'] += (f" {shape_meta.get('fontsize', 12)} "
+                         f"{shape_meta.get('fontstyle', 'normal')} "
+                         f"{shape_meta.get('fontweight', 'roman')}")
 
     return meta
 
