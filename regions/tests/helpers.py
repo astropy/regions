@@ -5,7 +5,6 @@ from astropy import units as u
 
 
 def make_simple_wcs(skycoord, resolution, size):
-
     crpix = (size + 1) / 2
     cdelt = resolution.to(u.deg).value
     skycoord_icrs = skycoord.transform_to('icrs')
