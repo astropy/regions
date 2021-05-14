@@ -43,14 +43,14 @@ def write_fits_region(filename, regions, header=None, overwrite=False):
         The filename in which the table is to be written.
 
     regions : list
-        A list of `regions.Region` objects.
+        A list of `~regions.Region` objects.
 
     header : `~astropy.io.fits.Header`, optional
         The FITS header.
 
     overwrite : bool, optional
         If True, overwrite the output file if it exists. Raises an
-        OSError if False and the output file exists. Default is False.
+        `OSError` if False and the output file exists. Default is False.
     """
     output = fits_region_objects_to_table(regions)
     bin_table = fits.BinTableHDU(data=output, header=header)

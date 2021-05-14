@@ -16,9 +16,11 @@ from ..shapes.circle import CirclePixelRegion
 from ..shapes.ellipse import EllipsePixelRegion, EllipseSkyRegion
 from ..shapes.rectangle import RectanglePixelRegion, RectangleSkyRegion
 
-__all__ = ["CircleAnnulusPixelRegion", "CircleAnnulusSkyRegion",
-           "EllipseAnnulusPixelRegion", "EllipseAnnulusSkyRegion",
-           "RectangleAnnulusPixelRegion", "RectangleAnnulusSkyRegion"]
+__all__ = ['AnnulusPixelRegion', 'AsymmetricAnnulusPixelRegion',
+           'AsymmetricAnnulusSkyRegion',
+           'CircleAnnulusPixelRegion', 'CircleAnnulusSkyRegion',
+           'EllipseAnnulusPixelRegion', 'EllipseAnnulusSkyRegion',
+           'RectangleAnnulusPixelRegion', 'RectangleAnnulusSkyRegion']
 
 
 class AnnulusPixelRegion(PixelRegion, abc.ABC):

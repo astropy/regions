@@ -19,7 +19,7 @@ class FITSRegionParser:
 
     Parameters
     ----------
-    table: `~astropy.table.Table`
+    table : `~astropy.table.Table`
         A FITS region table.
 
     errors : {'strict', 'warn', 'ignore'}, optional
@@ -101,10 +101,10 @@ class FITSRegionRowParser():
 
     Parameters
     ----------
-    row: `~astropy.table.row.Row`
+    row : `~astropy.table.Row`
         A row of the region table that is to be parsed.
 
-    unit: dict
+    unit : dict
         The units of each column in the row.
 
     errors : {'strict', 'warn', 'ignore'}, optional

@@ -45,7 +45,7 @@ def write_ds9(regions, filename, coordsys='fk5', fmt='.6f', radunit='deg'):
     Parameters
     ----------
     regions : list
-        A list of `regions.Region` objects.
+        A list of `~regions.Region` objects.
 
     filename : str
         The filename in which the string is to be written.

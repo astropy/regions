@@ -13,7 +13,7 @@ import numpy as np
 from .pixcoord import PixCoord
 from .core import PixelRegion, SkyRegion
 
-__all__ = ['RegionMeta', 'RegionVisual']
+__all__ = ['Meta', 'RegionMeta', 'RegionVisual']
 
 
 class RegionAttr(abc.ABC):
@@ -131,6 +131,9 @@ class CompoundRegionSky(RegionAttr):
 
 
 class Meta(dict):
+    """
+    A base class for region metadata.
+    """
 
     def __init__(self, seq=None, **kwargs):
         super().__init__()

@@ -156,6 +156,8 @@ class PixCoord:
 
         Parameters
         ----------
+        skycoord : `~astropy.coordinates.SkyCoord`
+            The sky coordinate.
         wcs : `~astropy.wcs.WCS`
             The WCS to use to convert pixels to world coordinates.
         origin : int, optional
