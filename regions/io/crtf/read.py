@@ -41,32 +41,34 @@ regex_line = re.compile(r'(?P<region>[+-]?(?:ann(?=\s))?\s*[a-z]+?\[[^=]+\])(?:\
 
 def read_crtf(filename, errors='strict'):
     """
-    Reads a CRTF region file and returns a list of region objects.
+    Read a CRTF region file and return a list of region objects.
 
     Parameters
     ----------
-    filename : `str`
-        The file path
-    errors : ``warn``, ``ignore``, ``strict``, optional
-      The error handling scheme to use for handling parsing errors.
-      The default is 'strict', which will raise a `~regions.CRTFRegionParserError`.
-      ``warn`` will raise a `~regions.CRTFRegionParserWarning`, and ``ignore`` will do nothing
-      (i.e., be silent).
+    filename : str
+        The file path.
+
+    errors : {'strict', 'warn', 'ignore'}, optional
+        The error handling scheme to use for handling parsing
+        errors. The default is 'strict', which will raise a
+        `~regions.CRTFRegionParserError`. 'warn' will raise a
+        `~regions.CRTFRegionParserWarning`, and 'ignore' will do nothing
+        (i.e., be silent).
 
     Returns
     -------
-    regions : `list`
-        Python `list` of `~regions.Region` objects.
+    regions : list
+        A list of `~regions.Region` objects.
 
     Examples
     --------
     >>> from regions import read_crtf
     >>> from astropy.utils.data import get_pkg_data_filename
-    >>> file = get_pkg_data_filename('data/CRTFgeneral.crtf', package='regions.io.crtf.tests')
+    >>> file = get_pkg_data_filename('data/CRTFgeneral.crtf',
+    ...                              package='regions.io.crtf.tests')
     >>> regs = read_crtf(file, errors='warn')
     >>> print(regs[0].visual)
     {'color': 'blue'}
-
     """
     with get_readable_fileobj(filename) as fh:
         if regex_begin.search(fh.readline()):
@@ -79,24 +81,29 @@ def read_crtf(filename, errors='strict'):
 
 class CRTFParser:
     """
-    Parses a CRTF string.
+    Parse a CRTF string.
 
-    This class transforms a CRTF string to a `~regions.io.core.ShapeList`. The
-    result is stored as ``shapes`` attribute.
+    This class transforms a CRTF string to a
+    `~regions.io.core.ShapeList`. The result is stored in the ``shapes``
+    attribute.
 
-    Each line is tested for either containing a region with meta attributes or global parameters.
-    If global parameters are found then, it is stored in the ``global_meta`` attribute.
-    If a region is found the `~regions.CRTFRegionParser` is invoked to transform the line into a
-    `~regions.io.core.Shape` object.
+    Each line is tested for either containing a region with meta
+    attributes or global parameters. If meta attributes or global
+    parameters are found, they are stored in the ``global_meta``
+    attribute. If a region is found, the `~regions.CRTFRegionParser`
+    is invoked to transform the line into a `~regions.io.core.Shape`
+    object, which is stored in the ``shapes`` attribute.
 
     Parameters
     ----------
-    region_string : `str`
-        CRTF region string
-    errors : ``warn``, ``ignore``, ``strict``, optional
-        The error handling scheme to use for handling parsing errors.
-        The default is 'strict', which will raise a `~regions.CRTFRegionParserError`.
-        ``warn`` will raise a `~regions.CRTFRegionParserWarning`, and ``ignore`` will do nothing
+    region_string : str
+        A CRTF region string.
+
+    errors : {'strict', 'warn', 'ignore'}, optional
+        The error handling scheme to use for handling parsing
+        errors. The default is 'strict', which will raise a
+        `~regions.CRTFRegionParserError`. 'warn' will raise a
+        `~regions.CRTFRegionParserWarning`, and 'ignore' will do nothing
         (i.e., be silent).
 
     Examples
@@ -106,7 +113,6 @@ class CRTFParser:
     >>> regs = CRTFParser(reg_str, errors='warn').shapes.to_regions()
     >>> print(regs[0].visual)
     {'color': 'blue'}
-
     """
 
     # It contains a tuple of valid definition (region, annotation) type.
@@ -121,7 +127,7 @@ class CRTFParser:
     def __init__(self, region_string, errors='strict'):
 
         if errors not in ('strict', 'ignore', 'warn'):
-            msg = "``errors`` must be one of strict, ignore, or warn; is {}"
+            msg = "errors must be one of strict, ignore, or warn; is {}"
             raise ValueError(msg.format(errors))
 
         self.region_string = region_string
@@ -145,9 +151,8 @@ class CRTFParser:
 
     def parse_line(self, line):
         """
-        Parses a single line.
+        Parse a single line.
         """
-
         # Skip blanks
         if line == '':
             return
@@ -192,16 +197,18 @@ class CRTFParser:
     def run(self):
         """
         Run all the steps.
-        Splits the regions into line and calls ``parse_line`` for each line.
+
+        This function splits the regions into lines and calls
+        ``parse_line`` for each line.
         """
         for line in self.region_string.split('\n'):
             self.parse_line(line)
 
     def parse_global_meta(self, global_meta_str):
         """
-        Parses the line starting with global to extract all the valid meta key/value pair.
+        Parse the line starting with global to extract all the valid
+        meta key/value pair.
         """
-
         if global_meta_str:
             global_meta_str = regex_meta.findall(global_meta_str + ',')
         if global_meta_str:
@@ -225,29 +232,38 @@ class CRTFParser:
 
 class CRTFRegionParser:
     """
-    Parse a CRTF region string
+    Parse a CRTF region string.
 
-    This will turn a line containing a CRTF region into a `~regions.Shape` object.
+    This will turn a line containing a CRTF region into a
+    `~regions.Shape` object.
 
     Parameters
     ----------
-    global_meta : `dict`
-        Global meta data of the CRTF file which is used as default meta values for regions
-    include : `str` {'+', '-'}
-        Flag at the beginning of the line
-    type_ : `str` {'reg', 'ann'}
-        Kind of the region definition
-    region_type : `str`
-        Region type
-    reg_str : `str`
-        Region string to parse
-    meta_str : `str`
-        Meta string to parse
-    errors : ``warn``, ``ignore``, ``strict``, optional
-        The error handling scheme to use for handling parsing errors.
-        The default is 'strict', which will raise a `~regions.CRTFRegionParserError`.
-        ``warn`` will raise a `~regions.CRTFRegionParserWarning`, and
-        ``ignore`` will do nothing (i.e., be silent).
+    global_meta : dict
+        Global meta data of the CRTF (CASA Region Text Format) file
+        which is used as default meta values for regions.
+
+    include : {'+', '-'}
+        Flag at the beginning of the line.
+
+    type_ : {'reg', 'ann'}
+        Kind of the region definition.
+
+    region_type : str
+        Region type.
+
+    reg_str : str
+        Region string to parse.
+
+    meta_str : str
+        Meta string to parse.
+
+    errors : {'strict', 'warn', 'ignore'}, optional
+        The error handling scheme to use for handling parsing
+        errors. The default is 'strict', which will raise a
+        `~regions.CRTFRegionParserError`. 'warn' will raise a
+        `~regions.CRTFRegionParserWarning`, and 'ignore' will do nothing
+        (i.e., be silent).
     """
 
     # List of valid coordinate system
@@ -304,9 +320,8 @@ class CRTFRegionParser:
 
     def parse(self):
         """
-        Starting point to parse the CRTF region string.
+        Parse the CRTF region string.
         """
-
         self.convert_meta()
         self.coordsys = self.meta.get('coord', 'image').lower()
         self.set_coordsys()
@@ -315,16 +330,17 @@ class CRTFRegionParser:
 
     def set_coordsys(self):
         """
-        Mapping to astropy's coordinate system name
-
-        # TODO: needs expert attention (Most reference systems are not mapped)
+        Map to astropy's coordinate system frame name.
         """
+        # TODO: needs expert attention (Most reference systems are not
+        # mapped)
         if self.coordsys.lower() in self.coordsys_mapping:
             self.coordsys = self.coordsys_mapping[self.coordsys.lower()]
 
     def convert_coordinates(self):
         """
-        Convert coordinate string to `~astropy.coordinates.Angle` or `~astropy.units.quantity.Quantity` objects
+        Convert coordinate string to `~astropy.coordinates.Angle` or
+        `~astropy.units.quantity.Quantity` objects.
         """
         coord_list_str = regex_coordinate.findall(self.reg_str) + regex_length.findall(self.reg_str)
         coord_list = []
@@ -373,7 +389,8 @@ class CRTFRegionParser:
 
     def convert_meta(self):
         """
-        Parses the meta_str to python dictionary and stores in ``meta`` attribute.
+        Parse the meta_str to a dictionary and store in the ``meta``
+        attribute.
         """
         if self.meta_str:
             self.meta_str = regex_meta.findall(self.meta_str + ',')
@@ -405,7 +422,7 @@ class CRTFRegionParser:
 
     def make_shape(self):
         """
-        Make shape object
+        Make a `~regions.Shape` object.
         """
         if self.region_type == 'ellipse':
             self.coord[2:] = [x * 2 for x in self.coord[2:]]
@@ -434,14 +451,14 @@ class CRTFRegionParser:
 
 class CoordinateParser:
     """
-    Helper class to structure coordinate parser
+    Helper class to structure coordinate parser.
     """
+
     @staticmethod
     def parse_coordinate(string_rep):
         """
-        Parse a single coordinate
+        Parse a single coordinate.
         """
-
         # Any CRTF coordinate representation (sexagesimal or degrees)
         if 'pix' in string_rep:
             return u.Quantity(string_rep[:-3], u.dimensionless_unscaled)
@@ -455,10 +472,13 @@ class CoordinateParser:
     @staticmethod
     def parse_angular_length_quantity(string_rep):
         """
-        Given a string that is a number and a unit, return a
-        Quantity of that string.Raise an Error If there is no unit.  e.g.:
-            50" -> 50*u.arcsec
-            50 -> CRTFRegionParserError : Units must be specified for 50
+        Parse a string into a Quantity object.
+
+        Given a string that is a number and a unit, return a Quantity of
+        that string. An error is raised if there is no unit, e.g.:
+
+        * 50" -> 50 * u.arcsec
+        * 50 -> CRTFRegionParserError : Units must be specified for 50
         """
         unit_mapping = {
             'deg': u.deg,

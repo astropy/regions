@@ -242,7 +242,7 @@ class BoundingBox:
 
         Parameters
         ----------
-        **kwargs : `dict`
+        **kwargs : dict
             Any keyword arguments accepted by
             `matplotlib.patches.Patch`.
 
@@ -294,10 +294,10 @@ class BoundingBox:
         origin : array_like, optional
             The ``(x, y)`` position of the origin of the displayed
             image.
-        ax : `matplotlib.axes.Axes` instance, optional
+        ax : `matplotlib.axes.Axes`, optional
             If `None`, then the current `~matplotlib.axes.Axes` instance
             is used.
-        **kwargs : `dict`
+        **kwargs : dict
             Any keyword arguments accepted by `matplotlib.patches.Patch`.
 
         Returns

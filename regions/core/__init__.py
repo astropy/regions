@@ -1,6 +1,6 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """
-Region core functionality.
+This subpackage provides the core functionality for regions.
 """
 from .core import *
 from .pixcoord import *

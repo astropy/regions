@@ -17,22 +17,22 @@ def skycoord_to_pixel_scale_angle(skycoord, wcs, small_offset=1 * u.arcsec):
     Parameters
     ----------
     skycoord : `~astropy.coordinates.SkyCoord`
-        Sky coordinates
+        The sky coordinates.
     wcs : `~astropy.wcs.WCS`
-        The WCS transformation to use
-    small_offset : `~astropy.units.Quantity`
-        A small offset to use to compute the angle
+        The WCS transformation to use.
+    small_offset : `~astropy.units.Quantity`, optional
+        A small offset to use to compute the angle.
 
     Returns
     -------
     pixcoord : `~regions.PixCoord`
-        Pixel coordinates
+        The pixel coordinates.
     scale : float
-        The pixel scale at each location, in degrees/pixel
+        The pixel scale at each location, in degrees/pixel.
     angle : `~astropy.units.Quantity`
-        The position angle of the celestial coordinate system in pixel space.
+        The position angle of the celestial coordinate system in pixel
+        space.
     """
-
     # Convert to pixel coordinates
     x, y = skycoord_to_pixel(skycoord, wcs, mode=skycoord_to_pixel_mode)
     pixcoord = PixCoord(x=x, y=y)
@@ -70,7 +70,8 @@ def skycoord_to_pixel_scale_angle(skycoord, wcs, small_offset=1 * u.arcsec):
 
 def assert_angle_or_pixel(name, q):
     """
-    Check that ``q`` is either an angular or a pixel `~astropy.units.Quantity`.
+    Check that ``q`` is either an angular or a pixel
+    `~astropy.units.Quantity`.
     """
     if isinstance(q, u.Quantity):
         if q.unit.physical_type == 'angle' or q.unit is u.pixel:

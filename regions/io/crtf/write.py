@@ -1,33 +1,33 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 from ..core import to_shape_list
 
-__all__ = [
-    'write_crtf',
-    'crtf_objects_to_string',
-]
+__all__ = ['write_crtf', 'crtf_objects_to_string']
 
 
 def crtf_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
     """
-    Converts a `list` of `~regions.Region` to CRTF region string.
+    Convert a list of `~regions.Region` objects to a CRTF region string.
 
     Parameters
     ----------
-    regions : `list`
-        List of `~regions.Region` objects
-    coordsys : `str`, optional
-        Astropy Coordinate system that overrides the coordinate system frame for
-        all regions. Default is 'fk5' (which maps to J2000).
-    fmt : `str`, optional
-        A python string format defining the output precision. Default is .6f,
-        which is accurate to 0.0036 arcseconds.
-    radunit : `str`, optional
-        This denotes the unit of the radius. Default is deg (degrees)
+    regions : list
+        A list of `~regions.Region` objects.
+
+    coordsys : str, optional
+        An Astropy coordinate system that overrides the coordinate
+        system frame for all regions.
+
+    fmt : str, optional
+        A python string format defining the output precision. Default is
+        '.6f', which is accurate to 0.0036 arcseconds.
+
+    radunit : str, optional
+        The unit of the radius.
 
     Returns
     -------
-    region_string : `str`
-        CRTF region string
+    region_string : str
+        A CRTF region string.
 
     Examples
     --------
@@ -39,7 +39,6 @@ def crtf_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
     #CRTFv0
     global coord=J2000
     circle[[1.000007deg, 2.000002deg], 5.000000deg]
-
     """
     shapelist = to_shape_list(regions, coordsys)
     return shapelist.to_crtf(coordsys, fmt, radunit)
@@ -47,24 +46,29 @@ def crtf_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
 
 def write_crtf(regions, filename, coordsys='fk5', fmt='.6f', radunit='deg'):
     """
-    Converts a `list` of `~regions.Region` to CRTF string and write to file.
+    Convert a list of `~regions.Region` to a CRTF string and write to a
+    file.
 
     See :ref:`gs-crtf`
 
     Parameters
     ----------
-    regions : `list`
-        List of `~regions.Region` objects
-    filename : `str`
-        Filename in which the string is to be written. Default is 'new.crtf'
-    coordsys : `str`, optional
-        Astropy Coordinate system that overrides the coordinate frames of all
-        regions. Default is 'fk5'.
-    fmt : `str`, optional
-        A python string format defining the output precision. Default is .6f,
-        which is accurate to 0.0036 arcseconds.
-    radunit : `str`, optional
-        This denotes the unit of the radius. Default is deg (degrees)
+    regions : list
+        A list of `~regions.Region` objects.
+
+    filename : str
+        The filename in which the string is to be written.
+
+    coordsys : str, optional
+        An Astropy coordinate system that overrides the coordinate
+        frames of all regions.
+
+    fmt : str, optional
+        A python string format defining the output precision. Default is
+        '.6f', which is accurate to 0.0036 arcseconds.
+
+    radunit : str, optional
+        The unit of the radius.
     """
     output = crtf_objects_to_string(regions, coordsys, fmt, radunit)
     with open(filename, 'w') as fh:

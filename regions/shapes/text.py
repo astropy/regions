@@ -10,22 +10,22 @@ __all__ = ['TextSkyRegion', 'TextPixelRegion']
 
 class TextPixelRegion(PointPixelRegion):
     """
-    A Text string in pixel coordinates
+    A text string in pixel coordinates.
 
     Parameters
     ----------
     center : `~regions.PixCoord`
-        The position of the leftmost point of the text string
-    text : `str`
+        The position of the leftmost point of the text string.
+    text : str
         The text string.
-    meta : `~regions.RegionMeta` object, optional
-        A dictionary which stores the meta attributes of this region.
-    visual : `~regions.RegionVisual` object, optional
-        A dictionary which stores the visual meta attributes of this region.
+    meta : `~regions.RegionMeta`, optional
+        A dictionary that stores the meta attributes of this region.
+    visual : `~regions.RegionVisual`, optional
+        A dictionary that stores the visual meta attributes of this
+        region.
 
     Examples
     --------
-
     .. plot::
         :include-source:
 
@@ -46,6 +46,7 @@ class TextPixelRegion(PointPixelRegion):
         plt.ylim(2.5, 20)
         ax.set_aspect('equal')
     """
+
     _params = ('center', 'text')
 
     def __init__(self, center, text, meta=None, visual=None):
@@ -58,20 +59,22 @@ class TextPixelRegion(PointPixelRegion):
 
     def as_artist(self, origin=(0, 0), **kwargs):
         """
-        Matplotlib Text object for this region (`matplotlib.text.Text`).
+        Return a matplotlib Text object for this region
+        (`matplotlib.text.Text`).
 
         Parameters
         ----------
         origin : array_like, optional
-            The ``(x, y)`` pixel position of the origin of the displayed image.
-            Default is (0, 0).
-        kwargs : `dict`
-            All keywords that a `~matplotlib.text.Text` object accepts
+            The ``(x, y)`` pixel position of the origin of the displayed
+            image.
+
+        **kwargs : dict
+            Any keyword arguments accepted by `~matplotlib.text.Text`.
 
         Returns
         -------
         text : `~matplotlib.text.Text`
-            Matplotlib Text object.
+            A matplotlib Text object.
         """
         from matplotlib.text import Text
 
@@ -85,19 +88,21 @@ class TextPixelRegion(PointPixelRegion):
 
 class TextSkyRegion(PointSkyRegion):
     """
-    A Text string in sky coordinates
+    A text string in sky coordinates.
 
     Parameters
     ----------
     center : `~astropy.coordinates.SkyCoord`
-        The position of the leftmost point of the text string
-    text : `str`
+        The position of the leftmost point of the text string.
+    text : str
         The text string.
-    meta : `~regions.RegionMeta` object, optional
-        A dictionary which stores the meta attributes of this region.
-    visual : `~regions.RegionVisual` object, optional
-        A dictionary which stores the visual meta attributes of this region.
+    meta : `~regions.RegionMeta`, optional
+        A dictionary that stores the meta attributes of this region.
+    visual : `~regions.RegionVisual`, optional
+        A dictionary that stores the visual meta attributes of this
+        region.
     """
+
     _params = ('center', 'text')
 
     def __init__(self, center, text, meta=None, visual=None):

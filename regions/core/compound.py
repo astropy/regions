@@ -12,27 +12,29 @@ __all__ = ['CompoundPixelRegion', 'CompoundSkyRegion']
 
 class CompoundPixelRegion(PixelRegion):
     """
-    Represents the logical combination of two regions in pixel coordinates.
+    A class that represents the logical combination of two regions in
+    pixel coordinates.
 
     Parameters
     ----------
-    region1 : `~regions.PixelRegion` object
+    region1 : `~regions.PixelRegion`
         The inner Pixel region.
-    region2 : `~regions.PixelRegion` object
+    region2 : `~regions.PixelRegion`
         The outer Pixel region.
-    operator : `function`
+    operator : callable
         A callable binary operator.
-    meta : `~regions.RegionMeta` object, optional
-        A dictionary which stores the meta attributes of this region.
-    visual : `~regions.RegionVisual` object, optional
-        A dictionary which stores the visual meta attributes of this region.
+    meta : `~regions.RegionMeta`, optional
+        A dictionary that stores the meta attributes of this region.
+    visual : `~regions.RegionVisual`, optional
+        A dictionary that stores the visual meta attributes of this
+        region.
     """
+
     _params = ('region1', 'region2', 'operator')
     region1 = CompoundRegionPix('region1')
     region2 = CompoundRegionPix('region2')
 
     def __init__(self, region1, region2, operator, meta=None, visual=None):
-
         if not callable(operator):
             raise TypeError("operator must be callable")
 
@@ -94,12 +96,12 @@ class CompoundPixelRegion(PixelRegion):
     @staticmethod
     def _make_annulus_path(patch_inner, patch_outer):
         """
-        Defines a matplotlib annulus path from two patches.
+        Define a matplotlib annulus path from two patches.
 
         This preserves the cubic Bezier curves (CURVE4) of the aperture
         paths.
 
-        # This is borrowed from photutils aperture.
+        Taken from ``photutils.aperture.core``
         """
         import matplotlib.path as mpath
 
@@ -121,20 +123,23 @@ class CompoundPixelRegion(PixelRegion):
 
     def as_artist(self, origin=(0, 0), **kwargs):
         """
-        Matplotlib patch object for annulus region (`matplotlib.patches.PathPatch`).
+        Return a matplotlib patch object for this region
+        (`matplotlib.patches.PathPatch`).
 
         Parameters
         ----------
         origin : array_like, optional
-            The ``(x, y)`` pixel position of the origin of the displayed image.
-            Default is (0, 0).
-        kwargs : `dict`
-            All keywords that a `~matplotlib.patches.PathPatch` object accepts
+            The ``(x, y)`` pixel position of the origin of the displayed
+            image.
+
+        **kwargs : `dict`
+            Any keyword arguments accepted by
+            `~matplotlib.patches.PathPatch`.
 
         Returns
         -------
         patch : `~matplotlib.patches.PathPatch`
-            Matplotlib patch object
+            A matplotlib patch object.
         """
         if self.region1.center == self.region2.center and self.operator == op.xor:
             import matplotlib.patches as mpatches
@@ -156,21 +161,22 @@ class CompoundPixelRegion(PixelRegion):
         raise NotImplementedError
 
     def rotate(self, center, angle):
-        """Make a rotated region.
+        """
+        Rotate the region.
 
-        Rotates counter-clockwise for positive ``angle``.
+        Postive ``angle`` corresponds to counter-clockwise rotation.
 
         Parameters
         ----------
-        center : `PixCoord`
-            Rotation center point
+        center : `~regions.PixCoord`
+            The rotation center point.
         angle : `~astropy.coordinates.Angle`
-            Rotation angle
+            The rotation angle.
 
         Returns
         -------
         region : `CompoundPixelRegion`
-            Rotated region (an independent copy)
+            The rotated region (which is an independent copy).
         """
         region1 = self.region1.rotate(center, angle)
         region2 = self.region2.rotate(center, angle)
@@ -179,21 +185,24 @@ class CompoundPixelRegion(PixelRegion):
 
 class CompoundSkyRegion(SkyRegion):
     """
-    Represents the logical combination of two regions in sky coordinates.
+    A class that represents the logical combination of two regions in
+    sky coordinates.
 
     Parameters
     ----------
-    region1 : `~regions.SkyRegion` object
+    region1 : `~regions.SkyRegion`
         The inner sky region.
-    region2 : `~regions.SkyRegion` object
+    region2 : `~regions.SkyRegion`
         The outer sky region.
-    operator : `function`
+    operator : callable
         A callable binary operator.
-    meta : `~regions.RegionMeta` object, optional
-        A dictionary which stores the meta attributes of this region.
-    visual : `~regions.RegionVisual` object, optional
-        A dictionary which stores the visual meta attributes of this region.
+    meta : `~regions.RegionMeta`, optional
+        A dictionary that stores the meta attributes of this region.
+    visual : `~regions.RegionVisual`, optional
+        A dictionary that stores the visual meta attributes of this
+        region.
     """
+
     _params = ('region1', 'region2', 'operator')
     region1 = CompoundRegionSky('region1')
     region2 = CompoundRegionSky('region2')

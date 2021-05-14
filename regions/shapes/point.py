@@ -15,15 +15,15 @@ class PointPixelRegion(PixelRegion):
     Parameters
     ----------
     center : `~regions.PixCoord`
-        The position of the point
-    meta : `~regions.RegionMeta` object, optional
-        A dictionary which stores the meta attributes of this region.
-    visual : `~regions.RegionVisual` object, optional
-        A dictionary which stores the visual meta attributes of this region.
+        The position of the point.
+    meta : `~regions.RegionMeta`, optional
+        A dictionary that stores the meta attributes of this region.
+    visual : `~regions.RegionVisual`, optional
+        A dictionary that stores the visual meta attributes of this
+        region.
 
     Examples
     --------
-
     .. plot::
         :include-source:
 
@@ -47,6 +47,7 @@ class PointPixelRegion(PixelRegion):
         ax.set_aspect('equal')
 
     """
+
     _params = ('center',)
     center = ScalarPix('center')
 
@@ -86,22 +87,24 @@ class PointPixelRegion(PixelRegion):
 
     def as_artist(self, origin=(0, 0), **kwargs):
         """
-        Matplotlib Line2D object for this region (`matplotlib.lines.Line2D`).
+        Return a matplotlib Line2D object for this region
+        (`matplotlib.lines.Line2D`).
 
         Parameters
         ----------
         origin : array_like, optional
-            The ``(x, y)`` pixel position of the origin of the displayed image.
-            Default is (0, 0).
-        kwargs : `dict`
-            All keywords that a `~matplotlib.lines.Line2D` object accepts
+            The ``(x, y)`` pixel position of the origin of the displayed
+            image.
+
+        **kwargs : `dict`
+            Any keyword arguments accepted by
+            `~matplotlib.lines.Line2D`.
 
         Returns
         -------
         point : `~matplotlib.lines.Line2D`
-            Matplotlib Line2D object.
+            A matplotlib Line2D object.
         """
-
         from matplotlib.lines import Line2D
 
         mpl_params = self.mpl_properties_default('LINE2D')
@@ -113,21 +116,22 @@ class PointPixelRegion(PixelRegion):
         return point
 
     def rotate(self, center, angle):
-        """Make a rotated region.
+        """
+        Rotate the region.
 
-        Rotates counter-clockwise for positive ``angle``.
+        Postive ``angle`` corresponds to counter-clockwise rotation.
 
         Parameters
         ----------
-        center : `PixCoord`
-            Rotation center point
+        center : `~regions.PixCoord`
+            The rotation center point.
         angle : `~astropy.coordinates.Angle`
-            Rotation angle
+            The rotation angle.
 
         Returns
         -------
         region : `PointPixelRegion`
-            Rotated region (an independent copy)
+            The rotated region (which is an independent copy).
         """
         center = self.center.rotate(center, angle)
         return self.copy(center=center)
@@ -140,12 +144,14 @@ class PointSkyRegion(SkyRegion):
     Parameters
     ----------
     center : `~astropy.coordinates.SkyCoord`
-        The position of the point
-    meta : `regions.RegionMeta` object, optional
-        A dictionary which stores the meta attributes of this region.
-    visual : `~regions.RegionVisual` object, optional
-        A dictionary which stores the visual meta attributes of this region.
+        The position of the point.
+    meta : `regions.RegionMeta`, optional
+        A dictionary that stores the meta attributes of this region.
+    visual : `~regions.RegionVisual`, optional
+        A dictionary that stores the visual meta attributes of this
+        region.
     """
+
     _params = ('center',)
     center = ScalarSky('center')
 

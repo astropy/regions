@@ -1,26 +1,22 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 from astropy.utils.exceptions import AstropyUserWarning
 
-__all__ = [
-    'CRTFRegionParserWarning',
-    'CRTFRegionParserError',
-]
+__all__ = ['CRTFRegionParserWarning', 'CRTFRegionParserError']
 
 
 class CRTFRegionParserWarning(AstropyUserWarning):
     """
-    A generic warning class for CRTF region parsing
+    A generic warning class for CRTF region parsing.
     """
 
 
 class CRTFRegionParserError(ValueError):
     """
-    A generic error class for CRTF region parsing
+    A generic error class for CRTF region parsing.
     """
 
 
 # Valid symbols for symbol region in CRTF.
-
 valid_symbols = {'.': 'point',
                  ',': 'pixel',
                  'o': 'circle',

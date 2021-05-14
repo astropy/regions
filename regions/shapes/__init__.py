@@ -1,5 +1,6 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-"""Region shapes.
+"""
+This subpackage defines region shapes.
 """
 from .circle import *
 from .ellipse import *

@@ -8,13 +8,12 @@ from astropy.table import Table
 from astropy.table import vstack as table_vstack
 from ..core.pixcoord import PixCoord
 
-__all__ = [
-    'make_example_dataset',
-]
+__all__ = ['make_example_dataset']
 
 
 def make_example_dataset(data='simulated', config=None):
-    """Make example dataset.
+    """
+    Make an example dataset.
 
     This is a factory function for ``ExampleDataset`` objects.
 
@@ -29,18 +28,18 @@ def make_example_dataset(data='simulated', config=None):
     Parameters
     ----------
     data : {'simulated', 'fermi'}
-        Which dataset to use
+        The dataset to use.
+
     config : dict or None
-        Configuration options
+        Configuration options.
 
     Returns
     -------
     dataset : ``ExampleDataset``
-        Example dataset object
+        Example dataset object.
 
     Examples
     --------
-
     Make an example dataset:
 
     >>> from regions import make_example_dataset
@@ -64,7 +63,8 @@ def make_example_dataset(data='simulated', config=None):
 
 
 class ExampleDataset:
-    """Base class for example dataset.
+    """
+    Base class for an example dataset.
     """
 
     def __init__(self, config=None):
@@ -113,7 +113,8 @@ class ExampleDataset:
 
     @lazyproperty
     def hdu_list(self):
-        """HDU list (`~astropy.io.fits.HDUList`).
+        """
+        HDU list (`~astropy.io.fits.HDUList`).
 
         Different pieces collected together in a HDU list.
 
@@ -138,14 +139,17 @@ class ExampleDataset:
 
 
 class ExampleDatasetSimulated(ExampleDataset):
-    """Example simulated dataset.
+    """
+    Example simulated dataset.
 
-    Similar to `ExampleDatasetFermi`, but simulated, not requiring any data files.
+    Similar to `ExampleDatasetFermi`, but simulated, not requiring any
+    data files.
     """
 
     @lazyproperty
     def source_table(self):
-        """Source table  (`~astropy.table.Table`).
+        """
+        Source table  (`~astropy.table.Table`).
 
         Columns: GLON, GLAT, COUNTS
         """
@@ -157,7 +161,8 @@ class ExampleDatasetSimulated(ExampleDataset):
 
     @lazyproperty
     def event_table(self):
-        """Event table (`~astropy.table.Table`).
+        """
+        Event table (`~astropy.table.Table`).
 
         Columns: GLON, GLAT, SOURCE_IDX
         """
@@ -185,15 +190,18 @@ class ExampleDatasetSimulated(ExampleDataset):
 
 
 class ExampleDatasetFermi(ExampleDataset):
-    """Example real dataset using Fermi-LAT 2FHL source catalog and event list.
+    """
+    Example real dataset using Fermi-LAT 2FHL source catalog and event
+    list.
 
-    When saving the HDU list to a FITS file, the file size is 748K, with the
-    65k EVENTS taking up most of the space.
+    When saving the HDU list to a FITS file, the file size is 748K, with
+    the 65k EVENTS taking up most of the space.
     """
 
     @lazyproperty
     def source_table(self):
-        """Source table  (`~astropy.table.Table`).
+        """
+        Source table  (`~astropy.table.Table`).
 
         Columns: GLON, GLAT, COUNTS
         """
@@ -206,7 +214,8 @@ class ExampleDatasetFermi(ExampleDataset):
 
     @lazyproperty
     def event_table(self):
-        """Event table (`~astropy.table.Table`).
+        """
+        Event table (`~astropy.table.Table`).
 
         Columns: GLON, GLAT
         """
@@ -220,7 +229,9 @@ class ExampleDatasetFermi(ExampleDataset):
 
 
 def _table_to_bintable(table):
-    """Convert `~astropy.table.Table` to `astropy.io.fits.BinTable`."""
+    """
+    Convert a `~astropy.table.Table` to a `astropy.io.fits.BinTable`.
+    """
     data = table.as_array()
     header = fits.Header()
     header.update(table.meta)

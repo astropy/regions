@@ -6,8 +6,8 @@ from .write import write_fits_region
 from ..core import ShapeList
 
 
-# FIXME: write_fits_region has its first two arguments backwards as compared to
-# write_crtf and write_ds9
+# FIXME: write_fits_region has its first two arguments backwards as
+# compared to write_crtf and write_ds9
 def write_fits(regions, filename, *args, **kwargs):
     return write_fits_region(filename, regions, *args, **kwargs)
 

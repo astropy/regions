@@ -14,12 +14,7 @@ from ..core import reg_mapping
 from ..core import Shape, ShapeList
 from .core import DS9RegionParserError, DS9RegionParserWarning, valid_symbols_ds9
 
-__all__ = [
-    'read_ds9',
-    'DS9Parser',
-    'DS9RegionParser',
-    'CoordinateParser'
-]
+__all__ = ['read_ds9', 'DS9Parser', 'DS9RegionParser', 'CoordinateParser']
 
 # Regular expression to extract region type or coodinate system
 regex_global = re.compile("^#? *(-?)([a-zA-Z0-9]+)")
@@ -36,22 +31,24 @@ regex_splitter = re.compile("[, ]")
 
 def read_ds9(filename, errors='strict'):
     """
-    Read a DS9 region file in as a `list` of `~regions.Region` objects.
+    Read a DS9 region file in as a list of `~regions.Region` objects.
 
     Parameters
     ----------
-    filename : `str`
-        The file path
-    errors : ``warn``, ``ignore``, ``strict``, optional
-      The error handling scheme to use for handling parsing errors.
-      The default is 'strict', which will raise a `~regions.DS9RegionParserError`.
-      ``warn`` will raise a `~regions.DS9RegionParserWarning`, and
-      ``ignore`` will do nothing (i.e., be silent).
+    filename : str
+        The file path.
+
+    errors : {'strict', 'warn', 'ignore'}, optional
+        The error handling scheme to use for handling parsing
+        errors. The default is 'strict', which will raise a
+        `~regions.DS9RegionParserError`. 'warn' will raise a
+        `~regions.DS9RegionParserWarning`, and 'ignore' will do nothing
+        (i.e., be silent).
 
     Returns
     -------
-    regions : `list`
-        Python list of `~regions.Region` objects.
+    regions : list
+        A list of `~regions.Region` objects.
 
     Examples
     --------
@@ -63,7 +60,6 @@ def read_ds9(filename, errors='strict'):
     Region: CirclePixelRegion
     center: PixCoord(x=330.0, y=1090.0)
     radius: 40.0
-
     """
     with get_readable_fileobj(filename) as fh:
         region_string = fh.read()
@@ -74,12 +70,13 @@ def read_ds9(filename, errors='strict'):
 
 class CoordinateParser:
     """
-    Helper class to structure coordinate parser
+    Helper class to structure coordinate parser.
     """
+
     @staticmethod
     def parse_coordinate(string_rep, unit):
         """
-        Parse a single coordinate
+        Parse a single coordinate.
         """
         # explicit radian ('r') value
         if string_rep[-1] == 'r':
@@ -112,11 +109,13 @@ class CoordinateParser:
     @staticmethod
     def parse_angular_length_quantity(string_rep, unit=u.deg):
         """
-        Given a string that is either a number or a number and a unit, return a
-        Quantity of that string.  e.g.:
+        Parse a string into a Quantity object.
 
-            23.9 -> 23.9*u.deg
-            50" -> 50*u.arcsec
+        Given a string that is a number and a unit, return a Quantity of
+        that string, e.g.:
+
+        * 23.9 -> 23.9 * u.deg
+        * 50" -> 50 * u.arcsec
         """
         unit_mapping = {
             '"': u.arcsec,
@@ -136,26 +135,29 @@ class CoordinateParser:
 
 class DS9Parser:
     """
-    Parse a DS9 string
+    Parse a DS9 string.
 
-    This class transforms a DS9 string to a `~regions.io.core.ShapeList`. The
-    result is stored as ``shapes`` attribute.
+    This class transforms a DS9 string to a
+    `~regions.io.core.ShapeList`. The result is stored as ``shapes``
+    attribute.
 
-    Each line is tested for either containing a region type or a coordinate
-    system. If a coordinate system is found the global coordsys state of the
-    parser is modified. If a region type is found the
-    `~regions.DS9RegionParser` is invokes to transform the line into a
-    `~regions.Shape` object.
+    Each line is tested for either containing a region type or a
+    coordinate system. If a coordinate system is found the global
+    coordsys state of the parser is modified. If a region type is found
+    the `~regions.DS9RegionParser` is invokes to transform the line into
+    a `~regions.Shape` object.
 
     Parameters
     ----------
-    region_string : `str`
-        DS9 region string
-    errors : ``warn``, ``ignore``, ``strict``, optional
-      The error handling scheme to use for handling parsing errors.
-      The default is 'strict', which will raise a `~regions.DS9RegionParserError`.
-      ``warn`` will raise a `~regions.DS9RegionParserWarning`, and
-      ``ignore`` will do nothing (i.e., be silent).
+    region_string : str
+        A DS9 region string.
+
+    errors : {'strict', 'warn', 'ignore'}, optional
+        The error handling scheme to use for handling parsing
+        errors. The default is 'strict', which will raise a
+        `~regions.DS9RegionParserError`. 'warn' will raise a
+        `~regions.DS9RegionParserWarning`, and 'ignore' will do nothing
+        (i.e., be silent).
 
     Examples
     --------
@@ -166,7 +168,6 @@ class DS9Parser:
     Region: CirclePixelRegion
     center: PixCoord(x=330.0, y=1090.0)
     radius: 40.0
-
     """
 
     # List of valid coordinate system
@@ -207,9 +208,8 @@ class DS9Parser:
     def set_coordsys(self, coordsys):
         """
         Transform coordinate system
-
-        # TODO: needs expert attention
         """
+        # TODO: needs expert attention
         if coordsys in self.coordsys_mapping:
             self.coordsys = self.coordsys_mapping[coordsys]
         else:
@@ -217,7 +217,7 @@ class DS9Parser:
 
     def run(self):
         """
-        Run all steps
+        Run all the steps.
         """
         for line_ in self.region_string.split('\n'):
             for line in line_.split(";"):
@@ -226,7 +226,7 @@ class DS9Parser:
 
     def parse_line(self, line):
         """
-        Parse one line
+        Parse a single line.
         """
         log.debug(f'Parsing {line}')
 
@@ -279,20 +279,21 @@ class DS9Parser:
     @staticmethod
     def parse_meta(meta_str):
         """
-        Parse the metadata for a single ds9 region string.
+        Parse the metadata for a single DS9 region string.
 
         Parameters
         ----------
-        meta_str : `str`
-            Meta string, the metadata is everything after the close-paren of the
-            region coordinate specification. All metadata is specified as
-            key=value pairs separated by whitespace, but sometimes the values
-            can also be whitespace separated.
+        meta_str : str
+            Meta string, the metadata is everything after the closing
+            parenthesis of the region coordinate specification. All
+            metadata is specified as key=value pairs separated by
+            whitespace, but sometimes the values can also be whitespace
+            separated.
 
         Returns
         -------
-        meta : `dict`
-            Dictionary containing the meta data
+        meta : dict
+            A dictionary containing the metadata.
         """
         keys_vals = [(x, y) for x, _, y in regex_meta.findall(meta_str.strip())]
         extra_text = regex_meta.split(meta_str.strip())[-1]
@@ -320,7 +321,7 @@ class DS9Parser:
 
     def parse_region(self, include, region_type, region_end, line):
         """
-        Extract a Shape from a region string
+        Extract a Shape from a region string.
         """
         if self.coordsys is None:
             raise DS9RegionParserError("No coordinate system specified and a"
@@ -346,25 +347,31 @@ coordinate = CoordinateParser.parse_coordinate
 
 class DS9RegionParser:
     """
-    Parse a DS9 region string
+    Parse a DS9 region string.
 
-    This will turn a line containing a DS9 region into a Shape
+    This will turn a line containing a DS9 region into a
+    `~regions.Shape` object.
 
     Parameters
     ----------
-    coordsys : `str`
-        Coordinate system
-    include : `str` {'', '-'}
+    coordsys : str
+        The coordinate system.
+
+    include : {'', '-'}
         Flag at the beginning of the line
-    region_type : `str`
-        Region type
-    region_end : `int`
-        Coordinate of the end of the regions name, this is passed in order to
-        handle whitespaces correctly
-    global_meta : `dict`
-        Global meta data
-    line : `str`
-        Line to parse
+
+    region_type : str
+        Region type.
+
+    region_end : int
+        Coordinate of the end of the region name. This is passed in
+        order to handle whitespace correctly.
+
+    global_meta : dict
+        Global metadata.
+
+    line : str
+        The line to parse.
     """
 
     # Coordinate unit transformations
@@ -422,7 +429,7 @@ class DS9RegionParser:
 
     def parse(self):
         """
-        Convert line to shape object
+        Parse the region string.
         """
         log.debug(self)
 
@@ -435,13 +442,13 @@ class DS9RegionParser:
 
     def parse_composite(self):
         """
-        Determine whether the region is composite
+        Determine whether the region is composite.
         """
         self.composite = "||" in self.line
 
     def split_line(self):
         """
-        Split line into coordinates and meta string
+        Split line into coordinates and meta string.
         """
         # coordinate of the # symbol or end of the line (-1) if not found
         hash_or_end = self.line.find("#")
@@ -456,7 +463,7 @@ class DS9RegionParser:
 
     def convert_coordinates(self):
         """
-        Convert coordinate string to objects
+        Convert coordinate string to objects.
         """
         coord_list = []
         # strip out "null" elements, i.e. ''.  It might be possible to eliminate
@@ -487,7 +494,7 @@ class DS9RegionParser:
 
     def convert_meta(self):
         """
-        Convert meta string to dict
+        Convert meta string to dict.
         """
         meta_ = DS9Parser.parse_meta(self.meta_str)
         self.meta = copy.deepcopy(self.global_meta)
@@ -500,7 +507,7 @@ class DS9RegionParser:
 
     def make_shape(self):
         """
-        Make shape object
+        Make shape object.
         """
         # In DS9, ellipse can also represents an elliptical annulus
         # For elliptical annulus angle is optional.
