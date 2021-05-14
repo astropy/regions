@@ -182,8 +182,8 @@ class DS9Parser:
 
     def __init__(self, region_string, errors='strict'):
         if errors not in ('strict', 'ignore', 'warn'):
-            msg = "``errors`` must be one of strict, ignore, or warn; is {}"
-            raise ValueError(msg.format(errors))
+            raise ValueError('errors must be one of "strict", "ignore", '
+                             'or "warn"')
         self.region_string = region_string
         self.errors = errors
 
@@ -262,8 +262,8 @@ class DS9Parser:
             self.set_coordsys(region_type)
             return
         if region_type not in DS9RegionParser.language_spec:
-            self._raise_error("Region type '{}' was identified, but it is not one of "
-                              "the known region types.".format(region_type))
+            self._raise_error(f"Region type '{region_type}' was identified, "
+                              "but it is not one of the known region types.")
             return
         else:
             # Found region specification,

@@ -104,7 +104,7 @@ def test_valid_row():
     with pytest.raises(FITSRegionParserError) as excinfo:
         FITSRegionParser(t)
 
-    assert "The column: 'R' is missing in the table" in str(excinfo.value)
+    assert "The column 'R' is missing in the table" in str(excinfo.value)
 
     t[0]['SHAPE'] = 'PONT'
 
@@ -120,4 +120,4 @@ def test_valid_row():
     with pytest.raises(FITSRegionParserError) as excinfo:
         FITSRegionParser(t)
 
-    assert "'PIE' is currently not supported in regions" in str(excinfo.value)
+    assert "'PIE' is currently not supported" in str(excinfo.value)

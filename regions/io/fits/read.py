@@ -48,8 +48,8 @@ class FITSRegionParser:
 
     def __init__(self, table, errors='strict'):
         if errors not in ('strict', 'ignore', 'warn'):
-            msg = "'errors' must be one of strict, ignore, or warn; is {}"
-            raise ValueError(msg.format(errors))
+            raise ValueError('errors must be one of "strict", "ignore", or '
+                             '"warn"')
         if not isinstance(table, Table):
             raise TypeError("The table should be an astropy table object")
         self.table = table
@@ -156,14 +156,15 @@ class FITSRegionRowParser():
                 if index < len(val) and val[index] is not None:
                     return val[index], unit
                 else:
-                    raise ValueError("The column: {} must have more than {} value for the "
-                                     "region {}".format(colname, index,
-                                                        self.region_type))
+                    raise ValueError(f"The column '{colname}' must have more "
+                                     f"than {index} value for the region "
+                                     f"{self.region_type}")
             else:
                 return val, unit
         except KeyError:
             if default is None:
-                self._raise_error(f"The column: '{colname}' is missing in the table")
+                self._raise_error(f"The column '{colname}' is missing in "
+                                  "the table")
             else:
                 return default
 
@@ -196,8 +197,8 @@ class FITSRegionRowParser():
         if region_type in reg_mapping['FITS_REGION']:
             region_type = reg_mapping['FITS_REGION'][region_type]
         else:
-            self._raise_error("'{}' is currently not supported in "
-                              "regions".format(self.region_type))
+            self._raise_error(f"'{self.region_type}' is currently not "
+                              "supported")
 
         return self.component, Shape('physical', region_type,
                                      coords, meta, False, False)
