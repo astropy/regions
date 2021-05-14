@@ -24,17 +24,17 @@ class EllipsePixelRegion(PixelRegion):
     ----------
     center : `~regions.PixCoord`
         The position of the center of the ellipse.
-    width : `float`
+    width : float
         The width of the ellipse (before rotation) in pixels
-    height : `float`
+    height : float
         The height of the ellipse (before rotation) in pixels
     angle : `~astropy.units.Quantity`, optional
         The rotation angle of the ellipse, measured anti-clockwise. If set to
         zero (the default), the width axis is lined up with the x axis.
-    meta : `~regions.RegionMeta` object, optional
-        A dictionary which stores the meta attributes of this region.
-    visual : `~regions.RegionVisual` object, optional
-        A dictionary which stores the visual meta attributes of this region.
+    meta : `~regions.RegionMeta`, optional
+        A dictionary that stores the meta attributes of this region.
+    visual : `~regions.RegionVisual`, optional
+        A dictionary that stores the visual meta attributes of this region.
 
     Examples
     --------
@@ -110,11 +110,9 @@ class EllipsePixelRegion(PixelRegion):
         The minimal bounding box (`~regions.BoundingBox`) enclosing the
         exact elliptical region.
         """
-
-        # We use the solution described in http://stackoverflow.com/a/88020
-        # which is to use the parametric equation of an ellipse and to find
-        # when dx/dt or dy/dt=0.
-
+        # We use the solution described in
+        # http://stackoverflow.com/a/88020, which is to use the parametric
+        # equation of an ellipse and to find when dx/dt or dy/dt=0.
         cos_angle = np.cos(self.angle)
         sin_angle = np.sin(self.angle)
         tan_angle = np.tan(self.angle)
@@ -180,21 +178,23 @@ class EllipsePixelRegion(PixelRegion):
 
     def as_artist(self, origin=(0, 0), **kwargs):
         """
-        Matplotlib patch object for this region (`matplotlib.patches.Ellipse`).
+        Return a matplotlib patch object for this region
+        (`matplotlib.patches.Ellipse`).
 
         Parameters
         ----------
         origin : array_like, optional
-            The ``(x, y)`` pixel position of the origin of the displayed image.
-            Default is (0, 0).
-        **kwargs : `dict`
-            All keywords that a `~matplotlib.patches.Ellipse` object accepts
+            The ``(x, y)`` pixel position of the origin of the displayed
+            image.
+
+        **kwargs : dict
+            Any keyword arguments accepted by
+            `~matplotlib.patches.Ellipse`.
 
         Returns
         -------
         patch : `~matplotlib.patches.Ellipse`
-            Matplotlib ellipse patch
-
+            A matplotlib ellipse patch.
         """
         from matplotlib.patches import Ellipse
         xy = self.center.x - origin[0], self.center.y - origin[1]
@@ -221,39 +221,41 @@ class EllipsePixelRegion(PixelRegion):
 
     def as_mpl_selector(self, ax, active=True, sync=True, callback=None, **kwargs):
         """
-        Matplotlib editable widget for this region (`matplotlib.widgets.EllipseSelector`)
+        A matplotlib editable widget for this region
+        (`matplotlib.widgets.EllipseSelector`).
 
         Parameters
         ----------
         ax : `~matplotlib.axes.Axes`
-            The Matplotlib axes to add the selector to.
+            The matplotlib axes to add the selector to.
         active : bool, optional
             Whether the selector should be active by default.
         sync : bool, optional
-            If `True` (the default), the region will be kept in sync with the
-            selector. Otherwise, the selector will be initialized with the
-            values from the region but the two will then be disconnected.
-        callback : func, optional
-            If specified, this function will be called every time the region is
-            updated. This only has an effect if ``sync`` is `True`. If a
-            callback is set, it is called for the first time once the selector
-            has been created.
-        **kwargs
-            Additional keyword arguments are passed to matplotlib.widgets.EllipseSelector`
+            If `True` (the default), the region will be kept in
+            sync with the selector. Otherwise, the selector will be
+            initialized with the values from the region but the two will
+            then be disconnected.
+        callback : callable, optional
+            If specified, this function will be called every time the
+            region is updated. This only has an effect if ``sync`` is
+            `True`. If a callback is set, it is called for the first
+            time once the selector has been created.
+        **kwargs : dict
+            Additional keyword arguments that are passed to
+            `matplotlib.widgets.EllipseSelector`.
 
         Returns
         -------
         selector : `matplotlib.widgets.EllipseSelector`
-            The Matplotlib selector.
+            The matplotlib selector.
 
         Notes
         -----
-        Once a selector has been created, you will need to keep a reference to
-        it until you no longer need it. In addition, you can enable/disable the
-        selector at any point by calling ``selector.set_active(True)`` or
-        ``selector.set_active(False)``.
+        Once a selector has been created, you will need to keep a
+        reference to it until you no longer need it. In addition,
+        you can enable/disable the selector at any point by calling
+        ``selector.set_active(True)`` or ``selector.set_active(False)``.
         """
-
         from matplotlib.widgets import EllipseSelector
 
         if hasattr(self, '_mpl_selector'):
@@ -286,21 +288,22 @@ class EllipsePixelRegion(PixelRegion):
         return self._mpl_selector
 
     def rotate(self, center, angle):
-        """Make a rotated region.
+        """
+        Rotate the region.
 
-        Rotates counter-clockwise for positive ``angle``.
+        Postive ``angle`` corresponds to counter-clockwise rotation.
 
         Parameters
         ----------
-        center : `PixCoord`
-            Rotation center point
+        center : `~regions.PixCoord`
+            The rotation center point.
         angle : `~astropy.coordinates.Angle`
-            Rotation angle
+            The rotation angle.
 
         Returns
         -------
         region : `EllipsePixelRegion`
-            Rotated region (an independent copy)
+            The rotated region (which is an independent copy).
         """
         center = self.center.rotate(center, angle)
         angle = self.angle + angle
@@ -316,18 +319,20 @@ class EllipseSkyRegion(SkyRegion):
     center : `~astropy.coordinates.SkyCoord`
         The position of the center of the ellipse.
     width : `~astropy.units.Quantity`
-        The width of the ellipse (before rotation) as an angle
+        The width of the ellipse (before rotation) as an angle.
     height : `~astropy.units.Quantity`
-        The height of the ellipse (before rotation) as an angle
+        The height of the ellipse (before rotation) as an angle.
     angle : `~astropy.units.Quantity`, optional
-        The rotation angle of the ellipse, measured anti-clockwise. If set to
-        zero (the default), the width axis is lined up with the longitude axis
-        of the celestial coordinates.
-    meta : `~regions.RegionMeta` object, optional
-        A dictionary which stores the meta attributes of this region.
-    visual : `~regions.RegionVisual` object, optional
-        A dictionary which stores the visual meta attributes of this region.
+        The rotation angle of the ellipse, measured anti-clockwise. If
+        set to zero (the default), the width axis is lined up with the
+        longitude axis of the celestial coordinates.
+    meta : `~regions.RegionMeta`, optional
+        A dictionary that stores the meta attributes of this region.
+    visual : `~regions.RegionVisual`, optional
+        A dictionary that stores the visual meta attributes of this
+        region.
     """
+
     _params = ('center', 'width', 'height', 'angle')
     center = ScalarSky('center')
     width = QuantityLength('width')
