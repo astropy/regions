@@ -48,8 +48,8 @@ class FITSRegionParser:
 
     def __init__(self, table, errors='strict'):
         if errors not in ('strict', 'ignore', 'warn'):
-            msg = "'errors' must be one of strict, ignore, or warn; is {}"
-            raise ValueError(msg.format(errors))
+            raise ValueError('errors must be one of "strict", "ignore", or '
+                             '"warn"')
         if not isinstance(table, Table):
             raise TypeError("The table should be an astropy table object")
         self.table = table
@@ -78,8 +78,7 @@ class FITSRegionParser:
 
         for col in self.table.colnames:
             if col not in self.valid_columns:
-                self._raise_error("This table has an invalid column name: '{}'"
-                                  .format(col))
+                self._raise_error(f"This table has an invalid column name: '{col}'")
             else:
                 self.unit[col] = self.table[col].unit
 
@@ -137,8 +136,7 @@ class FITSRegionRowParser():
         if region_type in language_spec:
             self.region_type = region_type
         else:
-            self._raise_error("'{}' is not a valid FITS Region type"
-                              .format(region_type))
+            self._raise_error(f"'{region_type}' is not a valid FITS Region type")
 
         self.component = str(self.row['COMPONENT'])
 
@@ -158,15 +156,15 @@ class FITSRegionRowParser():
                 if index < len(val) and val[index] is not None:
                     return val[index], unit
                 else:
-                    raise ValueError("The column: {} must have more than {} value for the "
-                                     "region {}".format(colname, index,
-                                                        self.region_type))
+                    raise ValueError(f"The column '{colname}' must have more "
+                                     f"than {index} value for the region "
+                                     f"{self.region_type}")
             else:
                 return val, unit
         except KeyError:
             if default is None:
-                self._raise_error("The column: '{}' is missing in the table"
-                                  .format(colname))
+                self._raise_error(f"The column '{colname}' is missing in "
+                                  "the table")
             else:
                 return default
 
@@ -199,8 +197,8 @@ class FITSRegionRowParser():
         if region_type in reg_mapping['FITS_REGION']:
             region_type = reg_mapping['FITS_REGION'][region_type]
         else:
-            self._raise_error("'{}' is currently not supported in "
-                              "regions".format(self.region_type))
+            self._raise_error(f"'{self.region_type}' is currently not "
+                              "supported")
 
         return self.component, Shape('physical', region_type,
                                      coords, meta, False, False)

@@ -215,12 +215,12 @@ class TestRectangleSkyRegion(BaseTestSkyRegion):
         angle=5 * u.deg,
     )
 
-    expected_repr = ('<RectangleSkyRegion(center=<SkyCoord (ICRS): (ra, dec) in '
-                'deg\n    ( 3.,  4.)>, width=4.0 deg, height=3.0 '
-                'deg, angle=5.0 deg)>')
+    expected_repr = ('<RectangleSkyRegion(center=<SkyCoord (ICRS): (ra, dec) '
+                     'in deg\n    (3., 4.)>, width=4.0 deg, height=3.0 deg, '
+                     'angle=5.0 deg)>')
     expected_str = ('Region: RectangleSkyRegion\ncenter: <SkyCoord '
-               '(ICRS): (ra, dec) in deg\n    ( 3.,  4.)>\nwidth: '
-               '4.0 deg\nheight: 3.0 deg\nangle: 5.0 deg')
+                    '(ICRS): (ra, dec) in deg\n    (3., 4.)>\nwidth: '
+                    '4.0 deg\nheight: 3.0 deg\nangle: 5.0 deg')
 
     def test_copy(self):
         reg = self.reg.copy()

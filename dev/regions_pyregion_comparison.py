@@ -28,7 +28,7 @@ p_region_count = re.compile(r"[^=\)]\(")
 results = list()
 
 for filename in TEST_FILE_DIR.glob('*.reg'):
-    print('\n\n{}'.format(filename))
+    print(f'\n\n{filename}')
 
     # estimate total number of regions
     n_regions = 0
@@ -89,6 +89,6 @@ result_table['compl_regions'].format = '0.1%'
 result_table.meta['repetitions for timing'] = REPETITIONS
 
 savename = 'regions_pyregion_comparison.csv'
-print('Writing {}'.format(savename))
+print(f'Writing {savename}')
 result_table.write(savename)
 result_table.pprint()

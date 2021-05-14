@@ -130,7 +130,7 @@ html_theme_options = {
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
-html_title = '{0} v{1}'.format(project, release)
+html_title = f'{project} v{release}'
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = project + 'doc'
@@ -165,7 +165,7 @@ if setup_cfg.get('edit_on_github').lower() == 'true':
     edit_on_github_doc_root = "docs"
 
 # -- Resolving issue number to links in changelog -----------------------------
-github_issues_url = 'https://github.com/{0}/issues/'.format(setup_cfg['github_project'])
+github_issues_url = f"https://github.com/{setup_cfg['github_project']}/issues/"
 
 # -- Turn on nitpicky mode for sphinx (to warn about references not found) ----
 #

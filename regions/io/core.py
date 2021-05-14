@@ -155,8 +155,7 @@ class ShapeList(list):
                 radunitstr = '"'
             else:
                 raise ValueError(
-                    'Radius unit arcsec not valid for coordsys {}'.format(
-                        coordsys))
+                    f'Radius unit arcsec not valid for coordsys {coordsys}')
         else:
             radunitstr = radunit
 
@@ -166,7 +165,7 @@ class ShapeList(list):
 
         # CASA does not support global coordinate specification, even though the
         # documentation for the specification explicitly states that it does.
-        output += 'global coord={}\n'.format(coordsys_mapping['CRTF'][coordsys.lower()])
+        output += f"global coord={coordsys_mapping['CRTF'][coordsys.lower()]}\n"
 
         for shape in self:
 
@@ -181,7 +180,7 @@ class ShapeList(list):
             include += "ann " if shape.meta.get('type', 'reg') == 'ann' else ""
 
             if shape.meta.get('label', "") != "":
-                shape.meta['label'] = "'{}'".format(shape.meta['label'])
+                shape.meta['label'] = f"'{shape.meta['label']}'"
             meta_str = ", ".join(f"{key}={val}" for key, val in
                                  shape.meta.items() if
                                  key not in ('include', 'comment', 'symbol',
@@ -194,19 +193,19 @@ class ShapeList(list):
             shape_coordsys = getattr(shape, 'coordsys')
             if shape_coordsys.lower() != coordsys.lower():
                 if meta_str.strip():
-                    meta_str = "coord={}, ".format(coordsys_mapping['CRTF'][coordsys.lower()]) + meta_str
+                    meta_str = f"coord={coordsys_mapping['CRTF'][coordsys.lower()]}, " + meta_str
                 else:
                     # if there is no metadata at all (above), the trailing comma is incorrect
-                    meta_str = "coord={}".format(coordsys_mapping['CRTF'][coordsys.lower()])
+                    meta_str = f"coord={coordsys_mapping['CRTF'][coordsys.lower()]}"
 
             if 'comment' in shape.meta:
                 meta_str += ", " + shape.meta['comment']
             if 'range' in shape.meta:
                 shape.meta['range'] = [str(str(x).replace(" ", "")) for x in
                                        shape.meta['range']]
-                meta_str += ", range={}".format(shape.meta['range']).replace("'", "")
+                meta_str += f", range={shape.meta['range']}".replace("'", "")
             if 'corr' in shape.meta:
-                meta_str += ", corr={}".format(shape.meta['corr']).replace("'", "")
+                meta_str += f", corr={shape.meta['corr']}".replace("'", "")
 
             coord = []
             if coordsys not in ['image', 'physical']:
@@ -229,9 +228,9 @@ class ShapeList(list):
                 coord[-1] = float(shape.coord[-1].to('deg').value)
 
             if shape.region_type == 'polygon':
-                val = '[{0:' + fmt + '}deg, {1:' + fmt + '}deg]'
-                temp = [val.format(x, y) for x, y in zip(coord[::2], coord[1::2])]
-                coord = ", ".join(temp)
+                vals = [f'[{x:{fmt}}deg, {y:{fmt}}deg]'
+                        for x, y in zip(coord[::2], coord[1::2])]
+                coord = ", ".join(vals)
                 line = crtf_strings['polygon'].format(include, coord)
             elif shape.region_type == 'point':
                 if 'symbol' in shape.meta:
@@ -319,14 +318,14 @@ class ShapeList(list):
                 shape.meta['point'] = valid_symbols_reverse[shape.meta['point']]
 
             if 'symsize' in shape.meta:
-                shape.meta['point'] += " {}".format(shape.meta.pop('symsize'))
+                shape.meta['point'] += f" {shape.meta.pop('symsize')}"
 
             meta_str = " ".join(f"{key}={val}" for key, val in
                                 shape.meta.items() if key not in ('include', 'tag', 'comment', 'font', 'text'))
             if 'tag' in shape.meta:
                 meta_str += " " + " ".join([f"tag={tag}" for tag in shape.meta['tag']])
             if 'font' in shape.meta:
-                meta_str += " " + 'font="{}"'.format(shape.meta['font'])
+                meta_str += " " + f"font=\"{shape.meta['font']}\""
             if shape.meta.get('text', '') != '':
                 meta_str += " " + 'text={' + shape.meta['text'] + '}'
             if 'comment' in shape.meta:
@@ -358,9 +357,7 @@ class ShapeList(list):
                     coord[1] += 1
 
             if shape.region_type == 'polygon':
-                val = "{0:" + fmt + "}"
-                temp = [val.format(x) for x in coord]
-                coord = ",".join(temp)
+                coord = ",".join([f'{x:{fmt}}' for x in coord])
                 line = ds9_strings['polygon'].format(include, coord)
             elif shape.region_type == 'ellipse':
                 coord[2:] = [x / 2 for x in coord[2:]]
@@ -528,13 +525,13 @@ class Shape:
 
     def __str__(self):
         ss = self.__class__.__name__
-        ss += '\nType : {}'.format(self.meta.get('type', 'reg'))
-        ss += f'\nCoord sys : {self.coordsys}'
-        ss += f'\nRegion type : {self.region_type}'
+        ss += f"\nType: {self.meta.get('type', 'reg')}"
+        ss += f'\nCoord sys: {self.coordsys}'
+        ss += f'\nRegion type: {self.region_type}'
         if self.region_type == 'symbol':
-            ss += '\nSymbol : {}'.format(self.meta['symbol'])
+            ss += f"\nSymbol: {self.meta['symbol']}"
         if self.region_type == 'text':
-            ss += '\nText : {}'.format(self.meta['text'])
+            ss += f"\nText: {self.meta['text']}"
         ss += f'\nMeta: {self.meta}'
         ss += f'\nComposite: {self.composite}'
         ss += f'\nInclude: {self.include}'
@@ -652,36 +649,36 @@ class Shape:
         Check for CRTF compatibility.
         """
         if self.region_type not in regions_attributes:
-            raise ValueError("'{}' is not a valid region type in this package"
-                             "supported by CRTF".format(self.region_type))
+            raise ValueError(f"'{self.region_type}' is not a valid region "
+                             "type")
 
         if self.coordsys not in valid_coordsys['CRTF']:
-            raise ValueError("'{}' is not a valid coordinate reference frame in "
-                             "astropy supported by CRTF".format(self.coordsys))
+            raise ValueError(f"'{self.coordsys}' is not a valid coordinate "
+                             "reference frame")
 
     def check_ds9(self):
         """
         Check for DS9 compatibility.
         """
         if self.region_type not in regions_attributes:
-            raise ValueError("'{}' is not a valid region type in this package"
-                             "supported by DS9".format(self.region_type))
+            raise ValueError(f"'{self.region_type}' is not a valid region "
+                             "type")
 
         if self.coordsys not in valid_coordsys['DS9']:
-            raise ValueError("'{}' is not a valid coordinate reference frame "
-                             "in astropy supported by DS9".format(self.coordsys))
+            raise ValueError(f"'{self.coordsys}' is not a valid coordinate "
+                             "reference frame")
 
     def _validate(self):
         """
         Check whether all the attributes of this object is valid.
         """
         if self.region_type not in regions_attributes:
-            raise ValueError("'{}' is not a valid region type in this package"
-                             .format(self.region_type))
+            raise ValueError(f"'{self.region_type}' is not a valid region "
+                             "type")
 
         if self.coordsys not in valid_coordsys['DS9'] + valid_coordsys['CRTF']:
-            raise ValueError("'{}' is not a valid coordinate reference frame "
-                             "in astropy".format(self.coordsys))
+            raise ValueError(f"'{self.coordsys}' is not a valid coordinate "
+                             "reference frame")
 
 
 def to_shape_list(region_list, coordinate_system='fk5'):
@@ -784,9 +781,9 @@ def to_ds9_meta(shape_meta):
     meta = _to_io_meta(shape_meta, valid_keys, key_mappings)
 
     if 'font' in meta:
-        meta['font'] += " {} {} {}".format(shape_meta.get('fontsize', 12),
-                                              shape_meta.get('fontstyle', 'normal'),
-                                              shape_meta.get('fontweight', 'roman'))
+        meta['font'] += (f" {shape_meta.get('fontsize', 12)} "
+                         f"{shape_meta.get('fontstyle', 'normal')} "
+                         f"{shape_meta.get('fontweight', 'roman')}")
 
     return meta
 

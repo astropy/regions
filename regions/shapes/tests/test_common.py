@@ -9,10 +9,10 @@ from ...core import PixCoord, BoundingBox
 class BaseTestRegion:
 
     def test_repr(self):
-        assert repr(self.reg).replace(" ","") == self.expected_repr.replace(" ","")
+        assert repr(self.reg) == self.expected_repr
 
     def test_str(self):
-        assert str(self.reg).replace(" ","") == self.expected_str.replace(" ","")
+        assert str(self.reg) == self.expected_str
 
 
 class BaseTestPixelRegion(BaseTestRegion):

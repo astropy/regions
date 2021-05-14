@@ -24,9 +24,9 @@ To learn more about the format specifications, please go to `the official page
     >>> parser = CRTFParser(reg_string)
     >>> print(parser.shapes[0])
     Shape
-    Type : reg
-    Coord sys : fk5
-    Region type : circle
+    Type: reg
+    Coord sys: fk5
+    Region type: circle
     Meta: {'color': 'green', 'include': True, 'type': 'reg'}
     Composite: False
     Include: True

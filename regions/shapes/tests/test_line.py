@@ -31,8 +31,10 @@ class TestLinePixelRegion(BaseTestPixelRegion):
     inside = []
     outside = [(3.1, 4.2), (5, 4)]
     expected_area = 0
-    expected_repr = '<LinePixelRegion(start=PixCoord(x=3, y=4), end=PixCoord(x=4, y=4))>'
-    expected_str = 'Region: LinePixelRegion\nstart: PixCoord(x=3, y=4)\nend: PixCoord(x=4, y=4)'
+    expected_repr = ('<LinePixelRegion(start=PixCoord(x=3, y=4), '
+                     'end=PixCoord(x=4, y=4))>')
+    expected_str = ('Region: LinePixelRegion\nstart: PixCoord(x=3, y=4)\n'
+                    'end: PixCoord(x=4, y=4)')
 
     def test_copy(self):
         reg = self.reg.copy()
@@ -66,12 +68,12 @@ class TestLineSkyRegion(BaseTestSkyRegion):
     end = SkyCoord(3 * u.deg, 5 * u.deg, frame='galactic')
     reg = LineSkyRegion(start, end)
 
-    expected_repr = ('<LineSkyRegion(start=<SkyCoord (Galactic): (l, b) in deg\n'
-                     '    ( 3.,  4.)>, end=<SkyCoord (Galactic): (l, b) in deg\n'
-                     '    ( 3.,  5.)>)>')
-    expected_str = ('Region: LineSkyRegion\nstart: <SkyCoord (Galactic): (l, b) in deg\n'
-                    '    ( 3.,  4.)>\nend: <SkyCoord (Galactic): (l, b) in deg\n'
-                    '    ( 3.,  5.)>')
+    expected_repr = ('<LineSkyRegion(start=<SkyCoord (Galactic): (l, b) '
+                     'in deg\n    (3., 4.)>, end=<SkyCoord (Galactic): '
+                     '(l, b) in deg\n    (3., 5.)>)>')
+    expected_str = ('Region: LineSkyRegion\nstart: <SkyCoord (Galactic): '
+                    '(l, b) in deg\n    (3., 4.)>\nend: <SkyCoord '
+                    '(Galactic): (l, b) in deg\n    (3., 5.)>')
 
     def test_copy(self):
         reg = self.reg.copy()

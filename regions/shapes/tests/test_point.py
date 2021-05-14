@@ -64,10 +64,10 @@ class TestPointSkyRegion(BaseTestSkyRegion):
 
     reg = PointSkyRegion(SkyCoord(3, 4, unit='deg'))
 
-    expected_repr = ('<PointSkyRegion(center=<SkyCoord (ICRS): (ra, dec) in deg\n'
-                     '    ( 3.,  4.)>)>')
+    expected_repr = ('<PointSkyRegion(center=<SkyCoord (ICRS): (ra, dec) '
+                     'in deg\n    (3., 4.)>)>')
     expected_str = ('Region: PointSkyRegion\ncenter: <SkyCoord (ICRS): '
-                    '(ra, dec) in deg\n    ( 3.,  4.)>')
+                    '(ra, dec) in deg\n    (3., 4.)>')
 
     def test_copy(self):
         reg = self.reg.copy()

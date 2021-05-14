@@ -27,8 +27,8 @@ def list_files():
 @click.argument('filename')
 def parse(filename, interactive, parser, errors):
     readname = TEST_FILE_DIR / filename
-    print('Reading {}'.format(readname))
-    print('Using parser {}'.format(parser))
+    print(f'Reading {readname}')
+    print(f'Using parser {parser}')
     if parser == 'regions':
         regions = read_ds9(str(readname), errors=errors)
     elif parser == 'pyregion':

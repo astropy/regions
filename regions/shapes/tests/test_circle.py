@@ -31,7 +31,8 @@ class TestCirclePixelRegion(BaseTestPixelRegion):
     outside = [(3, 0)]
     expected_area = 4 * np.pi
     expected_repr = '<CirclePixelRegion(center=PixCoord(x=3, y=4), radius=2)>'
-    expected_str = 'Region: CirclePixelRegion\ncenter: PixCoord(x=3, y=4)\nradius: 2'
+    expected_str = ('Region: CirclePixelRegion\ncenter: PixCoord(x=3, y=4)'
+                    '\nradius: 2')
 
     def test_copy(self):
         reg = self.reg.copy()
@@ -62,9 +63,9 @@ class TestCircleSkyRegion(BaseTestSkyRegion):
     reg = CircleSkyRegion(SkyCoord(3 * u.deg, 4 * u.deg), 2 * u.arcsec)
 
     expected_repr = ('<CircleSkyRegion(center=<SkyCoord (ICRS): (ra, dec) in '
-                     'deg\n    ( 3.,  4.)>, radius=2.0 arcsec)>')
+                     'deg\n    (3., 4.)>, radius=2.0 arcsec)>')
     expected_str = ('Region: CircleSkyRegion\ncenter: <SkyCoord (ICRS): '
-                    '(ra, dec) in deg\n    ( 3.,  4.)>\nradius: 2.0 '
+                    '(ra, dec) in deg\n    (3., 4.)>\nradius: 2.0 '
                     'arcsec')
 
     def test_copy(self):

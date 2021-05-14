@@ -127,8 +127,8 @@ class CRTFParser:
     def __init__(self, region_string, errors='strict'):
 
         if errors not in ('strict', 'ignore', 'warn'):
-            msg = "errors must be one of strict, ignore, or warn; is {}"
-            raise ValueError(msg.format(errors))
+            raise ValueError('errors must be one of "strict", "ignore", or '
+                             '"warn"')
 
         self.region_string = region_string
         self.errors = errors
@@ -349,13 +349,15 @@ class CRTFRegionParser:
             if len(coord_list_str) < 4:
                 self._raise_error(f'Not in proper format: {self.reg_str} polygon should have > 4 coordinates')
             if coord_list_str[0] != coord_list_str[-1]:
-                self._raise_error("Not in proper format: '{}', "
-                                  "In polygon, the last and first coordinates should be same".format(self.reg_str))
+                self._raise_error(f"Not in proper format: '{self.reg_str}'. "
+                                  "In polygon, the last and first "
+                                  "coordinates should be same")
         else:
             if len(coord_list_str) != len(self.language_spec[self.region_type]):
-                self._raise_error("Not in proper format: '{}', "
-                                  "Does not contain expected number of parameters for the region '{}'"
-                                  .format(self.reg_str, self.region_type))
+                self._raise_error(f"Not in proper format: '{self.reg_str}'. "
+                                  "Does not contain expected number of "
+                                  "parameters for the region "
+                                  f"'{self.region_type}'")
 
         for attr_spec, val_str in zip(self.language_spec[self.region_type], coord_list_str):
 

@@ -94,9 +94,7 @@ class PixCoord:
         return np.isscalar(self.x)
 
     def __repr__(self):
-        data = dict(name=self.__class__.__name__, x=self.x, y=self.y)
-        fmt = '{name}(x={x}, y={y})'
-        return fmt.format(**data)
+        return f'{self.__class__.__name__}(x={self.x}, y={self.y})'
 
     def __len__(self):
         return len(self.x)

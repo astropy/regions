@@ -39,24 +39,20 @@ class Region(abc.ABC):
         return self.__class__(**changes)
 
     def __repr__(self):
-        params = []
+        prefix = f'{self.__class__.__name__}'
+        cls_info = []
         if self._params is not None:
-            for key in self._params:
-                params.append('{}={}'.format(key.replace("_", " "),
-                                               getattr(self, key)))
-        params = ', '.join(params)
-
-        return f'<{self.__class__.__name__}({params})>'
+            for param in self._params:
+                cls_info.append(f'{param}={getattr(self, param)}')
+        cls_info = ', '.join(cls_info)
+        return f'<{prefix}({cls_info})>'
 
     def __str__(self):
         cls_info = [('Region', self.__class__.__name__)]
         if self._params is not None:
-            params_value = [(x.replace("_", " "), getattr(self, x))
-                            for x in self._params]
-            cls_info += params_value
-        fmt = [f'{key}: {val}' for key, val in cls_info]
-
-        return '\n'.join(fmt)
+            for param in self._params:
+                cls_info.append((param, getattr(self, param)))
+        return '\n'.join([f'{key}: {val}' for key, val in cls_info])
 
     @abc.abstractmethod
     def intersection(self, other):
@@ -221,12 +217,13 @@ class PixelRegion(Region):
     @staticmethod
     def _validate_mode(mode, subpixels):
         if mode not in VALID_MASK_MODES:
-            raise ValueError("Invalid mask mode: {} (should be one "
-                             "of {})".format(mode, '/'.join(VALID_MASK_MODES)))
+            valid_modes = '/'.join(VALID_MASK_MODES)
+            raise ValueError(f"Invalid mask mode: {mode} (should be one "
+                             f"of {valid_modes}")
         if mode == 'subpixels':
             if not isinstance(subpixels, int) or subpixels <= 0:
-                raise ValueError("Invalid subpixels value: {} (should be"
-                                 " a strictly positive integer)".format(subpixels))
+                raise ValueError(f"Invalid subpixels value: {subpixels} "
+                                 "(should be a strictly positive integer)")
 
     @abc.abstractmethod
     def as_artist(self, origin=(0, 0), **kwargs):

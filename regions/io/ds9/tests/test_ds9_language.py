@@ -55,12 +55,9 @@ def test_file(filename):
     actual = ds9_objects_to_string(regs, coordsys=str(coordsys), fmt='.2f',
                                    radunit=None if coordsys=='physical' else 'arcsec').strip()
 
-    reffile = get_pkg_data_filename('data/{coordsys}{strip}_reference.reg'
-                                    .format(coordsys=coordsys,
-                                            strip=("_strip"
-                                                   if "strip" in filename
-                                                   else "")))
-
+    strip = '_strip' if 'strip' in filename else ''
+    filepath = f'data/{coordsys}{strip}_reference.reg'
+    reffile = get_pkg_data_filename(filepath)
     with open(reffile, 'r') as fh:
         desired = fh.read().strip()
 
@@ -182,16 +179,18 @@ def test_ds9_color_override_global():
     """
     Color parsing test in the presence of a global
     """
-    global_test_str = str('global color=blue dashlist=8 3 width=1'
-                          ' font="helvetica 10 normal roman" select=1'
-                          ' highlite=1 dash=0 fixed=0 edit=1 move=1'
-                          ' delete=1 include=1 source=1')
+    global_test_str = ('global color=blue dashlist=8 3 width=1'
+                       ' font="helvetica 10 normal roman" select=1'
+                       ' highlite=1 dash=0 fixed=0 edit=1 move=1'
+                       ' delete=1 include=1 source=1\n')
 
-    ds9_str = '# Region file format: DS9 astropy/regions\n{global_str}\nfk5\n'
     reg1str = "circle(42.0000,43.0000,3.0000) # color=green"
     reg2str = "circle(43.0000,43.0000,3.0000) # color=orange"
     reg3str = "circle(43.0000,43.0000,3.0000)"
-    ds9_str = ds9_str.format(global_str=global_test_str) + "\n".join([reg1str, reg2str, reg3str])
+
+    global_str = (global_test_str + "fk5\n"
+                  + "\n".join([reg1str, reg2str, reg3str]))
+    ds9_str = f'# Region file format: DS9 astropy/regions\n{global_str}\n'
     parser = DS9Parser(ds9_str)
     regions = parser.shapes
     assert regions[0].meta['color'] == 'green'

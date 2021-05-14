@@ -29,9 +29,10 @@ class TestPolygonPixelRegion(BaseTestPixelRegion):
     inside = [(2, 2)]
     outside = [(3, 2), (3, 3)]
     expected_area = 3
-    expected_repr = '<PolygonPixelRegion(vertices=PixCoord(x=[1 3 1], y=[1 1 4]))>'
-    expected_str = ('Region: PolygonPixelRegion\nvertices: PixCoord(x=[1 3 1],'
-                    ' y=[1 1 4])')
+    expected_repr = ('<PolygonPixelRegion(vertices=PixCoord(x=[1 3 1], '
+                     'y=[1 1 4]))>')
+    expected_str = ('Region: PolygonPixelRegion\nvertices: '
+                    'PixCoord(x=[1 3 1], y=[1 1 4])')
 
     # We will be using this polygon for basic tests:
     #
@@ -108,11 +109,9 @@ class TestPolygonSkyRegion(BaseTestSkyRegion):
     reg = PolygonSkyRegion(SkyCoord([3, 4, 3] * u.deg, [3, 4, 4] * u.deg))
 
     expected_repr = ('<PolygonSkyRegion(vertices=<SkyCoord (ICRS): (ra, '
-                'dec) in deg\n    [( 3.,  3.), ( 4.,  4.), ( 3.,  '
-                '4.)]>)>')
+                     'dec) in deg\n    [(3., 3.), (4., 4.), (3., 4.)]>)>')
     expected_str = ('Region: PolygonSkyRegion\nvertices: <SkyCoord (ICRS):'
-               ' (ra, dec) in deg\n    [( 3.,  3.), ( 4.,  4.), ( 3.,'
-               '  4.)]>')
+                    ' (ra, dec) in deg\n    [(3., 3.), (4., 4.), (3., 4.)]>')
 
     def test_copy(self):
         reg = self.reg.copy()
