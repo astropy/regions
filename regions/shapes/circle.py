@@ -180,9 +180,9 @@ class CircleSkyRegion(SkyRegion):
         The center position.
     radius : `~astropy.units.Quantity`
         The radius in angular units.
-    meta : `~regions.RegionMeta` object, optional
+    meta : `~regions.RegionMeta`, optional
         A dictionary that stores the meta attributes of this region.
-    visual : `~regions.RegionVisual` object, optional
+    visual : `~regions.RegionVisual`, optional
         A dictionary that stores the visual meta attributes of this
         region.
     """
