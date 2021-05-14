@@ -4,31 +4,32 @@ import copy
 import operator
 
 
-__all__ = ['Region', 'PixelRegion', 'SkyRegion']
-
-
-"""
-Here we define global variables for the default `origin` and `mode` used
-for WCS transformations throughout the `regions` package.
-
-Their purpose is to simplify achieving uniformity across the codebase.
-They are mainly used as default arguments for methods that do WCS
-transformations.
-
-They are private (with an underscore), not part of the public API,
-users should not touch them.
-"""
+# Here we define global variables for the default `origin` and `mode` used
+# for WCS transformations throughout the `regions` package.
+#
+# Their purpose is to simplify achieving uniformity across the codebase.
+# They are mainly used as default arguments for methods that do WCS
+# transformations.
+#
+# They are private (with an underscore), not part of the public API, users
+# should not touch them.
 _DEFAULT_WCS_ORIGIN = 0
 _DEFAULT_WCS_MODE = 'all'
 
 VALID_MASK_MODES = {'center', 'exact', 'subpixels'}
 
+__all__ = ['Region', 'PixelRegion', 'SkyRegion']
+
 
 class Region(abc.ABC):
-    """Base class for all regions."""
+    """
+    Base class for all regions.
+    """
 
     def copy(self, **changes):
-        """Make an independent (deep) copy."""
+        """
+        Make an independent (deep) copy.
+        """
         fields = list(self._params) + ["meta", "visual"]
 
         for field in fields:
@@ -60,23 +61,24 @@ class Region(abc.ABC):
     @abc.abstractmethod
     def intersection(self, other):
         """
-        Returns a region representing the intersection of this region with
-        ``other``.
+        Return a region representing the intersection of this region
+        with ``other``.
         """
         raise NotImplementedError
 
     @abc.abstractmethod
     def symmetric_difference(self, other):
         """
-        Returns the union of the two regions minus any areas contained in the
-        intersection of the two regions.
+        Return the union of the two regions minus any areas contained in
+        the intersection of the two regions.
         """
         raise NotImplementedError
 
     @abc.abstractmethod
     def union(self, other):
         """
-        Returns a region representing the union of this region with ``other``.
+        Return a region representing the union of this region with
+        ``other``.
         """
         raise NotImplementedError
 
@@ -92,28 +94,29 @@ class Region(abc.ABC):
 
 class PixelRegion(Region):
     """
-    Base class for all regions defined in pixel coordinates
+    Base class for all regions defined in pixel coordinates.
     """
 
     def intersection(self, other):
         """
-        Returns a region representing the intersection of this region with
-        ``other``.
+        Return a region representing the intersection of this region
+        with ``other``.
         """
         from .compound import CompoundPixelRegion
         return CompoundPixelRegion(region1=self, region2=other, operator=operator.and_)
 
     def symmetric_difference(self, other):
         """
-        Returns the union of the two regions minus any areas contained in the
-        intersection of the two regions.
+        Return the union of the two regions minus any areas contained in
+        the intersection of the two regions.
         """
         from .compound import CompoundPixelRegion
         return CompoundPixelRegion(region1=self, region2=other, operator=operator.xor)
 
     def union(self, other):
         """
-        Returns a region representing the union of this region with ``other``.
+        Return a region representing the union of this region with
+        ``other``.
         """
         from .compound import CompoundPixelRegion
         return CompoundPixelRegion(region1=self, region2=other, operator=operator.or_)
@@ -121,7 +124,7 @@ class PixelRegion(Region):
     @abc.abstractmethod
     def contains(self, pixcoord):
         """
-        Checks whether a position or positions fall inside the region.
+        Check whether a position or positions fall inside the region.
 
         Parameters
         ----------
@@ -138,54 +141,71 @@ class PixelRegion(Region):
     @abc.abstractmethod
     def to_sky(self, wcs):
         """
-        Returns a region defined in sky coordinates.
+        Return a region defined in sky coordinates.
 
         Parameters
         ----------
-        wcs : `~astropy.wcs.WCS` instance
-            The world coordinate system transformation to assume
+        wcs : `~astropy.wcs.WCS`
+            The world coordinate system transformation to use to convert
+            from pixels to sky coordinates.
 
         Returns
         -------
-        sky_region : `~regions.SkyRegion` object.
+        sky_region : `~regions.SkyRegion`
+            The sky region.
         """
         raise NotImplementedError
 
     @property
     @abc.abstractmethod
     def area(self):
-        """Region area (float)"""
+        """
+        The area of the region.
+        """
         raise NotImplementedError
 
     @property
     @abc.abstractmethod
     def bounding_box(self):
         """
-        The minimal bounding box (in integer pixel coordinates) that contains
-        the region.
+        The minimal bounding box (in integer pixel coordinates) that
+        contains the region.
         """
         raise NotImplementedError
 
     @abc.abstractmethod
     def to_mask(self, mode='center', subpixels=5):
         """
-        Returns a mask for the aperture.
+        Return a mask for the region.
 
         Parameters
         ----------
-        mode : { 'center' | 'exact' | 'subpixels'}, optional
-            The following modes are available:
-                * ``'center'``: returns 1 for pixels where the center is in
-                  the region, and 0 otherwise.
-                * ``'exact'``: returns a value between 0 and 1 giving the
-                  fractional level of overlap of the pixel with the region.
-                * ``'subpixels'``: A pixel is divided into subpixels and
-                  the center of each subpixel is tested (a subpixel is
-                  either completely in or out of the region).  Returns a
-                  value between 0 and 1 giving the fractional level of
-                  overlap of the subpixels with the region.  With
-                  ``subpixels`` set to 1, this method is equivalent to
-                  ``'center'``.
+        mode : {'center', 'exact', 'subpixels'}, optional
+            The method used to determine the overlap of the region on
+            the pixel grid. Not all options are available for all region
+            types. Note that the more precise methods are generally
+            slower. The following methods are available:
+
+                * ``'center'``:
+                  A pixel is considered to be entirely in or out of the
+                  region depending on whether its center is in or out of
+                  the region. The returned mask will contain values only
+                  of 0 (out) and 1 (in).
+
+                * ``'exact'`` (default):
+                  The exact fractional overlap of the region and each
+                  pixel is calculated. The returned mask will contain
+                  values between 0 and 1.
+
+                * ``'subpixel'``:
+                  A pixel is divided into subpixels (see the
+                  ``subpixels`` keyword), each of which are considered
+                  to be entirely in or out of the region depending
+                  on whether its center is in or out of the region.
+                  If ``subpixels=1``, this method is equivalent to
+                  ``'center'``. The returned mask will contain values
+                  between 0 and 1.
+
         subpixels : int, optional
             For the ``'subpixel'`` mode, resample pixels by this factor
             in each dimension. That is, each pixel is divided into
@@ -193,8 +213,8 @@ class PixelRegion(Region):
 
         Returns
         -------
-        mask : `~regions.Mask`
-            A region mask object.
+        mask : `~regions.RegionMask`
+            A mask for the region.
         """
         raise NotImplementedError
 
@@ -211,30 +231,30 @@ class PixelRegion(Region):
     @abc.abstractmethod
     def as_artist(self, origin=(0, 0), **kwargs):
         """
-        Convert to mpl patch
+        Convert to matplotlib patch object for this region.
 
         Parameters
         ----------
         origin : array_like, optional
-            The ``(x, y)`` pixel position of the origin of the displayed image.
-            Default is (0, 0).
+            The ``(x, y)`` pixel position of the origin of the displayed
+            image.
 
-        **kwargs : `dict`
-            keywords that a `~matplotlib.patches.Patch` accepts
+        **kwargs : dict
+            Any keyword arguments accepted by
+            `~matplotlib.patches.Patch`.
 
         Returns
         -------
         patch : `~matplotlib.patches.Patch`
-            Matplotlib patch
+            A matplotlib patch.
         """
         raise NotImplementedError
 
     def mpl_properties_default(self, shape='patch'):
         """
-        This sets the default values of the visual attributes as specified
-        under DS9 convention.
+        Set the default values of the visual attributes as specified by
+        the DS9 convention.
         """
-
         kwargs = dict()
         kwargs['color'] = self.visual.get('color', 'green')
         kwargs['label'] = self.meta.get('label', "")
@@ -263,23 +283,27 @@ class PixelRegion(Region):
 
     def plot(self, origin=(0, 0), ax=None, **kwargs):
         """
-        Calls ``as_artist`` method forwarding all kwargs and adds patch
-        to given axis.
+        Plot the region on a matplotlib `~matplotlib.axes.Axes`
+        instance.
 
         Parameters
         ----------
         origin : array_like, optional
-            The ``(x, y)`` pixel position of the origin of the displayed image.
-            Default is (0, 0).
-        ax : `~matplotlib.axes.Axes`, optional
-            Axis
-        **kwargs : `dict`
-            keywords that a `~matplotlib.patches.Patch` accepts
+            The ``(x, y)`` pixel position of the origin of the displayed
+            image.
+
+        ax : `~matplotlib.axes.Axes` or `None`, optional
+            The matplotlib axes on which to plot.  If `None`, then the
+            current `~matplotlib.axes.Axes` instance is used.
+
+        **kwargs : dict
+            Any keyword arguments accepted by
+            `~matplotlib.patches.Patch`.
 
         Returns
         -------
         ax : `~matplotlib.axes.Axes`
-            Axes on which the patch is added.
+            The axes on which the patch was added.
         """
         import matplotlib.pyplot as plt
 
@@ -294,42 +318,44 @@ class PixelRegion(Region):
 
 class SkyRegion(Region):
     """
-    Base class for all regions defined in celestial coordinates
+    Base class for all regions defined in celestial coordinates.
     """
 
     def intersection(self, other):
         """
-        Returns a region representing the intersection of this region with
-        ``other``.
+        Return a region representing the intersection of this region
+        with ``other``.
         """
         from .compound import CompoundSkyRegion
         return CompoundSkyRegion(region1=self, region2=other, operator=operator.and_)
 
     def symmetric_difference(self, other):
         """
-        Returns the union of the two regions minus any areas contained in the
-        intersection of the two regions.
+        Return the union of the two regions minus any areas contained in
+        the intersection of the two regions.
         """
         from .compound import CompoundSkyRegion
         return CompoundSkyRegion(region1=self, region2=other, operator=operator.xor)
 
     def union(self, other):
         """
-        Returns a region representing the union of this region with ``other``.
+        Return a region representing the union of this region with
+        ``other``.
         """
         from .compound import CompoundSkyRegion
         return CompoundSkyRegion(region1=self, region2=other, operator=operator.or_)
 
     def contains(self, skycoord, wcs):
         """
-        Check whether a sky coordinate falls inside the region
+        Check whether a sky coordinate falls inside the region.
 
         Parameters
         ----------
         skycoord : `~astropy.coordinates.SkyCoord`
-            The position or positions to check
-        wcs : `~astropy.wcs.WCS` instance
-            The world coordinate system transformation to assume
+            The position or positions to check.
+        wcs : `~astropy.wcs.WCS`
+            The world coordinate system transformation to use to convert
+            between sky and pixel coordinates.
         """
         from .pixcoord import PixCoord
         pixel_region = self.to_pixel(wcs)
@@ -339,15 +365,17 @@ class SkyRegion(Region):
     @abc.abstractmethod
     def to_pixel(self, wcs):
         """
-        Returns the equivalent region defined in pixel coordinates.
+        Return the equivalent region defined in pixel coordinates.
 
         Parameters
         ----------
-        wcs : `~astropy.wcs.WCS` instance
-            The world coordinate system transformation to assume
+        wcs : `~astropy.wcs.WCS`
+            The world coordinate system transformation to use to convert
+            between sky and pixel coordinates.
 
         Returns
         -------
-        pixel_region : `~regions.PixelRegion` object.
+        pixel_region : `~regions.PixelRegion`
+            A pixel region.
         """
         raise NotImplementedError

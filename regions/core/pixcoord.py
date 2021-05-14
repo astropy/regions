@@ -9,31 +9,31 @@ __all__ = ['PixCoord']
 
 
 class PixCoord:
-    """Pixel coordinates.
+    """
+    A class for pixel coordinates.
 
     This class can represent scalar or array pixel coordinates.
 
     The data members are either numbers or Numpy arrays
     (not `~astropy.units.Quantity` objects with unit "pixel").
 
-    Given a `astropy.wcs.WCS` object, it can be transformed to and from a
-    `~astropy.coordinates.SkyCoord` object.
+    Given a `astropy.wcs.WCS` object, it can be transformed to and from
+    a `~astropy.coordinates.SkyCoord` object.
 
     Parameters
     ----------
     x : float or array-like
-        Pixel coordinate x value
+        Pixel coordinate x value.
     y : float or array-like
-        Pixel coordinate y value
+        Pixel coordinate y value.
 
     Examples
     --------
-
-    Usage examples are provided in the :ref:`gs-coord` section of the docs.
+    Usage examples are provided in the :ref:`gs-coord` section of the
+    docs.
     """
 
     def __init__(self, x, y):
-
         x, y = np.broadcast_arrays(x, y)
 
         if x.shape == ():
@@ -42,31 +42,32 @@ class PixCoord:
             self.x, self.y = x, y
 
     def copy(self):
-        return self.__class__(
-            copy.deepcopy(self.x),
-            copy.deepcopy(self.y),
-        )
+        return self.__class__(copy.deepcopy(self.x), copy.deepcopy(self.y))
 
     @staticmethod
     def _validate(val, name, expected='any'):
-        """Validate that a given object is an appropriate `PixCoord`.
+        """
+        Validate that a given object is an appropriate `PixCoord`.
 
-        This is used for input validation throughout the regions package,
-        especially in the `__init__` method of pixel region classes.
+        This is used for input validation throughout the regions
+        package, especially in the `__init__` method of pixel region
+        classes.
 
         Parameters
         ----------
         val : `PixCoord`
-            The object to check
+            The object to check.
         name : str
-            Parameter name (used for error messages)
+            Parameter name (used for error messages).
+
         expected : {'any', 'scalar', 'not scalar'}
-            What kind of PixCoord to check for
+            What kind of PixCoord to check for.
 
         Returns
         -------
         val : `PixCoord`
-            The input object (at the moment unmodified, might do fix-ups here later)
+            The input object (at the moment unmodified, might do fix-ups
+            here later).
         """
         if not isinstance(val, PixCoord):
             raise TypeError(f'{name} must be a PixCoord')
@@ -86,6 +87,10 @@ class PixCoord:
 
     @property
     def isscalar(self):
+        """
+        Whether the instance is scalar (e.g., a single (x, y)
+        coordinate).
+        """
         return np.isscalar(self.x)
 
     def __repr__(self):
@@ -94,19 +99,13 @@ class PixCoord:
         return fmt.format(**data)
 
     def __len__(self):
-        """Define len(pixcoord) for array-valued pixcoord"""
         return len(self.x)
 
     def __iter__(self):
-        """Allows iteration for array-valued pixcoord
-
-        Yields scalar `PixCoord` objects.
-        """
         for (x, y) in zip(self.x, self.y):
             yield PixCoord(x=x, y=y)
 
     def __getitem__(self, key):
-        """Define indexing and slicing."""
         if self.isscalar:
             raise IndexError('Scalar PixCoord cannot be indexed or sliced.')
 
@@ -117,9 +116,9 @@ class PixCoord:
 
     def __eq__(self, other):
         """
-        It checks whether ``other`` is `PixCoord` object and whether their
-        abscissa and ordinate values are equal using ``np.assert_allclose``
-        with their default tolerance values.
+        Checks whether ``other`` is `PixCoord` object and whether
+        their abscissa and ordinate values are equal using
+        `np.testing.assert_allclose` with its default tolerance values.
         """
         if isinstance(other, PixCoord):
             return np.allclose([self.x, self.y], [other.x, other.y])
@@ -127,30 +126,59 @@ class PixCoord:
             return False
 
     def to_sky(self, wcs, origin=_DEFAULT_WCS_ORIGIN, mode=_DEFAULT_WCS_MODE):
-        """Convert this `PixCoord` to `~astropy.coordinates.SkyCoord`.
-
-        Calls :meth:`astropy.coordinates.SkyCoord.from_pixel`.
-        See parameter description there.
         """
-        return SkyCoord.from_pixel(
-            xp=self.x, yp=self.y, wcs=wcs,
-            origin=origin, mode=mode,
-        )
+        Convert to a `~astropy.coordinates.SkyCoord`.
+
+        Parameters
+        ----------
+        wcs : `~astropy.wcs.WCS`
+            The WCS to use to convert pixels to world coordinates.
+        origin : int, optional
+            Whether to return 0 or 1-based pixel coordinates.
+        mode : {'all', 'wcs'}, optional
+            Whether to do the transformation including distortions
+            (``'all'``) or only including only the core WCS
+            transformation (``'wcs'``).
+
+        Returns
+        -------
+        coord : `~astropy.coordinates.SkyCoord`
+            A new object with sky coordinates corresponding to the pixel
+            coordinates.
+        """
+        return SkyCoord.from_pixel(xp=self.x, yp=self.y, wcs=wcs,
+                                   origin=origin, mode=mode)
 
     @classmethod
     def from_sky(cls, skycoord, wcs, origin=_DEFAULT_WCS_ORIGIN, mode=_DEFAULT_WCS_MODE):
-        """Create `PixCoord` from `~astropy.coordinates.SkyCoord`.
+        """
+        Create `PixCoord` from a `~astropy.coordinates.SkyCoord`.
 
-        Calls :meth:`astropy.coordinates.SkyCoord.to_pixel`.
-        See parameter description there.
+        Parameters
+        ----------
+        wcs : `~astropy.wcs.WCS`
+            The WCS to use to convert pixels to world coordinates.
+        origin : int, optional
+            Whether to return 0 or 1-based pixel coordinates.
+        mode : {'all', 'wcs'}, optional
+            Whether to do the transformation including distortions
+            (``'all'``) or only including only the core WCS
+            transformation (``'wcs'``).
+
+        Returns
+        -------
+        coord : `PixCoord`
+            A new `PixCoord` object at the position of the input sky
+            coordinates.
         """
         x, y = skycoord.to_pixel(wcs=wcs, origin=origin, mode=mode)
         return cls(x=x, y=y)
 
     def separation(self, other):
-        r"""Separation to another pixel coordinate.
+        r"""
+        Calculate the separation to another pixel coordinate.
 
-        This is the two-dimensional cartesian separation :math:`d` with
+        This is the two-dimensional Cartesian separation :math:`d` where
 
         .. math::
             d = \sqrt{(x_1 - x_2) ^ 2 + (y_1 - y_2) ^ 2}
@@ -158,12 +186,12 @@ class PixCoord:
         Parameters
         ----------
         other : `PixCoord`
-            Other pixel coordinate
+            The other pixel coordinate.
 
         Returns
         -------
         separation : `numpy.array`
-            Separation in pixels
+            The separation in pixels.
         """
         dx = other.x - self.x
         dy = other.y - self.y
@@ -177,21 +205,22 @@ class PixCoord:
         return self.x, self.y
 
     def rotate(self, center, angle):
-        """Make a rotated pixel coordinate.
+        """
+        Rotate the pixel coordinate.
 
-        Rotates counter-clockwise for positive ``angle``.
+        Postive ``angle`` corresponds to counter-clockwise rotation.
 
         Parameters
         ----------
-        center : PixCoord
-            Rotation center point
-        angle : Angle
-            Rotation angle
+        center : `PixCoord`
+            The rotation center point.
+        angle : `~astropy.coordinates.Angle`
+            The rotation angle.
 
         Returns
         -------
-        coord : PixCoord
-            Rotated coordinates (an independent copy)
+        coord : `PixCoord`
+            The rotated coordinates (which is an independent copy).
         """
         dx = self.x - center.x
         dy = self.y - center.y
