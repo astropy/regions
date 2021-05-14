@@ -28,8 +28,10 @@ class TestTextPixelRegion(BaseTestPixelRegion):
     inside = []
     outside = [(3.1, 4.2), (5, 4)]
     expected_area = 0
-    expected_repr = '<TextPixelRegion(center=PixCoord(x=3, y=4), text=Sample Text)>'
-    expected_str = 'Region: TextPixelRegion\ncenter: PixCoord(x=3, y=4)\ntext: Sample Text'
+    expected_repr = ('<TextPixelRegion(center=PixCoord(x=3, y=4), '
+                     'text=Sample Text)>')
+    expected_str = ('Region: TextPixelRegion\ncenter: PixCoord(x=3, y=4)\n'
+                    'text: Sample Text')
 
     def test_copy(self):
         reg = self.reg.copy()
@@ -52,10 +54,10 @@ class TestTextPixelRegion(BaseTestPixelRegion):
 class TestTextSkyRegion(BaseTestSkyRegion):
     reg = TextSkyRegion(SkyCoord(3, 4, unit='deg'), "Sample Text")
 
-    expected_repr = ('<TextSkyRegion(center=<SkyCoord (ICRS): (ra, dec) in deg\n'
-                     '    ( 3.,  4.)>, text=Sample Text)>')
+    expected_repr = ('<TextSkyRegion(center=<SkyCoord (ICRS): (ra, dec) in '
+                     'deg\n    (3., 4.)>, text=Sample Text)>')
     expected_str = ('Region: TextSkyRegion\ncenter: <SkyCoord (ICRS): '
-                    '(ra, dec) in deg\n    ( 3.,  4.)>\ntext: Sample Text')
+                    '(ra, dec) in deg\n    (3., 4.)>\ntext: Sample Text')
 
     def test_copy(self):
         reg = self.reg.copy()
