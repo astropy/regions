@@ -22,21 +22,22 @@ class RectanglePixelRegion(PixelRegion):
     ----------
     center : `~regions.PixCoord`
         The position of the center of the rectangle.
-    width : `float`
-        The width of the rectangle (before rotation) in pixels
-    height : `float`
-        The height of the rectangle (before rotation) in pixels
+    width : float
+        The width of the rectangle (before rotation) in pixels.
+    height : float
+        The height of the rectangle (before rotation) in pixels.
     angle : `~astropy.units.Quantity`, optional
-        The rotation angle of the rectangle, measured anti-clockwise. If set to
-        zero (the default), the width axis is lined up with the x axis.
-    meta : `~regions.RegionMeta` object, optional
-        A dictionary which stores the meta attributes of this region.
-    visual : `~regions.RegionVisual` object, optional
-        A dictionary which stores the visual meta attributes of this region.
+        The rotation angle of the rectangle, measured anti-clockwise. If
+        set to zero (the default), the width axis is lined up with the x
+        axis.
+    meta : `~regions.RegionMeta`, optional
+        A dictionary that stores the meta attributes of this region.
+    visual : `~regions.RegionVisual`, optional
+        A dictionary that stores the visual meta attributes of this
+        region.
 
     Examples
     --------
-
     .. plot::
         :include-source:
 
@@ -61,6 +62,7 @@ class RectanglePixelRegion(PixelRegion):
         plt.ylim(0, 20)
         ax.set_aspect('equal')
     """
+
     _params = ('center', 'width', 'height', 'angle')
     center = ScalarPix('center')
     width = ScalarLength('width')
@@ -77,7 +79,6 @@ class RectanglePixelRegion(PixelRegion):
 
     @property
     def area(self):
-        """Region area (float)"""
         return self.width * self.height
 
     def contains(self, pixcoord):
@@ -105,11 +106,6 @@ class RectanglePixelRegion(PixelRegion):
 
     @property
     def bounding_box(self):
-        """
-        The minimal bounding box (`~regions.BoundingBox`) enclosing the
-        exact rectangular region.
-        """
-
         w2 = self.width / 2.
         h2 = self.height / 2.
         cos_angle = np.cos(self.angle)  # self.angle is a Quantity
@@ -129,8 +125,7 @@ class RectanglePixelRegion(PixelRegion):
         return BoundingBox.from_float(xmin, xmax, ymin, ymax)
 
     def to_mask(self, mode='center', subpixels=5):
-
-        # NOTE: assumes this class represents a single circle
+        # NOTE: assumes this class represents a single rectangle
 
         self._validate_mode(mode, subpixels)
 
@@ -164,20 +159,23 @@ class RectanglePixelRegion(PixelRegion):
 
     def as_artist(self, origin=(0, 0), **kwargs):
         """
-        Matplotlib patch object for this region (`matplotlib.patches.Rectangle`).
+        Return a matplotlib patch object for this region
+        (`matplotlib.patches.Rectangle`).
 
         Parameters
         ----------
         origin : array_like, optional
-            The ``(x, y)`` pixel position of the origin of the displayed image.
-            Default is (0, 0).
-        **kwargs : `dict`
-            All keywords that a `~matplotlib.patches.Rectangle` object accepts
+            The ``(x, y)`` pixel position of the origin of the displayed
+            image.
+
+        **kwargs : dict
+            Any keyword arguments accepted by
+            `~matplotlib.patches.Rectangle`.
 
         Returns
         -------
         patch : `~matplotlib.patches.Rectangle`
-            Matplotlib circle patch
+            A matplotlib rectangle patch.
         """
         from matplotlib.patches import Rectangle
         xy = self._lower_left_xy()
@@ -205,39 +203,41 @@ class RectanglePixelRegion(PixelRegion):
 
     def as_mpl_selector(self, ax, active=True, sync=True, callback=None, **kwargs):
         """
-        Matplotlib editable widget for this region (`matplotlib.widgets.RectangleSelector`)
+        A matplotlib editable widget for this region
+        (`matplotlib.widgets.RectangleSelector`).
 
         Parameters
         ----------
         ax : `~matplotlib.axes.Axes`
-            The Matplotlib axes to add the selector to.
+            The matplotlib axes to add the selector to.
         active : bool, optional
             Whether the selector should be active by default.
         sync : bool, optional
-            If `True` (the default), the region will be kept in sync with the
-            selector. Otherwise, the selector will be initialized with the
-            values from the region but the two will then be disconnected.
-        callback : func, optional
-            If specified, this function will be called every time the region is
-            updated. This only has an effect if ``sync`` is `True`. If a
-            callback is set, it is called for the first time once the selector
-            has been created.
-        **kwargs
-            Additional keyword arguments are passed to matplotlib.widgets.RectangleSelector`
+            If `True` (the default), the region will be kept in
+            sync with the selector. Otherwise, the selector will be
+            initialized with the values from the region but the two will
+            then be disconnected.
+        callback : callable, optional
+            If specified, this function will be called every time the
+            region is updated. This only has an effect if ``sync`` is
+            `True`. If a callback is set, it is called for the first
+            time once the selector has been created.
+        **kwargs : dict
+            Additional keyword arguments are passed to
+            `matplotlib.widgets.RectangleSelector`.
 
         Returns
         -------
         selector : `matplotlib.widgets.RectangleSelector`
-            The Matplotlib selector.
+            The matplotlib selector.
 
         Notes
         -----
-        Once a selector has been created, you will need to keep a reference to
-        it until you no longer need it. In addition, you can enable/disable the
-        selector at any point by calling ``selector.set_active(True)`` or
-        ``selector.set_active(False)``.
+        Once a selector has been created, you will need to keep a
+        reference to it until you no longer need it. In addition,
+        you can enable/disable the selector at any point by calling
+        ``selector.set_active(True)`` or ``selector.set_active(False)``.
         """
-
         from matplotlib.widgets import RectangleSelector
 
         if hasattr(self, '_mpl_selector'):
@@ -272,9 +272,8 @@ class RectanglePixelRegion(PixelRegion):
     @property
     def corners(self):
         """
-        Return the x, y coordinate pairs that define the corners
+        Return the x, y coordinate pairs that define the corners.
         """
-
         corners = [(-self.width / 2, -self.height / 2),
                    (self.width / 2, -self.height / 2),
                    (self.width / 2, self.height / 2),
@@ -288,7 +287,7 @@ class RectanglePixelRegion(PixelRegion):
 
     def to_polygon(self):
         """
-        Return a 4-cornered polygon equivalent to this rectangle
+        Return a 4-sided polygon equivalent to this rectangle.
         """
         x, y = self.corners.T
         vertices = PixCoord(x=x, y=y)
@@ -297,11 +296,13 @@ class RectanglePixelRegion(PixelRegion):
 
     def _lower_left_xy(self):
         """
-        Compute lower left `xy` position.
+        Compute lower left ``xy`` pixel position.
 
-        This is used for the conversion to matplotlib in ``as_artist``
+        This is used for the conversion to matplotlib in ``as_artist``.
 
-        Taken from http://photutils.readthedocs.io/en/latest/_modules/photutils/aperture/rectangle.html#RectangularAperture.plot
+        Taken from
+        http://photutils.readthedocs.io/en/latest/_modules/photutils/ape
+        rture/rectangle.html#RectangularAperture.plot.
         """
         hw = self.width / 2.
         hh = self.height / 2.
@@ -314,21 +315,22 @@ class RectanglePixelRegion(PixelRegion):
         return x, y
 
     def rotate(self, center, angle):
-        """Make a rotated region.
+        """
+        Rotate the region.
 
-        Rotates counter-clockwise for positive ``angle``.
+        Postive ``angle`` corresponds to counter-clockwise rotation.
 
         Parameters
         ----------
-        center : `PixCoord`
-            Rotation center point
+        center : `~regions.PixCoord`
+            The rotation center point.
         angle : `~astropy.coordinates.Angle`
-            Rotation angle
+            The rotation angle.
 
         Returns
         -------
         region : `RectanglePixelRegion`
-            Rotated region (an independent copy)
+            The rotated region (which is an independent copy).
         """
         center = self.center.rotate(center, angle)
         angle = self.angle + angle
@@ -344,18 +346,20 @@ class RectangleSkyRegion(SkyRegion):
     center : `~astropy.coordinates.SkyCoord`
         The position of the center of the rectangle.
     width : `~astropy.units.Quantity`
-        The width of the rectangle (before rotation) as an angle
+        The width of the rectangle (before rotation) as an angle.
     height : `~astropy.units.Quantity`
-        The height of the rectangle (before rotation) as an angle
+        The height of the rectangle (before rotation) as an angle.
     angle : `~astropy.units.Quantity`, optional
-        The rotation angle of the rectangle, measured anti-clockwise. If set to
-        zero (the default), the width axis is lined up with the longitude axis
-        of the celestial coordinates.
-    meta : `~regions.RegionMeta` object, optional
-        A dictionary which stores the meta attributes of this region.
-    visual : `~regions.RegionVisual` object, optional
-        A dictionary which stores the visual meta attributes of this region.
+        The rotation angle of the rectangle, measured anti-clockwise. If
+        set to zero (the default), the width axis is lined up with the
+        longitude axis of the celestial coordinates.
+    meta : `~regions.RegionMeta`, optional
+        A dictionary that stores the meta attributes of this region.
+    visual : `~regions.RegionVisual`, optional
+        A dictionary that stores the visual meta attributes of this
+        region.
     """
+
     _params = ('center', 'width', 'height', 'angle')
     center = ScalarSky('center')
     width = QuantityLength('width')
