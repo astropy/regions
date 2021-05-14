@@ -1,4 +1,7 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
+"""
+The module provides several custom descriptor classes for attribute validation of region classes.  It also contains RegionMeta and RegionVisual classes to handle meta data of regions.
+"""
 
 import abc
 
@@ -11,12 +14,6 @@ from .pixcoord import PixCoord
 from .core import PixelRegion, SkyRegion
 
 __all__ = ['RegionMeta', 'RegionVisual']
-
-"""
-Several custom descriptor classes are present here for attribute validation of
-region classes.
-Also, contains RegionMeta and RegionVisual classes to handle meta data of regions.
-"""
 
 
 class RegionAttr(abc.ABC):
@@ -43,7 +40,7 @@ class RegionAttr(abc.ABC):
 
 class ScalarPix(RegionAttr):
     """
-    Descriptor class for `~regions.PixelRegion` which takes a scalar
+    Descriptor class for `~regions.PixelRegion`, which takes a scalar
     `~regions.PixCoord` object.
     """
 
@@ -54,8 +51,8 @@ class ScalarPix(RegionAttr):
 
 class OneDPix(RegionAttr):
     """
-    Descriptor class for `~regions.PixelRegion` which takes a one dimensional
-    `regions.PixCoord` object.
+    Descriptor class for `~regions.PixelRegion`, which takes a one
+    dimensional `regions.PixCoord` object.
     """
 
     def _validate(self, value):
@@ -66,7 +63,7 @@ class OneDPix(RegionAttr):
 
 class ScalarLength(RegionAttr):
     """
-    Descriptor class for `~regions.PixelRegion` which takes a scalar
+    Descriptor class for `~regions.PixelRegion`, which takes a scalar
     python/numpy number.
     """
 
@@ -78,7 +75,7 @@ class ScalarLength(RegionAttr):
 
 class ScalarSky(RegionAttr):
     """
-    Descriptor class for `~regions.SkyRegion` which takes a scalar
+    Descriptor class for `~regions.SkyRegion`, which takes a scalar
     `~astropy.coordinates.SkyCoord` object.
     """
 
@@ -90,8 +87,8 @@ class ScalarSky(RegionAttr):
 
 class OneDSky(RegionAttr):
     """
-    Descriptor class for `~regions.SkyRegion` which takes a one dimensional
-    `~astropy.coordinates.SkyCoord` object.
+    Descriptor class for `~regions.SkyRegion`, which takes a one
+    dimensional `~astropy.coordinates.SkyCoord` object.
     """
 
     def _validate(self, value):
@@ -102,7 +99,7 @@ class OneDSky(RegionAttr):
 
 class QuantityLength(RegionAttr):
     """
-    Descriptor class for `~regions.SkyRegion`  which takes a scalar
+    Descriptor class for `~regions.SkyRegion`, which takes a scalar
     `~astropy.units.Quantity` object.
     """
 
@@ -113,7 +110,7 @@ class QuantityLength(RegionAttr):
 
 class CompoundRegionPix(RegionAttr):
     """
-    Descriptor class for `~regions.CompoundPixelRegion` which takes a
+    Descriptor class for `~regions.CompoundPixelRegion`, which takes a
     `~regions.PixelRegion` object.
     """
 
@@ -124,7 +121,7 @@ class CompoundRegionPix(RegionAttr):
 
 class CompoundRegionSky(RegionAttr):
     """
-    Descriptor class is for `~regions.CompoundSkyRegion` which takes a
+    Descriptor class is for `~regions.CompoundSkyRegion`, which takes a
     `~regions.SkyRegion` object.
     """
 
@@ -136,7 +133,6 @@ class CompoundRegionSky(RegionAttr):
 class Meta(dict):
 
     def __init__(self, seq=None, **kwargs):
-
         super().__init__()
 
         if seq:
@@ -166,22 +162,23 @@ class Meta(dict):
 
 class RegionMeta(Meta):
     """
-    A python dictionary subclass which holds the meta attributes of the region.
+    A dictionary subclass that holds the meta attributes of the region.
     """
+
     valid_keys = ['label', 'include', 'frame', 'range', 'veltype',
-                  'restfreq', 'tag', 'comment', 'line', 'name',
-                  'select', 'highlite', 'fixed', 'edit', 'move', 'rotate',
-                  'delete', 'source', 'background', 'corr', 'type',
-                  'text'
-                  ]
+                  'restfreq', 'tag', 'comment', 'line', 'name', 'select',
+                  'highlite', 'fixed', 'edit', 'move', 'rotate', 'delete',
+                  'source', 'background', 'corr', 'type', 'text']
 
     key_mapping = {}
 
 
 class RegionVisual(Meta):
     """
-    A python dictionary subclass which holds the visual attributes of the region.
+    A dictionary subclass which holds the visual attributes of the
+    region.
     """
+
     valid_keys = ['color', 'dash', 'font', 'dashlist', 'symsize', 'symthick',
                   'symbol', 'fontsize', 'fontstyle', 'usetex', 'labelpos',
                   'labeloff', 'linewidth', 'linestyle', 'fill', 'line',
