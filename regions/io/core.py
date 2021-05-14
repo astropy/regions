@@ -155,8 +155,7 @@ class ShapeList(list):
                 radunitstr = '"'
             else:
                 raise ValueError(
-                    'Radius unit arcsec not valid for coordsys {}'.format(
-                        coordsys))
+                    f'Radius unit arcsec not valid for coordsys {coordsys}')
         else:
             radunitstr = radunit
 
@@ -166,7 +165,7 @@ class ShapeList(list):
 
         # CASA does not support global coordinate specification, even though the
         # documentation for the specification explicitly states that it does.
-        output += 'global coord={}\n'.format(coordsys_mapping['CRTF'][coordsys.lower()])
+        output += f"global coord={coordsys_mapping['CRTF'][coordsys.lower()]}\n"
 
         for shape in self:
 
@@ -181,7 +180,7 @@ class ShapeList(list):
             include += "ann " if shape.meta.get('type', 'reg') == 'ann' else ""
 
             if shape.meta.get('label', "") != "":
-                shape.meta['label'] = "'{}'".format(shape.meta['label'])
+                shape.meta['label'] = f"'{shape.meta['label']}'"
             meta_str = ", ".join(f"{key}={val}" for key, val in
                                  shape.meta.items() if
                                  key not in ('include', 'comment', 'symbol',
@@ -194,19 +193,19 @@ class ShapeList(list):
             shape_coordsys = getattr(shape, 'coordsys')
             if shape_coordsys.lower() != coordsys.lower():
                 if meta_str.strip():
-                    meta_str = "coord={}, ".format(coordsys_mapping['CRTF'][coordsys.lower()]) + meta_str
+                    meta_str = f"coord={coordsys_mapping['CRTF'][coordsys.lower()]}, " + meta_str
                 else:
                     # if there is no metadata at all (above), the trailing comma is incorrect
-                    meta_str = "coord={}".format(coordsys_mapping['CRTF'][coordsys.lower()])
+                    meta_str = f"coord={coordsys_mapping['CRTF'][coordsys.lower()]}"
 
             if 'comment' in shape.meta:
                 meta_str += ", " + shape.meta['comment']
             if 'range' in shape.meta:
                 shape.meta['range'] = [str(str(x).replace(" ", "")) for x in
                                        shape.meta['range']]
-                meta_str += ", range={}".format(shape.meta['range']).replace("'", "")
+                meta_str += f", range={shape.meta['range']}".replace("'", "")
             if 'corr' in shape.meta:
-                meta_str += ", corr={}".format(shape.meta['corr']).replace("'", "")
+                meta_str += f", corr={shape.meta['corr']}".replace("'", "")
 
             coord = []
             if coordsys not in ['image', 'physical']:
@@ -319,14 +318,14 @@ class ShapeList(list):
                 shape.meta['point'] = valid_symbols_reverse[shape.meta['point']]
 
             if 'symsize' in shape.meta:
-                shape.meta['point'] += " {}".format(shape.meta.pop('symsize'))
+                shape.meta['point'] += f" {shape.meta.pop('symsize')}"
 
             meta_str = " ".join(f"{key}={val}" for key, val in
                                 shape.meta.items() if key not in ('include', 'tag', 'comment', 'font', 'text'))
             if 'tag' in shape.meta:
                 meta_str += " " + " ".join([f"tag={tag}" for tag in shape.meta['tag']])
             if 'font' in shape.meta:
-                meta_str += " " + 'font="{}"'.format(shape.meta['font'])
+                meta_str += " " + f"font=\"{shape.meta['font']}\""
             if shape.meta.get('text', '') != '':
                 meta_str += " " + 'text={' + shape.meta['text'] + '}'
             if 'comment' in shape.meta:
@@ -528,13 +527,13 @@ class Shape:
 
     def __str__(self):
         ss = self.__class__.__name__
-        ss += '\nType : {}'.format(self.meta.get('type', 'reg'))
-        ss += f'\nCoord sys : {self.coordsys}'
-        ss += f'\nRegion type : {self.region_type}'
+        ss += f"\nType: {self.meta.get('type', 'reg')}"
+        ss += f'\nCoord sys: {self.coordsys}'
+        ss += f'\nRegion type: {self.region_type}'
         if self.region_type == 'symbol':
-            ss += '\nSymbol : {}'.format(self.meta['symbol'])
+            ss += f"\nSymbol: {self.meta['symbol']}"
         if self.region_type == 'text':
-            ss += '\nText : {}'.format(self.meta['text'])
+            ss += f"\nText: {self.meta['text']}"
         ss += f'\nMeta: {self.meta}'
         ss += f'\nComposite: {self.composite}'
         ss += f'\nInclude: {self.include}'

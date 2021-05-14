@@ -81,8 +81,7 @@ class ScalarSky(RegionAttr):
 
     def _validate(self, value):
         if not (isinstance(value, SkyCoord) and value.isscalar):
-            raise ValueError('The {} must be a 0D SkyCoord object'.
-                             format(self.name))
+            raise ValueError(f'The {self.name} must be a 0D SkyCoord object')
 
 
 class OneDSky(RegionAttr):
@@ -93,8 +92,7 @@ class OneDSky(RegionAttr):
 
     def _validate(self, value):
         if not (isinstance(value, SkyCoord) and value.ndim == 1):
-            raise ValueError('The {} must be a 1D SkyCoord object'.
-                             format(self.name))
+            raise ValueError(f'The {self.name} must be a 1D SkyCoord object')
 
 
 class QuantityLength(RegionAttr):

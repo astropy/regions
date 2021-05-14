@@ -78,8 +78,7 @@ class FITSRegionParser:
 
         for col in self.table.colnames:
             if col not in self.valid_columns:
-                self._raise_error("This table has an invalid column name: '{}'"
-                                  .format(col))
+                self._raise_error(f"This table has an invalid column name: '{col}'")
             else:
                 self.unit[col] = self.table[col].unit
 
@@ -137,8 +136,7 @@ class FITSRegionRowParser():
         if region_type in language_spec:
             self.region_type = region_type
         else:
-            self._raise_error("'{}' is not a valid FITS Region type"
-                              .format(region_type))
+            self._raise_error(f"'{region_type}' is not a valid FITS Region type")
 
         self.component = str(self.row['COMPONENT'])
 
@@ -165,8 +163,7 @@ class FITSRegionRowParser():
                 return val, unit
         except KeyError:
             if default is None:
-                self._raise_error("The column: '{}' is missing in the table"
-                                  .format(colname))
+                self._raise_error(f"The column: '{colname}' is missing in the table")
             else:
                 return default
 
