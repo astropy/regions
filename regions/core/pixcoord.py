@@ -97,6 +97,9 @@ class PixCoord:
         return f'{self.__class__.__name__}(x={self.x}, y={self.y})'
 
     def __len__(self):
+        if self.isscalar:
+            raise TypeError(f'Scalar {self.__class__.__name__!r} object has '
+                            'no len()')
         return len(self.x)
 
     def __iter__(self):
