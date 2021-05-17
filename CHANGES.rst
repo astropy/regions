@@ -51,6 +51,9 @@ Bug Fixes
 - Fixed an issue in the DS9 parser where uppercase coordinate frames
   would fail. [#237]
 
+- Fixed an issue where the CRTF file parser would fail if the CRTF
+  version number was included on the first line. [#240]
+
 API Changes
 -----------
 

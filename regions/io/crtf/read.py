@@ -14,7 +14,7 @@ from ..core import Shape, ShapeList, reg_mapping
 __all__ = ['read_crtf', 'CRTFParser', 'CRTFRegionParser']
 
 # All CASA files start with '#CRTF' . It may also include the version number like '#CRTFv0' .
-regex_begin = re.compile(r'^#CRTFv?[\d]?$')
+regex_begin = re.compile(r'^#CRTFv?[\d]?')
 
 # Comment Format :
 regex_comment = re.compile(r'^#.*$')
