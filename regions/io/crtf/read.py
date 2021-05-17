@@ -33,10 +33,10 @@ regex_meta = re.compile(r'(?:(\w+)\s*=[\s\'\"]*([^,\[\]]+?)[\'\",]+)|(?:(\w+)\s*
 
 # Region format which segregates include('+'|'-') parameter, kind of definition ('ann' for annotations | '' for regions)
 # and region type.
-regex_region = re.compile(r'(?P<include>[+-])?(?P<type>ann(?=\s))?\s*(?P<regiontype>[a-z]*?)\[[^=]*]')
+regex_region = re.compile(r'(?P<include>[+-])?(?P<type>ann(?=\s))?\s*(?P<regiontype>[a-z]*?)\s?\[[^=]*]')
 
 # Line format which checks the validity of the line and segregates the meta attributes from the region format.
-regex_line = re.compile(r'(?P<region>[+-]?(?:ann(?=\s))?\s*[a-z]+?\[[^=]+\])(?:\s*[,]\s*(?P<parameters>.*))?')
+regex_line = re.compile(r'(?P<region>[+-]?(?:ann(?=\s))?\s*[a-z]+?\s?\[[^=]+\])(?:\s*[,]\s*(?P<parameters>.*))?')
 
 
 def read_crtf(filename, errors='strict'):

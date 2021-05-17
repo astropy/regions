@@ -176,3 +176,13 @@ def test_crtf_header():
     assert reg.center.dec.unit == 'deg'
     assert reg.radius.value == 3.0
     assert reg.radius.unit == 'deg'
+
+
+def test_space_after_regname():
+    """
+    Regression test for #271: space is allowed
+    """
+    reg_str = 'circle [[42deg, 43deg], 3deg], coord=J2000, color=green'
+    parser = CRTFParser(reg_str)
+    reg = parser.shapes.to_regions()[0]
+    assert isinstance(reg, CircleSkyRegion)
