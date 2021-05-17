@@ -170,15 +170,16 @@ class DS9Parser:
     radius: 40.0
     """
 
-    # List of valid coordinate system
-    coordinate_systems = ['fk5', 'fk4', 'icrs', 'galactic', 'wcs', 'physical', 'image', 'ecliptic', 'J2000']
+    # List of valid coordinate system (all lowercase)
+    coordinate_systems = ['fk5', 'fk4', 'icrs', 'galactic', 'wcs',
+                          'physical', 'image', 'ecliptic', 'j2000']
     coordinate_systems += [f'wcs{letter}' for letter in string.ascii_lowercase]
 
     # Map to convert coordinate system names
     coordsys_mapping = dict(zip(coordinates.frame_transform_graph.get_names(),
                                 coordinates.frame_transform_graph.get_names()))
     coordsys_mapping['ecliptic'] = 'geocentrictrueecliptic'
-    coordsys_mapping['J2000'] = 'fk5'
+    coordsys_mapping['j2000'] = 'fk5'
 
     def __init__(self, region_string, errors='strict'):
         if errors not in ('strict', 'ignore', 'warn'):
