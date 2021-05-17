@@ -11,6 +11,7 @@ from ..read import CRTFParser, read_crtf
 from ..write import crtf_objects_to_string
 from ..core import CRTFRegionParserError
 
+from ....shapes.circle import CircleSkyRegion
 from ....shapes.ellipse import EllipseSkyRegion
 
 _ASTROPY_MINVERSION = vers.LooseVersion('1.1')
@@ -158,3 +159,20 @@ def test_file_crtf(filename):
 
     for split_line in desired_lines:
         assert split_line in actual_lines
+
+
+def test_crtf_header():
+    """
+    Regression test for issue #239.
+    """
+    crtf_str = ('#CRTFv0 CASA Region Text Format version 0\n'
+                'circle[[42deg, 43deg], 3deg], coord=J2000, color=green')
+    parser = CRTFParser(crtf_str)
+    reg = parser.shapes.to_regions()[0]
+    assert isinstance(reg, CircleSkyRegion)
+    assert reg.center.ra.value == 42.0
+    assert reg.center.ra.unit == 'deg'
+    assert reg.center.dec.value == 43.0
+    assert reg.center.dec.unit == 'deg'
+    assert reg.radius.value == 3.0
+    assert reg.radius.unit == 'deg'
