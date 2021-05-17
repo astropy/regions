@@ -163,8 +163,11 @@ as well as a cutout with the data multiplied by the mask::
     >>> weighted_data = mask.multiply(hdu.data)
     >>> pf.close()
 
+Note that ``weighted_data`` will have zeros where the mask is zero; it therefore
+should not be used to compute statistics.  See `Masked Statistics` below.
+
 We can take a look at the results to make sure the source overlaps
-with the aperture::
+with the aperture:
 
 .. doctest-skip::
 
@@ -240,6 +243,9 @@ at the extent of the mask in the image:
    :nofigs:
 
     pf.close()
+
+Masked Statistics
+`````````````````
 
 Finally, we can use the mask and data values to compute weighted
 statistics::
