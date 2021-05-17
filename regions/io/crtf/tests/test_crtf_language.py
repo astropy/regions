@@ -1,33 +1,30 @@
-import distutils.version as vers
 import pytest
 
-
-import astropy.version as astrov
+from astropy.coordinates import SkyCoord
+import astropy.units as u
 from astropy.utils.data import get_pkg_data_filename
 
-from astropy import coordinates, units as u
-
+from ..core import CRTFRegionParserError
 from ..read import CRTFParser, read_crtf
 from ..write import crtf_objects_to_string
-from ..core import CRTFRegionParserError
-
 from ....shapes.circle import CircleSkyRegion
 from ....shapes.ellipse import EllipseSkyRegion
 
-_ASTROPY_MINVERSION = vers.LooseVersion('1.1')
-_ASTROPY_VERSION = vers.LooseVersion(astrov.version)
 
-implemented_region_types = ('ellipse', 'circle', 'rectangle', 'poly', 'point', 'text', 'symbol')
+implemented_region_types = ('ellipse', 'circle', 'rectangle', 'poly', 'point',
+                            'text', 'symbol')
 
 
 def test_global_parser():
     """
     Checks that the global_parser does what's expected.
     """
-    global_test_str = "global coord=B1950_VLA, frame=BARY, corr=[I, Q], color=blue"
+    global_test_str = ("global coord=B1950_VLA, frame=BARY, corr=[I, Q], "
+                       "color=blue")
     global_parser = CRTFParser(global_test_str)
-    assert dict(global_parser.global_meta) == {'coord': 'B1950_VLA', 'frame': 'BARY',
-                                               'corr': ['I', 'Q'], 'color': 'blue'}
+    expected = {'coord': 'B1950_VLA', 'frame': 'BARY',
+                'corr': ['I', 'Q'], 'color': 'blue'}
+    assert dict(global_parser.global_meta) == expected
 
 
 def test_valid_crtf_line():
@@ -58,12 +55,10 @@ def test_valid_global_meta_key():
     """
     Checks whether the global key is valid or not.
     """
-
-    global_test_str = "global label=B1950_VLA, frame=BARY, corr=[I, Q], color=blue"
-
+    global_test_str = ("global label=B1950_VLA, frame=BARY, corr=[I, Q], "
+                       "color=blue")
     with pytest.raises(CRTFRegionParserError) as excinfo:
         CRTFParser(global_test_str)
-
     assert "'label' is not a valid global meta key" in str(excinfo.value)
 
 
@@ -71,12 +66,10 @@ def test_valid_meta_key():
     """
     Checks whether the key is valid or not.
     """
-
-    meta_test_str = "annulus[[17h51m03.2s, -45d17m50s], [0.10deg, 4.12deg]], hello='My label here'"
-
+    meta_test_str = ("annulus[[17h51m03.2s, -45d17m50s], [0.10deg, 4.12deg]], "
+                     "hello='My label here'")
     with pytest.raises(CRTFRegionParserError) as excinfo:
         CRTFParser(meta_test_str)
-
     assert "'hello' is not a valid meta key" in str(excinfo.value)
 
 
@@ -84,65 +77,52 @@ def test_valid_region_syntax():
     """
     Checks whether the region has valid parameters
     """
-
     reg_str1 = "circle[[18h12m24s, -23d11m00s], [2.3arcsec,4.5arcsec]"
-
     with pytest.raises(CRTFRegionParserError) as excinfo:
         CRTFParser(reg_str1)
+    assert ("Not in proper format: ('2.3arcsec', '4.5arcsec') should be "
+            "a single length" in str(excinfo.value))
 
-    assert "Not in proper format: ('2.3arcsec', '4.5arcsec') should be a single length" in str(excinfo.value)
-
-    reg_str2 = "symbol[[32.1423deg, 12.1412deg], 12deg], linewidth=2, coord=J2000, symsize=2"
-
+    reg_str2 = ("symbol[[32.1423deg, 12.1412deg], 12deg], linewidth=2, "
+                "coord=J2000, symsize=2")
     with pytest.raises(CRTFRegionParserError) as excinfo:
         CRTFParser(reg_str2)
-
-    assert "Not in proper format: '12deg' should be a symbol" in str(excinfo.value)
+    assert ("Not in proper format: '12deg' should be a symbol" in
+            str(excinfo.value))
 
     reg_str3 = "circle[[18h12m24s, -23d11m00s]"
-
     with pytest.raises(CRTFRegionParserError) as excinfo:
         CRTFParser(reg_str3)
+    assert ("Does not contain expected number of parameters for the region "
+            "'circle'" in str(excinfo.value))
 
-    assert "Does not contain expected number of parameters for the region 'circle'" in str(excinfo.value)
-
-    reg_str4 = "poly[[1, 2], [3,4], [5, 6]]"
-
+    reg_str4 = "poly[[1, 2]]"
     with pytest.raises(CRTFRegionParserError) as excinfo:
         CRTFParser(reg_str4)
-
-    assert "polygon should have > 4 coordinates" in str(excinfo.value)
-
-    reg_str5 = "poly[[1, 2], [3,4], [5, 6],[1,6]]"
-
-    with pytest.raises(CRTFRegionParserError) as excinfo:
-        CRTFParser(reg_str5)
-
-    assert "In polygon, the last and first coordinates should be same" in str(excinfo.value)
+    assert "polygon should have >= 2 coordinates" in str(excinfo.value)
 
     reg_str6 = "rotbox[[12h01m34.1s, 12d23m33s], [3arcmin,], 12deg]"
-
     with pytest.raises(CRTFRegionParserError) as excinfo:
         CRTFParser(reg_str6)
-
     assert "('3arcmin', '') should be a pair of length" in str(excinfo.value)
+
 
 def test_issue_312_regression():
     """
-    Make sure there is no trailing comma when writing a CRTF string with no metadata
+    Make sure there is no trailing comma when writing a CRTF string with
+    no metadata.
     """
-    reg = EllipseSkyRegion(center=coordinates.SkyCoord(279.174990*u.deg,
-                                                       -21.257123*u.deg,
-                                                       frame='fk5'),
-                           width=0.001571*u.deg, height=0.001973*u.deg,
-                           angle=111.273322*u.deg)
+    reg = EllipseSkyRegion(center=SkyCoord(279.174990 * u.deg,
+                                           -21.257123 * u.deg, frame='fk5'),
+                           width=0.001571 * u.deg, height=0.001973 * u.deg,
+                           angle=111.273322 * u.deg)
     crtfstr = crtf_objects_to_string([reg], 'fk5', '.6f', 'deg')
     assert crtfstr.strip()[-1] != ','
 
 
-@pytest.mark.parametrize('filename', ['data/CRTFgeneral.crtf', 'data/CRTFgeneraloutput.crtf'])
+@pytest.mark.parametrize('filename', ['data/CRTFgeneral.crtf',
+                                      'data/CRTFgeneraloutput.crtf'])
 def test_file_crtf(filename):
-
     filename = get_pkg_data_filename(filename)
     regs = read_crtf(filename, 'warn')
     actual_output = crtf_objects_to_string(regs, 'fk4', '.3f').strip()
