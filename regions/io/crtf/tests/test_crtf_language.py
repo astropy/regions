@@ -106,19 +106,11 @@ def test_valid_region_syntax():
 
     assert "Does not contain expected number of parameters for the region 'circle'" in str(excinfo.value)
 
-    reg_str4 = "poly[[1, 2], [3,4], [5, 6]]"
-
+    reg_str4 = "poly[[1, 2]]"
     with pytest.raises(CRTFRegionParserError) as excinfo:
         CRTFParser(reg_str4)
+    assert "polygon should have >= 2 coordinates" in str(excinfo.value)
 
-    assert "polygon should have > 4 coordinates" in str(excinfo.value)
-
-    reg_str5 = "poly[[1, 2], [3,4], [5, 6],[1,6]]"
-
-    with pytest.raises(CRTFRegionParserError) as excinfo:
-        CRTFParser(reg_str5)
-
-    assert "In polygon, the last and first coordinates should be same" in str(excinfo.value)
 
     reg_str6 = "rotbox[[12h01m34.1s, 12d23m33s], [3arcmin,], 12deg]"
 
