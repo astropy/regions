@@ -48,6 +48,9 @@ Bug Fixes
 - A ``ValueError`` is now raised when calling ``BoundingBox.slices``
   when ``ixmin`` or ``iymin`` is negative. [#347]
 
+- Fixed an issue in the DS9 parser where uppercase coordinate frames
+  would fail. [#237]
+
 API Changes
 -----------
 

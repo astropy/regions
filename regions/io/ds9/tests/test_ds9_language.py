@@ -215,6 +215,20 @@ def test_issue65_regression():
     assert reg.radius.value == 1.0
 
 
+def test_frame_uppercase():
+    """
+    Regression test for issue #236 (PR #237)
+    """
+    regstr = ('GALACTIC\ncircle(188.5557102,12.0314056,7.1245) # '
+              'text={This message has both ' 'a " and : in it} textangle=30')
+    parser = DS9Parser(regstr)
+    regions = parser.shapes
+    reg = regions[0].to_region()
+    assert reg.center.l.value == 188.5557102
+    assert reg.center.b.value == 12.0314056
+    assert reg.radius.value == 7.1245
+
+
 def test_pixel_angle():
     """
     Checks whether angle in PixelRegions is a u.Quantity object.
