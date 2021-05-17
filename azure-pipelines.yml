@@ -46,10 +46,6 @@ jobs:
     - linux32: py36-test-astropy32-cov
     - windows: py36-test-astropy40-cov
 
-    # Documentation builds
-    - linux: build_docs
-    - windows: build_docs
-
 - template: publish.yml@OpenAstronomy
   parameters:
     test_command: pytest -p no:warnings --pyargs regions
