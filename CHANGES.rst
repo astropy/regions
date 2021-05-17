@@ -54,6 +54,9 @@ Bug Fixes
 - Fixed an issue where the CRTF file parser would fail if the CRTF
   version number was included on the first line. [#240]
 
+- Fixed an issue where the CRTF file parser would fail if there was a
+  space after the region name. [#271]
+
 API Changes
 -----------
 
