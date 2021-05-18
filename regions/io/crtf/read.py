@@ -346,8 +346,8 @@ class CRTFRegionParser:
         coord_list = []
 
         if self.region_type == 'poly':
-            if len(coord_list_str) < 2:
-                self._raise_error(f'Not in proper format: {self.reg_str} polygon should have >= 2 coordinates')
+            if len(coord_list_str) < 3:
+                self._raise_error(f'Not in proper format: {self.reg_str} polygon should have >= 3 coordinates')
         else:
             if len(coord_list_str) != len(self.language_spec[self.region_type]):
                 self._raise_error(f"Not in proper format: '{self.reg_str}'. "

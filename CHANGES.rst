@@ -58,7 +58,8 @@ Bug Fixes
   space after the region name. [#271]
 
 - Fixed an issue where the CRTF file parser was too restrictive about
-  requiring the last and first poly coordinates to be the same. [#359]
+  requiring the last and first poly coordinates to be the same.
+  [#359, #362]
 
 API Changes
 -----------
