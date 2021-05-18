@@ -76,6 +76,19 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
                                  angle=90. * u.deg)
         assert reg.bounding_box.shape == (a, b)
 
+    def test_region_bbox_zero_size(self):
+        reg = EllipsePixelRegion(PixCoord(50, 50), width=0, height=0,
+                                 angle=0. * u.deg)
+        assert reg.bounding_box.shape == (1, 1)
+
+        reg = EllipsePixelRegion(PixCoord(50, 50), width=10, height=0,
+                                 angle=0. * u.deg)
+        assert reg.bounding_box.shape == (1, 11)
+
+        reg = EllipsePixelRegion(PixCoord(50, 50), width=0, height=10,
+                                 angle=0. * u.deg)
+        assert reg.bounding_box.shape == (11, 1)
+
     def test_rotate(self):
         reg = self.reg.rotate(PixCoord(2, 3), 90 * u.deg)
         assert_allclose(reg.center.xy, (1, 4))
