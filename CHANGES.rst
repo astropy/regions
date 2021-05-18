@@ -61,6 +61,10 @@ Bug Fixes
   requiring the last and first poly coordinates to be the same.
   [#359, #362]
 
+- Fixed a bug where an ``EllipsePixelRegion`` with zero height and/or
+  width would raise a ``ValueError`` when creating a ``RegionMask``.
+  [#363]
+
 API Changes
 -----------
 
