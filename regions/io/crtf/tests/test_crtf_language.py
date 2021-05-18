@@ -166,3 +166,16 @@ def test_space_after_regname():
     parser = CRTFParser(reg_str)
     reg = parser.shapes.to_regions()[0]
     assert isinstance(reg, CircleSkyRegion)
+
+
+def test_no_comma_after_region():
+    reg_str = 'circle [[42deg, 43deg], 3deg] coord=J2000, color=green'
+    parser = CRTFParser(reg_str)
+    reg = parser.shapes.to_regions()[0]
+    assert isinstance(reg, CircleSkyRegion)
+    assert reg.center.ra.value == 42.0
+    assert reg.center.ra.unit == 'deg'
+    assert reg.center.dec.value == 43.0
+    assert reg.center.dec.unit == 'deg'
+    assert reg.radius.value == 3.0
+    assert reg.radius.unit == 'deg'
