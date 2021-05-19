@@ -65,6 +65,9 @@ Bug Fixes
   width would raise a ``ValueError`` when creating a ``RegionMask``.
   [#363]
 
+- Fixed parsing CRTF regions files that do not have a comma after the
+  region. [#364]
+
 API Changes
 -----------
 
