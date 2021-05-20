@@ -615,7 +615,7 @@ class Shape:
         viz_keywords = ['color', 'dash', 'dashlist', 'width', 'font', 'symsize',
                         'symbol', 'symsize', 'fontsize', 'fontstyle', 'usetex',
                         'labelpos', 'labeloff', 'linewidth', 'linestyle',
-                        'point', 'textangle', 'fontweight']
+                        'point', 'textangle', 'fontweight', 'symthick']
 
         if isinstance(coords[0], SkyCoord):
             reg = self.shape_to_sky_region[self.region_type](*coords)
