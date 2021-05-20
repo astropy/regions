@@ -107,7 +107,7 @@ class PointPixelRegion(PixelRegion):
         """
         from matplotlib.lines import Line2D
 
-        mpl_params = self.mpl_properties_default('LINE2D')
+        mpl_params = self.mpl_properties_default('Line2D')
         mpl_params.update(kwargs)
 
         point = Line2D([self.center.x - origin[0]], [self.center.y - origin[1]],
