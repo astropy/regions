@@ -68,6 +68,8 @@ Bug Fixes
 - Fixed parsing CRTF regions files that do not have a comma after the
   region. [#364]
 
+- Fixed parsing CRTF regions files contain a ``symthick`` value. [#365]
+
 API Changes
 -----------
 

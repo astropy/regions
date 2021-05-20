@@ -179,3 +179,9 @@ def test_no_comma_after_region():
     assert reg.center.dec.unit == 'deg'
     assert reg.radius.value == 3.0
     assert reg.radius.unit == 'deg'
+
+
+def test_casa_file_crtf():
+    filename = get_pkg_data_filename('data/CRTF_CARTA.crtf')
+    regions = read_crtf(filename)
+    assert len(regions) == 2
