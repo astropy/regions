@@ -1,5 +1,6 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-"""Region utilities.
+"""
+This subpackage provides general-purpose utility functions.
 """
 
-from .wcs_helpers import *
+from .wcs_helpers import *  # noqa
