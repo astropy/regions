@@ -3,11 +3,12 @@ import numpy as np
 from astropy import units as u
 
 from astropy.coordinates import Angle
+import astropy.units as u
 from astropy.wcs.utils import pixel_to_skycoord
 
 from ..core import PixCoord, PixelRegion, SkyRegion, RegionMask, BoundingBox
 from .._geometry import rectangular_overlap_grid
-from .._utils.wcs_helpers import skycoord_to_pixel_scale_angle
+from .._utils.wcs_helpers import pixel_scale_angle_at_skycoord
 from ..core.attributes import ScalarPix, ScalarLength, QuantityLength, ScalarSky
 from .polygon import PolygonPixelRegion
 
@@ -95,13 +96,12 @@ class RectanglePixelRegion(PixelRegion):
             return np.logical_not(in_rect)
 
     def to_sky(self, wcs):
-        # TODO: write a pixel_to_skycoord_scale_angle
         center = pixel_to_skycoord(self.center.x, self.center.y, wcs)
-        _, scale, north_angle = skycoord_to_pixel_scale_angle(center, wcs)
-        width = Angle(self.width / scale, 'deg')
-        height = Angle(self.height / scale, 'deg')
-        return RectangleSkyRegion(center, width, height,
-                                  angle=self.angle - (north_angle - 90 * u.deg),
+        _, pixscale, north_angle = pixel_scale_angle_at_skycoord(center, wcs)
+        width = Angle(self.width * u.pix * pixscale, 'arcsec')
+        height = Angle(self.height * u.pix * pixscale, 'arcsec')
+        angle = self.angle - (north_angle - 90 * u.deg)
+        return RectangleSkyRegion(center, width, height, angle=angle,
                                   meta=self.meta, visual=self.visual)
 
     @property
@@ -377,11 +377,12 @@ class RectangleSkyRegion(SkyRegion):
         self.visual = visual or {}
 
     def to_pixel(self, wcs):
-        center, scale, north_angle = skycoord_to_pixel_scale_angle(self.center, wcs)
+        center, pixscale, north_angle = pixel_scale_angle_at_skycoord(
+            self.center, wcs)
         # FIXME: The following line is needed to get a scalar PixCoord
         center = PixCoord(float(center.x), float(center.y))
-        width = self.width.to('deg').value * scale
-        height = self.height.to('deg').value * scale
-        return RectanglePixelRegion(center, width, height,
-                                    angle=self.angle + (north_angle - 90 * u.deg),
+        width = (self.width / pixscale).to(u.pix).value
+        height = (self.height / pixscale).to(u.pix).value
+        angle = self.angle + (north_angle - 90 * u.deg)
+        return RectanglePixelRegion(center, width, height, angle=angle,
                                     meta=self.meta, visual=self.visual)

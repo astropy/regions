@@ -10,7 +10,7 @@ from regions import RegionVisual
 from regions.core.attributes import QuantityLength
 from regions.core.attributes import ScalarPix, ScalarLength
 from regions.core.attributes import ScalarSky
-from .._utils.wcs_helpers import skycoord_to_pixel_scale_angle
+from .._utils.wcs_helpers import pixel_scale_angle_at_skycoord
 from ..core import PixelRegion, SkyRegion, PixCoord
 from ..shapes.circle import CirclePixelRegion
 from ..shapes.ellipse import EllipsePixelRegion, EllipseSkyRegion
@@ -142,12 +142,11 @@ class CircleAnnulusPixelRegion(AnnulusPixelRegion):
 
     def to_sky(self, wcs):
         center = pixel_to_skycoord(self.center.x, self.center.y, wcs)
-        _, scale, _ = skycoord_to_pixel_scale_angle(center, wcs)
-        inner_radius = self.inner_radius / scale * u.deg
-        outer_radius = self.outer_radius / scale * u.deg
-        return CircleAnnulusSkyRegion(
-            center, inner_radius, outer_radius, self.meta, self.visual
-        )
+        _, pixscale, _ = pixel_scale_angle_at_skycoord(center, wcs)
+        inner_radius = self.inner_radius * u.pix * pixscale
+        outer_radius = self.outer_radius * u.pix * pixscale
+        return CircleAnnulusSkyRegion(center, inner_radius, outer_radius,
+                                      self.meta, self.visual)
 
 
 class CircleAnnulusSkyRegion(SkyRegion):
@@ -182,14 +181,13 @@ class CircleAnnulusSkyRegion(SkyRegion):
         self.visual = visual or RegionVisual()
 
     def to_pixel(self, wcs):
-        center, scale, _ = skycoord_to_pixel_scale_angle(self.center, wcs)
+        center, pixscale, _ = pixel_scale_angle_at_skycoord(self.center, wcs)
         # FIXME: The following line is needed to get a scalar PixCoord
         center = PixCoord(float(center.x), float(center.y))
-        inner_radius = self.inner_radius.to("deg").value * scale
-        outer_radius = self.outer_radius.to("deg").value * scale
-        return CircleAnnulusPixelRegion(
-            center, inner_radius, outer_radius, self.meta, self.visual
-        )
+        inner_radius = (self.inner_radius / pixscale).to(u.pix).value
+        outer_radius = (self.outer_radius / pixscale).to(u.pix).value
+        return CircleAnnulusPixelRegion(center, inner_radius, outer_radius,
+                                        self.meta, self.visual)
 
 
 class AsymmetricAnnulusPixelRegion(AnnulusPixelRegion):
@@ -252,15 +250,15 @@ class AsymmetricAnnulusPixelRegion(AnnulusPixelRegion):
 
     def to_sky_args(self, wcs):
         center = pixel_to_skycoord(self.center.x, self.center.y, wcs)
-        _, scale, north_angle = skycoord_to_pixel_scale_angle(center, wcs)
-
-        inner_width = self.inner_width / scale * u.deg
-        inner_height = self.inner_height / scale * u.deg
-        outer_width = self.outer_width / scale * u.deg
-        outer_height = self.outer_height / scale * u.deg
+        _, pixscale, north_angle = pixel_scale_angle_at_skycoord(center, wcs)
+        inner_width = (self.inner_width * u.pix * pixscale).to(u.arcsec)
+        inner_height = (self.inner_height * u.pix * pixscale).to(u.arcsec)
+        outer_width = (self.outer_width * u.pix * pixscale).to(u.arcsec)
+        outer_height = (self.outer_height * u.pix * pixscale).to(u.arcsec)
         angle = self.angle - (north_angle - 90 * u.deg)
 
-        return center, inner_width, inner_height, outer_width, outer_height, angle
+        return (center, inner_width, inner_height, outer_width, outer_height,
+                angle)
 
 
 class AsymmetricAnnulusSkyRegion(SkyRegion):
@@ -314,15 +312,17 @@ class AsymmetricAnnulusSkyRegion(SkyRegion):
         self.visual = visual or RegionVisual()
 
     def to_pixel_args(self, wcs):
-        center, scale, north_angle = skycoord_to_pixel_scale_angle(self.center, wcs)
+        center, pixscale, north_angle = pixel_scale_angle_at_skycoord(
+            self.center, wcs)
         center = PixCoord(center.x, center.y)
-        inner_width = self.inner_width.to("deg").value * scale
-        inner_height = self.inner_height.to("deg").value * scale
-        outer_width = self.outer_width.to("deg").value * scale
-        outer_height = self.outer_height.to("deg").value * scale
+        inner_width = (self.inner_width / pixscale).to(u.pix).value
+        inner_height = (self.inner_height / pixscale).to(u.pix).value
+        outer_width = (self.outer_width / pixscale).to(u.pix).value
+        outer_height = (self.outer_height / pixscale).to(u.pix).value
         angle = self.angle + (north_angle - 90 * u.deg)
 
-        return center, inner_width, inner_height, outer_width, outer_height, angle
+        return (center, inner_width, inner_height, outer_width, outer_height,
+                angle)
 
 
 class EllipseAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):

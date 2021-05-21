@@ -4,11 +4,12 @@ import math
 import numpy as np
 from astropy import units as u
 from astropy.coordinates import Angle
+import astropy.units as u
 from astropy.wcs.utils import pixel_to_skycoord
 
 from ..core import PixCoord, PixelRegion, SkyRegion, RegionMask, BoundingBox
 from .._geometry import elliptical_overlap_grid
-from .._utils.wcs_helpers import skycoord_to_pixel_scale_angle
+from .._utils.wcs_helpers import pixel_scale_angle_at_skycoord
 from ..core.attributes import (ScalarPix, ScalarLength, QuantityLength,
                                ScalarSky, RegionMeta, RegionVisual)
 
@@ -97,9 +98,9 @@ class EllipsePixelRegion(PixelRegion):
     def to_sky(self, wcs):
         # TODO: write a pixel_to_skycoord_scale_angle
         center = pixel_to_skycoord(self.center.x, self.center.y, wcs)
-        _, scale, north_angle = skycoord_to_pixel_scale_angle(center, wcs)
-        height = Angle(self.height / scale, 'deg')
-        width = Angle(self.width / scale, 'deg')
+        _, pixscale, north_angle = pixel_scale_angle_at_skycoord(center, wcs)
+        height = Angle(self.height * u.pix * pixscale, 'arcsec')
+        width = Angle(self.width * u.pix * pixscale, 'arcsec')
         return EllipseSkyRegion(center, width, height,
                                 angle=self.angle - (north_angle - 90 * u.deg),
                                 meta=self.meta, visual=self.visual)
@@ -336,11 +337,12 @@ class EllipseSkyRegion(SkyRegion):
         self.visual = visual or RegionVisual()
 
     def to_pixel(self, wcs):
-        center, scale, north_angle = skycoord_to_pixel_scale_angle(self.center, wcs)
+        center, pixscale, north_angle = pixel_scale_angle_at_skycoord(
+            self.center, wcs)
         # FIXME: The following line is needed to get a scalar PixCoord
         center = PixCoord(float(center.x), float(center.y))
-        height = self.height.to('deg').value * scale
-        width = self.width.to('deg').value * scale
-        return EllipsePixelRegion(center, width, height,
-                                  angle=self.angle + (north_angle - 90 * u.deg),
+        height = (self.height / pixscale).to(u.pixel).value
+        width = (self.width / pixscale).to(u.pixel).value
+        angle = self.angle + (north_angle - 90 * u.deg)
+        return EllipsePixelRegion(center, width, height, angle=angle,
                                   meta=self.meta, visual=self.visual)
