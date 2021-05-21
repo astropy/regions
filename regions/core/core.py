@@ -3,6 +3,7 @@ import abc
 import copy
 import operator
 
+from .metadata import RegionMeta, RegionVisual
 from .pixcoord import PixCoord
 
 __all__ = ['Region', 'PixelRegion', 'SkyRegion']
@@ -13,11 +14,13 @@ class Region(abc.ABC):
     Base class for all regions.
     """
 
+    _params = ()
+
     def copy(self, **changes):
         """
         Make an independent (deep) copy.
         """
-        fields = list(self._params) + ["meta", "visual"]
+        fields = list(self._params) + ['meta', 'visual']
 
         for field in fields:
             if field not in changes:
@@ -80,13 +83,17 @@ class PixelRegion(Region):
     Base class for all regions defined in pixel coordinates.
     """
 
+    meta = RegionMeta()
+    visual = RegionVisual()
+
     def intersection(self, other):
         """
         Return a region representing the intersection of this region
         with ``other``.
         """
         from .compound import CompoundPixelRegion
-        return CompoundPixelRegion(region1=self, region2=other, operator=operator.and_)
+        return CompoundPixelRegion(region1=self, region2=other,
+                                   operator=operator.and_)
 
     def symmetric_difference(self, other):
         """
@@ -94,7 +101,8 @@ class PixelRegion(Region):
         the intersection of the two regions.
         """
         from .compound import CompoundPixelRegion
-        return CompoundPixelRegion(region1=self, region2=other, operator=operator.xor)
+        return CompoundPixelRegion(region1=self, region2=other,
+                                   operator=operator.xor)
 
     def union(self, other):
         """
@@ -102,7 +110,8 @@ class PixelRegion(Region):
         ``other``.
         """
         from .compound import CompoundPixelRegion
-        return CompoundPixelRegion(region1=self, region2=other, operator=operator.or_)
+        return CompoundPixelRegion(region1=self, region2=other,
+                                   operator=operator.or_)
 
     @abc.abstractmethod
     def contains(self, pixcoord):
@@ -207,6 +216,7 @@ class PixelRegion(Region):
         if mode not in valid_modes:
             raise ValueError(f'Invalid mask mode: {mode} (should be one '
                              f'of {valid_modes}')
+
         if mode == 'subpixels':
             if not isinstance(subpixels, int) or subpixels <= 0:
                 raise ValueError(f'Invalid subpixels value: {subpixels} '
@@ -317,7 +327,8 @@ class SkyRegion(Region):
         with ``other``.
         """
         from .compound import CompoundSkyRegion
-        return CompoundSkyRegion(region1=self, region2=other, operator=operator.and_)
+        return CompoundSkyRegion(region1=self, region2=other,
+                                 operator=operator.and_)
 
     def symmetric_difference(self, other):
         """
@@ -325,7 +336,8 @@ class SkyRegion(Region):
         the intersection of the two regions.
         """
         from .compound import CompoundSkyRegion
-        return CompoundSkyRegion(region1=self, region2=other, operator=operator.xor)
+        return CompoundSkyRegion(region1=self, region2=other,
+                                 operator=operator.xor)
 
     def union(self, other):
         """
@@ -333,7 +345,8 @@ class SkyRegion(Region):
         ``other``.
         """
         from .compound import CompoundSkyRegion
-        return CompoundSkyRegion(region1=self, region2=other, operator=operator.or_)
+        return CompoundSkyRegion(region1=self, region2=other,
+                                 operator=operator.or_)
 
     def contains(self, skycoord, wcs):
         """

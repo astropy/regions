@@ -1,7 +1,8 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 import copy
-import numpy as np
+
 from astropy.coordinates import SkyCoord
+import numpy as np
 
 __all__ = ['PixCoord']
 
@@ -16,9 +17,9 @@ class PixCoord:
     """
     A class for pixel coordinates.
 
-    This class can represent scalar or array pixel coordinates.
+    This class can represent a scalar or an array of pixel coordinates.
 
-    The data members are either numbers or Numpy arrays
+    The data members are either numbers or `~numpy.ndarray`
     (not `~astropy.units.Quantity` objects with unit "pixel").
 
     Given a `astropy.wcs.WCS` object, it can be transformed to and from
@@ -54,7 +55,7 @@ class PixCoord:
         Validate that a given object is an appropriate `PixCoord`.
 
         This is used for input validation throughout the regions
-        package, especially in the `__init__` method of pixel region
+        package, especially in the ``__init__`` method of pixel region
         classes.
 
         Parameters
@@ -112,7 +113,8 @@ class PixCoord:
 
     def __getitem__(self, key):
         if self.isscalar:
-            raise IndexError('Scalar PixCoord cannot be indexed or sliced.')
+            raise IndexError(f'Scalar {self.__class__.__name__!r} cannot be '
+                             'indexed or sliced.')
 
         # Let Numpy do the slicing
         x = self.x[key]
@@ -234,8 +236,8 @@ class PixCoord:
         dy = self.y - center.y
         vec = np.array([dx, dy])
 
-        c, s = np.cos(angle), np.sin(angle)
-        rotation_matrix = np.array([[c, -s], [s, c]])
+        cosa, sina = np.cos(angle), np.sin(angle)
+        rotation_matrix = np.array([[cosa, -sina], [sina, cosa]])
 
         vec = np.matmul(rotation_matrix, vec)
 
