@@ -142,21 +142,23 @@ class PolygonPixelRegion(PixelRegion):
 
         **kwargs : dict
             Any keyword arguments accepted by
-            `~matplotlib.patches.Polygon`.
+            `~matplotlib.patches.Polygon`. These keywords will override
+            any visual meta attributes of this region.
 
         Returns
         -------
-        patch : `~matplotlib.patches.Polygon`
+        artist : `~matplotlib.patches.Polygon`
             A matplotlib polygon patch.
         """
         from matplotlib.patches import Polygon
+
         xy = np.vstack([self.vertices.x - origin[0],
                         self.vertices.y - origin[1]]).transpose()
 
-        mpl_params = self.mpl_properties_default('patch')
-        mpl_params.update(kwargs)
+        mpl_kwargs = self._define_mpl_kwargs(artist='Patch')
+        mpl_kwargs.update(kwargs)
 
-        return Polygon(xy=xy, **mpl_params)
+        return Polygon(xy=xy, **mpl_kwargs)
 
     def rotate(self, center, angle):
         """

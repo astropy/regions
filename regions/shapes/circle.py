@@ -132,21 +132,23 @@ class CirclePixelRegion(PixelRegion):
 
         **kwargs : dict
             Any keyword arguments accepted by
-            `~matplotlib.patches.Circle`.
+            `~matplotlib.patches.Circle`. These keywords will override
+            any visual meta attributes of this region.
 
         Returns
         -------
-        patch : `~matplotlib.patches.Circle`
+        artist : `~matplotlib.patches.Circle`
             A matplotlib circle patch.
         """
         from matplotlib.patches import Circle
+
         xy = self.center.x - origin[0], self.center.y - origin[1]
         radius = self.radius
 
-        mpl_params = self.mpl_properties_default('patch')
-        mpl_params.update(kwargs)
+        mpl_kwargs = self._define_mpl_kwargs(artist='Patch')
+        mpl_kwargs.update(kwargs)
 
-        return Circle(xy=xy, radius=radius, **mpl_params)
+        return Circle(xy=xy, radius=radius, **mpl_kwargs)
 
     def rotate(self, center, angle):
         """
