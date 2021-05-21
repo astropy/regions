@@ -1,69 +1,65 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 # (taken from photutils: should probably migrate into astropy.wcs)
-import numpy as np
 from astropy import units as u
-from astropy.coordinates import UnitSphericalRepresentation
-from astropy.wcs.utils import skycoord_to_pixel
+import numpy as np
+
 from ..core.pixcoord import PixCoord
 
-skycoord_to_pixel_mode = 'all'
 
-
-def skycoord_to_pixel_scale_angle(skycoord, wcs, small_offset=1 * u.arcsec):
+def pixel_scale_angle_at_skycoord(skycoord, wcs, offset=1 * u.arcsec):
     """
-    Convert a set of SkyCoord coordinates into pixel coordinates, pixel
-    scales, and position angles.
+    Calculate the pixel coordinate and scale and WCS rotation angle at
+    the position of a SkyCoord coordinate.
 
     Parameters
     ----------
     skycoord : `~astropy.coordinates.SkyCoord`
-        The sky coordinates.
-    wcs : `~astropy.wcs.WCS`
-        The WCS transformation to use.
-    small_offset : `~astropy.units.Quantity`, optional
-        A small offset to use to compute the angle.
+        The SkyCoord coordinate.
+
+    wcs : WCS object
+        A world coordinate system (WCS) transformation that
+        supports the `astropy shared interface for WCS
+        <https://docs.astropy.org/en/stable/wcs/wcsapi.html>`_ (e.g.,
+        `astropy.wcs.WCS`, `gwcs.wcs.WCS`).
+
+    offset : `~astropy.units.Quantity`
+        A small angular offset to use to compute the pixel scale and
+        position angle.
 
     Returns
     -------
-    pixcoord : `~regions.PixCoord`
-        The pixel coordinates.
-    scale : float
-        The pixel scale at each location, in degrees/pixel.
+    pixcoord : `~regions.core.PixCoord`
+        The pixel coordinate.
+
+    scale : `~astropy.units.Quantity`
+        The pixel scale in arcsec/pixel.
+
     angle : `~astropy.units.Quantity`
-        The position angle of the celestial coordinate system in pixel
-        space.
+        The angle (in degrees) measured counterclockwise from the
+        positive x axis to the "North" axis of the celestial coordinate
+        system.
+
+    Notes
+    -----
+    If distortions are present in the image, the x and y pixel scales
+    likely differ.  This function computes a single pixel scale along
+    the North/South axis.
     """
     # Convert to pixel coordinates
-    x, y = skycoord_to_pixel(skycoord, wcs, mode=skycoord_to_pixel_mode)
+    x, y = wcs.world_to_pixel(skycoord)
     pixcoord = PixCoord(x=x, y=y)
 
-    # We take a point directly 'above' (in latitude) the position requested
-    # and convert it to pixel coordinates, then we use that to figure out the
-    # scale and position angle of the coordinate system at the location of
-    # the points.
+    # We take a point directly North (i.e., latitude offset) the
+    # input sky coordinate and convert it to pixel coordinates,
+    # then we use the pixel deltas between the input and offset sky
+    # coordinate to calculate the pixel scale and angle.
+    skycoord_offset = skycoord.directional_offset_by(0.0, offset)
+    x_offset, y_offset = wcs.world_to_pixel(skycoord_offset)
 
-    # Find the coordinates as a representation object
-    r_old = skycoord.represent_as('unitspherical')
-
-    # Add a a small perturbation in the latitude direction (since longitude
-    # is more difficult because it is not directly an angle).
-    dlat = small_offset
-    r_new = UnitSphericalRepresentation(r_old.lon, r_old.lat + dlat)
-    coords_offset = skycoord.realize_frame(r_new)
-
-    # Find pixel coordinates of offset coordinates
-    x_offset, y_offset = skycoord_to_pixel(coords_offset, wcs,
-                                           mode=skycoord_to_pixel_mode)
-
-    # Find vector
     dx = x_offset - x
     dy = y_offset - y
-
-    # Find the length of the vector
-    scale = np.hypot(dx, dy) / dlat.to('degree').value
-
-    # Find the position angle
-    angle = np.arctan2(dy, dx) * u.radian
+    scale = offset.to(u.arcsec) / (np.hypot(dx, dy) * u.pixel)
+    angle = (np.arctan2(dy, dx) * u.radian).to(u.deg)
 
     return pixcoord, scale, angle
 
