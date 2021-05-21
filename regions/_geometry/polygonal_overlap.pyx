@@ -3,16 +3,13 @@
 import numpy as np
 cimport numpy as np
 
+from .pnpoly cimport point_in_polygon
 
 __all__ = ['polygonal_overlap_grid']
 
 
 DTYPE = np.float64
 ctypedef np.float64_t DTYPE_t
-
-from .pnpoly cimport point_in_polygon
-
-__all__ = ['polygonal_overlap_grid']
 
 
 def polygonal_overlap_grid(double xmin, double xmax, double ymin, double ymax,
