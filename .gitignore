@@ -57,8 +57,3 @@ pip-wheel-metadata
 
 # Mac OSX
 .DS_Store
-
-# Generated in doctests
-docs/*.reg
-docs/*.crtf
-docs/*.fits

@@ -40,6 +40,7 @@ There's also `~regions.write_ds9` and `~regions.read_ds9` which write to and
 read from a file in addition to doing the region serialisation and parsing.
 
 .. code-block:: python
+.. doctest-skip::
 
     >>> from regions import read_ds9, write_ds9
     >>> filename = 'ds9.reg'
@@ -52,6 +53,7 @@ read from a file in addition to doing the region serialisation and parsing.
 The ``visual`` metadata includes items used for display, e.g.:
 
 .. code-block:: python
+.. doctest-skip::
 
     >>> print(regions[0].visual)
     {'color': 'green'}

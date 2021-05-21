@@ -22,4 +22,10 @@ region file.
     center: <SkyCoord (ICRS): (ra, dec) in deg
         (211.06231757, 54.49779926)>
     radius: 0.05220229834 deg
+
+Now write to a DS9 region file:
+
+.. code-block:: python
+.. doctest-skip::
+
     >>> regions.write('regions.reg')
