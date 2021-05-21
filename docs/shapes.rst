@@ -198,7 +198,7 @@ As an example, let's use this :class:`~regions.CircleSkyRegion`, a sky circle re
     >>> from regions import CircleSkyRegion
 
     >>> center = SkyCoord(50, 10, unit='deg')
-    >>> radius = Angle(30, 'deg')
+    >>> radius = Angle(30, 'arcsec')
     >>> sky_reg = CircleSkyRegion(center, radius)
 
 To convert it to a :class:`~regions.PixelRegion`, call the
@@ -210,7 +210,7 @@ To convert it to a :class:`~regions.PixelRegion`, call the
     >>> print(pix_reg)  # doctest: +FLOAT_CMP
     Region: CirclePixelRegion
     center: PixCoord(x=55.35205711214607, y=40.0958313892697)
-    radius: 36.93290808340659
+    radius: 0.010259141135043101
 
 Also to convert a :class:`~regions.PixelRegion` to a
 :class:`~regions.SkyRegion`, call the :meth:`~regions.PixelRegion.to_sky` method:
@@ -222,7 +222,7 @@ Also to convert a :class:`~regions.PixelRegion` to a
     Region: CircleSkyRegion
     center: <SkyCoord (Galactic): (l, b) in deg
         (172.17231545, -38.27972337)>
-    radius: 18.55481729935556 deg
+    radius: 18.55481729935556 arcsec
 
 .. _sh-meta:
 
