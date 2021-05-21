@@ -70,6 +70,9 @@ Bug Fixes
 
 - Fixed parsing CRTF regions files contain a ``symthick`` value. [#365]
 
+- Fixed an issue where ``PointPixelRegion`` objects would not plot.
+  [#366]
+
 API Changes
 -----------
 
