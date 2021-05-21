@@ -1,0 +1,3 @@
+exclude_dirs:
+  - regions/*test*
+  - regions/**/*test*
