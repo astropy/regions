@@ -1,22 +1,16 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-
 """
-This is an in-development package for region handling based on Astropy.
-
-The goal is to merge the functionality from pyregion and photutils apertures
-and then after some time propose this package for inclusion in the Astropy core.
-
-* Code : https://github.com/astropy/regions
-* Docs : https://astropy-regions.readthedocs.io/en/latest/
+Regions is Astropy coordinated package to provide tools for region
+handling.
 """
 
 # Affiliated packages may add whatever they like to this file, but
 # should keep this content at the top.
 # ----------------------------------------------------------------------------
-from ._astropy_init import *
+from ._astropy_init import *  # noqa
 # ----------------------------------------------------------------------------
 
-from ._utils.examples import *  # noqa
 from .core import *  # noqa
-from .shapes import *  # noqa
 from .io import *  # noqa
+from .shapes import *  # noqa
+from ._utils.examples import *  # noqa
