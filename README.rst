@@ -28,8 +28,8 @@ for details.
     :target: https://pypi.org/project/regions/
     :alt: PyPI Latest Release
 
-.. |Conda Version| image:: https://img.shields.io/conda/vn/astropy/regions?label=conda%20package
-    :target: https://anaconda.org/astropy/regions
+.. |Conda Version| image:: https://img.shields.io/conda/vn/conda-forge/regions?label=conda%20package
+    :target: https://anaconda.org/conda-forge/regions
     :alt: Conda Latest Release
 
 .. |Astropy| image:: https://img.shields.io/badge/powered%20by-AstroPy-orange.svg?style=flat
