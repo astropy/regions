@@ -98,22 +98,21 @@ class PointPixelRegion(PixelRegion):
 
         **kwargs : `dict`
             Any keyword arguments accepted by
-            `~matplotlib.lines.Line2D`.
+            `~matplotlib.lines.Line2D`. These keywords will override any
+            visual meta attributes of this region.
 
         Returns
         -------
-        point : `~matplotlib.lines.Line2D`
+        artist : `~matplotlib.lines.Line2D`
             A matplotlib Line2D object.
         """
         from matplotlib.lines import Line2D
 
-        mpl_params = self.mpl_properties_default('LINE2D')
-        mpl_params.update(kwargs)
+        mpl_kwargs = self._define_mpl_kwargs(artist='Line2D')
+        mpl_kwargs.update(kwargs)
 
-        point = Line2D([self.center.x - origin[0]], [self.center.y - origin[1]],
-                       **mpl_params)
-
-        return point
+        return Line2D([self.center.x - origin[0]],
+                      [self.center.y - origin[1]], **mpl_kwargs)
 
     def rotate(self, center, angle):
         """

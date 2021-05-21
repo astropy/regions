@@ -170,26 +170,28 @@ class RectanglePixelRegion(PixelRegion):
 
         **kwargs : dict
             Any keyword arguments accepted by
-            `~matplotlib.patches.Rectangle`.
+            `~matplotlib.patches.Rectangle`. These keywords will
+            override any visual meta attributes of this region.
 
         Returns
         -------
-        patch : `~matplotlib.patches.Rectangle`
+        artist : `~matplotlib.patches.Rectangle`
             A matplotlib rectangle patch.
         """
         from matplotlib.patches import Rectangle
+
         xy = self._lower_left_xy()
         xy = xy[0] - origin[0], xy[1] - origin[1]
         width = self.width
         height = self.height
-        # From the docstring: MPL expects "rotation in degrees (anti-clockwise)"
+        # matplotlib expects rotation in degrees (anti-clockwise)
         angle = self.angle.to('deg').value
 
-        mpl_params = self.mpl_properties_default('patch')
-        mpl_params.update(kwargs)
+        mpl_kwargs = self._define_mpl_kwargs(artist='Patch')
+        mpl_kwargs.update(kwargs)
 
         return Rectangle(xy=xy, width=width, height=height,
-                         angle=angle, **mpl_params)
+                         angle=angle, **mpl_kwargs)
 
     def _update_from_mpl_selector(self, *args, **kwargs):
         xmin, xmax, ymin, ymax = self._mpl_selector.extents

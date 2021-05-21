@@ -175,25 +175,27 @@ class EllipsePixelRegion(PixelRegion):
 
         **kwargs : dict
             Any keyword arguments accepted by
-            `~matplotlib.patches.Ellipse`.
+            `~matplotlib.patches.Ellipse`. These keywords will override
+            any visual meta attributes of this region.
 
         Returns
         -------
-        patch : `~matplotlib.patches.Ellipse`
+        artist : `~matplotlib.patches.Ellipse`
             A matplotlib ellipse patch.
         """
         from matplotlib.patches import Ellipse
+
         xy = self.center.x - origin[0], self.center.y - origin[1]
         width = self.width
         height = self.height
-        # From the docstring: MPL expects "rotation in degrees (anti-clockwise)"
+        # matplotlib expects rotation in degrees (anti-clockwise)
         angle = self.angle.to('deg').value
 
-        mpl_params = self.mpl_properties_default('patch')
-        mpl_params.update(kwargs)
+        mpl_kwargs = self._define_mpl_kwargs(artist='Patch')
+        mpl_kwargs.update(kwargs)
 
         return Ellipse(xy=xy, width=width, height=height, angle=angle,
-                       **mpl_params)
+                       **kwargs)
 
     def _update_from_mpl_selector(self, *args, **kwargs):
         xmin, xmax, ymin, ymax = self._mpl_selector.extents

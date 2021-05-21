@@ -106,29 +106,29 @@ class LinePixelRegion(PixelRegion):
 
         **kwargs : dict
             Any keyword arguments accepted by
-            `~matplotlib.patches.Arrow`.
+            `~matplotlib.patches.Arrow`. These keywords will override
+            any visual meta attributes of this region.
 
         Returns
         -------
-        patch : `~matplotlib.patches.Arrow`
+        artist : `~matplotlib.patches.Arrow`
             A matplotlib line patch.
         """
-        # Long term we want to support DS9 lines with arrow heads
-
-        # We may want to use Line2D instead of arrow for lines because the width
-        # of the arrow is non-scalable in patches
-
+        # Note: Long term we want to support DS9 lines with arrow heads.
+        # We may want to use Line2D instead of arrow for lines because the
+        # width of the arrow is non-scalable in patches.
         from matplotlib.patches import Arrow
+
         x = self.start.x - origin[0]
         y = self.start.y - origin[1]
         dx = self.end.x - self.start.x
         dy = self.end.y - self.start.y
         kwargs.setdefault("width", 0.1)
 
-        mpl_params = self.mpl_properties_default('patch')
-        mpl_params.update(kwargs)
+        mpl_kwargs = self._define_mpl_kwargs(artist='Patch')
+        mpl_kwargs.update(kwargs)
 
-        return Arrow(x, y, dx, dy, **mpl_params)
+        return Arrow(x, y, dx, dy, **mpl_kwargs)
 
     def rotate(self, center, angle):
         """

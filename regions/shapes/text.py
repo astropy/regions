@@ -70,20 +70,21 @@ class TextPixelRegion(PointPixelRegion):
 
         **kwargs : dict
             Any keyword arguments accepted by `~matplotlib.text.Text`.
+            These keywords will override any visual meta attributes of
+            this region.
 
         Returns
         -------
-        text : `~matplotlib.text.Text`
+        artist : `~matplotlib.text.Text`
             A matplotlib Text object.
         """
         from matplotlib.text import Text
 
-        mpl_params = self.mpl_properties_default('text')
-        mpl_params.update(kwargs)
-        text = Text(self.center.x - origin[0], self.center.y - origin[1],
-                    self.text, **mpl_params)
+        mpl_kwargs = self._define_mpl_kwargs(artist='Text')
+        mpl_kwargs.update(kwargs)
 
-        return text
+        return Text(self.center.x - origin[0], self.center.y - origin[1],
+                    self.text, **mpl_kwargs)
 
 
 class TextSkyRegion(PointSkyRegion):

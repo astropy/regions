@@ -247,34 +247,40 @@ class PixelRegion(Region):
         """
         raise NotImplementedError
 
-    def mpl_properties_default(self, shape='patch'):
+    def _define_mpl_kwargs(self, artist='Patch'):
         """
-        Set the default values of the visual attributes as specified by
+        Define a dictionary of matplotlib keywords for the input
+        ``artist`` from the region's ``visual`` properties.
+
+        Unset ``visual`` properties are set to default values based on
         the DS9 convention.
         """
-        kwargs = dict()
-        kwargs['color'] = self.visual.get('color', 'green')
-        kwargs['label'] = self.meta.get('label', "")
+        if artist not in ('Patch', 'Line2D', 'Text'):
+            raise ValueError(f'artist "{artist}" is not supported')
 
-        if shape == 'text':
+        kwargs = {}
+        kwargs['color'] = self.visual.get('color', 'green')
+        kwargs['label'] = self.meta.get('label', '')
+
+        if artist == 'Text':
             kwargs['family'] = self.visual.get('font', 'helvetica')
-            kwargs['rotation'] = self.visual.get('textangle', '0')
-            kwargs['size'] = self.visual.get('fontsize', '12')
             kwargs['style'] = self.visual.get('fontsyle', 'normal')
             kwargs['weight'] = self.visual.get('fontweight', 'roman')
-
+            kwargs['size'] = self.visual.get('fontsize', '12')
+            kwargs['rotation'] = self.visual.get('textangle', '0')
         else:
-            if shape == 'Line2D':
+            kwargs['linewidth'] = self.visual.get('linewidth', 1)
+            kwargs['linestyle'] = self.visual.get('linstyle', 'solid')
+
+            if artist == 'Line2D':
                 kwargs['marker'] = self.visual.get('symbol', 'o')
                 kwargs['markersize'] = self.visual.get('symsize', 11)
                 kwargs['markeredgecolor'] = kwargs['color']
                 kwargs['markeredgewidth'] = self.visual.get('width', 1)
-            if shape == 'patch':
+
+            if artist == 'Patch':
                 kwargs['edgecolor'] = kwargs.pop('color')
                 kwargs['fill'] = self.visual.get('fill', False)
-
-            kwargs['linewidth'] = self.visual.get('linewidth', 1)
-            kwargs['linestyle'] = self.visual.get('linstyle', 'solid')
 
         return kwargs
 
