@@ -84,6 +84,7 @@ write as well as read from a file in addition to doing the region serialisation
 and parsing.
 
 .. code-block:: python
+.. doctest-skip::
 
     >>> from regions import CirclePixelRegion, PixCoord, write_fits_region
     >>> reg_pixel = CirclePixelRegion(PixCoord(1, 2), 5)

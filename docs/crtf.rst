@@ -53,6 +53,7 @@ There's also `~regions.write_crtf` and `~regions.read_crtf` which write to and
 read from a file in addition to doing the region serialisation and parsing.
 
 .. code-block:: python
+.. doctest-skip::
 
     >>> from regions import read_crtf, write_crtf
     >>> filename = 'region.crtf'
