@@ -148,8 +148,8 @@ github_issues_url = f'https://github.com/{github_project}/issues/'
 
 
 # -- Turn on nitpicky mode for sphinx (to warn about references not found) ----
-# nitpicky = True
-# nitpick_ignore = []
+nitpicky = True
+nitpick_ignore = []
 
 # Some warnings are impossible to suppress, and you can list specific
 # references that should be ignored in a nitpick-exceptions file which
