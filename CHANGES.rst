@@ -123,8 +123,8 @@ New features
   ``to_mask`` for ``regions.CompoundPixelRegion`` and ``to_pixel`` for
   ``regions.CircleSkyRegion``. [#137]
 
-- Handling dimension and broadcast of `x` and `y` in ``regions.PixCoord``.
-  [#172]
+- Handling dimension and broadcast of ``x`` and ``y`` in
+  ``regions.PixCoord``. [#172]
 
 - Deserialization of ``CRTF`` file format is possible. [#173]
 
