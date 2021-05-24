@@ -5,8 +5,6 @@ import operator
 
 from .pixcoord import PixCoord
 
-VALID_MASK_MODES = {'center', 'exact', 'subpixels'}
-
 __all__ = ['Region', 'PixelRegion', 'SkyRegion']
 
 
@@ -205,14 +203,14 @@ class PixelRegion(Region):
 
     @staticmethod
     def _validate_mode(mode, subpixels):
-        if mode not in VALID_MASK_MODES:
-            valid_modes = '/'.join(VALID_MASK_MODES)
-            raise ValueError(f"Invalid mask mode: {mode} (should be one "
-                             f"of {valid_modes}")
+        valid_modes = ('center', 'exact', 'subpixels')
+        if mode not in valid_modes:
+            raise ValueError(f'Invalid mask mode: {mode} (should be one '
+                             f'of {valid_modes}')
         if mode == 'subpixels':
             if not isinstance(subpixels, int) or subpixels <= 0:
-                raise ValueError(f"Invalid subpixels value: {subpixels} "
-                                 "(should be a strictly positive integer)")
+                raise ValueError(f'Invalid subpixels value: {subpixels} '
+                                 '(should be a strictly positive integer)')
 
     @abc.abstractmethod
     def as_artist(self, origin=(0, 0), **kwargs):
