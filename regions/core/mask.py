@@ -221,10 +221,9 @@ class RegionMask:
         """
         Get the mask-weighted pixel values from the data as a 1D array.
 
-        If the `~regions.core.RegionMask` was created with
-        ``mode='center'``, (where the mask weights are only 1 or 0),
-        then the returned values will simply be pixel values extracted
-        from the data.
+        If the `~regions.RegionMask` was created with ``mode='center'``,
+        (where the mask weights are only 1 or 0), then the returned
+        values will simply be pixel values extracted from the data.
 
         Parameters
         ----------
