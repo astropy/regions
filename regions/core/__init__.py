@@ -8,3 +8,4 @@ from .mask import *
 from .bounding_box import *
 from .compound import *
 from .attributes import *
+from .metadata import *
