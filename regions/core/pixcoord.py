@@ -3,9 +3,13 @@ import copy
 import numpy as np
 from astropy.coordinates import SkyCoord
 
-from .core import _DEFAULT_WCS_ORIGIN, _DEFAULT_WCS_MODE
-
 __all__ = ['PixCoord']
+
+
+# Define global variables for the default 'origin' and 'mode' used for
+# WCS transformations.
+_DEFAULT_WCS_ORIGIN = 0
+_DEFAULT_WCS_MODE = 'all'
 
 
 class PixCoord:
@@ -151,7 +155,8 @@ class PixCoord:
                                    origin=origin, mode=mode)
 
     @classmethod
-    def from_sky(cls, skycoord, wcs, origin=_DEFAULT_WCS_ORIGIN, mode=_DEFAULT_WCS_MODE):
+    def from_sky(cls, skycoord, wcs, origin=_DEFAULT_WCS_ORIGIN,
+                 mode=_DEFAULT_WCS_MODE):
         """
         Create `PixCoord` from a `~astropy.coordinates.SkyCoord`.
 

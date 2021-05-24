@@ -3,18 +3,7 @@ import abc
 import copy
 import operator
 
-
-# Here we define global variables for the default `origin` and `mode` used
-# for WCS transformations throughout the `regions` package.
-#
-# Their purpose is to simplify achieving uniformity across the codebase.
-# They are mainly used as default arguments for methods that do WCS
-# transformations.
-#
-# They are private (with an underscore), not part of the public API, users
-# should not touch them.
-_DEFAULT_WCS_ORIGIN = 0
-_DEFAULT_WCS_MODE = 'all'
+from .pixcoord import PixCoord
 
 VALID_MASK_MODES = {'center', 'exact', 'subpixels'}
 
@@ -360,7 +349,6 @@ class SkyRegion(Region):
             The world coordinate system transformation to use to convert
             between sky and pixel coordinates.
         """
-        from .pixcoord import PixCoord
         pixel_region = self.to_pixel(wcs)
         pixcoord = PixCoord.from_sky(skycoord, wcs)
         return pixel_region.contains(pixcoord)
