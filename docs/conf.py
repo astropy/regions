@@ -39,6 +39,7 @@ highlight_language = 'python3'
 needs_sphinx = '1.7'
 
 # Extend astropy intersphinx_mapping with packages we use here
+intersphinx_mapping['photutils'] = ('https://photutils.readthedocs.io/en/stable/', None)  # noqa
 #intersphinx_mapping['shapely'] = ('https://shapely.readthedocs.io/en/stable/', None)  # noqa
 
 # Exclude astropy intersphinx_mapping for unused packages
@@ -148,8 +149,8 @@ github_issues_url = f'https://github.com/{github_project}/issues/'
 
 
 # -- Turn on nitpicky mode for sphinx (to warn about references not found) ----
-# nitpicky = True
-# nitpick_ignore = []
+nitpicky = True
+nitpick_ignore = []
 
 # Some warnings are impossible to suppress, and you can list specific
 # references that should be ignored in a nitpick-exceptions file which
