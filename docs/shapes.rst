@@ -426,9 +426,10 @@ Lists
 A `~regions.Region` object can only represent one region, not
 an array (a.k.a. vector or list) of regions.
 
-This is in contrast to the aperture classes in `photutils` like
-:class:`~photutils.CircularAperture` that do allow the ``positions``
-(but usually not the other parameters) to be arrays:
+This is in contrast to the aperture classes in `Photutils
+<https://photutils.readthedocs.io/en/stable/>`__ like
+:class:`photutils.aperture.CircularAperture` that do allow the
+``positions`` (but usually not the other parameters) to be arrays:
 
 .. doctest-skip::
 
