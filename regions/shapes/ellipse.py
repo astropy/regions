@@ -352,8 +352,6 @@ class EllipseSkyRegion(SkyRegion):
     def to_pixel(self, wcs):
         center, pixscale, north_angle = pixel_scale_angle_at_skycoord(
             self.center, wcs)
-        # FIXME: The following line is needed to get a scalar PixCoord
-        center = PixCoord(float(center.x), float(center.y))
         height = (self.height / pixscale).to(u.pixel).value
         width = (self.width / pixscale).to(u.pixel).value
         angle = self.angle + (north_angle - 90 * u.deg)

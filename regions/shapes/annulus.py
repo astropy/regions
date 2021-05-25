@@ -186,8 +186,6 @@ class CircleAnnulusSkyRegion(SkyRegion):
 
     def to_pixel(self, wcs):
         center, pixscale, _ = pixel_scale_angle_at_skycoord(self.center, wcs)
-        # FIXME: The following line is needed to get a scalar PixCoord
-        center = PixCoord(float(center.x), float(center.y))
         inner_radius = (self.inner_radius / pixscale).to(u.pix).value
         outer_radius = (self.outer_radius / pixscale).to(u.pix).value
         return CircleAnnulusPixelRegion(center, inner_radius, outer_radius,
