@@ -5,8 +5,8 @@ import pytest
 
 from astropy import units as u
 from astropy.coordinates import SkyCoord
-from astropy.utils.data import get_pkg_data_filename
 from astropy.io import fits
+from astropy.utils.data import get_pkg_data_filename
 from astropy.wcs import WCS
 
 from ...core import PixCoord
@@ -15,14 +15,15 @@ from ..text import TextPixelRegion, TextSkyRegion
 from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
 
 
-@pytest.fixture(scope='session')
-def wcs():
+@pytest.fixture(scope='session', name='wcs')
+def wcs_fixture():
     filename = get_pkg_data_filename('data/example_header.fits')
     header = fits.getheader(filename)
     return WCS(header)
 
 
 class TestTextPixelRegion(BaseTestPixelRegion):
+
     reg = TextPixelRegion(PixCoord(3, 4), "Sample Text")
     sample_box = [-2, 8, -1, 9]
     inside = []
@@ -52,8 +53,8 @@ class TestTextPixelRegion(BaseTestPixelRegion):
 
 
 class TestTextSkyRegion(BaseTestSkyRegion):
-    reg = TextSkyRegion(SkyCoord(3, 4, unit='deg'), "Sample Text")
 
+    reg = TextSkyRegion(SkyCoord(3, 4, unit='deg'), "Sample Text")
     expected_repr = ('<TextSkyRegion(center=<SkyCoord (ICRS): (ra, dec) in '
                      'deg\n    (3., 4.)>, text=Sample Text)>')
     expected_str = ('Region: TextSkyRegion\ncenter: <SkyCoord (ICRS): '
@@ -69,4 +70,5 @@ class TestTextSkyRegion(BaseTestSkyRegion):
     def test_contains(self, wcs):
         position = SkyCoord([1, 2] * u.deg, [3, 4] * u.deg)
         # Nothing is in a text region
-        assert all(self.reg.contains(position, wcs) == np.array([False, False], dtype='bool'))
+        assert all(self.reg.contains(position, wcs)
+                   == np.array([False, False], dtype='bool'))

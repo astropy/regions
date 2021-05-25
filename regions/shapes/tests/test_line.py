@@ -1,24 +1,25 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
+
 from numpy.testing import assert_allclose
 import numpy as np
 import pytest
 
 from astropy import units as u
 from astropy.coordinates import SkyCoord
+from astropy.io import fits
 from astropy.tests.helper import assert_quantity_allclose
 from astropy.utils.data import get_pkg_data_filename
-from astropy.io import fits
 from astropy.wcs import WCS
 
-from ...tests.helpers import make_simple_wcs
 from ...core import PixCoord
+from ...tests.helpers import make_simple_wcs
 from ..line import LinePixelRegion, LineSkyRegion
-from .utils import HAS_MATPLOTLIB  # noqa
 from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
+from .utils import HAS_MATPLOTLIB  # noqa
 
 
-@pytest.fixture(scope='session')
-def wcs():
+@pytest.fixture(scope='session', name='wcs')
+def wcs_fixture():
     filename = get_pkg_data_filename('data/example_header.fits')
     header = fits.getheader(filename)
     return WCS(header)
@@ -92,12 +93,15 @@ class TestLineSkyRegion(BaseTestSkyRegion):
 
         skyline = pixline.to_sky(wcs)
 
-        assert_quantity_allclose(skyline.start.data.lon, self.reg.start.data.lon)
-        assert_quantity_allclose(skyline.start.data.lat, self.reg.start.data.lat)
+        assert_quantity_allclose(skyline.start.data.lon,
+                                 self.reg.start.data.lon)
+        assert_quantity_allclose(skyline.start.data.lat,
+                                 self.reg.start.data.lat)
         assert_quantity_allclose(skyline.end.data.lon, self.reg.end.data.lon)
         assert_quantity_allclose(skyline.end.data.lat, self.reg.end.data.lat)
 
     def test_contains(self, wcs):
         position = SkyCoord([1, 2] * u.deg, [3, 4] * u.deg)
         # lines do not contain things
-        assert all(self.reg.contains(position, wcs) == np.array([False, False], dtype='bool'))
+        assert all(self.reg.contains(position, wcs)
+                   == np.array([False, False], dtype='bool'))

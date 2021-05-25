@@ -1,24 +1,24 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
+
+from astropy import units as u
+from astropy.coordinates import SkyCoord
+from astropy.io import fits
+from astropy.tests.helper import assert_quantity_allclose
+from astropy.utils.data import get_pkg_data_filename
+from astropy.wcs import WCS
 import numpy as np
 from numpy.testing import assert_allclose
 import pytest
 
-from astropy import units as u
-from astropy.coordinates import SkyCoord
-from astropy.tests.helper import assert_quantity_allclose
-from astropy.utils.data import get_pkg_data_filename
-from astropy.io import fits
-from astropy.wcs import WCS
-
 from ...core import PixCoord
 from ...tests.helpers import make_simple_wcs
 from ..circle import CirclePixelRegion, CircleSkyRegion
-from .utils import HAS_MATPLOTLIB  # noqa
 from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
+from .utils import HAS_MATPLOTLIB  # noqa
 
 
-@pytest.fixture(scope='session')
-def wcs():
+@pytest.fixture(scope='session', name='wcs')
+def wcs_fixture():
     filename = get_pkg_data_filename('data/example_header.fits')
     header = fits.getheader(filename)
     return WCS(header)
@@ -87,8 +87,10 @@ class TestCircleSkyRegion(BaseTestSkyRegion):
 
         skycircle2 = pixcircle.to_sky(wcs)
 
-        assert_quantity_allclose(skycircle.center.data.lon, skycircle2.center.data.lon)
-        assert_quantity_allclose(skycircle.center.data.lat, skycircle2.center.data.lat)
+        assert_quantity_allclose(skycircle.center.data.lon,
+                                 skycircle2.center.data.lon)
+        assert_quantity_allclose(skycircle.center.data.lat,
+                                 skycircle2.center.data.lat)
         assert_quantity_allclose(skycircle2.radius, skycircle.radius)
 
     def test_dimension_center(self):
@@ -102,4 +104,5 @@ class TestCircleSkyRegion(BaseTestSkyRegion):
     def test_contains(self, wcs):
         position = SkyCoord([1, 3] * u.deg, [2, 4] * u.deg)
         # 1,2 is outside, 3,4 is the center and is inside
-        assert all(self.reg.contains(position, wcs) == np.array([False, True], dtype='bool'))
+        assert all(self.reg.contains(position, wcs)
+                   == np.array([False, True], dtype='bool'))
