@@ -1,17 +1,21 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-import numpy as np
+
 import math
 
 from astropy.coordinates import Angle
 import astropy.units as u
 from astropy.wcs.utils import pixel_to_skycoord
+import numpy as np
 
-from ..core import PixCoord, PixelRegion, SkyRegion, RegionMask, BoundingBox
+from ..core.attributes import (ScalarPix, ScalarLength, QuantityLength,
+                               ScalarSky)
+from ..core.bounding_box import BoundingBox
+from ..core.core import PixelRegion, SkyRegion
+from ..core.mask import RegionMask
+from ..core.metadata import RegionMeta, RegionVisual
+from ..core.pixcoord import PixCoord
 from .._utils.wcs_helpers import pixel_scale_angle_at_skycoord
 from .._geometry import circular_overlap_grid
-from ..core.metadata import RegionMeta, RegionVisual
-from ..core.attributes import (ScalarSky, ScalarPix, QuantityLength,
-                               ScalarLength)
 
 __all__ = ['CirclePixelRegion', 'CircleSkyRegion']
 
@@ -105,7 +109,8 @@ class CirclePixelRegion(PixelRegion):
         bbox = self.bounding_box
         ny, nx = bbox.shape
 
-        # Find position of pixel edges and recenter so that circle is at origin
+        # Find position of pixel edges and recenter so that circle is at
+        # origin
         xmin = float(bbox.ixmin) - 0.5 - self.center.x
         xmax = float(bbox.ixmax) - 0.5 - self.center.x
         ymin = float(bbox.iymin) - 0.5 - self.center.y

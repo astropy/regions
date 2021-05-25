@@ -1,18 +1,21 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
+
 import math
 
-import numpy as np
-from astropy import units as u
 from astropy.coordinates import Angle
 import astropy.units as u
 from astropy.wcs.utils import pixel_to_skycoord
+import numpy as np
 
-from ..core import PixCoord, PixelRegion, SkyRegion, RegionMask, BoundingBox
-from .._geometry import elliptical_overlap_grid
-from .._utils.wcs_helpers import pixel_scale_angle_at_skycoord
 from ..core.attributes import (ScalarPix, ScalarLength, QuantityLength,
                                ScalarSky)
+from ..core.bounding_box import BoundingBox
+from ..core.core import PixelRegion, SkyRegion
+from ..core.mask import RegionMask
 from ..core.metadata import RegionMeta, RegionVisual
+from ..core.pixcoord import PixCoord
+from .._geometry import elliptical_overlap_grid
+from .._utils.wcs_helpers import pixel_scale_angle_at_skycoord
 
 __all__ = ['EllipsePixelRegion', 'EllipseSkyRegion']
 
@@ -30,12 +33,14 @@ class EllipsePixelRegion(PixelRegion):
     height : float
         The height of the ellipse (before rotation) in pixels
     angle : `~astropy.units.Quantity`, optional
-        The rotation angle of the ellipse, measured anti-clockwise. If set to
-        zero (the default), the width axis is lined up with the x axis.
+        The rotation angle of the ellipse, measured anti-clockwise. If
+        set to zero (the default), the width axis is lined up with the x
+        axis.
     meta : `~regions.RegionMeta`, optional
         A dictionary that stores the meta attributes of this region.
     visual : `~regions.RegionVisual`, optional
-        A dictionary that stores the visual meta attributes of this region.
+        A dictionary that stores the visual meta attributes of this
+        region.
 
     Examples
     --------
@@ -51,17 +56,20 @@ class EllipsePixelRegion(PixelRegion):
         x0, y0 = 15, 10
         a, b = 8, 5
         theta = Angle(30, 'deg')
-        e = Ellipse2D(amplitude=100., x_0=x0, y_0=y0, a=a, b=b, theta=theta.radian)
+        ell = Ellipse2D(amplitude=100., x_0=x0, y_0=y0, a=a, b=b,
+                        theta=theta.radian)
         y, x = np.mgrid[0:20, 0:30]
         fig, ax = plt.subplots(1, 1)
-        ax.imshow(e(x, y), origin='lower', interpolation='none', cmap='Greys_r')
+        ax.imshow(ell(x, y), origin='lower', interpolation='none',
+                  cmap='Greys_r')
 
         center = PixCoord(x=x0, y=y0)
-        reg = EllipsePixelRegion(center=center, width=2*a, height=2*b, angle=theta)
+        reg = EllipsePixelRegion(center=center, width=2*a, height=2*b,
+                                 angle=theta)
         patch = reg.as_artist(facecolor='none', edgecolor='red', lw=2)
         ax.add_patch(patch)
-
     """
+
     _params = ('center', 'width', 'height', 'angle')
     center = ScalarPix('center')
     width = ScalarLength('width')
@@ -88,8 +96,9 @@ class EllipsePixelRegion(PixelRegion):
         sin_angle = np.sin(self.angle)
         dx = pixcoord.x - self.center.x
         dy = pixcoord.y - self.center.y
-        in_ell = ((2 * (cos_angle * dx + sin_angle * dy) / self.width) ** 2 +
-                  (2 * (sin_angle * dx - cos_angle * dy) / self.height) ** 2 <= 1.)
+        in_ell = ((2 * (cos_angle * dx + sin_angle * dy) / self.width) ** 2
+                  + (2 * (sin_angle * dx - cos_angle * dy)
+                     / self.height) ** 2 <= 1.)
         if self.meta.get('include', True):
             return in_ell
         else:
@@ -130,7 +139,6 @@ class EllipsePixelRegion(PixelRegion):
         return BoundingBox.from_float(xmin, xmax, ymin, ymax)
 
     def to_mask(self, mode='center', subpixels=5):
-
         # NOTE: assumes this class represents a single circle
 
         self._validate_mode(mode, subpixels)
@@ -143,7 +151,8 @@ class EllipsePixelRegion(PixelRegion):
         bbox = self.bounding_box
         ny, nx = bbox.shape
 
-        # Find position of pixel edges and recenter so that ellipse is at origin
+        # Find position of pixel edges and recenter so that ellipse is
+        # at origin
         xmin = float(bbox.ixmin) - 0.5 - self.center.x
         xmax = float(bbox.ixmax) - 0.5 - self.center.x
         ymin = float(bbox.iymin) - 0.5 - self.center.y
@@ -154,12 +163,10 @@ class EllipsePixelRegion(PixelRegion):
         else:
             use_exact = 1
 
-        fraction = elliptical_overlap_grid(
-            xmin, xmax, ymin, ymax, nx, ny,
-            0.5 * self.width, 0.5 * self.height,
-            self.angle.to(u.rad).value,
-            use_exact, subpixels,
-        )
+        fraction = elliptical_overlap_grid(xmin, xmax, ymin, ymax, nx, ny,
+                                           0.5 * self.width, 0.5 * self.height,
+                                           self.angle.to(u.rad).value,
+                                           use_exact, subpixels)
 
         return RegionMask(fraction, bbox=bbox)
 
@@ -208,7 +215,8 @@ class EllipsePixelRegion(PixelRegion):
         if self._mpl_selector_callback is not None:
             self._mpl_selector_callback(self)
 
-    def as_mpl_selector(self, ax, active=True, sync=True, callback=None, **kwargs):
+    def as_mpl_selector(self, ax, active=True, sync=True, callback=None,
+                        **kwargs):
         """
         A matplotlib editable widget for this region
         (`matplotlib.widgets.EllipseSelector`).
@@ -248,10 +256,12 @@ class EllipsePixelRegion(PixelRegion):
         from matplotlib.widgets import EllipseSelector
 
         if hasattr(self, '_mpl_selector'):
-            raise Exception("Cannot attach more than one selector to a region.")
+            raise Exception('Cannot attach more than one selector to a '
+                            'region.')
 
         if self.angle.value != 0:
-            raise NotImplementedError("Cannot create matplotlib selector for rotated ellipse.")
+            raise NotImplementedError('Cannot create matplotlib selector for '
+                                      'rotated ellipse.')
 
         if sync:
             sync_callback = self._update_from_mpl_selector
@@ -259,11 +269,13 @@ class EllipsePixelRegion(PixelRegion):
             def sync_callback(*args, **kwargs):
                 pass
 
-        self._mpl_selector = EllipseSelector(ax, sync_callback, interactive=True,
-                                             rectprops={'edgecolor': self.visual.get('color', 'black'),
-                                                        'facecolor': 'none',
-                                                        'linewidth': self.visual.get('linewidth', 1),
-                                                        'linestyle': self.visual.get('linestyle', 'solid')})
+        self._mpl_selector = EllipseSelector(
+            ax, sync_callback, interactive=True,
+            rectprops={'edgecolor': self.visual.get('color', 'black'),
+                       'facecolor': 'none',
+                       'linewidth': self.visual.get('linewidth', 1),
+                       'linestyle': self.visual.get('linestyle', 'solid')})
+
         self._mpl_selector.extents = (self.center.x - self.width / 2,
                                       self.center.x + self.width / 2,
                                       self.center.y - self.height / 2,
@@ -328,7 +340,8 @@ class EllipseSkyRegion(SkyRegion):
     height = QuantityLength('height')
     angle = QuantityLength('angle')
 
-    def __init__(self, center, width, height, angle=0. * u.deg, meta=None, visual=None):
+    def __init__(self, center, width, height, angle=0. * u.deg, meta=None,
+                 visual=None):
         self.center = center
         self.width = width
         self.height = height

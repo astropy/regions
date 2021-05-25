@@ -1,11 +1,13 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-import numpy as np
-import astropy.units as u
-from astropy.wcs.utils import pixel_to_skycoord, skycoord_to_pixel
 
-from ..core import PixCoord, PixelRegion, SkyRegion, BoundingBox
+from astropy.wcs.utils import pixel_to_skycoord, skycoord_to_pixel
+import numpy as np
+
 from ..core.attributes import ScalarPix, ScalarSky
+from ..core.bounding_box import BoundingBox
+from ..core.core import PixelRegion, SkyRegion
 from ..core.metadata import RegionMeta, RegionVisual
+from ..core.pixcoord import PixCoord
 
 __all__ = ['LinePixelRegion', 'LineSkyRegion']
 
@@ -75,7 +77,7 @@ class LinePixelRegion(PixelRegion):
         else:
             return np.logical_not(in_reg)
 
-    def to_sky(self, wcs, mode='local', tolerance=None):
+    def to_sky(self, wcs):
         start = pixel_to_skycoord(self.start.x, self.start.y, wcs)
         end = pixel_to_skycoord(self.end.x, self.end.y, wcs)
         return LineSkyRegion(start, end)
@@ -180,7 +182,7 @@ class LineSkyRegion(SkyRegion):
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
 
-    def contains(self, skycoord, wcs):
+    def contains(self, skycoord, wcs):  # pylint: disable=unused-argument
         if self.meta.get('include', True):
             # lines never contain anything
             return False

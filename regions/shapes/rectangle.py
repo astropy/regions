@@ -385,8 +385,8 @@ class RectangleSkyRegion(SkyRegion):
         self.width = width
         self.height = height
         self.angle = angle
-        self.meta = meta or {}
-        self.visual = visual or {}
+        self.meta = meta or RegionMeta()
+        self.visual = visual or RegionVisual()
 
     def to_pixel(self, wcs):
         center, pixscale, north_angle = pixel_scale_angle_at_skycoord(

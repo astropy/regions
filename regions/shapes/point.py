@@ -1,6 +1,7 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-import numpy as np
+
 from astropy.wcs.utils import pixel_to_skycoord, skycoord_to_pixel
+import numpy as np
 
 from ..core.attributes import ScalarPix, ScalarSky
 from ..core.bounding_box import BoundingBox

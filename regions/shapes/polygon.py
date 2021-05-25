@@ -1,6 +1,6 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
-from astropy.wcs.utils import skycoord_to_pixel, pixel_to_skycoord
+from astropy.wcs.utils import pixel_to_skycoord, skycoord_to_pixel
 import numpy as np
 
 from ..core.attributes import OneDPix, OneDSky
