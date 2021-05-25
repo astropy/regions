@@ -1,18 +1,22 @@
-import numpy as np
-from numpy.testing import assert_allclose
+# Licensed under a 3-clause BSD style license - see LICENSE.rst
 
 from astropy import units as u
 from astropy.coordinates import SkyCoord
 from astropy.tests.helper import assert_quantity_allclose
+import numpy as np
+from numpy.testing import assert_allclose
 
-from ...core import PixCoord
+from ...core.core import PixCoord
 from ...tests.helpers import make_simple_wcs
-from ..annulus import *
+from ..annulus import (CircleAnnulusPixelRegion, CircleAnnulusSkyRegion,
+                       EllipseAnnulusPixelRegion, EllipseAnnulusSkyRegion,
+                       RectangleAnnulusPixelRegion, RectangleAnnulusSkyRegion)
 from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
 
 
 class TestCircleAnnulusPixelRegion(BaseTestPixelRegion):
-    reg = CircleAnnulusPixelRegion(PixCoord(3, 4), inner_radius=2, outer_radius=3)
+    reg = CircleAnnulusPixelRegion(PixCoord(3, 4), inner_radius=2,
+                                   outer_radius=3)
     sample_box = [0, 6, 1, 7]
     inside = [(3, 2)]
     outside = [(3, 0)]
@@ -49,7 +53,8 @@ class TestCircleAnnulusPixelRegion(BaseTestPixelRegion):
 
 
 class TestCircleAnnulusSkyRegion(BaseTestSkyRegion):
-    reg = CircleAnnulusSkyRegion(SkyCoord(3 * u.deg, 4 * u.deg), 20 * u.arcsec, 30 * u.arcsec)
+    reg = CircleAnnulusSkyRegion(SkyCoord(3 * u.deg, 4 * u.deg),
+                                 20 * u.arcsec, 30 * u.arcsec)
     skycoord = SkyCoord(3 * u.deg, 4 * u.deg, frame='icrs')
     wcs = make_simple_wcs(skycoord, 5 * u.arcsec, 20)
 
