@@ -210,7 +210,10 @@ class RegionMask:
         if cutout is None:
             return None
         else:
-            weighted_cutout = cutout * self.data
+            # ignore multiplication with non-finite data values
+            with warnings.catch_warnings():
+                warnings.simplefilter('ignore', RuntimeWarning)
+                weighted_cutout = cutout * self.data
 
             # fill values outside of the mask but within the bounding box
             weighted_cutout[self._mask] = fill_value
@@ -255,7 +258,7 @@ class RegionMask:
                 raise ValueError('mask and data must have the same shape')
             pixel_mask &= ~mask[slc_large]
 
-        # ignore multiplication with inf data values
+        # ignore multiplication with non-finite data values
         with warnings.catch_warnings():
             warnings.simplefilter('ignore', RuntimeWarning)
             return (cutout * region_mask)[pixel_mask]
