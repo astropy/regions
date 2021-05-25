@@ -8,7 +8,8 @@ from astropy import units as u
 from astropy.utils.data import get_readable_fileobj
 from astropy import coordinates
 
-from .core import CRTFRegionParserError, CRTFRegionParserWarning, valid_symbols
+from .core import (CRTFRegionParserError, CRTFRegionParserWarning,
+                   valid_symbols)
 from ..core import Shape, ShapeList, reg_mapping
 
 __all__ = ['read_crtf', 'CRTFParser', 'CRTFRegionParser']

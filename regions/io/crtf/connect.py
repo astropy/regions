@@ -1,3 +1,5 @@
+# Licensed under a 3-clause BSD style license - see LICENSE.rst
+
 from astropy.io import registry
 
 from .read import read_crtf
@@ -8,7 +10,7 @@ from ..core import ShapeList
 CRTF_SIGNATURE = '#CRTF'
 
 
-def is_crtf(origin, path, fileobj, *args, **kwargs):
+def is_crtf(origin, path, fileobj, *args, **kwargs):  # pylint: disable=unused-argument
     """
     Identify a CRTF region file.
 

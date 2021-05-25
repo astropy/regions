@@ -1,4 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
+
 from ..core import to_shape_list
 
 __all__ = ['write_crtf', 'crtf_objects_to_string']

@@ -16,7 +16,7 @@ class CRTFRegionParserError(ValueError):
     """
 
 
-# Valid symbols for symbol region in CRTF.
+# Valid symbols in CRTF
 valid_symbols = {'.': 'point',
                  ',': 'pixel',
                  'o': 'circle',
@@ -24,7 +24,7 @@ valid_symbols = {'.': 'point',
                  '^': 'triangle_up',
                  '<': 'triangle_left',
                  '>': 'triangle_right',
-                 '1':  'tri_down',
+                 '1': 'tri_down',
                  '2': 'tri_up',
                  '3': 'tri_left',
                  '4': 'tri_right',
@@ -38,5 +38,4 @@ valid_symbols = {'.': 'point',
                  'D': 'diamond',
                  'd': 'thin_diamond',
                  '|': 'vline',
-                 '_': 'hline'
-                }
+                 '_': 'hline'}
