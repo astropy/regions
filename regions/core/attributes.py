@@ -13,6 +13,10 @@ import numpy as np
 from .core import PixelRegion, SkyRegion
 from .pixcoord import PixCoord
 
+__all__ = ['RegionAttr', 'ScalarPix', 'OneDPix', 'ScalarLength',
+           'ScalarSky', 'OneDSky', 'QuantityLength',
+           'CompoundRegionPix', 'CompoundRegionSky']
+
 
 class RegionAttr(abc.ABC):
     """Descriptor base class"""
