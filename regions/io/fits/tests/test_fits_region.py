@@ -10,12 +10,11 @@ from astropy import units as u
 from astropy.io import fits
 from astropy.wcs import WCS
 
+from ....shapes import CircleSkyRegion
+from ...core import to_shape_list
+from ..core import FITSRegionParserError
 from ..read import FITSRegionParser, read_fits_region
 from ..write import fits_region_objects_to_table
-from ..core import FITSRegionParserError
-from ...core import to_shape_list
-
-from ....shapes.circle import CircleSkyRegion
 
 implemented_region_types = ('ellipse', 'circle', 'box', 'polygon', 'point',
                             'annulus', 'elliptannulus')
@@ -23,10 +22,8 @@ implemented_region_types = ('ellipse', 'circle', 'box', 'polygon', 'point',
 
 @pytest.mark.parametrize('filename', ['data/fits_region.fits'])
 def test_file_fits(filename):
-
     filename = get_pkg_data_filename(filename)
     table = Table.read(filename)
-
     shapes = FITSRegionParser(table, 'warn').shapes
 
     assert shapes[0].region_type == 'circle'
@@ -52,50 +49,49 @@ def test_file_fits(filename):
                         list(table['R'][x][:2]) + [table['ROTANG'][x]])
 
     regs = shapes.to_regions()
-    table_ouput = fits_region_objects_to_table(regs)
+    table_output = fits_region_objects_to_table(regs)
+    shape_output = FITSRegionParser(table_output).shapes
 
-    shape_ouput = FITSRegionParser(table_ouput).shapes
+    for i, shape in enumerate(shapes):
+        assert shape.region_type == shape_output[i].region_type
+        assert shape.coord == shape_output[i].coord
+        assert shape.meta == shape_output[i].meta
 
-    for i in range(len(shapes)):
-        assert shapes[i].region_type == shape_ouput[i].region_type
-        assert shapes[i].coord == shape_ouput[i].coord
-        assert shapes[i].meta == shape_ouput[i].meta
-
-    # Reading the regions directly from file and converting to sky regions.
+    # Reading the regions directly from file and converting to sky
+    # regions.
     regs_sky = read_fits_region(filename)
-    with fits.open(filename) as pf:
-        header = pf[1].header
+    with fits.open(filename) as hdulist:
+        header = hdulist[1].header
         wcs = WCS(header, keysel=['image', 'binary', 'pixel'])
         regs_pix = [reg.to_pixel(wcs) for reg in regs_sky]
         shapes_roundtrip = to_shape_list(regs_pix, 'image')
 
-    for i in range(len(shapes)):
-        assert shapes[i].region_type == shapes_roundtrip[i].region_type
-        assert_allclose(shapes[i].coord[:-1], shapes_roundtrip[i].coord[:-1])
+    for i, shape in enumerate(shapes):
+        assert shape.region_type == shapes_roundtrip[i].region_type
+        assert_allclose(shape.coord[:-1], shapes_roundtrip[i].coord[:-1])
 
 
 def test_only_pixel_regions():
-
     reg_sky = CircleSkyRegion(SkyCoord(1, 2, unit='deg'), 5 * u.deg)
 
     with pytest.raises(TypeError) as excinfo:
         fits_region_objects_to_table([reg_sky])
 
-    assert 'Every region must be a pixel region' in str(excinfo.value)
+    estr = 'Every region must be a pixel region'
+    assert estr in str(excinfo.value)
 
 
 def test_valid_columns():
-
     t = Table([[1, 2, 3]], names=('a'))
 
     with pytest.raises(FITSRegionParserError) as excinfo:
         FITSRegionParser(t)
 
-    assert "This table has an invalid column name: 'a'" in str(excinfo.value)
+    estr = 'This table has an invalid column name: "a"'
+    assert estr in str(excinfo.value)
 
 
 def test_valid_row():
-
     x = [1]
     y = [2]
     shapes = ['CIRCLE']
@@ -106,14 +102,16 @@ def test_valid_row():
     with pytest.raises(FITSRegionParserError) as excinfo:
         FITSRegionParser(t)
 
-    assert "The column 'R' is missing in the table" in str(excinfo.value)
+    estr = 'The column "R" is missing in the table'
+    assert estr in str(excinfo.value)
 
     t[0]['SHAPE'] = 'PONT'
 
     with pytest.raises(FITSRegionParserError) as excinfo:
         FITSRegionParser(t)
 
-    assert "'PONT' is not a valid FITS Region type" in str(excinfo.value)
+    estr = '"PONT" is not a valid FITS Region type'
+    assert estr in str(excinfo.value)
 
     t['ROTANG'] = [[20, 30]]
     t['ROTANG'].unit = 'deg'
@@ -122,4 +120,5 @@ def test_valid_row():
     with pytest.raises(FITSRegionParserError) as excinfo:
         FITSRegionParser(t)
 
-    assert "'PIE' is currently not supported" in str(excinfo.value)
+    estr = '"PIE" is currently not supported'
+    assert estr in str(excinfo.value)

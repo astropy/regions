@@ -1,4 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
+
 from astropy.io import fits
 
 from ..core import to_shape_list, SkyRegion
