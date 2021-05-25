@@ -73,10 +73,17 @@ Bug Fixes
 - Fixed an issue where ``PointPixelRegion`` objects would not plot.
   [#366]
 
+- Fixed an issue where DS9 annulus regions with more than one annulus
+  would not be parsed correctly. Such regions are skipped for now. [#371]
+
+
 API Changes
 -----------
 
 - Deprecated the ``BoundingBox`` ``slices`` attribute. [#348]
+
+- The ``RegionMeta`` and ``RegionVisual`` classes have been moved to the
+  ``regions.core.metadata`` module. [#371]
 
 
 0.4 (2019-06-17)

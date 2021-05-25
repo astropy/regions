@@ -5,7 +5,6 @@ circle(331.00,1091.00,40.00) # dashlist=8 3 select=1 highlite=1 dash=0 fixed=0 e
 -box(675.00,1053.00,160.00,80.00,45.00) # dashlist=8 3 select=1 highlite=1 dash=0 fixed=0 edit=1 move=1 delete=1 source=1 text={Box} color=yellow width=1 font="helvetica 10 bold roman"
 polygon(813.49,1075.00,889.00,1150.51,964.51,1075.00,889.00,999.49) # dashlist=8 3 select=1 highlite=1 dash=0 fixed=0 edit=0 move=1 delete=1 source=1 text={Polygon} rotate=0 color=green width=1 font="courier 10 normal roman"
 -line(1017.00,1025.00,1137.00,1127.00) # dashlist=8 3 select=1 highlite=1 dash=0 fixed=0 edit=1 move=1 delete=1 source=1 line=1 1 text={Line} color=cyan width=1 font="helvetica 10 normal roman"
-annulus(331.00,867.00,20.00,40.00) # dashlist=8 3 select=1 highlite=1 dash=0 fixed=0 edit=1 move=1 delete=1 source=1 text={Annulus} color=magenta width=1 font="helvetica 10 bold roman"
 box(675.00,857.00,80.00,40.00,120.00) # dashlist=8 3 select=1 highlite=1 dash=0 fixed=0 edit=1 move=1 delete=1 source=1 text={Box Annulus} color=green width=1 font="helvetica 10 bold roman"
 point(317.00,681.00) # dashlist=8 3 select=1 highlite=1 dash=0 fixed=0 edit=1 move=1 delete=1 source=1 text={Circle Point} color=green width=1 font="helvetica 10 normal roman" point=circle
 point(495.00,677.00) # dashlist=8 3 select=1 highlite=1 dash=0 fixed=0 edit=1 move=1 delete=1 source=1 text={Box Point} color=red width=3 font="helvetica 10 normal roman" point=box

@@ -4,8 +4,8 @@ import astropy.units as u
 from astropy.wcs.utils import pixel_to_skycoord, skycoord_to_pixel
 
 from ..core import PixCoord, PixelRegion, SkyRegion, BoundingBox
-from ..core.attributes import ScalarPix, ScalarSky, RegionVisual, RegionMeta
-
+from ..core.attributes import ScalarPix, ScalarSky
+from ..core.metadata import RegionMeta, RegionVisual
 
 __all__ = ['LinePixelRegion', 'LineSkyRegion']
 

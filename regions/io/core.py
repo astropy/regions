@@ -13,7 +13,7 @@ from astropy.table import Table
 
 from .. import shapes
 from ..core import PixCoord, SkyRegion
-from ..core.attributes import RegionMeta, RegionVisual
+from ..core.metadata import RegionMeta, RegionVisual
 from .connect import ShapeListRead, ShapeListWrite
 from .ds9.core import DS9RegionParserWarning, valid_symbols_ds9
 from .crtf.core import CRTFRegionParserWarning
@@ -102,6 +102,11 @@ class ShapeList(list):
                 msg = f'Skipping elliptical annulus {shape}'
                 warn(msg, DS9RegionParserWarning)
                 continue
+            if shape.region_type == 'circleannulus' and len(shape.coord) > 4:
+                msg = f'Skipping circular annulus {shape}'
+                warn(msg, DS9RegionParserWarning)
+                continue
+
             if shape.region_type in ['box'] and shape.format_type == 'CRTF':
                 msg = f'Skipping {shape.region_type} {shape}'
                 warn(msg, CRTFRegionParserWarning)
