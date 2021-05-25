@@ -1,4 +1,7 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
+"""
+This module defines circular regions in both pixel and sky coordinates.
+"""
 
 import math
 
