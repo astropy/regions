@@ -1,7 +1,6 @@
-import numpy as np
-
-from astropy.wcs import WCS
 from astropy import units as u
+from astropy.wcs import WCS
+import numpy as np
 
 
 def make_simple_wcs(skycoord, resolution, size):

@@ -107,7 +107,7 @@ class TextSkyRegion(PointSkyRegion):
     _params = ('center', 'text')
 
     def __init__(self, center, text, meta=None, visual=None):
-        super().__init__(center,  meta, visual)
+        super().__init__(center, meta, visual)
         self.text = text
 
     def to_pixel(self, wcs):

@@ -193,7 +193,8 @@ class TestEllipseSkyRegion(BaseTestSkyRegion):
         height = 3 * u.arcsec
         with pytest.raises(ValueError) as excinfo:
             EllipseSkyRegion(center, width, height)
-        assert 'The center must be a 0D SkyCoord object' in str(excinfo.value)
+        estr = 'The center must be a scalar SkyCoord object'
+        assert estr in str(excinfo.value)
 
     def test_contains(self, wcs):
         position = SkyCoord([1, 3] * u.deg, [2, 4] * u.deg)

@@ -1,13 +1,16 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-import numpy as np
 
 from astropy.wcs.utils import skycoord_to_pixel, pixel_to_skycoord
+import numpy as np
 
-from ..core import PixelRegion, SkyRegion, RegionMask, BoundingBox, PixCoord
+from ..core.attributes import OneDPix, OneDSky
+from ..core.bounding_box import BoundingBox
+from ..core.core import PixelRegion, SkyRegion
+from ..core.mask import RegionMask
+from ..core.metadata import RegionMeta, RegionVisual
+from ..core.pixcoord import PixCoord
 from .._geometry import polygonal_overlap_grid
 from .._geometry.pnpoly import points_in_polygon
-from ..core.attributes import OneDPix, OneDSky
-from ..core.metadata import RegionMeta, RegionVisual
 
 __all__ = ['PolygonPixelRegion', 'PolygonSkyRegion']
 
@@ -114,7 +117,8 @@ class PolygonPixelRegion(PixelRegion):
         bbox = self.bounding_box
         ny, nx = bbox.shape
 
-        # Find position of pixel edges and recenter so that circle is at origin
+        # Find position of pixel edges and recenter so that circle is at
+        # origin
         xmin = float(bbox.ixmin) - 0.5
         xmax = float(bbox.ixmax) - 0.5
         ymin = float(bbox.iymin) - 0.5
@@ -123,10 +127,8 @@ class PolygonPixelRegion(PixelRegion):
         vx = np.asarray(self.vertices.x, dtype=float)
         vy = np.asarray(self.vertices.y, dtype=float)
 
-        fraction = polygonal_overlap_grid(
-            xmin, xmax, ymin, ymax,
-            nx, ny, vx, vy, use_exact, subpixels,
-        )
+        fraction = polygonal_overlap_grid(xmin, xmax, ymin, ymax, nx, ny,
+                                          vx, vy, use_exact, subpixels)
 
         return RegionMask(fraction, bbox=bbox)
 
