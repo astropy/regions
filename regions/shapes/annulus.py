@@ -5,8 +5,7 @@ from astropy import units as u
 from astropy.wcs.utils import pixel_to_skycoord
 
 from regions import CompoundPixelRegion
-from regions import RegionMeta
-from regions import RegionVisual
+from ..core.metadata import RegionMeta, RegionVisual
 from regions.core.attributes import QuantityLength
 from regions.core.attributes import ScalarPix, ScalarLength
 from regions.core.attributes import ScalarSky

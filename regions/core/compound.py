@@ -4,8 +4,8 @@ import operator as op
 import numpy as np
 
 from . import PixelRegion, SkyRegion, RegionMask
-from ..core.attributes import (CompoundRegionPix, CompoundRegionSky,
-                               RegionMeta, RegionVisual)
+from .attributes import CompoundRegionPix, CompoundRegionSky
+from .metadata import RegionMeta, RegionVisual
 
 __all__ = ['CompoundPixelRegion', 'CompoundSkyRegion']
 
