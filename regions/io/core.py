@@ -4,12 +4,11 @@ import string
 import numbers
 import numpy as np
 
-from astropy import units as u
-from astropy import coordinates
 from astropy.coordinates import Angle, SkyCoord
 from astropy.io.registry import UnifiedReadWriteMethod
 from astropy import log
 from astropy.table import Table
+import astropy.units as u
 
 from .. import shapes
 from ..core import PixCoord, SkyRegion

@@ -1,14 +1,13 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
-import pytest
-
-from numpy.testing import assert_allclose
+from astropy.coordinates import SkyCoord
+from astropy.io import fits
+import astropy.units as u
 from astropy.utils.data import get_pkg_data_filename
 from astropy.table import Table
-from astropy.coordinates import SkyCoord
-from astropy import units as u
-from astropy.io import fits
 from astropy.wcs import WCS
+from numpy.testing import assert_allclose
+import pytest
 
 from ....shapes import CircleSkyRegion
 from ...core import to_shape_list

@@ -1,7 +1,7 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
-from astropy import units as u
 from astropy.coordinates import SkyCoord
+import astropy.units as u
 from astropy.tests.helper import assert_quantity_allclose
 import numpy as np
 from numpy.testing import assert_allclose

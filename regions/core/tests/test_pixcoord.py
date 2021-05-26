@@ -3,10 +3,11 @@
 Tests for the pixcoord module.
 """
 
+import astropy.units as u
 import numpy as np
 from numpy.testing import assert_equal, assert_allclose
 import pytest
-from astropy import units as u
+
 from ..._utils.examples import make_example_dataset
 from ..pixcoord import PixCoord
 

@@ -5,8 +5,8 @@ implemented and doesn't check anything about correctness.
 """
 import itertools
 
-from astropy import units as u
 from astropy.coordinates import SkyCoord
+import astropy.units as u
 from astropy.wcs import WCS
 import pytest
 

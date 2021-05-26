@@ -4,7 +4,7 @@
 This module provides WCS helper tools.
 """
 
-from astropy import units as u
+import astropy.units as u
 import numpy as np
 
 from ..core.pixcoord import PixCoord

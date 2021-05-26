@@ -6,7 +6,7 @@ This module defines annulus regions in both pixel and sky coordinates.
 import abc
 import operator
 
-from astropy import units as u
+import astropy.units as u
 from astropy.wcs.utils import pixel_to_skycoord
 
 from ..core.attributes import (ScalarPix, ScalarLength, QuantityLength,

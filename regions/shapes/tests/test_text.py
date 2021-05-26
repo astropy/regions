@@ -3,9 +3,9 @@ import numpy as np
 from numpy.testing import assert_allclose
 import pytest
 
-from astropy import units as u
 from astropy.coordinates import SkyCoord
 from astropy.io import fits
+import astropy.units as u
 from astropy.utils.data import get_pkg_data_filename
 from astropy.wcs import WCS
 

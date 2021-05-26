@@ -4,8 +4,8 @@ import numpy as np
 from numpy.testing import assert_allclose
 import pytest
 
-from astropy import units as u
 from astropy.coordinates import SkyCoord
+import astropy.units as u
 from astropy.tests.helper import assert_quantity_allclose
 
 from ...core import PixCoord, BoundingBox

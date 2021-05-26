@@ -4,7 +4,7 @@ This file sets up detailed tests for computing masks with reference images.
 """
 import itertools
 
-from astropy import units as u
+import astropy.units as u
 import pytest
 
 from ...core import PixCoord

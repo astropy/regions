@@ -4,10 +4,10 @@ from numpy.testing import assert_allclose
 import numpy as np
 import pytest
 
-from astropy import units as u
 from astropy.coordinates import SkyCoord
 from astropy.io import fits
 from astropy.tests.helper import assert_quantity_allclose
+import astropy.units as u
 from astropy.utils.data import get_pkg_data_filename
 from astropy.wcs import WCS
 
