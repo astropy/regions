@@ -53,7 +53,7 @@ class FITSRegionParser:
             raise ValueError('errors must be one of "strict", "ignore", or '
                              '"warn"')
         if not isinstance(table, Table):
-            raise TypeError("The table should be an astropy table object")
+            raise TypeError('The table should be an astropy table object')
         self.table = table
         self.errors = errors
         self.unit = {}

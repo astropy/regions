@@ -388,7 +388,7 @@ class CRTFRegionParser:
                             val_str[1]))
                 else:
                     self._raise_error(f'Not in proper format: {val_str} '
-                                      'should be a pair of length')
+                                      'should be a pair of lengths')
 
             if attr_spec == 'l':
                 if isinstance(val_str, str):

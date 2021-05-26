@@ -265,8 +265,8 @@ class DS9Parser:
             self.set_coordsys(region_type)
             return
         if region_type not in DS9RegionParser.language_spec:
-            self._raise_error(f'Region type "{region_type}" was identified, '
-                              'but it is not one of the known region types.')
+            self._raise_error(f'Region type "{region_type}" was found, but '
+                              'it is not one of the supported region types.')
             return
         else:
             # Found region specification,
