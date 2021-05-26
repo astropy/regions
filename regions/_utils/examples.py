@@ -10,6 +10,8 @@ import numpy as np
 
 from ..core.pixcoord import PixCoord
 
+__all__ = ['make_example_dataset']
+
 
 def make_example_dataset(data='simulated', config=None):
     """
