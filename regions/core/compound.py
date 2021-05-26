@@ -3,8 +3,9 @@ import operator as op
 
 import numpy as np
 
-from . import PixelRegion, SkyRegion, RegionMask
 from .attributes import CompoundRegionPix, CompoundRegionSky
+from .core import PixelRegion, SkyRegion
+from .mask import RegionMask
 from .metadata import RegionMeta, RegionVisual
 
 __all__ = ['CompoundPixelRegion', 'CompoundSkyRegion']
@@ -89,9 +90,9 @@ class CompoundPixelRegion(PixelRegion):
     def to_sky(self, wcs):
         skyreg1 = self.region1.to_sky(wcs=wcs)
         skyreg2 = self.region2.to_sky(wcs=wcs)
-        return CompoundSkyRegion(region1=skyreg1,
-                                 operator=self.operator,
-                                 region2=skyreg2, meta=self.meta, visual=self.visual)
+        return CompoundSkyRegion(region1=skyreg1, operator=self.operator,
+                                 region2=skyreg2, meta=self.meta,
+                                 visual=self.visual)
 
     @staticmethod
     def _make_annulus_path(patch_inner, patch_outer):
@@ -101,7 +102,7 @@ class CompoundPixelRegion(PixelRegion):
         This preserves the cubic Bezier curves (CURVE4) of the aperture
         paths.
 
-        Taken from ``photutils.aperture.core``
+        Taken from ``photutils.aperture.core``.
         """
         import matplotlib.path as mpath
 
@@ -141,7 +142,9 @@ class CompoundPixelRegion(PixelRegion):
         patch : `~matplotlib.patches.PathPatch`
             A matplotlib patch object.
         """
-        if self.region1.center == self.region2.center and self.operator == op.xor:
+        if (self.region1.center == self.region2.center
+                and self.operator is op.xor):
+
             import matplotlib.patches as mpatches
 
             patch_inner = self.region1.as_artist(origin=origin)
@@ -238,9 +241,9 @@ class CompoundSkyRegion(SkyRegion):
     def to_pixel(self, wcs):
         pixreg1 = self.region1.to_pixel(wcs=wcs)
         pixreg2 = self.region2.to_pixel(wcs=wcs)
-        return CompoundPixelRegion(region1=pixreg1,
-                                   operator=self.operator,
-                                   region2=pixreg2, meta=self.meta, visual=self.visual)
+        return CompoundPixelRegion(region1=pixreg1, operator=self.operator,
+                                   region2=pixreg2, meta=self.meta,
+                                   visual=self.visual)
 
     def as_artist(self, ax, **kwargs):
         raise NotImplementedError

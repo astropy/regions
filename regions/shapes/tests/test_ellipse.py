@@ -1,31 +1,33 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
+
 import numpy as np
 from numpy.testing import assert_allclose, assert_equal
 import pytest
 
-import astropy.units as u
-from astropy.tests.helper import assert_quantity_allclose
 from astropy.coordinates import SkyCoord
-from astropy.utils.data import get_pkg_data_filename
 from astropy.io import fits
+from astropy.tests.helper import assert_quantity_allclose
+import astropy.units as u
+from astropy.utils.data import get_pkg_data_filename
 from astropy.wcs import WCS
 
 from ...core import PixCoord
 from ...tests.helpers import make_simple_wcs
 from ..ellipse import EllipsePixelRegion, EllipseSkyRegion
-from .utils import HAS_MATPLOTLIB  # noqa
 from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
+from .utils import HAS_MATPLOTLIB  # noqa
 
 
-@pytest.fixture(scope='session')
-def wcs():
+@pytest.fixture(scope='session', name='wcs')
+def wcs_fixture():
     filename = get_pkg_data_filename('data/example_header.fits')
     header = fits.getheader(filename)
     return WCS(header)
 
 
 class TestEllipsePixelRegion(BaseTestPixelRegion):
-    reg = EllipsePixelRegion(center=PixCoord(3, 4), width=4, height=3, angle=5 * u.deg)
+    reg = EllipsePixelRegion(center=PixCoord(3, 4), width=4, height=3,
+                             angle=5 * u.deg)
     sample_box = [-2, 8, -1, 9]
     inside = [(4.5, 4)]
     outside = [(5, 4)]
@@ -106,13 +108,16 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
         ax.imshow(data)
 
         def update_mask(reg):
-            mask[:] = reg.to_mask(mode='subpixels', subpixels=10).to_image(data.shape)
+            mask[:] = reg.to_mask(mode='subpixels',
+                                  subpixels=10).to_image(data.shape)
 
-        # For now this will only work with unrotated ellipses. Once this works
-        # with rotated ellipses, the following exception check can be removed
-        # as well as the ``angle=0 * u.deg`` in the call to copy() below.
+        # For now this will only work with unrotated ellipses. Once this
+        # works with rotated ellipses, the following exception check can
+        # be removed as well as the ``angle=0 * u.deg`` in the call to
+        # copy() below.
         with pytest.raises(NotImplementedError,
-                           match='Cannot create matplotlib selector for rotated ellipse.'):
+                           match=('Cannot create matplotlib selector for '
+                                  'rotated ellipse.')):
             self.reg.as_mpl_selector(ax)
 
         region = self.reg.copy(angle=0 * u.deg)
@@ -147,7 +152,9 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
             assert_allclose(region.height, 1)
             assert_quantity_allclose(region.angle, 0 * u.deg)
 
-            assert_equal(mask, region.to_mask(mode='subpixels', subpixels=10).to_image(data.shape))
+            assert_equal(mask,
+                         region.to_mask(mode='subpixels',
+                                        subpixels=10).to_image(data.shape))
 
         else:
 
@@ -159,7 +166,8 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
 
             assert_equal(mask, 0)
 
-        with pytest.raises(Exception, match='Cannot attach more than one selector to a region.'):
+        with pytest.raises(Exception, match=('Cannot attach more than one '
+                                             'selector to a region.')):
             region.as_mpl_selector(ax)
 
 
@@ -193,9 +201,11 @@ class TestEllipseSkyRegion(BaseTestSkyRegion):
         height = 3 * u.arcsec
         with pytest.raises(ValueError) as excinfo:
             EllipseSkyRegion(center, width, height)
-        assert 'The center must be a 0D SkyCoord object' in str(excinfo.value)
+        estr = 'The center must be a scalar SkyCoord object'
+        assert estr in str(excinfo.value)
 
     def test_contains(self, wcs):
         position = SkyCoord([1, 3] * u.deg, [2, 4] * u.deg)
         # 1,2 is outside, 3,4 is the center and is inside
-        assert all(self.reg.contains(position, wcs) == np.array([False, True], dtype='bool'))
+        assert all(self.reg.contains(position, wcs)
+                   == np.array([False, True], dtype='bool'))

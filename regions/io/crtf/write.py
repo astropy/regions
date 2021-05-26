@@ -1,4 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
+
 from ..core import to_shape_list
 
 __all__ = ['write_crtf', 'crtf_objects_to_string']
@@ -31,7 +32,7 @@ def crtf_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
 
     Examples
     --------
-    >>> from astropy import units as u
+    >>> import astropy.units as u
     >>> from astropy.coordinates import SkyCoord
     >>> from regions import CircleSkyRegion, crtf_objects_to_string
     >>> reg_sky = CircleSkyRegion(SkyCoord(1 * u.deg, 2 * u.deg), 5 * u.deg)

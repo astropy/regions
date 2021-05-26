@@ -13,13 +13,14 @@ import numpy as np
 from .core import PixelRegion, SkyRegion
 from .pixcoord import PixCoord
 
-__all__ = ['RegionAttr', 'ScalarPix', 'OneDPix', 'ScalarLength',
-           'ScalarSky', 'OneDSky', 'QuantityLength',
-           'CompoundRegionPix', 'CompoundRegionSky']
+__all__ = []
 
 
 class RegionAttr(abc.ABC):
-    """Descriptor base class"""
+    """
+    Base descriptor class for region attribute validation.
+    """
+
     def __init__(self, name):
         self.name = name
 
@@ -36,7 +37,12 @@ class RegionAttr(abc.ABC):
         del instance.__dict__[self.name]
 
     @abc.abstractmethod
-    def _validate(self):
+    def _validate(self, value):
+        """
+        Validate the attribute value.
+
+        An exception is raised if the value is invalid.
+        """
         pass
 
 
@@ -48,13 +54,14 @@ class ScalarPix(RegionAttr):
 
     def _validate(self, value):
         if not (isinstance(value, PixCoord) and value.isscalar):
-            raise ValueError(f'The {self.name} must be a 0D PixCoord object')
+            raise ValueError(f'The {self.name} must be a scalar PixCoord '
+                             'object')
 
 
 class OneDPix(RegionAttr):
     """
-    Descriptor class for `~regions.PixelRegion`, which takes a one
-    dimensional `regions.PixCoord` object.
+    Descriptor class for `~regions.PixelRegion`, which takes a
+    one-dimensional `regions.PixCoord` object.
     """
 
     def _validate(self, value):
@@ -83,13 +90,14 @@ class ScalarSky(RegionAttr):
 
     def _validate(self, value):
         if not (isinstance(value, SkyCoord) and value.isscalar):
-            raise ValueError(f'The {self.name} must be a 0D SkyCoord object')
+            raise ValueError(f'The {self.name} must be a scalar SkyCoord '
+                             'object')
 
 
 class OneDSky(RegionAttr):
     """
-    Descriptor class for `~regions.SkyRegion`, which takes a one
-    dimensional `~astropy.coordinates.SkyCoord` object.
+    Descriptor class for `~regions.SkyRegion`, which takes a
+    one-dimensional `~astropy.coordinates.SkyCoord` object.
     """
 
     def _validate(self, value):
@@ -105,7 +113,8 @@ class QuantityLength(RegionAttr):
 
     def _validate(self, value):
         if not (isinstance(value, Quantity) and value.isscalar):
-            raise ValueError(f'The {self.name} must be a scalar astropy Quantity object')
+            raise ValueError(f'The {self.name} must be a scalar astropy '
+                             'Quantity object')
 
 
 class CompoundRegionPix(RegionAttr):
@@ -121,7 +130,7 @@ class CompoundRegionPix(RegionAttr):
 
 class CompoundRegionSky(RegionAttr):
     """
-    Descriptor class is for `~regions.CompoundSkyRegion`, which takes a
+    Descriptor class for `~regions.CompoundSkyRegion`, which takes a
     `~regions.SkyRegion` object.
     """
 

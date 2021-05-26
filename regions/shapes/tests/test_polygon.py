@@ -1,22 +1,23 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
+
 import numpy as np
 from numpy.testing import assert_allclose
 import pytest
 
-from astropy.tests.helper import assert_quantity_allclose
-from astropy import units as u
 from astropy.coordinates import SkyCoord
+import astropy.units as u
+from astropy.tests.helper import assert_quantity_allclose
 
-from ..._utils.examples import make_example_dataset
 from ...core import PixCoord, BoundingBox
 from ...tests.helpers import make_simple_wcs
+from ..._utils.examples import make_example_dataset
 from ..polygon import PolygonPixelRegion, PolygonSkyRegion
-from .utils import HAS_MATPLOTLIB  # noqa
 from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
+from .utils import HAS_MATPLOTLIB  # noqa
 
 
-@pytest.fixture(scope='session')
-def wcs():
+@pytest.fixture(scope='session', name='wcs')
+def wcs_fixture():
     config = dict(crpix=(18, 9), cdelt=(-10, 10), shape=(18, 36))
     dataset = make_example_dataset(config=config)
     return dataset.wcs
@@ -123,19 +124,26 @@ class TestPolygonSkyRegion(BaseTestSkyRegion):
 
         pixpoly = self.reg.to_pixel(wcs)
 
-        assert_allclose(pixpoly.vertices.x, [11.187992, 10.976332, 11.024032], atol=1e-5)
-        assert_allclose(pixpoly.vertices.y, [1.999486, 2.039001, 2.077076], atol=1e-5)
+        assert_allclose(pixpoly.vertices.x, [11.187992, 10.976332, 11.024032],
+                        atol=1e-5)
+        assert_allclose(pixpoly.vertices.y, [1.999486, 2.039001, 2.077076],
+                        atol=1e-5)
 
         poly = pixpoly.to_sky(wcs)
 
-        # TODO: we should probably assert something about frame attributes,
-        # or generally some better way to check if two SkyCoord are the same?
-        # For now, we use the folloing line to transform back to ICRS (`poly` is in Galactic, same as WCS)
-        poly = PolygonSkyRegion(vertices=poly.vertices.transform_to(self.reg.vertices))
-        assert_quantity_allclose(poly.vertices.data.lon, self.reg.vertices.data.lon, atol=1e-3 * u.deg)
-        assert_quantity_allclose(poly.vertices.data.lat, self.reg.vertices.data.lat, atol=1e-3 * u.deg)
+        # TODO: we should probably assert something about frame
+        # attributes, or generally some better way to check if two
+        # SkyCoord are the same? For now, we use the folloing line to
+        # transform back to ICRS (`poly` is in Galactic, same as WCS)
+        poly = PolygonSkyRegion(
+            vertices=poly.vertices.transform_to(self.reg.vertices))
+        assert_quantity_allclose(poly.vertices.data.lon,
+                                 self.reg.vertices.data.lon, atol=1e-3 * u.deg)
+        assert_quantity_allclose(poly.vertices.data.lat,
+                                 self.reg.vertices.data.lat, atol=1e-3 * u.deg)
 
     def test_contains(self, wcs):
         position = SkyCoord([1, 3.25] * u.deg, [2, 3.75] * u.deg)
         # 1,2 is outside, 3.25,3.75 should be inside the triangle...
-        assert all(self.reg.contains(position, wcs) == np.array([False, True], dtype='bool'))
+        assert all(self.reg.contains(position, wcs)
+                   == np.array([False, True], dtype='bool'))

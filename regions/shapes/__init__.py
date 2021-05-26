@@ -2,11 +2,11 @@
 """
 This subpackage defines region shapes.
 """
-from .circle import *
-from .ellipse import *
-from .point import *
-from .polygon import *
-from .rectangle import *
-from .annulus import *
-from .line import *
-from .text import *
+from .annulus import *  # noqa
+from .circle import *  # noqa
+from .ellipse import *  # noqa
+from .line import *  # noqa
+from .point import *  # noqa
+from .polygon import *  # noqa
+from .rectangle import *  # noqa
+from .text import *  # noqa

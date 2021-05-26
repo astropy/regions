@@ -2,10 +2,11 @@
 """
 This subpackage provides the core functionality for regions.
 """
-from .core import *
-from .pixcoord import *
-from .mask import *
-from .bounding_box import *
-from .compound import *
-from .attributes import *
-from .metadata import *
+
+from .attributes import *  # noqa
+from .bounding_box import *  # noqa
+from .compound import *  # noqa
+from .core import *  # noqa
+from .mask import *  # noqa
+from .metadata import *  # noqa
+from .pixcoord import *  # noqa

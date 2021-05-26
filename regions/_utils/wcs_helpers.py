@@ -1,6 +1,10 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 # (taken from photutils: should probably migrate into astropy.wcs)
-from astropy import units as u
+"""
+This module provides WCS helper tools.
+"""
+
+import astropy.units as u
 import numpy as np
 
 from ..core.pixcoord import PixCoord
@@ -62,30 +66,3 @@ def pixel_scale_angle_at_skycoord(skycoord, wcs, offset=1 * u.arcsec):
     angle = (np.arctan2(dy, dx) * u.radian).to(u.deg)
 
     return pixcoord, scale, angle
-
-
-def assert_angle_or_pixel(name, q):
-    """
-    Check that ``q`` is either an angular or a pixel
-    `~astropy.units.Quantity`.
-    """
-    if isinstance(q, u.Quantity):
-        if q.unit.physical_type == 'angle' or q.unit is u.pixel:
-            pass
-        else:
-            raise ValueError(f"{name} should have angular or pixel units")
-    else:
-        raise TypeError(f"{name} should be a Quantity instance")
-
-
-def assert_angle(name, q):
-    """
-    Check that ``q`` is an angular `~astropy.units.Quantity`.
-    """
-    if isinstance(q, u.Quantity):
-        if q.unit.physical_type == 'angle':
-            pass
-        else:
-            raise ValueError(f"{name} should have angular units")
-    else:
-        raise TypeError(f"{name} should be a Quantity instance")

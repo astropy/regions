@@ -1,14 +1,15 @@
-import pytest
+# Licensed under a 3-clause BSD style license - see LICENSE.rst
 
 from astropy.coordinates import SkyCoord
 import astropy.units as u
 from astropy.utils.data import get_pkg_data_filename
+import pytest
 
+from ....shapes.circle import CircleSkyRegion
+from ....shapes.ellipse import EllipseSkyRegion
 from ..core import CRTFRegionParserError
 from ..read import CRTFParser, read_crtf
 from ..write import crtf_objects_to_string
-from ....shapes.circle import CircleSkyRegion
-from ....shapes.ellipse import EllipseSkyRegion
 
 
 implemented_region_types = ('ellipse', 'circle', 'rectangle', 'poly', 'point',
@@ -19,8 +20,8 @@ def test_global_parser():
     """
     Checks that the global_parser does what's expected.
     """
-    global_test_str = ("global coord=B1950_VLA, frame=BARY, corr=[I, Q], "
-                       "color=blue")
+    global_test_str = ('global coord=B1950_VLA, frame=BARY, corr=[I, Q], '
+                       'color=blue')
     global_parser = CRTFParser(global_test_str)
     expected = {'coord': 'B1950_VLA', 'frame': 'BARY',
                 'corr': ['I', 'Q'], 'color': 'blue'}
@@ -48,60 +49,63 @@ def test_valid_region_type():
     with pytest.raises(CRTFRegionParserError) as excinfo:
         CRTFParser(reg_str)
 
-    assert "Not a valid CRTF Region type: 'hyperbola'" in str(excinfo.value)
+    assert 'Not a valid CRTF Region type: "hyperbola"' in str(excinfo.value)
 
 
 def test_valid_global_meta_key():
     """
     Checks whether the global key is valid or not.
     """
-    global_test_str = ("global label=B1950_VLA, frame=BARY, corr=[I, Q], "
-                       "color=blue")
+    global_test_str = ('global label=B1950_VLA, frame=BARY, corr=[I, Q], '
+                       'color=blue')
     with pytest.raises(CRTFRegionParserError) as excinfo:
         CRTFParser(global_test_str)
-    assert "'label' is not a valid global meta key" in str(excinfo.value)
+    assert '"label" is not a valid global meta key' in str(excinfo.value)
 
 
 def test_valid_meta_key():
     """
     Checks whether the key is valid or not.
     """
-    meta_test_str = ("annulus[[17h51m03.2s, -45d17m50s], [0.10deg, 4.12deg]], "
-                     "hello='My label here'")
+    meta_test_str = ('annulus[[17h51m03.2s, -45d17m50s], [0.10deg, 4.12deg]], '
+                     'hello="My label here"')
     with pytest.raises(CRTFRegionParserError) as excinfo:
         CRTFParser(meta_test_str)
-    assert "'hello' is not a valid meta key" in str(excinfo.value)
+    assert '"hello" is not a valid meta key' in str(excinfo.value)
 
 
 def test_valid_region_syntax():
     """
     Checks whether the region has valid parameters
     """
-    reg_str1 = "circle[[18h12m24s, -23d11m00s], [2.3arcsec,4.5arcsec]"
+    reg_str1 = 'circle[[18h12m24s, -23d11m00s], [2.3arcsec,4.5arcsec]'
     with pytest.raises(CRTFRegionParserError) as excinfo:
         CRTFParser(reg_str1)
-    assert ("Not in proper format: ('2.3arcsec', '4.5arcsec') should be "
-            "a single length" in str(excinfo.value))
 
-    reg_str2 = ("symbol[[32.1423deg, 12.1412deg], 12deg], linewidth=2, "
-                "coord=J2000, symsize=2")
+    estr = ("Not in proper format: ('2.3arcsec', '4.5arcsec') should be "
+            "a single length")
+    assert estr in str(excinfo.value)
+
+    reg_str2 = ('symbol[[32.1423deg, 12.1412deg], 12deg], linewidth=2, '
+                'coord=J2000, symsize=2')
     with pytest.raises(CRTFRegionParserError) as excinfo:
         CRTFParser(reg_str2)
-    assert ("Not in proper format: '12deg' should be a symbol" in
-            str(excinfo.value))
+    estr = 'Not in proper format: "12deg" should be a symbol'
+    assert estr in str(excinfo.value)
 
-    reg_str3 = "circle[[18h12m24s, -23d11m00s]"
+    reg_str3 = 'circle[[18h12m24s, -23d11m00s]'
     with pytest.raises(CRTFRegionParserError) as excinfo:
         CRTFParser(reg_str3)
-    assert ("Does not contain expected number of parameters for the region "
-            "'circle'" in str(excinfo.value))
+    estr = ('Does not contain expected number of parameters for the region '
+            '"circle"')
+    assert estr in str(excinfo.value)
 
-    reg_str4 = "poly[[1, 2], [4, 5]]"
+    reg_str4 = 'poly[[1, 2], [4, 5]]'
     with pytest.raises(CRTFRegionParserError) as excinfo:
         CRTFParser(reg_str4)
-    assert "polygon should have >= 3 coordinates" in str(excinfo.value)
+    assert 'polygon should have >= 3 coordinates' in str(excinfo.value)
 
-    reg_str6 = "rotbox[[12h01m34.1s, 12d23m33s], [3arcmin,], 12deg]"
+    reg_str6 = 'rotbox[[12h01m34.1s, 12d23m33s], [3arcmin,], 12deg]'
     with pytest.raises(CRTFRegionParserError) as excinfo:
         CRTFParser(reg_str6)
     assert "('3arcmin', '') should be a pair of length" in str(excinfo.value)

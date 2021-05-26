@@ -1,11 +1,13 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-import numpy as np
-from astropy.utils import lazyproperty
-from astropy.io import fits
-from astropy.wcs import WCS
+
 from astropy.coordinates import SkyCoord
+from astropy.io import fits
 from astropy.table import Table
 from astropy.table import vstack as table_vstack
+from astropy.utils import lazyproperty
+from astropy.wcs import WCS
+import numpy as np
+
 from ..core.pixcoord import PixCoord
 
 __all__ = ['make_example_dataset']
@@ -36,7 +38,7 @@ def make_example_dataset(data='simulated', config=None):
     Returns
     -------
     dataset : ``ExampleDataset``
-        Example dataset object.
+        An example dataset object.
 
     Examples
     --------
@@ -99,7 +101,8 @@ class ExampleDataset:
     def image(self):
         """Counts image (`~astropy.io.fits.ImageHDU`)."""
         events = self.event_table
-        skycoord = SkyCoord(events['GLON'], events['GLAT'], unit='deg', frame='galactic')
+        skycoord = SkyCoord(events['GLON'], events['GLAT'], unit='deg',
+                            frame='galactic')
         pixcoord = PixCoord.from_sky(skycoord=skycoord, wcs=self.wcs)
 
         shape = self.config['shape']
@@ -171,10 +174,10 @@ class ExampleDatasetSimulated(ExampleDataset):
         for source in self.source_table:
             lon = source['GLON'] * np.ones(source['COUNTS'])
             lat = source['GLAT'] * np.ones(source['COUNTS'])
-            coord = SkyCoord(lon, lat, unit='deg', frame='galactic')
 
             # TODO: scatter positions assuming Gaussian PSF on the sky
             # using SkyOffsetFrame.
+            # coord = SkyCoord(lon, lat, unit='deg', frame='galactic')
 
             table = Table()
             table['GLON'] = lon
@@ -205,7 +208,8 @@ class ExampleDatasetFermi(ExampleDataset):
 
         Columns: GLON, GLAT, COUNTS
         """
-        url = 'https://github.com/gammapy/gammapy-extra/raw/master/datasets/fermi_2fhl/gll_psch_v08.fit.gz'
+        url = ('https://github.com/gammapy/gammapy-extra/raw/master/datasets/'
+               'fermi_2fhl/gll_psch_v08.fit.gz')
         table = Table.read(url, hdu='2FHL Source Catalog')
         table.rename_column('Npred', 'COUNTS')
         table.keep_columns(['GLON', 'GLAT', 'COUNTS'])
@@ -219,7 +223,8 @@ class ExampleDatasetFermi(ExampleDataset):
 
         Columns: GLON, GLAT
         """
-        url = 'https://github.com/gammapy/gammapy-extra/raw/master/datasets/fermi_2fhl/2fhl_events.fits.gz'
+        url = ('https://github.com/gammapy/gammapy-extra/raw/master/datasets/'
+               'fermi_2fhl/2fhl_events.fits.gz')
         table = Table.read(url, hdu='EVENTS')
         table.rename_column('L', 'GLON')
         table.rename_column('B', 'GLAT')
@@ -241,7 +246,7 @@ def _table_to_bintable(table):
 
 if __name__ == '__main__':
     dataset = make_example_dataset(data='simulated')
-    dataset.hdu_list.writeto('example-dataset-simulated.fits', clobber=True)
+    dataset.hdu_list.writeto('example-dataset-simulated.fits', overwrite=True)
 
     dataset = make_example_dataset(data='fermi')
-    dataset.hdu_list.writeto('example-dataset-fermi.fits', clobber=True)
+    dataset.hdu_list.writeto('example-dataset-fermi.fits', overwrite=True)

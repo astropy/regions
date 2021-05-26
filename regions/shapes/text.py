@@ -1,4 +1,7 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
+"""
+This module defines text regions in both pixel and sky coordinates.
+"""
 
 from astropy.wcs.utils import pixel_to_skycoord, skycoord_to_pixel
 
@@ -107,7 +110,7 @@ class TextSkyRegion(PointSkyRegion):
     _params = ('center', 'text')
 
     def __init__(self, center, text, meta=None, visual=None):
-        super().__init__(center,  meta, visual)
+        super().__init__(center, meta, visual)
         self.text = text
 
     def to_pixel(self, wcs):

@@ -1,3 +1,5 @@
+# Licensed under a 3-clause BSD style license - see LICENSE.rst
+
 from astropy.io import registry
 
 from .read import read_ds9
@@ -8,7 +10,7 @@ from ..core import ShapeList
 DS9_SIGNATURE = '# Region file format: DS9'
 
 
-def is_ds9(origin, path, fileobj, *args, **kwargs):
+def is_ds9(origin, path, fileobj, *args, **kwargs):  # noqa pylint: disable=unused-argument
     """
     Identify a DS9 region file.
 

@@ -1,7 +1,8 @@
-import numpy as np
+# Licensed under a 3-clause BSD style license - see LICENSE.rst
 
+import astropy.units as u
 from astropy.wcs import WCS
-from astropy import units as u
+import numpy as np
 
 
 def make_simple_wcs(skycoord, resolution, size):

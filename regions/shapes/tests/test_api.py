@@ -4,23 +4,23 @@ The tests in this file simply check what functionality is currently
 implemented and doesn't check anything about correctness.
 """
 import itertools
+
+from astropy.coordinates import SkyCoord
+import astropy.units as u
+from astropy.wcs import WCS
 import pytest
 
-from astropy import units as u
-from astropy.coordinates import SkyCoord
-from astropy.wcs import WCS
-
+from ...core.core import PixelRegion, Region, SkyRegion
 from ...core.mask import RegionMask
-from ...core.core import Region, SkyRegion, PixelRegion
 from ...core.pixcoord import PixCoord
+from ..annulus import (CircleAnnulusPixelRegion, CircleAnnulusSkyRegion,
+                       EllipseAnnulusPixelRegion, EllipseAnnulusSkyRegion,
+                       RectangleAnnulusPixelRegion, RectangleAnnulusSkyRegion)
 from ..circle import CirclePixelRegion, CircleSkyRegion
 from ..ellipse import EllipsePixelRegion, EllipseSkyRegion
+from ..point import PointPixelRegion, PointSkyRegion
 from ..polygon import PolygonPixelRegion, PolygonSkyRegion
 from ..rectangle import RectanglePixelRegion, RectangleSkyRegion
-from ..point import PointPixelRegion, PointSkyRegion
-from ..annulus import (CircleAnnulusPixelRegion, CircleAnnulusSkyRegion,
-                       RectangleAnnulusPixelRegion, RectangleAnnulusSkyRegion,
-                       EllipseAnnulusPixelRegion, EllipseAnnulusSkyRegion)
 
 PIXEL_REGIONS = [
     CirclePixelRegion(PixCoord(3, 4), radius=5),
@@ -30,22 +30,22 @@ PIXEL_REGIONS = [
     PolygonPixelRegion(PixCoord([1, 4, 3], [2, 4, 4])),
     RectanglePixelRegion(PixCoord(6, 5), width=3, height=5),
     RectangleAnnulusPixelRegion(PixCoord(6, 5), 3, 6, 5, 7),
-    PointPixelRegion(PixCoord(1, 2)),
-]
+    PointPixelRegion(PixCoord(1, 2))]
 
 SKY_REGIONS = [
     CircleSkyRegion(SkyCoord(3 * u.deg, 4 * u.deg), radius=5 * u.deg),
-    CircleAnnulusSkyRegion(SkyCoord(3 * u.deg, 4 * u.deg), 5 * u.deg, 7 * u.deg),
+    CircleAnnulusSkyRegion(SkyCoord(3 * u.deg, 4 * u.deg), 5 * u.deg,
+                           7 * u.deg),
     EllipseSkyRegion(SkyCoord(3 * u.deg, 4 * u.deg), width=7 * u.deg,
                      height=5 * u.deg, angle=3 * u.deg),
-    EllipseAnnulusSkyRegion(SkyCoord(3 * u.deg, 4 * u.deg), 7 * u.deg, 9 * u.deg,
-                            5 * u.deg, 9 * u.deg, angle=3 * u.deg),
+    EllipseAnnulusSkyRegion(SkyCoord(3 * u.deg, 4 * u.deg), 7 * u.deg,
+                            9 * u.deg, 5 * u.deg, 9 * u.deg, angle=3 * u.deg),
     PolygonSkyRegion(SkyCoord([1, 4, 3] * u.deg, [2, 4, 4] * u.deg)),
-    RectangleSkyRegion(SkyCoord(6 * u.deg, 5 * u.deg), width=3 * u.deg, height=5 * u.deg),
-    RectangleAnnulusSkyRegion(SkyCoord(6 * u.deg, 5 * u.deg), 3 * u.deg, 5 * u.deg,
-                              5 * u.deg, 7 * u.deg),
-    PointSkyRegion(SkyCoord(6 * u.deg, 5 * u.deg)),
-]
+    RectangleSkyRegion(SkyCoord(6 * u.deg, 5 * u.deg), width=3 * u.deg,
+                       height=5 * u.deg),
+    RectangleAnnulusSkyRegion(SkyCoord(6 * u.deg, 5 * u.deg), 3 * u.deg,
+                              5 * u.deg, 5 * u.deg, 7 * u.deg),
+    PointSkyRegion(SkyCoord(6 * u.deg, 5 * u.deg))]
 
 MASK_MODES = ['center', 'exact', 'subpixels']
 COMMON_WCS = WCS(naxis=2)
@@ -59,9 +59,10 @@ def ids_func(arg):
         return str(arg)
 
 
-@pytest.mark.parametrize('region', PIXEL_REGIONS, ids=ids_func)
+@pytest.mark.parametrize('region', [PIXEL_REGIONS[i] for i in (0, 2, 5)],
+                         ids=ids_func)
 def test_pix_in(region):
-    PixCoord(1, 1) in region
+    assert PixCoord(5, 4) in region
 
 
 @pytest.mark.parametrize('region', PIXEL_REGIONS, ids=ids_func)
@@ -101,7 +102,8 @@ def test_sky_in(region):
 
 @pytest.mark.parametrize('region', SKY_REGIONS, ids=ids_func)
 def test_sky_in_array(region):
-    region.contains(SkyCoord([1, 2, 3] * u.deg, [3, 2, 1] * u.deg, frame='icrs'), COMMON_WCS)
+    region.contains(SkyCoord([1, 2, 3] * u.deg, [3, 2, 1] * u.deg,
+                             frame='icrs'), COMMON_WCS)
 
 
 @pytest.mark.parametrize('region', SKY_REGIONS, ids=ids_func)
@@ -147,9 +149,11 @@ def test_attribute_validation_sky_regions(region):
                                   [1], SkyCoord(1 * u.deg, 2 * u.deg), 1],
                           angle=[u.Quantity([1 * u.deg, 2 * u.deg]), 2,
                                  SkyCoord(1 * u.deg, 2 * u.deg)],
-                          vertices=[u.Quantity("1deg"), 2, SkyCoord(1 * u.deg, 2 * u.deg),
-                                    SkyCoord([[1 * u.deg, 2 * u.deg]], [[2 * u.deg, 3 * u.deg]])]
-                          )
+                          vertices=[u.Quantity("1deg"), 2,
+                                    SkyCoord(1 * u.deg, 2 * u.deg),
+                                    SkyCoord([[1 * u.deg, 2 * u.deg]],
+                                             [[2 * u.deg, 3 * u.deg]])])
+
     invalid_values['width'] = invalid_values['radius']
     invalid_values['height'] = invalid_values['radius']
     invalid_values['inner_height'] = invalid_values['radius']

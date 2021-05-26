@@ -7,9 +7,9 @@ The approach is to divide the rectangle into two triangles, and
 reproject these so that the ellipse is a unit circle, then compute the
 intersection of a triangle with a unit circle.
 """
+
 import numpy as np
 cimport numpy as np
-
 
 __all__ = ['elliptical_overlap_grid']
 

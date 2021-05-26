@@ -1,4 +1,8 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
+"""
+Tests for the compound module.
+"""
+
 import operator
 import numpy as np
 from numpy.testing import assert_allclose
@@ -12,6 +16,9 @@ from ...tests.helpers import make_simple_wcs
 
 
 class TestCompoundPixel:
+    """
+    Test compound pixel regions.
+    """
     # Two circles that overlap in one column
     c1 = CirclePixelRegion(PixCoord(5, 5), 4)
     c2 = CirclePixelRegion(PixCoord(11, 5), 4)
@@ -19,7 +26,7 @@ class TestCompoundPixel:
     def test_copy(self):
         reg = (self.c1 | self.c2).copy()
         assert isinstance(reg, CompoundPixelRegion)
-        assert reg.operator == operator.or_
+        assert reg.operator is operator.or_
 
         assert isinstance(reg.region1, CirclePixelRegion)
         assert reg.region1.center.xy == (5, 5)
@@ -36,7 +43,7 @@ class TestCompoundPixel:
     def test_rotate(self):
         reg = (self.c1 | self.c2).rotate(PixCoord(0, 0), 360 * u.deg)
         assert isinstance(reg, CompoundPixelRegion)
-        assert reg.operator == operator.or_
+        assert reg.operator is operator.or_
 
         assert isinstance(reg.region1, CirclePixelRegion)
         assert_allclose(reg.region1.center.xy, (5, 5))
@@ -138,7 +145,6 @@ def test_compound_sky():
     assert (diff.contains(coords, wcs) == [True, True, False, False]).all()
 
     c3 = CircleSkyRegion(test_coord4, 0.1 * u.deg)
-
     union = c1 | c2 | c3
     assert (union.contains(coords, wcs) == [True, True, True, True]).all()
 
@@ -148,5 +154,4 @@ def test_compound_sky():
 
     diff = c1 ^ c2 ^ c3
     assert (diff.contains(coords, wcs) == [True, True, False, True]).all()
-
     assert 'Compound' in str(union)

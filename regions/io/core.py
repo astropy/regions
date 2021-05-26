@@ -4,12 +4,12 @@ import string
 import numbers
 import numpy as np
 
-from astropy import units as u
-from astropy import coordinates
-from astropy.coordinates import Angle, SkyCoord
-from astropy.io.registry import UnifiedReadWriteMethod
 from astropy import log
+from astropy.coordinates import (Angle, SkyCoord, UnitSphericalRepresentation,
+                                 frame_transform_graph)
+from astropy.io.registry import UnifiedReadWriteMethod
 from astropy.table import Table
+import astropy.units as u
 
 from .. import shapes
 from ..core import PixCoord, SkyRegion
@@ -572,9 +572,9 @@ class Shape:
         """
         parsed_angles = [(x, y)
                          for x, y in zip(self.coord[:-1:2], self.coord[1::2])
-                         if (isinstance(x, coordinates.Angle) and isinstance(y, coordinates.Angle))
+                         if (isinstance(x, Angle) and isinstance(y, Angle))
                          ]
-        frame = coordinates.frame_transform_graph.lookup_name(self.coordsys)
+        frame = frame_transform_graph.lookup_name(self.coordsys)
 
         lon, lat = zip(*parsed_angles)
         if hasattr(lon, '__len__') and hasattr(lat, '__len__') and len(lon) == 1 and len(lat) == 1:
@@ -583,7 +583,7 @@ class Shape:
         else:
             # otherwise, they are vector quantities
             lon, lat = u.Quantity(lon), u.Quantity(lat)
-        sphcoords = coordinates.UnitSphericalRepresentation(lon, lat)
+        sphcoords = UnitSphericalRepresentation(lon, lat)
         coords = [SkyCoord(frame(sphcoords))]
 
         if self.region_type != 'polygon':
@@ -729,7 +729,7 @@ def to_shape_list(region_list, coordinate_system='fk5'):
             else:
                 coordsys = 'image'
 
-        frame = coordinates.frame_transform_graph.lookup_name(coordsys)
+        frame = frame_transform_graph.lookup_name(coordsys)
 
         new_coord = []
         for val in coord:

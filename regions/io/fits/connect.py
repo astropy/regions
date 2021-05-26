@@ -1,9 +1,11 @@
+# Licensed under a 3-clause BSD style license - see LICENSE.rst
+
 from astropy.io import registry
 from astropy.io.fits.connect import is_fits
 
+from ..core import ShapeList
 from .read import read_fits_region
 from .write import write_fits_region
-from ..core import ShapeList
 
 
 # FIXME: write_fits_region has its first two arguments backwards as

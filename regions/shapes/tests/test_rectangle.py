@@ -1,50 +1,51 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
+
 import numpy as np
 from numpy.testing import assert_allclose, assert_equal
 import pytest
 
 import astropy.units as u
 from astropy.coordinates import SkyCoord
+from astropy.io import fits
 from astropy.tests.helper import assert_quantity_allclose
 from astropy.utils.data import get_pkg_data_filename
-from astropy.io import fits
 from astropy.wcs import WCS
 
 from ...core import PixCoord
-from ..rectangle import RectanglePixelRegion, RectangleSkyRegion
 from ...tests.helpers import make_simple_wcs
-from .utils import HAS_MATPLOTLIB  # noqa
+from ..rectangle import RectanglePixelRegion, RectangleSkyRegion
 from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
+from .utils import HAS_MATPLOTLIB  # noqa
 
 
-@pytest.fixture(scope='session')
-def wcs():
+@pytest.fixture(scope='session', name='wcs')
+def wcs_fixture():
     filename = get_pkg_data_filename('data/example_header.fits')
     header = fits.getheader(filename)
     return WCS(header)
 
-def test_corners():
 
-    xc,yc = 2,2
-    angle = 30*u.deg
+def test_corners():
+    xc, yc = 2, 2
+    angle = 30 * u.deg
     width = 2
     height = 1
-    reg = RectanglePixelRegion(center=PixCoord(xc, yc),
-                               width=width, height=height, angle=angle)
+    reg = RectanglePixelRegion(PixCoord(xc, yc), width=width, height=height,
+                               angle=angle)
 
-    y1 = yc + np.cos(angle) * height/2 + np.sin(angle) * width/2
-    x1 = xc + np.cos(angle) * width/2 - np.sin(angle) * height/2
+    y1 = yc + np.cos(angle) * (height / 2) + np.sin(angle) * (width / 2)
+    x1 = xc + np.cos(angle) * (width / 2) - np.sin(angle) * (height / 2)
 
     assert (x1, y1) in reg.corners
 
-    reg = RectanglePixelRegion(center=PixCoord(xc, yc),
-                               width=width, height=height, angle=90*u.deg)
+    reg = RectanglePixelRegion(PixCoord(xc, yc), width=width, height=height,
+                               angle=90 * u.deg)
     # simple case: rotate by 90
-    np.testing.assert_array_equal([(2.5, 1.), (2.5, 3.), (1.5, 3.), (1.5,1.)],
+    np.testing.assert_array_equal([(2.5, 1.), (2.5, 3.), (1.5, 3.), (1.5, 1.)],
                                   reg.corners)
 
-    reg = RectanglePixelRegion(center=PixCoord(xc, yc),
-                               width=width, height=height, angle=0*u.deg)
+    reg = RectanglePixelRegion(center=PixCoord(xc, yc), width=width,
+                               height=height, angle=0 * u.deg)
     # simpler case: rotate by 0
     np.testing.assert_array_equal([(1, 1.5), (3, 1.5), (3, 2.5), (1, 2.5)],
                                   reg.corners)
@@ -53,17 +54,18 @@ def test_corners():
     assert len(poly.vertices) == 4
 
 
-
 class TestRectanglePixelRegion(BaseTestPixelRegion):
 
-    reg = RectanglePixelRegion(center=PixCoord(3, 4), width=4, height=3, angle=5 * u.deg)
+    reg = RectanglePixelRegion(center=PixCoord(3, 4), width=4, height=3,
+                               angle=5 * u.deg)
     sample_box = [-2, 8, -1, 9]
     inside = [(4.5, 4)]
     outside = [(5, 2.5)]
     expected_area = 12
-    expected_repr = '<RectanglePixelRegion(center=PixCoord(x=3, y=4), width=4, height=3, angle=5.0 deg)>'
-    expected_str = ('Region: RectanglePixelRegion\ncenter: PixCoord(x=3, y=4)\n'
-                    'width: 4\nheight: 3\nangle: 5.0 deg')
+    expected_repr = ('<RectanglePixelRegion(center=PixCoord(x=3, y=4), '
+                     'width=4, height=3, angle=5.0 deg)>')
+    expected_str = ('Region: RectanglePixelRegion\ncenter: PixCoord(x=3, '
+                    'y=4)\nwidth: 4\nheight: 3\nangle: 5.0 deg')
 
     def test_copy(self):
         reg = self.reg.copy()
@@ -86,28 +88,20 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
     @pytest.mark.skipif('not HAS_MATPLOTLIB')
     def test_as_artist(self):
         patch = self.reg.as_artist()
-        # Note: `reg.center` is the center, `patch.xy` is the lower-left corner
+        # Note: `reg.center` is the center, `patch.xy` is the lower-left
+        # corner
         assert_allclose(patch.xy, (1.138344, 2.331396), atol=1e-3)
-
         assert_allclose(patch.get_width(), 4)
         assert_allclose(patch.get_height(), 3)
-        # `matplotlib.patches.Rectangle` currently doesn't expose `angle`.
-        # See https://github.com/matplotlib/matplotlib/issues/7536
-        # In the far future, when it's available in the matplotlib versions
-        # we support, we could re-activate a test here.
-        # For now, we could also add an assert on `patch.get_verts()` if
-        # it's considered important to test that the rotation was done
-        # correctly.
-        # assert_allclose(patch._angle, 5)
+        assert_allclose(patch.angle, 5)
 
     def test_rotate(self):
         reg = self.reg.rotate(PixCoord(2, 3), 90 * u.deg)
         assert_allclose(reg.center.xy, (1, 4))
-        assert_allclose(reg.angle.to_value("deg"), 95)
+        assert_allclose(reg.angle.to_value('deg'), 95)
 
     @pytest.mark.parametrize('sync', (False, True))
     def test_as_mpl_selector(self, sync):
-
         plt = pytest.importorskip('matplotlib.pyplot')
 
         data = np.random.random((16, 16))
@@ -117,13 +111,16 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
         ax.imshow(data)
 
         def update_mask(reg):
-            mask[:] = reg.to_mask(mode='subpixels', subpixels=10).to_image(data.shape)
+            mask[:] = reg.to_mask(
+                mode='subpixels', subpixels=10).to_image(data.shape)
 
-        # For now this will only work with unrotated rectangles. Once this works
-        # with rotated rectangles, the following exception check can be removed
-        # as well as the ``angle=0 * u.deg`` in the call to copy() below.
+        # For now this will only work with unrotated rectangles. Once
+        # this works with rotated rectangles, the following exception
+        # check can be removed as well as the ``angle=0 * u.deg`` in the
+        # call to copy() below.
         with pytest.raises(NotImplementedError,
-                           match='Cannot create matplotlib selector for rotated rectangle.'):
+                           match=('Cannot create matplotlib selector for '
+                                  'rotated rectangle.')):
             self.reg.as_mpl_selector(ax)
 
         region = self.reg.copy(angle=0 * u.deg)
@@ -151,17 +148,16 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
         ax.figure.canvas.draw()
 
         if sync:
-
             assert_allclose(region.center.x, 8.3)
             assert_allclose(region.center.y, 4.9)
             assert_allclose(region.width, 2)
             assert_allclose(region.height, 1)
             assert_quantity_allclose(region.angle, 0 * u.deg)
 
-            assert_equal(mask, region.to_mask(mode='subpixels', subpixels=10).to_image(data.shape))
+            assert_equal(mask, region.to_mask(
+                mode='subpixels', subpixels=10).to_image(data.shape))
 
         else:
-
             assert_allclose(region.center.x, 3)
             assert_allclose(region.center.y, 4)
             assert_allclose(region.width, 4)
@@ -170,7 +166,8 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
 
             assert_equal(mask, 0)
 
-        with pytest.raises(Exception, match='Cannot attach more than one selector to a region.'):
+        with pytest.raises(Exception, match=('Cannot attach more than one '
+                                             'selector to a region.')):
             region.as_mpl_selector(ax)
 
 
@@ -179,41 +176,38 @@ def test_rectangular_pixel_region_bbox():
     width = 7
     height = 3
     a = RectanglePixelRegion(PixCoord(50, 50), width=width, height=height,
-                             angle=0.*u.deg)
+                             angle=0. * u.deg)
     assert a.bounding_box.shape == (height, width)
 
     a = RectanglePixelRegion(PixCoord(50.5, 50.5), width=width, height=height,
-                             angle=0.*u.deg)
+                             angle=0. * u.deg)
     assert a.bounding_box.shape == (height + 1, width + 1)
 
     a = RectanglePixelRegion(PixCoord(50, 50), width=width, height=height,
-                             angle=90.*u.deg)
+                             angle=90. * u.deg)
     assert a.bounding_box.shape == (width, height)
 
     # even sizes
     width = 8
     height = 4
     a = RectanglePixelRegion(PixCoord(50, 50), width=width, height=height,
-                             angle=0.*u.deg)
+                             angle=0. * u.deg)
     assert a.bounding_box.shape == (height + 1, width + 1)
 
     a = RectanglePixelRegion(PixCoord(50.5, 50.5), width=width, height=height,
-                             angle=0.*u.deg)
+                             angle=0. * u.deg)
     assert a.bounding_box.shape == (height, width)
 
     a = RectanglePixelRegion(PixCoord(50.5, 50.5), width=width, height=height,
-                             angle=90.*u.deg)
+                             angle=90. * u.deg)
     assert a.bounding_box.shape == (width, height)
 
 
 class TestRectangleSkyRegion(BaseTestSkyRegion):
 
-    reg = RectangleSkyRegion(
-        center=SkyCoord(3, 4, unit='deg'),
-        width=4 * u.deg,
-        height=3 * u.deg,
-        angle=5 * u.deg,
-    )
+    reg = RectangleSkyRegion(center=SkyCoord(3, 4, unit='deg'),
+                             width=4 * u.deg, height=3 * u.deg,
+                             angle=5 * u.deg)
 
     expected_repr = ('<RectangleSkyRegion(center=<SkyCoord (ICRS): (ra, dec) '
                      'in deg\n    (3., 4.)>, width=4.0 deg, height=3.0 deg, '
@@ -225,13 +219,14 @@ class TestRectangleSkyRegion(BaseTestSkyRegion):
     def test_copy(self):
         reg = self.reg.copy()
         assert_allclose(reg.center.ra.deg, 3)
-        assert_allclose(reg.width.to_value("deg"),  4)
-        assert_allclose(reg.height.to_value("deg"), 3)
-        assert_allclose(reg.angle.to_value("deg"), 5)
+        assert_allclose(reg.width.to_value('deg'), 4)
+        assert_allclose(reg.height.to_value('deg'), 3)
+        assert_allclose(reg.angle.to_value('deg'), 5)
         assert reg.visual == {}
         assert reg.meta == {}
 
     def test_contains(self, wcs):
         position = SkyCoord([1, 3] * u.deg, [2, 4] * u.deg)
         # 1,2 is outside, 3,4 is the center and is inside
-        assert all(self.reg.contains(position, wcs) == np.array([False, True], dtype='bool'))
+        assert all(self.reg.contains(position, wcs)
+                   == np.array([False, True], dtype='bool'))

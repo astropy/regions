@@ -1,34 +1,39 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
+"""
+Tests for the pixcoord module.
+"""
+
+import astropy.units as u
 import numpy as np
 from numpy.testing import assert_equal, assert_allclose
 import pytest
-from astropy import units as u
+
 from ..._utils.examples import make_example_dataset
 from ..pixcoord import PixCoord
 
 
-@pytest.fixture(scope='session')
-def wcs():
+@pytest.fixture(scope='session', name='wcs')
+def fixture_wcs():
     config = dict(crpix=(18, 9), cdelt=(-10, 10), shape=(18, 36))
     dataset = make_example_dataset(config=config)
     return dataset.wcs
 
 
 def test_pixcoord_copy_scalar():
-    p = PixCoord(x=1, y=2)
-    p2 = p.copy()
-    p.x = 99
-    p.y = 99
-    assert p2.xy == (1, 2)
+    pc1 = PixCoord(x=1, y=2)
+    pc2 = pc1.copy()
+    pc1.x = 99
+    pc1.y = 99
+    assert pc2.xy == (1, 2)
 
 
 def test_pixcoord_copy_array():
-    p = PixCoord(x=[1, 2], y=[3, 4])
-    p2 = p.copy()
-    p.x[0] = 99
-    p.y[0] = 99
-    assert_equal(p2.x, [1, 2])
-    assert_equal(p2.y, [3, 4])
+    pc1 = PixCoord(x=[1, 2], y=[3, 4])
+    pc2 = pc1.copy()
+    pc1.x[0] = 99
+    pc1.y[0] = 99
+    assert_equal(pc2.x, [1, 2])
+    assert_equal(pc2.y, [3, 4])
 
 
 def test_pixcoord_basic_dimension():
@@ -37,197 +42,186 @@ def test_pixcoord_basic_dimension():
 
 
 def test_pixcoord_basics_scalar():
-    p = PixCoord(x=1, y=2)
-    p1 = PixCoord(x=np.array(1), y=2)
-    p2 = PixCoord(x=np.array(1), y=np.array(2))
+    pc0 = PixCoord(x=1, y=2)
+    pc1 = PixCoord(x=np.array(1), y=2)
+    pc2 = PixCoord(x=np.array(1), y=np.array(2))
 
-    assert p == p1
-    assert p1 == p2
+    assert pc0 == pc1
+    assert pc1 == pc2
 
-    assert p.x == 1
-    assert p.y == 2
+    assert pc0.x == 1
+    assert pc0.y == 2
 
-    assert p.isscalar
-    assert p1.isscalar
-    assert p2.isscalar
+    assert pc0.isscalar
+    assert pc1.isscalar
+    assert pc2.isscalar
 
-    assert str(p) == 'PixCoord(x=1, y=2)'
-    assert repr(p) == 'PixCoord(x=1, y=2)'
+    assert str(pc0) == 'PixCoord(x=1, y=2)'
+    assert repr(pc0) == 'PixCoord(x=1, y=2)'
 
     with pytest.raises(TypeError):
-        len(p)
+        _ = len(pc0)
 
     with pytest.raises(IndexError):
-        p[0]
+        _ = pc0[0]
 
 
 def test_pixcoord_basics_array_1d():
-    p = PixCoord(x=[1, 2, 3], y=[11, 22, 33])
-    p1 = PixCoord(x=1, y=[1, 2, 3])
+    pc0 = PixCoord(x=[1, 2, 3], y=[11, 22, 33])
+    pc1 = PixCoord(x=1, y=[1, 2, 3])
 
-    assert_equal(p.x, [1, 2, 3])
-    assert_equal(p.y, [11, 22, 33])
+    assert_equal(pc0.x, [1, 2, 3])
+    assert_equal(pc0.y, [11, 22, 33])
 
-    assert_equal(p1.x, [1, 1, 1])
-    assert_equal(p1.y, [1, 2, 3])
+    assert_equal(pc1.x, [1, 1, 1])
+    assert_equal(pc1.y, [1, 2, 3])
 
-    assert not p.isscalar
-    assert not p1.isscalar
+    assert not pc0.isscalar
+    assert not pc1.isscalar
 
-    assert str(p) == 'PixCoord(x=[1 2 3], y=[11 22 33])'
-    assert str(p1) == 'PixCoord(x=[1 1 1], y=[1 2 3])'
+    assert str(pc0) == 'PixCoord(x=[1 2 3], y=[11 22 33])'
+    assert str(pc1) == 'PixCoord(x=[1 1 1], y=[1 2 3])'
 
-    assert repr(p) == 'PixCoord(x=[1 2 3], y=[11 22 33])'
-    assert repr(p1) == 'PixCoord(x=[1 1 1], y=[1 2 3])'
+    assert repr(pc0) == 'PixCoord(x=[1 2 3], y=[11 22 33])'
+    assert repr(pc1) == 'PixCoord(x=[1 1 1], y=[1 2 3])'
 
-    assert len(p) == 3
-    assert len(p1) == 3
+    assert len(pc0) == 3
+    assert len(pc1) == 3
 
-    # Test `__iter__` via assertions on the last element
-    p2 = [_ for _ in p][-1]
-    assert p2.x == 3
-    assert p2.y == 33
+    pc2 = list(iter(pc0))[-1]
+    assert pc2.x == 3
+    assert pc2.y == 33
 
-    # Test `__getitem__
-    p3 = p[-1]
-    assert p3.isscalar
-    assert p3.x == 3
-    assert p3.y == 33
+    pc3 = pc0[-1]
+    assert pc3.isscalar
+    assert pc3.x == 3
+    assert pc3.y == 33
 
-    p4 = p[1:]
-    assert len(p4) == 2
-    assert_equal(p4.x, [2, 3])
-    assert_equal(p4.y, [22, 33])
+    pc4 = pc0[1:]
+    assert len(pc4) == 2
+    assert_equal(pc4.x, [2, 3])
+    assert_equal(pc4.y, [22, 33])
 
 
 def test_pixcoord_basics_array_2d():
-    p = PixCoord(
-        [[1, 2, 3], [4, 5, 6]],
-        [[11, 12, 13], [14, 15, 16]],
-    )
+    pc0 = PixCoord([[1, 2, 3], [4, 5, 6]], [[11, 12, 13], [14, 15, 16]])
+    assert_equal(pc0.x, [[1, 2, 3], [4, 5, 6]])
+    assert_equal(pc0.y, [[11, 12, 13], [14, 15, 16]])
+    assert pc0.isscalar is False
 
-    assert_equal(p.x, [[1, 2, 3], [4, 5, 6]])
-    assert_equal(p.y, [[11, 12, 13], [14, 15, 16]])
-
-    assert p.isscalar is False
-
-    # TODO: this repr with the newline isn't nice ... improve it somehow?
     expected = ('PixCoord(x=[[1 2 3]\n [4 5 6]], '
                 'y=[[11 12 13]\n [14 15 16]])')
-    assert str(p) == expected
-    assert repr(p) == expected
+    assert str(pc0) == expected
+    assert repr(pc0) == expected
+    assert len(pc0) == 2
 
-    assert len(p) == 2
+    assert_equal(pc0[0].x, pc0.x[0])
+    assert_equal(pc0[0].y, pc0.y[0])
 
-    # TODO: does `__iter__` and `__getitem__` make sense for 2d array case?
-    # (see tests above)
+    pc1 = list(iter(pc0))
+    assert_equal(pc1[0].x, pc0.x[0])
+    assert_equal(pc1[0].y, pc0.y[0])
 
 
 def test_pixcoord_to_sky_scalar(wcs):
-    p = PixCoord(x=18, y=9)
+    pc1 = PixCoord(x=18, y=9)
 
-    s = p.to_sky(wcs=wcs)
-    assert s.name == 'galactic'
-    assert_allclose(s.data.lon.deg, 349.88093995435634)
-    assert_allclose(s.data.lat.deg, 10.003028030623508)
+    sc = pc1.to_sky(wcs=wcs)
+    assert sc.name == 'galactic'
+    assert_allclose(sc.data.lon.deg, 349.88093995435634)
+    assert_allclose(sc.data.lat.deg, 10.003028030623508)
 
-    p2 = PixCoord.from_sky(skycoord=s, wcs=wcs)
-    assert isinstance(p2.x, float)
-    assert p2.isscalar
+    pc2 = PixCoord.from_sky(skycoord=sc, wcs=wcs)
+    assert isinstance(pc2.x, float)
+    assert pc2.isscalar
 
-    assert p == p2
+    assert pc1 == pc2
 
 
 def test_pixcoord_to_sky_array_1d(wcs):
-    p = PixCoord(x=[17, 18], y=[8, 9])
+    pc1 = PixCoord(x=[17, 18], y=[8, 9])
 
-    s = p.to_sky(wcs=wcs)
-    assert s.name == 'galactic'
-    assert_allclose(s.data.lon.deg, [0, 349.88094])
-    assert_allclose(s.data.lat.deg, [0, 10.003028])
+    sc = pc1.to_sky(wcs=wcs)
+    assert sc.name == 'galactic'
+    assert_allclose(sc.data.lon.deg, [0, 349.88094])
+    assert_allclose(sc.data.lat.deg, [0, 10.003028])
 
-    p2 = PixCoord.from_sky(skycoord=s, wcs=wcs)
-    assert isinstance(p2.x, np.ndarray)
-    assert p2.x.shape == (2,)
-    assert not p2.isscalar
+    pc2 = PixCoord.from_sky(skycoord=sc, wcs=wcs)
+    assert isinstance(pc2.x, np.ndarray)
+    assert pc2.x.shape == (2,)
+    assert not pc2.isscalar
 
-    assert p == p2
+    assert pc1 == pc2
 
 
 def test_pixcoord_to_sky_array_2d(wcs):
-    p1 = PixCoord(x=[[17, 17, 17], [18, 18, 18]], y=[[8, 8, 8], [9, 9, 9]])
-    p = PixCoord(x=[[17, 18]], y=[[8, 9]])
+    pc0 = PixCoord(x=[[17, 18]], y=[[8, 9]])
+    pc1 = PixCoord(x=[[17, 17, 17], [18, 18, 18]], y=[[8, 8, 8], [9, 9, 9]])
 
-    s = p.to_sky(wcs=wcs)
-    assert s.name == 'galactic'
+    sc0 = pc0.to_sky(wcs=wcs)
+    assert sc0.name == 'galactic'
 
-    s1 = p1.to_sky(wcs=wcs)
-    assert s.name == 'galactic'
-    assert_allclose(s1.data.lon.deg, [[0, 0, 0],
-                                      [349.88094, 349.88094, 349.88094]])
-    assert_allclose(s1.data.lat.deg, [[0, 0, 0],
-                                      [10.003028, 10.003028, 10.003028]])
-    assert_allclose(s.data.lon.deg, [[0, 349.88094]])
-    assert_allclose(s.data.lat.deg, [[0, 10.003028]])
+    sc1 = pc1.to_sky(wcs=wcs)
+    assert sc1.name == 'galactic'
+    assert_allclose(sc1.data.lon.deg, [[0, 0, 0],
+                                       [349.88094, 349.88094, 349.88094]])
+    assert_allclose(sc1.data.lat.deg, [[0, 0, 0],
+                                       [10.003028, 10.003028, 10.003028]])
+    assert_allclose(sc0.data.lon.deg, [[0, 349.88094]])
+    assert_allclose(sc0.data.lat.deg, [[0, 10.003028]])
 
-    p2 = PixCoord.from_sky(skycoord=s, wcs=wcs)
-    assert isinstance(p2.x, np.ndarray)
-    assert p2.x.shape == (1, 2)
-    assert not p2.isscalar
+    pc2 = PixCoord.from_sky(skycoord=sc0, wcs=wcs)
+    assert isinstance(pc2.x, np.ndarray)
+    assert pc2.x.shape == (1, 2)
+    assert not pc2.isscalar
 
-    assert p == p2
+    assert pc0 == pc2
 
 
 def test_pixcoord_separation_scalar():
-    p1 = PixCoord(x=1, y=2)
-    p2 = PixCoord(x=4, y=6)
-    sep = p1.separation(p2)
+    pc1 = PixCoord(x=1, y=2)
+    pc2 = PixCoord(x=4, y=6)
+    sep = pc1.separation(pc2)
     assert_allclose(sep, 5)
 
 
 def test_pixcoord_separation_array_1d():
-    p1 = PixCoord(x=[1, 1], y=[2, 2])
-    p2 = PixCoord(x=[4, 4], y=[6, 6])
-    sep = p1.separation(p2)
+    pc1 = PixCoord(x=[1, 1], y=[2, 2])
+    pc2 = PixCoord(x=[4, 4], y=[6, 6])
+    sep = pc1.separation(pc2)
     assert_allclose(sep, [5, 5])
 
 
 def test_pixcoord_separation_array_2d():
-    p1 = PixCoord(x=[[1, 1]], y=[[2, 2]])
-    p2 = PixCoord(x=[[4, 4]], y=[[6, 6]])
-    sep = p1.separation(p2)
+    pc1 = PixCoord(x=[[1, 1]], y=[[2, 2]])
+    pc2 = PixCoord(x=[[4, 4]], y=[[6, 6]])
+    sep = pc1.separation(pc2)
     assert isinstance(sep, np.ndarray)
     assert sep.shape == (1, 2)
     assert_allclose(sep, [[5, 5]])
 
 
 def test_equality():
-    a = np.array([1, 2])
-    b = PixCoord(a[0], a[1])
-    c = PixCoord(a[0] + 0.0000001, a[1])
+    arr = np.array([1, 2])
+    pc1 = PixCoord(arr[0], arr[1])
+    pc2 = PixCoord(arr[0] + 0.0000001, arr[1])
 
-    assert not b == a
-    assert b == b
-    assert b == c
+    assert not pc1 == arr
+    assert pc1 == PixCoord(arr[0], arr[1])
+    assert pc1 == pc2
 
-    a = PixCoord(
-        [[1, 2, 3], [4, 5, 6]],
-        [[11, 12, 13], [14, 15, 16]],
-    )
+    pc3 = PixCoord([[1, 2, 3], [4, 5, 6]], [[11, 12, 13], [14, 15, 16]])
+    pc4 = PixCoord([[1, 2, 3], [4, 5, 6]],
+                   [[11.0000002, 12, 13], [14, 15, 16]])
 
-    b = PixCoord(
-        [[1, 2, 3], [4, 5, 6]],
-        [[11.0000002, 12, 13], [14, 15, 16]],
-    )
-
-    assert a == b
-    assert a == a
+    assert pc3 == pc4
+    assert pc3 == PixCoord([[1, 2, 3], [4, 5, 6]],
+                           [[11, 12, 13], [14, 15, 16]])
 
 
 def test_pixcoord_xy():
-    a = np.array([1, 2])
-    pc = PixCoord(a[0], a[1])
-
+    arr = np.array([1, 2])
+    pc = PixCoord(arr[0], arr[1])
     assert pc.xy[0] == pc.x
     assert pc.xy[1] == pc.y
 

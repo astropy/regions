@@ -1,10 +1,17 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-import numpy as np
-from astropy.wcs.utils import pixel_to_skycoord, skycoord_to_pixel
+"""
+This module defines point regions in both pixel and sky coordinates.
+"""
 
-from ..core import PixCoord, PixelRegion, SkyRegion, BoundingBox
+from astropy.wcs.utils import pixel_to_skycoord, skycoord_to_pixel
+import numpy as np
+
 from ..core.attributes import ScalarPix, ScalarSky
+from ..core.bounding_box import BoundingBox
+from ..core.core import PixelRegion, SkyRegion
 from ..core.metadata import RegionMeta, RegionVisual
+from ..core.pixcoord import PixCoord
+
 
 __all__ = ['PointPixelRegion', 'PointSkyRegion']
 
@@ -33,11 +40,16 @@ class PointPixelRegion(PixelRegion):
 
         fig, ax = plt.subplots(1, 1)
         regs = []
-        regs.append(PointPixelRegion(PixCoord(2, 2), visual=RegionVisual(symbol='D')))
-        regs.append(PointPixelRegion(PixCoord(2, 3), visual=RegionVisual(symbol='*')))
-        regs.append(PointPixelRegion(PixCoord(3, 3), visual=RegionVisual(symbol='^')))
-        regs.append(PointPixelRegion(PixCoord(3, 2), visual=RegionVisual(symbol='*')))
-        regs.append(PointPixelRegion(PixCoord(2, 4), visual=RegionVisual(symbol='x')))
+        regs.append(PointPixelRegion(PixCoord(2, 2),
+                    visual=RegionVisual(symbol='D')))
+        regs.append(PointPixelRegion(PixCoord(2, 3),
+                    visual=RegionVisual(symbol='*')))
+        regs.append(PointPixelRegion(PixCoord(3, 3),
+                    visual=RegionVisual(symbol='^')))
+        regs.append(PointPixelRegion(PixCoord(3, 2),
+                    visual=RegionVisual(symbol='*')))
+        regs.append(PointPixelRegion(PixCoord(2, 4),
+                    visual=RegionVisual(symbol='x')))
         regs.append(PointPixelRegion(PixCoord(4, 2)))
 
         for reg in regs:
@@ -46,7 +58,6 @@ class PointPixelRegion(PixelRegion):
         plt.xlim(0, 6)
         plt.ylim(0, 6)
         ax.set_aspect('equal')
-
     """
 
     _params = ('center',)
@@ -59,7 +70,7 @@ class PointPixelRegion(PixelRegion):
 
     @property
     def area(self):
-        return 0
+        return 0.0
 
     def contains(self, pixcoord):
         if pixcoord.isscalar:
@@ -68,7 +79,7 @@ class PointPixelRegion(PixelRegion):
             in_reg = np.zeros(pixcoord.x.shape, dtype=bool)
 
         if self.meta.get('include', True):
-            # in_reg = False, always.  Points do not include anything
+            # in_reg = False, always.  Points do not include anything.
             return in_reg
         else:
             return np.logical_not(in_reg)
@@ -160,7 +171,7 @@ class PointSkyRegion(SkyRegion):
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
 
-    def contains(self, skycoord, wcs):
+    def contains(self, skycoord, wcs):  # pylint: disable=unused-argument
         if self.meta.get('include', True):
             # points never include anything
             return False

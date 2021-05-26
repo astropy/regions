@@ -1,10 +1,14 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-# Base class for all shape tests
+"""
+Base class for all shape tests.
+"""
+
 import numpy as np
 from numpy.testing import assert_equal, assert_allclose
 import pytest
 
-from ...core import PixCoord, BoundingBox
+from ...core.pixcoord import PixCoord
+
 
 class BaseTestRegion:
 
@@ -27,12 +31,12 @@ class BaseTestPixelRegion(BaseTestRegion):
         except NotImplementedError:
             try:
                 mask = self.reg.to_mask(mode='subpixels', subpixels=30)
-                assert_allclose(np.sum(mask.data), self.expected_area, rtol=0.005)
+                assert_allclose(np.sum(mask.data), self.expected_area,
+                                rtol=0.005)
             except NotImplementedError:
                 pytest.skip()
 
     def test_contains_scalar(self):
-
         if len(self.inside) > 0:
             pixcoord = PixCoord(*self.inside[0])
             assert self.reg.contains(pixcoord)
@@ -44,9 +48,7 @@ class BaseTestPixelRegion(BaseTestRegion):
             assert pixcoord not in self.reg
 
     def test_contains_array_1d(self):
-
         pixcoord = PixCoord(*zip(*(self.inside + self.outside)))
-
         actual = self.reg.contains(pixcoord)
         assert_equal(actual[:len(self.inside)], True)
         assert_equal(actual[len(self.inside):], False)
@@ -56,7 +58,6 @@ class BaseTestPixelRegion(BaseTestRegion):
         assert 'coord must be scalar' in str(excinfo.value)
 
     def test_contains_array_2d(self):
-
         x, y = zip(*(self.inside + self.outside))
         pixcoord = PixCoord([x] * 3, [y] * 3)
 

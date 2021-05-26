@@ -1,14 +1,16 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
+
 from warnings import warn
 
-from astropy import units as u
-import numpy as np
-from astropy.table import Table
 from astropy.io import fits
+from astropy.table import Table
+import astropy.units as u
 from astropy.wcs import WCS
+import numpy as np
 
-from .core import FITSRegionParserError, FITSRegionParserWarning, language_spec
 from ..core import Shape, ShapeList, reg_mapping
+from .core import (FITSRegionParserError, FITSRegionParserWarning,
+                   language_spec)
 
 __all__ = ['FITSRegionParser', 'read_fits_region', 'FITSRegionRowParser']
 
@@ -75,10 +77,10 @@ class FITSRegionParser:
             raise FITSRegionParserError(msg)
 
     def parse_table(self):
-
         for col in self.table.colnames:
             if col not in self.valid_columns:
-                self._raise_error(f"This table has an invalid column name: '{col}'")
+                self._raise_error('This table has an invalid column name: '
+                                  f'"{col}"')
             else:
                 self.unit[col] = self.table[col].unit
 
@@ -136,7 +138,8 @@ class FITSRegionRowParser():
         if region_type in language_spec:
             self.region_type = region_type
         else:
-            self._raise_error(f"'{region_type}' is not a valid FITS Region type")
+            self._raise_error(f'"{region_type}" is not a valid FITS Region '
+                              'type')
 
         self.component = str(self.row['COMPONENT'])
 
@@ -156,15 +159,15 @@ class FITSRegionRowParser():
                 if index < len(val) and val[index] is not None:
                     return val[index], unit
                 else:
-                    raise ValueError(f"The column '{colname}' must have more "
-                                     f"than {index} value for the region "
-                                     f"{self.region_type}")
+                    raise ValueError(f'The column "{colname}" must have more '
+                                     f'than {index} value for the region '
+                                     f'{self.region_type}')
             else:
                 return val, unit
         except KeyError:
             if default is None:
-                self._raise_error(f"The column '{colname}' is missing in "
-                                  "the table")
+                self._raise_error(f'The column "{colname}" is missing in '
+                                  'the table')
             else:
                 return default
 
@@ -175,7 +178,6 @@ class FITSRegionRowParser():
             raise FITSRegionParserError(msg)
 
     def parse(self):
-
         coords = []
 
         for x in language_spec[self.region_type]:
@@ -190,21 +192,20 @@ class FITSRegionRowParser():
                 coords_new += [x, y]
             coords = coords_new
         elif self.region_type == 'BOX':
-            # Add a 0 rotation to turn it into ROTBOX
-            coords.append(0.0*u.deg)
+            # Add a 0-degree rotation to turn it into ROTBOX
+            coords.append(0.0 * u.deg)
 
         region_type = self.region_type.lower()
         if region_type in reg_mapping['FITS_REGION']:
             region_type = reg_mapping['FITS_REGION'][region_type]
         else:
-            self._raise_error(f"'{self.region_type}' is currently not "
-                              "supported")
+            self._raise_error(f'"{self.region_type}" is currently not '
+                              'supported')
 
         return self.component, Shape('physical', region_type,
                                      coords, meta, False, False)
 
     def _parse_value(self, val, unit):
-
         units = dict(pix=u.dimensionless_unscaled,
                      deg=u.deg,
                      rad=u.rad,
@@ -213,7 +214,7 @@ class FITSRegionRowParser():
         if unit is not None:
             return val * units.get(str(unit), unit)
         else:
-            self._raise_error(f"The unit: {unit} is invalid")
+            self._raise_error(f'The unit: {unit} is invalid')
 
 
 def read_fits_region(filename, errors='strict'):
@@ -253,7 +254,8 @@ def read_fits_region(filename, errors='strict'):
             if hdu.name == 'REGION':
                 table = Table.read(hdu)
                 wcs = WCS(hdu.header, keysel=['image', 'binary', 'pixel'])
-                regions_list = FITSRegionParser(table, errors).shapes.to_regions()  # noqa
+                parser = FITSRegionParser(table, errors)
+                regions_list = parser.shapes.to_regions()
                 for reg in regions_list:
                     regions.append(reg.to_sky(wcs))
 

@@ -1,16 +1,23 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
-import numpy as np
-from astropy import units as u
+"""
+This module defines rectangular regions in both pixel and sky coordinates.
+"""
 
 from astropy.coordinates import Angle
 import astropy.units as u
 from astropy.wcs.utils import pixel_to_skycoord
+import numpy as np
 
-from ..core import PixCoord, PixelRegion, SkyRegion, RegionMask, BoundingBox
+from ..core.attributes import (ScalarPix, ScalarLength, QuantityLength,
+                               ScalarSky)
+from ..core.bounding_box import BoundingBox
+from ..core.core import PixelRegion, SkyRegion
+from ..core.mask import RegionMask
+from ..core.metadata import RegionMeta, RegionVisual
+from ..core.pixcoord import PixCoord
 from .._geometry import rectangular_overlap_grid
 from .._utils.wcs_helpers import pixel_scale_angle_at_skycoord
-from ..core.attributes import ScalarPix, ScalarLength, QuantityLength, ScalarSky
-from ..core.metadata import RegionMeta, RegionVisual
+
 from .polygon import PolygonPixelRegion
 
 __all__ = ['RectanglePixelRegion', 'RectangleSkyRegion']
@@ -71,13 +78,14 @@ class RectanglePixelRegion(PixelRegion):
     height = ScalarLength('height')
     angle = QuantityLength('angle')
 
-    def __init__(self, center, width, height, angle=0 * u.deg, meta=None, visual=None):
+    def __init__(self, center, width, height, angle=0 * u.deg, meta=None,
+                 visual=None):
         self.center = center
         self.width = width
         self.height = height
         self.angle = angle
-        self.meta = meta or {}
-        self.visual = visual or {}
+        self.meta = meta or RegionMeta()
+        self.visual = visual or RegionVisual()
 
     @property
     def area(self):
@@ -90,7 +98,8 @@ class RectanglePixelRegion(PixelRegion):
         dy = pixcoord.y - self.center.y
         dx_rot = cos_angle * dx + sin_angle * dy
         dy_rot = sin_angle * dx - cos_angle * dy
-        in_rect = (np.abs(dx_rot) < self.width * 0.5) & (np.abs(dy_rot) < self.height * 0.5)
+        in_rect = ((np.abs(dx_rot) < self.width * 0.5)
+                   & (np.abs(dy_rot) < self.height * 0.5))
         if self.meta.get('include', True):
             return in_rect
         else:
@@ -138,7 +147,8 @@ class RectanglePixelRegion(PixelRegion):
         bbox = self.bounding_box
         ny, nx = bbox.shape
 
-        # Find position of pixel edges and recenter so that circle is at origin
+        # Find position of pixel edges and recenter so that circle is at
+        # origin
         xmin = float(bbox.ixmin) - 0.5 - self.center.x
         xmax = float(bbox.ixmax) - 0.5 - self.center.x
         ymin = float(bbox.iymin) - 0.5 - self.center.y
@@ -149,12 +159,10 @@ class RectanglePixelRegion(PixelRegion):
         else:
             use_exact = 1
 
-        fraction = rectangular_overlap_grid(
-            xmin, xmax, ymin, ymax, nx, ny,
-            self.width, self.height,
-            self.angle.to(u.rad).value,
-            use_exact, subpixels,
-        )
+        fraction = rectangular_overlap_grid(xmin, xmax, ymin, ymax, nx, ny,
+                                            self.width, self.height,
+                                            self.angle.to(u.rad).value,
+                                            use_exact, subpixels)
 
         return RegionMask(fraction, bbox=bbox)
 
@@ -204,7 +212,8 @@ class RectanglePixelRegion(PixelRegion):
         if self._mpl_selector_callback is not None:
             self._mpl_selector_callback(self)
 
-    def as_mpl_selector(self, ax, active=True, sync=True, callback=None, **kwargs):
+    def as_mpl_selector(self, ax, active=True, sync=True, callback=None,
+                        **kwargs):
         """
         A matplotlib editable widget for this region
         (`matplotlib.widgets.RectangleSelector`).
@@ -244,10 +253,12 @@ class RectanglePixelRegion(PixelRegion):
         from matplotlib.widgets import RectangleSelector
 
         if hasattr(self, '_mpl_selector'):
-            raise Exception("Cannot attach more than one selector to a region.")
+            raise Exception('Cannot attach more than one selector to a '
+                            'region.')
 
         if self.angle.value != 0:
-            raise NotImplementedError("Cannot create matplotlib selector for rotated rectangle.")
+            raise NotImplementedError('Cannot create matplotlib selector for '
+                                      'rotated rectangle.')
 
         if sync:
             sync_callback = self._update_from_mpl_selector
@@ -255,11 +266,13 @@ class RectanglePixelRegion(PixelRegion):
             def sync_callback(*args, **kwargs):
                 pass
 
-        self._mpl_selector = RectangleSelector(ax, sync_callback, interactive=True,
-                                               rectprops={'edgecolor': self.visual.get('color', 'black'),
-                                                          'facecolor': 'none',
-                                                          'linewidth': self.visual.get('linewidth', 1),
-                                                          'linestyle': self.visual.get('linestyle', 'solid')})
+        self._mpl_selector = RectangleSelector(
+            ax, sync_callback, interactive=True,
+            rectprops={'edgecolor': self.visual.get('color', 'black'),
+                       'facecolor': 'none',
+                       'linewidth': self.visual.get('linewidth', 1),
+                       'linestyle': self.visual.get('linestyle', 'solid')})
+
         self._mpl_selector.extents = (self.center.x - self.width / 2,
                                       self.center.x + self.width / 2,
                                       self.center.y - self.height / 2,
@@ -369,19 +382,18 @@ class RectangleSkyRegion(SkyRegion):
     height = QuantityLength('height')
     angle = QuantityLength('angle')
 
-    def __init__(self, center, width, height, angle=0 * u.deg, meta=None, visual=None):
+    def __init__(self, center, width, height, angle=0 * u.deg, meta=None,
+                 visual=None):
         self.center = center
         self.width = width
         self.height = height
         self.angle = angle
-        self.meta = meta or {}
-        self.visual = visual or {}
+        self.meta = meta or RegionMeta()
+        self.visual = visual or RegionVisual()
 
     def to_pixel(self, wcs):
         center, pixscale, north_angle = pixel_scale_angle_at_skycoord(
             self.center, wcs)
-        # FIXME: The following line is needed to get a scalar PixCoord
-        center = PixCoord(float(center.x), float(center.y))
         width = (self.width / pixscale).to(u.pix).value
         height = (self.height / pixscale).to(u.pix).value
         angle = self.angle + (north_angle - 90 * u.deg)
