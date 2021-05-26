@@ -254,6 +254,7 @@ class BoundingBox:
         .. plot::
             :include-source:
 
+            import numpy as np
             import matplotlib.pyplot as plt
             from regions import BoundingBox
             bbox = BoundingBox(2, 7, 3, 8)

@@ -37,8 +37,6 @@ class PolygonPixelRegion(PixelRegion):
     .. plot::
         :include-source:
 
-        import numpy as np
-        from astropy.coordinates import Angle
         from regions import PixCoord, PolygonPixelRegion
         import matplotlib.pyplot as plt
 
