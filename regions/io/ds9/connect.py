@@ -10,7 +10,7 @@ from ..core import ShapeList
 DS9_SIGNATURE = '# Region file format: DS9'
 
 
-def is_ds9(origin, path, fileobj, *args, **kwargs):  # pylint: disable=unused-argument
+def is_ds9(origin, path, fileobj, *args, **kwargs):  # noqa pylint: disable=unused-argument
     """
     Identify a DS9 region file.
 
