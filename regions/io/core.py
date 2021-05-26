@@ -4,13 +4,11 @@ import numbers
 import string
 from warnings import warn
 
-from astropy import log
 from astropy.coordinates import (Angle, SkyCoord, UnitSphericalRepresentation,
                                  frame_transform_graph)
 from astropy.io.registry import UnifiedReadWriteMethod
 from astropy.table import Table
 import astropy.units as u
-from astropy.table import Table
 import numpy as np
 
 from ..shapes import (CirclePixelRegion, CircleSkyRegion,
@@ -92,7 +90,7 @@ coordsys_mapping['DS9']['geocentrictrueecliptic'] = 'ECLIPTIC'
 
 class RegionConversionError(ValueError):
     """
-    A generic error class for Shape to Region conversion.
+    A generic error class for Shape to Region conversions.
     """
 
 
@@ -101,7 +99,7 @@ class ShapeList(list):
     A class to hold a list of `~regions.Shape` objects.
     """
 
-    # Unified I/O read and write methods from .connect
+    # Unified I/O read and write methods
     read = UnifiedReadWriteMethod(ShapeListRead)
     write = UnifiedReadWriteMethod(ShapeListWrite)
 
@@ -111,11 +109,13 @@ class ShapeList(list):
         """
         regions = []
         for shape in self:
-            # Skip elliptical annulus for now
+            # Skip elliptical multi-annulus for now
             if shape.region_type == 'ellipse' and len(shape.coord) > 5:
                 msg = f'Skipping elliptical annulus {shape}'
                 warn(msg, DS9RegionParserWarning)
                 continue
+
+            # Skip DS9 circular multi-annulus for now
             if shape.region_type == 'circleannulus' and len(shape.coord) > 4:
                 msg = f'Skipping circular annulus {shape}'
                 warn(msg, DS9RegionParserWarning)
@@ -200,16 +200,23 @@ class ShapeList(list):
             # specification, CASA does *not* support a preceding "+". If
             # you want a region included, leave the opening character
             # blank.
-            include = '-' if shape.include in (False, '-') else ''
-            include += 'ann ' if shape.meta.get('type', 'reg') == 'ann' else ""
+            include = ''
+            if shape.include in (False, '-'):
+                include = '-'
+
+            if shape.meta.get('type', 'reg') == 'ann':
+                include += 'ann '
 
             if shape.meta.get('label', '') != '':
                 shape.meta['label'] = f"'{shape.meta['label']}'"
-            meta_str = ', '.join(f'{key}={val}' for key, val in
-                                 shape.meta.items() if
-                                 key not in ('include', 'comment', 'symbol',
-                                             'coord', 'text', 'range', 'corr',
-                                             'type'))
+
+            keylist = ('include', 'comment', 'symbol', 'coord', 'text',
+                       'range', 'corr', 'type')
+            meta_pairs = []
+            for key, val in shape.meta.items():
+                if key not in keylist:
+                    meta_pairs.append(f'{key}={val}')
+            meta_str = ', '.join(meta_pairs)
 
             # The first item should be the coordinates, since CASA
             # cannot recognize a region without an inline coordinate
@@ -241,7 +248,7 @@ class ShapeList(list):
                     if isinstance(val, Angle):
                         coord.append(float(val.value))
                     else:
-                        if radunit == '' or None:
+                        if radunit == '' or radunit is None:
                             coord.append(float(val.value))
                         else:
                             coord.append(float(val.to(radunit).value))
@@ -328,12 +335,7 @@ class ShapeList(list):
         output = '# Region file format: DS9 astropy/regions\n'
 
         if radunit == 'arcsec':
-            # what's this for?
-            if coordsys in coordsys_mapping['DS9'].values():
-                radunitstr = '"'
-            else:
-                raise ValueError('Radius unit arcsec not valid for '
-                                 f'coordsys {coordsys}')
+            radunitstr = '"'
         else:
             radunitstr = ''
 
@@ -348,7 +350,9 @@ class ShapeList(list):
             shape.meta = to_ds9_meta(shape.meta)
 
             # if unspecified, include is True.
-            include = "-" if shape.include in (False, '-') else ""
+            include = ''
+            if shape.include in (False, '-'):
+                include = '-'
 
             if 'point' in shape.meta:
                 shape.meta['point'] = \
@@ -357,14 +361,16 @@ class ShapeList(list):
             if 'symsize' in shape.meta:
                 shape.meta['point'] += f' {shape.meta.pop("symsize")}'
 
-            meta_str = ' '.join(f'{key}={val}' for key, val in
-                                shape.meta.items()
-                                if key not in
-                                ('include', 'tag', 'comment', 'font', 'text'))
+            keylist = ('include', 'tag', 'comment', 'font', 'text')
+            meta_pairs = []
+            for key, val in shape.meta.items():
+                if key not in keylist:
+                    meta_pairs.append(f'{key}={val}')
+            meta_str = ' '.join(meta_pairs)
 
             if 'tag' in shape.meta:
                 tags = [f'tag={tag}' for tag in shape.meta['tag']]
-                meta_str += (' ' + ' '.join(tags))
+                meta_str += ' ' + ' '.join(tags)
 
             if 'font' in shape.meta:
                 meta_str += f" font=\"{shape.meta['font']}\""
@@ -376,13 +382,12 @@ class ShapeList(list):
                 meta_str += f' {shape.meta["comment"]}'
 
             coord = []
-
             if coordsys not in ['image', 'physical']:
                 for val in shape.coord:
                     if isinstance(val, Angle):
                         coord.append(float(val.value))
                     else:
-                        if radunit == '' or None:
+                        if radunit == '' or radunit is None:
                             coord.append(float(val.value))
                         else:
                             coord.append(float(val.to(radunit).value))
@@ -466,8 +471,8 @@ class ShapeList(list):
             else:
                 components.append(num + 1)
 
-        # padding every value with zeros at the end to make sure that
-        # all values in the column have same length
+        # pad every value with zeros at the end to make sure that all
+        # values in the column have same length
         for i in range(len(self)):
             if np.isscalar(coord_x[i]):
                 coord_x[i] = np.array([coord_x[i]])
@@ -575,7 +580,7 @@ class Shape:
 
     def __str__(self):
         ss = self.__class__.__name__
-        ss += f"\nType: {self.meta.get('type', 'reg')}"
+        ss += f'\nType: {self.meta.get("type", "reg")}'
         ss += f'\nCoord sys: {self.coordsys}'
         ss += f'\nRegion type: {self.region_type}'
         if self.region_type == 'symbol':
@@ -615,10 +620,11 @@ class Shape:
         """
         Convert to sky coordinates.
         """
-        parsed_angles = [(x, y)
-                         for x, y in zip(self.coord[:-1:2], self.coord[1::2])
-                         if (isinstance(x, Angle)
-                             and isinstance(y, Angle))]
+        parsed_angles = []
+        for x, y in zip(self.coord[:-1:2], self.coord[1::2]):
+            if isinstance(x, Angle) and isinstance(y, Angle):
+                parsed_angles.append((x, y))
+
         frame = frame_transform_graph.lookup_name(self.coordsys)
 
         lon, lat = zip(*parsed_angles)
@@ -682,8 +688,7 @@ class Shape:
         # both 'text' and 'label' should be set to the same value, where
         # we default to the 'text' value since that is the one used by
         # ds9 regions
-        label = self.meta.get('text',
-                              self.meta.get('label', ""))
+        label = self.meta.get('text', self.meta.get('label', ""))
         if label != '':
             reg.meta['label'] = label
         for key in self.meta:
@@ -692,6 +697,7 @@ class Shape:
             else:
                 reg.meta[key] = self.meta[key]
         reg.meta['include'] = self.include
+
         return reg
 
     def _raise_error(self, msg):
@@ -766,7 +772,7 @@ def to_shape_list(region_list, coordinate_system='fk5'):
             coord.append(getattr(region, val))
 
         if reg_type == 'polygon':
-            coord = [x for x in region.vertices]
+            coord = region.vertices
 
         if coordinate_system:
             coordsys = coordinate_system
