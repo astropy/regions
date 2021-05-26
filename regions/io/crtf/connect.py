@@ -2,15 +2,15 @@
 
 from astropy.io import registry
 
+from ..core import ShapeList
 from .read import read_crtf
 from .write import write_crtf
-from ..core import ShapeList
 
 
 CRTF_SIGNATURE = '#CRTF'
 
 
-def is_crtf(origin, path, fileobj, *args, **kwargs):  # pylint: disable=unused-argument
+def is_crtf(origin, path, fileobj, *args, **kwargs):  # noqa pylint: disable=unused-argument
     """
     Identify a CRTF region file.
 

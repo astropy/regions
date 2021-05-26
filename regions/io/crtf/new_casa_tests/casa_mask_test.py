@@ -2,22 +2,23 @@
 
 import pickle
 import tempfile
+
+from astropy.coordinates import SkyCoord
+import astropy.units as u
 import pytest
 
-from astropy import coordinates, units as u
-
-from ..write import write_crtf
-
 from ....shapes.ellipse import EllipseSkyRegion
+from ..write import write_crtf
 
 try:
     from casatools import image, simulator
     from casatasks import tclean
-    CASATOOLS_INSTALLED = True
+    HAS_CASATOOLS = True
 except ImportError:
-    CASATOOLS_INSTALLED = False
+    HAS_CASATOOLS = False
 
-@pytest.mark.skipif('not CASATOOLS_INSTALLED')
+
+@pytest.mark.skipif('not HAS_CASATOOLS')
 def test_casa_masking():
     with tempfile.TemporaryDirectory() as tmpdir:
         # SIMULATE SOME DATA SET
@@ -29,7 +30,7 @@ def test_casa_masking():
         zz = [-0.5, -1.0, -1.5, -2.0, -2.5]
 
         sm = simulator()
-        sm.open(tmpdir+'/SIM.ms')
+        sm.open(tmpdir + '/SIM.ms')
         # do configuration
         posvla = me.observatory('VLA')
         sm.setconfig(telescopename='VLA', x=xx, y=yy, z=zz, dishdiameter=diam,
@@ -37,18 +38,16 @@ def test_casa_masking():
                      coordsystem='local', referencelocation=posvla)
 
         # Initialize the spectral windows
-        sm.setspwindow(spwname='CBand', freq='5GHz',
-                        deltafreq='50MHz',
-                        freqresolution='50MHz',
-                        nchannels=1,
-                        stokes='RR RL LR LL')
+        sm.setspwindow(spwname='CBand', freq='5GHz', deltafreq='50MHz',
+                       freqresolution='50MHz', nchannels=1,
+                       stokes='RR RL LR LL')
 
         # Initialize the source and calibrater
         sm.setfield(sourcename='My cal',
-                    sourcedirection=['J2000','00h0m0.0','+45.0.0.000'],
+                    sourcedirection=['J2000', '00h0m0.0', '+45.0.0.000'],
                     calcode='A')
         sm.setfield(sourcename='My source',
-                    sourcedirection=['J2000','01h0m0.0','+47.0.0.000'])
+                    sourcedirection=['J2000', '01h0m0.0', '+47.0.0.000'])
 
         sm.setlimits(shadowlimit=0.001, elevationlimit='8.0deg')
         sm.setauto(autocorrwt=0.0)
@@ -62,24 +61,19 @@ def test_casa_masking():
         sm.close()
 
         # Create mask to use during clean
-        reg = EllipseSkyRegion(center=coordinates.SkyCoord(0.0*u.deg,
-                                                        45.0*u.deg,
-                                                        frame='fk5'),
-                                width=1.0*u.arcmin, height=2.0*u.arcmin,
-                                angle=45*u.deg)
-        write_crtf([reg], tmpdir+'/SIM.crtf', 'fk5', '.6f', 'deg')
+        reg = EllipseSkyRegion(SkyCoord(0.0 * u.deg, 45.0 * u.deg,
+                                        frame='fk5'),
+                               width=1.0 * u.arcmin, height=2.0 * u.arcmin,
+                               angle=45 * u.deg)
+        write_crtf([reg], tmpdir + '/SIM.crtf', 'fk5', '.6f', 'deg')
 
         # Image the dataset
-        tclean(vis=tmpdir+'/SIM.ms',
-                imagename=tmpdir+'/SIM',
-                imsize=100,
-                cell='5arcsec',
-                niter=1,
-                mask=tmpdir+'/SIM.crtf',
-                interactive=False)
+        tclean(vis=tmpdir + '/SIM.ms', imagename=tmpdir + '/SIM', imsize=100,
+               cell='5arcsec', niter=1, mask=tmpdir + '/SIM.crtf',
+               interactive=False)
 
         ia = image()
-        ia.open(tmpdir+'/SIM.mask')
+        ia.open(tmpdir + '/SIM.mask')
         mask_array = ia.getregion()
         ia.close()
 
