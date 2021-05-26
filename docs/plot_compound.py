@@ -1,3 +1,4 @@
+# Licensed under a 3-clause BSD style license - see LICENSE.rst
 """
 Example script illustrating compound regions.
 """
@@ -22,13 +23,11 @@ dataset.image.data = np.zeros_like(dataset.image.data)
 # define 2 sky circles
 circle1 = CircleSkyRegion(
     center=SkyCoord(20, 0, unit='deg', frame='galactic'),
-    radius=Angle('30 deg')
-)
+    radius=Angle('30 deg'))
 
 circle2 = CircleSkyRegion(
     center=SkyCoord(50, 45, unit='deg', frame='galactic'),
-    radius=Angle('30 deg'),
-)
+    radius=Angle('30 deg'))
 
 # define skycoords
 lon = np.arange(-180, 181, 10)
@@ -56,8 +55,10 @@ ax.scatter(skycoords_xor.l.value, skycoords_xor.b.value, color='orange',
 ax.scatter(skycoords_and.l.value, skycoords_and.b.value, color='magenta',
            label='and', transform=ax.get_transform('galactic'))
 
-circle1.to_pixel(wcs=wcs).plot(ax=ax, edgecolor='green', facecolor='none', alpha=0.8, lw=3)
-circle2.to_pixel(wcs=wcs).plot(ax=ax, edgecolor='red', facecolor='none', alpha=0.8, lw=3)
+circle1.to_pixel(wcs=wcs).plot(ax=ax, edgecolor='green', facecolor='none',
+                               alpha=0.8, lw=3)
+circle2.to_pixel(wcs=wcs).plot(ax=ax, edgecolor='red', facecolor='none',
+                               alpha=0.8, lw=3)
 
 ax.legend(loc='lower right')
 

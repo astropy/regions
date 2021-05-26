@@ -1,3 +1,5 @@
+# Licensed under a 3-clause BSD style license - see LICENSE.rst
+
 from matplotlib import pyplot as plt
 
 from astropy.utils.data import get_pkg_data_filename

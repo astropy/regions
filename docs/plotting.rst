@@ -39,8 +39,7 @@ for point regions. For example:
 .. plot::
    :include-source:
 
-    from regions import PixCoord, BoundingBox
-    import matplotlib.pyplot as plt
+    from regions import BoundingBox
 
     bbox = BoundingBox(ixmin=-1, ixmax=1, iymin=-2, iymax=2)
     # shifting the origin to (1, 1) pixel position

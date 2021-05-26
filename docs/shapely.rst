@@ -25,12 +25,12 @@ do this, that's a good reason to use Shapely.
 
     import matplotlib.pyplot as plt
     from regions import PixCoord, CirclePixelRegion
+    from shapely.geometry import Point
 
     # Make an example region
     region = CirclePixelRegion(center=PixCoord(3, 2), radius=2)
 
     # Convert to Shapely
-    from shapely.geometry import Point
     point = Point(region.center.x, region.center.y)
     circle = point.buffer(region.radius)
 
