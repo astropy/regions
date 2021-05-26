@@ -627,6 +627,9 @@ class Shape:
 
         frame = frame_transform_graph.lookup_name(self.coordsys)
 
+        if len(parsed_angles) == 0:
+            raise ValueError('error parsing region')
+
         lon, lat = zip(*parsed_angles)
         if (hasattr(lon, '__len__') and hasattr(lat, '__len__')
                 and len(lon) == 1 and len(lat) == 1):
