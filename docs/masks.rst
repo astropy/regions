@@ -16,7 +16,7 @@ All :class:`~regions.PixelRegion` objects have a
 :meth:`~regions.PixelRegion.to_mask` method that returns a
 :class:`~regions.RegionMask` object that contains information about
 whether pixels are inside the region, and can be used to mask data
-arrays:
+arrays::
 
     >>> from regions.core import PixCoord
     >>> from regions.shapes.circle import CirclePixelRegion
@@ -178,12 +178,12 @@ with the aperture:
     >>> plt.imshow(mask.data, cmap=plt.cm.viridis,
     ...            interpolation='nearest', origin='lower',
     ...            extent=mask.bbox.extent)
-    >>> plt.subplot(1,3,2)
+    >>> plt.subplot(1, 3, 2)
     >>> plt.title("Data cutout", size=9)
     >>> plt.imshow(data, cmap=plt.cm.viridis,
     ...            interpolation='nearest', origin='lower',
     ...            extent=mask.bbox.extent)
-    >>> plt.subplot(1,3,3)
+    >>> plt.subplot(1, 3, 3)
     >>> plt.title("Data cutout multiplied by mask", size=9)
     >>> plt.imshow(weighted_data, cmap=plt.cm.viridis,
     ...            interpolation='nearest', origin='lower',
@@ -196,28 +196,29 @@ with the aperture:
 
     from astropy.io import fits
     from astropy.utils.data import get_pkg_data_filename
+    import matplotlib.pyplot as plt
+    from regions.core import PixCoord
+    from regions.shapes.circle import CirclePixelRegion
+
     filename = get_pkg_data_filename('photometry/M6707HH.fits')
     pf = fits.open(filename)
     hdu = pf[0]
-    from regions.core import PixCoord
-    from regions.shapes.circle import CirclePixelRegion
     center = PixCoord(158.5, 1053.5)
     aperture = CirclePixelRegion(center, 4.)
     mask = aperture.to_mask(mode='exact')
     data = mask.cutout(hdu.data)
     weighted_data = mask.multiply(hdu.data)
-    import matplotlib.pyplot as plt
-    plt.subplot(1,3,1)
+    plt.subplot(1, 3, 1)
     plt.title("Mask", size=9)
     plt.imshow(mask.data, cmap=plt.cm.viridis,
                interpolation='nearest', origin='lower',
                extent=mask.bbox.extent)
-    plt.subplot(1,3,2)
+    plt.subplot(1, 3, 2)
     plt.title("Data cutout", size=9)
     plt.imshow(data, cmap=plt.cm.viridis,
                interpolation='nearest', origin='lower',
                extent=mask.bbox.extent)
-    plt.subplot(1,3,3)
+    plt.subplot(1, 3, 3)
     plt.title("Data cutout multiplied by mask", size=9)
     plt.imshow(weighted_data, cmap=plt.cm.viridis,
                interpolation='nearest', origin='lower',
@@ -231,6 +232,19 @@ at the extent of the mask in the image:
    :include-source:
    :align: center
 
+    from astropy.io import fits
+    from astropy.utils.data import get_pkg_data_filename
+    import matplotlib.pyplot as plt
+    from regions.core import PixCoord
+    from regions.shapes.circle import CirclePixelRegion
+
+    filename = get_pkg_data_filename('photometry/M6707HH.fits')
+    pf = fits.open(filename)
+    hdu = pf[0]
+    center = PixCoord(158.5, 1053.5)
+    aperture = CirclePixelRegion(center, 4.)
+    mask = aperture.to_mask(mode='exact')
+
     ax = plt.subplot(1, 1, 1)
     ax.imshow(hdu.data, cmap=plt.cm.viridis,
               interpolation='nearest', origin='lower')
@@ -238,11 +252,6 @@ at the extent of the mask in the image:
     ax.add_artist(aperture.as_artist(facecolor='none', edgecolor='orange'))
     ax.set_xlim(120, 180)
     ax.set_ylim(1000, 1059)
-
-.. plot::
-   :context:
-   :nofigs:
-
     pf.close()
 
 

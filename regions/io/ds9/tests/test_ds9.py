@@ -1,4 +1,7 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
+"""
+Tests for the ds9 subpackage.
+"""
 
 import os
 
@@ -12,6 +15,7 @@ from astropy.utils.data import get_pkg_data_filename, get_pkg_data_filenames
 from astropy.utils.exceptions import AstropyUserWarning
 
 from ....shapes.circle import CircleSkyRegion
+from ..core import DS9RegionParserWarning
 from ..read import read_ds9, DS9Parser
 from ..write import write_ds9, ds9_objects_to_string
 
@@ -19,13 +23,11 @@ from ..write import write_ds9, ds9_objects_to_string
 def test_read():
     # Check that all test files including reference files are readable
     files = get_pkg_data_filenames('data')
-    for f in files:
-        with open(f) as f:
-            DS9Parser(f.read(), errors='warn')
-
-
-implemented_region_types = ('ellipse', 'circle', 'rectangle', 'polygon',
-                            'point')
+    # DS9RegionParserWarning from non-supported panda, [b/e]panda regions
+    with catch_warnings(DS9RegionParserWarning):
+        for file in files:
+            with open(file) as fh:
+                DS9Parser(fh.read(), errors='warn')
 
 
 # TODO: ds9.physical.windows.reg contains different values -> Why?
@@ -42,7 +44,10 @@ implemented_region_types = ('ellipse', 'circle', 'rectangle', 'polygon',
                           'data/ds9.physical.strip.reg'])
 def test_file(filename):
     filename = get_pkg_data_filename(filename)
-    regs = read_ds9(filename, errors='warn')
+
+    # DS9RegionParserWarnings from skipped multi-annulus regions
+    with catch_warnings(DS9RegionParserWarning):
+        regs = read_ds9(filename, errors='warn')
 
     coordsys = os.path.basename(filename).split(".")[1]
 
@@ -136,8 +141,8 @@ def test_missing_region_warns():
 
     assert len(parser.shapes) == 1
     assert len(ASWarn) == 1
-    estr = ('Region type "notaregiontype" was identified, but it is not one '
-            'of the known region types.')
+    estr = ('Region type "notaregiontype" was found, but it is not one '
+            'of the supported region types.')
     assert estr in str(ASWarn[0].message)
 
 

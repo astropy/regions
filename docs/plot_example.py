@@ -1,11 +1,10 @@
-"""Example how to plot sky regions on a sky image.
+# Licensed under a 3-clause BSD style license - see LICENSE.rst
+"""
+Example how to plot sky regions on a sky image.
 """
 from astropy.coordinates import SkyCoord, Angle
-from regions import (
-    make_example_dataset,
-    CircleSkyRegion,
-)
 import matplotlib.pyplot as plt
+from regions import (make_example_dataset, CircleSkyRegion)
 
 config = dict(crpix=(18, 9), cdelt=(-10, 10), shape=(18, 36))
 dataset = make_example_dataset(data='simulated', config=config)
@@ -22,9 +21,11 @@ ax.imshow(dataset.image.data, cmap='gray', vmin=0, vmax=1,
 
 for source in dataset.source_table:
     # Plot a sky circle around each source
-    center = SkyCoord(source['GLON'], source['GLAT'], unit='deg', frame='galactic')
+    center = SkyCoord(source['GLON'], source['GLAT'], unit='deg',
+                      frame='galactic')
     radius = Angle(20, 'deg')
     region = CircleSkyRegion(center=center, radius=radius)
     pix_region = region.to_pixel(wcs=wcs)
 
-    pix_region.plot(ax=ax, edgecolor='yellow', facecolor='yellow', alpha=0.5, lw=3)
+    pix_region.plot(ax=ax, edgecolor='yellow', facecolor='yellow',
+                    alpha=0.5, lw=3)

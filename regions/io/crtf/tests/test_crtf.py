@@ -1,4 +1,7 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
+"""
+Tests for the crtf subpackage.
+"""
 
 from astropy.coordinates import SkyCoord
 import astropy.units as u
@@ -108,7 +111,7 @@ def test_valid_region_syntax():
     reg_str6 = 'rotbox[[12h01m34.1s, 12d23m33s], [3arcmin,], 12deg]'
     with pytest.raises(CRTFRegionParserError) as excinfo:
         CRTFParser(reg_str6)
-    assert "('3arcmin', '') should be a pair of length" in str(excinfo.value)
+    assert "('3arcmin', '') should be a pair of lengths" in str(excinfo.value)
 
 
 def test_issue_312_regression():

@@ -32,6 +32,8 @@ representing one DS9 region. The `~regions.Shape` objects can be converted to
 
 Serialisation is done using the `~regions.ds9_objects_to_string` function
 
+.. code-block:: python
+
     >>> from regions import ds9_objects_to_string
     >>> ds9_objects_to_string(regions, coordsys='galactic')
     '# Region file format: DS9 astropy/regions\ngalactic\ncircle(42.000000,43.000000,3.000000) # color=green\n'
@@ -39,7 +41,6 @@ Serialisation is done using the `~regions.ds9_objects_to_string` function
 There's also `~regions.write_ds9` and `~regions.read_ds9` which write to and
 read from a file in addition to doing the region serialisation and parsing.
 
-.. code-block:: python
 .. doctest-skip::
 
     >>> from regions import read_ds9, write_ds9
@@ -52,7 +53,6 @@ read from a file in addition to doing the region serialisation and parsing.
 
 The ``visual`` metadata includes items used for display, e.g.:
 
-.. code-block:: python
 .. doctest-skip::
 
     >>> print(regions[0].visual)
