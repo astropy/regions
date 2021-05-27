@@ -2,6 +2,8 @@
 
 from astropy.io.registry import UnifiedReadWrite, read, write
 
+__all__ = []
+
 
 class ShapeListRead(UnifiedReadWrite):
     """

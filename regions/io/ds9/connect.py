@@ -6,6 +6,7 @@ from .read import read_ds9
 from .write import write_ds9
 from ..core import ShapeList
 
+__all__ = []
 
 DS9_SIGNATURE = '# Region file format: DS9'
 

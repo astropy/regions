@@ -7,6 +7,8 @@ from ..core import ShapeList
 from .read import read_fits_region
 from .write import write_fits_region
 
+__all__ = []
+
 
 # FIXME: write_fits_region has its first two arguments backwards as
 # compared to write_crtf and write_ds9
