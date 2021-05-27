@@ -1,17 +1,21 @@
-from .core import *
-from . import connect
+# Licensed under a 3-clause BSD style license - see LICENSE.rst
+"""
+This subpackage provides tools for reading and writing region files.
+"""
+from .connect import *  # noqa
+from .core import *  # noqa
 
-from .ds9.read import *
-from .ds9.write import *
-from .ds9.core import *
-from .ds9 import connect
+from .ds9.connect import *  # noqa
+from .ds9.core import *  # noqa
+from .ds9.read import *  # noqa
+from .ds9.write import *  # noqa
 
-from .crtf.read import *
-from .crtf.write import *
-from .crtf.core import *
-from .crtf import connect
+from .crtf.connect import *  # noqa
+from .crtf.core import *  # noqa
+from .crtf.read import *  # noqa
+from .crtf.write import *  # noqa
 
-from .fits.core import *
-from .fits.read import *
-from .fits.write import *
-from .fits import connect
+from .fits.connect import *  # noqa
+from .fits.core import *  # noqa
+from .fits.read import *  # noqa
+from .fits.write import *  # noqa
