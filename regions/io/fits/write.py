@@ -2,7 +2,7 @@
 
 from astropy.io import fits
 
-from ..core import to_shape_list, SkyRegion
+from ..core import _to_shape_list, SkyRegion
 
 __all__ = ['write_fits_region', 'fits_region_objects_to_table']
 
@@ -27,7 +27,7 @@ def fits_region_objects_to_table(regions):
         if isinstance(reg, SkyRegion):
             raise TypeError('Every region must be a pixel region')
 
-    shape_list = to_shape_list(regions, coordinate_system='image')
+    shape_list = _to_shape_list(regions, coordinate_system='image')
     return shape_list.to_fits()
 
 

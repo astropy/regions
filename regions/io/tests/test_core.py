@@ -4,7 +4,9 @@ from astropy.tests.helper import assert_quantity_allclose
 from astropy.units.quantity import Quantity
 import pytest
 
-from .. import DS9Parser, CRTFParser, to_shape_list
+from ..core import _to_shape_list
+from ..crtf.read import CRTFParser
+from ..ds9.read import DS9Parser
 
 
 def test_shape_ds9():
@@ -13,7 +15,7 @@ def test_shape_ds9():
     parser = DS9Parser(reg_str)
     shape1 = parser.shapes[0]
     region = parser.shapes.to_regions()
-    shape2 = to_shape_list(region, 'galactic')[0]
+    shape2 = _to_shape_list(region, 'galactic')[0]
 
     assert shape1.coordsys == shape2.coordsys
     assert shape1.region_type == shape2.region_type
@@ -41,7 +43,7 @@ def test_shape_crtf():
     parser = CRTFParser(reg_str)
     shape1 = parser.shapes[0]
     region = parser.shapes.to_regions()
-    shape2 = to_shape_list(region, 'fk5')[0]
+    shape2 = _to_shape_list(region, 'fk5')[0]
 
     assert shape1.coordsys == shape2.coordsys
     assert shape1.region_type == shape2.region_type

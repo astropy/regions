@@ -14,7 +14,7 @@ from ..core import Shape, ShapeList, reg_mapping
 from .core import (DS9RegionParserError, DS9RegionParserWarning,
                    valid_symbols_ds9)
 
-__all__ = ['read_ds9', 'DS9Parser', 'DS9RegionParser', 'CoordinateParser']
+__all__ = ['read_ds9', 'DS9Parser']
 
 # Regular expression to extract region type or coodinate system
 regex_global = re.compile('^#? *(-?)([a-zA-Z0-9]+)')
@@ -68,7 +68,7 @@ def read_ds9(filename, errors='strict'):
     return parser.shapes.to_regions()
 
 
-class CoordinateParser:
+class _DS9CoordinateParser:
     """
     Helper class to structure coordinate parser.
     """
@@ -145,12 +145,6 @@ class DS9Parser:
     `~regions.io.core.ShapeList`. The result is stored as ``shapes``
     attribute.
 
-    Each line is tested for either containing a region type or a
-    coordinate system. If a coordinate system is found the global
-    coordsys state of the parser is modified. If a region type is found
-    the `~regions.DS9RegionParser` is invokes to transform the line into
-    a `~regions.Shape` object.
-
     Parameters
     ----------
     region_string : str
@@ -173,6 +167,12 @@ class DS9Parser:
     center: PixCoord(x=330.0, y=1090.0)
     radius: 40.0
     """
+
+    # Each line is tested for either containing a region type or a
+    # coordinate system. If a coordinate system is found the global
+    # coordsys state of the parser is modified. If a region type is
+    # found the ``_DS9RegionParser`` is invokes to transform the line
+    # into a `~regions.Shape` object.
 
     # List of valid coordinate system (all lowercase)
     coordinate_systems = ['fk5', 'fk4', 'icrs', 'galactic', 'wcs',
@@ -264,7 +264,7 @@ class DS9Parser:
             # Found coord system definition
             self.set_coordsys(region_type)
             return
-        if region_type not in DS9RegionParser.language_spec:
+        if region_type not in _DS9RegionParser.language_spec:
             self._raise_error(f'Region type "{region_type}" was found, but '
                               'it is not one of the supported region types.')
             return
@@ -332,23 +332,23 @@ class DS9Parser:
             raise DS9RegionParserError('No coordinate system specified and a '
                                        'region has been found.')
 
-        helper = DS9RegionParser(coordsys=self.coordsys, include=include,
-                                 region_type=region_type,
-                                 region_end=region_end,
-                                 global_meta=self.global_meta, line=line)
+        helper = _DS9RegionParser(coordsys=self.coordsys, include=include,
+                                  region_type=region_type,
+                                  region_end=region_end,
+                                  global_meta=self.global_meta, line=line)
         helper.parse()
         self.shapes.append(helper.shape)
 
 
 # Global definitions to improve readability
-radius = CoordinateParser.parse_angular_length_quantity
-width = CoordinateParser.parse_angular_length_quantity
-height = CoordinateParser.parse_angular_length_quantity
-angle = CoordinateParser.parse_angular_length_quantity
-coordinate = CoordinateParser.parse_coordinate
+radius = _DS9CoordinateParser.parse_angular_length_quantity
+width = _DS9CoordinateParser.parse_angular_length_quantity
+height = _DS9CoordinateParser.parse_angular_length_quantity
+angle = _DS9CoordinateParser.parse_angular_length_quantity
+coordinate = _DS9CoordinateParser.parse_coordinate
 
 
-class DS9RegionParser:
+class _DS9RegionParser:
     """
     Parse a DS9 region string.
 
@@ -405,8 +405,7 @@ class DS9RegionParser:
                      'polygon': itertools.cycle((coordinate,)),
                      'line': (coordinate, coordinate, coordinate, coordinate),
                      'annulus': itertools.chain((coordinate, coordinate),
-                                                itertools.cycle((radius,))),
-                     }
+                                                itertools.cycle((radius,)))}
 
     def __init__(self, coordsys, include, region_type, region_end,
                  global_meta, line):
@@ -489,7 +488,7 @@ class DS9RegionParser:
                 coord_list.append(element_parser(element))
 
         if self.region_type in ['ellipse', 'box'] and len(coord_list) % 2 == 1:
-            coord_list[-1] = CoordinateParser.parse_angular_length_quantity(
+            coord_list[-1] = _DS9CoordinateParser.parse_angular_length_quantity(
                 elements[len(coord_list) - 1])
 
         # Reset iterator for ellipse and annulus

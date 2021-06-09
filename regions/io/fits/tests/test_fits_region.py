@@ -13,7 +13,7 @@ from numpy.testing import assert_allclose
 import pytest
 
 from ....shapes import CircleSkyRegion
-from ...core import to_shape_list
+from ...core import _to_shape_list
 from ..core import FITSRegionParserError
 from ..read import FITSRegionParser, read_fits_region
 from ..write import fits_region_objects_to_table
@@ -66,7 +66,7 @@ def test_file_fits(filename):
         header = hdulist[1].header
         wcs = WCS(header, keysel=['image', 'binary', 'pixel'])
         regs_pix = [reg.to_pixel(wcs) for reg in regs_sky]
-        shapes_roundtrip = to_shape_list(regs_pix, 'image')
+        shapes_roundtrip = _to_shape_list(regs_pix, 'image')
 
     for i, shape in enumerate(shapes):
         assert shape.region_type == shapes_roundtrip[i].region_type

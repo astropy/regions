@@ -27,9 +27,7 @@ from .connect import ShapeListRead, ShapeListWrite
 from .ds9.core import DS9RegionParserWarning, valid_symbols_ds9
 from .crtf.core import CRTFRegionParserWarning
 
-__all__ = ['ShapeList', 'Shape', 'to_shape_list', 'to_crtf_meta',
-           'to_ds9_meta']
-
+__all__ = ['ShapeList', 'Shape']
 
 regions_attributes = dict(circle=['center', 'radius'],
                           ellipse=['center', 'width', 'height', 'angle'],
@@ -194,7 +192,7 @@ class ShapeList(list):
 
         for shape in self:
             shape.check_crtf()
-            shape.meta = to_crtf_meta(shape.meta)
+            shape.meta = _to_crtf_meta(shape.meta)
 
             # if unspecified, include is True. Despite the
             # specification, CASA does *not* support a preceding "+". If
@@ -347,7 +345,7 @@ class ShapeList(list):
 
         for shape in self:
             shape.check_ds9()
-            shape.meta = to_ds9_meta(shape.meta)
+            shape.meta = _to_ds9_meta(shape.meta)
 
             # if unspecified, include is True.
             include = ''
@@ -743,7 +741,7 @@ class Shape:
                              'reference frame')
 
 
-def to_shape_list(region_list, coordinate_system='fk5'):
+def _to_shape_list(region_list, coordinate_system='fk5'):
     """
     Convert a list of regions into a `~regions.ShapeList` object.
 
@@ -812,7 +810,7 @@ def to_shape_list(region_list, coordinate_system='fk5'):
     return shape_list
 
 
-def to_ds9_meta(shape_meta):
+def _to_ds9_meta(shape_meta):
     """
     Make the metadata DS9 compatible by filtering and mapping the valid
     keys.
@@ -849,7 +847,7 @@ def to_ds9_meta(shape_meta):
     return meta
 
 
-def to_crtf_meta(shape_meta):
+def _to_crtf_meta(shape_meta):
     """
     Make the metadata CRTF compatible by filtering and mapping the valid
     keys.
