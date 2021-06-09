@@ -13,7 +13,7 @@ from ..core import Shape, ShapeList, reg_mapping
 from .core import (CRTFRegionParserError, CRTFRegionParserWarning,
                    valid_symbols)
 
-__all__ = ['read_crtf', 'CRTFParser', 'CRTFRegionParser']
+__all__ = ['read_crtf', 'CRTFParser']
 
 # All CASA files start with '#CRTF' . It may also include the version
 # number like '#CRTFv0' .
@@ -93,13 +93,6 @@ class CRTFParser:
     `~regions.io.core.ShapeList`. The result is stored in the ``shapes``
     attribute.
 
-    Each line is tested for either containing a region with meta
-    attributes or global parameters. If meta attributes or global
-    parameters are found, they are stored in the ``global_meta``
-    attribute. If a region is found, the `~regions.CRTFRegionParser`
-    is invoked to transform the line into a `~regions.io.core.Shape`
-    object, which is stored in the ``shapes`` attribute.
-
     Parameters
     ----------
     region_string : str
@@ -120,6 +113,13 @@ class CRTFParser:
     >>> print(regs[0].visual)
     {'color': 'blue'}
     """
+
+    # Each line is tested for either containing a region with meta
+    # attributes or global parameters. If meta attributes or global
+    # parameters are found, they are stored in the ``global_meta``
+    # attribute. If a region is found, then ``_CRTFRegionParser``
+    # is invoked to transform the line into a `~regions.io.core.Shape`
+    # object, which is stored in the ``shapes`` attribute.
 
     # valid definition (region or annotation) types
     valid_definition = ('box', 'centerbox', 'rotbox', 'poly', 'circle',
@@ -180,7 +180,7 @@ class CRTFParser:
             include = region.group('include') or '+'
             region_type = region.group('regiontype').lower()
             if region_type in self.valid_definition:
-                helper = CRTFRegionParser(
+                helper = _CRTFRegionParser(
                     self.global_meta, include, type_, region_type,
                     *crtf_line.group('region', 'parameters'))
 
@@ -236,7 +236,7 @@ class CRTFParser:
                                       'key')
 
 
-class CRTFRegionParser:
+class _CRTFRegionParser:
     """
     Parse a CRTF region string.
 

@@ -12,7 +12,7 @@ from ..core import Shape, ShapeList, reg_mapping
 from .core import (FITSRegionParserError, FITSRegionParserWarning,
                    language_spec)
 
-__all__ = ['FITSRegionParser', 'read_fits_region', 'FITSRegionRowParser']
+__all__ = ['FITSRegionParser', 'read_fits_region']
 
 
 class FITSRegionParser:
@@ -88,7 +88,7 @@ class FITSRegionParser:
             self.table['COMPONENT'] = np.ones([1, len(self.table)])
 
         for row in self.table:
-            reg = FITSRegionRowParser(row, self.unit, self.errors)
+            reg = _FITSRegionRowParser(row, self.unit, self.errors)
             component, shape = reg.parse()
             if component in self.shapes:
                 self._shapes[component].append(shape)
@@ -96,7 +96,7 @@ class FITSRegionParser:
                 self._shapes[component] = [shape]
 
 
-class FITSRegionRowParser():
+class _FITSRegionRowParser():
     """
     Parse a single row of a FITS region table.
 
