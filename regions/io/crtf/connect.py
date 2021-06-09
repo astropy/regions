@@ -6,7 +6,7 @@ from ..core import ShapeList
 from .read import read_crtf
 from .write import write_crtf
 
-__all__  = []
+__all__ = []
 
 CRTF_SIGNATURE = '#CRTF'
 
