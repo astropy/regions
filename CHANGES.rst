@@ -85,6 +85,11 @@ API Changes
 - The ``RegionMeta`` and ``RegionVisual`` classes have been moved to the
   ``regions.core.metadata`` module. [#371]
 
+- The following helper functions were removed from the public API:
+  ``to_shape_list``, ``to_crtf_meta``, ``to_ds9_meta``,
+  ``CRTFRegionParser``, ``DS9RegionParser``, ``CoordinateParser``,
+  ``FITSRegionRowParser``. [#375]
+
 
 0.4 (2019-06-17)
 ================
