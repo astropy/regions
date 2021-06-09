@@ -371,9 +371,9 @@ class _CRTFRegionParser:
             if attr_spec == 'c':
                 if len(val_str) == 2 and val_str[1] != '':
                     coord_list.append(
-                        CoordinateParser.parse_coordinate(val_str[0]))
+                        _CRTFCoordinateParser.parse_coordinate(val_str[0]))
                     coord_list.append(
-                        CoordinateParser.parse_coordinate(val_str[1]))
+                        _CRTFCoordinateParser.parse_coordinate(val_str[1]))
                 else:
                     self._raise_error(f'Not in proper format: {val_str} '
                                       'should be a coordinate')
@@ -381,10 +381,10 @@ class _CRTFRegionParser:
             if attr_spec == 'pl':
                 if len(val_str) == 2 and val_str[1] != '':
                     coord_list.append(
-                        CoordinateParser.parse_angular_length_quantity(
+                        _CRTFCoordinateParser.parse_angular_length_quantity(
                             val_str[0]))
                     coord_list.append(
-                        CoordinateParser.parse_angular_length_quantity(
+                        _CRTFCoordinateParser.parse_angular_length_quantity(
                             val_str[1]))
                 else:
                     self._raise_error(f'Not in proper format: {val_str} '
@@ -393,7 +393,7 @@ class _CRTFRegionParser:
             if attr_spec == 'l':
                 if isinstance(val_str, str):
                     coord_list.append(
-                        CoordinateParser.parse_angular_length_quantity(
+                        _CRTFCoordinateParser.parse_angular_length_quantity(
                             val_str))
                 else:
                     self._raise_error(f'Not in proper format: {val_str} '
@@ -472,7 +472,7 @@ class _CRTFRegionParser:
                            include=self.include)
 
 
-class CoordinateParser:
+class _CRTFCoordinateParser:
     """
     Helper class to structure coordinate parser.
     """
