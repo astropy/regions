@@ -1,6 +1,6 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
-from ..core import to_shape_list
+from ..core import _to_shape_list
 
 __all__ = ['write_crtf', 'crtf_objects_to_string']
 
@@ -41,7 +41,7 @@ def crtf_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
     global coord=J2000
     circle[[1.000007deg, 2.000002deg], 5.000000deg]
     """
-    shapelist = to_shape_list(regions, coordsys)
+    shapelist = _to_shape_list(regions, coordsys)
     return shapelist.to_crtf(coordsys, fmt, radunit)
 
 

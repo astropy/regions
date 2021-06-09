@@ -27,7 +27,7 @@ from .connect import ShapeListRead, ShapeListWrite
 from .ds9.core import DS9RegionParserWarning, valid_symbols_ds9
 from .crtf.core import CRTFRegionParserWarning
 
-__all__ = ['ShapeList', 'Shape', 'to_shape_list']
+__all__ = ['ShapeList', 'Shape']
 
 regions_attributes = dict(circle=['center', 'radius'],
                           ellipse=['center', 'width', 'height', 'angle'],
@@ -741,7 +741,7 @@ class Shape:
                              'reference frame')
 
 
-def to_shape_list(region_list, coordinate_system='fk5'):
+def _to_shape_list(region_list, coordinate_system='fk5'):
     """
     Convert a list of regions into a `~regions.ShapeList` object.
 

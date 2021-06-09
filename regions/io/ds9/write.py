@@ -1,6 +1,6 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
-from ..core import to_shape_list
+from ..core import _to_shape_list
 
 __all__ = ['write_ds9', 'ds9_objects_to_string']
 
@@ -32,7 +32,7 @@ def ds9_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
     region_string : str
         A DS9 region string.
     """
-    shapelist = to_shape_list(regions, coordsys)
+    shapelist = _to_shape_list(regions, coordsys)
     return shapelist.to_ds9(coordsys, fmt, radunit)
 
 
