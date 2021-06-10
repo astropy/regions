@@ -85,12 +85,12 @@ function::
           1.0 .. 4.0       5.0 .. 8.0 polygon       0.0 .. 0.0       0.0         8
          10.0 .. 0.0       5.5 .. 0.0  ROTBOX      10.0 .. 0.0       0.0         9
 
-The `~regions.write_fits_region` and `~regions.read_fits_region`
+The `~regions.write_fits` and `~regions.read_fits_region`
 functions write as well as read from a file in addition to doing the
 region serialisation and parsing:
 
 .. doctest-skip::
 
-    >>> from regions import CirclePixelRegion, PixCoord, write_fits_region
+    >>> from regions import CirclePixelRegion, PixCoord, write_fits
     >>> reg_pixel = CirclePixelRegion(PixCoord(1, 2), 5)
-    >>> write_fits_region('regions_output.fits', regions=[reg_pixel], overwrite=True)
+    >>> write_fits('regions_output.fits', regions=[reg_pixel], overwrite=True)
