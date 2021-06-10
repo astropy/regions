@@ -2,7 +2,7 @@
 
 from astropy.io import registry
 
-from ..core import ShapeList
+from ...core.regionlist import RegionList
 from .read import read_crtf
 from .write import write_crtf
 
@@ -49,6 +49,6 @@ def is_crtf(origin, path, fileobj, *args, **kwargs):  # noqa pylint: disable=unu
                 and path.lower().endswith(('.crtf', '.crtf.gz')))
 
 
-registry.register_reader('crtf', ShapeList, read_crtf)
-registry.register_writer('crtf', ShapeList, write_crtf)
-registry.register_identifier('crtf', ShapeList, is_crtf)
+registry.register_reader('crtf', RegionList, read_crtf)
+registry.register_writer('crtf', RegionList, write_crtf)
+registry.register_identifier('crtf', RegionList, is_crtf)

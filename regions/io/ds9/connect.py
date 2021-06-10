@@ -2,9 +2,9 @@
 
 from astropy.io import registry
 
+from ...core.regionlist import RegionList
 from .read import read_ds9
 from .write import write_ds9
-from ..core import ShapeList
 
 __all__ = []
 
@@ -50,6 +50,6 @@ def is_ds9(origin, path, fileobj, *args, **kwargs):  # noqa pylint: disable=unus
                                            '.reg.gz')))
 
 
-registry.register_reader('ds9', ShapeList, read_ds9)
-registry.register_writer('ds9', ShapeList, write_ds9)
-registry.register_identifier('ds9', ShapeList, is_ds9)
+registry.register_reader('ds9', RegionList, read_ds9)
+registry.register_writer('ds9', RegionList, write_ds9)
+registry.register_identifier('ds9', RegionList, is_ds9)
