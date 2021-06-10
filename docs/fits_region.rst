@@ -9,10 +9,10 @@ objects to FITS region file. A `FITS Region Binary Table
 <https://fits.gsfc.nasa.gov/registry/region.html>`_ defines a spatial
 region of a two-dimensional image in pixels.
 
-The file can be read in using the `~regions.read_fits_region`
-function. The name of the header must be ``REGION`` for
-the `~regions.read_fits_region` to parse the table. The
-`~regions.read_fits_region` function returns a sky region object.
+The file can be read in using the `~regions.read_fits` function. The
+name of the header must be ``REGION`` for the `~regions.read_fits` to
+parse the table. The `~regions.read_fits` function returns a sky region
+object.
 
 Some FITS regions, such as ``rectangle``, ``rotrectangle``,
 ``pie``, ``sector``, are not supported by this package.
@@ -85,9 +85,9 @@ function::
           1.0 .. 4.0       5.0 .. 8.0 polygon       0.0 .. 0.0       0.0         8
          10.0 .. 0.0       5.5 .. 0.0  ROTBOX      10.0 .. 0.0       0.0         9
 
-The `~regions.write_fits` and `~regions.read_fits_region`
-functions write as well as read from a file in addition to doing the
-region serialisation and parsing:
+The `~regions.write_fits` and `~regions.read_fits` functions write as
+well as read from a file in addition to doing the region serialisation
+and parsing:
 
 .. doctest-skip::
 

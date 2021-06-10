@@ -5,6 +5,7 @@ from warnings import warn
 from astropy.io import fits
 from astropy.table import Table
 import astropy.units as u
+from astropy.utils import deprecated
 from astropy.wcs import WCS
 import numpy as np
 
@@ -12,7 +13,7 @@ from ..core import Shape, ShapeList, reg_mapping
 from .core import (FITSRegionParserError, FITSRegionParserWarning,
                    language_spec)
 
-__all__ = ['FITSRegionParser', 'read_fits_region']
+__all__ = ['FITSRegionParser', 'read_fits']
 
 
 class FITSRegionParser:
@@ -217,7 +218,7 @@ class _FITSRegionRowParser():
             self._raise_error(f'The unit: {unit} is invalid')
 
 
-def read_fits_region(filename, errors='strict'):
+def read_fits(filename, errors='strict'):
     """
     Read a FITS region file, converting a FITS regions table to a list
     of `~regions.Region` objects.
@@ -242,10 +243,10 @@ def read_fits_region(filename, errors='strict'):
     Examples
     --------
     >>> from astropy.utils.data import get_pkg_data_filename
-    >>> from regions import read_fits_region
+    >>> from regions import read_fits
     >>> file_read = get_pkg_data_filename('data/fits_region.fits',
     ...                                   package='regions.io.fits.tests')
-    >>> regions = read_fits_region(file_read)
+    >>> regions = read_fits(file_read)
     """
     regions = []
 
@@ -260,3 +261,29 @@ def read_fits_region(filename, errors='strict'):
                     regions.append(reg.to_sky(wcs))
 
     return regions
+
+
+@deprecated('0.5', alternative='read_fits')
+def read_fits_region(filename, errors='strict'):
+    """
+    Read a FITS region file, converting a FITS regions table to a list
+    of `~regions.Region` objects.
+
+    Parameters
+    ----------
+    filename : str
+        The file path.
+
+    errors : {'strict', 'warn', 'ignore'}, optional
+        The error handling scheme to use for handling parsing
+        errors. The default is 'strict', which will raise a
+        `~regions.FITSRegionParserError`. 'warn' will raise a
+        `~regions.FITSRegionParserWarning`, and 'ignore' will do
+        nothing (i.e., be silent).
+
+    Returns
+    -------
+    regions : list
+        A list of `~regions.Region` objects.
+    """
+    return read_fits(filename, errors=errors)
