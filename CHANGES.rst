@@ -85,6 +85,12 @@ API Changes
 - The ``RegionMeta`` and ``RegionVisual`` classes have been moved to the
   ``regions.core.metadata`` module. [#371]
 
+- Deprecated the ``read_fits_region`` and ``write_fits_region``
+  functions. Instead, use the ``read_fits`` and ``write_fits``
+  functions. Note that the ``write_fits`` function is called as
+  ``write_fits(regions, filename)`` for consistency with the other
+  functions that write files. [#376]
+
 - The following helper functions were removed from the public API:
   ``to_shape_list``, ``to_crtf_meta``, ``to_ds9_meta``,
   ``CRTFRegionParser``, ``DS9RegionParser``, ``CoordinateParser``,

@@ -15,7 +15,7 @@ import pytest
 from ....shapes import CircleSkyRegion
 from ...core import _to_shape_list
 from ..core import FITSRegionParserError
-from ..read import FITSRegionParser, read_fits_region
+from ..read import FITSRegionParser, read_fits
 from ..write import fits_region_objects_to_table
 
 implemented_region_types = ('ellipse', 'circle', 'box', 'polygon', 'point',
@@ -61,7 +61,7 @@ def test_file_fits(filename):
 
     # Reading the regions directly from file and converting to sky
     # regions.
-    regs_sky = read_fits_region(filename)
+    regs_sky = read_fits(filename)
     with fits.open(filename) as hdulist:
         header = hdulist[1].header
         wcs = WCS(header, keysel=['image', 'binary', 'pixel'])
