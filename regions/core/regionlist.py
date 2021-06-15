@@ -3,10 +3,8 @@
 This module provides a RegionList class.
 """
 
-from astropy.io.registry import UnifiedReadWriteMethod
-
-from .connect import RegionListRead, RegionListWrite
 from .core import Region
+from .registry import RegionsRegistry
 
 __all__ = ['RegionList']
 
@@ -20,10 +18,6 @@ class RegionList:
     regions : list of `~region.Region`
         The list of region objects.
     """
-
-    # Unified I/O read and write methods
-    read = UnifiedReadWriteMethod(RegionListRead)
-    write = UnifiedReadWriteMethod(RegionListWrite)
 
     def __init__(self, regions):
         self.regions = regions
@@ -60,8 +54,15 @@ class RegionList:
         newcls.regions = self.regions.copy()
         return newcls
 
+    @classmethod
+    def read(cls, filename, format=None, **kwargs):
+        """
+        Read in a regions file.
+        """
+        return RegionsRegistry.read(filename, cls.__name__, format, **kwargs)
 
-# use list API docs for these methods
+
+# reuse the `list` API docs for these methods
 methods = ('append', 'extend', 'insert', 'reverse', 'pop', 'copy')
 for method in methods:
     getattr(RegionList, method).__doc__ = getattr(list, method).__doc__

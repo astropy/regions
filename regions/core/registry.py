@@ -24,3 +24,11 @@ class RegionsRegistry:
             cls.registry[key] = wrapped_func
             return wrapped_func
         return inner_wrapper
+
+    @classmethod
+    def read(cls, filename, classname, format=None, **kwargs):
+        """
+        Read in a regions file.
+        """
+        key = (classname, 'read', format)
+        return RegionsRegistry.registry[key](filename, **kwargs)
