@@ -47,8 +47,3 @@ def is_crtf(origin, path, fileobj, *args, **kwargs):  # noqa pylint: disable=unu
     else:
         return (path is not None
                 and path.lower().endswith(('.crtf', '.crtf.gz')))
-
-
-registry.register_reader('crtf', RegionList, read_crtf)
-registry.register_writer('crtf', RegionList, write_crtf)
-registry.register_identifier('crtf', RegionList, is_crtf)

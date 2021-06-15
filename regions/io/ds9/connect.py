@@ -1,11 +1,5 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
-from astropy.io import registry
-
-from ...core.regionlist import RegionList
-from .read import read_ds9
-from .write import write_ds9
-
 __all__ = []
 
 DS9_SIGNATURE = '# Region file format: DS9'
@@ -48,8 +42,3 @@ def is_ds9(origin, path, fileobj, *args, **kwargs):  # noqa pylint: disable=unus
         return (path is not None
                 and path.lower().endswith(('.ds9', '.reg', '.ds9.gz',
                                            '.reg.gz')))
-
-
-registry.register_reader('ds9', RegionList, read_ds9)
-registry.register_writer('ds9', RegionList, write_ds9)
-registry.register_identifier('ds9', RegionList, is_ds9)
