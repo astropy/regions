@@ -9,6 +9,8 @@ from astropy.coordinates import Angle, frame_transform_graph
 import astropy.units as u
 from astropy.utils.data import get_readable_fileobj
 
+from ...core.registry import RegionsRegistry
+from ...core import RegionList
 from ..core import Shape, ShapeList, reg_mapping
 from .core import (CRTFRegionParserError, CRTFRegionParserWarning,
                    valid_symbols)
@@ -44,14 +46,15 @@ regex_region = re.compile(r'(?P<include>[+-])?(?P<type>ann(?=\s))?\s*(?P<regiont
 regex_line = re.compile(r'(?P<region>[+-]?(?:ann(?=\s))?\s*[a-z]+?\s?\[[^=]+\])(?:\s*,?\s*(?P<parameters>.*))?')  # noqa
 
 
-def read_crtf(filename, errors='strict'):
+@RegionsRegistry.register('RegionList', 'read', 'crtf')
+def read_crtf(filename, errors='strict', cache=False):
     """
     Read a CRTF region file and return a list of region objects.
 
     Parameters
     ----------
     filename : str
-        The file path.
+        The filename of the file to access.
 
     errors : {'strict', 'warn', 'ignore'}, optional
         The error handling scheme to use for handling parsing
@@ -59,6 +62,11 @@ def read_crtf(filename, errors='strict'):
         `~regions.CRTFRegionParserError`. 'warn' will raise a
         `~regions.CRTFRegionParserWarning`, and 'ignore' will do nothing
         (i.e., be silent).
+
+    cache : bool or 'update', optional
+        Whether to cache the contents of remote URLs. If 'update', check
+        the remote URL for a new version but store the result in the
+        cache.
 
     Returns
     -------
@@ -78,8 +86,8 @@ def read_crtf(filename, errors='strict'):
     with get_readable_fileobj(filename) as fh:
         if regex_begin.search(fh.readline()):
             region_string = fh.read()
-            parser = CRTFParser(region_string, errors)
-            return parser.shapes.to_regions()
+            parser = CRTFParser(region_string, errors=errors)
+            return RegionList(parser.shapes.to_regions())
         else:
             raise CRTFRegionParserError('Every CRTF Region must start with '
                                         '"#CRTF"')

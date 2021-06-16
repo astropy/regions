@@ -9,6 +9,8 @@ from astropy.utils import deprecated
 from astropy.wcs import WCS
 import numpy as np
 
+from ...core.registry import RegionsRegistry
+from ...core import RegionList
 from ..core import Shape, ShapeList, reg_mapping
 from .core import (FITSRegionParserError, FITSRegionParserWarning,
                    language_spec)
@@ -218,7 +220,8 @@ class _FITSRegionRowParser():
             self._raise_error(f'The unit: {unit} is invalid')
 
 
-def read_fits(filename, errors='strict'):
+@RegionsRegistry.register('RegionList', 'read', 'fits')
+def read_fits(filename, errors='strict', cache=False):
     """
     Read a FITS region file, converting a FITS regions table to a list
     of `~regions.Region` objects.
@@ -234,6 +237,11 @@ def read_fits(filename, errors='strict'):
         `~regions.FITSRegionParserError`. 'warn' will raise a
         `~regions.FITSRegionParserWarning`, and 'ignore' will do
         nothing (i.e., be silent).
+
+    cache : bool or 'update', optional
+        Whether to cache the contents of remote URLs. If 'update', check
+        the remote URL for a new version but store the result in the
+        cache.
 
     Returns
     -------
@@ -260,7 +268,7 @@ def read_fits(filename, errors='strict'):
                 for reg in regions_list:
                     regions.append(reg.to_sky(wcs))
 
-    return regions
+    return RegionList(regions)
 
 
 @deprecated('0.5', alternative='read_fits')
