@@ -6,6 +6,11 @@ This module provides a RegionsRegistry class.
 __all__ = []
 
 
+class IORegistryError(Exception):
+    """Custom error for registry errors."""
+    pass
+
+
 class RegionsRegistry:
     """
     Class to hold registry to read, write, parse, and serialize regions
@@ -26,10 +31,28 @@ class RegionsRegistry:
         return inner_wrapper
 
     @classmethod
+    def get_identifiers(cls, classname):
+        return [key for key in cls.registry.keys()
+                if key[0] == classname and key[1] == 'identify']
+
+    @classmethod
     def read(cls, filename, classname, format=None, **kwargs):
         """
         Read in a regions file.
         """
+        if format is None:
+            identifiers = cls.get_identifiers(classname)
+            if identifiers:
+                for identifier in identifiers:
+                    if cls.registry[identifier]('read', filename):
+                        format = identifier[2]
+                        break  # finds the first valid filetype
+
+            if format is None:
+                raise IORegistryError('Format could not be identified based '
+                                      'on the file name or contents, please '
+                                      'provide a "format" argument.')
+
         key = (classname, 'read', format)
         return RegionsRegistry.registry[key](filename, **kwargs)
 
