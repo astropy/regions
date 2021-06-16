@@ -3,7 +3,6 @@
 from astropy.io import registry
 from astropy.io.fits.connect import is_fits
 
-from ...core.regionlist import RegionList
 from .read import read_fits
 from .write import write_fits
 

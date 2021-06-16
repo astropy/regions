@@ -2,7 +2,6 @@
 
 from astropy.io import registry
 
-from ...core.regionlist import RegionList
 from .read import read_crtf
 from .write import write_crtf
 

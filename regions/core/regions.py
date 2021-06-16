@@ -1,15 +1,15 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """
-This module provides a RegionList class.
+This module provides a Regions class.
 """
 
 from .core import Region
 from .registry import RegionsRegistry
 
-__all__ = ['RegionList']
+__all__ = ['Regions']
 
 
-class RegionList:
+class Regions:
     """
     Class to hold a list of `~regions.Region` objects.
 
@@ -82,4 +82,4 @@ class RegionList:
 # reuse the `list` API docs for these methods
 methods = ('append', 'extend', 'insert', 'reverse', 'pop', 'copy')
 for method in methods:
-    getattr(RegionList, method).__doc__ = getattr(list, method).__doc__
+    getattr(Regions, method).__doc__ = getattr(list, method).__doc__

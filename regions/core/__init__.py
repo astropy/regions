@@ -10,4 +10,4 @@ from .core import *  # noqa
 from .mask import *  # noqa
 from .metadata import *  # noqa
 from .pixcoord import *  # noqa
-from .regionlist import *  # noqa
+from .regions import *  # noqa
