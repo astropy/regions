@@ -78,6 +78,13 @@ class Regions:
                                      self.__class__.__name__, format=format,
                                      **kwargs)
 
+    def serialize(self, format=None, **kwargs):
+        """
+        Serialize to a regions string or table.
+        """
+        return RegionsRegistry.serialize(self.regions, self.__class__.__name__,
+                                         format=format, **kwargs)
+
 
 # reuse the `list` API docs for these methods
 methods = ('append', 'extend', 'insert', 'reverse', 'pop', 'copy')

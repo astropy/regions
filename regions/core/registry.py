@@ -48,3 +48,11 @@ class RegionsRegistry:
         """
         key = (classname, 'write', format)
         return RegionsRegistry.registry[key](regions, filename, **kwargs)
+
+    @classmethod
+    def serialize(cls, regions, classname, format=None, **kwargs):
+        """
+        Serialize to a regions string or table.
+        """
+        key = (classname, 'serialize', format)
+        return RegionsRegistry.registry[key](regions, **kwargs)
