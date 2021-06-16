@@ -1,5 +1,7 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
+from ...core import Regions
+from ...core.registry import RegionsRegistry
 from ..core import _to_shape_list
 
 __all__ = ['write_ds9', 'ds9_objects_to_string']
@@ -36,6 +38,7 @@ def ds9_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
     return shapelist.to_ds9(coordsys, fmt, radunit)
 
 
+@RegionsRegistry.register('Regions', 'write', 'ds9')
 def write_ds9(regions, filename, coordsys='fk5', fmt='.6f', radunit='deg'):
     """
     Convert a list of `~regions.Region` to a DS9 string and write to a

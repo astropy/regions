@@ -1,5 +1,7 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
+from ...core import Regions
+from ...core.registry import RegionsRegistry
 from ..core import _to_shape_list
 
 __all__ = ['write_crtf', 'crtf_objects_to_string']
@@ -45,6 +47,7 @@ def crtf_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
     return shapelist.to_crtf(coordsys, fmt, radunit)
 
 
+@RegionsRegistry.register('Regions', 'write', 'crtf')
 def write_crtf(regions, filename, coordsys='fk5', fmt='.6f', radunit='deg'):
     """
     Convert a list of `~regions.Region` to a CRTF string and write to a
