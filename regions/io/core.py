@@ -6,7 +6,6 @@ from warnings import warn
 
 from astropy.coordinates import (Angle, SkyCoord, UnitSphericalRepresentation,
                                  frame_transform_graph)
-from astropy.io.registry import UnifiedReadWriteMethod
 from astropy.table import Table
 import astropy.units as u
 import numpy as np
@@ -23,7 +22,6 @@ from ..shapes import (CirclePixelRegion, CircleSkyRegion,
                       TextPixelRegion, TextSkyRegion)
 from ..core.core import PixCoord, SkyRegion
 from ..core.metadata import RegionMeta, RegionVisual
-from .connect import ShapeListRead, ShapeListWrite
 from .ds9.core import DS9RegionParserWarning, valid_symbols_ds9
 from .crtf.core import CRTFRegionParserWarning
 
@@ -96,10 +94,6 @@ class ShapeList(list):
     """
     A class to hold a list of `~regions.Shape` objects.
     """
-
-    # Unified I/O read and write methods
-    read = UnifiedReadWriteMethod(ShapeListRead)
-    write = UnifiedReadWriteMethod(ShapeListWrite)
 
     def to_regions(self):
         """
