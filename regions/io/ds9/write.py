@@ -7,6 +7,12 @@ from ..core import _to_shape_list
 __all__ = ['write_ds9', 'ds9_objects_to_string']
 
 
+@RegionsRegistry.register('Regions', 'serialize', 'ds9')
+def _serialize_ds9(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
+    shapelist = _to_shape_list(regions, coordsys)
+    return shapelist.to_ds9(coordsys, fmt, radunit)
+
+
 def ds9_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
     """
     Convert a list of `~regions.Region` objects to a DS9 region string.
@@ -34,8 +40,7 @@ def ds9_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
     region_string : str
         A DS9 region string.
     """
-    shapelist = _to_shape_list(regions, coordsys)
-    return shapelist.to_ds9(coordsys, fmt, radunit)
+    return _serialize_ds9(regions, coordsys=coordsys, fmt=fmt, radunit=radunit)
 
 
 @RegionsRegistry.register('Regions', 'write', 'ds9')

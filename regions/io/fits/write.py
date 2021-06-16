@@ -10,6 +10,16 @@ from ..core import _to_shape_list, SkyRegion
 __all__ = ['write_fits', 'fits_region_objects_to_table']
 
 
+@RegionsRegistry.register('Regions', 'serialize', 'fits')
+def _serialize_fits(regions):
+    for region in regions:
+        if isinstance(region, SkyRegion):
+            raise TypeError('Every region must be a pixel region')
+
+    shape_list = _to_shape_list(regions, coordinate_system='image')
+    return shape_list.to_fits()
+
+
 def fits_region_objects_to_table(regions):
     """
     Convert a list of `~regions.Region` objects to a FITS region table.
@@ -26,12 +36,7 @@ def fits_region_objects_to_table(regions):
     region_string : `~astropy.table.Table`
         A FITS region table.
     """
-    for reg in regions:
-        if isinstance(reg, SkyRegion):
-            raise TypeError('Every region must be a pixel region')
-
-    shape_list = _to_shape_list(regions, coordinate_system='image')
-    return shape_list.to_fits()
+    return _serialize_fits(regions)
 
 
 @RegionsRegistry.register('Regions', 'write', 'fits')
