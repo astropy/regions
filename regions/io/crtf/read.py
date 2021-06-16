@@ -9,8 +9,8 @@ from astropy.coordinates import Angle, frame_transform_graph
 import astropy.units as u
 from astropy.utils.data import get_readable_fileobj
 
-from ...core.registry import RegionsRegistry
 from ...core import RegionList
+from ...core.registry import RegionsRegistry
 from ..core import Shape, ShapeList, reg_mapping
 from .core import (CRTFRegionParserError, CRTFRegionParserWarning,
                    valid_symbols)
@@ -86,11 +86,16 @@ def read_crtf(filename, errors='strict', cache=False):
     with get_readable_fileobj(filename) as fh:
         if regex_begin.search(fh.readline()):
             region_string = fh.read()
-            parser = CRTFParser(region_string, errors=errors)
-            return RegionList(parser.shapes.to_regions())
+            return _parse_crtf(region_string, errors=errors)
         else:
             raise CRTFRegionParserError('Every CRTF Region must start with '
                                         '"#CRTF"')
+
+
+@RegionsRegistry.register('RegionList', 'parse', 'crtf')
+def _parse_crtf(region_string, errors='strict'):
+    parser = CRTFParser(region_string, errors=errors)
+    return RegionList(parser.shapes.to_regions())
 
 
 class CRTFParser:

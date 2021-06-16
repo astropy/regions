@@ -9,8 +9,8 @@ from astropy.utils import deprecated
 from astropy.wcs import WCS
 import numpy as np
 
-from ...core.registry import RegionsRegistry
 from ...core import RegionList
+from ...core.registry import RegionsRegistry
 from ..core import Shape, ShapeList, reg_mapping
 from .core import (FITSRegionParserError, FITSRegionParserWarning,
                    language_spec)
@@ -256,19 +256,23 @@ def read_fits(filename, errors='strict', cache=False):
     ...                                   package='regions.io.fits.tests')
     >>> regions = read_fits(file_read)
     """
-    regions = []
-
     with fits.open(filename) as hdul:
+        sky_regions = []
         for hdu in hdul:
             if hdu.name == 'REGION':
-                table = Table.read(hdu)
-                wcs = WCS(hdu.header, keysel=['image', 'binary', 'pixel'])
-                parser = FITSRegionParser(table, errors)
-                regions_list = parser.shapes.to_regions()
-                for reg in regions_list:
-                    regions.append(reg.to_sky(wcs))
+                region_table = Table.read(hdu)
+                regions = _parse_fits(region_table, errors=errors)
 
-    return RegionList(regions)
+                wcs = WCS(hdu.header, keysel=['image', 'binary', 'pixel'])
+                for reg in regions:
+                    sky_regions.append(reg.to_sky(wcs))
+        return RegionList(sky_regions)
+
+
+@RegionsRegistry.register('RegionList', 'parse', 'fits')
+def _parse_fits(region_table, errors='strict'):
+    parser = FITSRegionParser(region_table, errors=errors)
+    return RegionList(parser.shapes.to_regions())
 
 
 @deprecated('0.5', alternative='read_fits')
