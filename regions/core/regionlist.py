@@ -70,6 +70,14 @@ class RegionList:
         return RegionsRegistry.parse(data, cls.__name__, format=format,
                                      **kwargs)
 
+    def write(self, filename, format=None, **kwargs):
+        """
+        Write to a regions file.
+        """
+        return RegionsRegistry.write(self.regions, filename,
+                                     self.__class__.__name__, format=format,
+                                     **kwargs)
+
 
 # reuse the `list` API docs for these methods
 methods = ('append', 'extend', 'insert', 'reverse', 'pop', 'copy')

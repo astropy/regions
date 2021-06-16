@@ -40,3 +40,11 @@ class RegionsRegistry:
         """
         key = (classname, 'parse', format)
         return RegionsRegistry.registry[key](data, **kwargs)
+
+    @classmethod
+    def write(cls, regions, filename, classname, format=None, **kwargs):
+        """
+        Write to a regions file.
+        """
+        key = (classname, 'write', format)
+        return RegionsRegistry.registry[key](regions, filename, **kwargs)
