@@ -32,3 +32,11 @@ class RegionsRegistry:
         """
         key = (classname, 'read', format)
         return RegionsRegistry.registry[key](filename, **kwargs)
+
+    @classmethod
+    def parse(cls, data, classname, format=None, **kwargs):
+        """
+        Parse a regions string or table.
+        """
+        key = (classname, 'parse', format)
+        return RegionsRegistry.registry[key](data, **kwargs)

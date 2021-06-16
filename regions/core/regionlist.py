@@ -59,8 +59,16 @@ class RegionList:
         """
         Read in a regions file.
         """
-        return RegionsRegistry.read(filename, cls.__name__, format,
+        return RegionsRegistry.read(filename, cls.__name__, format=format,
                                     cache=cache, **kwargs)
+
+    @classmethod
+    def parse(cls, data, format=None, **kwargs):
+        """
+        Parse a regions string or table.
+        """
+        return RegionsRegistry.parse(data, cls.__name__, format=format,
+                                     **kwargs)
 
 
 # reuse the `list` API docs for these methods
