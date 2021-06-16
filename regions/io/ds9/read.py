@@ -32,14 +32,14 @@ regex_splitter = re.compile('[, ]')
 
 
 @RegionsRegistry.register('RegionList', 'read', 'ds9')
-def read_ds9(filename, errors='strict'):
+def read_ds9(filename, errors='strict', cache=False):
     """
     Read a DS9 region file in as a list of `~regions.Region` objects.
 
     Parameters
     ----------
     filename : str
-        The file path.
+        The filename of the file to access.
 
     errors : {'strict', 'warn', 'ignore'}, optional
         The error handling scheme to use for handling parsing
@@ -47,6 +47,11 @@ def read_ds9(filename, errors='strict'):
         `~regions.DS9RegionParserError`. 'warn' will raise a
         `~regions.DS9RegionParserWarning`, and 'ignore' will do nothing
         (i.e., be silent).
+
+    cache : bool or 'update', optional
+        Whether to cache the contents of remote URLs. If 'update', check
+        the remote URL for a new version but store the result in the
+        cache.
 
     Returns
     -------
@@ -64,11 +69,10 @@ def read_ds9(filename, errors='strict'):
     center: PixCoord(x=330.0, y=1090.0)
     radius: 40.0
     """
-    with get_readable_fileobj(filename) as fh:
+    with get_readable_fileobj(filename, cache=cache) as fh:
         region_string = fh.read()
-
-    parser = DS9Parser(region_string, errors=errors)
-    return RegionList(parser.shapes.to_regions())
+        parser = DS9Parser(region_string, errors=errors)
+        return RegionList(parser.shapes.to_regions())
 
 
 class _DS9CoordinateParser:

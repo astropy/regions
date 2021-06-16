@@ -55,11 +55,12 @@ class RegionList:
         return newcls
 
     @classmethod
-    def read(cls, filename, format=None, **kwargs):
+    def read(cls, filename, format=None, cache=False, **kwargs):
         """
         Read in a regions file.
         """
-        return RegionsRegistry.read(filename, cls.__name__, format, **kwargs)
+        return RegionsRegistry.read(filename, cls.__name__, format,
+                                    cache=cache, **kwargs)
 
 
 # reuse the `list` API docs for these methods
