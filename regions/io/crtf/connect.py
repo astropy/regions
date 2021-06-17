@@ -32,7 +32,8 @@ def is_crtf(methodname, filepath):
         return filepath.lower().endswith(exten[methodname])
 
     elif methodname == 'read':
-        if filepath.lower().endswith(exten[methodname]):
+        if (isinstance(filepath, str)
+                and filepath.lower().endswith(exten[methodname])):
             return True
         else:
             with get_readable_fileobj(filepath, encoding='binary') as fileobj:

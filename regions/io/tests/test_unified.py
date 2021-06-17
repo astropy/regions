@@ -19,7 +19,6 @@ def test_read_filename(filename):
     assert isinstance(result, Regions)
 
 
-# this does not work yet
 @parametrize_filenames
 @pytest.mark.parametrize('encoding',
                          ['binary',

@@ -34,7 +34,8 @@ def is_fits(methodname, filepath):
         return filepath.lower().endswith(exten[methodname])
 
     elif methodname == 'read':
-        if filepath.lower().endswith(exten[methodname]):
+        if (isinstance(filepath, str)
+                and filepath.lower().endswith(exten[methodname])):
             return True
         else:
             try:
