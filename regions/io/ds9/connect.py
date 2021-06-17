@@ -2,12 +2,13 @@
 
 from astropy.utils.data import get_readable_fileobj
 
+from ...core.regions import Regions
 from ...core.registry import RegionsRegistry
 
 __all__ = []
 
 
-@RegionsRegistry.register('Regions', 'identify', 'ds9')
+@RegionsRegistry.register(Regions, 'identify', 'ds9')
 def is_ds9(methodname, filepath):
     """
     Identify a DS9 region file.

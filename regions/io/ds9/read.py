@@ -31,7 +31,7 @@ regex_paren = re.compile('[()]')
 regex_splitter = re.compile('[, ]')
 
 
-@RegionsRegistry.register('Regions', 'read', 'ds9')
+@RegionsRegistry.register(Regions, 'read', 'ds9')
 def read_ds9(filename, errors='strict', cache=False):
     """
     Read a DS9 region file in as a list of `~regions.Region` objects.
@@ -74,7 +74,7 @@ def read_ds9(filename, errors='strict', cache=False):
         return _parse_ds9(region_string, errors=errors)
 
 
-@RegionsRegistry.register('Regions', 'parse', 'ds9')
+@RegionsRegistry.register(Regions, 'parse', 'ds9')
 def _parse_ds9(region_string, errors='strict'):
     parser = DS9Parser(region_string, errors=errors)
     return Regions(parser.shapes.to_regions())

@@ -10,7 +10,7 @@ from ..core import _to_shape_list, SkyRegion
 __all__ = ['write_fits', 'fits_region_objects_to_table']
 
 
-@RegionsRegistry.register('Regions', 'serialize', 'fits')
+@RegionsRegistry.register(Regions, 'serialize', 'fits')
 def _serialize_fits(regions):
     for region in regions:
         if isinstance(region, SkyRegion):
@@ -39,7 +39,7 @@ def fits_region_objects_to_table(regions):
     return _serialize_fits(regions)
 
 
-@RegionsRegistry.register('Regions', 'write', 'fits')
+@RegionsRegistry.register(Regions, 'write', 'fits')
 def write_fits(regions, filename, header=None, overwrite=False):
     """
     Convert a list of `~regions.Region` to a FITS region table and write

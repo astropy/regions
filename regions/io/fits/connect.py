@@ -4,12 +4,13 @@ import warnings
 
 from astropy.io import fits
 
+from ...core.regions import Regions
 from ...core.registry import RegionsRegistry
 
 __all__ = []
 
 
-@RegionsRegistry.register('Regions', 'identify', 'fits')
+@RegionsRegistry.register(Regions, 'identify', 'fits')
 def is_fits(methodname, filepath):
     """
     Identify a FITS region file.

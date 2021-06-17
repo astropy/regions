@@ -59,14 +59,14 @@ class Regions:
         """
         Get the registered I/O formats as a Table.
         """
-        return RegionsRegistry.get_formats(cls.__name__)
+        return RegionsRegistry.get_formats(cls)
 
     @classmethod
     def read(cls, filename, format=None, cache=False, **kwargs):
         """
         Read in a regions file.
         """
-        return RegionsRegistry.read(filename, cls.__name__, format=format,
+        return RegionsRegistry.read(filename, cls, format=format,
                                     cache=cache, **kwargs)
 
     @classmethod
@@ -74,7 +74,7 @@ class Regions:
         """
         Parse a regions string or table.
         """
-        return RegionsRegistry.parse(data, cls.__name__, format=format,
+        return RegionsRegistry.parse(data, cls, format=format,
                                      **kwargs)
 
     def write(self, filename, format=None, **kwargs):
@@ -82,14 +82,14 @@ class Regions:
         Write to a regions file.
         """
         return RegionsRegistry.write(self.regions, filename,
-                                     self.__class__.__name__, format=format,
+                                     self.__class__, format=format,
                                      **kwargs)
 
     def serialize(self, format=None, **kwargs):
         """
         Serialize to a regions string or table.
         """
-        return RegionsRegistry.serialize(self.regions, self.__class__.__name__,
+        return RegionsRegistry.serialize(self.regions, self.__class__,
                                          format=format, **kwargs)
 
 

@@ -7,7 +7,7 @@ from ..core import _to_shape_list
 __all__ = ['write_crtf', 'crtf_objects_to_string']
 
 
-@RegionsRegistry.register('Regions', 'serialize', 'crtf')
+@RegionsRegistry.register(Regions, 'serialize', 'crtf')
 def _serialize_crtf(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
     shapelist = _to_shape_list(regions, coordsys)
     return shapelist.to_crtf(coordsys, fmt, radunit)
@@ -53,7 +53,7 @@ def crtf_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
                            radunit=radunit)
 
 
-@RegionsRegistry.register('Regions', 'write', 'crtf')
+@RegionsRegistry.register(Regions, 'write', 'crtf')
 def write_crtf(regions, filename, coordsys='fk5', fmt='.6f', radunit='deg'):
     """
     Convert a list of `~regions.Region` to a CRTF string and write to a

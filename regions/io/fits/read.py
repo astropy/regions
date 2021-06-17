@@ -220,7 +220,7 @@ class _FITSRegionRowParser():
             self._raise_error(f'The unit: {unit} is invalid')
 
 
-@RegionsRegistry.register('Regions', 'read', 'fits')
+@RegionsRegistry.register(Regions, 'read', 'fits')
 def read_fits(filename, errors='strict', cache=False):
     """
     Read a FITS region file, converting a FITS regions table to a list
@@ -269,7 +269,7 @@ def read_fits(filename, errors='strict', cache=False):
         return Regions(sky_regions)
 
 
-@RegionsRegistry.register('Regions', 'parse', 'fits')
+@RegionsRegistry.register(Regions, 'parse', 'fits')
 def _parse_fits(region_table, errors='strict'):
     parser = FITSRegionParser(region_table, errors=errors)
     return Regions(parser.shapes.to_regions())

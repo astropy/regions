@@ -46,7 +46,7 @@ regex_region = re.compile(r'(?P<include>[+-])?(?P<type>ann(?=\s))?\s*(?P<regiont
 regex_line = re.compile(r'(?P<region>[+-]?(?:ann(?=\s))?\s*[a-z]+?\s?\[[^=]+\])(?:\s*,?\s*(?P<parameters>.*))?')  # noqa
 
 
-@RegionsRegistry.register('Regions', 'read', 'crtf')
+@RegionsRegistry.register(Regions, 'read', 'crtf')
 def read_crtf(filename, errors='strict', cache=False):
     """
     Read a CRTF region file and return a list of region objects.
@@ -92,7 +92,7 @@ def read_crtf(filename, errors='strict', cache=False):
                                         '"#CRTF"')
 
 
-@RegionsRegistry.register('Regions', 'parse', 'crtf')
+@RegionsRegistry.register(Regions, 'parse', 'crtf')
 def _parse_crtf(region_string, errors='strict'):
     parser = CRTFParser(region_string, errors=errors)
     return Regions(parser.shapes.to_regions())
