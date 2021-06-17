@@ -37,6 +37,13 @@ class RegionsRegistry:
                 if key[0] == classobj and key[1] == 'identify']
 
     @classmethod
+    def _no_format_error(cls, classobj):
+        msg = ('Format could not be identified based on the file name or '
+               'contents, please provide a "format" argument.'
+               f'\n{cls._get_format_table_str(classobj)}')
+        raise IORegistryError(msg)
+
+    @classmethod
     def identify_format(cls, filename, classobj, methodname):
         format = None
         identifiers = cls.get_identifiers(classobj)
@@ -47,10 +54,7 @@ class RegionsRegistry:
                     break  # finds the first valid filetype
 
         if format is None:
-            msg = ('Format could not be identified based on the file name or '
-                   'contents, please provide a "format" argument.'
-                   f'\n{cls._get_format_table_str(classobj)}')
-            raise IORegistryError(msg)
+            cls._no_format_error(classobj)
 
         return format
 
@@ -77,10 +81,7 @@ class RegionsRegistry:
         Parse a regions string or table.
         """
         if format is None:
-            msg = ('Format could not be identified based on the file name or '
-                   'contents, please provide a "format" argument.'
-                   f'\n{cls._get_format_table_str(classobj)}')
-            raise IORegistryError(msg)
+            cls._no_format_error(classobj)
 
         key = (classobj, 'parse', format)
         try:
@@ -114,10 +115,7 @@ class RegionsRegistry:
         Serialize to a regions string or table.
         """
         if format is None:
-            msg = ('Format could not be identified based on the file name or '
-                   'contents, please provide a "format" argument.'
-                   f'\n{cls._get_format_table_str(classobj)}')
-            raise IORegistryError(msg)
+            cls._no_format_error(classobj)
 
         key = (classobj, 'serialize', format)
         try:
