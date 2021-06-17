@@ -163,3 +163,28 @@ class RegionsRegistry:
         tbl = cls.get_formats(classobj)
         lines.extend(tbl.pformat(max_lines=-1, max_width=80))
         return '\n'.join(lines)
+
+
+def _update_docstring(classobj, methodname):
+    """
+    Update the docstring to include a table of all available registered
+    formats and methods.
+    """
+    import re
+
+    if methodname == 'identify':
+        return
+
+    lines = getattr(classobj, methodname).__doc__.splitlines()
+    matches = [re.search(r'(\S)', line) for line in lines[1:]]
+    left_indent = ' ' * min(match.start() for match in matches if match)
+    new_lines = RegionsRegistry._get_format_table_str(classobj).splitlines()
+    lines.extend([left_indent + line for line in new_lines])
+
+    try:
+        # classmethod
+        getattr(classobj, methodname).__func__.__doc__ = '\n'.join(lines)
+    except AttributeError:
+        # instancemethod
+        getattr(classobj, methodname).__doc__ = '\n'.join(lines)
+    return
