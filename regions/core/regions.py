@@ -55,6 +55,13 @@ class Regions:
         return newcls
 
     @classmethod
+    def get_formats(cls):
+        """
+        Get the registered I/O formats as a Table.
+        """
+        return RegionsRegistry.get_formats(cls.__name__)
+
+    @classmethod
     def read(cls, filename, format=None, cache=False, **kwargs):
         """
         Read in a regions file.
