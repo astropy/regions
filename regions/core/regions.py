@@ -34,6 +34,13 @@ class Regions:
             newcls.regions = newregions
             return newcls
 
+    def __repr__(self):
+        cls_name = self.__class__.__name__
+        return f'<{cls_name}({repr(self.regions)})>'
+
+    def __str__(self):
+        return str(self.regions)
+
     def __len__(self):
         return len(self.regions)
 
@@ -58,7 +65,7 @@ class Regions:
         regions : list of `~regions.Region`
             A list of regions to include.
         """
-        self.regions.extend(iterable)
+        self.regions.extend(regions)
 
     def insert(self, index, region):
         """
@@ -71,7 +78,7 @@ class Regions:
         region : `~regions.Region`
             The region to insert.
         """
-        self.regions.insert(index, item)
+        self.regions.insert(index, region)
 
     def reverse(self):
         """
