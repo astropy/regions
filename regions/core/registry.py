@@ -3,17 +3,18 @@
 This module provides a RegionsRegistry class.
 """
 
+from astropy.table import Table
+
 __all__ = []
 
 
 class IORegistryError(Exception):
-    """Custom error for registry errors."""
-    pass
+    """Exception class for various registry errors."""
 
 
 class RegionsRegistry:
     """
-    Class to hold registry to read, write, parse, and serialize regions
+    Class to hold a registry to read, write, parse, and serialize regions
     in various formats.
     """
 
@@ -32,11 +33,11 @@ class RegionsRegistry:
 
     @classmethod
     def get_identifiers(cls, classname):
-        return [key for key in cls.registry.keys()
+        return [key for key in cls.registry
                 if key[0] == classname and key[1] == 'identify']
 
     @classmethod
-    def get_format(cls, filename, classname, methodname):
+    def identify_format(cls, filename, classname, methodname):
         format = None
         identifiers = cls.get_identifiers(classname)
         if identifiers:
@@ -46,9 +47,11 @@ class RegionsRegistry:
                     break  # finds the first valid filetype
 
         if format is None:
-            raise IORegistryError('Format could not be identified based on '
-                                  'the file name or contents, please provide '
-                                  'a "format" argument.')
+            msg = ('Format could not be identified based on the file name or '
+                   'contents, please provide a "format" argument.'
+                   f'\n{cls._get_format_table_str(classname)}')
+            raise IORegistryError(msg)
+
         return format
 
     @classmethod
@@ -57,9 +60,14 @@ class RegionsRegistry:
         Read in a regions file.
         """
         if format is None:
-            format = cls.get_format(filename, classname, 'read')
+            format = cls.identify_format(filename, classname, 'read')
         key = (classname, 'read', format)
-        return cls.registry[key](filename, **kwargs)
+        try:
+            return cls.registry[key](filename, **kwargs)
+        except KeyError:
+            msg = (f'No reader defined for format "{format}" and class '
+                   f'"{classname}".\n{cls._get_format_table_str(classname)}')
+            raise IORegistryError(msg) from None
 
     @classmethod
     def parse(cls, data, classname, format=None, **kwargs):
@@ -75,7 +83,7 @@ class RegionsRegistry:
         Write to a regions file.
         """
         if format is None:
-            format = cls.get_format(filename, classname, 'write')
+            format = cls.identify_format(filename, classname, 'write')
         key = (classname, 'write', format)
         return cls.registry[key](regions, filename, **kwargs)
 
@@ -86,3 +94,41 @@ class RegionsRegistry:
         """
         key = (classname, 'serialize', format)
         return cls.registry[key](regions, **kwargs)
+
+    @classmethod
+    def get_formats(cls, classname):
+        """
+        Get the registered I/O formats as a Table.
+        """
+        filetypes = list({key[2] for key in cls.registry
+                          if key[0] == classname})
+
+        rows = [['Format', 'Parse', 'Serialize', 'Read', 'Write',
+                 'Auto-identify']]
+        for filetype in sorted(filetypes):
+            keys = {key[1] for key in cls.registry
+                    if key[0] == classname and key[2] == filetype}
+            row = [filetype]
+            for methodname in rows[0][1:]:
+                name = ('identify' if 'identify' in methodname
+                        else methodname.lower())
+                row.append('Yes' if name in keys else 'No')
+            rows.append(row)
+
+        if len(rows) == 1:
+            return ''
+
+        cols = list(zip(*rows))
+        tbl = Table()
+        for col in cols:
+            tbl[col[0]] = col[1:]
+
+        return tbl
+
+    @classmethod
+    def _get_format_table_str(cls, classname):
+        lines = ['', f'The available formats for the {classname} class are:',
+                 '']
+        tbl = cls.get_formats(classname)
+        lines.extend(tbl.pformat(max_lines=-1, max_width=80))
+        return '\n'.join(lines)
