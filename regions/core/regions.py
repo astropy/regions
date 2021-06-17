@@ -188,7 +188,7 @@ class Regions:
         return RegionsRegistry.parse(data, cls, format=format,
                                      **kwargs)
 
-    def write(self, filename, format=None, **kwargs):
+    def write(self, filename, format=None, overwrite=False, **kwargs):
         """
         Write the regions to a region file in the specified format.
 
@@ -214,12 +214,17 @@ class Regions:
         format : str, optional
             The file format specifier.
 
+        overwrite : bool, optional
+            If True, overwrite the output file if it exists. Raises an
+            `OSError` if False and the output file exists. Default is
+            False.
+
         **kwargs : dict, optional
             Keyword arguments passed to the data writer.
         """
         return RegionsRegistry.write(self.regions, filename,
                                      self.__class__, format=format,
-                                     **kwargs)
+                                     overwrite=overwrite, **kwargs)
 
     def serialize(self, format=None, **kwargs):
         """

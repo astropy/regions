@@ -1,5 +1,7 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
+import os
+
 from ...core import Regions
 from ...core.registry import RegionsRegistry
 from ..core import _to_shape_list
@@ -54,7 +56,8 @@ def crtf_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
 
 
 @RegionsRegistry.register(Regions, 'write', 'crtf')
-def write_crtf(regions, filename, coordsys='fk5', fmt='.6f', radunit='deg'):
+def write_crtf(regions, filename, coordsys='fk5', fmt='.6f', radunit='deg',
+               overwrite=False):
     """
     Convert a list of `~regions.Region` to a CRTF string and write to a
     file.
@@ -79,7 +82,15 @@ def write_crtf(regions, filename, coordsys='fk5', fmt='.6f', radunit='deg'):
 
     radunit : str, optional
         The unit of the radius.
+
+    overwrite : bool, optional
+        If True, overwrite the output file if it exists. Raises an
+        `OSError` if False and the output file exists. Default is False.
     """
-    output = crtf_objects_to_string(regions, coordsys, fmt, radunit)
+    if os.path.lexists(filename) and not overwrite:
+        raise OSError(f'{filename} already exists')
+
+    output = _serialize_crtf(regions, coordsys=coordsys, fmt=fmt,
+                             radunit=radunit)
     with open(filename, 'w') as fh:
         fh.write(output)

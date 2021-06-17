@@ -62,7 +62,7 @@ def write_fits(regions, filename, header=None, overwrite=False):
         If True, overwrite the output file if it exists. Raises an
         `OSError` if False and the output file exists. Default is False.
     """
-    output = fits_region_objects_to_table(regions)
+    output = _serialize_fits(regions)
     bin_table = fits.BinTableHDU(data=output, header=header)
     bin_table.writeto(filename, overwrite=overwrite)
 
