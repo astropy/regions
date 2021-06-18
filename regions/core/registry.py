@@ -147,7 +147,7 @@ class RegionsRegistry:
             rows.append(row)
 
         if len(rows) == 1:
-            return ''
+            return Table()
 
         cols = list(zip(*rows))
         tbl = Table()

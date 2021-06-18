@@ -5,6 +5,7 @@ import operator
 
 from .metadata import RegionMeta, RegionVisual
 from .pixcoord import PixCoord
+from .registry import RegionsRegistry
 
 __all__ = ['Region', 'PixelRegion', 'SkyRegion']
 
@@ -76,6 +77,78 @@ class Region(abc.ABC):
 
     def __xor__(self, other):
         return self.symmetric_difference(other)
+
+    @classmethod
+    def get_formats(cls):
+        """
+        Get the registered I/O formats as a Table.
+        """
+        return RegionsRegistry.get_formats(Region)
+
+    def write(self, filename, format=None, overwrite=False, **kwargs):
+        """
+        Write the region to a region file in the specified format.
+
+        This method allows writing a file in many supported data
+        formats, e.g.,::
+
+            >>> reg.write('new_regions.reg', format='ds9')
+            >>> reg.write('new_regions.crtf', format='crtf')
+            >>> reg.write('new_regions.fits', format='fits')
+
+        A list of the available formats for `~regions.Region` is
+        available using::
+
+            >>> from regions import Region
+            >>> Region.get_formats()
+
+        Parameters
+        ----------
+        filename : str
+            The filename or URL of the file to write.
+
+        format : str, optional
+            The file format specifier.
+
+        overwrite : bool, optional
+            If True, overwrite the output file if it exists. Raises an
+            `OSError` if False and the output file exists. Default is
+            False.
+
+        **kwargs : dict, optional
+            Keyword arguments passed to the data writer.
+        """
+        return RegionsRegistry.write([self], filename,
+                                     Region, format=format,
+                                     overwrite=overwrite, **kwargs)
+
+    def serialize(self, format=None, **kwargs):
+        """
+        Serialize the region to a region string or table.
+
+        This method allows serializing regions in many supported data
+        formats, e.g.,::
+
+            >>> reg1_str = reg.serialize(format='ds9')
+            >>> reg2_str = reg.serialize(format='crtf')
+            >>> reg3_tbl = reg.serialize(format='fits')
+
+        A list of the available formats for `~regions.Region` is
+        available using::
+
+            >>> from regions import Region
+            >>> Region.get_formats()
+
+        Parameters
+        ----------
+        format : str, optional
+            The file format specifier.
+
+        **kwargs : dict, optional
+            Keyword arguments passed to the data serializer.
+        """
+        return RegionsRegistry.serialize([self], Region, format=format,
+                                         **kwargs)
 
 
 class PixelRegion(Region):
