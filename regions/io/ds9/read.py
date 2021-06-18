@@ -9,6 +9,7 @@ from warnings import warn
 from astropy.coordinates import Angle, frame_transform_graph
 import astropy.units as u
 from astropy.utils.data import get_readable_fileobj
+from astropy.utils.decorators import deprecated
 
 from ...core import Regions
 from ...core.registry import RegionsRegistry
@@ -32,7 +33,7 @@ regex_splitter = re.compile('[, ]')
 
 
 @RegionsRegistry.register(Regions, 'read', 'ds9')
-def read_ds9(filename, errors='strict', cache=False):
+def _read_ds9(filename, errors='strict', cache=False):
     """
     Read a DS9 region file in as a list of `~regions.Region` objects.
 
@@ -76,7 +77,7 @@ def read_ds9(filename, errors='strict', cache=False):
 
 @RegionsRegistry.register(Regions, 'parse', 'ds9')
 def _parse_ds9(region_string, errors='strict'):
-    parser = DS9Parser(region_string, errors=errors)
+    parser = _DS9Parser(region_string, errors=errors)
     return Regions(parser.shapes.to_regions())
 
 
@@ -149,7 +150,7 @@ class _DS9CoordinateParser:
             return u.Quantity(float(string_rep), unit=unit)
 
 
-class DS9Parser:
+class _DS9Parser:
     """
     Parse a DS9 string.
 
@@ -554,3 +555,56 @@ class _DS9RegionParser:
                            region_type=reg_mapping['DS9'][self.region_type],
                            coord=self.coord, meta=self.meta,
                            composite=self.composite, include=self.include)
+
+
+@deprecated('0.5', alternative='`regions.Regions.read`')
+def read_ds9(filename, errors='strict', cache=False):
+    """
+    Read a DS9 region file in as a list of `~regions.Region` objects.
+
+    Parameters
+    ----------
+    filename : str
+        The filename of the file to access.
+
+    errors : {'strict', 'warn', 'ignore'}, optional
+        The error handling scheme to use for handling parsing
+        errors. The default is 'strict', which will raise a
+        `~regions.DS9RegionParserError`. 'warn' will raise a
+        `~regions.DS9RegionParserWarning`, and 'ignore' will do nothing
+        (i.e., be silent).
+
+    cache : bool or 'update', optional
+        Whether to cache the contents of remote URLs. If 'update', check
+        the remote URL for a new version but store the result in the
+        cache.
+
+    Returns
+    -------
+    regions : list
+        A list of `~regions.Region` objects.
+    """
+    return _read_ds9(filename, errors=errors, cache=cache)
+
+
+@deprecated('0.5', alternative='`regions.Regions.parse`')
+class DS9Parser(_DS9Parser):
+    """
+    Parse a DS9 string.
+
+    This class transforms a DS9 string to a
+    `~regions.io.core.ShapeList`. The result is stored as ``shapes``
+    attribute.
+
+    Parameters
+    ----------
+    region_string : str
+        A DS9 region string.
+
+    errors : {'strict', 'warn', 'ignore'}, optional
+        The error handling scheme to use for handling parsing
+        errors. The default is 'strict', which will raise a
+        `~regions.DS9RegionParserError`. 'warn' will raise a
+        `~regions.DS9RegionParserWarning`, and 'ignore' will do nothing
+        (i.e., be silent).
+    """

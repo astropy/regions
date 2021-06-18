@@ -8,6 +8,7 @@ from warnings import warn
 from astropy.coordinates import Angle, frame_transform_graph
 import astropy.units as u
 from astropy.utils.data import get_readable_fileobj
+from astropy.utils.decorators import deprecated
 
 from ...core import Regions
 from ...core.registry import RegionsRegistry
@@ -47,7 +48,7 @@ regex_line = re.compile(r'(?P<region>[+-]?(?:ann(?=\s))?\s*[a-z]+?\s?\[[^=]+\])(
 
 
 @RegionsRegistry.register(Regions, 'read', 'crtf')
-def read_crtf(filename, errors='strict', cache=False):
+def _read_crtf(filename, errors='strict', cache=False):
     """
     Read a CRTF region file and return a list of region objects.
 
@@ -94,11 +95,11 @@ def read_crtf(filename, errors='strict', cache=False):
 
 @RegionsRegistry.register(Regions, 'parse', 'crtf')
 def _parse_crtf(region_string, errors='strict'):
-    parser = CRTFParser(region_string, errors=errors)
+    parser = _CRTFParser(region_string, errors=errors)
     return Regions(parser.shapes.to_regions())
 
 
-class CRTFParser:
+class _CRTFParser:
     """
     Parse a CRTF string.
 
@@ -534,3 +535,56 @@ class _CRTFCoordinateParser:
         else:
             raise CRTFRegionParserError('Units must be specified for '
                                         f'{string_rep}')
+
+
+@deprecated('0.5', alternative='`regions.Regions.read`')
+def read_crtf(filename, errors='strict', cache=False):
+    """
+    Read a CRTF region file and return a list of region objects.
+
+    Parameters
+    ----------
+    filename : str
+        The filename of the file to access.
+
+    errors : {'strict', 'warn', 'ignore'}, optional
+        The error handling scheme to use for handling parsing
+        errors. The default is 'strict', which will raise a
+        `~regions.CRTFRegionParserError`. 'warn' will raise a
+        `~regions.CRTFRegionParserWarning`, and 'ignore' will do nothing
+        (i.e., be silent).
+
+    cache : bool or 'update', optional
+        Whether to cache the contents of remote URLs. If 'update', check
+        the remote URL for a new version but store the result in the
+        cache.
+
+    Returns
+    -------
+    regions : list
+        A list of `~regions.Region` objects.
+    """
+    return _read_crtf(filename, errors=errors, cache=cache)
+
+
+@deprecated('0.5', alternative='`regions.Regions.parse`')
+class CRTFParser(_CRTFParser):
+    """
+    Parse a CRTF string.
+
+    This class transforms a CRTF string to a
+    `~regions.io.core.ShapeList`. The result is stored in the ``shapes``
+    attribute.
+
+    Parameters
+    ----------
+    region_string : str
+        A CRTF region string.
+
+    errors : {'strict', 'warn', 'ignore'}, optional
+        The error handling scheme to use for handling parsing
+        errors. The default is 'strict', which will raise a
+        `~regions.CRTFRegionParserError`. 'warn' will raise a
+        `~regions.CRTFRegionParserWarning`, and 'ignore' will do nothing
+        (i.e., be silent).
+    """

@@ -5,7 +5,7 @@ from warnings import warn
 from astropy.io import fits
 from astropy.table import Table
 import astropy.units as u
-from astropy.utils import deprecated
+from astropy.utils.decorators import deprecated
 from astropy.wcs import WCS
 import numpy as np
 
@@ -18,7 +18,7 @@ from .core import (FITSRegionParserError, FITSRegionParserWarning,
 __all__ = ['FITSRegionParser', 'read_fits']
 
 
-class FITSRegionParser:
+class _FITSRegionParser:
     """
     Parses a FITS Region table.
 
@@ -210,18 +210,15 @@ class _FITSRegionRowParser():
 
     def _parse_value(self, val, unit):
         units = dict(pix=u.dimensionless_unscaled,
-                     deg=u.deg,
-                     rad=u.rad,
-                     )
-
-        if unit is not None:
-            return val * units.get(str(unit), unit)
-        else:
+                     deg=u.deg, rad=u.rad)
+        if unit is None:
             self._raise_error(f'The unit: {unit} is invalid')
+
+        return val * units.get(str(unit), unit)
 
 
 @RegionsRegistry.register(Regions, 'read', 'fits')
-def read_fits(filename, errors='strict', cache=False):
+def _read_fits(filename, errors='strict', cache=False):
     """
     Read a FITS region file, converting a FITS regions table to a list
     of `~regions.Region` objects.
@@ -256,7 +253,7 @@ def read_fits(filename, errors='strict', cache=False):
     ...                                   package='regions.io.fits.tests')
     >>> regions = read_fits(file_read)
     """
-    with fits.open(filename) as hdul:
+    with fits.open(filename, cache=cache) as hdul:
         sky_regions = []
         for hdu in hdul:
             if hdu.name == 'REGION':
@@ -275,8 +272,8 @@ def _parse_fits(region_table, errors='strict'):
     return Regions(parser.shapes.to_regions())
 
 
-@deprecated('0.5', alternative='read_fits')
-def read_fits_region(filename, errors='strict'):
+@deprecated('0.5', alternative='`regions.Regions.read`')
+def read_fits_region(filename, errors='strict', cache=False):
     """
     Read a FITS region file, converting a FITS regions table to a list
     of `~regions.Region` objects.
@@ -293,9 +290,64 @@ def read_fits_region(filename, errors='strict'):
         `~regions.FITSRegionParserWarning`, and 'ignore' will do
         nothing (i.e., be silent).
 
+    cache : bool or 'update', optional
+        Whether to cache the contents of remote URLs. If 'update', check
+        the remote URL for a new version but store the result in the
+        cache.
+
     Returns
     -------
     regions : list
         A list of `~regions.Region` objects.
     """
-    return read_fits(filename, errors=errors)
+    return _read_fits(filename, errors=errors, cache=cache)
+
+
+@deprecated('0.5', alternative='`regions.Regions.read`')
+def read_fits(filename, errors='strict', cache=False):
+    """
+    Read a FITS region file, converting a FITS regions table to a list
+    of `~regions.Region` objects.
+
+    Parameters
+    ----------
+    filename : str
+        The file path.
+
+    errors : {'strict', 'warn', 'ignore'}, optional
+        The error handling scheme to use for handling parsing
+        errors. The default is 'strict', which will raise a
+        `~regions.FITSRegionParserError`. 'warn' will raise a
+        `~regions.FITSRegionParserWarning`, and 'ignore' will do
+        nothing (i.e., be silent).
+
+    cache : bool or 'update', optional
+        Whether to cache the contents of remote URLs. If 'update', check
+        the remote URL for a new version but store the result in the
+        cache.
+
+    Returns
+    -------
+    regions : list
+        A list of `~regions.Region` objects.
+    """
+    return _read_fits(filename, errors=errors, cache=cache)
+
+
+@deprecated('0.5', alternative='`regions.Regions.parse`')
+class FITSRegionParser(_FITSRegionParser):
+    """
+    Parses a FITS Region table.
+
+    Parameters
+    ----------
+    table : `~astropy.table.Table`
+        A FITS region table.
+
+    errors : {'strict', 'warn', 'ignore'}, optional
+        The error handling scheme to use for handling parsing
+        errors. The default is 'strict', which will raise a
+        `~regions.FITSRegionParserError`. 'warn' will raise a
+        `~regions.FITSRegionParserWarning`, and 'ignore' will do nothing
+        (i.e., be silent).
+    """
