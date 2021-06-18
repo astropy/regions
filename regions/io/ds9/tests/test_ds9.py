@@ -14,10 +14,10 @@ import astropy.units as u
 from astropy.utils.data import get_pkg_data_filename, get_pkg_data_filenames
 from astropy.utils.exceptions import AstropyUserWarning
 
+from ....core import Regions
 from ....shapes.circle import CircleSkyRegion
 from ..core import DS9RegionParserWarning
-from ..read import read_ds9, DS9Parser
-from ..write import write_ds9, ds9_objects_to_string
+from ..read import _DS9Parser
 
 
 def test_read():
@@ -27,7 +27,7 @@ def test_read():
     with catch_warnings(DS9RegionParserWarning):
         for file in files:
             with open(file) as fh:
-                DS9Parser(fh.read(), errors='warn')
+                _DS9Parser(fh.read(), errors='warn')
 
 
 # TODO: ds9.physical.windows.reg contains different values -> Why?
@@ -47,13 +47,13 @@ def test_file(filename):
 
     # DS9RegionParserWarnings from skipped multi-annulus regions
     with catch_warnings(DS9RegionParserWarning):
-        regs = read_ds9(filename, errors='warn')
+        regs = Regions.read(filename, errors='warn', format='ds9')
 
     coordsys = os.path.basename(filename).split(".")[1]
 
     radunit = None if coordsys == 'physical' else 'arcsec'
-    actual = ds9_objects_to_string(regs, coordsys=str(coordsys), fmt='.2f',
-                                   radunit=radunit).strip()
+    actual = regs.serialize(format='ds9', coordsys=str(coordsys), fmt='.2f',
+                            radunit=radunit).strip()
 
     strip = '_strip' if 'strip' in filename else ''
     filepath = os.path.join('data', f'{coordsys}{strip}_reference.reg')
@@ -72,16 +72,16 @@ def test_file(filename):
         assert split_line in actual_lines
 
 
-def test_ds9_objects_to_str():
+def test_ds9_serialize():
     """
-    Simple test case for ds9_objects_to_str.
+    Simple test case for serialize.
     """
     center = SkyCoord(42, 43, unit='deg')
     radius = Angle(3, 'deg')
     region = CircleSkyRegion(center, radius)
     expected = ('# Region file format: DS9 astropy/regions\nfk5\n'
                 'circle(42.0000,43.0000,3.0000)\n')
-    actual = ds9_objects_to_string([region], fmt='.4f')
+    actual = region.serialize(format='ds9', fmt='.4f')
     assert actual == expected
 
 
@@ -91,8 +91,7 @@ def test_ds9_string_to_objects():
     """
     ds9_str = ('# Region file format: DS9 astropy/regions\nfk5\n'
                'circle(42.0000,43.0000,3.0000)\n')
-    parser = DS9Parser(ds9_str)
-    regions = parser.shapes.to_regions()
+    regions = Regions.parse(ds9_str, format='ds9')
     reg = regions[0]
 
     assert_allclose(reg.center.ra.deg, 42)
@@ -106,13 +105,13 @@ def test_ds9_string_to_objects_whitespace():
     """
     ds9_str = ('# Region file format: DS9 astropy/regions\nfk5\n'
                ' -circle(42.0000,43.0000,3.0000)\n')
-    parser = DS9Parser(ds9_str)
-    assert not parser.shapes[0].include
+    region = Regions.parse(ds9_str, format='ds9')[0]
+    assert not region.meta['include']
 
 
 def test_ds9_io(tmpdir):
     """
-    Simple test case for write_ds9 and read_ds9.
+    Simple test case for write and read.
     """
     center = SkyCoord(42, 43, unit='deg', frame='fk5')
     radius = Angle(3, 'deg')
@@ -120,14 +119,14 @@ def test_ds9_io(tmpdir):
     reg.meta['name'] = 'MyName'
 
     filename = os.path.join(str(tmpdir), 'ds9.reg')
-    write_ds9([reg], filename, coordsys='fk5')
-    reg = read_ds9(filename)[0]
+    reg.write(filename, coordsys='fk5', format='ds9')
+    reg2 = Regions.read(filename, format='ds9')[0]
 
-    assert_allclose(reg.center.ra.deg, 42)
-    assert_allclose(reg.center.dec.deg, 43)
-    assert_allclose(reg.radius.value, 3)
-    assert 'name' in reg.meta
-    assert reg.meta['name'] == 'MyName'
+    assert_allclose(reg2.center.ra.deg, 42)
+    assert_allclose(reg2.center.dec.deg, 43)
+    assert_allclose(reg2.radius.value, 3)
+    assert 'name' in reg2.meta
+    assert reg2.meta['name'] == 'MyName'
 
 
 def test_missing_region_warns():
@@ -137,9 +136,9 @@ def test_missing_region_warns():
     # this will warn on both the commented first line and the
     # not_a_region line
     with catch_warnings(AstropyUserWarning) as ASWarn:
-        parser = DS9Parser(ds9_str, errors='warn')
+        regions = Regions.parse(ds9_str, format='ds9', errors='warn')
 
-    assert len(parser.shapes) == 1
+    assert len(regions) == 1
     assert len(ASWarn) == 1
     estr = ('Region type "notaregiontype" was found, but it is not one '
             'of the supported region types.')
@@ -154,7 +153,7 @@ def test_global_parser():
                        'font="helvetica 10 normal roman" select=1 '
                        'highlite=1 dash=0 fixed=0 edit=1 move=1 '
                        'delete=1 include=1 source=1')
-    global_parser = DS9Parser(global_test_str)
+    global_parser = _DS9Parser(global_test_str)
 
     exp = {'dash': '0', 'source': '1', 'move': '1',
            'font': 'helvetica 10 normal roman', 'dashlist': '8 3',
@@ -171,11 +170,9 @@ def test_ds9_color():
                'circle(42.0000,43.0000,3.0000) # color=green\n'
                'circle(43.0000,43.0000,3.0000) # color=orange\n')
 
-    parser = DS9Parser(ds9_str)
-    regions = parser.shapes
-
-    assert regions[0].meta['color'] == 'green'
-    assert regions[1].meta['color'] == 'orange'
+    regions = Regions.parse(ds9_str, format='ds9')
+    assert regions[0].visual['color'] == 'green'
+    assert regions[1].visual['color'] == 'orange'
 
 
 def test_ds9_color_override_global():
@@ -194,28 +191,24 @@ def test_ds9_color_override_global():
     global_str = (global_test_str + 'fk5\n'
                   + '\n'.join([reg1str, reg2str, reg3str]))
     ds9_str = f'# Region file format: DS9 astropy/regions\n{global_str}\n'
-    parser = DS9Parser(ds9_str)
-    regions = parser.shapes
-    assert regions[0].meta['color'] == 'green'
-    assert regions[1].meta['color'] == 'orange'
-    assert regions[2].meta['color'] == 'blue'
+    regions = Regions.parse(ds9_str, format='ds9')
+    assert regions[0].visual['color'] == 'green'
+    assert regions[1].visual['color'] == 'orange'
+    assert regions[2].visual['color'] == 'blue'
 
 
 def test_issue134_regression():
     regstr = 'galactic; circle(+0:14:26.064,+0:00:45.206,30.400")'
-    parser = DS9Parser(regstr)
-    regions = parser.shapes
-    assert regions[0].to_region().radius.value == 30.4
+    regions = Regions.parse(regstr, format='ds9')
+    assert regions[0].radius.value == 30.4
 
 
 def test_issue65_regression():
     regstr = 'J2000; circle 188.5557102 12.0314056 1" # color=red'
-    parser = DS9Parser(regstr)
-    regions = parser.shapes
-    reg = regions[0].to_region()
-    assert reg.center.ra.value == 188.5557102
-    assert reg.center.dec.value == 12.0314056
-    assert reg.radius.value == 1.0
+    region = Regions.parse(regstr, format='ds9')[0]
+    assert region.center.ra.value == 188.5557102
+    assert region.center.dec.value == 12.0314056
+    assert region.radius.value == 1.0
 
 
 def test_frame_uppercase():
@@ -224,12 +217,10 @@ def test_frame_uppercase():
     """
     regstr = ('GALACTIC\ncircle(188.5557102,12.0314056,7.1245) # '
               'text={This message has both ' 'a " and : in it} textangle=30')
-    parser = DS9Parser(regstr)
-    regions = parser.shapes
-    reg = regions[0].to_region()
-    assert reg.center.l.value == 188.5557102
-    assert reg.center.b.value == 12.0314056
-    assert reg.radius.value == 7.1245
+    region = Regions.parse(regstr, format='ds9')[0]
+    assert region.center.l.value == 188.5557102
+    assert region.center.b.value == 12.0314056
+    assert region.radius.value == 7.1245
 
 
 def test_pixel_angle():
@@ -237,9 +228,8 @@ def test_pixel_angle():
     Check whether angle in PixelRegions is a u.Quantity object.
     """
     reg_str = 'image\nbox(1.5,2,2,1,0)'
-    reg = DS9Parser(reg_str).shapes.to_regions()[0]
-
-    assert isinstance(reg.angle, u.quantity.Quantity)
+    region = Regions.parse(reg_str, format='ds9')[0]
+    assert isinstance(region.angle, u.quantity.Quantity)
 
 
 def test_expicit_formatting_directives():
@@ -247,33 +237,33 @@ def test_expicit_formatting_directives():
     Check whether every explicit formatting directive is supported.
     """
     reg_str = 'image\ncircle(1.5, 2, 2)'
-    valid_coord = DS9Parser(reg_str).shapes[0].coord
+    valid_coord = _DS9Parser(reg_str).shapes[0].coord
 
     reg_str_explicit = 'image\ncircle(1.5p, 2p, 2p)'
-    coord = DS9Parser(reg_str_explicit).shapes[0].coord
+    coord = _DS9Parser(reg_str_explicit).shapes[0].coord
     assert_quantity_allclose(coord, valid_coord)
 
     reg_str_explicit = 'image\ncircle(1.5i, 2i, 2i)'
-    coord = DS9Parser(reg_str_explicit).shapes[0].coord
+    coord = _DS9Parser(reg_str_explicit).shapes[0].coord
     assert_quantity_allclose(coord, valid_coord)
 
     reg_str = 'fk5\ncircle(1.5, 2, 2)'
-    valid_coord = DS9Parser(reg_str).shapes[0].coord
+    valid_coord = _DS9Parser(reg_str).shapes[0].coord
 
     reg_str_explicit = 'fk5\ncircle(1.5d, 2d, 2d)'
-    coord = DS9Parser(reg_str_explicit).shapes[0].coord
+    coord = _DS9Parser(reg_str_explicit).shapes[0].coord
     assert_quantity_allclose(coord, valid_coord)
 
     reg_str_explicit = 'fk5\ncircle(1.5r, 2r, 2r)'
-    coord = DS9Parser(reg_str_explicit).shapes[0].coord
+    coord = _DS9Parser(reg_str_explicit).shapes[0].coord
     for val in coord:
         assert val.unit == u.Unit('rad')
 
     reg_str = 'fk5\ncircle(1:20:30, 2:3:7, 2)'
-    valid_coord = DS9Parser(reg_str).shapes[0].coord
+    valid_coord = _DS9Parser(reg_str).shapes[0].coord
 
     reg_str_explicit = 'fk5\ncircle(1h20m30s, 2d3m7s, 2d)'
-    coord = DS9Parser(reg_str_explicit).shapes[0].coord
+    coord = _DS9Parser(reg_str_explicit).shapes[0].coord
     assert_quantity_allclose(u.Quantity(coord), u.Quantity(valid_coord))
 
 
@@ -283,12 +273,9 @@ def test_text_metadata():
     parsed and stored appropriately.
     """
     reg_str = 'image\ncircle(1.5, 2, 2) # text={this_is_text}'
-    parsed_reg = DS9Parser(reg_str)
+    regions = Regions.parse(reg_str, format='ds9')
 
-    assert len(parsed_reg.shapes) == 1
-    assert parsed_reg.shapes[0].meta['text'] == 'this_is_text'
-
-    regs = parsed_reg.shapes.to_regions()
-
-    assert regs[0].meta['label'] == 'this_is_text'
-    assert regs[0].meta['text'] == 'this_is_text'
+    assert len(regions) == 1
+    assert regions[0].meta['text'] == 'this_is_text'
+    assert regions[0].meta['label'] == 'this_is_text'
+    assert regions[0].meta['text'] == 'this_is_text'
