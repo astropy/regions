@@ -13,7 +13,7 @@ from astropy.utils.decorators import deprecated
 
 from ...core import Regions
 from ...core.registry import RegionsRegistry
-from ..core import Shape, ShapeList, reg_mapping
+from ..core import _Shape, _ShapeList, reg_mapping
 from .core import (DS9RegionParserError, DS9RegionParserWarning,
                    valid_symbols_ds9)
 
@@ -210,7 +210,7 @@ class _DS9Parser:
         self.global_meta = {}
 
         # Results
-        self.shapes = ShapeList()
+        self.shapes = _ShapeList()
 
         self.run()
 
@@ -551,10 +551,10 @@ class _DS9RegionParser:
 
         self.meta.pop('coord', None)
 
-        self.shape = Shape(coordsys=self.coordsys,
-                           region_type=reg_mapping['DS9'][self.region_type],
-                           coord=self.coord, meta=self.meta,
-                           composite=self.composite, include=self.include)
+        self.shape = _Shape(coordsys=self.coordsys,
+                            region_type=reg_mapping['DS9'][self.region_type],
+                            coord=self.coord, meta=self.meta,
+                            composite=self.composite, include=self.include)
 
 
 @deprecated('0.5', alternative='`regions.Regions.read`')

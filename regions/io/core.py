@@ -8,6 +8,7 @@ from astropy.coordinates import (Angle, SkyCoord, UnitSphericalRepresentation,
                                  frame_transform_graph)
 from astropy.table import Table
 import astropy.units as u
+from astropy.utils.decorators import deprecated
 import numpy as np
 
 from ..shapes import (CirclePixelRegion, CircleSkyRegion,
@@ -90,7 +91,7 @@ class RegionConversionError(ValueError):
     """
 
 
-class ShapeList(list):
+class _ShapeList(list):
     """
     A class to hold a list of `~regions.Shape` objects.
     """
@@ -493,7 +494,7 @@ class ShapeList(list):
         return table
 
 
-class Shape:
+class _Shape:
     """
     Helper class to represent a DS9/CRTF Region.
 
@@ -754,7 +755,7 @@ def _to_shape_list(region_list, coordinate_system='fk5'):
     shape_list: `regions.ShapeList`
         A `~regions.ShapeList` object.
     """
-    shape_list = ShapeList()
+    shape_list = _ShapeList()
 
     for region in region_list:
         coord = []
@@ -798,8 +799,8 @@ def _to_shape_list(region_list, coordinate_system='fk5'):
 
         include = region.meta.pop('include', True)
 
-        shape_list.append(Shape(coordsys, reg_type, new_coord, meta, False,
-                                include))
+        shape_list.append(_Shape(coordsys, reg_type, new_coord, meta, False,
+                                 include))
 
     return shape_list
 
@@ -902,3 +903,39 @@ def _to_io_meta(shape_meta, valid_keys, key_mappings):
             meta[key_mappings.get(key, key)] = shape_meta[key]
 
     return meta
+
+
+@deprecated('0.5', alternative='`regions.Regions`')
+class ShapeList(_ShapeList):
+    """
+    A class to hold a list of `~regions.Shape` objects.
+    """
+
+
+@deprecated('0.5', alternative='`regions.Region`')
+class Shape(_Shape):
+    """
+    Helper class to represent a DS9/CRTF Region.
+
+    This serves as intermediate step in the parsing process.
+
+    Parameters
+    ----------
+    coordsys : str
+        An Astropy Coordinate system frame used in the region.
+
+    region_type : str
+        The type of the region (as defined in this package).
+
+    coord : list of `~astropy.coordinates.Angle` or `~astropy.units.Quantity`
+        The region coordinates.
+
+    meta : dict
+        The meta attributes.
+
+    composite : bool
+        Flag indicting wheter the region is a Composite region.
+
+    include : bool
+        Flag indicating where to include or exclude the region.
+    """

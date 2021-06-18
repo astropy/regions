@@ -12,7 +12,7 @@ from astropy.utils.decorators import deprecated
 
 from ...core import Regions
 from ...core.registry import RegionsRegistry
-from ..core import Shape, ShapeList, reg_mapping
+from ..core import _Shape, _ShapeList, reg_mapping
 from .core import (CRTFRegionParserError, CRTFRegionParserWarning,
                    valid_symbols)
 
@@ -154,7 +154,7 @@ class _CRTFParser:
         self.region_string = region_string
         self.errors = errors
         self.global_meta = {}  # global states
-        self.shapes = ShapeList()
+        self.shapes = _ShapeList()
         self.run()
 
     def __str__(self):
@@ -478,12 +478,12 @@ class _CRTFRegionParser:
 
         self.meta.pop('coord', None)
 
-        self.shape = Shape(coordsys=self.coordsys,
-                           region_type=reg_mapping['CRTF'][self.region_type],
-                           coord=self.coord,
-                           meta=self.meta,
-                           composite=False,
-                           include=self.include)
+        self.shape = _Shape(coordsys=self.coordsys,
+                            region_type=reg_mapping['CRTF'][self.region_type],
+                            coord=self.coord,
+                            meta=self.meta,
+                            composite=False,
+                            include=self.include)
 
 
 class _CRTFCoordinateParser:

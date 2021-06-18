@@ -11,7 +11,7 @@ import numpy as np
 
 from ...core import Regions
 from ...core.registry import RegionsRegistry
-from ..core import Shape, ShapeList, reg_mapping
+from ..core import _Shape, _ShapeList, reg_mapping
 from .core import (FITSRegionParserError, FITSRegionParserWarning,
                    language_spec)
 
@@ -66,11 +66,11 @@ class _FITSRegionParser:
 
     @property
     def shapes(self):
-        shape_list = ShapeList()
+        shape_list = _ShapeList()
         components = list(self._shapes.keys())
         components.sort()
         for component in components:
-            shape_list += ShapeList(self._shapes[component])
+            shape_list += _ShapeList(self._shapes[component])
         return shape_list
 
     def _raise_error(self, msg):
@@ -205,8 +205,8 @@ class _FITSRegionRowParser():
             self._raise_error(f'"{self.region_type}" is currently not '
                               'supported')
 
-        return self.component, Shape('physical', region_type,
-                                     coords, meta, False, False)
+        return self.component, _Shape('physical', region_type,
+                                      coords, meta, False, False)
 
     def _parse_value(self, val, unit):
         units = dict(pix=u.dimensionless_unscaled,
