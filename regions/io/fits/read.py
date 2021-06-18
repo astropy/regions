@@ -246,7 +246,7 @@ def _read_fits(filename, errors='strict', cache=False):
 
 @RegionsRegistry.register(Regions, 'parse', 'fits')
 def _parse_fits(region_table, errors='strict'):
-    parser = FITSRegionParser(region_table, errors=errors)
+    parser = _FITSRegionParser(region_table, errors=errors)
     return Regions(parser.shapes.to_regions())
 
 
