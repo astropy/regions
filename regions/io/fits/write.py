@@ -24,8 +24,6 @@ def fits_region_objects_to_table(regions):
     """
     Convert a list of `~regions.Region` objects to a FITS region table.
 
-    See :ref:`gs-ds9`
-
     Parameters
     ----------
     regions : list
@@ -44,8 +42,6 @@ def write_fits(regions, filename, header=None, overwrite=False):
     """
     Convert a list of `~regions.Region` to a FITS region table and write
     to a file.
-
-    See :ref:`gs-fits`
 
     Parameters
     ----------
@@ -72,8 +68,6 @@ def write_fits_region(filename, regions, header=None, overwrite=False):
     """
     Convert a list of `~regions.Region` to a FITS region table and write
     to a file.
-
-    See :ref:`gs-fits`
 
     Parameters
     ----------

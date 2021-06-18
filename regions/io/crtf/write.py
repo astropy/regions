@@ -62,8 +62,6 @@ def write_crtf(regions, filename, coordsys='fk5', fmt='.6f', radunit='deg',
     Convert a list of `~regions.Region` to a CRTF string and write to a
     file.
 
-    See :ref:`gs-crtf`
-
     Parameters
     ----------
     regions : list

@@ -19,8 +19,6 @@ def ds9_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
     """
     Convert a list of `~regions.Region` objects to a DS9 region string.
 
-    See :ref:`gs-ds9`
-
     Parameters
     ----------
     regions : list
@@ -51,8 +49,6 @@ def write_ds9(regions, filename, coordsys='fk5', fmt='.6f', radunit='deg',
     """
     Convert a list of `~regions.Region` to a DS9 string and write to a
     file.
-
-    See :ref:`gs-ds9`
 
     Parameters
     ----------
