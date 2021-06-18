@@ -10,9 +10,9 @@ import pytest
 
 from ....shapes.circle import CircleSkyRegion
 from ....shapes.ellipse import EllipseSkyRegion
+from ....core import Regions
 from ..core import CRTFRegionParserError
-from ..read import CRTFParser, read_crtf
-from ..write import crtf_objects_to_string
+from ..read import _CRTFParser
 
 
 implemented_region_types = ('ellipse', 'circle', 'rectangle', 'poly', 'point',
@@ -25,7 +25,7 @@ def test_global_parser():
     """
     global_test_str = ('global coord=B1950_VLA, frame=BARY, corr=[I, Q], '
                        'color=blue')
-    global_parser = CRTFParser(global_test_str)
+    global_parser = _CRTFParser(global_test_str)
     expected = {'coord': 'B1950_VLA', 'frame': 'BARY',
                 'corr': ['I', 'Q'], 'color': 'blue'}
     assert dict(global_parser.global_meta) == expected
@@ -38,7 +38,7 @@ def test_valid_crtf_line():
     line_str = 'coord=B1950_VLA, frame=BARY, corr=[I, Q], color=blue'
 
     with pytest.raises(CRTFRegionParserError) as excinfo:
-        CRTFParser(line_str)
+        Regions.parse(line_str, format='crtf')
 
     assert 'Not a valid CRTF line:' in str(excinfo.value)
 
@@ -50,7 +50,7 @@ def test_valid_region_type():
     reg_str = 'hyperbola[[18h12m24s, -23d11m00s], 2.3arcsec]'
 
     with pytest.raises(CRTFRegionParserError) as excinfo:
-        CRTFParser(reg_str)
+        Regions.parse(reg_str, format='crtf')
 
     assert 'Not a valid CRTF Region type: "hyperbola"' in str(excinfo.value)
 
@@ -62,7 +62,7 @@ def test_valid_global_meta_key():
     global_test_str = ('global label=B1950_VLA, frame=BARY, corr=[I, Q], '
                        'color=blue')
     with pytest.raises(CRTFRegionParserError) as excinfo:
-        CRTFParser(global_test_str)
+        Regions.parse(global_test_str, format='crtf')
     assert '"label" is not a valid global meta key' in str(excinfo.value)
 
 
@@ -73,7 +73,7 @@ def test_valid_meta_key():
     meta_test_str = ('annulus[[17h51m03.2s, -45d17m50s], [0.10deg, 4.12deg]], '
                      'hello="My label here"')
     with pytest.raises(CRTFRegionParserError) as excinfo:
-        CRTFParser(meta_test_str)
+        Regions.parse(meta_test_str, format='crtf')
     assert '"hello" is not a valid meta key' in str(excinfo.value)
 
 
@@ -83,7 +83,7 @@ def test_valid_region_syntax():
     """
     reg_str1 = 'circle[[18h12m24s, -23d11m00s], [2.3arcsec,4.5arcsec]'
     with pytest.raises(CRTFRegionParserError) as excinfo:
-        CRTFParser(reg_str1)
+        Regions.parse(reg_str1, format='crtf')
 
     estr = ("Not in proper format: ('2.3arcsec', '4.5arcsec') should be "
             "a single length")
@@ -92,25 +92,25 @@ def test_valid_region_syntax():
     reg_str2 = ('symbol[[32.1423deg, 12.1412deg], 12deg], linewidth=2, '
                 'coord=J2000, symsize=2')
     with pytest.raises(CRTFRegionParserError) as excinfo:
-        CRTFParser(reg_str2)
+        Regions.parse(reg_str2, format='crtf')
     estr = 'Not in proper format: "12deg" should be a symbol'
     assert estr in str(excinfo.value)
 
     reg_str3 = 'circle[[18h12m24s, -23d11m00s]'
     with pytest.raises(CRTFRegionParserError) as excinfo:
-        CRTFParser(reg_str3)
+        Regions.parse(reg_str3, format='crtf')
     estr = ('Does not contain expected number of parameters for the region '
             '"circle"')
     assert estr in str(excinfo.value)
 
     reg_str4 = 'poly[[1, 2], [4, 5]]'
     with pytest.raises(CRTFRegionParserError) as excinfo:
-        CRTFParser(reg_str4)
+        Regions.parse(reg_str4, format='crtf')
     assert 'polygon should have >= 3 coordinates' in str(excinfo.value)
 
     reg_str6 = 'rotbox[[12h01m34.1s, 12d23m33s], [3arcmin,], 12deg]'
     with pytest.raises(CRTFRegionParserError) as excinfo:
-        CRTFParser(reg_str6)
+        Regions.parse(reg_str6, format='crtf')
     assert "('3arcmin', '') should be a pair of lengths" in str(excinfo.value)
 
 
@@ -123,7 +123,8 @@ def test_issue_312_regression():
                                            -21.257123 * u.deg, frame='fk5'),
                            width=0.001571 * u.deg, height=0.001973 * u.deg,
                            angle=111.273322 * u.deg)
-    crtfstr = crtf_objects_to_string([reg], 'fk5', '.6f', 'deg')
+    crtfstr = reg.serialize(format='crtf', coordsys='fk5', fmt='.6f',
+                            radunit='deg')
     assert crtfstr.strip()[-1] != ','
 
 
@@ -131,8 +132,9 @@ def test_issue_312_regression():
                                       'data/CRTFgeneraloutput.crtf'])
 def test_file_crtf(filename):
     filename = get_pkg_data_filename(filename)
-    regs = read_crtf(filename, 'warn')
-    actual_output = crtf_objects_to_string(regs, 'fk4', '.3f').strip()
+    regs = Regions.read(filename, errors='warn', format='crtf')
+    actual_output = regs.serialize(format='crtf', coordsys='fk4',
+                                   fmt='.3f').strip()
 
     with open(get_pkg_data_filename('data/CRTFgeneraloutput.crtf')) as f:
         ref_output = f.read().strip()
@@ -154,8 +156,7 @@ def test_crtf_header():
     """
     crtf_str = ('#CRTFv0 CASA Region Text Format version 0\n'
                 'circle[[42deg, 43deg], 3deg], coord=J2000, color=green')
-    parser = CRTFParser(crtf_str)
-    reg = parser.shapes.to_regions()[0]
+    reg = Regions.parse(crtf_str, format='crtf')[0]
     assert isinstance(reg, CircleSkyRegion)
     assert reg.center.ra.value == 42.0
     assert reg.center.ra.unit == 'deg'
@@ -170,15 +171,13 @@ def test_space_after_regname():
     Regression test for #271: space is allowed
     """
     reg_str = 'circle [[42deg, 43deg], 3deg], coord=J2000, color=green'
-    parser = CRTFParser(reg_str)
-    reg = parser.shapes.to_regions()[0]
+    reg = Regions.parse(reg_str, format='crtf')[0]
     assert isinstance(reg, CircleSkyRegion)
 
 
 def test_no_comma_after_region():
     reg_str = 'circle [[42deg, 43deg], 3deg] coord=J2000, color=green'
-    parser = CRTFParser(reg_str)
-    reg = parser.shapes.to_regions()[0]
+    reg = Regions.parse(reg_str, format='crtf')[0]
     assert isinstance(reg, CircleSkyRegion)
     assert reg.center.ra.value == 42.0
     assert reg.center.ra.unit == 'deg'
@@ -190,5 +189,5 @@ def test_no_comma_after_region():
 
 def test_casa_file_crtf():
     filename = get_pkg_data_filename('data/CRTF_CARTA.crtf')
-    regions = read_crtf(filename)
+    regions = Regions.read(filename, format='crtf')
     assert len(regions) == 2
