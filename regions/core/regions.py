@@ -7,6 +7,8 @@ from .core import Region
 from .registry import RegionsRegistry
 
 __all__ = ['Regions']
+__doctest_skip__ = ['Regions.read', 'Regions.write', 'Regions.parse',
+                    'Regions.serialize']
 
 
 class Regions:

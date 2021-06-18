@@ -8,6 +8,7 @@ from .pixcoord import PixCoord
 from .registry import RegionsRegistry
 
 __all__ = ['Region', 'PixelRegion', 'SkyRegion']
+__doctest_skip__ = ['Region.serialize', 'Region.write']
 
 
 class Region(abc.ABC):
