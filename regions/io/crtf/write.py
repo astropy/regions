@@ -2,13 +2,14 @@
 
 import os
 
-from ...core import Regions
+from ...core import Region, Regions
 from ...core.registry import RegionsRegistry
 from ..core import _to_shape_list
 
 __all__ = ['write_crtf', 'crtf_objects_to_string']
 
 
+@RegionsRegistry.register(Region, 'serialize', 'crtf')
 @RegionsRegistry.register(Regions, 'serialize', 'crtf')
 def _serialize_crtf(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
     shapelist = _to_shape_list(regions, coordsys)
@@ -55,6 +56,7 @@ def crtf_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
                            radunit=radunit)
 
 
+@RegionsRegistry.register(Region, 'write', 'crtf')
 @RegionsRegistry.register(Regions, 'write', 'crtf')
 def write_crtf(regions, filename, coordsys='fk5', fmt='.6f', radunit='deg',
                overwrite=False):

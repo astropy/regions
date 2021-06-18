@@ -3,13 +3,14 @@
 from astropy.io import fits
 from astropy.utils import deprecated
 
-from ...core import Regions
+from ...core import Region, Regions
 from ...core.registry import RegionsRegistry
 from ..core import _to_shape_list, SkyRegion
 
 __all__ = ['write_fits', 'fits_region_objects_to_table']
 
 
+@RegionsRegistry.register(Region, 'serialize', 'fits')
 @RegionsRegistry.register(Regions, 'serialize', 'fits')
 def _serialize_fits(regions):
     for region in regions:
@@ -37,6 +38,7 @@ def fits_region_objects_to_table(regions):
     return _serialize_fits(regions)
 
 
+@RegionsRegistry.register(Region, 'write', 'fits')
 @RegionsRegistry.register(Regions, 'write', 'fits')
 def write_fits(regions, filename, header=None, overwrite=False):
     """

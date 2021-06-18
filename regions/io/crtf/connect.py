@@ -2,12 +2,13 @@
 
 from astropy.utils.data import get_readable_fileobj
 
-from ...core.regions import Regions
+from ...core import Region, Regions
 from ...core.registry import RegionsRegistry
 
 __all__ = []
 
 
+@RegionsRegistry.register(Region, 'identify', 'crtf')
 @RegionsRegistry.register(Regions, 'identify', 'crtf')
 def is_crtf(methodname, filepath):
     """
