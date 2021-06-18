@@ -29,6 +29,17 @@ filename suffix for a particular format.
        fits   .fits           `FITS Region Binary Table <https://fits.gsfc.nasa.gov/registry/region.html>`_
 ============  ==============  ========================
 
+Use the :meth:`~regions.Regions.get_formats` method to get the
+registered I/O formats as a :class:`~astropy.table.Table`::
+
+    >>> from regions import Regions
+    >>> print(Regions.get_formats())
+    Format Parse Serialize Read Write Auto-identify
+    ------ ----- --------- ---- ----- -------------
+      crtf   Yes       Yes  Yes   Yes           Yes
+       ds9   Yes       Yes  Yes   Yes           Yes
+      fits   Yes       Yes  Yes   Yes           Yes
+
 
 Examples
 --------
@@ -122,3 +133,43 @@ be specified when serializing region data. Serializing regions to the
 .. doctest-skip::
 
     >>> regions_str = regions.serialize(format='ds9')
+
+
+Region Classes I/O
+==================
+
+Additionally, all of the Region classes (i.e., :class:`~regions.Region`
+subclasses) support the :meth:`~regions.Regions.write` and
+:meth:`~regions.Regions.serialize` methods.
+
+As an example, let's create a :class:`~regions.CircleSkyRegion` object::
+
+    >>> from astropy.coordinates import SkyCoord
+    >>> import astropy.units as u
+    >>> from regions import CircleSkyRegion
+    >>> coord = SkyCoord(202.469575, 47.19525833, unit='deg', frame='fk5')
+    >>> region = CircleSkyRegion(coord, radius=0.01 * u.deg)
+    >>> region
+    <CircleSkyRegion(center=<SkyCoord (FK5: equinox=J2000.000): (ra, dec) in deg
+    (202.469575, 47.19525833)>, radius=0.01 deg)>
+
+To serialize the region::
+
+    >>> region.serialize(format='ds9')
+    '# Region file format: DS9 astropy/regions\nfk5\ncircle(202.469575,47.195258,0.010000)\n'
+
+To write the region to a region file:
+
+.. doctest-skip::
+
+    >>> region.write('my_region.ds9', format='ds9')
+
+Use the :meth:`~regions.Region.get_formats` method to list all available
+formats and methods for the :class:`~regions.Region` subclasses::
+
+    >>> print(region.get_formats())
+    Format Parse Serialize Read Write Auto-identify
+    ------ ----- --------- ---- ----- -------------
+      crtf    No       Yes   No   Yes           Yes
+       ds9    No       Yes   No   Yes           Yes
+      fits    No       Yes   No   Yes           Yes
