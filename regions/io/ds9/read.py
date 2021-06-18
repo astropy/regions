@@ -58,17 +58,6 @@ def _read_ds9(filename, errors='strict', cache=False):
     -------
     regions : list
         A list of `~regions.Region` objects.
-
-    Examples
-    --------
-    >>> from regions import read_ds9
-    >>> from astropy.utils.data import get_pkg_data_filename
-    >>> file = get_pkg_data_filename('data/physical_reference.reg', package='regions.io.ds9.tests')
-    >>> regs = read_ds9(file, errors='warn')
-    >>> print(regs[0])
-    Region: CirclePixelRegion
-    center: PixCoord(x=330.0, y=1090.0)
-    radius: 40.0
     """
     with get_readable_fileobj(filename, cache=cache) as fh:
         region_string = fh.read()
@@ -169,16 +158,6 @@ class _DS9Parser:
         `~regions.DS9RegionParserError`. 'warn' will raise a
         `~regions.DS9RegionParserWarning`, and 'ignore' will do nothing
         (i.e., be silent).
-
-    Examples
-    --------
-    >>> from regions import DS9Parser
-    >>> reg_str = 'image\\n circle(331.00,1091.00,40.00) # dashlist=8 3 select=1 highlite=1 dash=0 fixed=0 edit=1 move=1 delete=1 source=1 text={Circle} tag={foo} tag={foo bar} This is a Comment color=pink width=3 font="times 10 normal roman"'
-    >>> regs = DS9Parser(reg_str, errors='warn').shapes.to_regions()
-    >>> print(regs[0])
-    Region: CirclePixelRegion
-    center: PixCoord(x=330.0, y=1090.0)
-    radius: 40.0
     """
 
     # Each line is tested for either containing a region type or a

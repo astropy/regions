@@ -33,20 +33,6 @@ class _FITSRegionParser:
         `~regions.FITSRegionParserError`. 'warn' will raise a
         `~regions.FITSRegionParserWarning`, and 'ignore' will do nothing
         (i.e., be silent).
-
-    Examples
-    --------
-    >>> from regions import FITSRegionParser
-    >>> from astropy.table import Table
-    >>> from astropy.utils.data import get_pkg_data_filename
-    >>> filename = get_pkg_data_filename('data/fits_region.fits',
-    ...                                  package='regions.io.fits.tests')
-    >>> table = Table.read(filename)
-    >>> parser = FITSRegionParser(table)
-    >>> shapes = parser.shapes
-    >>> regions = shapes.to_regions()
-    >>> regions[5]
-    <PointPixelRegion(center=PixCoord(x=341.0, y=345.0))>
     """
 
     valid_columns = ['X', 'Y', 'SHAPE', 'COMPONENT', 'R', 'ROTANG']
@@ -244,14 +230,6 @@ def _read_fits(filename, errors='strict', cache=False):
     -------
     regions : list
         A list of `~regions.Region` objects.
-
-    Examples
-    --------
-    >>> from astropy.utils.data import get_pkg_data_filename
-    >>> from regions import read_fits
-    >>> file_read = get_pkg_data_filename('data/fits_region.fits',
-    ...                                   package='regions.io.fits.tests')
-    >>> regions = read_fits(file_read)
     """
     with fits.open(filename, cache=cache) as hdul:
         sky_regions = []

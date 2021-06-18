@@ -73,16 +73,6 @@ def _read_crtf(filename, errors='strict', cache=False):
     -------
     regions : list
         A list of `~regions.Region` objects.
-
-    Examples
-    --------
-    >>> from regions import read_crtf
-    >>> from astropy.utils.data import get_pkg_data_filename
-    >>> file = get_pkg_data_filename('data/CRTFgeneral.crtf',
-    ...                              package='regions.io.crtf.tests')
-    >>> regs = read_crtf(file, errors='warn')
-    >>> print(regs[0].visual)
-    {'color': 'blue'}
     """
     with get_readable_fileobj(filename) as fh:
         if regex_begin.search(fh.readline()):
@@ -118,14 +108,6 @@ class _CRTFParser:
         `~regions.CRTFRegionParserError`. 'warn' will raise a
         `~regions.CRTFRegionParserWarning`, and 'ignore' will do nothing
         (i.e., be silent).
-
-    Examples
-    --------
-    >>> from regions import CRTFParser
-    >>> reg_str = 'ann circle[[18h12m24s, -23d11m00s], 2.3arcsec], coord=B1950, frame=BARY, corr=[I, Q], color=blue'
-    >>> regs = CRTFParser(reg_str, errors='warn').shapes.to_regions()
-    >>> print(regs[0].visual)
-    {'color': 'blue'}
     """
 
     # Each line is tested for either containing a region with meta

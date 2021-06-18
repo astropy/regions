@@ -43,17 +43,6 @@ def crtf_objects_to_string(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
     -------
     region_string : str
         A CRTF region string.
-
-    Examples
-    --------
-    >>> import astropy.units as u
-    >>> from astropy.coordinates import SkyCoord
-    >>> from regions import CircleSkyRegion, crtf_objects_to_string
-    >>> reg_sky = CircleSkyRegion(SkyCoord(1 * u.deg, 2 * u.deg), 5 * u.deg)
-    >>> print(crtf_objects_to_string([reg_sky]))
-    #CRTFv0
-    global coord=J2000
-    circle[[1.000007deg, 2.000002deg], 5.000000deg]
     """
     return _serialize_crtf(regions, coordsys=coordsys, fmt=fmt,
                            radunit=radunit)
