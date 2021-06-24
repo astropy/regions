@@ -5,18 +5,20 @@ from warnings import warn
 from astropy.io import fits
 from astropy.table import Table
 import astropy.units as u
-from astropy.utils import deprecated
+from astropy.utils.decorators import deprecated
 from astropy.wcs import WCS
 import numpy as np
 
-from ..core import Shape, ShapeList, reg_mapping
+from ...core import Regions
+from ...core.registry import RegionsRegistry
+from ..core import _Shape, _ShapeList, reg_mapping
 from .core import (FITSRegionParserError, FITSRegionParserWarning,
                    language_spec)
 
 __all__ = ['FITSRegionParser', 'read_fits']
 
 
-class FITSRegionParser:
+class _FITSRegionParser:
     """
     Parses a FITS Region table.
 
@@ -31,20 +33,6 @@ class FITSRegionParser:
         `~regions.FITSRegionParserError`. 'warn' will raise a
         `~regions.FITSRegionParserWarning`, and 'ignore' will do nothing
         (i.e., be silent).
-
-    Examples
-    --------
-    >>> from regions import FITSRegionParser
-    >>> from astropy.table import Table
-    >>> from astropy.utils.data import get_pkg_data_filename
-    >>> filename = get_pkg_data_filename('data/fits_region.fits',
-    ...                                  package='regions.io.fits.tests')
-    >>> table = Table.read(filename)
-    >>> parser = FITSRegionParser(table)
-    >>> shapes = parser.shapes
-    >>> regions = shapes.to_regions()
-    >>> regions[5]
-    <PointPixelRegion(center=PixCoord(x=341.0, y=345.0))>
     """
 
     valid_columns = ['X', 'Y', 'SHAPE', 'COMPONENT', 'R', 'ROTANG']
@@ -64,11 +52,11 @@ class FITSRegionParser:
 
     @property
     def shapes(self):
-        shape_list = ShapeList()
+        shape_list = _ShapeList()
         components = list(self._shapes.keys())
         components.sort()
         for component in components:
-            shape_list += ShapeList(self._shapes[component])
+            shape_list += _ShapeList(self._shapes[component])
         return shape_list
 
     def _raise_error(self, msg):
@@ -203,22 +191,20 @@ class _FITSRegionRowParser():
             self._raise_error(f'"{self.region_type}" is currently not '
                               'supported')
 
-        return self.component, Shape('physical', region_type,
-                                     coords, meta, False, False)
+        return self.component, _Shape('physical', region_type,
+                                      coords, meta, False, False)
 
     def _parse_value(self, val, unit):
         units = dict(pix=u.dimensionless_unscaled,
-                     deg=u.deg,
-                     rad=u.rad,
-                     )
-
-        if unit is not None:
-            return val * units.get(str(unit), unit)
-        else:
+                     deg=u.deg, rad=u.rad)
+        if unit is None:
             self._raise_error(f'The unit: {unit} is invalid')
 
+        return val * units.get(str(unit), unit)
 
-def read_fits(filename, errors='strict'):
+
+@RegionsRegistry.register(Regions, 'read', 'fits')
+def _read_fits(filename, errors='strict', cache=False):
     """
     Read a FITS region file, converting a FITS regions table to a list
     of `~regions.Region` objects.
@@ -235,36 +221,37 @@ def read_fits(filename, errors='strict'):
         `~regions.FITSRegionParserWarning`, and 'ignore' will do
         nothing (i.e., be silent).
 
+    cache : bool or 'update', optional
+        Whether to cache the contents of remote URLs. If 'update', check
+        the remote URL for a new version but store the result in the
+        cache.
+
     Returns
     -------
     regions : list
         A list of `~regions.Region` objects.
-
-    Examples
-    --------
-    >>> from astropy.utils.data import get_pkg_data_filename
-    >>> from regions import read_fits
-    >>> file_read = get_pkg_data_filename('data/fits_region.fits',
-    ...                                   package='regions.io.fits.tests')
-    >>> regions = read_fits(file_read)
     """
-    regions = []
-
-    with fits.open(filename) as hdul:
+    with fits.open(filename, cache=cache) as hdul:
+        sky_regions = []
         for hdu in hdul:
             if hdu.name == 'REGION':
-                table = Table.read(hdu)
+                region_table = Table.read(hdu)
+                regions = _parse_fits(region_table, errors=errors)
+
                 wcs = WCS(hdu.header, keysel=['image', 'binary', 'pixel'])
-                parser = FITSRegionParser(table, errors)
-                regions_list = parser.shapes.to_regions()
-                for reg in regions_list:
-                    regions.append(reg.to_sky(wcs))
-
-    return regions
+                for reg in regions:
+                    sky_regions.append(reg.to_sky(wcs))
+        return Regions(sky_regions)
 
 
-@deprecated('0.5', alternative='read_fits')
-def read_fits_region(filename, errors='strict'):
+@RegionsRegistry.register(Regions, 'parse', 'fits')
+def _parse_fits(region_table, errors='strict'):
+    parser = _FITSRegionParser(region_table, errors=errors)
+    return Regions(parser.shapes.to_regions())
+
+
+@deprecated('0.5', alternative='`regions.Regions.read`')
+def read_fits_region(filename, errors='strict', cache=False):
     """
     Read a FITS region file, converting a FITS regions table to a list
     of `~regions.Region` objects.
@@ -281,9 +268,64 @@ def read_fits_region(filename, errors='strict'):
         `~regions.FITSRegionParserWarning`, and 'ignore' will do
         nothing (i.e., be silent).
 
+    cache : bool or 'update', optional
+        Whether to cache the contents of remote URLs. If 'update', check
+        the remote URL for a new version but store the result in the
+        cache.
+
     Returns
     -------
     regions : list
         A list of `~regions.Region` objects.
     """
-    return read_fits(filename, errors=errors)
+    return _read_fits(filename, errors=errors, cache=cache)
+
+
+@deprecated('0.5', alternative='`regions.Regions.read`')
+def read_fits(filename, errors='strict', cache=False):
+    """
+    Read a FITS region file, converting a FITS regions table to a list
+    of `~regions.Region` objects.
+
+    Parameters
+    ----------
+    filename : str
+        The file path.
+
+    errors : {'strict', 'warn', 'ignore'}, optional
+        The error handling scheme to use for handling parsing
+        errors. The default is 'strict', which will raise a
+        `~regions.FITSRegionParserError`. 'warn' will raise a
+        `~regions.FITSRegionParserWarning`, and 'ignore' will do
+        nothing (i.e., be silent).
+
+    cache : bool or 'update', optional
+        Whether to cache the contents of remote URLs. If 'update', check
+        the remote URL for a new version but store the result in the
+        cache.
+
+    Returns
+    -------
+    regions : list
+        A list of `~regions.Region` objects.
+    """
+    return _read_fits(filename, errors=errors, cache=cache)
+
+
+@deprecated('0.5', alternative='`regions.Regions.parse`')
+class FITSRegionParser(_FITSRegionParser):
+    """
+    Parses a FITS Region table.
+
+    Parameters
+    ----------
+    table : `~astropy.table.Table`
+        A FITS region table.
+
+    errors : {'strict', 'warn', 'ignore'}, optional
+        The error handling scheme to use for handling parsing
+        errors. The default is 'strict', which will raise a
+        `~regions.FITSRegionParserError`. 'warn' will raise a
+        `~regions.FITSRegionParserWarning`, and 'ignore' will do nothing
+        (i.e., be silent).
+    """

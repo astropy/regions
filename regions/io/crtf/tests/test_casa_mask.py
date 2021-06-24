@@ -8,7 +8,7 @@ import astropy.units as u
 import pytest
 
 from ....shapes.ellipse import EllipseSkyRegion
-from ..write import write_crtf
+from ..write import _write_crtf
 
 try:
     from casatools import image, simulator
@@ -65,7 +65,7 @@ def test_casa_masking():
                                         frame='fk5'),
                                width=1.0 * u.arcmin, height=2.0 * u.arcmin,
                                angle=45 * u.deg)
-        write_crtf([reg], tmpdir + '/SIM.crtf', 'fk5', '.6f', 'deg')
+        _write_crtf([reg], tmpdir + '/SIM.crtf', 'fk5', '.6f', 'deg')
 
         # Image the dataset
         tclean(vis=tmpdir + '/SIM.ms', imagename=tmpdir + '/SIM', imsize=100,

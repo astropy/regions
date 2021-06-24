@@ -8,8 +8,11 @@ from warnings import warn
 from astropy.coordinates import Angle, frame_transform_graph
 import astropy.units as u
 from astropy.utils.data import get_readable_fileobj
+from astropy.utils.decorators import deprecated
 
-from ..core import Shape, ShapeList, reg_mapping
+from ...core import Regions
+from ...core.registry import RegionsRegistry
+from ..core import _Shape, _ShapeList, reg_mapping
 from .core import (CRTFRegionParserError, CRTFRegionParserWarning,
                    valid_symbols)
 
@@ -44,14 +47,15 @@ regex_region = re.compile(r'(?P<include>[+-])?(?P<type>ann(?=\s))?\s*(?P<regiont
 regex_line = re.compile(r'(?P<region>[+-]?(?:ann(?=\s))?\s*[a-z]+?\s?\[[^=]+\])(?:\s*,?\s*(?P<parameters>.*))?')  # noqa
 
 
-def read_crtf(filename, errors='strict'):
+@RegionsRegistry.register(Regions, 'read', 'crtf')
+def _read_crtf(filename, errors='strict', cache=False):
     """
     Read a CRTF region file and return a list of region objects.
 
     Parameters
     ----------
     filename : str
-        The file path.
+        The filename of the file to access.
 
     errors : {'strict', 'warn', 'ignore'}, optional
         The error handling scheme to use for handling parsing
@@ -60,32 +64,32 @@ def read_crtf(filename, errors='strict'):
         `~regions.CRTFRegionParserWarning`, and 'ignore' will do nothing
         (i.e., be silent).
 
+    cache : bool or 'update', optional
+        Whether to cache the contents of remote URLs. If 'update', check
+        the remote URL for a new version but store the result in the
+        cache.
+
     Returns
     -------
     regions : list
         A list of `~regions.Region` objects.
-
-    Examples
-    --------
-    >>> from regions import read_crtf
-    >>> from astropy.utils.data import get_pkg_data_filename
-    >>> file = get_pkg_data_filename('data/CRTFgeneral.crtf',
-    ...                              package='regions.io.crtf.tests')
-    >>> regs = read_crtf(file, errors='warn')
-    >>> print(regs[0].visual)
-    {'color': 'blue'}
     """
     with get_readable_fileobj(filename) as fh:
         if regex_begin.search(fh.readline()):
             region_string = fh.read()
-            parser = CRTFParser(region_string, errors)
-            return parser.shapes.to_regions()
+            return _parse_crtf(region_string, errors=errors)
         else:
             raise CRTFRegionParserError('Every CRTF Region must start with '
                                         '"#CRTF"')
 
 
-class CRTFParser:
+@RegionsRegistry.register(Regions, 'parse', 'crtf')
+def _parse_crtf(region_string, errors='strict'):
+    parser = _CRTFParser(region_string, errors=errors)
+    return Regions(parser.shapes.to_regions())
+
+
+class _CRTFParser:
     """
     Parse a CRTF string.
 
@@ -104,14 +108,6 @@ class CRTFParser:
         `~regions.CRTFRegionParserError`. 'warn' will raise a
         `~regions.CRTFRegionParserWarning`, and 'ignore' will do nothing
         (i.e., be silent).
-
-    Examples
-    --------
-    >>> from regions import CRTFParser
-    >>> reg_str = 'ann circle[[18h12m24s, -23d11m00s], 2.3arcsec], coord=B1950, frame=BARY, corr=[I, Q], color=blue'
-    >>> regs = CRTFParser(reg_str, errors='warn').shapes.to_regions()
-    >>> print(regs[0].visual)
-    {'color': 'blue'}
     """
 
     # Each line is tested for either containing a region with meta
@@ -140,7 +136,7 @@ class CRTFParser:
         self.region_string = region_string
         self.errors = errors
         self.global_meta = {}  # global states
-        self.shapes = ShapeList()
+        self.shapes = _ShapeList()
         self.run()
 
     def __str__(self):
@@ -464,12 +460,12 @@ class _CRTFRegionParser:
 
         self.meta.pop('coord', None)
 
-        self.shape = Shape(coordsys=self.coordsys,
-                           region_type=reg_mapping['CRTF'][self.region_type],
-                           coord=self.coord,
-                           meta=self.meta,
-                           composite=False,
-                           include=self.include)
+        self.shape = _Shape(coordsys=self.coordsys,
+                            region_type=reg_mapping['CRTF'][self.region_type],
+                            coord=self.coord,
+                            meta=self.meta,
+                            composite=False,
+                            include=self.include)
 
 
 class _CRTFCoordinateParser:
@@ -521,3 +517,56 @@ class _CRTFCoordinateParser:
         else:
             raise CRTFRegionParserError('Units must be specified for '
                                         f'{string_rep}')
+
+
+@deprecated('0.5', alternative='`regions.Regions.read`')
+def read_crtf(filename, errors='strict', cache=False):
+    """
+    Read a CRTF region file and return a list of region objects.
+
+    Parameters
+    ----------
+    filename : str
+        The filename of the file to access.
+
+    errors : {'strict', 'warn', 'ignore'}, optional
+        The error handling scheme to use for handling parsing
+        errors. The default is 'strict', which will raise a
+        `~regions.CRTFRegionParserError`. 'warn' will raise a
+        `~regions.CRTFRegionParserWarning`, and 'ignore' will do nothing
+        (i.e., be silent).
+
+    cache : bool or 'update', optional
+        Whether to cache the contents of remote URLs. If 'update', check
+        the remote URL for a new version but store the result in the
+        cache.
+
+    Returns
+    -------
+    regions : list
+        A list of `~regions.Region` objects.
+    """
+    return _read_crtf(filename, errors=errors, cache=cache)
+
+
+@deprecated('0.5', alternative='`regions.Regions.parse`')
+class CRTFParser(_CRTFParser):
+    """
+    Parse a CRTF string.
+
+    This class transforms a CRTF string to a
+    `~regions.io.core.ShapeList`. The result is stored in the ``shapes``
+    attribute.
+
+    Parameters
+    ----------
+    region_string : str
+        A CRTF region string.
+
+    errors : {'strict', 'warn', 'ignore'}, optional
+        The error handling scheme to use for handling parsing
+        errors. The default is 'strict', which will raise a
+        `~regions.CRTFRegionParserError`. 'warn' will raise a
+        `~regions.CRTFRegionParserWarning`, and 'ignore' will do nothing
+        (i.e., be silent).
+    """

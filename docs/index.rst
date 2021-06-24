@@ -36,10 +36,7 @@ User Documentation
    compound
    masks
    plotting
-   ds9
-   crtf
-   fits_region
-   unified
+   region_io
    shapely
    changelog
 

@@ -9,8 +9,11 @@ from warnings import warn
 from astropy.coordinates import Angle, frame_transform_graph
 import astropy.units as u
 from astropy.utils.data import get_readable_fileobj
+from astropy.utils.decorators import deprecated
 
-from ..core import Shape, ShapeList, reg_mapping
+from ...core import Regions
+from ...core.registry import RegionsRegistry
+from ..core import _Shape, _ShapeList, reg_mapping
 from .core import (DS9RegionParserError, DS9RegionParserWarning,
                    valid_symbols_ds9)
 
@@ -29,14 +32,15 @@ regex_paren = re.compile('[()]')
 regex_splitter = re.compile('[, ]')
 
 
-def read_ds9(filename, errors='strict'):
+@RegionsRegistry.register(Regions, 'read', 'ds9')
+def _read_ds9(filename, errors='strict', cache=False):
     """
     Read a DS9 region file in as a list of `~regions.Region` objects.
 
     Parameters
     ----------
     filename : str
-        The file path.
+        The filename of the file to access.
 
     errors : {'strict', 'warn', 'ignore'}, optional
         The error handling scheme to use for handling parsing
@@ -45,27 +49,25 @@ def read_ds9(filename, errors='strict'):
         `~regions.DS9RegionParserWarning`, and 'ignore' will do nothing
         (i.e., be silent).
 
+    cache : bool or 'update', optional
+        Whether to cache the contents of remote URLs. If 'update', check
+        the remote URL for a new version but store the result in the
+        cache.
+
     Returns
     -------
     regions : list
         A list of `~regions.Region` objects.
-
-    Examples
-    --------
-    >>> from regions import read_ds9
-    >>> from astropy.utils.data import get_pkg_data_filename
-    >>> file = get_pkg_data_filename('data/physical_reference.reg', package='regions.io.ds9.tests')
-    >>> regs = read_ds9(file, errors='warn')
-    >>> print(regs[0])
-    Region: CirclePixelRegion
-    center: PixCoord(x=330.0, y=1090.0)
-    radius: 40.0
     """
-    with get_readable_fileobj(filename) as fh:
+    with get_readable_fileobj(filename, cache=cache) as fh:
         region_string = fh.read()
+        return _parse_ds9(region_string, errors=errors)
 
-    parser = DS9Parser(region_string, errors=errors)
-    return parser.shapes.to_regions()
+
+@RegionsRegistry.register(Regions, 'parse', 'ds9')
+def _parse_ds9(region_string, errors='strict'):
+    parser = _DS9Parser(region_string, errors=errors)
+    return Regions(parser.shapes.to_regions())
 
 
 class _DS9CoordinateParser:
@@ -137,7 +139,7 @@ class _DS9CoordinateParser:
             return u.Quantity(float(string_rep), unit=unit)
 
 
-class DS9Parser:
+class _DS9Parser:
     """
     Parse a DS9 string.
 
@@ -156,16 +158,6 @@ class DS9Parser:
         `~regions.DS9RegionParserError`. 'warn' will raise a
         `~regions.DS9RegionParserWarning`, and 'ignore' will do nothing
         (i.e., be silent).
-
-    Examples
-    --------
-    >>> from regions import DS9Parser
-    >>> reg_str = 'image\\n circle(331.00,1091.00,40.00) # dashlist=8 3 select=1 highlite=1 dash=0 fixed=0 edit=1 move=1 delete=1 source=1 text={Circle} tag={foo} tag={foo bar} This is a Comment color=pink width=3 font="times 10 normal roman"'
-    >>> regs = DS9Parser(reg_str, errors='warn').shapes.to_regions()
-    >>> print(regs[0])
-    Region: CirclePixelRegion
-    center: PixCoord(x=330.0, y=1090.0)
-    radius: 40.0
     """
 
     # Each line is tested for either containing a region type or a
@@ -197,7 +189,7 @@ class DS9Parser:
         self.global_meta = {}
 
         # Results
-        self.shapes = ShapeList()
+        self.shapes = _ShapeList()
 
         self.run()
 
@@ -538,7 +530,60 @@ class _DS9RegionParser:
 
         self.meta.pop('coord', None)
 
-        self.shape = Shape(coordsys=self.coordsys,
-                           region_type=reg_mapping['DS9'][self.region_type],
-                           coord=self.coord, meta=self.meta,
-                           composite=self.composite, include=self.include)
+        self.shape = _Shape(coordsys=self.coordsys,
+                            region_type=reg_mapping['DS9'][self.region_type],
+                            coord=self.coord, meta=self.meta,
+                            composite=self.composite, include=self.include)
+
+
+@deprecated('0.5', alternative='`regions.Regions.read`')
+def read_ds9(filename, errors='strict', cache=False):
+    """
+    Read a DS9 region file in as a list of `~regions.Region` objects.
+
+    Parameters
+    ----------
+    filename : str
+        The filename of the file to access.
+
+    errors : {'strict', 'warn', 'ignore'}, optional
+        The error handling scheme to use for handling parsing
+        errors. The default is 'strict', which will raise a
+        `~regions.DS9RegionParserError`. 'warn' will raise a
+        `~regions.DS9RegionParserWarning`, and 'ignore' will do nothing
+        (i.e., be silent).
+
+    cache : bool or 'update', optional
+        Whether to cache the contents of remote URLs. If 'update', check
+        the remote URL for a new version but store the result in the
+        cache.
+
+    Returns
+    -------
+    regions : list
+        A list of `~regions.Region` objects.
+    """
+    return _read_ds9(filename, errors=errors, cache=cache)
+
+
+@deprecated('0.5', alternative='`regions.Regions.parse`')
+class DS9Parser(_DS9Parser):
+    """
+    Parse a DS9 string.
+
+    This class transforms a DS9 string to a
+    `~regions.io.core.ShapeList`. The result is stored as ``shapes``
+    attribute.
+
+    Parameters
+    ----------
+    region_string : str
+        A DS9 region string.
+
+    errors : {'strict', 'warn', 'ignore'}, optional
+        The error handling scheme to use for handling parsing
+        errors. The default is 'strict', which will raise a
+        `~regions.DS9RegionParserError`. 'warn' will raise a
+        `~regions.DS9RegionParserWarning`, and 'ignore' will do nothing
+        (i.e., be silent).
+    """

@@ -34,6 +34,12 @@ New Features
 
 - Added ``get_values`` method to ``RegionMask``. [#351, #353]
 
+- Added a ``Regions`` class with a unified I/O interface for reading,
+  writing, parsing, and serializing regions. [#378]
+
+- Added ``serialize`` and ``write`` methods to all ``Region``
+  subclasses. [#378]
+
 Bug Fixes
 ---------
 
@@ -94,7 +100,19 @@ API Changes
 - The following helper functions were removed from the public API:
   ``to_shape_list``, ``to_crtf_meta``, ``to_ds9_meta``,
   ``CRTFRegionParser``, ``DS9RegionParser``, ``CoordinateParser``,
-  ``FITSRegionRowParser``. [#375]
+  and ``FITSRegionRowParser``. [#375]
+
+- Deprecated the following I/O classes and functions:
+  ``crtf_objects_to_string``, ``ds9_objects_to_string``,
+  ``fits_region_object_to_table``, ``read_crtf``, ``read_ds9``,
+  ``read_fits``, ``write_crtf``, ``write_ds9``, ``write_fits``,
+  ``CRTFParser``, ``DS9Parser``, ``FITSRegionParser``, ``ShapeList``,
+  and ``Shape``. The ``Regions`` and ``Region`` objects now support this
+  functionality via a unified I/O interface. [#378]
+
+- Existing ``ds9`` and ``crtf`` region files will not be overwritten
+  by default with the ``write`` functions. Set ``overwrite=True`` to
+  overwrite existing files. [#378]
 
 
 0.4 (2019-06-17)

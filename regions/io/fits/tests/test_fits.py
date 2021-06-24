@@ -12,11 +12,11 @@ from astropy.wcs import WCS
 from numpy.testing import assert_allclose
 import pytest
 
+from ....core import Regions
 from ....shapes import CircleSkyRegion
 from ...core import _to_shape_list
 from ..core import FITSRegionParserError
-from ..read import FITSRegionParser, read_fits
-from ..write import fits_region_objects_to_table
+from ..read import _FITSRegionParser
 
 implemented_region_types = ('ellipse', 'circle', 'box', 'polygon', 'point',
                             'annulus', 'elliptannulus')
@@ -26,7 +26,7 @@ implemented_region_types = ('ellipse', 'circle', 'box', 'polygon', 'point',
 def test_file_fits(filename):
     filename = get_pkg_data_filename(filename)
     table = Table.read(filename)
-    shapes = FITSRegionParser(table, 'warn').shapes
+    shapes = _FITSRegionParser(table, 'warn').shapes
 
     assert shapes[0].region_type == 'circle'
     assert shapes[1].region_type == 'rectangle'
@@ -50,9 +50,9 @@ def test_file_fits(filename):
         assert_allclose([val.value for val in shapes[x].coord[2:]],
                         list(table['R'][x][:2]) + [table['ROTANG'][x]])
 
-    regs = shapes.to_regions()
-    table_output = fits_region_objects_to_table(regs)
-    shape_output = FITSRegionParser(table_output).shapes
+    regs = Regions(shapes.to_regions())
+    table_output = regs.serialize(format='fits')
+    shape_output = _FITSRegionParser(table_output).shapes
 
     for i, shape in enumerate(shapes):
         assert shape.region_type == shape_output[i].region_type
@@ -61,7 +61,7 @@ def test_file_fits(filename):
 
     # Reading the regions directly from file and converting to sky
     # regions.
-    regs_sky = read_fits(filename)
+    regs_sky = Regions.read(filename, format='fits')
     with fits.open(filename) as hdulist:
         header = hdulist[1].header
         wcs = WCS(header, keysel=['image', 'binary', 'pixel'])
@@ -75,9 +75,10 @@ def test_file_fits(filename):
 
 def test_only_pixel_regions():
     reg_sky = CircleSkyRegion(SkyCoord(1, 2, unit='deg'), 5 * u.deg)
+    reg = Regions([reg_sky])
 
     with pytest.raises(TypeError) as excinfo:
-        fits_region_objects_to_table([reg_sky])
+        reg.serialize(format='fits')
 
     estr = 'Every region must be a pixel region'
     assert estr in str(excinfo.value)
@@ -87,7 +88,7 @@ def test_valid_columns():
     t = Table([[1, 2, 3]], names=('a'))
 
     with pytest.raises(FITSRegionParserError) as excinfo:
-        FITSRegionParser(t)
+        Regions.parse(t, format='fits')
 
     estr = 'This table has an invalid column name: "a"'
     assert estr in str(excinfo.value)
@@ -102,7 +103,7 @@ def test_valid_row():
     t['Y'].unit = 'pix'
 
     with pytest.raises(FITSRegionParserError) as excinfo:
-        FITSRegionParser(t)
+        Regions.parse(t, format='fits')
 
     estr = 'The column "R" is missing in the table'
     assert estr in str(excinfo.value)
@@ -110,7 +111,7 @@ def test_valid_row():
     t[0]['SHAPE'] = 'PONT'
 
     with pytest.raises(FITSRegionParserError) as excinfo:
-        FITSRegionParser(t)
+        Regions.parse(t, format='fits')
 
     estr = '"PONT" is not a valid FITS Region type'
     assert estr in str(excinfo.value)
@@ -120,7 +121,7 @@ def test_valid_row():
     t[0]['SHAPE'] = 'PIE'
 
     with pytest.raises(FITSRegionParserError) as excinfo:
-        FITSRegionParser(t)
+        Regions.parse(t, format='fits')
 
     estr = '"PIE" is currently not supported'
     assert estr in str(excinfo.value)
