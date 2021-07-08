@@ -292,3 +292,16 @@ def test_angle_serialization():
     expected = ('# Region file format: DS9 astropy/regions\nfk5\n'
                 'circle(10.000009,20.000002,0.000278)\n')
     assert regstr == expected
+
+
+def test_semicolon():
+    """
+    Regression test for issue #238 to allow semicolons in the text
+    field.
+    """
+    regstr = ('galactic\n'
+              'circle(0.003, 0.1, 206.696") # text={S17; test} color=red\n'
+              'circle(0.1, -0.5, 360.148") # text={S19} color=red')
+
+    reg = Regions.parse(regstr, format='ds9')
+    assert len(reg) == 2

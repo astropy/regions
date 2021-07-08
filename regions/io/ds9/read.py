@@ -217,7 +217,9 @@ class _DS9Parser:
         Run all the steps.
         """
         for line_ in self.region_string.split('\n'):
-            for line in line_.split(';'):
+            # split on all semicolons, except those between {} braces
+            # (ds9 text strings)
+            for line in re.split(r';+(?=[^{}]*(?:\{|$))', line_):
                 self.parse_line(line)
 
     def parse_line(self, line):
