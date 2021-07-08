@@ -3,7 +3,7 @@ import operator as op
 
 import numpy as np
 
-from .attributes import CompoundRegionPix, CompoundRegionSky
+from .attributes import RegionType
 from .core import PixelRegion, SkyRegion
 from .mask import RegionMask
 from .metadata import RegionMeta, RegionVisual
@@ -32,8 +32,8 @@ class CompoundPixelRegion(PixelRegion):
     """
 
     _params = ('region1', 'region2', 'operator')
-    region1 = CompoundRegionPix('region1')
-    region2 = CompoundRegionPix('region2')
+    region1 = RegionType('region1', PixelRegion)
+    region2 = RegionType('region2', PixelRegion)
 
     def __init__(self, region1, region2, operator, meta=None, visual=None):
         if not callable(operator):
@@ -207,8 +207,8 @@ class CompoundSkyRegion(SkyRegion):
     """
 
     _params = ('region1', 'region2', 'operator')
-    region1 = CompoundRegionSky('region1')
-    region2 = CompoundRegionSky('region2')
+    region1 = RegionType('region1', SkyRegion)
+    region2 = RegionType('region2', SkyRegion)
 
     def __init__(self, region1, region2, operator, meta=None, visual=None):
         if not callable(operator):
