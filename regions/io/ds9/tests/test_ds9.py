@@ -279,3 +279,16 @@ def test_text_metadata():
     assert regions[0].meta['text'] == 'this_is_text'
     assert regions[0].meta['label'] == 'this_is_text'
     assert regions[0].meta['text'] == 'this_is_text'
+
+
+def test_angle_serialization():
+    """
+    Regression test for issue #223 to ensure Angle arcsec inputs are
+    correctly converted to degrees.
+    """
+    reg = Regions([CircleSkyRegion(SkyCoord(10,20, unit='deg'),
+                                   Angle(1, 'arcsec'))])
+    regstr = reg.serialize(format='ds9')
+    expected = ('# Region file format: DS9 astropy/regions\nfk5\n'
+                'circle(10.000009,20.000002,0.000278)\n')
+    assert regstr == expected

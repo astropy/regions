@@ -82,6 +82,9 @@ Bug Fixes
 - Fixed an issue where DS9 annulus regions with more than one annulus
   would not be parsed correctly. Such regions are skipped for now. [#371]
 
+- Fixed an issue where ``Angle`` values for ``SkyRegion`` shape
+  parameters could be incorrectly serialized. [#380]
+
 
 API Changes
 -----------
