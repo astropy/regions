@@ -286,7 +286,7 @@ def test_angle_serialization():
     Regression test for issue #223 to ensure Angle arcsec inputs are
     correctly converted to degrees.
     """
-    reg = Regions([CircleSkyRegion(SkyCoord(10,20, unit='deg'),
+    reg = Regions([CircleSkyRegion(SkyCoord(10, 20, unit='deg'),
                                    Angle(1, 'arcsec'))])
     regstr = reg.serialize(format='ds9')
     expected = ('# Region file format: DS9 astropy/regions\nfk5\n'
@@ -305,3 +305,21 @@ def test_semicolon():
 
     reg = Regions.parse(regstr, format='ds9')
     assert len(reg) == 2
+
+
+def test_parser_no_metadata():
+    """
+    Regression test for issue #259 to ensure regions without metadata
+    are parsed correctly.
+    """
+    regstr1 = 'galactic;circle(42,43,3)'
+    regstr2 = 'galactic;circle 42 43 3'
+    reg1 = Regions.parse(regstr1, format='ds9')[0]
+    reg2 = Regions.parse(regstr2, format='ds9')[0]
+
+    assert isinstance(reg1, CircleSkyRegion)
+    assert isinstance(reg2, CircleSkyRegion)
+    assert reg1.radius.value == 3.0
+    assert reg2.radius.value == 3.0
+    assert reg1.radius.unit == 'deg'
+    assert reg2.radius.unit == 'deg'
