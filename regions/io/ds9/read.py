@@ -447,17 +447,17 @@ class _DS9RegionParser:
         """
         Split line into coordinates and meta string.
         """
-        # coordinate of the # symbol or end of the line (-1) if not found
-        hash_or_end = self.line.find('#')
-        temp = self.line[self.region_end:hash_or_end].strip(' |')
+        # index of the # symbol or end of the line (-1) if not found
+        hash_idx = self.line.find('#')
+        if hash_idx == -1:
+            temp = self.line[self.region_end:].strip(' |')
+            self.meta_str = ''  # no metadata found
+        else:
+            temp = self.line[self.region_end:hash_idx].strip(' |')
+            self.meta_str = self.line[hash_idx:]
+
         # force all coordinate names (circle, etc) to be lower-case
         self.coord_str = regex_paren.sub('', temp).lower()
-
-        # don't want any meta_str if there is no metadata found
-        if hash_or_end >= 0:
-            self.meta_str = self.line[hash_or_end:]
-        else:
-            self.meta_str = ''
 
     def convert_coordinates(self):
         """
