@@ -3,7 +3,7 @@
 Tests for the crtf subpackage.
 """
 
-from astropy.coordinates import SkyCoord
+from astropy.coordinates import Angle, SkyCoord
 import astropy.units as u
 from astropy.utils.data import get_pkg_data_filename
 import pytest
@@ -191,3 +191,16 @@ def test_casa_file_crtf():
     filename = get_pkg_data_filename('data/CRTF_CARTA.crtf')
     regions = Regions.read(filename, format='crtf')
     assert len(regions) == 2
+
+
+def test_angle_serialization():
+    """
+    Regression test for issue #223 to ensure Angle arcsec inputs are
+    correctly converted to degrees.
+    """
+    reg = Regions([CircleSkyRegion(SkyCoord(10,20, unit='deg'),
+                                   Angle(1, 'arcsec'))])
+    regstr = reg.serialize(format='crtf')
+    expected = ('#CRTFv0\nglobal coord=J2000\ncircle[[10.000009deg, '
+                '20.000002deg], 0.000278deg]\n')
+    assert regstr == expected
