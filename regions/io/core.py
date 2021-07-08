@@ -782,7 +782,11 @@ def _to_shape_list(region_list, coordinate_system='fk5'):
 
         new_coord = []
         for val in coord:
-            if isinstance(val, (Angle, u.Quantity, numbers.Number)):
+            if isinstance(val, Angle):
+                # convert Angle to Quantity; Angle values get units
+                # stripped in serialization, but Quantity gets converted
+                new_coord.append(u.Quantity(val))
+            elif isinstance(val, (u.Quantity, numbers.Number)):
                 new_coord.append(val)
             elif isinstance(val, PixCoord):
                 new_coord.append(u.Quantity(val.x, u.dimensionless_unscaled))
