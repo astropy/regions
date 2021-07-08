@@ -85,6 +85,9 @@ Bug Fixes
 - Fixed an issue where ``Angle`` values for ``SkyRegion`` shape
   parameters could be incorrectly serialized. [#380]
 
+- Fixed an issue where a semicolon in the DS9 text field would raise an
+  error. [#381]
+
 
 API Changes
 -----------
