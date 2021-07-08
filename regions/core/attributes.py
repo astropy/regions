@@ -10,7 +10,6 @@ from astropy.coordinates import SkyCoord
 from astropy.units import Quantity
 import numpy as np
 
-from .core import PixelRegion, SkyRegion
 from .pixcoord import PixCoord
 
 __all__ = []
@@ -117,23 +116,16 @@ class QuantityLength(RegionAttr):
                              'Quantity object')
 
 
-class CompoundRegionPix(RegionAttr):
+class RegionType(RegionAttr):
     """
-    Descriptor class for `~regions.CompoundPixelRegion`, which takes a
-    `~regions.PixelRegion` object.
+    Descriptor class for compound pixel and sky regions.
     """
+
+    def __init__(self, name, regionclass):
+        self.name = name
+        self.regionclass = regionclass
 
     def _validate(self, value):
-        if not isinstance(value, PixelRegion):
-            raise ValueError(f'The {self.name} must be a PixelRegion object')
-
-
-class CompoundRegionSky(RegionAttr):
-    """
-    Descriptor class for `~regions.CompoundSkyRegion`, which takes a
-    `~regions.SkyRegion` object.
-    """
-
-    def _validate(self, value):
-        if not isinstance(value, SkyRegion):
-            raise ValueError(f'The {self.name} must be a SkyRegion object')
+        if not isinstance(value, self.regionclass):
+            raise ValueError(f'The {self.name} must be a '
+                             f'{self.regionclass.__name__} object')
