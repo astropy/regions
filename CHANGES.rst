@@ -86,7 +86,7 @@ Bug Fixes
   parameters could be incorrectly serialized. [#380]
 
 - Fixed an issue where a semicolon in the DS9 text field would raise an
-  error. [#381]
+  error. [#381,#383]
 
 - Fixed an issue where DS9 regions without metadata would not be parsed
   correctly. [#382]
