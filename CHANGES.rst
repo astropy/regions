@@ -88,6 +88,8 @@ Bug Fixes
 - Fixed an issue where a semicolon in the DS9 text field would raise an
   error. [#381]
 
+- Fixed an issue where DS9 regions without metadata would not be parsed
+  correctly. [#382]
 
 API Changes
 -----------
