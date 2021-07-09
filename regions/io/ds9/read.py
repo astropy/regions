@@ -10,7 +10,6 @@ from astropy.coordinates import Angle, frame_transform_graph
 import astropy.units as u
 from astropy.utils.data import get_readable_fileobj
 from astropy.utils.decorators import deprecated
-import numpy as np
 
 from ...core import Regions
 from ...core.registry import RegionsRegistry
@@ -539,74 +538,68 @@ class _DS9RegionParser:
                             composite=self.composite, include=self.include)
 
 
-def _splitkeep(in_str, delimiter='text'):
-    """
-    Split a string at the delimiter, but keep the delimiter and the
-    start of the split strings.
-    """
-    split = in_str.split(delimiter)
-    return [split[0]] + [delimiter + substr for substr in split[1:]]
-
-
-def _find_text_delim_idx(line, delimiter='text'):
+def _find_text_delim_idx(regstr):
     """
     Find the indices of the DS9 text field delimiters ({}, '', or "") in
     a string.
-
-    Note that the input line must contain only one text field.
     """
-    start_idx = line.find(delimiter)
-    if start_idx == -1:
-        return -1, -1
-    start_idx += len(delimiter)
-    idx = np.array([line.find(char, start_idx) for char in ('{', '"', "'")])
-    if np.max(idx) == -1:
-        return -1, -1
-    start_idx = np.min(idx[idx > 0])
-    text_delim = line[start_idx]
-    if text_delim == '{':
-        text_delim = '}'  # closing delimiter
-    end_idx = line.find(text_delim, start_idx + 1)
-    return start_idx, end_idx
+    pattern = re.compile(r'(text\s*=\s*[{\'"])')
+    idx0 = []
+    delim = []
+    start_idx = []
+    for match in pattern.finditer(regstr):
+        idx0.append(match.start())
+        end_delim = match.group()[-1]
+        if end_delim == '{':
+            end_delim = '}'
+        delim.append(end_delim)
+        start_idx.append(match.span()[1])
+
+    idx1 = []
+    for sidx, char in zip(start_idx, delim):
+        idx1.append(regstr.find(char, sidx))
+
+    return idx0, idx1
 
 
-def _split_semicolon(region_str, delimiter='text'):
-    """
+def _split_semicolon(regstr):
+    r"""
     Split a DS9 region string on semicolons.  The line is not split on
     semicolons found in a text field.
+
+    This turned out to be a very trickly problem (attempts with regex failed)
+      * text fields are delimited by {}, '', or ""
+      * the text delimiters do not have to be consistent within a file
+      * region strings can have unpaired ' (arcmin) or " (arcsec)
+      * region strings can have "#" in a color value (cannot split on #)
+      * the text field can contain "text={str}", "text='str'",
+        'test="str"' etc., e.g., text={text="hello"}
+      * the delimiter characters (escaped or not) used by the text field
+        are not allowed within the text field, e.g., "text={my
+        field\{test\}}" and "text='my field \'test\''" are invalid.
+        However, "text={my field, 'test'}" is valid
+
+    This code finds the text field delimiters and then finds the indices
+    of the opening and closing delimiters. Text fields that contain
+    "text={str}", etc. are included (as a smaller range between the
+    larger text field range), but this is fine because all we need are
+    index ranges where to exclude semicolons (for splitting). Semicolons
+    found at indices between the open/close delimiter indices are
+    excluded from splitting.
     """
-    lines = _splitkeep(region_str, delimiter)
+    idx0, idx1 = _find_text_delim_idx(regstr)
 
-    # find the line lengths (to calculate absolute indexing)
-    linelens = []
-    for line in lines:
-        linelens.append(len(line))
-    lineidx = np.cumsum(linelens)[:-1]
-
-    # find the absolute indicies of the start and end of the text fields
-    idx0 = []
-    idx1 = []
-    for line in lines:
-        tmp0, tmp1 = _find_text_delim_idx(line)
-        if tmp0 != -1 and tmp1 != -1:
-            idx0.append(tmp0)
-            idx1.append(tmp1)
-    idx0 = np.array(idx0) + lineidx
-    idx1 = np.array(idx1) + lineidx
-
-    # find the indicies of all semicolons that are not in a text field
-    semi_idx = [pos for pos, char in enumerate(region_str) if char == ';']
+    semi_idx = [pos for pos, char in enumerate(regstr) if char == ';']
     fidx = []
     for i in semi_idx:
         for i0, i1 in zip(idx0, idx1):
-            if i0 <= i <= i1:
+            if i >= i0 and i <= i1:
                 break
-        else:  # did not break
+        else:
             fidx.append(i + 1)
+    fidx.insert(0, 0)
 
-    fidx.insert(0, 0)  # start of region_str
-    return [region_str[i:j].rstrip(';')
-            for i, j in zip(fidx, fidx[1:] + [None])]
+    return [regstr[i:j].rstrip(';') for i, j in zip(fidx, fidx[1:] + [None])]
 
 
 @deprecated('0.5', alternative='`regions.Regions.read`')
