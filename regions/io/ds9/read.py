@@ -10,6 +10,7 @@ from astropy.coordinates import Angle, frame_transform_graph
 import astropy.units as u
 from astropy.utils.data import get_readable_fileobj
 from astropy.utils.decorators import deprecated
+import numpy as np
 
 from ...core import Regions
 from ...core.registry import RegionsRegistry
@@ -219,7 +220,7 @@ class _DS9Parser:
         for line_ in self.region_string.split('\n'):
             # split on all semicolons, except those between {} braces
             # (ds9 text strings)
-            for line in re.split(r';+(?=[^{}]*(?:\{|$))', line_):
+            for line in _split_semicolon(line_):
                 self.parse_line(line)
 
     def parse_line(self, line):
@@ -536,6 +537,76 @@ class _DS9RegionParser:
                             region_type=reg_mapping['DS9'][self.region_type],
                             coord=self.coord, meta=self.meta,
                             composite=self.composite, include=self.include)
+
+
+def _splitkeep(in_str, delimiter='text'):
+    """
+    Split a string at the delimiter, but keep the delimiter and the
+    start of the split strings.
+    """
+    split = in_str.split(delimiter)
+    return [split[0]] + [delimiter + substr for substr in split[1:]]
+
+
+def _find_text_delim_idx(line, delimiter='text'):
+    """
+    Find the indices of the DS9 text field delimiters ({}, '', or "") in
+    a string.
+
+    Note that the input line must contain only one text field.
+    """
+    start_idx = line.find(delimiter)
+    if start_idx == -1:
+        return -1, -1
+    start_idx += len(delimiter)
+    idx = np.array([line.find(char, start_idx) for char in ('{', '"', "'")])
+    if np.max(idx) == -1:
+        return -1, -1
+    start_idx = np.min(idx[idx > 0])
+    text_delim = line[start_idx]
+    if text_delim == '{':
+        text_delim = '}'  # closing delimiter
+    end_idx = line.find(text_delim, start_idx + 1)
+    return start_idx, end_idx
+
+
+def _split_semicolon(region_str, delimiter='text'):
+    """
+    Split a DS9 region string on semicolons.  The line is not split on
+    semicolons found in a text field.
+    """
+    lines = _splitkeep(region_str, delimiter)
+
+    # find the line lengths (to calculate absolute indexing)
+    linelens = []
+    for line in lines:
+        linelens.append(len(line))
+    lineidx = np.cumsum(linelens)[:-1]
+
+    # find the absolute indicies of the start and end of the text fields
+    idx0 = []
+    idx1 = []
+    for line in lines:
+        tmp0, tmp1 = _find_text_delim_idx(line)
+        if tmp0 != -1 and tmp1 != -1:
+            idx0.append(tmp0)
+            idx1.append(tmp1)
+    idx0 = np.array(idx0) + lineidx
+    idx1 = np.array(idx1) + lineidx
+
+    # find the indicies of all semicolons that are not in a text field
+    semi_idx = [pos for pos, char in enumerate(region_str) if char == ';']
+    fidx = []
+    for i in semi_idx:
+        for i0, i1 in zip(idx0, idx1):
+            if i0 <= i <= i1:
+                break
+        else:  # did not break
+            fidx.append(i + 1)
+
+    fidx.insert(0, 0)  # start of region_str
+    return [region_str[i:j].rstrip(';')
+            for i, j in zip(fidx, fidx[1:] + [None])]
 
 
 @deprecated('0.5', alternative='`regions.Regions.read`')
