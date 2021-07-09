@@ -306,6 +306,34 @@ def test_semicolon():
     reg = Regions.parse(regstr, format='ds9')
     assert len(reg) == 2
 
+    regstr = ('galactic;'
+              'circle(202.4,47.2,10.9) # text={test; test; A1} color=red;'
+              'circle(103.8,40.6,3.6) # text="A, \'B\', ; {C}, D"'
+              ' color=orange;'
+              'circle(103.8,30.6,3.6) # text="A, \'B, ; C}, D" color=orange;'
+              'circle(303.8,40.6,3.6) # text=\'A, "B", ; {C}, D\' color=cyan;'
+              'circle(303.8,40.6,3.11);'
+              'circle(303.8,30.6,3.6) # text=\'A, "B, ; {C, D\' color=cyan;'
+              'circle(503.8,40.6,3.6) # text={A, "B", ; \'C\', D}'
+              ' color=yellow\n'
+              'circle(503.8,30.6,3.6) # text={A, "B, ; \'C, D} color=yellow;'
+              '-ellipse(104.84,68.55,7.93",3.96",158.39) # dashlist=8 3'
+              ' select=1 highlite=1 dash=0 fixed=0 edit=1 move=1 delete=1'
+              ' source=1 text={Ellipse;Text} background color=#0ff width=1'
+              ' font="helvetica 10 normal italic";'
+              "ellipse(104.84,68.55,7.93',3.96',158.39) # dashlist=8 3"
+              ' text="hello; world;";'
+              'circle(1.5, 2, 2) # text={this_is_text};'
+              'text(151.1,51.2) # text={text ; hi ; there;} textangle=45'
+              ' color=orange font="helvetica 12 normal roman";'
+              'text(151.1,51.2) # text=  {text ; hi ; there;} textangle=45'
+              ' color=orange font="helvetica 12 normal roman";'
+              'circle(1.5, 2, 2) # text={text="hi;world";text;"tes\'t};'
+              "circle(1.5, 2, 2) # text={text='hi;world';text;\"tes't};")
+
+    reg = Regions.parse(regstr, format='ds9')
+    assert len(reg) == 15
+
 
 def test_parser_no_metadata():
     """
