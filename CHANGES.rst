@@ -23,9 +23,6 @@ New Features
   pixel-based regions. This method returns an interactive Matplotlib
   selector widget. [#317]
 
-- Added a unified read-write interface for all region formats, inspired
-  by and using the same infrastructure as astropy.table. [#307]
-
 - Added a ``get_overlap_slices`` method to ``BoundingBox``. [#348]
 
 - Added a ``center`` attribute to ``BoundingBox``. [#348]
@@ -74,7 +71,8 @@ Bug Fixes
 - Fixed parsing CRTF regions files that do not have a comma after the
   region. [#364]
 
-- Fixed parsing CRTF regions files contain a ``symthick`` value. [#365]
+- Fixed parsing CRTF regions files that contain a ``symthick`` value.
+  [#365]
 
 - Fixed an issue where ``PointPixelRegion`` objects would not plot.
   [#366]
