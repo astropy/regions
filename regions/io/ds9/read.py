@@ -219,7 +219,7 @@ class _DS9Parser:
         for line_ in self.region_string.split('\n'):
             # split on all semicolons, except those between {} braces
             # (ds9 text strings)
-            for line in re.split(r';+(?=[^{}]*(?:\{|$))', line_):
+            for line in _split_semicolon(line_):
                 self.parse_line(line)
 
     def parse_line(self, line):
@@ -536,6 +536,70 @@ class _DS9RegionParser:
                             region_type=reg_mapping['DS9'][self.region_type],
                             coord=self.coord, meta=self.meta,
                             composite=self.composite, include=self.include)
+
+
+def _find_text_delim_idx(regstr):
+    """
+    Find the indices of the DS9 text field delimiters ({}, '', or "") in
+    a string.
+    """
+    pattern = re.compile(r'(text\s*=\s*[{\'"])')
+    idx0 = []
+    delim = []
+    start_idx = []
+    for match in pattern.finditer(regstr):
+        idx0.append(match.start())
+        end_delim = match.group()[-1]
+        if end_delim == '{':
+            end_delim = '}'
+        delim.append(end_delim)
+        start_idx.append(match.span()[1])
+
+    idx1 = []
+    for sidx, char in zip(start_idx, delim):
+        idx1.append(regstr.find(char, sidx))
+
+    return idx0, idx1
+
+
+def _split_semicolon(regstr):
+    r"""
+    Split a DS9 region string on semicolons.  The line is not split on
+    semicolons found in a text field.
+
+    This turned out to be a very trickly problem (attempts with regex failed)
+      * text fields are delimited by {}, '', or ""
+      * the text delimiters do not have to be consistent within a file
+      * region strings can have unpaired ' (arcmin) or " (arcsec)
+      * region strings can have "#" in a color value (cannot split on #)
+      * the text field can contain "text={str}", "text='str'",
+        'test="str"' etc., e.g., text={text="hello"}
+      * the delimiter characters (escaped or not) used by the text field
+        are not allowed within the text field, e.g., "text={my
+        field\{test\}}" and "text='my field \'test\''" are invalid.
+        However, "text={my field, 'test'}" is valid
+
+    This code finds the text field delimiters and then finds the indices
+    of the opening and closing delimiters. Text fields that contain
+    "text={str}", etc. are included (as a smaller range between the
+    larger text field range), but this is fine because all we need are
+    index ranges where to exclude semicolons (for splitting). Semicolons
+    found at indices between the open/close delimiter indices are
+    excluded from splitting.
+    """
+    idx0, idx1 = _find_text_delim_idx(regstr)
+
+    semi_idx = [pos for pos, char in enumerate(regstr) if char == ';']
+    fidx = []
+    for i in semi_idx:
+        for i0, i1 in zip(idx0, idx1):
+            if i >= i0 and i <= i1:
+                break
+        else:
+            fidx.append(i + 1)
+    fidx.insert(0, 0)
+
+    return [regstr[i:j].rstrip(';') for i, j in zip(fidx, fidx[1:] + [None])]
 
 
 @deprecated('0.5', alternative='`regions.Regions.read`')
