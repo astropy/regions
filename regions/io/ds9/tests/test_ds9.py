@@ -326,7 +326,7 @@ def test_semicolon():
               'circle(1.5, 2, 2) # text={this_is_text};'
               'text(151.1,51.2) # text={text ; hi ; there;} textangle=45'
               ' color=orange font="helvetica 12 normal roman";'
-              'text(151.1,51.2) # text=  {text ; hi ; there;} textangle=45'
+              'text(151.1,51.2) # text  =  {text ; hi ; there;} textangle=45'
               ' color=orange font="helvetica 12 normal roman";'
               'circle(1.5, 2, 2) # text={text="hi;world";text;"tes\'t};'
               "circle(1.5, 2, 2) # text={text='hi;world';text;\"tes't};")
@@ -351,3 +351,36 @@ def test_parser_no_metadata():
     assert reg2.radius.value == 3.0
     assert reg1.radius.unit == 'deg'
     assert reg2.radius.unit == 'deg'
+
+
+def test_spaces_metadata():
+    """
+    Regression test for spaces before or after "=" in region metadata.
+    """
+    regstr = ('galactic;'
+              'circle(202.4,47.2,10.9) # text={a; test; test; A1} color=red;'
+              'circle(202.4,47.2,10.9) # text ={a; test; test; A1} color= red;'
+              'circle(202.4,47.2,10.9) # text= {a; test; test; A1} color =red;'
+              'circle(202.4,47.2,10.9) # text = {a; test; test; A1}'
+              ' color = red;')
+    reg = Regions.parse(regstr, format='ds9')
+    assert len(reg) == 4
+    for i in range(1, len(reg)):
+        assert reg[0].visual == reg[i].visual
+        assert reg[0].meta == reg[i].meta
+
+    regstr2 = ('galactic;'
+               'text(151.1,51.2) # text={text ; hi ; there;} textangle= 45'
+               ' color=orange font="helvetica 12 normal roman";'
+               'text(151.1,51.2) # text  ={text ; hi ; there;} textangle =45'
+               ' color=orange font="helvetica 12 normal roman";'
+               'text(151.1,51.2) # text=  {text ; hi ; there;} textangle  =45'
+               ' color   =   orange font="helvetica 12 normal roman";'
+               'text(151.1,51.2) # text   =  {text ; hi ; there;} textangle=45'
+               ' color   =orange font="helvetica 12 normal roman";')
+
+    reg = Regions.parse(regstr2, format='ds9')
+    assert len(reg) == 4
+    for i in range(1, len(reg)):
+        assert reg[0].visual == reg[i].visual
+        assert reg[0].meta == reg[i].meta

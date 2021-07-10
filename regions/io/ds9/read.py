@@ -23,7 +23,7 @@ __all__ = ['read_ds9', 'DS9Parser']
 regex_global = re.compile('^#? *(-?)([a-zA-Z0-9]+)')
 
 # Regular expression to extract meta attributes
-regex_meta = re.compile(r'([a-zA-Z]+)(=)({.*?}|\'.*?\'|\".*?\"|[0-9\s]+\s?|[^=\s]+\s?[0-9]*)\s?')  # noqa
+regex_meta = re.compile(r'([a-zA-Z]+)(\s*)(=)(\s*)({.*?}|\'.*?\'|\".*?\"|[0-9\s]+\s?|[^=\s]+\s?[0-9]*)\s?')
 
 # Regular expression to strip parenthesis
 regex_paren = re.compile('[()]')
@@ -293,7 +293,7 @@ class _DS9Parser:
             A dictionary containing the metadata.
         """
         # keys must be lower-casae, but data can be any case
-        keys_vals = [(x.lower(), y) for x, _, y
+        keys_vals = [(x.lower(), y) for x, _, _, _, y
                      in regex_meta.findall(meta_str.strip())]
         extra_text = regex_meta.split(meta_str.strip())[-1]
         result = {}

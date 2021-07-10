@@ -91,6 +91,8 @@ Bug Fixes
 - Fixed an issue where DS9 regions without metadata would not be parsed
   correctly. [#382]
 
+- Fixed an issue parsing spaces in DS9 region metadata. [#384]
+
 API Changes
 -----------
 
