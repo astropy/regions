@@ -19,7 +19,7 @@ from .core import (DS9RegionParserError, DS9RegionParserWarning,
 
 __all__ = ['read_ds9', 'DS9Parser']
 
-# Regular expression to extract region type or coodinate system
+# Regular expression to extract region type or coordinate system
 regex_global = re.compile('^#? *(-?)([a-zA-Z0-9]+)')
 
 # Regular expression to extract meta attributes
@@ -292,7 +292,7 @@ class _DS9Parser:
         meta : dict
             A dictionary containing the metadata.
         """
-        # keys must be lower-casae, but data can be any case
+        # keys must be lower-case, but data can be any case
         keys_vals = [(x.lower(), y) for x, _, _, _, y
                      in regex_meta.findall(meta_str.strip())]
         extra_text = regex_meta.split(meta_str.strip())[-1]
