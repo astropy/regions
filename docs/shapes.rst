@@ -5,9 +5,8 @@
     >>> dataset = make_example_dataset(data='simulated')
     >>> wcs = dataset.wcs
 
-.. _sh:
 
-.. _sh-shapes:
+.. _shapes:
 
 Shapes
 ======
