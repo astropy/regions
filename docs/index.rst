@@ -31,6 +31,7 @@ Getting Started
    install
    getting_started
    contributing
+   license
    changelog
 
 
