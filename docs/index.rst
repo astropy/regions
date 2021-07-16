@@ -31,6 +31,7 @@ Getting Started
 
    installation
    getting_started
+   contributing
    changelog
 
 
@@ -56,56 +57,3 @@ User Documentation
 |   :width: 300px                        |   :width: 300px                    |
 |   :target:    _static/region_ds9.png   |                                    |
 +----------------------------------------+------------------------------------+
-
-
-Reporting Issues
-================
-
-If you have found a bug in Regions please report it by creating a
-new issue on the `Regions GitHub issue tracker
-<https://github.com/astropy/regions/issues>`_.
-
-Please include an example that demonstrates the issue that will allow
-the developers to reproduce and fix the problem. You may also be asked to
-provide information about your operating system and a full Python
-stack trace. The developers will walk you through obtaining a stack
-trace if it is necessary.
-
-Astropy Regions uses a package of utilities called `astropy-helpers
-<https://github.com/astropy/astropy-helpers>`_ during building and
-installation. If you have any build or installation issue mentioning
-the ``astropy_helpers`` or ``ah_bootstrap`` modules please send a
-report to the `astropy-helpers issue tracker
-<https://github.com/astropy/astropy-helpers/issues>`_. If you are
-unsure, then it's fine to report to the main Regions issue tracker.
-
-
-Contributing
-============
-
-Like the `Astropy`_ project, Regions is made both by and for its
-users. We accept contributions at all levels, spanning the gamut from
-fixing a typo in the documentation to developing a major new feature.
-We welcome contributors who will abide by the `Python Software
-Foundation Code of Conduct
-<https://www.python.org/psf/conduct/>`_.
-If you have a feature request or would like to contribute to ``regions``,
-please go here: https://github.com/astropy/regions/
-
-Regions follows the same workflow and coding guidelines as
-`Astropy`_. The following pages will help you get started with
-contributing fixes, code, or documentation (no git or GitHub
-experience necessary):
-
-* `How to make a code contribution <https://docs.astropy.org/en/latest/development/workflow/development_workflow.html>`_
-
-* `Coding Guidelines <https://docs.astropy.org/en/latest/development/codeguide.html>`_
-
-* `Developer Documentation <https://docs.astropy.org/en/latest/#developer-documentation>`_
-
-
-Get Help
-========
-
-Besides github, you can `get help`_ from the community in a number of ways.
-There is also a slack channel for regions hosted under the main astropy slack.
