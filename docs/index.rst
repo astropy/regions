@@ -1,12 +1,5 @@
 .. include:: references.txt
 
-.. warning::
-    This ``regions`` package is in a very early stage of development.
-    It is neither feature complete nor API stable!
-    That said, please have a look and try to use it for your applications.
-    Feedback and contributions are welcome!
-
-
 ###############
 Astropy Regions
 ###############
@@ -21,6 +14,12 @@ package.
 
 * Code : `GitHub repository`_
 * Contributors : https://github.com/astropy/regions/graphs/contributors
+
+.. warning::
+    This ``regions`` package is in an early stage of development. It
+    is neither feature complete nor API stable. That said, please
+    have a look and try to use it for your applications. Feedback and
+    contributions are welcome!
 
 
 Getting Started
