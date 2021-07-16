@@ -7,21 +7,32 @@
     Feedback and contributions are welcome!
 
 
-#############################
-Astropy Regions Documentation
-#############################
+###############
+Astropy Regions
+###############
 
-This is an in-development `affiliated package`_ of `Astropy`_ for region handling.
+**Regions** is an in-development `coordinated package`_ of `Astropy`_
+for region handling.
 
-To get an overview of available features, see :ref:`gs`.
+To get an overview of available features, see :ref:`getting_started`.
 
-The goal is to merge the functionality from `pyregion`_ and `photutils`_ apertures
-and then after some time propose this package for inclusion in the Astropy core.
+The eventual goal is to merge this package into the Astropy core
+package.
 
-* Code : `Github repository`_
-* Docs : `Region documentation`_
+* Code : `GitHub repository`_
 * Contributors : https://github.com/astropy/regions/graphs/contributors
-* Releases: https://pypi.org/project/regions
+
+
+Getting Started
+===============
+
+.. toctree::
+   :maxdepth: 1
+
+   installation
+   getting_started
+   changelog
+
 
 User Documentation
 ==================
@@ -29,8 +40,6 @@ User Documentation
 .. toctree::
    :maxdepth: 1
 
-   installation
-   getting_started
    shapes
    contains
    compound
@@ -38,24 +47,16 @@ User Documentation
    plotting
    region_io
    shapely
-   changelog
-
-+----------------------------------------+----------------------------------------+
-| ds9                                    | regions + matplotlib                   |
-+========================================+========================================+
-| .. image::    _static/region_ds9.png   | .. plot:: plot_reg.py                  |
-|   :width: 300px                        |   :width: 300px                        |
-|   :target:    _static/region_ds9.png   |                                        |
-+----------------------------------------+----------------------------------------+
-
-Advanced
-========
-
-.. toctree::
-   :maxdepth: 1
-
    api
-   development
+
++----------------------------------------+------------------------------------+
+| ds9                                    | regions + matplotlib               |
++========================================+====================================+
+| .. image::    _static/region_ds9.png   | .. plot:: plot_reg.py              |
+|   :width: 300px                        |   :width: 300px                    |
+|   :target:    _static/region_ds9.png   |                                    |
++----------------------------------------+------------------------------------+
+
 
 Reporting Issues
 ================

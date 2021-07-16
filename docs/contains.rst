@@ -8,7 +8,8 @@
 Checking for points inside regions
 ==================================
 
-Let's continue with sky and pixel regions defined in the :ref:`gs` section:
+Let's continue with sky and pixel regions defined in the
+:ref:`getting_started` section:
 
 .. code-block:: python
 

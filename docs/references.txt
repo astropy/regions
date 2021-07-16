@@ -5,5 +5,4 @@
 .. _shapely: https://shapely.readthedocs.io/en/latest/
 .. _Github repository: https://github.com/astropy/regions
 .. _Region documentation: https://astropy-regions.readthedocs.io/en/latest/
-.. _affiliated package: https://www.astropy.org/affiliated/index.html
-.. _get help: https://www.astropy.org/help.html
+.. _coordinated package: https://www.astropy.org/affiliated/index.html#coordinated-packages
