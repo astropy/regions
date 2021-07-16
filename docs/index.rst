@@ -28,7 +28,7 @@ Getting Started
 .. toctree::
    :maxdepth: 1
 
-   installation
+   install
    getting_started
    contributing
    changelog
