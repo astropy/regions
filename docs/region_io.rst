@@ -7,13 +7,14 @@ The regions package provides a unified interface for reading, writing,
 parsing, and serializing regions data in different formats.
 
 
-Getting Started with Regions I/O
-================================
+Regions I/O
+===========
 
-The `~regions.Regions` class includes four methods,
+The `~regions.Regions` class (which represents a list
+of `~regions.Region` objects) includes four methods,
 :meth:`~regions.Regions.read`, :meth:`~regions.Regions.write`,
 :meth:`~regions.Regions.parse`, and :meth:`~regions.Regions.serialize`,
-that make is possible to read, write, parse, and serialize region files
+that make it possible to read, write, parse, and serialize region files
 or region data.
 
 The :class:`~regions.Regions` class has built-in support for various
@@ -41,11 +42,8 @@ registered I/O formats as a :class:`~astropy.table.Table`::
       fits   Yes       Yes  Yes   Yes           Yes
 
 
-Examples
---------
-
 Read
-^^^^
+----
 
 To read in a region file, first import the :class:`~regions.Regions`
 class, then call the :meth:`~regions.Regions.read` method with the name
@@ -82,7 +80,7 @@ uncompress them if supported by the Python installation (see
 
 
 Write
-^^^^^
+-----
 
 Use the :meth:`~regions.Regions.write` method to write regions to
 a region file. Like the :meth:`~regions.Regions.read` method, the
@@ -103,7 +101,7 @@ If the file already exists and you want to overwrite it, then set the
 
 
 Parse
-^^^^^
+-----
 
 Region data in the form of a string or table may also be
 parsed into a :class:`~regions.Regions` object by using the
@@ -122,7 +120,7 @@ parsed for the ``fits`` format::
 
 
 Serialize
-^^^^^^^^^
+---------
 
 Regions can be serialized to a string or table by using the
 :meth:`~regions.Regions.serialize` method. The ``format`` keyword must
