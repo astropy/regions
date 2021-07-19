@@ -28,8 +28,8 @@ class RegionMask:
 
     Examples
     --------
-    Usage examples are provided in the :ref:`gs-masks` section of the
-    docs.
+    Usage examples are provided in the :ref:`overlap-masks` section of
+    the docs.
     """
 
     def __init__(self, data, bbox):
