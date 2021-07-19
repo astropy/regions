@@ -34,8 +34,8 @@ class PixCoord:
 
     Examples
     --------
-    Usage examples are provided in the :ref:`gs-coord` section of the
-    docs.
+    Usage examples are provided in the :ref:`getting_started-coord`
+    section of the documentation.
     """
 
     def __init__(self, x, y):

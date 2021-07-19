@@ -1,6 +1,5 @@
 .. _changelog:
 
-
 **************
 Full Changelog
 **************
