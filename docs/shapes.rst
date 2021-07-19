@@ -171,7 +171,7 @@ Polygon
 
     >>> vertices = SkyCoord([1, 2, 2], [1, 1, 2], unit='deg', frame='fk5')
     >>> region_sky = PolygonSkyRegion(vertices=vertices)
-    >>> vertices = PixCoord(x=[1, 2, 2], y=[1, 1, 2]))
+    >>> vertices = PixCoord(x=[1, 2, 2], y=[1, 1, 2])
     >>> region_pix = PolygonPixelRegion(vertices=vertices)
 
 
@@ -271,8 +271,6 @@ to a :class:`~regions.SkyRegion`, call the
         (172.17231545, -38.27972337)>
     radius: 18.55481729935556 arcsec
 
-
-.. _sh-lists:
 
 Multiple Regions
 ----------------
