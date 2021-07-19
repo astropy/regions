@@ -34,7 +34,7 @@ class PixCoord:
 
     Examples
     --------
-    Usage examples are provided in the :ref:`getting-started-coord`
+    Usage examples are provided in the :ref:`getting_started-coord`
     section of the documentation.
     """
 

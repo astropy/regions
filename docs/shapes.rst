@@ -16,9 +16,6 @@ coordinates, representing shapes such as circles, ellipses, rectangles,
 polygons, lines, and points. There are also regions defining circular,
 elliptical, and rectangular annuli.
 
-There is also a `~regions.Regions` class that can hold a list of
-`~regions.Region` objects.
-
 
 Defining Shapes
 ---------------
@@ -295,13 +292,14 @@ This is in contrast to the aperture classes in `Photutils
     >>> apertures = CircularAperture(positions, r=4.2)
 
 To represent lists of `~regions.Region` objects, you can store them in
-Python lists (or other containers, but lists are the most common). To
-create many similar regions or process many regions you can use for
-loops or list comprehensions.
+Python lists or the `~regions.Regions` class, which effectly acts like a
+list of regions. To create many similar regions or process many regions
+you can use for loops or list comprehensions.
 
 .. code-block:: python
 
     >>> from regions import PixCoord, CirclePixelRegion
+    >>> from regions import Regions
     >>> regions = [CirclePixelRegion(center=PixCoord(x, y), radius=4.2)
     ...            for x, y in [(1, 2), (3, 4)]]
     >>> for region in regions:
@@ -310,3 +308,18 @@ loops or list comprehensions.
     PixCoord(x=3, y=4)
     >>> [region.area for region in regions]
     [55.41769440932395, 55.41769440932395]
+
+To create a `~regions.Regions` object, simply pass in a list of
+regions::
+
+    >>> regs = Regions(regions)
+    >>> print(regs[0])
+    Region: CirclePixelRegion
+    center: PixCoord(x=1, y=2)
+    radius: 4.2
+    >>> [reg.area for reg in regs]
+    [55.41769440932395, 55.41769440932395]
+
+The `~regions.Regions` class also provides a :ref:`unified interface for
+reading, writing, parsing, and serializing regions data <regions_io>` in
+different standard formats.

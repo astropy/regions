@@ -1,10 +1,10 @@
-.. _unified-io:
+.. _regions_io:
 
 Reading/Writing Region Files
 ****************************
 
 The regions package provides a unified interface for reading, writing,
-parsing, and serializing regions data in different formats.
+parsing, and serializing regions data in different standard formats.
 
 
 Regions I/O
