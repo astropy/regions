@@ -1,4 +1,4 @@
-Combining regions
+Combining Regions
 =================
 
 There are a few ways to combine any two `~regions.Region` objects

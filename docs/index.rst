@@ -42,6 +42,7 @@ User Documentation
    :maxdepth: 1
 
    shapes
+   metadata
    contains
    compound
    masks

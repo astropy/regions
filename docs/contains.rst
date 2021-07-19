@@ -1,4 +1,4 @@
-Checking for points inside regions
+Checking for Points Inside Regions
 ==================================
 
 Let's start by defining both a sky and pixel region::
