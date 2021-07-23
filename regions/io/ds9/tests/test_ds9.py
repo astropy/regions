@@ -411,6 +411,7 @@ def test_point_boxcircle():
     assert regions[2].as_artist().get_color() == 'green'
 
 
+@pytest.mark.skipif('not HAS_MATPLOTLIB')
 def test_compound_color():
     regstr = ('# Region file format: DS9 astropy/regions\n'
               'image\n'
