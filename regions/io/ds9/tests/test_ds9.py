@@ -409,3 +409,11 @@ def test_point_boxcircle():
     assert regions[1].as_artist().get_color() == 'blue'
     assert isinstance(regions[2].as_artist().get_marker(), mpath.Path)
     assert regions[2].as_artist().get_color() == 'green'
+
+
+def test_compound_color():
+    regstr = ('# Region file format: DS9 astropy/regions\n'
+              'image\n'
+              'annulus(651.0,301.0,60.0,90.0) # color=red')
+    regions = Regions.parse(regstr, format='ds9')
+    assert regions[0].as_artist().get_edgecolor() == (1., 0., 0., 1.)
