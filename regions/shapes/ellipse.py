@@ -206,7 +206,7 @@ class EllipsePixelRegion(PixelRegion):
         mpl_kwargs.update(kwargs)
 
         return Ellipse(xy=xy, width=width, height=height, angle=angle,
-                       **kwargs)
+                       **mpl_kwargs)
 
     def _update_from_mpl_selector(self, *args, **kwargs):
         xmin, xmax, ymin, ymax = self._mpl_selector.extents
