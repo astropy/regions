@@ -326,6 +326,8 @@ class PixelRegion(Region):
         Unset ``visual`` properties are set to default values based on
         the DS9 convention.
         """
+        from ..io.ds9.core import valid_symbols_ds9
+
         if artist not in ('Patch', 'Line2D', 'Text'):
             raise ValueError(f'artist "{artist}" is not supported')
 
@@ -344,7 +346,8 @@ class PixelRegion(Region):
             kwargs['linestyle'] = self.visual.get('linstyle', 'solid')
 
             if artist == 'Line2D':
-                kwargs['marker'] = self.visual.get('symbol', 'o')
+                boxcircle = valid_symbols_ds9['boxcircle']
+                kwargs['marker'] = self.visual.get('symbol', boxcircle)
                 kwargs['markersize'] = self.visual.get('symsize', 11)
                 kwargs['markeredgecolor'] = kwargs['color']
                 kwargs['markeredgewidth'] = self.visual.get('width', 1)
