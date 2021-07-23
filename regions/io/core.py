@@ -8,7 +8,6 @@ from astropy.coordinates import (Angle, SkyCoord, UnitSphericalRepresentation,
                                  frame_transform_graph)
 from astropy.table import Table
 import astropy.units as u
-from astropy.utils.decorators import deprecated
 import numpy as np
 
 from ..shapes import (CirclePixelRegion, CircleSkyRegion,
@@ -26,7 +25,7 @@ from ..core.metadata import RegionMeta, RegionVisual
 from .ds9.core import DS9RegionParserWarning, valid_symbols_ds9
 from .crtf.core import CRTFRegionParserWarning
 
-__all__ = ['ShapeList', 'Shape']
+__all__ = []
 
 regions_attributes = dict(circle=['center', 'radius'],
                           ellipse=['center', 'width', 'height', 'angle'],
@@ -907,39 +906,3 @@ def _to_io_meta(shape_meta, valid_keys, key_mappings):
             meta[key_mappings.get(key, key)] = shape_meta[key]
 
     return meta
-
-
-@deprecated('0.5', alternative='`regions.Regions`')
-class ShapeList(_ShapeList):
-    """
-    A class to hold a list of `~regions.Shape` objects.
-    """
-
-
-@deprecated('0.5', alternative='`regions.Region`')
-class Shape(_Shape):
-    """
-    Helper class to represent a DS9/CRTF Region.
-
-    This serves as intermediate step in the parsing process.
-
-    Parameters
-    ----------
-    coordsys : str
-        An Astropy Coordinate system frame used in the region.
-
-    region_type : str
-        The type of the region (as defined in this package).
-
-    coord : list of `~astropy.coordinates.Angle` or `~astropy.units.Quantity`
-        The region coordinates.
-
-    meta : dict
-        The meta attributes.
-
-    composite : bool
-        Flag indicting wheter the region is a Composite region.
-
-    include : bool
-        Flag indicating where to include or exclude the region.
-    """
