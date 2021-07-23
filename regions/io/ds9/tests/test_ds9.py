@@ -19,6 +19,12 @@ from ....shapes.circle import CircleSkyRegion
 from ..core import DS9RegionParserWarning
 from ..read import _DS9Parser
 
+try:
+    import matplotlib  # noqa
+    HAS_MATPLOTLIB = True
+except ImportError:
+    HAS_MATPLOTLIB = False
+
 
 def test_read():
     # Check that all test files including reference files are readable
@@ -384,3 +390,22 @@ def test_spaces_metadata():
     for i in range(1, len(reg)):
         assert reg[0].visual == reg[i].visual
         assert reg[0].meta == reg[i].meta
+
+
+@pytest.mark.skipif('not HAS_MATPLOTLIB')
+def test_point_boxcircle():
+    import matplotlib.path as mpath
+
+    regstr = ('# Region file format: DS9 astropy/regions\n'
+              'image\n'
+              'point(101.000000,101.000000) # color=red\n'
+              'point(101.000000,201.000000) # point=boxcircle color=blue\n'
+              'point(101.000000,301.000000)')
+    regions = Regions.parse(regstr, format='ds9')
+
+    assert isinstance(regions[0].as_artist().get_marker(), mpath.Path)
+    assert regions[0].as_artist().get_color() == 'red'
+    assert isinstance(regions[1].visual['symbol'], mpath.Path)
+    assert regions[1].as_artist().get_color() == 'blue'
+    assert isinstance(regions[2].as_artist().get_marker(), mpath.Path)
+    assert regions[2].as_artist().get_color() == 'green'
