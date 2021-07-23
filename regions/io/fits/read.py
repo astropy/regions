@@ -5,7 +5,6 @@ from warnings import warn
 from astropy.io import fits
 from astropy.table import Table
 import astropy.units as u
-from astropy.utils.decorators import deprecated
 from astropy.wcs import WCS
 import numpy as np
 
@@ -15,7 +14,7 @@ from ..core import _Shape, _ShapeList, reg_mapping
 from .core import (FITSRegionParserError, FITSRegionParserWarning,
                    language_spec)
 
-__all__ = ['FITSRegionParser', 'read_fits']
+__all__ = []
 
 
 class _FITSRegionParser:
@@ -248,84 +247,3 @@ def _read_fits(filename, errors='strict', cache=False):
 def _parse_fits(region_table, errors='strict'):
     parser = _FITSRegionParser(region_table, errors=errors)
     return Regions(parser.shapes.to_regions())
-
-
-@deprecated('0.5', alternative='`regions.Regions.read`')
-def read_fits_region(filename, errors='strict', cache=False):
-    """
-    Read a FITS region file, converting a FITS regions table to a list
-    of `~regions.Region` objects.
-
-    Parameters
-    ----------
-    filename : str
-        The file path.
-
-    errors : {'strict', 'warn', 'ignore'}, optional
-        The error handling scheme to use for handling parsing
-        errors. The default is 'strict', which will raise a
-        `~regions.FITSRegionParserError`. 'warn' will raise a
-        `~regions.FITSRegionParserWarning`, and 'ignore' will do
-        nothing (i.e., be silent).
-
-    cache : bool or 'update', optional
-        Whether to cache the contents of remote URLs. If 'update', check
-        the remote URL for a new version but store the result in the
-        cache.
-
-    Returns
-    -------
-    regions : list
-        A list of `~regions.Region` objects.
-    """
-    return _read_fits(filename, errors=errors, cache=cache)
-
-
-@deprecated('0.5', alternative='`regions.Regions.read`')
-def read_fits(filename, errors='strict', cache=False):
-    """
-    Read a FITS region file, converting a FITS regions table to a list
-    of `~regions.Region` objects.
-
-    Parameters
-    ----------
-    filename : str
-        The file path.
-
-    errors : {'strict', 'warn', 'ignore'}, optional
-        The error handling scheme to use for handling parsing
-        errors. The default is 'strict', which will raise a
-        `~regions.FITSRegionParserError`. 'warn' will raise a
-        `~regions.FITSRegionParserWarning`, and 'ignore' will do
-        nothing (i.e., be silent).
-
-    cache : bool or 'update', optional
-        Whether to cache the contents of remote URLs. If 'update', check
-        the remote URL for a new version but store the result in the
-        cache.
-
-    Returns
-    -------
-    regions : list
-        A list of `~regions.Region` objects.
-    """
-    return _read_fits(filename, errors=errors, cache=cache)
-
-
-@deprecated('0.5', alternative='`regions.Regions.parse`')
-class FITSRegionParser(_FITSRegionParser):
-    """
-    Parses a FITS Region table.
-
-    Parameters
-    ----------
-    table : `~astropy.table.Table`
-        A FITS region table.
-
-    errors : {'strict', 'warn', 'ignore'}, optional
-        The error handling scheme to use for handling parsing
-        errors. The default is 'strict', which will raise a
-        `~regions.FITSRegionParserError`. 'warn' will raise a
-        `~regions.FITSRegionParserWarning`, and 'ignore' will do nothing
-        (i.e., be silent).
-    """

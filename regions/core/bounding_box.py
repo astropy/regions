@@ -4,7 +4,6 @@ This module defines a class for a rectangular bounding box.
 """
 
 from astropy.io.fits.util import _is_int
-from astropy.utils import deprecated
 import numpy as np
 
 __all__ = ['BoundingBox']
@@ -155,20 +154,6 @@ class BoundingBox:
         The ``(ny, nx)`` shape of the bounding box.
         """
         return self.iymax - self.iymin, self.ixmax - self.ixmin
-
-    @property
-    @deprecated('0.5', alternative='get_overlap_slices')
-    def slices(self):
-        """
-        The bounding box as a tuple of `slice` objects.
-
-        The slice tuple is in numpy axis order (i.e., ``(y, x)``) and
-        therefore can be used to slice numpy arrays.
-        """
-        if self.iymin < 0 or self.ixmin < 0:
-            raise ValueError('cannot create slices when ixmin or iymin is '
-                             'negative')
-        return slice(self.iymin, self.iymax), slice(self.ixmin, self.ixmax)
 
     def get_overlap_slices(self, shape):
         """
