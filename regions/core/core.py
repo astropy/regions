@@ -348,6 +348,7 @@ class PixelRegion(Region):
                 kwargs['markersize'] = self.visual.get('symsize', 11)
                 kwargs['markeredgecolor'] = kwargs['color']
                 kwargs['markeredgewidth'] = self.visual.get('width', 1)
+                kwargs['fillstyle'] = self.visual.get('fill', 'none')
 
             if artist == 'Patch':
                 kwargs['edgecolor'] = kwargs.pop('color')
