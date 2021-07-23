@@ -7,8 +7,15 @@ General
 New Features
 ------------
 
+- Added the DS9 'boxcircle' point symbol. [#387]
+
 Bug Fixes
 ---------
+
+- Fixed the DS9 default point symbol to use 'boxcircle'. [#387]
+
+- Point symbol markers are no longer filled for consistency with DS9.
+  [387]
 
 API Changes
 -----------
