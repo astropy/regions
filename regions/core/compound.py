@@ -150,7 +150,9 @@ class CompoundPixelRegion(PixelRegion):
             patch_inner = self.region1.as_artist(origin=origin)
             patch_outer = self.region2.as_artist(origin=origin)
             path = self._make_annulus_path(patch_inner, patch_outer)
-            patch = mpatches.PathPatch(path, **kwargs)
+            mpl_kwargs = self._define_mpl_kwargs(artist='Patch')
+            mpl_kwargs.update(kwargs)
+            patch = mpatches.PathPatch(path, **mpl_kwargs)
             return patch
         else:
             raise NotImplementedError
