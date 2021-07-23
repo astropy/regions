@@ -44,11 +44,11 @@ class CompoundPixelRegion(PixelRegion):
         if meta is None:
             self.meta = region1.meta
         else:
-            self.meta = RegionMeta()
+            self.meta = meta
         if visual is None:
             self.visual = region1.visual
         else:
-            self.visual = RegionVisual()
+            self.visual = visual
         self._operator = operator
 
     @property
@@ -147,10 +147,16 @@ class CompoundPixelRegion(PixelRegion):
 
             import matplotlib.patches as mpatches
 
+            # set mpl_kwargs before as_artist is called on region1 and
+            # region2
+            mpl_kwargs = self._define_mpl_kwargs(artist='Patch')
+            mpl_kwargs.update(kwargs)
+
             patch_inner = self.region1.as_artist(origin=origin)
             patch_outer = self.region2.as_artist(origin=origin)
             path = self._make_annulus_path(patch_inner, patch_outer)
-            patch = mpatches.PathPatch(path, **kwargs)
+
+            patch = mpatches.PathPatch(path, **mpl_kwargs)
             return patch
         else:
             raise NotImplementedError

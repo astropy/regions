@@ -15,7 +15,13 @@ Bug Fixes
 - Fixed the DS9 default point symbol to use 'boxcircle'. [#387]
 
 - Point symbol markers are no longer filled for consistency with DS9.
-  [387]
+  [#387]
+
+- Fixed an issue where plotting elliptical regions were incorrectly
+  filled by default. [#389]
+
+- Fixed an issue where compound region colors were being set correctly.
+  [#389]
 
 API Changes
 -----------
