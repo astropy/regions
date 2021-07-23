@@ -13,6 +13,17 @@ Bug Fixes
 API Changes
 -----------
 
+- Removed the following deprecated I/O classes and functions:
+  ``crtf_objects_to_string``, ``ds9_objects_to_string``,
+  ``fits_region_object_to_table``, ``read_crtf``, ``read_ds9``,
+  ``read_fits``, ``read_fits_region``, ``write_crtf``, ``write_ds9``,
+  ``write_fits``, ``write_fits_region`` ``CRTFParser``, ``DS9Parser``,
+  ``FITSRegionParser``, ``ShapeList``, and ``Shape``. The ``Regions``
+  and ``Region`` objects now support this functionality via a unified
+  I/O interface. [#386]
+
+- Removed the deprecated ``BoundingBox`` ``slices`` attribute. [#386]
+
 
 0.5 (2021-07-20)
 ================
