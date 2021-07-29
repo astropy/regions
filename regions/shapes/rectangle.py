@@ -272,7 +272,7 @@ class RectanglePixelRegion(PixelRegion):
         if hasattr(self, '_mpl_selector'):
             raise AttributeError('Cannot attach more than one selector to a region.')
 
-        if self.angle.value != 0 and not hasattr(RectangleSelector, '_rotation'):
+        if self.angle.value != 0 and not hasattr(RectangleSelector, 'rotation'):
             raise NotImplementedError('Cannot create matplotlib selector for rotated rectangle.')
 
         if sync:
@@ -297,8 +297,7 @@ class RectanglePixelRegion(PixelRegion):
                                       xy0[1], self.center.y + self.height / 2)
 
         if self.angle.value != 0:
-            self._mpl_selector._set_corner_width_rotation(xy0, self.width, self.height,
-                                                          self.angle.to_value('radian'))
+            self._mpl_selector.rotation = self.angle.to_value('radian')
 
         self._mpl_selector.set_active(active)
         self._mpl_selector_callback = callback

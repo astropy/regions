@@ -129,12 +129,16 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
         # For now this will only work with unrotated ellipses. Once this
         # works with rotated ellipses, the following exception check can
         # be removed as well as the ``angle=0 * u.deg`` in the call to
-        # copy() below.
-        with pytest.raises(NotImplementedError,
-                           match=('Cannot create matplotlib selector for rotated ellipse.')):
-            self.reg.as_mpl_selector(ax)
+        # copy() below - should (hopefully) be implemented with mpl 3.6.
+        if MPL_VERSION < 36:
+            with pytest.raises(NotImplementedError,
+                               match=('Cannot create matplotlib selector for rotated ellipse.')):
+                self.reg.as_mpl_selector(ax)
+            angle = 0 * u.deg
+        else:
+            angle = self.reg.angle
 
-        region = self.reg.copy(angle=0 * u.deg)
+        region = self.reg.copy(angle=angle)
 
         selector = region.as_mpl_selector(ax, callback=update_mask, sync=sync)
 
@@ -160,7 +164,7 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
             assert_allclose(region.center.y, 4)
             assert_allclose(region.width, 4)
             assert_allclose(region.height, 3)
-            assert_quantity_allclose(region.angle, 0 * u.deg)
+            assert_quantity_allclose(region.angle, angle)
 
             assert_equal(mask, 0)
 
