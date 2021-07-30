@@ -68,12 +68,14 @@ class RegionsRegistry:
 
         key = (classobj, 'read', format)
         try:
-            return cls.registry[key](filename, **kwargs)
+            reader = cls.registry[key]
         except KeyError:
             msg = (f'No reader defined for format "{format}" and class '
                    f'"{classobj.__name__}".\n'
                    f'{cls._get_format_table_str(classobj)}')
             raise IORegistryError(msg) from None
+
+        return reader(filename, **kwargs)
 
     @classmethod
     def parse(cls, data, classobj, format=None, **kwargs):
@@ -85,12 +87,14 @@ class RegionsRegistry:
 
         key = (classobj, 'parse', format)
         try:
-            return cls.registry[key](data, **kwargs)
+            parser = cls.registry[key]
         except KeyError:
             msg = (f'No parser defined for format "{format}" and class '
                    f'"{classobj.__name__}".\n'
                    f'{cls._get_format_table_str(classobj)}')
             raise IORegistryError(msg) from None
+
+        return parser(data, **kwargs)
 
     @classmethod
     def write(cls, regions, filename, classobj, format=None, **kwargs):
@@ -102,12 +106,14 @@ class RegionsRegistry:
 
         key = (classobj, 'write', format)
         try:
-            return cls.registry[key](regions, filename, **kwargs)
+            writer = cls.registry[key]
         except KeyError:
             msg = (f'No writer defined for format "{format}" and class '
                    f'"{classobj.__name__}".\n'
                    f'{cls._get_format_table_str(classobj)}')
             raise IORegistryError(msg) from None
+
+        return writer(regions, filename, **kwargs)
 
     @classmethod
     def serialize(cls, regions, classobj, format=None, **kwargs):
@@ -119,12 +125,14 @@ class RegionsRegistry:
 
         key = (classobj, 'serialize', format)
         try:
-            return cls.registry[key](regions, **kwargs)
+            serializer = cls.registry[key]
         except KeyError:
             msg = (f'No serializer defined for format "{format}" and class '
                    f'"{classobj.__name__}".\n'
                    f'{cls._get_format_table_str(classobj)}')
             raise IORegistryError(msg) from None
+
+        return serializer(regions, **kwargs)
 
     @classmethod
     def get_formats(cls, classobj):
