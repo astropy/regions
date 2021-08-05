@@ -238,3 +238,51 @@ def test_pixcoord_rotate_array():
     center = PixCoord(2, 3)
     point = point.rotate(center, 90 * u.deg)
     assert_allclose(point.xy, ([1, 1], [4, 4]))
+
+
+def test_pixcoord_addition():
+    point1 = PixCoord([3, 3], [4, 4])
+    point2 = PixCoord([5, 7], [6, 1])
+    center = PixCoord(2, 3)
+
+    p1 = point1 + point2
+    p2 = point2 + point1
+    assert p1 == p2
+    assert_equal(p1.x, (8, 10))
+    assert_equal(p1.y, (10, 5))
+
+    p3 = point1 + center
+    p4 = center + point1
+    assert p3 == p4
+    assert_equal(p3.x, (5, 5))
+    assert_equal(p3.y, (7, 7))
+
+    p5 = point1 + point1 + point1
+    assert_equal(p5.x, point1.x * 3)
+    assert_equal(p5.y, point1.y * 3)
+
+    with pytest.raises(TypeError):
+        point1 + 10
+
+    with pytest.raises(ValueError):
+        point1 + PixCoord([1, 1, 1], [2, 2, 2])
+
+
+def test_pixcoord_subtraction():
+    point1 = PixCoord([3, 3], [4, 4])
+    point2 = PixCoord([5, 7], [6, 1])
+    center = PixCoord(2, 3)
+
+    p1 = point2 - point1
+    assert_equal(p1.x, (2, 4))
+    assert_equal(p1.y, (2, -3))
+
+    p2 = point1 - center
+    assert_equal(p2.x, (1, 1))
+    assert_equal(p2.y, (1, 1))
+
+    with pytest.raises(TypeError):
+        point1 - 10
+
+    with pytest.raises(ValueError):
+        point1 - PixCoord([1, 1, 1], [2, 2, 2])
