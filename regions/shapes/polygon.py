@@ -3,6 +3,7 @@
 This module defines polygon regions in both pixel and sky coordinates.
 """
 
+import astropy.units as u
 from astropy.wcs.utils import pixel_to_skycoord, skycoord_to_pixel
 import numpy as np
 
@@ -15,7 +16,8 @@ from ..core.pixcoord import PixCoord
 from .._geometry import polygonal_overlap_grid
 from .._geometry.pnpoly import points_in_polygon
 
-__all__ = ['PolygonPixelRegion', 'PolygonSkyRegion']
+__all__ = ['PolygonPixelRegion', 'RegularPolygonPixelRegion',
+           'PolygonSkyRegion']
 
 
 class PolygonPixelRegion(PixelRegion):
@@ -191,6 +193,36 @@ class PolygonPixelRegion(PixelRegion):
         """
         vertices = self.vertices.rotate(center, angle)
         return self.copy(vertices=vertices)
+
+
+class RegularPolygonPixelRegion(PolygonPixelRegion):
+    def __init__(self, center, nvertices, radius, angle=0. * u.deg,
+                 meta=None, visual=None):
+
+        if nvertices < 3:
+            raise ValueError('nvertices must be >= 3')
+        self.center = center
+        self.nvertices = nvertices
+        self.radius = radius
+        self.angle = angle
+        self.vertices = self._calc_vertices()
+        self.meta = meta or RegionMeta()
+        self.visual = visual or RegionVisual()
+
+        self.side_length = 2. * self.radius * np.sin(np.pi / self.nvertices)
+        self.inradius = self.radius * np.cos(np.pi / self.nvertices)
+        self.perimeter = self.side_length * self.nvertices
+        self.interior_angle = ((self.nvertices - 2) / self.nvertices
+                               * 180) << u.deg
+        self.exterior_angle = 360. / self.nvertices << u.deg
+
+    def _calc_vertices(self):
+        # uses the matplotlib convention that the polygon always points "up"
+        theta = ((2. * np.pi / self.nvertices * np.arange(self.nvertices)
+                 + (np.pi / 2)) << u.radian) + self.angle
+        xvert = self.radius * np.cos(theta)
+        yvert = self.radius * np.sin(theta)
+        return self.center + PixCoord(xvert, yvert)
 
 
 class PolygonSkyRegion(SkyRegion):
