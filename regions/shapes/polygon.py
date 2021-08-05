@@ -196,6 +196,47 @@ class PolygonPixelRegion(PixelRegion):
 
 
 class RegularPolygonPixelRegion(PolygonPixelRegion):
+    """
+    A regular polygon in pixel coordinates.
+
+    Parameters
+    ----------
+    center : `~regions.PixCoord`
+        The position of the center of the polygon.
+    nvertices : `~regions.PixCoord`
+        The number of polygon vertices (or sides).
+    radius : float
+        The distance from the center to any vertex. This is also known
+        as the circumradius.
+    angle : `~astropy.units.Quantity`, optional
+        The rotation angle of the polygon, measured anti-clockwise. If
+        set to zero (the default), the polygon will point "up" following
+        the `matplotlib.patches.RegularPolygon` convention.
+    meta : `~regions.RegionMeta`, optional
+        A dictionary that stores the meta attributes of this region.
+    visual : `~regions.RegionVisual`, optional
+        A dictionary that stores the visual meta attributes of this
+        region.
+
+    Attributes
+    ----------
+    side_length : float
+        The side length.
+    inradius : float
+        The radius of the largest circle contained entirely within the
+        polygon. This value is identical to the length of a line segment
+        from the polygon center to the midpoint of one of its sides
+        (known as as the apothem).
+    perimeter : float
+        The polygon perimeter.
+    interior_angle : float
+        The polygon interior angle, which is the angle at each vertex on
+        the inside of the polygon.
+    exterior_angle : float
+        The polygon exterior angle, which is an angle at each vertex on
+        the ouside of the polygon.
+    """
+
     def __init__(self, center, nvertices, radius, angle=0. * u.deg,
                  meta=None, visual=None):
 
