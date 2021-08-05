@@ -31,6 +31,10 @@ class PolygonPixelRegion(PixelRegion):
     visual : `~regions.RegionVisual`, optional
         A dictionary that stores the visual meta attributes of this
         region.
+    origin : `~regions.PixCoord`, optional
+        The origin for polynomial vertices. Using this keyword allows
+        ``vertices`` to be specified relative to an origin pixel
+        coordinate.
 
     Examples
     --------
@@ -56,10 +60,13 @@ class PolygonPixelRegion(PixelRegion):
     _params = ('vertices',)
     vertices = OneDPix('vertices')
 
-    def __init__(self, vertices, meta=None, visual=None):
-        self.vertices = vertices
+    def __init__(self, vertices, meta=None, visual=None,
+                 origin=PixCoord(0, 0)):
+        self._vertices = vertices
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
+        self.origin = origin
+        self.vertices = vertices + origin
 
     @property
     def area(self):
