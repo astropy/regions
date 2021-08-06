@@ -200,6 +200,13 @@ class RegularPolygonPixelRegion(PolygonPixelRegion):
     """
     A regular polygon in pixel coordinates.
 
+    .. note::
+
+        This class will be serialized as a generic polygon
+        region, thus when read back in it will produce a
+        `~regions.PolygonPixelRegion` object instead of a
+        `~regions.RegularPolygonPixelRegion` object.
+
     Parameters
     ----------
     center : `~regions.PixCoord`
