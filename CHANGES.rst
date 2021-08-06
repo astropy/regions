@@ -14,6 +14,8 @@ New Features
 - Added an ``origin`` keyword to ``PolygonPixelRegion`` to allow
   specifying the vertices relative to an origin pixel. [#397]
 
+- Added a ``RegularPolygonPixelRegion`` class. [#398]
+
 Bug Fixes
 ---------
 

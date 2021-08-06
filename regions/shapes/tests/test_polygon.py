@@ -1,5 +1,6 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
+from copy import copy
 import numpy as np
 from numpy.testing import assert_allclose, assert_equal
 import pytest
@@ -11,7 +12,8 @@ from astropy.tests.helper import assert_quantity_allclose
 from ...core import PixCoord, BoundingBox
 from ...tests.helpers import make_simple_wcs
 from ..._utils.examples import make_example_dataset
-from ..polygon import PolygonPixelRegion, PolygonSkyRegion
+from ..polygon import (PolygonPixelRegion, RegularPolygonPixelRegion,
+                       PolygonSkyRegion)
 from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
 from .utils import HAS_MATPLOTLIB  # noqa
 
@@ -156,3 +158,84 @@ class TestPolygonSkyRegion(BaseTestSkyRegion):
         # 1,2 is outside, 3.25,3.75 should be inside the triangle...
         assert all(self.reg.contains(position, wcs)
                    == np.array([False, True], dtype='bool'))
+
+
+class TestRegionPolygonPixelRegion(BaseTestPixelRegion):
+
+    reg = RegularPolygonPixelRegion(PixCoord(50, 50), 8, 20, angle=25*u.deg)
+    inside = [(40, 40)]
+    outside = [(20, 20), (80, 90)]
+    expected_area = 1131.37085
+    expected_repr = ('<RegularPolygonPixelRegion(center=PixCoord(x=50, y=50), '
+                     'nvertices=8, radius=20, angle=25.0 deg)>')
+
+    expected_str = ('Region: RegularPolygonPixelRegion\n'
+                    'center: PixCoord(x=50, y=50)\n'
+                    'nvertices: 8\n'
+                    'radius: 20\nangle: 25.0 deg')
+
+    def test_copy(self):
+        reg = self.reg.copy()
+        x_expected = copy(self.reg.vertices.x)
+        y_expected = copy(self.reg.vertices.y)
+        assert_allclose(reg.vertices.x, x_expected)
+        assert_allclose(reg.vertices.y, y_expected)
+        assert reg.visual == {}
+        assert reg.meta == {}
+
+    def test_bounding_box(self):
+        bbox = self.reg.bounding_box
+        assert bbox == BoundingBox(ixmin=31, ixmax=70, iymin=31, iymax=70)
+
+    def test_to_mask(self):
+        # The true area of this polygon is 3
+        # We only do very low-precision asserts below,
+        # because results can be unstable with points
+        # on the edge of the polygon.
+        # Basically we check that mask.data is filled
+        # with something useful at all.
+
+        # Bounding box and output shape is independent of subpixels,
+        # so we only assert on it once here, not in the other cases below
+        mask = self.reg.to_mask(mode='center', subpixels=1)
+        assert 1130 <= np.sum(mask.data) <= 1135
+        assert mask.bbox == BoundingBox(ixmin=31, ixmax=70, iymin=31,
+                                        iymax=70)
+        assert mask.data.shape == (39, 39)
+
+        # Test more cases for to_mask
+        # This example is with the default: subpixels=5
+        mask = self.reg.to_mask(mode='subpixels')
+        assert 1130 <= np.sum(mask.data) <= 1135
+
+        mask = self.reg.to_mask(mode='subpixels', subpixels=8)
+        assert 1130 <= np.sum(mask.data) <= 1135
+
+        mask = self.reg.to_mask(mode='subpixels', subpixels=9)
+        assert 1130 <= np.sum(mask.data) <= 1135
+
+        mask = self.reg.to_mask(mode='subpixels', subpixels=10)
+        assert 1130 <= np.sum(mask.data) <= 1135
+
+        with pytest.raises(NotImplementedError):
+            self.reg.to_mask(mode='exact')
+
+    @pytest.mark.skipif('not HAS_MATPLOTLIB')
+    def test_as_artist(self):
+        patch = self.reg.as_artist()
+        expected = [[41.54763477, 68.12615574], [31.20614758, 56.84040287],
+                    [31.87384426, 41.54763477], [43.15959713, 31.20614758],
+                    [58.45236523, 31.87384426], [68.79385242, 43.15959713],
+                    [68.12615574, 58.45236523], [56.84040287, 68.79385242],
+                    [41.54763477, 68.12615574]]
+        assert_allclose(patch.xy, expected)
+
+    def test_rotate(self):
+        reg = self.reg.rotate(self.reg.center, 20 * u.deg)
+        assert reg.angle.value == 45.0
+        x_vert = [35.85786438, 30., 35.85786438, 50., 64.14213562, 70.,
+                  64.14213562, 50.]
+        y_vert = [64.14213562, 50., 35.85786438, 30., 35.85786438, 50.,
+                  64.14213562, 70.]
+        assert_allclose(reg.vertices.x, x_vert)
+        assert_allclose(reg.vertices.y, y_vert)
