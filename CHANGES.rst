@@ -9,6 +9,8 @@ New Features
 
 - Added the DS9 'boxcircle' point symbol. [#387]
 
+- Added the ability to add and subtract ``PixCoord`` objects. [#396]
+
 Bug Fixes
 ---------
 

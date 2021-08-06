@@ -121,16 +121,25 @@ class PixCoord:
         y = self.y[key]
         return PixCoord(x=x, y=y)
 
+    def __add__(self, other):
+        if not isinstance(other, self.__class__):
+            raise TypeError('Can add only to another PixCoord')
+        return self.__class__(self.x + other.x, self.y + other.y)
+
+    def __sub__(self, other):
+        if not isinstance(other, self.__class__):
+            raise TypeError('Can subtract only from another PixCoord')
+        return self.__class__(self.x - other.x, self.y - other.y)
+
     def __eq__(self, other):
         """
         Checks whether ``other`` is `PixCoord` object and whether
         their abscissa and ordinate values are equal using
         `np.testing.assert_allclose` with its default tolerance values.
         """
-        if isinstance(other, PixCoord):
+        if isinstance(other, self.__class__):
             return np.allclose([self.x, self.y], [other.x, other.y])
-        else:
-            return False
+        return False
 
     def to_sky(self, wcs, origin=_DEFAULT_WCS_ORIGIN, mode=_DEFAULT_WCS_MODE):
         """
