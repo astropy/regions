@@ -1,7 +1,7 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
 import numpy as np
-from numpy.testing import assert_allclose
+from numpy.testing import assert_allclose, assert_equal
 import pytest
 
 from astropy.coordinates import SkyCoord
@@ -103,6 +103,15 @@ class TestPolygonPixelRegion(BaseTestPixelRegion):
         reg = self.reg.rotate(PixCoord(3, 1), -90 * u.deg)
         assert_allclose(reg.vertices.x, [3, 3, 6])
         assert_allclose(reg.vertices.y, [3, 1, 3])
+
+    def test_origin(self):
+        verts = PixCoord([1, 3, 1], [1, 1, 4])
+        reg1 = PolygonPixelRegion(verts)
+
+        origin = PixCoord(1, 1)
+        relverts = verts - origin
+        reg2 = PolygonPixelRegion(relverts, origin=origin)
+        assert_equal(reg1.vertices, reg2.vertices)
 
 
 class TestPolygonSkyRegion(BaseTestSkyRegion):

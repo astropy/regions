@@ -11,6 +11,9 @@ New Features
 
 - Added the ability to add and subtract ``PixCoord`` objects. [#396]
 
+- Added an ``origin`` keyword to ``PolygonPixelRegion`` to allow
+  specifying the vertices relative to an origin pixel. [#397]
+
 Bug Fixes
 ---------
 
