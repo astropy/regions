@@ -13,7 +13,8 @@ import numpy as np
 from ..shapes import (CirclePixelRegion, CircleSkyRegion,
                       EllipsePixelRegion, EllipseSkyRegion,
                       RectanglePixelRegion, RectangleSkyRegion,
-                      PolygonPixelRegion, PolygonSkyRegion,
+                      PolygonPixelRegion, RegularPolygonPixelRegion,
+                      PolygonSkyRegion,
                       CircleAnnulusPixelRegion, CircleAnnulusSkyRegion,
                       EllipseAnnulusPixelRegion, EllipseAnnulusSkyRegion,
                       RectangleAnnulusPixelRegion, RectangleAnnulusSkyRegion,
@@ -760,6 +761,8 @@ def _to_shape_list(region_list, coordinate_system='fk5'):
         coord = []
         if isinstance(region, SkyRegion):
             reg_type = region.__class__.__name__[:-9].lower()
+        elif isinstance(region, RegularPolygonPixelRegion):
+            reg_type = 'polygon'
         else:
             reg_type = region.__class__.__name__[:-11].lower()
 
