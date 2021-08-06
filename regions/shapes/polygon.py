@@ -7,7 +7,8 @@ import astropy.units as u
 from astropy.wcs.utils import pixel_to_skycoord, skycoord_to_pixel
 import numpy as np
 
-from ..core.attributes import OneDPix, OneDSky
+from ..core.attributes import (OneDPix, OneDSky, ScalarPix, ScalarLength,
+                               QuantityLength)
 from ..core.bounding_box import BoundingBox
 from ..core.core import PixelRegion, SkyRegion
 from ..core.mask import RegionMask
@@ -271,6 +272,12 @@ class RegularPolygonPixelRegion(PolygonPixelRegion):
         ax.set_aspect('equal')
     """
 
+    _params = ('center', 'nvertices', 'radius', 'angle')
+    center = ScalarPix('center')
+    nvertices = ScalarLength('nvertices')
+    radius = ScalarLength('radius')
+    angle = QuantityLength('angle')
+
     def __init__(self, center, nvertices, radius, angle=0. * u.deg,
                  meta=None, visual=None):
 
@@ -280,9 +287,8 @@ class RegularPolygonPixelRegion(PolygonPixelRegion):
         self.nvertices = nvertices
         self.radius = radius
         self.angle = angle
-        self.vertices = self._calc_vertices()
-        self.meta = meta or RegionMeta()
-        self.visual = visual or RegionVisual()
+
+        super().__init__(self._calc_vertices(), meta=meta, visual=visual)
 
         self.side_length = 2. * self.radius * np.sin(np.pi / self.nvertices)
         self.inradius = self.radius * np.cos(np.pi / self.nvertices)
