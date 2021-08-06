@@ -18,6 +18,8 @@ class PixCoord:
     A class for pixel coordinates.
 
     This class can represent a scalar or an array of pixel coordinates.
+    `~regions.PixCoord` objects can be added or subtracted to each
+    other. They can also be compared for equality.
 
     The data members are either numbers or `~numpy.ndarray`
     (not `~astropy.units.Quantity` objects with unit "pixel").
