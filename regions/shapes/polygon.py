@@ -305,6 +305,28 @@ class RegularPolygonPixelRegion(PolygonPixelRegion):
         yvert = self.radius * np.sin(theta)
         return self.center + PixCoord(xvert, yvert)
 
+    def rotate(self, center, angle):
+        """
+        Rotate the region.
+
+        Postive ``angle`` corresponds to counter-clockwise rotation.
+
+        Parameters
+        ----------
+        center : `~regions.PixCoord`
+            The rotation center point.
+        angle : `~astropy.coordinates.Angle`
+            The rotation angle.
+
+        Returns
+        -------
+        region : `PolygonPixelRegion`
+            The rotated region (which is an independent copy).
+        """
+        center = self.center.rotate(center, angle)
+        angle = self.angle + angle
+        return self.copy(center=center, angle=angle)
+
 
 class PolygonSkyRegion(SkyRegion):
     """

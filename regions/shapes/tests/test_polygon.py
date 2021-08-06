@@ -230,7 +230,12 @@ class TestRegionPolygonPixelRegion(BaseTestPixelRegion):
                     [41.54763477, 68.12615574]]
         assert_allclose(patch.xy, expected)
 
-    def zz_test_rotate(self):
-        reg = self.reg.rotate(PixCoord(3, 1), -90 * u.deg)
-        assert_allclose(reg.vertices.x, [3, 3, 6])
-        assert_allclose(reg.vertices.y, [3, 1, 3])
+    def test_rotate(self):
+        reg = self.reg.rotate(self.reg.center, 20 * u.deg)
+        assert reg.angle.value == 45.0
+        x_vert = [35.85786438, 30., 35.85786438, 50., 64.14213562, 70.,
+                  64.14213562, 50.]
+        y_vert = [64.14213562, 50., 35.85786438, 30., 35.85786438, 50.,
+                  64.14213562, 70.]
+        assert_allclose(reg.vertices.x, x_vert)
+        assert_allclose(reg.vertices.y, y_vert)
