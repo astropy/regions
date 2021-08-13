@@ -404,11 +404,11 @@ def test_point_boxcircle():
     regions = Regions.parse(regstr, format='ds9')
 
     assert isinstance(regions[0].as_artist().get_marker(), mpath.Path)
-    assert regions[0].as_artist().get_color() == 'red'
+    assert regions[0].as_artist().get_markeredgecolor() == 'red'
     assert isinstance(regions[1].visual['symbol'], mpath.Path)
-    assert regions[1].as_artist().get_color() == 'blue'
+    assert regions[1].as_artist().get_markeredgecolor() == 'blue'
     assert isinstance(regions[2].as_artist().get_marker(), mpath.Path)
-    assert regions[2].as_artist().get_color() == 'green'
+    assert regions[2].as_artist().get_markeredgecolor() == '#00ff00'
 
 
 @pytest.mark.skipif('not HAS_MATPLOTLIB')

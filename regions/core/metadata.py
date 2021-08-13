@@ -111,7 +111,7 @@ class RegionVisual(Meta):
 
                 kwargs['marker'] = valid_symbols_ds9['boxcircle']
                 kwargs['markersize'] = 11
-                kwargs['markeredgecolor'] = kwargs['color']
+                kwargs['markeredgecolor'] = kwargs.pop('color')
                 kwargs['fillstyle'] = 'none'
             elif artist == 'Patch':
                 kwargs['edgecolor'] = kwargs.pop('color')
