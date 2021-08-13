@@ -44,6 +44,13 @@ API Changes
 
 - Removed the deprecated ``BoundingBox`` ``slices`` attribute. [#386]
 
+- The default matplotlib keywords that are used when plotting now depend
+  on the value of ``self.visual['default_style']``. This keyword is
+  currently set (to a value of 'ds9') only when reading DS9 region
+  files. If set to 'ds9', DS9 plotting defaults are used. If not set or
+  set to 'mpl' or None, then the matplotlib defaults will be used, with
+  the exception that fill is turned off for Patch and Line2D artists.
+
 
 0.5 (2021-07-20)
 ================

@@ -34,6 +34,7 @@ class CompoundPixelRegion(PixelRegion):
     _params = ('region1', 'region2', 'operator')
     region1 = RegionType('region1', PixelRegion)
     region2 = RegionType('region2', PixelRegion)
+    mpl_artist = 'Patch'
 
     def __init__(self, region1, region2, operator, meta=None, visual=None):
         if not callable(operator):
@@ -149,7 +150,7 @@ class CompoundPixelRegion(PixelRegion):
 
             # set mpl_kwargs before as_artist is called on region1 and
             # region2
-            mpl_kwargs = self._define_mpl_kwargs(artist='Patch')
+            mpl_kwargs = self.visual.define_mpl_kwargs(self.mpl_artist)
             mpl_kwargs.update(kwargs)
 
             patch_inner = self.region1.as_artist(origin=origin)

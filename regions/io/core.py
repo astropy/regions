@@ -669,7 +669,7 @@ class _Shape:
                         'symsize', 'symbol', 'symsize', 'fontsize',
                         'fontstyle', 'usetex', 'labelpos', 'labeloff',
                         'linewidth', 'linestyle', 'point', 'textangle',
-                        'fontweight', 'symthick']
+                        'fontweight', 'symthick', 'default_style']
 
         if isinstance(coords[0], SkyCoord):
             reg = self.shape_to_sky_region[self.region_type](*coords)

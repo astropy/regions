@@ -24,6 +24,14 @@ object.
     axes.set_xlim([-0.5, 1])
     axes.set_ylim([-0.5, 1])
 
+The default keyword arguments for the matplotlib artist depend on the
+value of the ``default_style`` keyword in the `~regions.RegionVisual`
+dictionary. This keyword is currently set (to a value of 'ds9') only
+when reading from DS9 region files. If this keyword is not set or set
+to 'mpl' or `None`, then the matplotlib defaults will be used, with the
+exception that fill is turned off for `~matplotlib.patches.Patch` and
+`~matplotlib.lines.Line2D` artists.
+
 The :meth:`regions.PixelRegion.plot` method is a convenience method that
 combines these two steps (creating a matplotlib patch artist and adding
 it to an axis). If no axis is passed then it calls ``plt.gca()``.

@@ -505,6 +505,7 @@ class _DS9RegionParser:
         self.include = (self.meta.get('include', True)
                         if self.include == '' else self.include != '-')
         self.meta['include'] = self.include
+        self.meta['default_style'] = 'ds9'
 
     def make_shape(self):
         """

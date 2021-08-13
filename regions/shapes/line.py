@@ -58,6 +58,7 @@ class LinePixelRegion(PixelRegion):
     _params = ('start', 'end')
     start = ScalarPix('start')
     end = ScalarPix('end')
+    mpl_artist = 'Patch'
 
     def __init__(self, start, end, meta=None, visual=None):
         self.start = start
@@ -130,7 +131,7 @@ class LinePixelRegion(PixelRegion):
         dy = self.end.y - self.start.y
         kwargs.setdefault("width", 0.1)
 
-        mpl_kwargs = self._define_mpl_kwargs(artist='Patch')
+        mpl_kwargs = self.visual.define_mpl_kwargs(self.mpl_artist)
         mpl_kwargs.update(kwargs)
 
         return Arrow(x, y, dx, dy, **mpl_kwargs)

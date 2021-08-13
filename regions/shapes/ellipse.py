@@ -78,6 +78,7 @@ class EllipsePixelRegion(PixelRegion):
     width = ScalarLength('width')
     height = ScalarLength('height')
     angle = QuantityLength('angle')
+    mpl_artist = 'Patch'
 
     def __init__(self, center, width, height, angle=0. * u.deg, meta=None,
                  visual=None):
@@ -202,7 +203,7 @@ class EllipsePixelRegion(PixelRegion):
         # matplotlib expects rotation in degrees (anti-clockwise)
         angle = self.angle.to('deg').value
 
-        mpl_kwargs = self._define_mpl_kwargs(artist='Patch')
+        mpl_kwargs = self.visual.define_mpl_kwargs(self.mpl_artist)
         mpl_kwargs.update(kwargs)
 
         return Ellipse(xy=xy, width=width, height=height, angle=angle,

@@ -404,11 +404,11 @@ def test_point_boxcircle():
     regions = Regions.parse(regstr, format='ds9')
 
     assert isinstance(regions[0].as_artist().get_marker(), mpath.Path)
-    assert regions[0].as_artist().get_color() == 'red'
+    assert regions[0].as_artist().get_markeredgecolor() == 'red'
     assert isinstance(regions[1].visual['symbol'], mpath.Path)
-    assert regions[1].as_artist().get_color() == 'blue'
+    assert regions[1].as_artist().get_markeredgecolor() == 'blue'
     assert isinstance(regions[2].as_artist().get_marker(), mpath.Path)
-    assert regions[2].as_artist().get_color() == 'green'
+    assert regions[2].as_artist().get_markeredgecolor() == '#00ff00'
 
 
 @pytest.mark.skipif('not HAS_MATPLOTLIB')
@@ -418,3 +418,53 @@ def test_compound_color():
               'annulus(651.0,301.0,60.0,90.0) # color=red')
     regions = Regions.parse(regstr, format='ds9')
     assert regions[0].as_artist().get_edgecolor() == (1., 0., 0., 1.)
+
+
+@pytest.mark.skipif('not HAS_MATPLOTLIB')
+def test_default_mpl_kwargs():
+    # Patch
+    regstr = ('# Region file format: DS9 astropy/regions\n'
+              'image\n'
+              'circle(101.0,101.0,3.0) # color=red\n'
+              'circle(101.0,301.0,3.0)\n'
+              'point(101.0,101.0) # color=red\n'
+              'point(101.0,301.0)\n'
+              'text(101.0,101.0) # text={Text} color=red\n'
+              'text(101.0,101.0) # text={Text}')
+    regions = Regions.parse(regstr, format='ds9')
+
+    assert regions[0].visual['default_style'] == 'ds9'
+    assert regions[0].as_artist().get_edgecolor() == (1, 0, 0, 1)
+    assert regions[1].as_artist().get_edgecolor() == (0, 1, 0, 1)
+
+    for i in (0, 1):
+        regions[i].visual['default_style'] = None
+    assert regions[0].as_artist().get_edgecolor() == (1, 0, 0, 1)
+    assert regions[1].as_artist().get_edgecolor() == (0, 0, 0, 1)
+
+    # Line2D
+    assert regions[2].visual['default_style'] == 'ds9'
+    assert regions[2].as_artist().get_markeredgecolor() == 'red'
+    assert regions[3].as_artist().get_markeredgecolor() == '#00ff00'
+
+    for i in (2, 3):
+        regions[i].visual['default_style'] = None
+    assert regions[2].as_artist().get_markeredgecolor() == 'red'
+    assert regions[3].as_artist().get_markeredgecolor() == 'C0'
+
+    # Text
+    assert regions[4].visual['default_style'] == 'ds9'
+    assert regions[4].as_artist().get_color() == 'red'
+    assert regions[5].as_artist().get_color() == '#00ff00'
+
+    for i in (4, 5):
+        assert regions[i].as_artist().get_va() == 'center'
+        assert regions[i].as_artist().get_ha() == 'center'
+
+    for i in (4, 5):
+        regions[i].visual['default_style'] = None
+        assert regions[i].as_artist().get_va() == 'baseline'
+        assert regions[i].as_artist().get_ha() == 'left'
+
+    assert regions[4].as_artist().get_color() == 'red'
+    assert regions[5].as_artist().get_color() == 'black'
