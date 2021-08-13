@@ -72,10 +72,10 @@ class RegionVisual(Meta):
         Define the default matplotlib kwargs for the specified artist.
 
         The kwargs depend on the value of self.visual['default_style'],
-        which can be set when reading region files. If this is not set
-        or set to `mpl' or `None`, then the matplotlib defaults will be
-        used, with the exception that Patch and Line2D fill is turned
-        off.
+        which can be set when reading region files. If this keywords is
+        not set or set to 'mpl' or `None`, then the matplotlib defaults
+        will be used, with the exception fill is turned off for Patch
+        and Line2D objects.
 
         Parameters
         ----------
