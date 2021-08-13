@@ -318,47 +318,6 @@ class PixelRegion(Region):
         """
         raise NotImplementedError
 
-    def _define_mpl_kwargs(self, artist='Patch'):
-        """
-        Define a dictionary of matplotlib keywords for the input
-        ``artist`` from the region's ``visual`` properties.
-
-        Unset ``visual`` properties are set to default values based on
-        the DS9 convention.
-        """
-        from ..io.ds9.core import valid_symbols_ds9
-
-        if artist not in ('Patch', 'Line2D', 'Text'):
-            raise ValueError(f'artist "{artist}" is not supported')
-
-        kwargs = {}
-        kwargs['color'] = self.visual.get('color', 'green')
-        kwargs['label'] = self.meta.get('label', '')
-
-        if artist == 'Text':
-            kwargs['family'] = self.visual.get('font', 'helvetica')
-            kwargs['style'] = self.visual.get('fontsyle', 'normal')
-            kwargs['weight'] = self.visual.get('fontweight', 'roman')
-            kwargs['size'] = self.visual.get('fontsize', '12')
-            kwargs['rotation'] = self.visual.get('textangle', '0')
-        else:
-            kwargs['linewidth'] = self.visual.get('linewidth', 1)
-            kwargs['linestyle'] = self.visual.get('linstyle', 'solid')
-
-            if artist == 'Line2D':
-                boxcircle = valid_symbols_ds9['boxcircle']
-                kwargs['marker'] = self.visual.get('symbol', boxcircle)
-                kwargs['markersize'] = self.visual.get('symsize', 11)
-                kwargs['markeredgecolor'] = kwargs['color']
-                kwargs['markeredgewidth'] = self.visual.get('width', 1)
-                kwargs['fillstyle'] = self.visual.get('fill', 'none')
-
-            if artist == 'Patch':
-                kwargs['edgecolor'] = kwargs.pop('color')
-                kwargs['fill'] = self.visual.get('fill', False)
-
-        return kwargs
-
     def plot(self, origin=(0, 0), ax=None, **kwargs):
         """
         Plot the region on a matplotlib `~matplotlib.axes.Axes`
