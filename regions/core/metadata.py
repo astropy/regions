@@ -121,3 +121,80 @@ class RegionVisual(Meta):
                 raise ValueError('invalid visual["default"] value')
 
         return kwargs
+
+    def _to_mpl_kwargs(self, artist):
+        """
+        Convert the visual metadata to a dictionary of matplotlib
+        keyword arguments for the given artist.
+
+        Parameters
+        ----------
+        artist : {'Text', 'Line2D', 'Patch'}
+            The matplotlib artist type.
+
+        Returns
+        -------
+        result : dict
+            A dictionary of matplotlib keyword arguments.
+        """
+        kwargs = {}
+
+        if artist == 'Text':
+            keymap = {'font': 'family',
+                      'fontstyle': 'style',
+                      'fontweight': 'weight',
+                      'fontsize': 'size',
+                      'textangle': 'rotation'}
+
+        elif artist == 'Line2D':
+            keymap = {'symbol': 'marker',
+                      'symsize': 'markersize',
+                      'color': 'markeredgecolor',
+                      'linewidth': 'markeredgewidth',
+                      'fill': 'fillstyle'}
+
+        elif artist == 'Patch':
+            keymap = {'color': 'edgecolor',
+                      'fill': 'fill'}
+
+        else:
+            raise ValueError('invalid artist type')
+
+        kwargs = {}
+        for name, val in self.items():
+            if name in keymap:
+                # NOTE: this will override existing mpl kwargs
+                kwargs[keymap[name]] = val
+            else:
+                kwargs[name] = val
+
+        default_style = kwargs.pop('default_style', None)
+        if default_style == 'ds9':
+            for key, val in kwargs.items():
+                if val == 'green':
+                    # X11/mpl green is #008000, ds9 uses #00ff00
+                    kwargs[key] = '#00ff00'
+
+        return kwargs
+
+    def define_mpl_kwargs(self, artist):
+        """
+        Define a dictionary of matplotlib keywords for the input
+        ``artist`` from the region's ``visual`` properties.
+
+        Parameters
+        ----------
+        artist : {'Text', 'Line2D', 'Patch'}
+            The matplotlib artist type.
+
+        Returns
+        -------
+        result : dict
+            A dictionary of matplotlib keyword arguments.
+        """
+        if artist not in ('Patch', 'Line2D', 'Text'):
+            raise ValueError(f'artist "{artist}" is not supported')
+
+        kwargs = self._define_default_mpl_kwargs(artist)
+        kwargs.update(self._to_mpl_kwargs(artist))
+        return kwargs

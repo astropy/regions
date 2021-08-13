@@ -116,7 +116,7 @@ parsed for the ``fits`` format::
     >>> print(regions)
     [<CirclePixelRegion(center=PixCoord(x=146.1, y=253.17), radius=3.1)>]
     >>> print(regions[0].visual)
-    {'color': 'green'}
+    {'color': 'green', 'default_style': 'ds9'}
 
 
 Serialize
