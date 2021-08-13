@@ -51,6 +51,7 @@ class TextPixelRegion(PointPixelRegion):
     """
 
     _params = ('center', 'text')
+    mpl_artist = 'Text'
 
     def __init__(self, center, text, meta=None, visual=None):
         super().__init__(center, meta, visual)
@@ -83,7 +84,7 @@ class TextPixelRegion(PointPixelRegion):
         """
         from matplotlib.text import Text
 
-        mpl_kwargs = self._define_mpl_kwargs(artist='Text')
+        mpl_kwargs = self.visual.define_mpl_kwargs(self.mpl_artist)
         mpl_kwargs.update(kwargs)
 
         return Text(self.center.x - origin[0], self.center.y - origin[1],

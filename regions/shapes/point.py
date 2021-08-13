@@ -62,6 +62,7 @@ class PointPixelRegion(PixelRegion):
 
     _params = ('center',)
     center = ScalarPix('center')
+    mpl_artist = 'Line2D'
 
     def __init__(self, center, meta=None, visual=None):
         self.center = center
@@ -120,7 +121,7 @@ class PointPixelRegion(PixelRegion):
         """
         from matplotlib.lines import Line2D
 
-        mpl_kwargs = self._define_mpl_kwargs(artist='Line2D')
+        mpl_kwargs = self.visual.define_mpl_kwargs(self.mpl_artist)
         mpl_kwargs.update(kwargs)
 
         return Line2D([self.center.x - origin[0]],
