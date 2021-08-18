@@ -758,7 +758,6 @@ def _to_shape_list(region_list, coordinate_system='fk5'):
     shape_list = _ShapeList()
 
     for region in region_list:
-        coord = []
         if isinstance(region, SkyRegion):
             reg_type = region.__class__.__name__[:-9].lower()
         elif isinstance(region, RegularPolygonPixelRegion):
@@ -766,11 +765,12 @@ def _to_shape_list(region_list, coordinate_system='fk5'):
         else:
             reg_type = region.__class__.__name__[:-11].lower()
 
-        for val in regions_attributes[reg_type]:
-            coord.append(getattr(region, val))
-
         if reg_type == 'polygon':
             coord = region.vertices
+        else:
+            coord = []
+            for val in regions_attributes[reg_type]:
+                coord.append(getattr(region, val))
 
         if coordinate_system:
             coordsys = coordinate_system
