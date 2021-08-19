@@ -11,14 +11,14 @@ __all__ = []
 
 @RegionsRegistry.register(Region, 'serialize', 'ds9')
 @RegionsRegistry.register(Regions, 'serialize', 'ds9')
-def _serialize_ds9(regions, coordsys='fk5', fmt='.6f', radunit='deg'):
-    shapelist = _to_shape_list(regions, coordsys)
-    return shapelist.to_ds9(coordsys, fmt, radunit)
+def _serialize_ds9(regions, fmt='.6f', radunit='deg'):
+    shapelist = _to_shape_list(regions)
+    return shapelist.to_ds9(fmt, radunit)
 
 
 @RegionsRegistry.register(Region, 'write', 'ds9')
 @RegionsRegistry.register(Regions, 'write', 'ds9')
-def _write_ds9(regions, filename, coordsys='fk5', fmt='.6f', radunit='deg',
+def _write_ds9(regions, filename, fmt='.6f', radunit='deg',
                overwrite=False):
     """
     Convert a list of `~regions.Region` to a DS9 string and write to a
@@ -31,10 +31,6 @@ def _write_ds9(regions, filename, coordsys='fk5', fmt='.6f', radunit='deg',
 
     filename : str
         The filename in which the string is to be written.
-
-    coordsys : str, optional
-        An Astropy coordinate system that overrides the coordinate
-        frames of all regions.
 
     fmt : str, optional
         A python string format defining the output precision. Default is
@@ -50,7 +46,6 @@ def _write_ds9(regions, filename, coordsys='fk5', fmt='.6f', radunit='deg',
     if os.path.lexists(filename) and not overwrite:
         raise OSError(f'{filename} already exists')
 
-    output = _serialize_ds9(regions, coordsys=coordsys, fmt=fmt,
-                            radunit=radunit)
+    output = _serialize_ds9(regions, fmt=fmt, radunit=radunit)
     with open(filename, 'w') as fh:
         fh.write(output)

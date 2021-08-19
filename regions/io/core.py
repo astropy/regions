@@ -288,16 +288,12 @@ class _ShapeList(list):
 
         return output
 
-    def to_ds9(self, coordsys='fk5', fmt='.6f', radunit='deg'):
+    def to_ds9(self, fmt='.6f', radunit='deg'):
         """
         Convert to DS9 region strings.
 
         Parameters
         ----------
-        coordsys : str
-            An Astropy coordinate system that overrides the coordinate
-            system frame for all regions.
-
         fmt : str
             A python string format defining the output precision.
             Default is '.6f', which is accurate to 0.0036 arcseconds.
@@ -336,8 +332,6 @@ class _ShapeList(list):
             ds9_strings[key] = val.replace('FMT', fmt).replace('RAD',
                                                                radunitstr)
 
-        output += f'{coordsys}\n'
-
         for shape in self:
             shape.check_ds9()
             shape.meta = _to_ds9_meta(shape.meta)
@@ -375,7 +369,7 @@ class _ShapeList(list):
                 meta_str += f' {shape.meta["comment"]}'
 
             coord = []
-            if coordsys not in ['image', 'physical']:
+            if shape.coordsys not in ['image', 'physical']:
                 for val in shape.coord:
                     if isinstance(val, Angle):
                         coord.append(float(val.value))
@@ -414,10 +408,10 @@ class _ShapeList(list):
             else:
                 line = ds9_strings[shape.region_type].format(include, *coord)
 
+            region_output = f'{line}'
             if meta_str.strip():
-                output += f'{line} # {meta_str}\n'
-            else:
-                output += f'{line}\n'
+                region_output += f' # {meta_str}'
+            output +=  f'{shape.coordsys}; {region_output}\n'
 
         return output
 
@@ -772,6 +766,7 @@ def _to_shape_list(region_list, coordinate_system='fk5'):
             for val in regions_attributes[reg_type]:
                 coord.append(getattr(region, val))
 
+
         if coordinate_system:
             coordsys = coordinate_system
         else:
@@ -779,8 +774,6 @@ def _to_shape_list(region_list, coordinate_system='fk5'):
                 coordsys = coord[0].name
             else:
                 coordsys = 'image'
-
-        frame = frame_transform_graph.lookup_name(coordsys)
 
         new_coord = []
         for val in coord:
@@ -794,6 +787,7 @@ def _to_shape_list(region_list, coordinate_system='fk5'):
                 new_coord.append(u.Quantity(val.x, u.dimensionless_unscaled))
                 new_coord.append(u.Quantity(val.y, u.dimensionless_unscaled))
             else:
+                frame = frame_transform_graph.lookup_name(coordsys)
                 new_coord.append(Angle(val.transform_to(frame).spherical.lon))
                 new_coord.append(Angle(val.transform_to(frame).spherical.lat))
 
