@@ -164,7 +164,7 @@ class CirclePixelRegion(PixelRegion):
         """
         Rotate the region.
 
-        Postive ``angle`` corresponds to counter-clockwise rotation.
+        Positive ``angle`` corresponds to counter-clockwise rotation.
 
         Parameters
         ----------

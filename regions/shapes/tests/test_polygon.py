@@ -144,7 +144,7 @@ class TestPolygonSkyRegion(BaseTestSkyRegion):
 
         # TODO: we should probably assert something about frame
         # attributes, or generally some better way to check if two
-        # SkyCoord are the same? For now, we use the folloing line to
+        # SkyCoord are the same? For now, we use the following line to
         # transform back to ICRS (`poly` is in Galactic, same as WCS)
         poly = PolygonSkyRegion(
             vertices=poly.vertices.transform_to(self.reg.vertices))

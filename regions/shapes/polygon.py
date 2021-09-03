@@ -179,7 +179,7 @@ class PolygonPixelRegion(PixelRegion):
         """
         Rotate the region.
 
-        Postive ``angle`` corresponds to counter-clockwise rotation.
+        Positive ``angle`` corresponds to counter-clockwise rotation.
 
         Parameters
         ----------
@@ -243,7 +243,7 @@ class RegularPolygonPixelRegion(PolygonPixelRegion):
         the inside of the polygon.
     exterior_angle : float
         The polygon exterior angle, which is an angle at each vertex on
-        the ouside of the polygon.
+        the outside of the polygon.
 
     Examples
     --------
@@ -317,7 +317,7 @@ class RegularPolygonPixelRegion(PolygonPixelRegion):
         """
         Rotate the region.
 
-        Postive ``angle`` corresponds to counter-clockwise rotation.
+        Positive ``angle`` corresponds to counter-clockwise rotation.
 
         Parameters
         ----------
