@@ -199,10 +199,10 @@ class RegionMask:
         Returns
         -------
         result : `~numpy.ndarray` or `None`
-            A 2D mask-weighted cutout from the input ``data``.  If there
-            is a partial overlap of the region mask with the input data,
-            pixels outside of the data will be assigned to
-            ``fill_value`` before being multipled with the mask.  `None`
+            A 2D mask-weighted cutout from the input ``data``. If
+            there is a partial overlap of the region mask with the
+            input data, pixels outside of the data will be assigned to
+            ``fill_value`` before being multiplied with the mask. `None`
             is returned if there is no overlap of the region with the
             input ``data``.
         """

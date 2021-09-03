@@ -229,7 +229,7 @@ class PixCoord:
         """
         Rotate the pixel coordinate.
 
-        Postive ``angle`` corresponds to counter-clockwise rotation.
+        Positive ``angle`` corresponds to counter-clockwise rotation.
 
         Parameters
         ----------
