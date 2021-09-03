@@ -290,9 +290,9 @@ This is in contrast to the aperture classes in `Photutils
     >>> apertures = CircularAperture(positions, r=4.2)
 
 To represent lists of `~regions.Region` objects, you can store them in
-Python lists or the `~regions.Regions` class, which effectly acts like a
-list of regions. To create many similar regions or process many regions
-you can use for loops or list comprehensions.
+Python lists or the `~regions.Regions` class, which effectively acts
+like a list of regions. To create many similar regions or process many
+regions you can use for loops or list comprehensions.
 
 .. code-block:: python
 

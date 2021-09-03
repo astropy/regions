@@ -108,12 +108,12 @@ def test_valid_row():
     estr = 'The column "R" is missing in the table'
     assert estr in str(excinfo.value)
 
-    t[0]['SHAPE'] = 'PONT'
+    t[0]['SHAPE'] = 'INVAL'
 
     with pytest.raises(FITSRegionParserError) as excinfo:
         Regions.parse(t, format='fits')
 
-    estr = '"PONT" is not a valid FITS Region type'
+    estr = '"INVAL" is not a valid FITS Region type'
     assert estr in str(excinfo.value)
 
     t['ROTANG'] = [[20, 30]]

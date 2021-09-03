@@ -515,7 +515,7 @@ class _Shape:
         The meta attributes.
 
     composite : bool
-        Flag indicting wheter the region is a Composite region.
+        Flag indicting whether the region is a Composite region.
 
     include : bool
         Flag indicating where to include or exclude the region.
