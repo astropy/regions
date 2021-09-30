@@ -67,10 +67,12 @@ class RegionVisual(Meta):
     region.
     """
 
-    valid_keys = ['color', 'dash', 'dashlist', 'fill', 'font', 'fontsize',
+    valid_keys = ['color', 'dash', 'dashlist', 'fill', 'font',
+                  'fontname', 'fontsize',
                   'fontstyle', 'fontweight', 'labeloff', 'labelpos', 'line',
-                  'linestyle', 'linewidth', 'marker', 'symbol', 'symsize',
-                  'symthick', 'textangle', 'usetex', 'default_style']
+                  'linestyle', 'linewidth', 'marker', 'markersize', 'symbol',
+                  'symsize', 'symthick', 'textangle', 'usetex',
+                  'default_style']
 
     key_mapping = {'point': 'symbol', 'width': 'linewidth'}
 
@@ -144,8 +146,6 @@ class RegionVisual(Meta):
         result : dict
             A dictionary of matplotlib keyword arguments.
         """
-        kwargs = {}
-
         if artist == 'Text':
             keymap = {'font': 'family',
                       'fontstyle': 'style',
