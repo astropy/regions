@@ -10,6 +10,7 @@ from astropy.utils.exceptions import AstropyUserWarning
 from ...core import Region, Regions, PixelRegion
 from ...core.registry import RegionsRegistry
 from ..core import _to_shape_list
+from .core import valid_symbols_ds9
 
 __all__ = []
 
@@ -84,7 +85,8 @@ def _get_region_shape(region, mapping):
 def _get_region_center(region, precision=8):
     if isinstance(region, PixelRegion):
         # pixels (TODO: apply precision?)
-        center = f'{region.center.x},{region.center.y}'
+        # DS9's origin is (1, 1)
+        center = f'{region.center.x + 1},{region.center.y + 1}'
     else:
         # decimal degrees
         center = region.center.to_string(precision=precision).replace(' ', ',')
@@ -94,7 +96,7 @@ def _get_region_center(region, precision=8):
 def _get_shape_params(region, template, precision=8):
     param = {}
     for param_name in region._params:
-        if param_name == 'center':
+        if param_name in ('center', 'text'):
             continue
         value = getattr(region, param_name)
         if isinstance(value, Angle):
@@ -115,12 +117,45 @@ def _get_shape_params(region, template, precision=8):
     return param_str
 
 
-def _get_region_meta(region, valid_keys):
-    region_meta = {**region.meta, **region.visual}
+def _remove_invalid_keys(region_meta, valid_keys):
+    # TODO: instead of new dict, del region_meta in-place?
     meta = {}
     for key in region_meta:
         if key in valid_keys:
             meta[key] = region_meta[key]
+    return meta
+
+
+# TODO: remove me after the parsers are refactored
+def _translate_to_mpl_meta(region):
+    """
+    Translate region visual metadata to valid mpl keys.
+    """
+    meta = region.visual.copy()
+
+    dash = meta.pop('dash', 0)
+    dashlist = meta.pop('dashlist', None)
+    if int(dash) == 1:
+        meta['linestyle'] = 'dashed'
+        if dashlist is not None:
+            meta['dashes'] = [int(i) for i in dashlist.split()]
+
+    font = meta.pop('font', None)
+    if font is not None:
+        meta['fontname'] = font
+
+    symbol = meta.pop('symbol', None)
+    if symbol is not None:
+        meta['marker'] = symbol
+    symsize = meta.pop('symsize', None)
+    if symsize is not None:
+        meta['markersize'] = symsize
+
+    # TODO: if region is point
+    #width = meta.pop('width', None)
+    #if width is not None:
+    #    meta['markeredgewidth'] = width
+
     return meta
 
 
@@ -129,56 +164,46 @@ def _translate_ds9_meta(meta):
     Translate metadata from other regions or matplotlib to valid ds9
     meta keys.
     """
+    if 'include' in meta:
+        if meta['include'] is True:
+            meta['include'] = 1
+        else:
+            meta['include'] = 0
+    else:
+        meta['include'] = 1
+
     if 'text' in meta:
-        meta.pop('label', None)
-    else:
-        if 'label' in meta:
-            meta['text'] = meta.pop('label')
+        meta['text'] = f'{{{meta["text"]}}}'
 
-    if 'width' in meta:
-        meta.pop('linewidth', None)
-    else:
-        if 'linewidth' in meta:
-            meta['width'] = meta.pop('linewidth')
+    linewidth = meta.pop('linewidth', None)
+    if linewidth is not None:
+        meta['width'] = linewidth
 
-    if 'point' in meta:
-        meta.pop('symbol', None)
-        meta.pop('symsize', None)
-    else:
-        # symsize without symbol is ignored
-        if 'symbol' in meta:
-            point = f'{meta.pop("symbol")}'
-            if 'symsize' in meta:
-                point += f' {meta.pop("symsize")}'
-            meta['point'] = point
+    # point
+    markeredgewidth = meta.pop('markeredgewidth', None)
+    if markeredgewidth is not None:
+        meta['width'] = markeredgewidth
 
-    if 'font' in meta:
-        meta.pop('fontname', None)
-        meta.pop('fontsize', None)
-        meta.pop('fontweight', None)
-        meta.pop('fontstyle', None)
-    else:
-        # fontsize, fontweight, and fontstyle without fontname are ignored
-        if 'fontname' in meta:
-            font = f'{meta.pop("fontname")}'
-        if 'fontsize' in meta:
-            font += f'{meta.pop("fontsize")}'
-        if 'fontweight' in meta:
-            font += f'{meta.pop("fontweight")}'
-        if 'fontstyle' in meta:
-            font += f'{meta.pop("fontstyle")}'
+    fontname = meta.pop('fontname', None)
+    if fontname is not None:
+        fontsize = meta.pop('fontname', 10)  # default 10
+        fontweight = meta.pop('fontname', 'normal')
+        fontstyle = meta.pop('fontstyle', 'roman').replace('normal',
+                                                           'roman')
+        meta['font'] = f'"{fontname} {fontsize} {fontweight} {fontstyle}"'
 
-    if 'dash' in meta:
-        if (meta['dash'] == 0) or (meta['dash'] == 1 and 'dashlist' in meta):
-            meta.pop('linestyle', None)
-            meta.pop('dashes', None)
-    else:
-        # if dash not in meta, dashlist is ignored
-        if meta.get('linestyle', 'solid') in ('dashed', '--'):
-            meta['dash'] = 1
-            if 'dashes' in meta:
-                dashes = meta.pop('dashes')
-                meta['dashlist'] = f'{dashes[0]} {dashes[1]}'
+    linestyle = meta.pop('linestyle', None)
+    if linestyle in ('dashed', '--'):
+        meta['dash'] = 1
+        dashes = meta.pop('dashes', None)
+        if dashes is not None:
+            meta['dashlist'] = f'{dashes[0]} {dashes[1]}'
+
+    marker = meta.pop('marker', None)
+    if marker is not None:
+        symbol_map = {y: x for x, y in valid_symbols_ds9.items()}
+        markersize = meta.pop('markersize', 11)
+        meta['point'] = f'{symbol_map[marker]} {markersize}'
 
     return meta
 
@@ -223,23 +248,72 @@ def _serialize_region_ds9(region, precision=8):
     region_center = _get_region_center(region, precision=precision)
     template = shape_templates[shape][1]
     shape_params = _get_shape_params(region, template, precision=precision)
-    shape_str = f'{region_type}({region_center},{shape_params})'
+    if shape_params:
+        shape_params = f',{shape_params}'
+    shape_str = f'{region_type}({region_center}{shape_params})'
 
     # ds9 meta keys
     meta_keys = ['text', 'select', 'highlite', 'fixed', 'edit', 'move',
                  'rotate', 'delete', 'include', 'tag']
     visual_keys = ['color', 'textangle', 'textrotate', 'dash', 'dashlist',
                    'width', 'font', 'fill', 'point']
+    valid_keys = meta_keys + visual_keys
 
-    # meta keys that can be mapped
-    # TODO: make specific to mpl artist type?
-    other_keys = ['label', 'linewidth', 'fontname', 'fontsize', 'fontweight',
-                  'fontstyle', 'symbol', 'symsize', 'linewidth', 'linestyle',
-                  'dashes']
+    # TODO: remove after parsers are refactored
+    visual_meta = _translate_to_mpl_meta(region)
 
-    valid_keys = meta_keys + visual_keys + other_keys
-
-    valid_meta = _get_region_meta(region, valid_keys)
-    meta = _translate_ds9_meta(valid_meta)
+    region_meta = {**region.meta, **visual_meta}
+    meta = _translate_ds9_meta(region_meta)
+    meta = _remove_invalid_keys(meta, valid_keys)
 
     return {'frame': frame, 'shape': shape_str, 'meta': meta}
+
+
+def _make_meta_str(meta):
+    metalist = []
+    for key, val in meta.items():
+        if key == 'tag':
+            metalist.append(' '.join([f'tag={val}' for val in meta[key]]))
+        else:
+            metalist.append(f'{key}={val}')
+    return ' '.join(metalist)
+
+
+def _new_serialize_ds9(regions, precision=8):
+    region_data = []
+    for region in regions:
+        region_data.append(_serialize_region_ds9(region, precision=precision))
+
+    # extract common meta to global
+    # tag cannot be in global
+    metalist_notag = []
+    for rd in region_data:
+        tmp = rd['meta']
+        tmp.pop('tag', None)
+        metalist_notag.append(tmp)
+
+    output = '# Region file format: DS9 astropy/regions\n'
+
+    global_meta = dict(set.intersection(*[set(d.items())
+                                          for d in metalist_notag]))
+    if global_meta:
+        global_str = f'global {_make_meta_str(global_meta)}'
+        output += f'{global_str}\n'
+
+    #metalist = [rd['meta'] for rd in region_data]
+    metalist = []
+    for rd in region_data:
+        tmp = rd['meta']
+        for key in global_meta.keys():
+            tmp.pop(key)
+        metalist.append(tmp)
+
+    # TODO
+    # extract common coord frame for consecutive regions
+
+    for data, meta in zip(region_data, metalist):
+        meta_str = _make_meta_str(meta)
+        output += f'{data["frame"]}; {data["shape"]} # {meta_str}\n'
+
+    print(output)
+    return output
