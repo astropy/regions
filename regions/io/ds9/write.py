@@ -61,7 +61,10 @@ def _get_frame_name(region, mapping):
     if isinstance(region, PixelRegion):
         frame = 'image'
     else:
-        frame = region.center.frame.name
+        if 'center' in region._params:
+            frame = region.center.frame.name
+        elif 'vertices' in region._params:
+            frame = region.vertices.frame.name
 
     if frame not in mapping.keys():
         warnings.warn(f'Cannot serialize region with frame={frame}, skipping',
