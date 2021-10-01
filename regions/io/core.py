@@ -836,8 +836,8 @@ def _to_ds9_meta(shape_meta):
 
     if 'font' in meta:
         meta['font'] += (f" {shape_meta.get('fontsize', 12)} "
-                         f"{shape_meta.get('fontstyle', 'normal')} "
-                         f"{shape_meta.get('fontweight', 'roman')}")
+                         f"{shape_meta.get('fontweight', 'normal')} "
+                         f"{shape_meta.get('fontstyle', 'roman')}")
 
     return meta
 

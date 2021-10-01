@@ -527,7 +527,7 @@ class _DS9RegionParser:
 
         if 'font' in self.meta:
             fonts = self.meta['font'].split(' ')
-            keys = ['font', 'fontsize', 'fontstyle', 'fontweight']
+            keys = ['font', 'fontsize', 'fontweight', 'fontstyle']
             for i, val in enumerate(fonts):
                 self.meta[keys[i]] = val
 
