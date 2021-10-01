@@ -7,7 +7,7 @@ from astropy.coordinates import Angle, SkyCoord
 from astropy.units import Quantity
 from astropy.utils.exceptions import AstropyUserWarning
 
-from ...core import Region, Regions, PixelRegion
+from ...core import Region, Regions, PixelRegion, PixCoord
 from ...core.registry import RegionsRegistry
 from ..core import _to_shape_list
 from .core import valid_symbols_ds9
@@ -104,27 +104,40 @@ def _get_region_center(region, precision=8):
             # to_string converts to decimal degrees
             center = region.center.to_string(
                 precision=precision).replace(' ', ',')
-        #elif 'vertices' in region._params:
-        #    # polygon region
-        #    center = ' '.join(region.vertices.to_string(
-        #        precision=precision)).replace(' ', ',')
-        #else:
-        #    raise ValueError('cannot parse center or vertices')
     return center
 
 
-def _get_shape_params(region, template, precision=8):
+def _get_region_params(region, template, precision=8):
+
+    ellipse_axes = ('width', 'height', 'inner_width', 'inner_height',
+                    'outer_width', 'outer_height')
+    ellipse_names = ('ellipse', 'ellipseannulus')
+
     param = {}
     for param_name in region._params:
-        #if param_name in ('center', 'vertices', 'text'):
-        if param_name in ('center', 'text'):
+        if param_name in ('text'):
             continue
+
+        if param_name in ellipse_axes and template[0] in ellipse_names:
+            is_ellipse = True
+        else:
+            is_ellipse = False
+
+        #print('REGION', param_name, is_ellipse)
+
         value = getattr(region, param_name)
-        if isinstance(value, Angle):
-            value = value.to_string(unit='deg', decimal=True,
-                                    precision=precision)
-        elif isinstance(value, Quantity):
-            value = value.to_string(unit='deg', precision=precision)[:-4]
+
+        if isinstance(value, PixCoord):
+            # pixels (TODO: apply precision?)
+            # DS9's origin is (1, 1)
+            if value.isscalar:
+                value = f'{value.x + 1},{value.y + 1}'
+            else:
+                value_str = ''
+                for val in value:
+                    value_str += f'{val.x + 1},{val.y + 1},'
+                value = value_str[:-1]
+
         elif isinstance(value, SkyCoord):
             # polygon region
             if not value.isscalar:
@@ -133,12 +146,25 @@ def _get_shape_params(region, template, precision=8):
             else:
                 value = value.to_string(
                     precision=precision).replace(' ', ',')
+
+        elif isinstance(value, Angle):
+            if is_ellipse:
+                value /= 2.0
+            value = value.to_string(unit='deg', decimal=True,
+                                    precision=precision)
+
+        elif isinstance(value, Quantity):
+            if is_ellipse:
+                value /= 2.0
+            value = value.to_string(unit='deg', precision=precision)[:-4]
+
         else:
             value = f'{value:.{precision}f}'
+
         param[param_name] = value
 
     try:
-        param_str = template.format(**param)
+        param_str = template[1].format(**param)
     except KeyError as err:
         raise ValueError(
             f'unable to get shape parameters for {region!r}') from err
@@ -215,8 +241,8 @@ def _translate_ds9_meta(meta):
 
     fontname = meta.pop('fontname', None)
     if fontname is not None:
-        fontsize = meta.pop('fontname', 10)  # default 10
-        fontweight = meta.pop('fontname', 'normal')
+        fontsize = meta.pop('fontsize', 10)  # default 10
+        fontweight = meta.pop('fontweight', 'normal')
         fontstyle = meta.pop('fontstyle', 'roman').replace('normal',
                                                            'roman')
         meta['font'] = f'"{fontname} {fontsize} {fontweight} {fontstyle}"'
@@ -250,36 +276,39 @@ def _serialize_region_ds9(region, precision=8):
     # unsupported ds9 shapes:
     # vector, ruler, compass, projection, panda, epanda, bpanda, composite
     shape_templates = {'circle': ('circle',
-                                  '{radius}'),
+                                  '{center},{radius}'),
                        'ellipse': ('ellipse',
-                                   '{width},{height},{angle}'),
+                                   '{center},{width},{height}'
+                                   ',{angle}'),
                        'rectangle': ('box',
-                                     '{width},{height}{angle}'),
+                                     '{center},{width},{height},{angle}'),
                        'circleannulus': ('annulus',
-                                         '{inner_radius},{outer_radius}'),
+                                         '{center},{inner_radius},'
+                                         '{outer_radius}'),
                        'ellipseannulus': ('ellipse',
-                                          '{inner_width},{inner_height},'
-                                          '{outer_width},{outer_height},'
-                                          '{angle}'),
+                                          '{center},{inner_width},'
+                                          '{inner_height},'
+                                          '{outer_width},'
+                                          '{outer_height},{angle}'),
                        'rectangleannulus': ('box',
-                                            '{inner_width},{inner_height},'
-                                            '{outer_width},{outer_height},'
-                                            '{angle}'),
+                                            '{center},{inner_width},'
+                                            '{inner_height},{outer_width},'
+                                            '{outer_height},{angle}'),
                        'polygon': ('polygon',
                                    '{vertices}'),
                        'line': ('line',
                                 '{start},{end}'),
-                       'point': ('point', ''),
-                       'text': ('text', '')}
+                       'point': ('point', '{center}'),
+                       'text': ('text', '{center}')}
 
     frame = _get_frame_name(region, mapping=frame_mapping)
     shape, region_type = _get_region_shape(region, shape_templates)
-    region_center = _get_region_center(region, precision=precision)
-    template = shape_templates[shape][1]
-    shape_params = _get_shape_params(region, template, precision=precision)
-    if shape_params:
-        shape_params = f',{shape_params}'
-    shape_str = f'{region_type}({region_center}{shape_params})'
+    #region_center = _get_region_center(region, precision=precision)
+    template = shape_templates[shape]
+    region_params = _get_region_params(region, template, precision=precision)
+    #if shape_params:
+    #    shape_params = f',{shape_params}'
+    region_str = f'{region_type}({region_params})'
 
     # ds9 meta keys
     meta_keys = ['text', 'select', 'highlite', 'fixed', 'edit', 'move',
@@ -295,7 +324,7 @@ def _serialize_region_ds9(region, precision=8):
     meta = _translate_ds9_meta(region_meta)
     meta = _remove_invalid_keys(meta, valid_keys)
 
-    return {'frame': frame, 'shape': shape_str, 'meta': meta}
+    return {'frame': frame, 'region': region_str, 'meta': meta}
 
 
 def _make_meta_str(meta):
@@ -342,7 +371,7 @@ def _new_serialize_ds9(regions, precision=8):
 
     for data, meta in zip(region_data, metalist):
         meta_str = _make_meta_str(meta)
-        output += f'{data["frame"]}; {data["shape"]} # {meta_str}\n'
+        output += f'{data["frame"]}; {data["region"]} # {meta_str}\n'
 
     print(output)
     return output
