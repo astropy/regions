@@ -3,7 +3,7 @@
 import os
 import warnings
 
-from astropy.coordinates import Angle
+from astropy.coordinates import Angle, SkyCoord
 from astropy.units import Quantity
 from astropy.utils.exceptions import AstropyUserWarning
 
@@ -65,6 +65,13 @@ def _get_frame_name(region, mapping):
             frame = region.center.frame.name
         elif 'vertices' in region._params:
             frame = region.vertices.frame.name
+        elif 'start' in region._params:
+            frame = region.start.frame.name
+        else:
+            raise ValueError('unable to determine frame name')
+
+    #print('REGION', region)
+    #print(frame, region)
 
     if frame not in mapping.keys():
         warnings.warn(f'Cannot serialize region with frame={frame}, skipping',
@@ -86,19 +93,30 @@ def _get_region_shape(region, mapping):
 
 
 def _get_region_center(region, precision=8):
+    center = ''
     if isinstance(region, PixelRegion):
         # pixels (TODO: apply precision?)
         # DS9's origin is (1, 1)
-        center = f'{region.center.x + 1},{region.center.y + 1}'
+        if 'center' in region._params:
+            center = f'{region.center.x + 1},{region.center.y + 1}'
     else:
-        # decimal degrees
-        center = region.center.to_string(precision=precision).replace(' ', ',')
+        if 'center' in region._params:
+            # to_string converts to decimal degrees
+            center = region.center.to_string(
+                precision=precision).replace(' ', ',')
+        #elif 'vertices' in region._params:
+        #    # polygon region
+        #    center = ' '.join(region.vertices.to_string(
+        #        precision=precision)).replace(' ', ',')
+        #else:
+        #    raise ValueError('cannot parse center or vertices')
     return center
 
 
 def _get_shape_params(region, template, precision=8):
     param = {}
     for param_name in region._params:
+        #if param_name in ('center', 'vertices', 'text'):
         if param_name in ('center', 'text'):
             continue
         value = getattr(region, param_name)
@@ -107,6 +125,14 @@ def _get_shape_params(region, template, precision=8):
                                     precision=precision)
         elif isinstance(value, Quantity):
             value = value.to_string(unit='deg', precision=precision)[:-4]
+        elif isinstance(value, SkyCoord):
+            # polygon region
+            if not value.isscalar:
+                value = ' '.join(value.to_string(
+                    precision=precision)).replace(' ', ',')
+            else:
+                value = value.to_string(
+                    precision=precision).replace(' ', ',')
         else:
             value = f'{value:.{precision}f}'
         param[param_name] = value
