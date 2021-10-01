@@ -56,7 +56,7 @@ class RegionMeta(Meta):
     valid_keys = ['background', 'comment', 'corr', 'delete', 'edit', 'fixed',
                   'frame', 'highlite', 'include', 'label', 'line', 'move',
                   'name', 'range', 'restfreq', 'rotate', 'select', 'source',
-                  'tag', 'text', 'type', 'veltype']
+                  'tag', 'text', 'type', 'veltype', 'textrotate']
 
     key_mapping = {}
 
@@ -71,7 +71,7 @@ class RegionVisual(Meta):
                   'fontname', 'fontsize',
                   'fontstyle', 'fontweight', 'labeloff', 'labelpos', 'line',
                   'linestyle', 'linewidth', 'marker', 'markersize', 'symbol',
-                  'symsize', 'symthick', 'textangle', 'usetex',
+                  'symsize', 'symthick', 'textangle', 'textrotate', 'usetex',
                   'default_style']
 
     key_mapping = {'point': 'symbol', 'width': 'linewidth'}
