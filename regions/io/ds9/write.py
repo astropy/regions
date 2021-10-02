@@ -15,17 +15,16 @@ from .core import valid_symbols_ds9
 __all__ = []
 
 
-@RegionsRegistry.register(Region, 'serialize', 'ds9')
-@RegionsRegistry.register(Regions, 'serialize', 'ds9')
-def _serialize_ds9(regions, fmt='.6f', radunit='deg'):
-    shapelist = _to_shape_list(regions)
-    return shapelist.to_ds9(fmt, radunit)
+#@RegionsRegistry.register(Region, 'serialize', 'ds9')
+#@RegionsRegistry.register(Regions, 'serialize', 'ds9')
+#def _serialize_ds9(regions, fmt='.6f', radunit='deg'):
+#    shapelist = _to_shape_list(regions)
+#    return shapelist.to_ds9(fmt, radunit)
 
 
 @RegionsRegistry.register(Region, 'write', 'ds9')
 @RegionsRegistry.register(Regions, 'write', 'ds9')
-def _write_ds9(regions, filename, fmt='.6f', radunit='deg',
-               overwrite=False):
+def _write_ds9(regions, filename, *, precision=8, overwrite=False):
     """
     Convert a list of `~regions.Region` to a DS9 string and write to a
     file.
@@ -52,7 +51,7 @@ def _write_ds9(regions, filename, fmt='.6f', radunit='deg',
     if os.path.lexists(filename) and not overwrite:
         raise OSError(f'{filename} already exists')
 
-    output = _serialize_ds9(regions, fmt=fmt, radunit=radunit)
+    output = _serialize_ds9(regions, precision=precision)
     with open(filename, 'w') as fh:
         fh.write(output)
 
@@ -337,7 +336,9 @@ def _make_meta_str(meta):
     return ' '.join(metalist)
 
 
-def _new_serialize_ds9(regions, precision=8):
+@RegionsRegistry.register(Region, 'serialize', 'ds9')
+@RegionsRegistry.register(Regions, 'serialize', 'ds9')
+def _serialize_ds9(regions, precision=8):
     region_data = []
     for region in regions:
         region_data.append(_serialize_region_ds9(region, precision=precision))
