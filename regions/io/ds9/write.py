@@ -67,10 +67,7 @@ def _get_frame_name(region, mapping):
         elif 'start' in region._params:
             frame = region.start.frame.name
         else:
-            raise ValueError('unable to determine frame name')
-
-    #print('REGION', region)
-    #print(frame, region)
+            raise ValueError(f'Unable to get shape parameters for {region!r}')
 
     if frame not in mapping.keys():
         warnings.warn(f'Cannot serialize region with frame={frame}, skipping',
@@ -91,23 +88,7 @@ def _get_region_shape(region, mapping):
     return shape, mapping[shape][0]
 
 
-def _get_region_center(region, precision=8):
-    center = ''
-    if isinstance(region, PixelRegion):
-        # pixels (TODO: apply precision?)
-        # DS9's origin is (1, 1)
-        if 'center' in region._params:
-            center = f'{region.center.x + 1},{region.center.y + 1}'
-    else:
-        if 'center' in region._params:
-            # to_string converts to decimal degrees
-            center = region.center.to_string(
-                precision=precision).replace(' ', ',')
-    return center
-
-
 def _get_region_params(region, template, precision=8):
-
     ellipse_axes = ('width', 'height', 'inner_width', 'inner_height',
                     'outer_width', 'outer_height')
     ellipse_names = ('ellipse', 'ellipseannulus')
@@ -122,13 +103,11 @@ def _get_region_params(region, template, precision=8):
         else:
             is_ellipse = False
 
-        #print('REGION', param_name, is_ellipse)
-
         value = getattr(region, param_name)
 
         if isinstance(value, PixCoord):
-            # pixels (TODO: apply precision?)
-            # DS9's origin is (1, 1)
+            # pixels; DS9's origin is (1, 1)
+            # TODO: apply precision?
             if value.isscalar:
                 value = f'{value.x + 1},{value.y + 1}'
             else:
@@ -166,7 +145,7 @@ def _get_region_params(region, template, precision=8):
         param_str = template[1].format(**param)
     except KeyError as err:
         raise ValueError(
-            f'unable to get shape parameters for {region!r}') from err
+            f'Unable to get shape parameters for {region!r}') from err
 
     return param_str
 
@@ -302,11 +281,8 @@ def _serialize_region_ds9(region, precision=8):
 
     frame = _get_frame_name(region, mapping=frame_mapping)
     shape, region_type = _get_region_shape(region, shape_templates)
-    #region_center = _get_region_center(region, precision=precision)
     template = shape_templates[shape]
     region_params = _get_region_params(region, template, precision=precision)
-    #if shape_params:
-    #    shape_params = f',{shape_params}'
     region_str = f'{region_type}({region_params})'
 
     # ds9 meta keys
@@ -318,8 +294,8 @@ def _serialize_region_ds9(region, precision=8):
 
     # TODO: remove after parsers are refactored
     visual_meta = _translate_to_mpl_meta(region)
-
     region_meta = {**region.meta, **visual_meta}
+
     meta = _translate_ds9_meta(region_meta)
     meta = _remove_invalid_keys(meta, valid_keys)
 
