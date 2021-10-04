@@ -67,7 +67,45 @@ def _read_ds9(filename, errors='strict', cache=False):
 @RegionsRegistry.register(Regions, 'parse', 'ds9')
 def _parse_ds9(region_string, errors='strict'):
     parser = _DS9Parser(region_string, errors=errors)
-    return Regions(parser.shapes.to_regions())
+    regions = Regions(parser.shapes.to_regions())
+
+    for region in regions:
+        region.visual = _translate_to_mpl_meta(region.visual)
+
+    return regions
+
+
+# TODO: remove me after the parsers are refactored
+def _translate_to_mpl_meta(region_visual):
+    """
+    Translate region visual metadata to valid mpl keys.
+    """
+    meta = region_visual.copy()
+
+    dash = meta.pop('dash', 0)
+    dashlist = meta.pop('dashlist', None)
+    if int(dash) == 1:
+        meta['linestyle'] = 'dashed'
+        if dashlist is not None:
+            meta['dashes'] = [int(i) for i in dashlist.split()]
+
+    font = meta.pop('font', None)
+    if font is not None:
+        meta['fontname'] = font
+
+    symbol = meta.pop('symbol', None)
+    if symbol is not None:
+        meta['marker'] = symbol
+    symsize = meta.pop('symsize', None)
+    if symsize is not None:
+        meta['markersize'] = symsize
+
+    # TODO: if region is point
+    #width = meta.pop('width', None)
+    #if width is not None:
+    #    meta['markeredgewidth'] = width
+
+    return meta
 
 
 class _DS9CoordinateParser:
