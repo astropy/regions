@@ -9,17 +9,61 @@ from astropy.utils.exceptions import AstropyUserWarning
 
 from ...core import Region, Regions, PixelRegion, PixCoord
 from ...core.registry import RegionsRegistry
-from ..core import _to_shape_list
 from .core import valid_symbols_ds9
 
 __all__ = []
 
 
-#@RegionsRegistry.register(Region, 'serialize', 'ds9')
-#@RegionsRegistry.register(Regions, 'serialize', 'ds9')
-#def _serialize_ds9(regions, fmt='.6f', radunit='deg'):
-#    shapelist = _to_shape_list(regions)
-#    return shapelist.to_ds9(fmt, radunit)
+@RegionsRegistry.register(Region, 'serialize', 'ds9')
+@RegionsRegistry.register(Regions, 'serialize', 'ds9')
+def _serialize_ds9(regions, precision=8):
+    region_data = []
+    for region in regions:
+        region_data.append(_serialize_region_ds9(region, precision=precision))
+
+    # extract common metadata to global metadata
+    # "tag" cannot be in global
+    metalist_notag = []
+    for region in region_data:
+        meta_tmp = region['meta']
+        meta_tmp.pop('tag', None)
+        metalist_notag.append(meta_tmp)
+
+    # ds9 file header
+    output = '# Region file format: DS9 astropy/regions\n'
+
+    # global metadata
+    global_meta = dict(set.intersection(*[set(meta_dict.items())
+                                          for meta_dict in metalist_notag]))
+    if global_meta:
+        global_str = f'global {_make_meta_str(global_meta)}'
+        output += f'{global_str}\n'
+
+    metadata = []
+    frames = []
+    for region in region_data:
+        meta_tmp = region['meta']
+        frames.append(region['frame'])
+        for key in global_meta:
+            meta_tmp.pop(key)
+        metadata.append(meta_tmp)
+
+    # extract coordinate frame if identical for all regions
+    # TODO: extract common coord frame(s) for block(s) of consecutive regions
+    frames = set(frames)
+    global_frame = None
+    if len(frames) == 1:
+        global_frame = frames.pop()
+        output += f'{global_frame}\n'
+
+    # add line for each region
+    for region, meta in zip(region_data, metadata):
+        meta_str = _make_meta_str(meta)
+        if global_frame is None:
+            output += f'{region["frame"]}; '
+        output += f'{region["region"]} # {meta_str}\n'
+
+    return output
 
 
 @RegionsRegistry.register(Region, 'write', 'ds9')
@@ -76,16 +120,30 @@ def _get_frame_name(region, mapping):
     return mapping[frame]
 
 
-def _get_region_shape(region, mapping):
+def _get_region_shape(region):
     shape = region.__class__.__name__.lower().replace('skyregion', '')
     shape = shape.replace('pixelregion', '')
     shape = shape.replace('regularpolygon', 'polygon')
+    return shape
 
-    if shape not in mapping.keys():
-        warnings.warn(f'Cannot serialize region shape "{shape}", '
-                      'skipping', AstropyUserWarning)
 
-    return shape, mapping[shape][0]
+def _remove_invalid_keys(region_meta, valid_keys):
+    # TODO: instead of new dict, del region_meta in-place?
+    meta = {}
+    for key in region_meta:
+        if key in valid_keys:
+            meta[key] = region_meta[key]
+    return meta
+
+
+def _make_meta_str(meta):
+    metalist = []
+    for key, val in meta.items():
+        if key == 'tag':
+            metalist.append(' '.join([f'tag={val}' for val in meta[key]]))
+        else:
+            metalist.append(f'{key}={val}')
+    return ' '.join(metalist)
 
 
 def _get_region_params(region, template, precision=8):
@@ -98,15 +156,13 @@ def _get_region_params(region, template, precision=8):
         if param_name in ('text'):
             continue
 
-        if param_name in ellipse_axes and template[0] in ellipse_names:
-            is_ellipse = True
-        else:
-            is_ellipse = False
+        is_ellipse = (param_name in ellipse_axes
+                      and template[0] in ellipse_names)
 
         value = getattr(region, param_name)
 
         if isinstance(value, PixCoord):
-            # pixels; DS9's origin is (1, 1)
+            # pixels; ds9's origin is (1, 1)
             # TODO: apply precision?
             if value.isscalar:
                 value = f'{value.x + 1},{value.y + 1}'
@@ -150,53 +206,14 @@ def _get_region_params(region, template, precision=8):
     return param_str
 
 
-def _remove_invalid_keys(region_meta, valid_keys):
-    # TODO: instead of new dict, del region_meta in-place?
-    meta = {}
-    for key in region_meta:
-        if key in valid_keys:
-            meta[key] = region_meta[key]
-    return meta
-
-
-# TODO: remove me after the parsers are refactored
-def _translate_to_mpl_meta(region):
-    """
-    Translate region visual metadata to valid mpl keys.
-    """
-    meta = region.visual.copy()
-
-    dash = meta.pop('dash', 0)
-    dashlist = meta.pop('dashlist', None)
-    if int(dash) == 1:
-        meta['linestyle'] = 'dashed'
-        if dashlist is not None:
-            meta['dashes'] = [int(i) for i in dashlist.split()]
-
-    font = meta.pop('font', None)
-    if font is not None:
-        meta['fontname'] = font
-
-    symbol = meta.pop('symbol', None)
-    if symbol is not None:
-        meta['marker'] = symbol
-    symsize = meta.pop('symsize', None)
-    if symsize is not None:
-        meta['markersize'] = symsize
-
-    # TODO: if region is point
-    #width = meta.pop('width', None)
-    #if width is not None:
-    #    meta['markeredgewidth'] = width
-
-    return meta
-
-
-def _translate_ds9_meta(meta):
+def _translate_ds9_meta(region, shape):
     """
     Translate metadata from other regions or matplotlib to valid ds9
     meta keys.
     """
+    meta = {**region.meta, **region.visual}
+
+    # TODO: fix this in ds9 parser
     if 'include' in meta:
         if meta['include'] is True:
             meta['include'] = 1
@@ -204,6 +221,10 @@ def _translate_ds9_meta(meta):
             meta['include'] = 0
     else:
         meta['include'] = 1
+
+    if 'annulus' in shape:
+        # ds9 does not allow fill for annulus regions
+        meta.pop('fill', None)
 
     if 'text' in meta:
         meta['text'] = f'{{{meta["text"]}}}'
@@ -216,6 +237,12 @@ def _translate_ds9_meta(meta):
     markeredgewidth = meta.pop('markeredgewidth', None)
     if markeredgewidth is not None:
         meta['width'] = markeredgewidth
+
+    marker = meta.pop('marker', None)
+    if marker is not None:
+        symbol_map = {y: x for x, y in valid_symbols_ds9.items()}
+        markersize = meta.pop('markersize', 11)
+        meta['point'] = f'{symbol_map[marker]} {markersize}'
 
     fontname = meta.pop('fontname', None)
     if fontname is not None:
@@ -232,11 +259,14 @@ def _translate_ds9_meta(meta):
         if dashes is not None:
             meta['dashlist'] = f'{dashes[0]} {dashes[1]}'
 
-    marker = meta.pop('marker', None)
-    if marker is not None:
-        symbol_map = {y: x for x, y in valid_symbols_ds9.items()}
-        markersize = meta.pop('markersize', 11)
-        meta['point'] = f'{symbol_map[marker]} {markersize}'
+    # ds9 meta keys
+    meta_keys = ['text', 'select', 'highlite', 'fixed', 'edit', 'move',
+                 'rotate', 'delete', 'include', 'tag', 'source',
+                 'background']
+    visual_keys = ['color', 'textangle', 'textrotate', 'dash', 'dashlist',
+                   'width', 'font', 'fill', 'point']
+    valid_keys = meta_keys + visual_keys
+    meta = _remove_invalid_keys(meta, valid_keys)
 
     return meta
 
@@ -280,75 +310,19 @@ def _serialize_region_ds9(region, precision=8):
                        'text': ('text', '{center}')}
 
     frame = _get_frame_name(region, mapping=frame_mapping)
-    shape, region_type = _get_region_shape(region, shape_templates)
-    template = shape_templates[shape]
-    region_params = _get_region_params(region, template, precision=precision)
+
+    shape = _get_region_shape(region)
+    if shape not in shape_templates:
+        warnings.warn(f'Cannot serialize region shape "{shape}", '
+                      'skipping', AstropyUserWarning)
+
+    region_params = _get_region_params(region,
+                                       shape_templates[shape],
+                                       precision=precision)
+
+    region_type = shape_templates[shape][0]
     region_str = f'{region_type}({region_params})'
 
-    # ds9 meta keys
-    meta_keys = ['text', 'select', 'highlite', 'fixed', 'edit', 'move',
-                 'rotate', 'delete', 'include', 'tag']
-    visual_keys = ['color', 'textangle', 'textrotate', 'dash', 'dashlist',
-                   'width', 'font', 'fill', 'point']
-    valid_keys = meta_keys + visual_keys
-
-    # TODO: remove after parsers are refactored
-    visual_meta = _translate_to_mpl_meta(region)
-    region_meta = {**region.meta, **visual_meta}
-
-    meta = _translate_ds9_meta(region_meta)
-    meta = _remove_invalid_keys(meta, valid_keys)
+    meta = _translate_ds9_meta(region, shape)
 
     return {'frame': frame, 'region': region_str, 'meta': meta}
-
-
-def _make_meta_str(meta):
-    metalist = []
-    for key, val in meta.items():
-        if key == 'tag':
-            metalist.append(' '.join([f'tag={val}' for val in meta[key]]))
-        else:
-            metalist.append(f'{key}={val}')
-    return ' '.join(metalist)
-
-
-@RegionsRegistry.register(Region, 'serialize', 'ds9')
-@RegionsRegistry.register(Regions, 'serialize', 'ds9')
-def _serialize_ds9(regions, precision=8):
-    region_data = []
-    for region in regions:
-        region_data.append(_serialize_region_ds9(region, precision=precision))
-
-    # extract common meta to global
-    # tag cannot be in global
-    metalist_notag = []
-    for rd in region_data:
-        tmp = rd['meta']
-        tmp.pop('tag', None)
-        metalist_notag.append(tmp)
-
-    output = '# Region file format: DS9 astropy/regions\n'
-
-    global_meta = dict(set.intersection(*[set(d.items())
-                                          for d in metalist_notag]))
-    if global_meta:
-        global_str = f'global {_make_meta_str(global_meta)}'
-        output += f'{global_str}\n'
-
-    #metalist = [rd['meta'] for rd in region_data]
-    metalist = []
-    for rd in region_data:
-        tmp = rd['meta']
-        for key in global_meta.keys():
-            tmp.pop(key)
-        metalist.append(tmp)
-
-    # TODO
-    # extract common coord frame for consecutive regions
-
-    for data, meta in zip(region_data, metalist):
-        meta_str = _make_meta_str(meta)
-        output += f'{data["frame"]}; {data["region"]} # {meta_str}\n'
-
-    print(output)
-    return output
