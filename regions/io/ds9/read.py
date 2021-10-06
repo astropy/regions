@@ -155,7 +155,7 @@ def _parse_ds9(region_str, errors=None):
     composite_meta = ''
 
     #allowed_values = coordinate_frames + list(shape_templates.keys())
-    allowed_values = coordinate_frames + ds9_shapes
+    allowed_frames_shapes = coordinate_frames + ds9_shapes
 
     for line in _split_lines(region_str):
         # skip blank lines
@@ -167,8 +167,8 @@ def _parse_ds9(region_str, errors=None):
                 and not line.startswith(('# text(', '# composite('))):
             continue
 
-        # ds9 region file can have multiple (including successive)
-        # global lines
+        # ds9 region files can have multiple (including successive)
+        # global lines, so here we keep a list
         if line.startswith('global'):
             global_meta.append(line[7:])
             continue
@@ -180,7 +180,7 @@ def _parse_ds9(region_str, errors=None):
             include_symbol = match.groups()[0]
             frame_or_shape = match.groups()[1]
 
-        if frame_or_shape not in allowed_values:
+        if frame_or_shape not in allowed_frames_shapes:
             raise ValueError(f'Unable to parse line "{line}".')
 
         if frame_or_shape in coordinate_frames:
@@ -190,23 +190,29 @@ def _parse_ds9(region_str, errors=None):
         if frame_or_shape in ds9_shapes:
             shape = frame_or_shape
             if frame is None:
-                raise ValueError(f'Coordinate frame was not found for '
-                                 'region "{line}".')
+                raise ValueError('Coordinate frame was not found for region '
+                                 f'"{line}".')
 
             if shape == 'composite':
-                #line_tmp = line[span[1]:]
                 idx = line.find('||')
                 if idx == -1:
                     raise ValueError(f'unable to parse line "{line}"')
-                # TODO: this meta_str is like a "local" global line
-                # this will always contain at least "composite=1"
+                # composite meta applies to all regions within the
+                # composite shape; this will always contain at least
+                # "composite=1"
                 composite_meta = line[idx + 2:].strip()
 
-            params_str, meta_str = _parse_shape(shape, match.span(), line)
-            region_data.append((global_meta.copy(), frame, shape, params_str,
-                               meta_str, composite_meta))
+            if include_symbol == '-':
+                include = 0
+            else:  # '+' or ''
+                include = 1
+            include_meta = {'include': include}
 
-            # reset composite metadata
+            params_str, meta_str = _parse_shape(shape, match.span(), line)
+            region_data.append((frame, shape, params_str, global_meta.copy(),
+                                composite_meta, include_meta, meta_str))
+
+            # reset composite metadata after the composite region ends
             if '||' not in line and composite_meta:
                 composite_meta = ''
 
