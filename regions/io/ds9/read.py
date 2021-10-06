@@ -152,6 +152,7 @@ def _parse_ds9(region_str, errors=None):
     global_meta = []
     frame = None
     region_data = []
+    composite_meta = ''
 
     #allowed_values = coordinate_frames + list(shape_templates.keys())
     allowed_values = coordinate_frames + ds9_shapes
@@ -192,9 +193,22 @@ def _parse_ds9(region_str, errors=None):
                 raise ValueError(f'Coordinate frame was not found for '
                                  'region "{line}".')
 
+            if shape == 'composite':
+                #line_tmp = line[span[1]:]
+                idx = line.find('||')
+                if idx == -1:
+                    raise ValueError(f'unable to parse line "{line}"')
+                # TODO: this meta_str is like a "local" global line
+                # this will always contain at least "composite=1"
+                composite_meta = line[idx + 2:].strip()
+
             params_str, meta_str = _parse_shape(shape, match.span(), line)
             region_data.append((global_meta.copy(), frame, shape, params_str,
-                               meta_str))
+                               meta_str, composite_meta))
+
+            # reset composite metadata
+            if '||' not in line and composite_meta:
+                composite_meta = ''
 
     return region_data
 
@@ -210,17 +224,17 @@ def _parse_shape(shape, span, line):
     full_line = line
     line = full_line[span[1]:]
 
-    if shape == 'composite':
-        idx = line.find('||')
-        if idx == -1:
-            raise ValueError(f'unable to parse line "{line}"')
-        # TODO: this meta_str is like a "local" global line
-        # this will always contain at least "composite=1"
-        meta_str = line[idx + 2:]
-        params_str = ''  # ignore composite coordinates
+#    if shape == 'composite':
+#        idx = line.find('||')
+#        if idx == -1:
+#            raise ValueError(f'unable to parse line "{line}"')
+#        # TODO: this meta_str is like a "local" global line
+#        # this will always contain at least "composite=1"
+#        meta_str = line[idx + 2:]
+#        params_str = ''  # ignore composite coordinates
 
     # ds9 writes out text regions in this odd format
-    elif shape == 'text' and full_line.startswith('# text'):
+    if shape == 'text' and full_line.startswith('# text'):
         idx = line.find(' ')
         if idx == -1:
             raise ValueError(f'unable to parse line "{line}"')
