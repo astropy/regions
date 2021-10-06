@@ -4,32 +4,79 @@ import copy
 import itertools
 import re
 import string
-from warnings import warn
+import warnings
+from dataclasses import dataclass
 
 from astropy.coordinates import Angle, frame_transform_graph
 import astropy.units as u
 from astropy.utils.data import get_readable_fileobj
 
-from ...core import Regions
+from ...core import Regions, RegionMeta, RegionVisual
 from ...core.registry import RegionsRegistry
 from ..core import _Shape, _ShapeList, reg_mapping
 from .core import (DS9RegionParserError, DS9RegionParserWarning,
                    valid_symbols_ds9)
 
+from ...shapes import (CirclePixelRegion, CircleSkyRegion,
+                       EllipsePixelRegion, EllipseSkyRegion,
+                       RectanglePixelRegion, RectangleSkyRegion,
+                       PolygonPixelRegion, PolygonSkyRegion,
+                       RegularPolygonPixelRegion,
+                       CircleAnnulusPixelRegion, CircleAnnulusSkyRegion,
+                       EllipseAnnulusPixelRegion, EllipseAnnulusSkyRegion,
+                       RectangleAnnulusPixelRegion, RectangleAnnulusSkyRegion,
+                       LinePixelRegion, LineSkyRegion,
+                       PointPixelRegion, PointSkyRegion,
+                       TextPixelRegion, TextSkyRegion)
+
+
 __all__ = []
+
+# Regular expression to extract meta attributes
+meta_regex = re.compile('([a-zA-Z]+)\s*=\s*({.*?}|\'.*?\'|\".*?\"|'
+                        '[0-9\s]+\s?|[^=\s]+\s*[0-9]*)')
 
 # Regular expression to extract region type or coordinate system
 regex_global = re.compile('^#? *(-?)([a-zA-Z0-9]+)')
-
-# Regular expression to extract meta attributes
-regex_meta = re.compile(r'([a-zA-Z]+)(\s*)(=)(\s*)({.*?}|\'.*?\'|\".*?\"|'
-                        r'[0-9\s]+\s?|[^=\s]+\s?[0-9]*)\s?')
 
 # Regular expression to strip parenthesis
 regex_paren = re.compile('[()]')
 
 # Regular expression to split coordinate strings
 regex_splitter = re.compile('[, ]')
+
+
+shape_to_region = {}
+shape_to_region['pixel'] = {'circle': CirclePixelRegion,
+                            'ellipse': EllipsePixelRegion,
+                            'rectangle': RectanglePixelRegion,
+                            'polygon': PolygonPixelRegion,
+                            'circleannulus': CircleAnnulusPixelRegion,
+                            'ellipseannulus': EllipseAnnulusPixelRegion,
+                            'rectangleannulus': RectangleAnnulusPixelRegion,
+                            'line': LinePixelRegion,
+                            'point': PointPixelRegion,
+                            'text': TextPixelRegion}
+shape_to_region['sky'] = {'circle': CircleSkyRegion,
+                          'ellipse': EllipseSkyRegion,
+                          'rectangle': RectangleSkyRegion,
+                          'polygon': PolygonSkyRegion,
+                          'circleannulus': CircleAnnulusSkyRegion,
+                          'ellipseannulus': EllipseAnnulusSkyRegion,
+                          'rectangleannulus': RectangleAnnulusSkyRegion,
+                          'line': LineSkyRegion,
+                          'point': PointSkyRegion,
+                          'text': TextSkyRegion}
+
+
+@dataclass
+class RegionData:
+    frame: str
+    region_type: str
+    shape: str
+    shape_params: str
+    meta: dict
+    visual: dict
 
 
 @RegionsRegistry.register(Regions, 'read', 'ds9')
@@ -92,8 +139,10 @@ def _split_lines(region_str):
 
 # linear,
 coordinate_frames = ['image', 'icrs', 'fk5', 'j2000', 'fk4', 'b1950',
-                     'galactic', 'ecliptic', 'wcs']
-coordinate_frames += [f'wcs{letter}' for letter in string.ascii_lowercase]
+                     'galactic', 'ecliptic']
+wcs_frames = ['wcs', 'wcs0'] + [f'wcs{letter}'
+                                for letter in string.ascii_lowercase]
+coordinate_frames += wcs_frames
 
 regex_frame_or_shape = re.compile('^#? *([+-]?)([a-zA-Z0-9]+)')
 
@@ -141,20 +190,19 @@ shape_templates = {'circle': ('circle',
                     'text': ('text', '{center}')}
 
 
-
-
-
-
-
-
 @RegionsRegistry.register(Regions, 'parse', 'ds9')
 def _parse_ds9(region_str, errors=None):
-    global_meta = []
+    region_data = _parse_region_data(region_str)
+
+    return region_data
+
+
+def _parse_region_data(region_str):
+    global_meta = {}
     frame = None
     region_data = []
     composite_meta = ''
 
-    #allowed_values = coordinate_frames + list(shape_templates.keys())
     allowed_frames_shapes = coordinate_frames + ds9_shapes
 
     for line in _split_lines(region_str):
@@ -168,17 +216,16 @@ def _parse_ds9(region_str, errors=None):
             continue
 
         # ds9 region files can have multiple (including successive)
-        # global lines, so here we keep a list
+        # global lines
         if line.startswith('global'):
-            global_meta.append(line[7:])
+            global_meta.update(_parse_meta(line[7:]))
             continue
 
         match = regex_frame_or_shape.search(line)
         if match is None:
             raise ValueError(f'Unable to parse line "{line}".')
-        else:
-            include_symbol = match.groups()[0]
-            frame_or_shape = match.groups()[1]
+        include_symbol = match.groups()[0]
+        frame_or_shape = match.groups()[1]
 
         if frame_or_shape not in allowed_frames_shapes:
             raise ValueError(f'Unable to parse line "{line}".')
@@ -193,6 +240,11 @@ def _parse_ds9(region_str, errors=None):
                 raise ValueError('Coordinate frame was not found for region '
                                  f'"{line}".')
 
+            if frame in wcs_frames:
+                warnings.warn('DS9 wcs coordinate frames are unsupported, '
+                              'skipping region.')
+                continue
+
             if shape == 'composite':
                 idx = line.find('||')
                 if idx == -1:
@@ -200,7 +252,7 @@ def _parse_ds9(region_str, errors=None):
                 # composite meta applies to all regions within the
                 # composite shape; this will always contain at least
                 # "composite=1"
-                composite_meta = line[idx + 2:].strip()
+                composite_meta = _parse_meta(line[idx + 2:].strip())
 
             if include_symbol == '-':
                 include = 0
@@ -209,35 +261,126 @@ def _parse_ds9(region_str, errors=None):
             include_meta = {'include': include}
 
             params_str, meta_str = _parse_shape(shape, match.span(), line)
-            region_data.append((frame, shape, params_str, global_meta.copy(),
-                                composite_meta, include_meta, meta_str))
+
+            meta, visual = _make_metadata(shape, global_meta, composite_meta,
+                                          include_meta, meta_str)
+
+            region_type = 'sky'
+            if frame == 'image':
+                region_type = 'pixel'
+
+            region_data.append(RegionData(frame, region_type, shape,
+                                          params_str, meta, visual))
 
             # reset composite metadata after the composite region ends
             if '||' not in line and composite_meta:
-                composite_meta = ''
+                composite_meta = {}
 
     return region_data
 
 
-
-
 def _parse_meta(line):
-    #return meta_dict
-    return {}
+    #meta_regex = re.compile('([a-zA-Z]+)\s*=\s*({.*?}|\'.*?\'|\".*?\"|'
+    #                        '[0-9\s]+\s?|[^=\s]+\s*[0-9]*)')
+    meta = {}
+    for key, val in meta_regex.findall(line):
+        val = val.strip().strip("'").strip('"').lstrip('{').rstrip('}')
+        if key not in meta:
+            if key == 'tag':
+                val = [val]
+            meta[key] = val
+        else:
+            if key == 'tag':
+                meta[key].append(val)
+            else:
+                warnings.warn(f'Found duplicate metadata for "{key}", '
+                              'skipping')
+    return meta
+
+
+def _make_metadata(shape, global_meta, composite_meta, include_meta, meta_str):
+    all_meta = global_meta.copy()
+    all_meta.update(composite_meta)
+    all_meta.update(include_meta)
+    all_meta.update(_parse_meta(meta_str))
+
+    unsupported = ('line', 'ruler')
+    # TODO: support text annotations for all DS9 regions
+    #ds9_visual_keys = ('color', 'dashlist', 'dash', 'width', 'font', 'fill',
+    #                   'point', 'text')
+    ds9_visual_keys = ('color', 'dashlist', 'dash', 'width', 'font', 'fill',
+                       'point')
+
+    meta = {}
+    visual = {}
+    for key, value in all_meta.items():
+        if key in unsupported:
+            if key == 'line' and '1' not in value:  # ignore this special case
+                continue
+            warnings.warn(f'DS9 meta "{key}={value}" is unsupported and '
+                          'will be dropped')
+
+        try:
+            value = int(value)
+        except (ValueError, TypeError):
+            pass
+
+        if key in ds9_visual_keys:
+            visual[key] = value
+        else:
+            meta[key] = value
+
+    visual = _translate_visual_metadata(visual, shape)
+
+    return meta, visual
+
+
+def _translate_visual_metadata(visual_meta, shape):
+    """
+    Translate ds9 visual metadata to mpl.
+    """
+    meta = visual_meta.copy()
+
+    dash = meta.pop('dash', 0)
+    dashlist = meta.pop('dashlist', None)
+    if int(dash) == 1:
+        if shape == 'point':
+            warnings.warn('dashed lines are unsupported for DS9 point '
+                          'regions')
+
+        meta['linestyle'] = 'dashed'
+        if dashlist is not None:
+            meta['dashes'] = [int(i) for i in dashlist.split()]
+
+    # "point=symbol [size]"; size is optional, symbol is not
+    point = meta.pop('point', None)
+    if point is not None:
+        point_ = point.split()
+        if len(point_) == 1:
+            meta['marker'] = point_[0]
+        elif len(point_) == 2:
+            meta['marker'], meta['markersize'] = point_
+        else:
+            raise ValueError(f'invalid point data "{point}"')
+
+    font = meta.pop('font', None)
+    if font is not None:
+        (meta['fontname'], meta['fontsize'], meta['fontweight'],
+         meta['fontstyle']) = font.split()
+        meta['fontsize'] = int(meta['fontsize'])
+        meta['fontstyle'].replace('roman', 'normal')
+
+    if shape == 'point':
+        width = meta.pop('width', None)
+        if width is not None:
+            meta['markeredgewidth'] = width
+
+    return meta
 
 
 def _parse_shape(shape, span, line):
     full_line = line
     line = full_line[span[1]:]
-
-#    if shape == 'composite':
-#        idx = line.find('||')
-#        if idx == -1:
-#            raise ValueError(f'unable to parse line "{line}"')
-#        # TODO: this meta_str is like a "local" global line
-#        # this will always contain at least "composite=1"
-#        meta_str = line[idx + 2:]
-#        params_str = ''  # ignore composite coordinates
 
     # ds9 writes out text regions in this odd format
     if shape == 'text' and full_line.startswith('# text'):
@@ -257,95 +400,29 @@ def _parse_shape(shape, span, line):
             meta_str = line[hash_idx + 1:]
 
     params_str = params_str.strip(' |')  # trailing space and | chars
+    params_str = re.sub('[()]', '', params_str).lower()
     meta_str = meta_str.strip()
 
     return params_str, meta_str
 
 
+def _parse_shape_parameters(region_data):
+
+    if region_data['frame'] == 'image':
+        if region_data['shape'] == 'circle':
+            x, y, radius = region_data['params']
+
+    return
 
 
 
-
-
-#  elements = [x for x in regex_splitter.split(self.coord_str) if x]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# region class name
-# region parameters
-# region metadata
-#   * meta (direct from region file format)
-#   * visual (translated to mpl keywords)
-# -> then construct list of Region objects -> Regions()
-
-#    return region_data
-
-
-#regex_frame_or_shape = re.compile('^#? *([+-]?)([a-zA-Z0-9]+)')
-
-
-def _parse_line(line, global_meta=None, frame=None):
-    # skip comments and blank lines
-    if not line or line[0] == '#':
-        return
-
-    line = line.strip().lower()
-
-    # NOTE: a region file have multiple global lines
-    global_meta = ''
-    if line.startswith('global'):
-        global_meta = line
-
-
-
-    frame = None
-
-    match = regex_frame_or_shape.search(line)
-    if match is not None:
-        include_symbol = match.groups()[0]
-        frame_or_shape = match.groups()[1]
-
-
-    if frame_or_shape in coordinate_frames:
-        frame = frame_or_shape
-
-
-
-
-
-    #if line.startswith(coordinate_frames):
-    #    frame =
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+def _make_region(region_data):
+    region_type = region_data.region_type
+    shape = region_data.shape
+    region = shape_to_region[region_type][shape](*shape_params)
+    region.meta = RegionMeta(region_data.meta)
+    region.visual = RegionVisual(region_data.visual)
+    return region
 
 
 def _find_text_delim_idx(region_str):
@@ -378,7 +455,7 @@ def _split_semicolon(region_str):
 
     The line is not split on semicolons found in a text field.
 
-    This turned out to be a very trickly problem (attempts with regex
+    This turned out to be a very tricky problem (attempts with regex
     failed):
 
       * text fields are delimited by {}, '', or ""
@@ -406,7 +483,7 @@ def _split_semicolon(region_str):
     fidx = []
     for i in semi_idx:
         for i0, i1 in zip(idx0, idx1):
-            if i >= i0 and i <= i1:
+            if i0 <= i <= i1:
                 break
         else:
             fidx.append(i + 1)
