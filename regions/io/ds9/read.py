@@ -194,10 +194,10 @@ shape_templates = {'circle': ('circle',
 def _parse_ds9(region_str, errors=None):
     region_data = _parse_region_data(region_str)
 
-    #regions = []
-    #for region_data_ in region_data:
-    #    regions.extend(_make_region(region_data_))
-    #return regions
+    # regions = []
+    # for region_data_ in region_data:
+    #     regions.extend(_make_region(region_data_))
+    # return regions
 
     return region_data
 
@@ -427,6 +427,60 @@ template = {'point': ('coord', 'coord'),
                                        itertools.cycle(('length',)))}
 
 
+def _parse_coord(param_str, region_type, index):
+    if region_type == 'pixel':
+        invalid_chars = ('d', 'r', 'p', ':', 'h', 'm', 's')
+        for char in invalid_chars:
+            if char in param_str:
+                warnings.warn('Cannot parse pixel region position '
+                              'coordinates')
+                return None
+        if param_str[-1] == 'i':
+            param_str = param_str[:-1]
+
+        # DS9 uses 1-index pixels
+        return float(param_str) - 1
+
+    invalid_chars = ('i', 'p')
+    for char in invalid_chars:
+        if char in param_str:
+            warnings.warn('Cannot parse sky region position coordinates')
+            return None
+
+    if param_str[-1] == 'r':
+        return Angle(param_str[:-1], unit=u.radian)
+
+    elif param_str[-1] == 'd':
+        return Angle(param_str[:-1], unit=u.degree)
+
+    elif 'd' in param_str or 'h' in param_str:
+        return Angle(param_str)
+
+    elif ':' in param_str:
+        vals = tuple(float(x) for x in param_str.split(':'))
+        if index % 2 == 0:
+            return Angle(vals, u.hourangle)
+        else:
+            return Angle(vals, u.degree)
+
+    else:  # unit not specified
+        return Angle(float(param_str), unit=u.degree)
+
+
+
+
+
+
+
+    pass
+
+
+def _parse_length(param_str):
+    pass
+
+
+def _parse_angle(param_str):
+    pass
 
 
 def _parse_shape_params(region_data):
@@ -449,7 +503,18 @@ def _parse_shape_params(region_data):
     for idx, (param_type, value) in enumerate(zip(template[shape], params)):
         if nshapes > 1 and idx == nparams - 1:
             param_type = 'angle'
-        shape_params.append((param_type, value))
+
+        if param_type == 'coord':
+            param = _parse_coord(value, region_type, idx)
+        elif param_type == 'length'
+            param = _parse_length(value)
+        elif param_type == 'angle'
+            param = _parse_angle(value)
+        else:
+            raise ValueError('cannot parse shape parameters')
+
+        #shape_params.append((param_type, value))
+        shape_params.append(param)
 
     # create multiple shapes for multi-ellipse or multi-box regions
     if nshapes > 1:
