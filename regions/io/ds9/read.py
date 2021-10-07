@@ -194,6 +194,11 @@ shape_templates = {'circle': ('circle',
 def _parse_ds9(region_str, errors=None):
     region_data = _parse_region_data(region_str)
 
+    #regions = []
+    #for region_data_ in region_data:
+    #    regions.extend(_make_region(region_data_))
+    #return regions
+
     return region_data
 
 
@@ -406,23 +411,73 @@ def _parse_shape(shape, span, line):
     return params_str, meta_str
 
 
-def _parse_shape_parameters(region_data):
 
-    if region_data['frame'] == 'image':
-        if region_data['shape'] == 'circle':
-            x, y, radius = region_data['params']
 
-    return
+
+template = {'point': ('coord', 'coord'),
+            'text': ('coord', 'coord'),
+            'circle': ('coord', 'coord', 'length'),
+            #'ellipse': ('coord', 'coord', 'length', 'length', 'angle'),
+            #'box': ('coord', 'coord', 'length', 'length', 'angle'),
+            'ellipse': ('coord', 'coord', itertools.cycle(('length',))),
+            'box': ('coord', 'coord', itertools.cycle(('length',))),
+            'polygon': itertools.cycle(('coord',)),
+            'line': ('coord', 'coord', 'coord', 'coord'),
+            'annulus': itertools.chain(('coord', 'coord'),
+                                       itertools.cycle(('length',)))}
+
+
+
+
+def _parse_shape_params(region_data):
+
+    region_type = region_data.region_type
+    shape = region_data.shape
+    shape = 'ellipse'
+    params = [val for val in re.split(r'\s|\,', region_data.shape_params)
+              if val]
+
+    nparams = len(params)
+    nshapes = 1
+    if shape in ('ellipse', 'box') and nparams > 5:
+        if nparams % 2 != 1:
+            raise ValueError(f'incorrect number of parameters ({nparams}) '
+                             'for shape "{shape}"')
+        nshapes += (nparams - 5) // 2
+
+    shape_params = []
+    for idx, (param_type, value) in enumerate(zip(template[shape], params)):
+        if nshapes > 1 and idx == nparams - 1:
+            param_type = 'angle'
+        shape_params.append((param_type, value))
+
+    # create multiple shapes for multi-ellipse or multi-box regions
+    if nshapes > 1:
+        tmp_params = []
+        for i in range(nshapes):
+            idx = (i + 1) * 2
+            params = (shape_params[0], shape_params[1], shape_params[idx],
+                      shape_params[idx + 1], shape_params[-1])
+            tmp_params.append(params)
+        shape_params = tmp_params
+
+    return shape_params
 
 
 
 def _make_region(region_data):
     region_type = region_data.region_type
     shape = region_data.shape
-    region = shape_to_region[region_type][shape](*shape_params)
-    region.meta = RegionMeta(region_data.meta)
-    region.visual = RegionVisual(region_data.visual)
-    return region
+    shape_params_list = _parse_shape_params(region_data)
+
+    regions = []
+    for shape_params in shape_params_list:
+        region = shape_to_region[region_type][shape](*shape_params)
+        region.meta = RegionMeta(region_data.meta)
+        region.visual = RegionVisual(region_data.visual)
+        regions.append(region)
+
+    return regions
 
 
 def _find_text_delim_idx(region_str):
