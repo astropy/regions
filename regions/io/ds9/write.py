@@ -250,6 +250,11 @@ def _translate_ds9_meta(region, shape):
         if dashes is not None:
             meta['dashlist'] = f'{dashes[0]} {dashes[1]}'
 
+    rotation = meta.pop('rotation', None)
+    if rotation is not None:
+        meta['textangle'] = rotation
+        #meta['textrotate'] = 1
+
     # ds9 meta keys
     meta_keys = ['text', 'select', 'highlite', 'fixed', 'edit', 'move',
                  'rotate', 'delete', 'include', 'tag', 'source',
