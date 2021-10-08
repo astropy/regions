@@ -213,15 +213,6 @@ def _translate_ds9_meta(region, shape):
     """
     meta = {**region.meta, **region.visual}
 
-    # TODO: fix this in ds9 parser
-    if 'include' in meta:
-        if meta['include'] is True:
-            meta['include'] = 1
-        else:
-            meta['include'] = 0
-    else:
-        meta['include'] = 1
-
     if 'annulus' in shape:
         # ds9 does not allow fill for annulus regions
         meta.pop('fill', None)
