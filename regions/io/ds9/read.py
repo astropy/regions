@@ -427,20 +427,21 @@ template = {'point': ('coord', 'coord'),
                                        itertools.cycle(('length',)))}
 
 
-def _parse_coord(param_str, region_type, index):
-    if region_type == 'pixel':
-        invalid_chars = ('d', 'r', 'p', ':', 'h', 'm', 's')
-        for char in invalid_chars:
-            if char in param_str:
-                warnings.warn('Cannot parse pixel region position '
-                              'coordinates')
-                return None
-        if param_str[-1] == 'i':
-            param_str = param_str[:-1]
+def _parse_pixel_coord(param_str):
+    invalid_chars = ('d', 'r', 'p', ':', 'h', 'm', 's')
+    for char in invalid_chars:
+        if char in param_str:
+            warnings.warn('Cannot parse pixel region position coordinates')
+            return None
 
-        # DS9 uses 1-index pixels
-        return float(param_str) - 1
+    if param_str[-1] == 'i':
+        param_str = param_str[:-1]
 
+    # DS9 uses 1-index pixels
+    return float(param_str) - 1
+
+
+def _parse_sky_coord(param_str, index):
     invalid_chars = ('i', 'p')
     for char in invalid_chars:
         if char in param_str:
@@ -467,20 +468,43 @@ def _parse_coord(param_str, region_type, index):
         return Angle(float(param_str), unit=u.degree)
 
 
+def _parse_coord(region_type, param_str, index):
+    if region_type == 'pixel':
+        return _parse_pixel_coord(param_str)
+    else:
+        return _parse_sky_coord(param_str, index)
 
 
+def _parse_size(region_type, param_str):
+    if region_type == 'pixel':
+        invalid_chars = ('"', "'", 'd', 'r', 'p')
+        for char in invalid_chars:
+            if char in param_str:
+                warnings.warn('Cannot parse pixel region parameters')
+                return None
 
+        if param_str[-1] == 'i':
+            param_str = param_str[:-1]
 
+        return float(param_str)
 
-    pass
+    else:
+        invalid_chars = ('p', 'i')
+        for char in invalid_chars:
+            if char in param_str:
+                warnings.warn('Cannot parse sky region parameters')
+                return None
 
-
-def _parse_length(param_str):
-    pass
-
-
-def _parse_angle(param_str):
-    pass
+    unit_mapping = {'"': u.arcsec,
+                    "'": u.arcmin,
+                    'd': u.deg,
+                    'r': u.rad
+                    }
+    if param_str[-1] not in string.digits:
+        unit = unit_mapping[param_str[-1]]
+        return u.Quantity(float(param_str[:-1]), unit=unit)
+    else:
+        return u.Quantity(float(param_str), unit=u.degree)
 
 
 def _parse_shape_params(region_data):
@@ -505,11 +529,9 @@ def _parse_shape_params(region_data):
             param_type = 'angle'
 
         if param_type == 'coord':
-            param = _parse_coord(value, region_type, idx)
-        elif param_type == 'length'
-            param = _parse_length(value)
-        elif param_type == 'angle'
-            param = _parse_angle(value)
+            param = _parse_coord(region_type, value, idx)
+        elif param_type in ('length', 'angle'):
+            param = _parse_size(region_type, value)
         else:
             raise ValueError('cannot parse shape parameters')
 
