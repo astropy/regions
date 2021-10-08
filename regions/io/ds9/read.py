@@ -129,7 +129,7 @@ def _split_lines(region_str):
         # split on all semicolons,
         # except those between {} braces ({} contain ds9 text strings)
         for line_ in _split_semicolon(line):
-            lines.append(line_.strip().lower())
+            lines.append(line_.strip())
     return lines
 
 
@@ -214,6 +214,8 @@ def _parse_region_data(region_str):
     allowed_frames_shapes = coordinate_frames + ds9_shapes
 
     for line in _split_lines(region_str):
+        orig_line = line
+        line = line.lower()
         # skip blank lines
         if not line:
             continue
@@ -226,7 +228,7 @@ def _parse_region_data(region_str):
         # ds9 region files can have multiple (including successive)
         # global lines
         if line.startswith('global'):
-            global_meta.update(_parse_meta(line[7:]))
+            global_meta.update(_parse_meta(orig_line[7:]))
             continue
 
         match = regex_frame_or_shape.search(line)
@@ -268,7 +270,7 @@ def _parse_region_data(region_str):
                 include = 1
             include_meta = {'include': include}
 
-            params_str, meta_str = _parse_shape(shape, match.span(), line)
+            params_str, meta_str = _parse_shape(shape, match.span(), orig_line)
 
             meta, visual = _make_metadata(shape, global_meta, composite_meta,
                                           include_meta, meta_str)
@@ -293,6 +295,7 @@ def _parse_meta(line):
     meta = {}
     for key, val in meta_regex.findall(line):
         val = val.strip().strip("'").strip('"').lstrip('{').rstrip('}')
+        key = key.lower()
         if key not in meta:
             if key == 'tag':
                 val = [val]
@@ -317,7 +320,7 @@ def _make_metadata(shape, global_meta, composite_meta, include_meta, meta_str):
     #ds9_visual_keys = ('color', 'dashlist', 'dash', 'width', 'font', 'fill',
     #                   'point', 'text')
     ds9_visual_keys = ('color', 'dashlist', 'dash', 'width', 'font', 'fill',
-                       'point')
+                       'point', 'textangle')
 
     meta = {}
     visual = {}
@@ -365,11 +368,12 @@ def _translate_visual_metadata(visual_meta, shape):
     if point is not None:
         point_ = point.split()
         if len(point_) == 1:
-            meta['marker'] = point_[0]
+            ds9_marker = point_[0]
         elif len(point_) == 2:
-            meta['marker'], meta['markersize'] = point_
+            ds9_marker, meta['markersize'] = point_
         else:
             raise ValueError(f'invalid point data "{point}"')
+        meta['marker'] = valid_symbols_ds9[ds9_marker]
 
     font = meta.pop('font', None)
     if font is not None:
@@ -383,6 +387,11 @@ def _translate_visual_metadata(visual_meta, shape):
         if width is not None:
             meta['markeredgewidth'] = width
 
+    if shape == 'text':
+        textangle = meta.pop('textangle', None)
+        if textangle is not None:
+            meta['rotation'] = textangle
+
     return meta
 
 
@@ -391,7 +400,7 @@ def _parse_shape(shape, span, line):
     line = full_line[span[1]:]
 
     # ds9 writes out text regions in this odd format
-    if shape == 'text' and full_line.startswith('# text'):
+    if shape == 'text' and full_line.lower().startswith('# text'):
         idx = line.find(' ')
         if idx == -1:
             raise ValueError(f'unable to parse line "{line}"')
@@ -610,12 +619,16 @@ def _final_sky_params(shape, shape_params, frame):
     frame_mapping_rev = {val: key for key, val in frame_mapping.items()}
     frame = frame_mapping_rev[frame]
 
-    if shape in ('polygon', 'line'):
+    if shape == 'polygon':
         params = [SkyCoord(shape_params[0::2], shape_params[1::2],
                            frame=frame)]
+    elif shape == 'line':
+        params = [SkyCoord(*shape_params[0:2], frame=frame),
+                  SkyCoord(*shape_params[2:4], frame=frame)]
     else:
         params = ([SkyCoord(shape_params[0], shape_params[1],
                             frame=frame)] + shape_params[2:])
+
     return params
 
 
@@ -636,8 +649,13 @@ def _make_region(region_data):
             final_params.extend([_final_sky_params(shape, shape_params, frame)])
 
     # for Text need to add meta['text'] to params
-    if shape == 'text':
-        final_params.append(region_data.meta['text'])
+    # if shape == 'text':
+    #     print(region_data.meta)
+    #     print(region_data.meta['text'])
+    #     print(final_params)
+    #     final_params.append(region_data.meta['text'])
+    #     print(final_params)
+
 
     #print(region_type, shape, shape_params_list)
     #print('FP:', final_params)
@@ -647,13 +665,22 @@ def _make_region(region_data):
 
     regions = []
     for shape_params in final_params:
+
+        # for Text need to add meta['text'] to params
+        if shape == 'text':
+            #print(region_data.meta)
+            #print(region_data.meta['text'])
+            #print(final_params)
+            shape_params.append(region_data.meta['text'])
+            #print(final_params)
+
         #print(region_type, shape, shape_params)
         #print(shape_to_region[region_type][shape])
         print(region_type, shape, shape_params)
 
         region = shape_to_region[region_type][shape](*shape_params)
-        #region.meta = RegionMeta(region_data.meta)
-        #region.visual = RegionVisual(region_data.visual)
+        region.meta = RegionMeta(region_data.meta)
+        region.visual = RegionVisual(region_data.visual)
         regions.append(region)
 
     return regions

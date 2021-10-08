@@ -72,7 +72,7 @@ class RegionVisual(Meta):
                   'fontstyle', 'fontweight', 'labeloff', 'labelpos', 'line',
                   'linestyle', 'linewidth', 'marker', 'markersize', 'symbol',
                   'symsize', 'symthick', 'textangle', 'textrotate', 'usetex',
-                  'default_style']
+                  'default_style', 'dashes', 'markeredgewidth', 'rotation']
 
     key_mapping = {'point': 'symbol', 'width': 'linewidth'}
 
