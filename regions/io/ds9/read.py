@@ -1,17 +1,17 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
-import copy
+from copy import deepcopy
 import itertools
 import re
 import string
 import warnings
 from dataclasses import dataclass
 
-from astropy.coordinates import Angle, frame_transform_graph
+from astropy.coordinates import Angle, frame_transform_graph, SkyCoord
 import astropy.units as u
 from astropy.utils.data import get_readable_fileobj
 
-from ...core import Regions, RegionMeta, RegionVisual
+from ...core import Regions, RegionMeta, RegionVisual, PixCoord
 from ...core.registry import RegionsRegistry
 from ..core import _Shape, _ShapeList, reg_mapping
 from .core import (DS9RegionParserError, DS9RegionParserWarning,
@@ -49,9 +49,11 @@ regex_splitter = re.compile('[, ]')
 shape_to_region = {}
 shape_to_region['pixel'] = {'circle': CirclePixelRegion,
                             'ellipse': EllipsePixelRegion,
-                            'rectangle': RectanglePixelRegion,
+                            #'rectangle': RectanglePixelRegion,
+                            'box': RectanglePixelRegion,
                             'polygon': PolygonPixelRegion,
-                            'circleannulus': CircleAnnulusPixelRegion,
+                            #'circleannulus': CircleAnnulusPixelRegion,
+                            'annulus': CircleAnnulusPixelRegion,
                             'ellipseannulus': EllipseAnnulusPixelRegion,
                             'rectangleannulus': RectangleAnnulusPixelRegion,
                             'line': LinePixelRegion,
@@ -59,9 +61,11 @@ shape_to_region['pixel'] = {'circle': CirclePixelRegion,
                             'text': TextPixelRegion}
 shape_to_region['sky'] = {'circle': CircleSkyRegion,
                           'ellipse': EllipseSkyRegion,
-                          'rectangle': RectangleSkyRegion,
+                          #'rectangle': RectangleSkyRegion,
+                          'box': RectangleSkyRegion,
                           'polygon': PolygonSkyRegion,
-                          'circleannulus': CircleAnnulusSkyRegion,
+                          #'circleannulus': CircleAnnulusSkyRegion,
+                          'annulus': CircleAnnulusSkyRegion,
                           'ellipseannulus': EllipseAnnulusSkyRegion,
                           'rectangleannulus': RectangleAnnulusSkyRegion,
                           'line': LineSkyRegion,
@@ -193,13 +197,12 @@ shape_templates = {'circle': ('circle',
 @RegionsRegistry.register(Regions, 'parse', 'ds9')
 def _parse_ds9(region_str, errors=None):
     region_data = _parse_region_data(region_str)
+    #return region_data
 
-    # regions = []
-    # for region_data_ in region_data:
-    #     regions.extend(_make_region(region_data_))
-    # return regions
-
-    return region_data
+    regions = []
+    for region_data_ in region_data:
+        regions.extend(_make_region(region_data_))
+    return regions
 
 
 def _parse_region_data(region_str):
@@ -419,8 +422,10 @@ template = {'point': ('coord', 'coord'),
             'circle': ('coord', 'coord', 'length'),
             #'ellipse': ('coord', 'coord', 'length', 'length', 'angle'),
             #'box': ('coord', 'coord', 'length', 'length', 'angle'),
-            'ellipse': ('coord', 'coord', itertools.cycle(('length',))),
-            'box': ('coord', 'coord', itertools.cycle(('length',))),
+            'ellipse': itertools.chain(('coord', 'coord'),
+                                       itertools.cycle(('length',))),
+            'box': itertools.chain(('coord', 'coord'),
+                                   itertools.cycle(('length',))),
             'polygon': itertools.cycle(('coord',)),
             'line': ('coord', 'coord', 'coord', 'coord'),
             'annulus': itertools.chain(('coord', 'coord'),
@@ -441,7 +446,7 @@ def _parse_pixel_coord(param_str):
     return float(param_str) - 1
 
 
-def _parse_sky_coord(param_str, index):
+def _parse_sky_coord(param_str, frame, index):
     invalid_chars = ('i', 'p')
     for char in invalid_chars:
         if char in param_str:
@@ -458,21 +463,20 @@ def _parse_sky_coord(param_str, index):
         return Angle(param_str)
 
     elif ':' in param_str:
-        vals = tuple(float(x) for x in param_str.split(':'))
-        if index % 2 == 0:
-            return Angle(vals, u.hourangle)
+        if index % 2 == 0 and frame not in ('galactic',):
+            return Angle(param_str, u.hourangle)
         else:
-            return Angle(vals, u.degree)
+            return Angle(param_str, u.degree)
 
     else:  # unit not specified
         return Angle(float(param_str), unit=u.degree)
 
 
-def _parse_coord(region_type, param_str, index):
+def _parse_coord(region_type, param_str, frame, index):
     if region_type == 'pixel':
         return _parse_pixel_coord(param_str)
     else:
-        return _parse_sky_coord(param_str, index)
+        return _parse_sky_coord(param_str, frame, index)
 
 
 def _parse_size(region_type, param_str):
@@ -507,11 +511,30 @@ def _parse_size(region_type, param_str):
         return u.Quantity(float(param_str), unit=u.degree)
 
 
+def _parse_angle(param_str):
+    invalid_chars = ('p', 'i')
+    for char in invalid_chars:
+        if char in param_str:
+            warnings.warn('Cannot parse region angle parameter')
+            return None
+
+    unit_mapping = {'"': u.arcsec,
+                    "'": u.arcmin,
+                    'd': u.deg,
+                    'r': u.rad
+                    }
+    if param_str[-1] not in string.digits:
+        unit = unit_mapping[param_str[-1]]
+        return u.Quantity(float(param_str[:-1]), unit=unit)
+    else:
+        return u.Quantity(float(param_str), unit=u.degree)
+
+
 def _parse_shape_params(region_data):
 
     region_type = region_data.region_type
     shape = region_data.shape
-    shape = 'ellipse'
+    frame = region_data.frame
     params = [val for val in re.split(r'\s|\,', region_data.shape_params)
               if val]
 
@@ -520,21 +543,32 @@ def _parse_shape_params(region_data):
     if shape in ('ellipse', 'box') and nparams > 5:
         if nparams % 2 != 1:
             raise ValueError(f'incorrect number of parameters ({nparams}) '
-                             'for shape "{shape}"')
+                             f'for shape "{shape}"')
         nshapes += (nparams - 5) // 2
 
+    if shape in ('ellipse', 'box', 'annulus'):
+        # deepcopy to "reset" the cycle iterators
+        shape_template = deepcopy(template[shape])
+    else:
+        shape_template = template[shape]
+
     shape_params = []
-    for idx, (param_type, value) in enumerate(zip(template[shape], params)):
-        if nshapes > 1 and idx == nparams - 1:
+    for idx, (param_type, value) in enumerate(zip(shape_template, params)):
+        if shape in ('ellipse', 'box') and idx == nparams - 1:
             param_type = 'angle'
 
+        #print(idx, param_type, value, region_type, shape, nshapes)
+
         if param_type == 'coord':
-            param = _parse_coord(region_type, value, idx)
-        elif param_type in ('length', 'angle'):
+            param = _parse_coord(region_type, value, frame, idx)
+        elif param_type in ('length',):
             param = _parse_size(region_type, value)
+        elif param_type in ('angle',):
+            param = _parse_angle(value)
         else:
             raise ValueError('cannot parse shape parameters')
 
+        print(param_type, value, param)
         #shape_params.append((param_type, value))
         shape_params.append(param)
 
@@ -543,25 +577,83 @@ def _parse_shape_params(region_data):
         tmp_params = []
         for i in range(nshapes):
             idx = (i + 1) * 2
-            params = (shape_params[0], shape_params[1], shape_params[idx],
-                      shape_params[idx + 1], shape_params[-1])
+            params = [shape_params[0], shape_params[1], shape_params[idx],
+                      shape_params[idx + 1], shape_params[-1]]
             tmp_params.append(params)
         shape_params = tmp_params
+    else:
+        shape_params = [shape_params]
 
     return shape_params
 
+
+def _final_pixel_params(shape, shape_params):
+    if shape == 'polygon':
+        params = [PixCoord(shape_params[0::2], shape_params[1::2])]
+    elif shape == 'line':
+        params = [PixCoord(*shape_params[0:2]), PixCoord(*shape_params[2:4])]
+    else:
+        params = ([PixCoord(shape_params[0], shape_params[1])]
+                  + shape_params[2:])
+
+    return params
+
+
+def _final_sky_params(shape, shape_params, frame):
+    frame_mapping = {'image': 'image',
+                     'icrs': 'icrs',
+                     'fk5': 'fk5',
+                     'fk4': 'fk4',
+                     'galactic': 'galactic',
+                     'geocentrictrueecliptic': 'ecliptic'}
+
+    frame_mapping_rev = {val: key for key, val in frame_mapping.items()}
+    frame = frame_mapping_rev[frame]
+
+    if shape in ('polygon', 'line'):
+        params = [SkyCoord(shape_params[0::2], shape_params[1::2],
+                           frame=frame)]
+    else:
+        params = ([SkyCoord(shape_params[0], shape_params[1],
+                            frame=frame)] + shape_params[2:])
+    return params
 
 
 def _make_region(region_data):
     region_type = region_data.region_type
     shape = region_data.shape
+    frame = region_data.frame
     shape_params_list = _parse_shape_params(region_data)
 
-    regions = []
+    # format positions
+    #   * create pixcoord or skycoord positions
+    #   * (x, y) pairs for polygon
+    final_params = []
     for shape_params in shape_params_list:
+        if region_type == 'pixel':
+            final_params.extend([_final_pixel_params(shape, shape_params)])
+        else:
+            final_params.extend([_final_sky_params(shape, shape_params, frame)])
+
+    # for Text need to add meta['text'] to params
+    if shape == 'text':
+        final_params.append(region_data.meta['text'])
+
+    #print(region_type, shape, shape_params_list)
+    #print('FP:', final_params)
+    #return [region_data]
+
+    # for shape_params in shape_params_list:
+
+    regions = []
+    for shape_params in final_params:
+        #print(region_type, shape, shape_params)
+        #print(shape_to_region[region_type][shape])
+        print(region_type, shape, shape_params)
+
         region = shape_to_region[region_type][shape](*shape_params)
-        region.meta = RegionMeta(region_data.meta)
-        region.visual = RegionVisual(region_data.visual)
+        #region.meta = RegionMeta(region_data.meta)
+        #region.visual = RegionVisual(region_data.visual)
         regions.append(region)
 
     return regions
