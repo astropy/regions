@@ -359,9 +359,11 @@ def _translate_visual_metadata(visual_meta, shape):
             warnings.warn('dashed lines are unsupported for DS9 point '
                           'regions')
 
-        meta['linestyle'] = 'dashed'
         if dashlist is not None:
-            meta['dashes'] = [int(i) for i in dashlist.split()]
+            dashes = tuple([int(i) for i in dashlist.split()])
+            meta['linestyle'] = (0, dashes)
+        else:
+            meta['linestyle'] = 'dashed'
 
     # "point=symbol [size]"; size is optional, symbol is not
     point = meta.pop('point', None)
