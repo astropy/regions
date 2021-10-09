@@ -394,6 +394,12 @@ def _translate_visual_metadata(visual_meta, shape):
         if textangle is not None:
             meta['rotation'] = textangle
 
+    if shape not in ('point', 'line', 'text'):
+        color = meta.pop('color', None)
+        if color is not None:
+            meta['facecolor'] = color
+            meta['edgecolor'] = color
+
     return meta
 
 
