@@ -204,4 +204,18 @@ class RegionVisual(Meta):
 
         kwargs = self._define_default_mpl_kwargs(artist)
         kwargs.update(self._to_mpl_kwargs(artist))
+
+        remove_keys = []
+        if artist is not 'Text':
+            remove_keys.extend(['fontname', 'fontsize', 'fontweight',
+                                'fontstyle'])
+        else:
+            remove_keys.extend(['linewidth'])
+
+        for key in remove_keys:
+            kwargs.pop(key, None)
+
+        if 'fontstyle' in kwargs:
+            kwargs['fontstyle'].replace('roman', 'normal')
+
         return kwargs
