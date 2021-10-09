@@ -193,6 +193,8 @@ def _get_region_params(region, template, precision=8):
             value = value.to_string(unit='deg', precision=precision)[:-4]
 
         else:
+            if is_ellipse:
+                value /= 2.0
             value = f'{value:.{precision}f}'
 
         param[param_name] = value
@@ -244,11 +246,15 @@ def _translate_ds9_meta(region, shape):
         meta['font'] = f'"{fontname} {fontsize} {fontweight} {fontstyle}"'
 
     linestyle = meta.pop('linestyle', None)
-    if linestyle in ('dashed', '--'):
+    if linestyle is not None:
         meta['dash'] = 1
-        dashes = meta.pop('dashes', None)
-        if dashes is not None:
-            meta['dashlist'] = f'{dashes[0]} {dashes[1]}'
+    #if linestyle in ('dashed', '--'):
+    if isinstance(linestyle, tuple):
+        meta['dashlist'] = f'{linestyle[1][0]} {linestyle[1][1]}'
+
+        #dashes = meta.pop('dashes', None)
+        #if dashes is not None:
+        #    meta['dashlist'] = f'{dashes[0]} {dashes[1]}'
 
     rotation = meta.pop('rotation', None)
     if rotation is not None:
