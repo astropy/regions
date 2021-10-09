@@ -574,6 +574,8 @@ def _parse_shape_params(region_data):
             param = _parse_coord(region_type, value, frame, idx)
         elif param_type in ('length',):
             param = _parse_size(region_type, value)
+            if shape == 'ellipse':
+                param *= 2.0
         elif param_type in ('angle',):
             param = _parse_angle(value)
         else:
