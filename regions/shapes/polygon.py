@@ -80,17 +80,44 @@ class PolygonPixelRegion(PixelRegion):
 
     @property
     def area(self):
+        """Return area of polygon computed by the shoelace formula."""
+
         # See https://stackoverflow.com/questions/24467972
 
         # Use offsets to improve numerical precision
         x_ = self.vertices.x - self.vertices.x.mean()
         y_ = self.vertices.y - self.vertices.y.mean()
 
-        # Shoelace formula, for our case where the start vertex
-        # isn't duplicated at the end, written to avoid an array copy
-        area_main = np.dot(x_[:-1], y_[1:]) - np.dot(y_[:-1], x_[1:])
-        area_last = x_[-1] * y_[0] - y_[-1] * x_[0]
-        return 0.5 * np.abs(area_main + area_last)
+        # Shoelace formula; for our case where the start vertex is
+        # not duplicated at the end, index to avoid an array copy.
+        indices = np.arange(len(x_)) - 1
+        return 0.5 * abs(np.dot(x_[indices], y_) - np.dot(y_[indices], x_))
+
+    @property
+    def centroid(self):
+        """Return centroid (centre of mass) of polygon."""
+
+        # See http://paulbourke.net/geometry/polygonmesh/
+        #     https://www.ma.ic.ac.uk/~rn/centroid.pdf
+
+        # Use vertex position offsets from mean to improve numerical precision;
+        # for a triangle the mean already locates the centroid.
+        x0 = self.vertices.x.mean()
+        y0 = self.vertices.y.mean()
+
+        if len(self.vertices) == 3:
+            return PixCoord(x0, y0)
+
+        x_ = self.vertices.x - x0
+        y_ = self.vertices.y - y0
+        indices = np.arange(len(x_)) - 1
+
+        xs = x_[indices] + x_
+        ys = y_[indices] + y_
+        dxy = x_[indices] * y_ - y_[indices] * x_
+        scl = 1. / (6 * self.area)
+
+        return PixCoord(np.dot(xs, dxy) * scl + x0, np.dot(ys, dxy) * scl + y0)
 
     def contains(self, pixcoord):
         pixcoord = PixCoord._validate(pixcoord, 'pixcoord')
@@ -133,8 +160,7 @@ class PolygonPixelRegion(PixelRegion):
         bbox = self.bounding_box
         ny, nx = bbox.shape
 
-        # Find position of pixel edges and recenter so that circle is at
-        # origin
+        # Find position of pixel edges and recenter so that circle is at origin
         xmin = float(bbox.ixmin) - 0.5
         xmax = float(bbox.ixmax) - 0.5
         ymin = float(bbox.iymin) - 0.5
@@ -178,6 +204,91 @@ class PolygonPixelRegion(PixelRegion):
         mpl_kwargs.update(kwargs)
 
         return Polygon(xy=xy, **mpl_kwargs)
+
+    def _update_from_mpl_selector(self, verts, *args, **kwargs):
+        """Set position and orientation from selector properties."""
+        # Polygon selector calls ``callback(self.verts)``.
+
+        self.vertices = PixCoord(*np.array(verts).T)
+
+        if getattr(self, '_mpl_selector_callback', None) is not None:
+            self._mpl_selector_callback(self)
+
+    def as_mpl_selector(self, ax, active=True, sync=True, callback=None, **kwargs):
+        """
+        A matplotlib editable widget for this region
+        (`matplotlib.widgets.PolygonSelector`).
+
+        Parameters
+        ----------
+        ax : `~matplotlib.axes.Axes`
+            The matplotlib axes to add the selector to.
+        active : bool, optional
+            Whether the selector should be active by default.
+        sync : bool, optional
+            If `True` (the default), the region will be kept in
+            sync with the selector. Otherwise, the selector will be
+            initialized with the values from the region but the two will
+            then be disconnected.
+        callback : callable, optional
+            If specified, this function will be called every time the
+            region is updated. This only has an effect if ``sync`` is
+            `True`. If a callback is set, it is called for the first
+            time once the selector has been created.
+        **kwargs : dict
+            Additional keyword arguments that are passed to
+            `matplotlib.widgets.PolygonSelector`.
+
+        Returns
+        -------
+        selector : `matplotlib.widgets.PolygonSelector`
+            The matplotlib selector.
+
+        Notes
+        -----
+        Once a selector has been created, you will need to keep a
+        reference to it until you no longer need it. In addition,
+        you can enable/disable the selector at any point by calling
+        ``selector.set_active(True)`` or ``selector.set_active(False)``.
+        """
+        from matplotlib.widgets import PolygonSelector
+        import matplotlib._version
+        _mpl_version = getattr(matplotlib._version, 'version', None)
+        if _mpl_version is None:
+            _mpl_version = matplotlib._version.get_versions()['version']
+
+        if hasattr(self, '_mpl_selector'):
+            raise Exception('Cannot attach more than one selector to a region.')
+
+        if not hasattr(PolygonSelector, '_scale_polygon'):
+            raise NotImplementedError('Rescalable ``PolygonSelector`` widgets are not '
+                                      f'yet supported with matplotlib {_mpl_version}.')
+
+        if sync:
+            sync_callback = self._update_from_mpl_selector
+        else:
+            def sync_callback(*args, **kwargs):
+                pass
+
+        self._mpl_selector = PolygonSelector(
+            ax, sync_callback, draw_box=True,
+            props={'color': self.visual.get('color', 'black'),
+                   'linewidth': self.visual.get('linewidth', 1),
+                   'linestyle': self.visual.get('linestyle', 'solid')})
+
+        self._mpl_selector._xs = list(self.vertices.x) + [self.vertices.x[0]]
+        self._mpl_selector._ys = list(self.vertices.y) + [self.vertices.y[0]]
+        self._mpl_selector._selection_completed = True
+        self._mpl_selector._draw_polygon()
+        self._mpl_selector._update_box()
+
+        self._mpl_selector.set_active(active)
+        self._mpl_selector_callback = callback
+
+        if sync and self._mpl_selector_callback is not None:
+            self._mpl_selector_callback(self)
+
+        return self._mpl_selector
 
     def rotate(self, center, angle):
         """
