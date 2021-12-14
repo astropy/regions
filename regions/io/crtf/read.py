@@ -482,10 +482,20 @@ class _CRTFCoordinateParser:
             return u.Quantity(string_rep[:-3], u.dimensionless_unscaled)
         if 'h' in string_rep or 'rad' in string_rep:
             return Angle(string_rep)
+
+        # CRTF format apparently implicitly defines
+        # 18:20:30.12
+        # strings as hour units, and
+        # 10.11.54.69
+        # as degrees.
+        # I can't find this definition in documentation anywhere, though.
         if len(string_rep.split('.')) >= 3:
             string_rep = string_rep.replace('.', ':', 2)
+            unit = u.deg
+        elif string_rep.count(":") == 2:
+            unit = u.hour
 
-        return Angle(string_rep, u.deg)
+        return Angle(string_rep, unit)
 
     @staticmethod
     def parse_angular_length_quantity(string_rep):
