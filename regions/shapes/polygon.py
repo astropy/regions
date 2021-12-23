@@ -271,17 +271,12 @@ class PolygonPixelRegion(PixelRegion):
                 pass
 
         self._mpl_selector = PolygonSelector(
-            ax, sync_callback, draw_box=True,
+            ax, sync_callback, draw_bounding_box=True,
             props={'color': self.visual.get('color', 'black'),
                    'linewidth': self.visual.get('linewidth', 1),
                    'linestyle': self.visual.get('linestyle', 'solid')})
 
-        self._mpl_selector._xs = list(self.vertices.x) + [self.vertices.x[0]]
-        self._mpl_selector._ys = list(self.vertices.y) + [self.vertices.y[0]]
-        self._mpl_selector._selection_completed = True
-        self._mpl_selector._draw_polygon()
-        self._mpl_selector._update_box()
-
+        self._mpl_selector.verts = list(zip(self.vertices.x, self.vertices.y))
         self._mpl_selector.set_active(active)
         self._mpl_selector_callback = callback
 
