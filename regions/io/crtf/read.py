@@ -489,9 +489,9 @@ class _CRTFCoordinateParser:
         # 10.11.54.69
         # as degrees.
         # I can't find this definition in documentation anywhere, though.
+        unit = u.deg
         if len(string_rep.split('.')) >= 3:
             string_rep = string_rep.replace('.', ':', 2)
-            unit = u.deg
         elif string_rep.count(":") == 2:
             unit = u.hour
 
