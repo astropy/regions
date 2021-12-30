@@ -77,6 +77,7 @@ class PolygonPixelRegion(PixelRegion):
             origin = PixCoord(0, 0)
         self.origin = origin
         self.vertices = vertices + origin
+        self._rotation = 0.0 * u.degree
 
     @property
     def area(self):
@@ -305,6 +306,24 @@ class PolygonPixelRegion(PixelRegion):
         """
         vertices = self.vertices.rotate(center, angle)
         return self.copy(vertices=vertices)
+
+    @property
+    def rotation(self):
+        """
+        Rotation angle to apply in-place rotations (operating on this instance).
+        Since `.setter` will apply the rotation directly on the vertices, this
+        value will always be reset to 0.
+        """
+        return self._rotation
+
+    @rotation.setter
+    def rotation(self, angle):
+        self.vertices = self.vertices.rotate(self.centroid, angle - self._rotation)
+        self._rotation = 0.0 * u.degree
+        if hasattr(self, '_mpl_selector'):
+            self._mpl_selector.verts = list(zip(self.vertices.x, self.vertices.y))
+            if getattr(self, '_mpl_selector_callback', None) is not None:
+                self._mpl_selector_callback(self)
 
 
 class RegularPolygonPixelRegion(PolygonPixelRegion):
