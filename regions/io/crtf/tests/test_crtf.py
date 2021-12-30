@@ -223,4 +223,4 @@ def test_read_sexagesimal_regression407():
     filename = get_pkg_data_filename(filename)
     regs = Regions.read(filename, errors='warn', format='crtf')
 
-    assert regs[0].center.ra == 281.93342096*u.deg
+    assert_quantity_allclose(regs[0].center.ra, 281.93342096 * u.deg, rtol=1e-9)
