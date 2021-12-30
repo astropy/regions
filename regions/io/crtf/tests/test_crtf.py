@@ -6,6 +6,7 @@ Tests for the crtf subpackage.
 from astropy.coordinates import Angle, SkyCoord
 import astropy.units as u
 from astropy.utils.data import get_pkg_data_filename
+from astropy.tests.helper import assert_quantity_allclose
 import pytest
 
 from ....shapes.circle import CircleSkyRegion
