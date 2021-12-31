@@ -96,6 +96,9 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
         assert_allclose(reg.center.xy, (1, 4))
         assert_allclose(reg.angle.to_value("deg"), 95)
 
+    # TODO: Is this MatplotlibDeprecationWarning something to worry about?
+    @pytest.mark.filterwarnings(r"ignore:The 'rectprops' parameter of "
+                                r"__init__\(\) has been renamed 'props'")
     @pytest.mark.parametrize('sync', (False, True))
     def test_as_mpl_selector(self, sync):
 
