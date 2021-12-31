@@ -9,7 +9,7 @@ from numpy.testing import assert_allclose
 import pytest
 
 from astropy.coordinates import Angle, SkyCoord
-from astropy.tests.helper import catch_warnings, assert_quantity_allclose
+from astropy.tests.helper import assert_quantity_allclose
 import astropy.units as u
 from astropy.utils.data import get_pkg_data_filename, get_pkg_data_filenames
 from astropy.utils.exceptions import AstropyUserWarning
@@ -30,7 +30,7 @@ def test_read():
     # Check that all test files including reference files are readable
     files = get_pkg_data_filenames('data')
     # DS9RegionParserWarning from non-supported panda, [b/e]panda regions
-    with catch_warnings(DS9RegionParserWarning):
+    with pytest.warns(DS9RegionParserWarning):
         for file in files:
             with open(file) as fh:
                 _DS9Parser(fh.read(), errors='warn')
@@ -52,7 +52,7 @@ def test_file(filename):
     filename = get_pkg_data_filename(filename)
 
     # DS9RegionParserWarnings from skipped multi-annulus regions
-    with catch_warnings(DS9RegionParserWarning):
+    with pytest.warns(DS9RegionParserWarning):
         regs = Regions.read(filename, errors='warn', format='ds9')
 
     coordsys = os.path.basename(filename).split(".")[1]
@@ -141,14 +141,12 @@ def test_missing_region_warns():
 
     # this will warn on both the commented first line and the
     # not_a_region line
-    with catch_warnings(AstropyUserWarning) as ASWarn:
-        regions = Regions.parse(ds9_str, format='ds9', errors='warn')
-
-    assert len(regions) == 1
-    assert len(ASWarn) == 1
     estr = ('Region type "notaregiontype" was found, but it is not one '
             'of the supported region types.')
-    assert estr in str(ASWarn[0].message)
+    with pytest.warns(AstropyUserWarning, match=estr) as ASWarn:
+        regions = Regions.parse(ds9_str, format='ds9', errors='warn')
+    assert len(regions) == 1
+    assert len(ASWarn) == 1
 
 
 def test_global_parser():
