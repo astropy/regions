@@ -12,6 +12,7 @@ from ..write import _write_crtf
 
 try:
     from casatools import image, simulator
+    from casatools import measures as me
     from casatasks import tclean
     HAS_CASATOOLS = True
 except ImportError:
