@@ -156,9 +156,100 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
 
             assert_equal(mask, 0)
 
-        with pytest.raises(Exception, match=('Cannot attach more than one '
-                                             'selector to a region.')):
+        with pytest.raises(Exception, match=('Cannot attach more than one selector to a region.')):
             region.as_mpl_selector(ax)
+
+    @pytest.mark.parametrize('anywhere', (False, True))
+    def test_mpl_selector_drag(self, anywhere):
+        """Test dragging of entire region from central handle and anywhere."""
+
+        plt = pytest.importorskip('matplotlib.pyplot')
+        from matplotlib.testing.widgets import do_event  # click_and_drag
+
+        data = np.random.random((16, 16))
+        mask = np.zeros_like(data)
+
+        ax = plt.subplot(1, 1, 1)
+        ax.imshow(data)
+
+        def update_mask(reg):
+            mask[:] = reg.to_mask(mode='subpixels', subpixels=10).to_image(data.shape)
+
+        region = self.reg.copy(angle=0 * u.deg)
+
+        selector = region.as_mpl_selector(ax, callback=update_mask, drag_from_anywhere=anywhere)
+
+        # click_and_drag(selector, start=(3, 4), end=(3.5, 4.5))
+        do_event(selector, 'press', xdata=3, ydata=4, button=1)
+        do_event(selector, 'onmove', xdata=3.5, ydata=4.5, button=1)
+        do_event(selector, 'release', xdata=3.5, ydata=4.5, button=1)
+
+        ax.figure.canvas.draw()
+
+        assert_allclose(region.center.x, 3.5)
+        assert_allclose(region.center.y, 4.5)
+        assert_allclose(region.width, 4)
+        assert_allclose(region.height, 3)
+
+        do_event(selector, 'press', xdata=3.25, ydata=4.25, button=1)
+        do_event(selector, 'onmove', xdata=4.25, ydata=5.25, button=1)
+        do_event(selector, 'release', xdata=4.25, ydata=5.25, button=1)
+
+        ax.figure.canvas.draw()
+
+        # For drag_from_anywhere=False this will have created a new 1x1 rectangle.
+        if anywhere:
+            assert_allclose(region.center.x, 4.5)
+            assert_allclose(region.center.y, 5.5)
+            assert_allclose(region.width, 4)
+            assert_allclose(region.height, 3)
+        else:
+            assert_allclose(region.center.x, 4.5)
+            assert_allclose(region.center.y, 5.5)
+
+        assert_equal(mask, region.to_mask(mode='subpixels', subpixels=10).to_image(data.shape))
+
+        assert selector.drag_from_anywhere is anywhere
+        assert region._mpl_selector.drag_from_anywhere is anywhere
+
+    @pytest.mark.parametrize('userargs',
+                             ({'useblit': True},
+                              {'grab_range': 20, 'minspanx': 5,  'minspany': 4},
+                              {'props': {'facecolor': 'blue', 'linewidth': 2}},
+                              {'twit': 'gumby'}))
+    def test_mpl_selector_kwargs(self, userargs):
+        """Test that additional kwargs are passed to selector."""
+
+        plt = pytest.importorskip('matplotlib.pyplot')
+
+        data = np.random.random((16, 16))
+        mask = np.zeros_like(data)
+
+        ax = plt.subplot(1, 1, 1)
+        ax.imshow(data)
+
+        def update_mask(reg):
+            mask[:] = reg.to_mask(mode='subpixels', subpixels=10).to_image(data.shape)
+
+        region = self.reg.copy(angle=0 * u.deg)
+
+        if 'twit' in userargs:
+            with pytest.raises(TypeError, match=(r'__init__.. got an unexpected keyword argument')):
+                selector = region.as_mpl_selector(ax, callback=update_mask, **userargs)
+        else:
+            selector = region.as_mpl_selector(ax, callback=update_mask, **userargs)
+            assert region._mpl_selector.artists[0].get_edgecolor() == (0, 0, 0, 1)
+
+            if 'props' in userargs:
+                assert region._mpl_selector.artists[0].get_facecolor() == (0, 0, 1, 1)
+                assert region._mpl_selector.artists[0].get_linewidth() == 2
+            else:
+                assert region._mpl_selector.artists[0].get_facecolor() == (0, 0, 0, 0)
+                assert region._mpl_selector.artists[0].get_linewidth() == 1
+
+                for key, val in userargs.items():
+                    assert getattr(region._mpl_selector, key) == val
+                    assert getattr(selector, key) == val
 
 
 class TestEllipseSkyRegion(BaseTestSkyRegion):

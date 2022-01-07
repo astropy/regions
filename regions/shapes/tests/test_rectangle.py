@@ -153,8 +153,7 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
 
             assert_equal(mask, 0)
 
-        with pytest.raises(Exception, match=('Cannot attach more than one '
-                                             'selector to a region.')):
+        with pytest.raises(Exception, match=('Cannot attach more than one selector to a region.')):
             region.as_mpl_selector(ax)
 
     @pytest.mark.parametrize('anywhere', (False, True))
@@ -171,8 +170,7 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
         ax.imshow(data)
 
         def update_mask(reg):
-            mask[:] = reg.to_mask(
-                mode='subpixels', subpixels=10).to_image(data.shape)
+            mask[:] = reg.to_mask(mode='subpixels', subpixels=10).to_image(data.shape)
 
         region = self.reg.copy(angle=0 * u.deg)
 
@@ -210,6 +208,45 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
 
         assert selector.drag_from_anywhere is anywhere
         assert region._mpl_selector.drag_from_anywhere is anywhere
+
+    @pytest.mark.parametrize('userargs',
+                             ({'useblit': True},
+                              {'grab_range': 20, 'minspanx': 5,  'minspany': 4},
+                              {'props': {'facecolor': 'blue', 'linewidth': 2}},
+                              {'twit': 'gumby'}))
+    def test_mpl_selector_kwargs(self, userargs):
+        """Test that additional kwargs are passed to selector."""
+
+        plt = pytest.importorskip('matplotlib.pyplot')
+
+        data = np.random.random((16, 16))
+        mask = np.zeros_like(data)
+
+        ax = plt.subplot(1, 1, 1)
+        ax.imshow(data)
+
+        def update_mask(reg):
+            mask[:] = reg.to_mask(mode='subpixels', subpixels=10).to_image(data.shape)
+
+        region = self.reg.copy(angle=0 * u.deg)
+
+        if 'twit' in userargs:
+            with pytest.raises(TypeError, match=(r'__init__.. got an unexpected keyword argument')):
+                selector = region.as_mpl_selector(ax, callback=update_mask, **userargs)
+        else:
+            selector = region.as_mpl_selector(ax, callback=update_mask, **userargs)
+            assert region._mpl_selector.artists[0].get_edgecolor() == (0, 0, 0, 1)
+
+            if 'props' in userargs:
+                assert region._mpl_selector.artists[0].get_facecolor() == (0, 0, 1, 1)
+                assert region._mpl_selector.artists[0].get_linewidth() == 2
+            else:
+                assert region._mpl_selector.artists[0].get_facecolor() == (0, 0, 0, 0)
+                assert region._mpl_selector.artists[0].get_linewidth() == 1
+
+                for key, val in userargs.items():
+                    assert getattr(region._mpl_selector, key) == val
+                    assert getattr(selector, key) == val
 
 
 def test_rectangular_pixel_region_bbox():

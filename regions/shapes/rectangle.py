@@ -234,6 +234,10 @@ class RectanglePixelRegion(PixelRegion):
             region is updated. This only has an effect if ``sync`` is
             `True`. If a callback is set, it is called for the first
             time once the selector has been created.
+        drag_from_anywhere : bool, optional
+            If `True`, the selector can be moved by clicking anywhere within
+            its bounds, else only at the central anchor
+            (only available with matplotlib 3.5 upwards; default: `False`).
         **kwargs : dict
             Additional keyword arguments are passed to
             `matplotlib.widgets.RectangleSelector`.
@@ -272,11 +276,12 @@ class RectanglePixelRegion(PixelRegion):
             def sync_callback(*args, **kwargs):
                 pass
 
+        rectprops = {'edgecolor': self.visual.get('color', 'black'),
+                     'facecolor': 'none',
+                     'linewidth': self.visual.get('linewidth', 1),
+                     'linestyle': self.visual.get('linestyle', 'solid')}
+        rectprops.update(kwargs.pop('props', dict()))
         # `rectprops` renamed `props` in mpl 3.5 and deprecated for 3.7.
-        rectprops = kwargs.pop('props', {'edgecolor': self.visual.get('color', 'black'),
-                                         'facecolor': 'none',
-                                         'linewidth': self.visual.get('linewidth', 1),
-                                         'linestyle': self.visual.get('linestyle', 'solid')})
         if _mpl_version < Version('3.5'):
             kwargs.update({'rectprops': rectprops})
         else:
