@@ -15,6 +15,26 @@ instructions
 and usage information.
 
 
+Citing Regions
+--------------
+
+|Zenodo|
+
+If you use Regions for a project that leads to a publication, whether
+directly or as a dependency of another package, please include the
+following acknowledgment::
+
+    This research made use of Regions, an Astropy package for region
+    handling (Bradley et al. 202X).
+
+where (Bradley et al. 202X) is a citation to the `Zenodo
+record <https://doi.org/10.5281/zenodo.5826358>`_ of the
+Regions version that was used. We also encourage citations in
+the main text wherever appropriate. Please see the `CITATION
+<https://github.com/astropy/regions/blob/main/regions/CITATION.rst>`_
+file for details and an example BibTeX entry.
+
+
 License
 -------
 
@@ -35,6 +55,9 @@ for details.
 .. |Astropy| image:: https://img.shields.io/badge/powered%20by-AstroPy-orange.svg?style=flat
     :target: https://www.astropy.org/
     :alt: Powered by Astropy
+
+.. |Zenodo| image:: https://zenodo.org/badge/35690635.svg
+    :target: https://zenodo.org/badge/latestdoi/35690635
 
 .. |CI Status| image:: https://github.com/astropy/regions/workflows/CI%20Tests/badge.svg#
     :target: https://github.com/astropy/regions/actions
