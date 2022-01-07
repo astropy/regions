@@ -107,6 +107,7 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
     def test_as_mpl_selector(self, sync):
 
         plt = pytest.importorskip('matplotlib.pyplot')
+        from matplotlib.testing.widgets import do_event
 
         data = np.random.random((16, 16))
         mask = np.zeros_like(data)
@@ -115,39 +116,23 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
         ax.imshow(data)
 
         def update_mask(reg):
-            mask[:] = reg.to_mask(mode='subpixels',
-                                  subpixels=10).to_image(data.shape)
+            mask[:] = reg.to_mask(mode='subpixels', subpixels=10).to_image(data.shape)
 
         # For now this will only work with unrotated ellipses. Once this
         # works with rotated ellipses, the following exception check can
         # be removed as well as the ``angle=0 * u.deg`` in the call to
         # copy() below.
         with pytest.raises(NotImplementedError,
-                           match=('Cannot create matplotlib selector for '
-                                  'rotated ellipse.')):
+                           match=('Cannot create matplotlib selector for rotated ellipse.')):
             self.reg.as_mpl_selector(ax)
 
         region = self.reg.copy(angle=0 * u.deg)
 
         selector = region.as_mpl_selector(ax, callback=update_mask, sync=sync)  # noqa
 
-        from matplotlib.backend_bases import MouseEvent, MouseButton
-
-        x, y = ax.transData.transform([[7.3, 4.4]])[0]
-        ax.figure.canvas.callbacks.process('button_press_event',
-                                           MouseEvent('button_press_event',
-                                                      ax.figure.canvas, x, y,
-                                                      button=MouseButton.LEFT))
-        x, y = ax.transData.transform([[9.3, 5.4]])[0]
-        ax.figure.canvas.callbacks.process('motion_notify_event',
-                                           MouseEvent('button_press_event',
-                                                      ax.figure.canvas, x, y,
-                                                      button=MouseButton.LEFT))
-        x, y = ax.transData.transform([[9.3, 5.4]])[0]
-        ax.figure.canvas.callbacks.process('button_release_event',
-                                           MouseEvent('button_press_event',
-                                                      ax.figure.canvas, x, y,
-                                                      button=MouseButton.LEFT))
+        do_event(selector, 'press', xdata=7.3, ydata=4.4, button=1)
+        do_event(selector, 'onmove', xdata=9.3, ydata=5.4, button=1)
+        do_event(selector, 'release', xdata=9.3, ydata=5.4, button=1)
 
         ax.figure.canvas.draw()
 
@@ -159,9 +144,7 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
             assert_allclose(region.height, 1)
             assert_quantity_allclose(region.angle, 0 * u.deg)
 
-            assert_equal(mask,
-                         region.to_mask(mode='subpixels',
-                                        subpixels=10).to_image(data.shape))
+            assert_equal(mask, region.to_mask(mode='subpixels', subpixels=10).to_image(data.shape))
 
         else:
 
