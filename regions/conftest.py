@@ -3,8 +3,6 @@
 # get picked up when running the tests inside an interpreter using
 # packagename.test
 
-import os
-
 try:
     import pytest_arraydiff
 except ImportError:
@@ -32,15 +30,14 @@ def pytest_configure(config):
         # Customize the following lines to add/remove entries from the
         # list of packages for which version numbers are displayed when
         # running the tests.
-        PYTEST_HEADER_MODULES['Cython'] = 'Cython'  # noqa
-        PYTEST_HEADER_MODULES['Numpy'] = 'numpy'  # noqa
-        PYTEST_HEADER_MODULES['Astropy'] = 'astropy'  # noqa
-        PYTEST_HEADER_MODULES['Matplotlib'] = 'matplotlib'  # noqa
-        PYTEST_HEADER_MODULES['Shapely'] = 'shapely'  # noqa
-        PYTEST_HEADER_MODULES.pop('scipy', None)  # noqa
-        PYTEST_HEADER_MODULES.pop('Pandas', None)  # noqa
-        PYTEST_HEADER_MODULES.pop('h5py', None)  # noqa
+        PYTEST_HEADER_MODULES['Cython'] = 'Cython'
+        PYTEST_HEADER_MODULES['Numpy'] = 'numpy'
+        PYTEST_HEADER_MODULES['Astropy'] = 'astropy'
+        PYTEST_HEADER_MODULES['Matplotlib'] = 'matplotlib'
+        PYTEST_HEADER_MODULES['Shapely'] = 'shapely'
+        PYTEST_HEADER_MODULES.pop('scipy', None)
+        PYTEST_HEADER_MODULES.pop('Pandas', None)
+        PYTEST_HEADER_MODULES.pop('h5py', None)
 
-        from . import __version__
-        packagename = os.path.basename(os.path.dirname(__file__))
-        TESTED_VERSIONS[packagename] = __version__
+        from regions import __version__
+        TESTED_VERSIONS['regions'] = __version__
