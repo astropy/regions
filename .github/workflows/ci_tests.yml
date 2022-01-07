@@ -87,6 +87,9 @@ jobs:
           - os: windows-latest
             python: '3.9'
             tox_env: 'py39-test-alldeps-devdeps'
+          - os: ubuntu-18.04
+            python: '3.9'
+            tox_env: 'py39-test-alldeps-devdeps'
 
     steps:
     - name: Check out repository
