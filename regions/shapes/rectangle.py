@@ -251,6 +251,12 @@ class RectanglePixelRegion(PixelRegion):
         ``selector.set_active(True)`` or ``selector.set_active(False)``.
         """
         from matplotlib.widgets import RectangleSelector
+        import matplotlib._version
+        from packaging.version import Version
+        _mpl_version = getattr(matplotlib._version, 'version', None)
+        if _mpl_version is None:
+            _mpl_version = matplotlib._version.get_versions()['version']
+        _mpl_version = Version(_mpl_version)
 
         if hasattr(self, '_mpl_selector'):
             raise Exception('Cannot attach more than one selector to a '
@@ -266,13 +272,17 @@ class RectanglePixelRegion(PixelRegion):
             def sync_callback(*args, **kwargs):
                 pass
 
-        rectprops = kwargs.pop('rectprops', {'edgecolor': self.visual.get('color', 'black'),
-                                             'facecolor': 'none',
-                                             'linewidth': self.visual.get('linewidth', 1),
-                                             'linestyle': self.visual.get('linestyle', 'solid')})
+        # `rectprops` renamed `props` in mpl 3.5 and deprecated for 3.7.
+        rectprops = kwargs.pop('props', {'edgecolor': self.visual.get('color', 'black'),
+                                         'facecolor': 'none',
+                                         'linewidth': self.visual.get('linewidth', 1),
+                                         'linestyle': self.visual.get('linestyle', 'solid')})
+        if _mpl_version < Version('3.5'):
+            kwargs.update({'rectprops': rectprops})
+        else:
+            kwargs.update({'props': rectprops})
 
-        self._mpl_selector = RectangleSelector(ax, sync_callback, interactive=True,
-                                               rectprops=rectprops, **kwargs)
+        self._mpl_selector = RectangleSelector(ax, sync_callback, interactive=True, **kwargs)
 
         self._mpl_selector.extents = (self.center.x - self.width / 2,
                                       self.center.x + self.width / 2,
