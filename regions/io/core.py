@@ -411,7 +411,7 @@ class _ShapeList(list):
             region_output = f'{line}'
             if meta_str.strip():
                 region_output += f' # {meta_str}'
-            output +=  f'{shape.coordsys}; {region_output}\n'
+            output += f'{shape.coordsys}; {region_output}\n'
 
         return output
 
@@ -897,7 +897,7 @@ def _to_io_meta(shape_meta, valid_keys, key_mappings):
         An IO compatible meta dictionary according to ``valid_keys`` and
         ``key_mappings``.
     """
-    meta = dict()
+    meta = {}
 
     for key in shape_meta:
         if key in valid_keys:

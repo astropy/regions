@@ -7,13 +7,12 @@ import string
 import warnings
 from dataclasses import dataclass
 
-from astropy.coordinates import Angle, frame_transform_graph, SkyCoord
+from astropy.coordinates import Angle, SkyCoord
 import astropy.units as u
 from astropy.utils.data import get_readable_fileobj
 
 from ...core import Regions, RegionMeta, RegionVisual, PixCoord
 from ...core.registry import RegionsRegistry
-from ..core import _Shape, _ShapeList, reg_mapping
 from .core import (DS9RegionParserError, DS9RegionParserWarning,
                    valid_symbols_ds9)
 
@@ -21,7 +20,6 @@ from ...shapes import (CirclePixelRegion, CircleSkyRegion,
                        EllipsePixelRegion, EllipseSkyRegion,
                        RectanglePixelRegion, RectangleSkyRegion,
                        PolygonPixelRegion, PolygonSkyRegion,
-                       RegularPolygonPixelRegion,
                        CircleAnnulusPixelRegion, CircleAnnulusSkyRegion,
                        EllipseAnnulusPixelRegion, EllipseAnnulusSkyRegion,
                        RectangleAnnulusPixelRegion, RectangleAnnulusSkyRegion,
@@ -33,8 +31,8 @@ from ...shapes import (CirclePixelRegion, CircleSkyRegion,
 __all__ = []
 
 # Regular expression to extract meta attributes
-meta_regex = re.compile('([a-zA-Z]+)\s*=\s*({.*?}|\'.*?\'|\".*?\"|'
-                        '[0-9\s]+\s?|[^=\s]+\s*[0-9]*)')
+meta_regex = re.compile(r'([a-zA-Z]+)\s*=\s*({.*?}|\'.*?\'|\".*?\"|'
+                        r'[0-9\s]+\s?|[^=\s]+\s*[0-9]*)')
 
 # Regular expression to extract region type or coordinate system
 regex_global = re.compile('^#? *(-?)([a-zA-Z0-9]+)')
@@ -168,30 +166,30 @@ ds9_shapes = ['circle', 'ellipse', 'box', 'annulus', 'polygon', 'line',
               'point', 'text', 'composite']
 
 shape_templates = {'circle': ('circle',
-                                '{center},{radius}'),
-                    'ellipse': ('ellipse',
-                                '{center},{width},{height}'
-                                ',{angle}'),
-                    'rectangle': ('box',
-                                    '{center},{width},{height},{angle}'),
-                    'circleannulus': ('annulus',
-                                        '{center},{inner_radius},'
-                                        '{outer_radius}'),
-                    'ellipseannulus': ('ellipse',
-                                        '{center},{inner_width},'
-                                        '{inner_height},'
-                                        '{outer_width},'
-                                        '{outer_height},{angle}'),
-                    'rectangleannulus': ('box',
+                              '{center},{radius}'),
+                   'ellipse': ('ellipse',
+                               '{center},{width},{height}'
+                               ',{angle}'),
+                   'rectangle': ('box',
+                                 '{center},{width},{height},{angle}'),
+                   'circleannulus': ('annulus',
+                                     '{center},{inner_radius},'
+                                     '{outer_radius}'),
+                   'ellipseannulus': ('ellipse',
+                                      '{center},{inner_width},'
+                                      '{inner_height},'
+                                      '{outer_width},'
+                                      '{outer_height},{angle}'),
+                   'rectangleannulus': ('box',
                                         '{center},{inner_width},'
                                         '{inner_height},{outer_width},'
                                         '{outer_height},{angle}'),
-                    'polygon': ('polygon',
-                                '{vertices}'),
-                    'line': ('line',
+                   'polygon': ('polygon',
+                               '{vertices}'),
+                   'line': ('line',
                             '{start},{end}'),
-                    'point': ('point', '{center}'),
-                    'text': ('text', '{center}')}
+                   'point': ('point', '{center}'),
+                   'text': ('text', '{center}')}
 
 
 @RegionsRegistry.register(Regions, 'parse', 'ds9')
@@ -360,7 +358,7 @@ def _translate_visual_metadata(visual_meta, shape):
                           'regions')
 
         if dashlist is not None:
-            dashes = tuple([int(i) for i in dashlist.split()])
+            dashes = tuple(int(i) for i in dashlist.split())
             meta['linestyle'] = (0, dashes)
         else:
             meta['linestyle'] = 'dashed'
@@ -429,9 +427,6 @@ def _parse_shape(shape, span, line):
     meta_str = meta_str.strip()
 
     return params_str, meta_str
-
-
-
 
 
 template = {'point': ('coord', 'coord'),
@@ -656,7 +651,8 @@ def _make_region(region_data):
         if region_type == 'pixel':
             final_params.extend([_final_pixel_params(shape, shape_params)])
         else:
-            final_params.extend([_final_sky_params(shape, shape_params, frame)])
+            final_params.extend([_final_sky_params(shape, shape_params,
+                                                   frame)])
 
     # for Text need to add meta['text'] to params
     # if shape == 'text':
@@ -665,7 +661,6 @@ def _make_region(region_data):
     #     print(final_params)
     #     final_params.append(region_data.meta['text'])
     #     print(final_params)
-
 
     #print(region_type, shape, shape_params_list)
     #print('FP:', final_params)

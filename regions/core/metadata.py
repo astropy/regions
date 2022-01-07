@@ -207,7 +207,7 @@ class RegionVisual(Meta):
         kwargs.update(self._to_mpl_kwargs(artist))
 
         remove_keys = []
-        if artist is not 'Text':
+        if artist != 'Text':
             remove_keys.extend(['fontname', 'fontsize', 'fontweight',
                                 'fontstyle'])
         else:
