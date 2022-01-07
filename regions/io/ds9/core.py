@@ -1,7 +1,6 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
 from astropy.utils.exceptions import AstropyUserWarning
-import numpy as np
 
 try:
     import matplotlib  # noqa
@@ -30,7 +29,7 @@ if not HAS_MATPLOTLIB:
 else:
     import matplotlib.path as mpath
 
-    vertices = [[0., -1.], [0.2652031 , -1.],
+    vertices = [[0., -1.], [0.2652031, -1.],
                 [0.51957987, -0.89463369], [0.70710678, -0.70710678],
                 [0.89463369, -0.51957987], [1., -0.2652031],
                 [1., 0.], [1., 0.2652031], [0.89463369, 0.51957987],

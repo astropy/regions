@@ -198,7 +198,7 @@ def test_angle_serialization():
     Regression test for issue #223 to ensure Angle arcsec inputs are
     correctly converted to degrees.
     """
-    reg = Regions([CircleSkyRegion(SkyCoord(10,20, unit='deg'),
+    reg = Regions([CircleSkyRegion(SkyCoord(10, 20, unit='deg'),
                                    Angle(1, 'arcsec'))])
     regstr = reg.serialize(format='crtf')
     expected = ('#CRTFv0\nglobal coord=J2000\ncircle[[10.000009deg, '
