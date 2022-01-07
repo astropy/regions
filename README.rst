@@ -4,7 +4,7 @@ Regions
 
 |PyPI Version| |Conda Version| |Astropy|
 
-|AzurePipelines Status| |Codecov Status| |Latest RTD Status|
+|CI Status| |Codecov Status| |Latest RTD Status|
 
 Regions is an `Astropy`_ package for region handling.
 
@@ -36,9 +36,9 @@ for details.
     :target: https://www.astropy.org/
     :alt: Powered by Astropy
 
-.. |AzurePipelines Status| image:: https://dev.azure.com/astropy-project/regions/_apis/build/status/astropy.regions?branchName=main
-    :target: https://dev.azure.com/astropy-project/regions/_build/latest?definitionId=7&branchName=main
-    :alt: Azure Pipelines Statue
+.. |CI Status| image:: https://github.com/astropy/regions/workflows/CI%20Tests/badge.svg#
+    :target: https://github.com/astropy/regions/actions
+    :alt: CI Status
 
 .. |Codecov Status| image:: https://img.shields.io/codecov/c/github/astropy/regions?logo=codecov
     :target: https://codecov.io/gh/astropy/regions
