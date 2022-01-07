@@ -1,4 +1,6 @@
 include CHANGES.rst
+include CITATION.rst
+include regions/CITATION.rst
 include LICENSE.rst
 include README.rst
 include pyproject.toml
