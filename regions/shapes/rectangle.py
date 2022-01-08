@@ -255,16 +255,10 @@ class RectanglePixelRegion(PixelRegion):
         ``selector.set_active(True)`` or ``selector.set_active(False)``.
         """
         from matplotlib.widgets import RectangleSelector
-        import matplotlib._version
-        from packaging.version import Version
-        _mpl_version = getattr(matplotlib._version, 'version', None)
-        if _mpl_version is None:
-            _mpl_version = matplotlib._version.get_versions()['version']
-        _mpl_version = Version(_mpl_version)
+        from .utils import MPL_VERSION
 
         if hasattr(self, '_mpl_selector'):
-            raise Exception('Cannot attach more than one selector to a '
-                            'region.')
+            raise Exception('Cannot attach more than one selector to a region.')
 
         if self.angle.value != 0:
             raise NotImplementedError('Cannot create matplotlib selector for '
@@ -282,7 +276,7 @@ class RectanglePixelRegion(PixelRegion):
                      'linestyle': self.visual.get('linestyle', 'solid')}
         rectprops.update(kwargs.pop('props', dict()))
         # `rectprops` renamed `props` in mpl 3.5 and deprecated for 3.7.
-        if _mpl_version < Version('3.5'):
+        if MPL_VERSION < 35:
             kwargs.update({'rectprops': rectprops})
         else:
             kwargs.update({'props': rectprops})

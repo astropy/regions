@@ -41,6 +41,7 @@ needs_sphinx = '1.7'
 # Extend astropy intersphinx_mapping with packages we use here
 intersphinx_mapping['photutils'] = ('https://photutils.readthedocs.io/en/stable/', None)  # noqa
 #intersphinx_mapping['shapely'] = ('https://shapely.readthedocs.io/en/stable/', None)  # noqa
+intersphinx_mapping['matplotlib'] = ('https://matplotlib.org/stable/', None)  # noqa
 
 # Exclude astropy intersphinx_mapping for unused packages
 del intersphinx_mapping['scipy']  # noqa

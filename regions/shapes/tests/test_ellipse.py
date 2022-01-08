@@ -15,7 +15,7 @@ from ...core import PixCoord, RegionMeta, RegionVisual
 from ...tests.helpers import make_simple_wcs
 from ..ellipse import EllipsePixelRegion, EllipseSkyRegion
 from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
-from .utils import HAS_MATPLOTLIB  # noqa
+from ..utils import HAS_MATPLOTLIB, MPL_VERSION  # noqa
 
 
 @pytest.fixture(scope='session', name='wcs')
@@ -100,9 +100,7 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
         assert_allclose(reg.center.xy, (1, 4))
         assert_allclose(reg.angle.to_value("deg"), 95)
 
-    # TODO: Is this MatplotlibDeprecationWarning something to worry about?
-    @pytest.mark.filterwarnings(r"ignore:The 'rectprops' parameter of "
-                                r"__init__\(\) has been renamed 'props'")
+    @pytest.mark.skipif(MPL_VERSION < 33, reason='requires `do_event`')
     @pytest.mark.parametrize('sync', (False, True))
     def test_as_mpl_selector(self, sync):
 
@@ -159,12 +157,13 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
         with pytest.raises(Exception, match=('Cannot attach more than one selector to a region.')):
             region.as_mpl_selector(ax)
 
+    @pytest.mark.skipif(MPL_VERSION < 33, reason='requires `do_event`')
     @pytest.mark.parametrize('anywhere', (False, True))
     def test_mpl_selector_drag(self, anywhere):
         """Test dragging of entire region from central handle and anywhere."""
 
         plt = pytest.importorskip('matplotlib.pyplot')
-        from matplotlib.testing.widgets import do_event  # click_and_drag
+        from matplotlib.testing.widgets import do_event
 
         data = np.random.random((16, 16))
         mask = np.zeros_like(data)
@@ -177,7 +176,14 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
 
         region = self.reg.copy(angle=0 * u.deg)
 
-        selector = region.as_mpl_selector(ax, callback=update_mask, drag_from_anywhere=anywhere)
+        if anywhere and MPL_VERSION < 35:
+            pytest.skip('Requires `drag_from_anywhere` kwarg')
+        elif MPL_VERSION < 35:
+            selector = region.as_mpl_selector(ax, callback=update_mask)
+        else:
+            selector = region.as_mpl_selector(ax, callback=update_mask, drag_from_anywhere=anywhere)
+            assert selector.drag_from_anywhere is anywhere
+            assert region._mpl_selector.drag_from_anywhere is anywhere
 
         # click_and_drag(selector, start=(3, 4), end=(3.5, 4.5))
         do_event(selector, 'press', xdata=3, ydata=4, button=1)
@@ -209,9 +215,6 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
 
         assert_equal(mask, region.to_mask(mode='subpixels', subpixels=10).to_image(data.shape))
 
-        assert selector.drag_from_anywhere is anywhere
-        assert region._mpl_selector.drag_from_anywhere is anywhere
-
     @pytest.mark.parametrize('userargs',
                              ({'useblit': True},
                               {'grab_range': 20, 'minspanx': 5,  'minspany': 4},
@@ -232,6 +235,9 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
             mask[:] = reg.to_mask(mode='subpixels', subpixels=10).to_image(data.shape)
 
         region = self.reg.copy(angle=0 * u.deg)
+
+        if MPL_VERSION < 35 and 'grab_range' in userargs:
+            userargs['maxdist'] = userargs.pop('grab_range')
 
         if 'twit' in userargs:
             with pytest.raises(TypeError, match=(r'__init__.. got an unexpected keyword argument')):
