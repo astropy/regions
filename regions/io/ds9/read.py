@@ -57,9 +57,24 @@ def _read_ds9(filename, cache=False):
 
 @RegionsRegistry.register(Regions, 'parse', 'ds9')
 def _parse_ds9(region_str):
-    region_data = _parse_region_data(region_str)
-    #return region_data
+    """
+    Parse a DS9 region string.
 
+    Parameters
+    ----------
+    region_str : str
+        The string contents of a DS9 region file.
+
+    Returns
+    -------
+    regions : list
+        A list of `~regions.Region` objects.
+    """
+    region_data = _parse_region_data(region_str)
+    return region_data
+
+    # FIXME: need to handle (multi)annulus -> multi circ ann,
+    # (multi)ellipse -> multi ell ann, (multi)box -> mult box ann
     regions = []
     for region_data_ in region_data:
         regions.extend(_make_region(region_data_))
@@ -68,6 +83,11 @@ def _parse_ds9(region_str):
 
 @dataclass
 class _RegionData:
+    """
+    Class to hold data used to initialize a Region object.
+
+    Data for multi-annulus regions is stored in a single object.
+    """
     frame: str
     region_type: str
     shape: str
@@ -77,16 +97,42 @@ class _RegionData:
 
 
 def _split_lines(region_str):
+    """
+    Split a region string on newlines and all semicolons, except those
+    between {} braces ({} contains ds9 text strings).
+
+    Parameters
+    ----------
+    region_str : str
+        The string contents of a DS9 region file.
+
+    Returns
+    -------
+    lines : list of str
+        A list of strings.
+    """
     lines = []
     for line in region_str.split('\n'):
-        # split on all semicolons,
-        # except those between {} braces ({} contains ds9 text strings)
         for line_ in _split_semicolon(line):
             lines.append(line_.strip())
     return lines
 
 
 def _parse_region_data(region_str):
+    """
+    Parse region data.
+
+    Parameters
+    ----------
+    region_str : str
+        The string contents of a DS9 region file.
+
+    Returns
+    -------
+    lines : list of `_RegionData`
+        A list of `_RegionData` objects. Data for multi-annulus regions
+        is stored in a single object.
+    """
     global_meta = {}
     composite_meta = ''
     frame = None
@@ -170,18 +216,21 @@ def _parse_region_data(region_str):
                 # "composite=1"
                 composite_meta = _parse_metadata(line[idx + 2:].strip())
 
+            # NOTE: include=1/0 in metadata overrides the leading
+            #       "-/+" symbol
             if include_symbol == '-':
                 include = 0
             else:  # '+' or ''
                 include = 1
             include_meta = {'include': include}
 
-            params_str, meta_str = _parse_shape(shape, match.span(),
-                                                original_line)
+            params_str, meta_str = _parse_shape_line(shape, original_line,
+                                                     match.span())
 
+            region_meta = _parse_metadata(meta_str)
             meta, visual = _define_region_metadata(shape, global_meta,
                                                    composite_meta,
-                                                   include_meta, meta_str)
+                                                   include_meta, region_meta)
 
             region_type = 'sky'
             if frame == 'image':
@@ -197,15 +246,25 @@ def _parse_region_data(region_str):
     return region_data
 
 
-def _parse_metadata(line):
+def _parse_metadata(metadata_str):
     """
-    Parse metadata from a ds9 region string line.
+    Parse metadata for a single ds9 region.
+
+    Parameters
+    ----------
+    metadata_str : str
+        The region metadata (e.g., everything after the "#").
+
+    Returns
+    -------
+    metadata : dict
+        The region metadata as a dictionary.
     """
     metadata_regex = re.compile(r'([a-zA-Z]+)\s*=\s*({.*?}|\'.*?\'|\".*?\"|'
                                 r'[0-9\s]+\s?|[^=\s]+\s*[0-9]*)')
 
     metadata = {}
-    for key, val in metadata_regex.findall(line):
+    for key, val in metadata_regex.findall(metadata_str):
         val = val.strip().strip("'").strip('"').lstrip('{').rstrip('}')
         key = key.lower()
         if key not in metadata:
@@ -222,16 +281,43 @@ def _parse_metadata(line):
 
 
 def _define_region_metadata(shape, global_meta, composite_meta, include_meta,
-                            meta_str):
+                            region_meta):
+    """
+    Define the meta and visual dictionaries of metadata for the region.
+
+    Parameters
+    ----------
+    shape : str
+        The DS9 region shape (e.g., 'circle').
+
+    global_meta : dict
+        The global metadata.
+
+    composite_meta : dict
+        The metadata for a composite region.
+
+    include_meta : dict
+        The include/exclude metadata.
+
+    region_meta : dict
+        The region metadata.
+
+    Returns
+    -------
+    meta, visual : tuple of dict
+        The meta and visual dictionaries of region metadata. The visual
+        metadata is translated to matplotlib keywords.
+    """
     all_meta = global_meta.copy()
     all_meta.update(composite_meta)
     all_meta.update(include_meta)
-    all_meta.update(_parse_metadata(meta_str))
+    # region_meta must come after include_meta because include=1/0 in
+    # metadata overrides the leading "-/+" include symbol
+    all_meta.update(region_meta)
 
     unsupported = ('line', 'ruler')
-    # TODO: support text annotations for all DS9 regions
-    # ds9_visual_keys = ('color', 'dash', 'dashlist', 'fill', 'font', 'point',
-    #                    'text', 'textangle', 'textrotate', 'width')
+    # TODO: include text in visual keys to support text annotations for
+    # all DS9 regions?
     ds9_visual_keys = ('color', 'dash', 'dashlist', 'fill', 'font', 'point',
                        'textangle', 'textrotate', 'width')
 
@@ -254,14 +340,28 @@ def _define_region_metadata(shape, global_meta, composite_meta, include_meta,
         else:
             meta[key] = value
 
-    visual = _translate_visual_metadata(visual, shape)
+    visual = _translate_visual_metadata(shape, visual)
 
     return meta, visual
 
 
-def _translate_visual_metadata(visual_meta, shape):
+def _translate_visual_metadata(shape, visual_meta):
     """
-    Translate ds9 visual metadata to matplotlib.
+    Translate ds9 visual metadata to dictionary of matplotlib keywords.
+
+    Parameters
+    ----------
+    shape : str
+        The DS9 region shape (e.g., 'circle').
+
+    visual_meta : dict
+        The visual metadata.
+
+    Returns
+    -------
+    visual : dict
+        The visual dictionaries of region metadata translated
+        to matplotlib keywords.
     """
     meta = visual_meta.copy()
 
@@ -316,9 +416,32 @@ def _translate_visual_metadata(visual_meta, shape):
     return meta
 
 
-def _parse_shape(shape, span, line):
+def _parse_shape_line(shape, line, span):
+    """
+    Parse a shape line of a DS9 file.
+
+    Parameters
+    ----------
+    shape : str
+        The DS9 region shape (e.g., 'circle').
+
+    line : str
+        A line defining a DS9 region.
+
+    span : 2 tuple
+        A tuple containing the (start, end) positions of the match
+        defining the shape.
+
+    Returns
+    -------
+    shape_params_str : str
+        The region shape parameters as a string.
+
+    meta_str : str
+        The region metadata as a string.
+    """
     full_line = line
-    line = full_line[span[1]:]
+    line = full_line[span[1]:]  # starts with the shape parameters
 
     # ds9 writes out text regions in this odd (undocumented) format
     if shape == 'text' and full_line.lower().startswith('# text'):
@@ -326,22 +449,23 @@ def _parse_shape(shape, span, line):
         if idx == -1:
             raise ValueError(f'unable to parse line "{line}"')
         meta_str = line[idx + 1:]
-        params_str = line[:idx]
+        shape_params_str = line[:idx]
 
     else:
-        hash_idx = line.find('#')
-        if hash_idx == -1:
-            params_str = line
+        # split line into shape parameters and metadata
+        parts = line.split('#', 1)  # color value can contain a #
+        if len(parts) == 1:
+            shape_params_str = line
             meta_str = ''  # no metadata found
         else:
-            params_str = line[:hash_idx]
-            meta_str = line[hash_idx + 1:]
+            shape_params_str, meta_str = parts
 
-    params_str = params_str.strip(' |')  # trailing space and | chars
-    params_str = re.sub('[()]', '', params_str).lower()
+    # strip trailing space and | chars
+    shape_params_str = shape_params_str.strip(' |')
+    shape_params_str = re.sub('[()]', '', shape_params_str).lower()
     meta_str = meta_str.strip()
 
-    return params_str, meta_str
+    return shape_params_str, meta_str
 
 
 def _parse_pixel_coord(param_str):
@@ -432,12 +556,26 @@ def _parse_size(region_type, param_str):
 
 
 def _parse_shape_params(region_data):
+    """
+    Parse the shape parameters for a region line.
+
+    Parameters
+    ----------
+    region_data : `_RegionData` instance
+        A `_RegionData` instance containing the data for a region line.
+        Data for multi-annulus regions is stored in a single object.
+
+    Returns
+    -------
+    shape_params : list of list(s)
+        The shape parameters for each region(s). ``shape_params`` is
+        a list of lists of shape parameters. A separate shape list is
+        returned for multiple annulus/box/ellipse regions. Otherwise,
+        the list contains only one list.
+    """
     ds9_template = {'point': ('coord', 'coord'),
                     'text': ('coord', 'coord'),
                     'circle': ('coord', 'coord', 'length'),
-                    #'ellipse': ('coord', 'coord', 'length', 'length',
-                    #            'angle'),
-                    #'box': ('coord', 'coord', 'length', 'length', 'angle'),
                     'ellipse': itertools.chain(('coord', 'coord'),
                                                itertools.cycle(('length',))),
                     'box': itertools.chain(('coord', 'coord'),
@@ -472,8 +610,6 @@ def _parse_shape_params(region_data):
         if shape in ('ellipse', 'box') and idx == nparams - 1:
             param_type = 'angle'
 
-        #print(idx, param_type, value, region_type, shape, nshapes)
-
         if param_type == 'coord':
             param = _parse_coord(region_type, value, frame, idx)
         elif param_type in ('length',):
@@ -485,8 +621,6 @@ def _parse_shape_params(region_data):
         else:
             raise ValueError('cannot parse shape parameters')
 
-        print(param_type, value, param)
-        #shape_params.append((param_type, value))
         shape_params.append(param)
 
     # create multiple shapes for multi-ellipse or multi-box regions
@@ -504,7 +638,7 @@ def _parse_shape_params(region_data):
     return shape_params
 
 
-def _final_pixel_params(shape, shape_params):
+def _define_pixel_params(shape, shape_params):
     if shape == 'polygon':
         params = [PixCoord(shape_params[0::2], shape_params[1::2])]
     elif shape == 'line':
@@ -512,11 +646,10 @@ def _final_pixel_params(shape, shape_params):
     else:
         params = ([PixCoord(shape_params[0], shape_params[1])]
                   + shape_params[2:])
-
     return params
 
 
-def _final_sky_params(shape, shape_params, frame):
+def _define_sky_params(shape, shape_params, frame):
     frame_mapping = {'image': 'image',
                      'icrs': 'icrs',
                      'fk5': 'fk5',
@@ -536,17 +669,17 @@ def _final_sky_params(shape, shape_params, frame):
     else:
         params = ([SkyCoord(shape_params[0], shape_params[1],
                             frame=frame)] + shape_params[2:])
-
     return params
 
 
 def _make_region(region_data):
+    """
+    region_data : `_RegionData` instance
+    """
     pixel_map = {'circle': CirclePixelRegion,
                  'ellipse': EllipsePixelRegion,
-                 #'rectangle': RectanglePixelRegion,
                  'box': RectanglePixelRegion,
                  'polygon': PolygonPixelRegion,
-                 #'circleannulus': CircleAnnulusPixelRegion,
                  'annulus': CircleAnnulusPixelRegion,
                  'ellipseannulus': EllipseAnnulusPixelRegion,
                  'rectangleannulus': RectangleAnnulusPixelRegion,
@@ -556,10 +689,8 @@ def _make_region(region_data):
 
     sky_map = {'circle': CircleSkyRegion,
                'ellipse': EllipseSkyRegion,
-               #'rectangle': RectangleSkyRegion,
                'box': RectangleSkyRegion,
                'polygon': PolygonSkyRegion,
-               #'circleannulus': CircleAnnulusSkyRegion,
                'annulus': CircleAnnulusSkyRegion,
                'ellipseannulus': EllipseAnnulusSkyRegion,
                'rectangleannulus': RectangleAnnulusSkyRegion,
@@ -574,43 +705,27 @@ def _make_region(region_data):
     region_type = region_data.region_type
     shape = region_data.shape
     frame = region_data.frame
+
     shape_params_list = _parse_shape_params(region_data)
 
-    # format positions
-    #   * create pixcoord or skycoord positions
-    #   * (x, y) pairs for polygon
-    final_params = []
+    # define the parameters to initalize a Region
+    region_params = []
     for shape_params in shape_params_list:
         if region_type == 'pixel':
-            final_params.extend([_final_pixel_params(shape, shape_params)])
+            region_params.extend([_define_pixel_params(shape, shape_params)])
         else:
-            final_params.extend([_final_sky_params(shape, shape_params,
-                                                   frame)])
+            region_params.extend([_define_sky_params(shape, shape_params,
+                                                     frame)])
 
-    # for Text need to add meta['text'] to params
-    # if shape == 'text':
-    #     print(region_data.meta)
-    #     print(region_data.meta['text'])
-    #     print(final_params)
-    #     final_params.append(region_data.meta['text'])
-    #     print(final_params)
-
-    #print(region_type, shape, shape_params_list)
-    #print('FP:', final_params)
-    #return [region_data]
-
-    # for shape_params in shape_params_list:
+    print('region_params', region_params)
 
     regions = []
-    for shape_params in final_params:
-
-        # for Text need to add meta['text'] to params
+    for shape_params in region_params:
+        # for Text region, we need to add meta['text'] to params
         if shape == 'text':
             #print(region_data.meta)
             #print(region_data.meta['text'])
-            #print(final_params)
             shape_params.append(region_data.meta['text'])
-            #print(final_params)
 
         #print(region_type, shape, shape_params)
         #print(shape_to_region[region_type][shape])
