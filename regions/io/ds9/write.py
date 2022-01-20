@@ -9,7 +9,7 @@ from astropy.utils.exceptions import AstropyUserWarning
 
 from ...core import Region, Regions, PixelRegion, PixCoord
 from ...core.registry import RegionsRegistry
-from .core import valid_symbols_ds9
+from .core import ds9_valid_symbols
 
 __all__ = []
 
@@ -226,7 +226,7 @@ def _translate_ds9_meta(region, shape):
 
     marker = meta.pop('marker', None)
     if marker is not None:
-        symbol_map = {y: x for x, y in valid_symbols_ds9.items()}
+        symbol_map = {y: x for x, y in ds9_valid_symbols.items()}
         markersize = meta.pop('markersize', 11)  # default 11
         meta['point'] = f'{symbol_map[marker]} {markersize}'
 

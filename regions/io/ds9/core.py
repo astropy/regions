@@ -4,19 +4,7 @@ from astropy.utils.exceptions import AstropyUserWarning
 
 from ..._utils.optional_deps import HAS_MATPLOTLIB
 
-__all__ = ['DS9RegionParserWarning', 'DS9RegionParserError']
-
-
-class DS9RegionParserWarning(AstropyUserWarning):
-    """
-    A generic warning class for DS9 region parsing.
-    """
-
-
-class DS9RegionParserError(ValueError):
-    """
-    A generic error class for DS9 region parsing.
-    """
+__all__ = []
 
 
 if not HAS_MATPLOTLIB:
@@ -47,7 +35,7 @@ else:
     arrow = mpath.Path(arrow_verts, codes=None)
 
 # mapping to matplotlib marker symbols, also compatible with CRTF.
-valid_symbols_ds9 = {'circle': 'o',
+ds9_valid_symbols = {'circle': 'o',
                      'box': 's',
                      'diamond': 'D',
                      'x': 'x',

@@ -1,11 +1,11 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
 from copy import deepcopy
+from dataclasses import dataclass
 import itertools
 import re
 import string
 import warnings
-from dataclasses import dataclass
 
 from astropy.coordinates import Angle, SkyCoord
 import astropy.units as u
@@ -13,8 +13,7 @@ from astropy.utils.data import get_readable_fileobj
 
 from ...core import Regions, RegionMeta, RegionVisual, PixCoord
 from ...core.registry import RegionsRegistry
-from .core import (DS9RegionParserError, DS9RegionParserWarning,
-                   valid_symbols_ds9)
+from .core import ds9_valid_symbols
 
 from ...shapes import (CirclePixelRegion, CircleSkyRegion,
                        EllipsePixelRegion, EllipseSkyRegion,
@@ -27,62 +26,11 @@ from ...shapes import (CirclePixelRegion, CircleSkyRegion,
                        PointPixelRegion, PointSkyRegion,
                        TextPixelRegion, TextSkyRegion)
 
-
 __all__ = []
-
-# Regular expression to extract meta attributes
-meta_regex = re.compile(r'([a-zA-Z]+)\s*=\s*({.*?}|\'.*?\'|\".*?\"|'
-                        r'[0-9\s]+\s?|[^=\s]+\s*[0-9]*)')
-
-# Regular expression to extract region type or coordinate system
-regex_global = re.compile('^#? *(-?)([a-zA-Z0-9]+)')
-
-# Regular expression to strip parenthesis
-regex_paren = re.compile('[()]')
-
-# Regular expression to split coordinate strings
-regex_splitter = re.compile('[, ]')
-
-
-shape_to_region = {}
-shape_to_region['pixel'] = {'circle': CirclePixelRegion,
-                            'ellipse': EllipsePixelRegion,
-                            #'rectangle': RectanglePixelRegion,
-                            'box': RectanglePixelRegion,
-                            'polygon': PolygonPixelRegion,
-                            #'circleannulus': CircleAnnulusPixelRegion,
-                            'annulus': CircleAnnulusPixelRegion,
-                            'ellipseannulus': EllipseAnnulusPixelRegion,
-                            'rectangleannulus': RectangleAnnulusPixelRegion,
-                            'line': LinePixelRegion,
-                            'point': PointPixelRegion,
-                            'text': TextPixelRegion}
-shape_to_region['sky'] = {'circle': CircleSkyRegion,
-                          'ellipse': EllipseSkyRegion,
-                          #'rectangle': RectangleSkyRegion,
-                          'box': RectangleSkyRegion,
-                          'polygon': PolygonSkyRegion,
-                          #'circleannulus': CircleAnnulusSkyRegion,
-                          'annulus': CircleAnnulusSkyRegion,
-                          'ellipseannulus': EllipseAnnulusSkyRegion,
-                          'rectangleannulus': RectangleAnnulusSkyRegion,
-                          'line': LineSkyRegion,
-                          'point': PointSkyRegion,
-                          'text': TextSkyRegion}
-
-
-@dataclass
-class RegionData:
-    frame: str
-    region_type: str
-    shape: str
-    shape_params: str
-    meta: dict
-    visual: dict
 
 
 @RegionsRegistry.register(Regions, 'read', 'ds9')
-def _read_ds9(filename, errors='strict', cache=False):
+def _read_ds9(filename, cache=False):
     """
     Read a DS9 region file in as a list of `~regions.Region` objects.
 
@@ -90,13 +38,6 @@ def _read_ds9(filename, errors='strict', cache=False):
     ----------
     filename : str
         The filename of the file to access.
-
-    errors : {'strict', 'warn', 'ignore'}, optional
-        The error handling scheme to use for handling parsing
-        errors. The default is 'strict', which will raise a
-        `~regions.DS9RegionParserError`. 'warn' will raise a
-        `~regions.DS9RegionParserWarning`, and 'ignore' will do nothing
-        (i.e., be silent).
 
     cache : bool or 'update', optional
         Whether to cache the contents of remote URLs. If 'update', check
@@ -110,90 +51,11 @@ def _read_ds9(filename, errors='strict', cache=False):
     """
     with get_readable_fileobj(filename, cache=cache) as fh:
         region_string = fh.read()
-        return _parse_ds9(region_string, errors=errors)
-
-
-#def _zz_split_lines(region_str):
-#    for line in region_str.split('\n'):
-#        # split on all semicolons,
-#        # except those between {} braces ({} contain ds9 text strings)
-#        for line_ in _split_semicolon(line):
-#            yield line_
-
-
-def _split_lines(region_str):
-    lines = []
-    for line in region_str.split('\n'):
-        # split on all semicolons,
-        # except those between {} braces ({} contain ds9 text strings)
-        for line_ in _split_semicolon(line):
-            lines.append(line_.strip())
-    return lines
-
-
-# NOTES:
-#   * wcs[a-z] maps to icrs (print warning)
-# Unsupported:
-#   * linear
-#   * amplifier
-#   * detector
-#   * physical
-
-# linear,
-coordinate_frames = ['image', 'icrs', 'fk5', 'j2000', 'fk4', 'b1950',
-                     'galactic', 'ecliptic']
-wcs_frames = ['wcs', 'wcs0'] + [f'wcs{letter}'
-                                for letter in string.ascii_lowercase]
-coordinate_frames += wcs_frames
-
-regex_frame_or_shape = re.compile('^#? *([+-]?)([a-zA-Z0-9]+)')
-
-# DS9 language specification. This defines how a certain region is read.
-# language_spec = {'point': (coordinate, coordinate),
-#                     'text': (coordinate, coordinate),
-#                     'circle': (coordinate, coordinate, radius),
-#                     # This is a special case to deal with n elliptical annuli
-#                     'ellipse': itertools.chain((coordinate, coordinate),
-#                                             itertools.cycle((radius,))),
-#                     'box': (coordinate, coordinate, width, height, angle),
-#                     'polygon': itertools.cycle((coordinate,)),
-#                     'line': (coordinate, coordinate, coordinate, coordinate),
-#                     'annulus': itertools.chain((coordinate, coordinate),
-#                                             itertools.cycle((radius,)))}
-
-
-ds9_shapes = ['circle', 'ellipse', 'box', 'annulus', 'polygon', 'line',
-              'point', 'text', 'composite']
-
-shape_templates = {'circle': ('circle',
-                              '{center},{radius}'),
-                   'ellipse': ('ellipse',
-                               '{center},{width},{height}'
-                               ',{angle}'),
-                   'rectangle': ('box',
-                                 '{center},{width},{height},{angle}'),
-                   'circleannulus': ('annulus',
-                                     '{center},{inner_radius},'
-                                     '{outer_radius}'),
-                   'ellipseannulus': ('ellipse',
-                                      '{center},{inner_width},'
-                                      '{inner_height},'
-                                      '{outer_width},'
-                                      '{outer_height},{angle}'),
-                   'rectangleannulus': ('box',
-                                        '{center},{inner_width},'
-                                        '{inner_height},{outer_width},'
-                                        '{outer_height},{angle}'),
-                   'polygon': ('polygon',
-                               '{vertices}'),
-                   'line': ('line',
-                            '{start},{end}'),
-                   'point': ('point', '{center}'),
-                   'text': ('text', '{center}')}
+        return _parse_ds9(region_string)
 
 
 @RegionsRegistry.register(Regions, 'parse', 'ds9')
-def _parse_ds9(region_str, errors=None):
+def _parse_ds9(region_str):
     region_data = _parse_region_data(region_str)
     #return region_data
 
@@ -203,17 +65,48 @@ def _parse_ds9(region_str, errors=None):
     return regions
 
 
+@dataclass
+class _RegionData:
+    frame: str
+    region_type: str
+    shape: str
+    shape_params: str
+    meta: dict
+    visual: dict
+
+
+def _split_lines(region_str):
+    lines = []
+    for line in region_str.split('\n'):
+        # split on all semicolons,
+        # except those between {} braces ({} contains ds9 text strings)
+        for line_ in _split_semicolon(line):
+            lines.append(line_.strip())
+    return lines
+
+
 def _parse_region_data(region_str):
     global_meta = {}
+    composite_meta = ''
     frame = None
     region_data = []
-    composite_meta = ''
+
+    ds9_shapes = ['circle', 'ellipse', 'box', 'annulus', 'polygon', 'line',
+                  'point', 'text', 'composite']
+    unsupported_shapes = ['vector', 'ruler', 'compass', 'projection',
+                          'epanda', 'bpanda']
+
+    coordinate_frames = ['image', 'icrs', 'fk5', 'j2000', 'fk4', 'b1950',
+                         'galactic', 'ecliptic']
+    unsupported_frames = ['linear', 'amplifier', 'detector', 'physical']
+    wcs_frames = ['wcs', 'wcs0'] + [f'wcs{letter}'
+                                    for letter in string.ascii_lowercase]
+    unsupported_frames += wcs_frames
 
     allowed_frames_shapes = coordinate_frames + ds9_shapes
+    regex_frame_or_shape = re.compile('^#? *([+-]?)([a-zA-Z0-9]+)')
 
     for line in _split_lines(region_str):
-        orig_line = line
-        line = line.lower()
         # skip blank lines
         if not line:
             continue
@@ -223,10 +116,13 @@ def _parse_region_data(region_str):
                 and not line.startswith(('# text(', '# composite('))):
             continue
 
+        orig_line = line
+        line = line.lower()
+
         # ds9 region files can have multiple (including successive)
         # global lines
         if line.startswith('global'):
-            global_meta.update(_parse_meta(orig_line[7:]))
+            global_meta.update(_parse_metadata(orig_line[7:]))
             continue
 
         match = regex_frame_or_shape.search(line)
@@ -239,28 +135,37 @@ def _parse_region_data(region_str):
             raise ValueError(f'Unable to parse line "{line}".')
 
         if frame_or_shape in coordinate_frames:
+            # frame persists for subsequent regions until changed
             frame = frame_or_shape
             continue
 
         if frame_or_shape in ds9_shapes:
             shape = frame_or_shape
+
+            if shape in unsupported_shapes:
+                warnings.warn(f'DS9 shape {shape} is unsupported, '
+                              'skipping the corresponding region.')
+                continue
+
+            # a frame must be defined before any shape(s)
             if frame is None:
                 raise ValueError('Coordinate frame was not found for region '
                                  f'"{line}".')
 
-            if frame in wcs_frames:
-                warnings.warn('DS9 wcs coordinate frames are unsupported, '
-                              'skipping region.')
+            if frame in unsupported_frames:
+                warnings.warn(f'DS9 coordinate frame {frame} is unsupported, '
+                              'skipping the corresponding region.')
                 continue
 
             if shape == 'composite':
                 idx = line.find('||')
                 if idx == -1:
-                    raise ValueError(f'unable to parse line "{line}"')
-                # composite meta applies to all regions within the
+                    raise ValueError('unable to parse line with composite '
+                                     f'shape: "{line}"')
+                # composite metadata applies to all regions within the
                 # composite shape; this will always contain at least
                 # "composite=1"
-                composite_meta = _parse_meta(line[idx + 2:].strip())
+                composite_meta = _parse_metadata(line[idx + 2:].strip())
 
             if include_symbol == '-':
                 include = 0
@@ -270,15 +175,16 @@ def _parse_region_data(region_str):
 
             params_str, meta_str = _parse_shape(shape, match.span(), orig_line)
 
-            meta, visual = _make_metadata(shape, global_meta, composite_meta,
-                                          include_meta, meta_str)
+            meta, visual = _define_region_metadata(shape, global_meta,
+                                                   composite_meta,
+                                                   include_meta, meta_str)
 
             region_type = 'sky'
             if frame == 'image':
                 region_type = 'pixel'
 
-            region_data.append(RegionData(frame, region_type, shape,
-                                          params_str, meta, visual))
+            region_data.append(_RegionData(frame, region_type, shape,
+                                           params_str, meta, visual))
 
             # reset composite metadata after the composite region ends
             if '||' not in line and composite_meta:
@@ -287,38 +193,43 @@ def _parse_region_data(region_str):
     return region_data
 
 
-def _parse_meta(line):
-    #meta_regex = re.compile('([a-zA-Z]+)\s*=\s*({.*?}|\'.*?\'|\".*?\"|'
-    #                        '[0-9\s]+\s?|[^=\s]+\s*[0-9]*)')
-    meta = {}
-    for key, val in meta_regex.findall(line):
+def _parse_metadata(line):
+    """
+    Parse metadata from a ds9 region string line.
+    """
+    metadata_regex = re.compile(r'([a-zA-Z]+)\s*=\s*({.*?}|\'.*?\'|\".*?\"|'
+                                r'[0-9\s]+\s?|[^=\s]+\s*[0-9]*)')
+
+    metadata = {}
+    for key, val in metadata_regex.findall(line):
         val = val.strip().strip("'").strip('"').lstrip('{').rstrip('}')
         key = key.lower()
-        if key not in meta:
+        if key not in metadata:
             if key == 'tag':
-                val = [val]
-            meta[key] = val
+                val = [val]  # tag value is always a list
+            metadata[key] = val
         else:
             if key == 'tag':
-                meta[key].append(val)
+                metadata[key].append(val)
             else:
                 warnings.warn(f'Found duplicate metadata for "{key}", '
                               'skipping')
-    return meta
+    return metadata
 
 
-def _make_metadata(shape, global_meta, composite_meta, include_meta, meta_str):
+def _define_region_metadata(shape, global_meta, composite_meta, include_meta,
+                            meta_str):
     all_meta = global_meta.copy()
     all_meta.update(composite_meta)
     all_meta.update(include_meta)
-    all_meta.update(_parse_meta(meta_str))
+    all_meta.update(_parse_metadata(meta_str))
 
     unsupported = ('line', 'ruler')
     # TODO: support text annotations for all DS9 regions
-    #ds9_visual_keys = ('color', 'dashlist', 'dash', 'width', 'font', 'fill',
-    #                   'point', 'text')
-    ds9_visual_keys = ('color', 'dashlist', 'dash', 'width', 'font', 'fill',
-                       'point', 'textangle')
+    # ds9_visual_keys = ('color', 'dash', 'dashlist', 'fill', 'font', 'point',
+    #                    'text', 'textangle', 'textrotate', 'width')
+    ds9_visual_keys = ('color', 'dash', 'dashlist', 'fill', 'font', 'point',
+                       'textangle', 'textrotate', 'width')
 
     meta = {}
     visual = {}
@@ -346,7 +257,7 @@ def _make_metadata(shape, global_meta, composite_meta, include_meta, meta_str):
 
 def _translate_visual_metadata(visual_meta, shape):
     """
-    Translate ds9 visual metadata to mpl.
+    Translate ds9 visual metadata to matplotlib.
     """
     meta = visual_meta.copy()
 
@@ -373,7 +284,7 @@ def _translate_visual_metadata(visual_meta, shape):
             ds9_marker, meta['markersize'] = point_
         else:
             raise ValueError(f'invalid point data "{point}"')
-        meta['marker'] = valid_symbols_ds9[ds9_marker]
+        meta['marker'] = ds9_valid_symbols[ds9_marker]
 
     font = meta.pop('font', None)
     if font is not None:
@@ -405,7 +316,7 @@ def _parse_shape(shape, span, line):
     full_line = line
     line = full_line[span[1]:]
 
-    # ds9 writes out text regions in this odd format
+    # ds9 writes out text regions in this odd (undocumented) format
     if shape == 'text' and full_line.lower().startswith('# text'):
         idx = line.find(' ')
         if idx == -1:
@@ -429,21 +340,6 @@ def _parse_shape(shape, span, line):
     return params_str, meta_str
 
 
-template = {'point': ('coord', 'coord'),
-            'text': ('coord', 'coord'),
-            'circle': ('coord', 'coord', 'length'),
-            #'ellipse': ('coord', 'coord', 'length', 'length', 'angle'),
-            #'box': ('coord', 'coord', 'length', 'length', 'angle'),
-            'ellipse': itertools.chain(('coord', 'coord'),
-                                       itertools.cycle(('length',))),
-            'box': itertools.chain(('coord', 'coord'),
-                                   itertools.cycle(('length',))),
-            'polygon': itertools.cycle(('coord',)),
-            'line': ('coord', 'coord', 'coord', 'coord'),
-            'annulus': itertools.chain(('coord', 'coord'),
-                                       itertools.cycle(('length',)))}
-
-
 def _parse_pixel_coord(param_str):
     invalid_chars = ('d', 'r', 'p', ':', 'h', 'm', 's')
     for char in invalid_chars:
@@ -454,7 +350,7 @@ def _parse_pixel_coord(param_str):
     if param_str[-1] == 'i':
         param_str = param_str[:-1]
 
-    # DS9 uses 1-index pixels
+    # DS9 uses 1-indexed pixels
     return float(param_str) - 1
 
 
@@ -491,6 +387,24 @@ def _parse_coord(region_type, param_str, frame, index):
         return _parse_sky_coord(param_str, frame, index)
 
 
+def _parse_angle(param_str):
+    invalid_chars = ('p', 'i')
+    for char in invalid_chars:
+        if char in param_str:
+            warnings.warn('Cannot parse sky region parameter')
+            return None
+
+    unit_mapping = {'"': u.arcsec,
+                    "'": u.arcmin,
+                    'd': u.deg,
+                    'r': u.rad}
+    if param_str[-1] not in string.digits:
+        unit = unit_mapping[param_str[-1]]
+        return u.Quantity(float(param_str[:-1]), unit=unit)
+    else:
+        return u.Quantity(float(param_str), unit=u.degree)
+
+
 def _parse_size(region_type, param_str):
     if region_type == 'pixel':
         invalid_chars = ('"', "'", 'd', 'r', 'p')
@@ -505,44 +419,25 @@ def _parse_size(region_type, param_str):
         return float(param_str)
 
     else:
-        invalid_chars = ('p', 'i')
-        for char in invalid_chars:
-            if char in param_str:
-                warnings.warn('Cannot parse sky region parameters')
-                return None
-
-    unit_mapping = {'"': u.arcsec,
-                    "'": u.arcmin,
-                    'd': u.deg,
-                    'r': u.rad
-                    }
-    if param_str[-1] not in string.digits:
-        unit = unit_mapping[param_str[-1]]
-        return u.Quantity(float(param_str[:-1]), unit=unit)
-    else:
-        return u.Quantity(float(param_str), unit=u.degree)
-
-
-def _parse_angle(param_str):
-    invalid_chars = ('p', 'i')
-    for char in invalid_chars:
-        if char in param_str:
-            warnings.warn('Cannot parse region angle parameter')
-            return None
-
-    unit_mapping = {'"': u.arcsec,
-                    "'": u.arcmin,
-                    'd': u.deg,
-                    'r': u.rad
-                    }
-    if param_str[-1] not in string.digits:
-        unit = unit_mapping[param_str[-1]]
-        return u.Quantity(float(param_str[:-1]), unit=unit)
-    else:
-        return u.Quantity(float(param_str), unit=u.degree)
+        # size in angular units
+        return _parse_angle(param_str)
 
 
 def _parse_shape_params(region_data):
+    ds9_template = {'point': ('coord', 'coord'),
+                    'text': ('coord', 'coord'),
+                    'circle': ('coord', 'coord', 'length'),
+                    #'ellipse': ('coord', 'coord', 'length', 'length',
+                    #            'angle'),
+                    #'box': ('coord', 'coord', 'length', 'length', 'angle'),
+                    'ellipse': itertools.chain(('coord', 'coord'),
+                                               itertools.cycle(('length',))),
+                    'box': itertools.chain(('coord', 'coord'),
+                                           itertools.cycle(('length',))),
+                    'polygon': itertools.cycle(('coord',)),
+                    'line': ('coord', 'coord', 'coord', 'coord'),
+                    'annulus': itertools.chain(('coord', 'coord'),
+                                               itertools.cycle(('length',)))}
 
     region_type = region_data.region_type
     shape = region_data.shape
@@ -560,9 +455,9 @@ def _parse_shape_params(region_data):
 
     if shape in ('ellipse', 'box', 'annulus'):
         # deepcopy to "reset" the cycle iterators
-        shape_template = deepcopy(template[shape])
+        shape_template = deepcopy(ds9_template[shape])
     else:
-        shape_template = template[shape]
+        shape_template = ds9_template[shape]
 
     shape_params = []
     for idx, (param_type, value) in enumerate(zip(shape_template, params)):
@@ -576,7 +471,7 @@ def _parse_shape_params(region_data):
         elif param_type in ('length',):
             param = _parse_size(region_type, value)
             if shape == 'ellipse':
-                param *= 2.0
+                param *= 2.0  # ds9 uses semi-axis lengths
         elif param_type in ('angle',):
             param = _parse_angle(value)
         else:
@@ -638,6 +533,36 @@ def _final_sky_params(shape, shape_params, frame):
 
 
 def _make_region(region_data):
+    pixel_map = {'circle': CirclePixelRegion,
+                 'ellipse': EllipsePixelRegion,
+                 #'rectangle': RectanglePixelRegion,
+                 'box': RectanglePixelRegion,
+                 'polygon': PolygonPixelRegion,
+                 #'circleannulus': CircleAnnulusPixelRegion,
+                 'annulus': CircleAnnulusPixelRegion,
+                 'ellipseannulus': EllipseAnnulusPixelRegion,
+                 'rectangleannulus': RectangleAnnulusPixelRegion,
+                 'line': LinePixelRegion,
+                 'point': PointPixelRegion,
+                 'text': TextPixelRegion}
+
+    sky_map = {'circle': CircleSkyRegion,
+               'ellipse': EllipseSkyRegion,
+               #'rectangle': RectangleSkyRegion,
+               'box': RectangleSkyRegion,
+               'polygon': PolygonSkyRegion,
+               #'circleannulus': CircleAnnulusSkyRegion,
+               'annulus': CircleAnnulusSkyRegion,
+               'ellipseannulus': EllipseAnnulusSkyRegion,
+               'rectangleannulus': RectangleAnnulusSkyRegion,
+               'line': LineSkyRegion,
+               'point': PointSkyRegion,
+               'text': TextSkyRegion}
+
+    shape_to_region = {}
+    shape_to_region['pixel'] = pixel_map
+    shape_to_region['sky'] = sky_map
+
     region_type = region_data.region_type
     shape = region_data.shape
     frame = region_data.frame
