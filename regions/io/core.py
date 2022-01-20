@@ -23,7 +23,6 @@ from ..shapes import (CirclePixelRegion, CircleSkyRegion,
                       TextPixelRegion, TextSkyRegion)
 from ..core.core import PixCoord, SkyRegion
 from ..core.metadata import RegionMeta, RegionVisual
-from .ds9.core import DS9RegionParserWarning, valid_symbols_ds9
 from .crtf.core import CRTFRegionParserWarning
 
 __all__ = []
@@ -45,11 +44,9 @@ regions_attributes['rectangleannulus'] = regions_attributes['ellipseannulus']
 
 # Map the region names in the respective format to the ones available in
 # this package
-reg_mapping = {'DS9': {x: x for x in regions_attributes},
-               'CRTF': {x: x for x in regions_attributes},
+reg_mapping = {'CRTF': {x: x for x in regions_attributes},
                'FITS_REGION': {x: x for x in regions_attributes}}
 
-reg_mapping['DS9']['box'] = 'rectangle'
 reg_mapping['CRTF']['rotbox'] = 'rectangle'
 reg_mapping['CRTF']['box'] = 'rectangle'
 reg_mapping['CRTF']['centerbox'] = 'rectangle'
@@ -57,32 +54,24 @@ reg_mapping['CRTF']['poly'] = 'polygon'
 reg_mapping['CRTF']['symbol'] = 'point'
 reg_mapping['CRTF']['text'] = 'text'
 reg_mapping['CRTF']['annulus'] = 'circleannulus'
-reg_mapping['DS9']['text'] = 'text'
-reg_mapping['DS9']['annulus'] = 'circleannulus'
 reg_mapping['FITS_REGION']['annulus'] = 'circleannulus'
 reg_mapping['FITS_REGION']['box'] = 'rectangle'
 reg_mapping['FITS_REGION']['rotbox'] = 'rectangle'
 reg_mapping['FITS_REGION']['elliptannulus'] = 'ellipseannulus'
 
 # valid astropy coordinate frames in their respective formats
-valid_coordsys = {'DS9': ['image', 'physical', 'fk4', 'fk5', 'icrs',
-                          'galactic', 'geocentrictrueecliptic', 'wcs'],
-                  'CRTF': ['image', 'fk5', 'fk4', 'galactic',
+valid_coordsys = {'CRTF': ['image', 'fk5', 'fk4', 'galactic',
                            'geocentrictrueecliptic', 'supergalactic', 'icrs']}
-valid_coordsys['DS9'] += [f'wcs{x}' for x in string.ascii_lowercase]
 
 # Map astropy's coordinate frame names with their respective name in
 # the file format.
-coordsys_mapping = {'DS9': {x: x for x in valid_coordsys['DS9']},
-                    'CRTF': {x: x.upper() for x in valid_coordsys['CRTF']}}
+coordsys_mapping = {'CRTF': {x: x.upper() for x in valid_coordsys['CRTF']}}
 
 # Coordinate frame names must be uppercase following the CASA CRTF syntax
 coordsys_mapping['CRTF']['geocentrictrueecliptic'] = 'ECLIPTIC'
 coordsys_mapping['CRTF']['fk5'] = 'J2000'
 coordsys_mapping['CRTF']['fk4'] = 'B1950'
 coordsys_mapping['CRTF']['supergalactic'] = 'SUPERGAL'
-
-coordsys_mapping['DS9']['geocentrictrueecliptic'] = 'ECLIPTIC'
 
 
 class RegionConversionError(ValueError):
@@ -105,13 +94,7 @@ class _ShapeList(list):
             # Skip elliptical multi-annulus for now
             if shape.region_type == 'ellipse' and len(shape.coord) > 5:
                 msg = f'Skipping elliptical annulus {shape}'
-                warn(msg, DS9RegionParserWarning)
-                continue
-
-            # Skip DS9 circular multi-annulus for now
-            if shape.region_type == 'circleannulus' and len(shape.coord) > 4:
-                msg = f'Skipping circular annulus {shape}'
-                warn(msg, DS9RegionParserWarning)
+                warn(msg, AstropyUserWarning)
                 continue
 
             if shape.region_type in ['box'] and shape.format_type == 'CRTF':
@@ -288,133 +271,6 @@ class _ShapeList(list):
 
         return output
 
-    def to_ds9(self, fmt='.6f', radunit='deg'):
-        """
-        Convert to DS9 region strings.
-
-        Parameters
-        ----------
-        fmt : str
-            A python string format defining the output precision.
-            Default is '.6f', which is accurate to 0.0036 arcseconds.
-
-        radunit : str
-            The unit of the radius.
-
-        Returns
-        -------
-        region_string : str
-            A DS9 region string.
-        """
-        valid_symbols_reverse = {y: x for x, y in valid_symbols_ds9.items()}
-
-        ds9_strings = {
-            'circle': '{0}circle({1:FMT},{2:FMT},{3:FMT}RAD)',
-            'circleannulus': ('{0}annulus({1:FMT},{2:FMT},{3:FMT}RAD,'
-                              '{4:FMT}RAD)'),
-            'ellipse': ('{0}ellipse({1:FMT},{2:FMT},{3:FMT}RAD,{4:FMT}RAD,'
-                        '{5:FMT})'),
-            'rectangle': ('{0}box({1:FMT},{2:FMT},{3:FMT}RAD,{4:FMT}RAD,'
-                          '{5:FMT})'),
-            'polygon': '{0}polygon({1})',
-            'point': '{0}point({1:FMT},{2:FMT})',
-            'line': '{0}line({1:FMT},{2:FMT},{3:FMT},{4:FMT})',
-            'text': '{0}text({1:FMT},{2:FMT})'}
-
-        output = '# Region file format: DS9 astropy/regions\n'
-
-        if radunit == 'arcsec':
-            radunitstr = '"'
-        else:
-            radunitstr = ''
-
-        for key, val in ds9_strings.items():
-            ds9_strings[key] = val.replace('FMT', fmt).replace('RAD',
-                                                               radunitstr)
-
-        for shape in self:
-            shape.check_ds9()
-            shape.meta = _to_ds9_meta(shape.meta)
-
-            # if unspecified, include is True.
-            include = ''
-            if shape.include in (False, '-'):
-                include = '-'
-
-            if 'point' in shape.meta:
-                shape.meta['point'] = \
-                    valid_symbols_reverse[shape.meta['point']]
-
-            if 'symsize' in shape.meta:
-                shape.meta['point'] += f' {shape.meta.pop("symsize")}'
-
-            keylist = ('include', 'tag', 'comment', 'font', 'text')
-            meta_pairs = []
-            for key, val in shape.meta.items():
-                if key not in keylist:
-                    meta_pairs.append(f'{key}={val}')
-            meta_str = ' '.join(meta_pairs)
-
-            if 'tag' in shape.meta:
-                tags = [f'tag={tag}' for tag in shape.meta['tag']]
-                meta_str += ' ' + ' '.join(tags)
-
-            if 'font' in shape.meta:
-                meta_str += f" font=\"{shape.meta['font']}\""
-
-            if shape.meta.get('text', '') != '':
-                meta_str += ' text={' + shape.meta['text'] + '}'
-
-            if 'comment' in shape.meta:
-                meta_str += f' {shape.meta["comment"]}'
-
-            coord = []
-            if shape.coordsys not in ['image', 'physical']:
-                for val in shape.coord:
-                    if isinstance(val, Angle):
-                        coord.append(float(val.value))
-                    else:
-                        if radunit == '' or radunit is None:
-                            coord.append(float(val.value))
-                        else:
-                            coord.append(float(val.to(radunit).value))
-
-                if (shape.region_type in ['ellipse', 'rectangle']
-                        and len(shape.coord) % 2 == 1):
-                    coord[-1] = float(shape.coord[-1].to('deg').value)
-
-            else:
-                for val in shape.coord:
-                    if isinstance(val, u.Quantity):
-                        coord.append(float(val.value))
-                    else:
-                        coord.append(float(val))
-                if shape.region_type in ['polygon', 'line']:
-                    coord = [x + 1 for x in coord]
-                else:
-                    coord[0] += 1
-                    coord[1] += 1
-
-            if shape.region_type == 'polygon':
-                coord = ",".join([f'{x:{fmt}}' for x in coord])
-                line = ds9_strings['polygon'].format(include, coord)
-
-            elif shape.region_type == 'ellipse':
-                coord[2:] = [x / 2 for x in coord[2:]]
-                if len(coord) % 2 == 1:
-                    coord[-1] *= 2
-                line = ds9_strings['ellipse'].format(include, *coord)
-
-            else:
-                line = ds9_strings[shape.region_type].format(include, *coord)
-
-            region_output = f'{line}'
-            if meta_str.strip():
-                region_output += f' # {meta_str}'
-            output += f'{shape.coordsys}; {region_output}\n'
-
-        return output
-
     def to_fits(self):
         """
         Convert to a `~astropy.table.Table` object.
@@ -490,7 +346,7 @@ class _ShapeList(list):
 
 class _Shape:
     """
-    Helper class to represent a DS9/CRTF Region.
+    Helper class to represent a CRTF Region.
 
     This serves as intermediate step in the parsing process.
 
@@ -706,18 +562,6 @@ class _Shape:
             raise ValueError(f'"{self.coordsys}" is not a valid coordinate '
                              'reference frame')
 
-    def check_ds9(self):
-        """
-        Check for DS9 compatibility.
-        """
-        if self.region_type not in regions_attributes:
-            raise ValueError(f'"{self.region_type}" is not a valid region '
-                             'type')
-
-        if self.coordsys not in valid_coordsys['DS9']:
-            raise ValueError(f'"{self.coordsys}" is not a valid coordinate '
-                             'reference frame')
-
     def _validate(self):
         """
         Check whether all the attributes of this object is valid.
@@ -726,7 +570,7 @@ class _Shape:
             raise ValueError(f'"{self.region_type}" is not a valid region '
                              'type')
 
-        if self.coordsys not in valid_coordsys['DS9'] + valid_coordsys['CRTF']:
+        if self.coordsys not in valid_coordsys['CRTF']:
             raise ValueError(f'"{self.coordsys}" is not a valid coordinate '
                              'reference frame')
 
@@ -804,43 +648,6 @@ def _to_shape_list(region_list, coordinate_system='fk5'):
                                  include))
 
     return shape_list
-
-
-def _to_ds9_meta(shape_meta):
-    """
-    Make the metadata DS9 compatible by filtering and mapping the valid
-    keys.
-
-    Parameters
-    ----------
-    shape_meta : dict
-        The meta attribute of a `regions.Shape` object.
-
-    Returns
-    -------
-    meta : dict
-        A DS9 compatible meta dictionary.
-    """
-    # meta keys allowed in DS9.
-    valid_keys = ['symbol', 'include', 'tag', 'line', 'comment',
-                  'name', 'select', 'highlite', 'fixed', 'label', 'text',
-                  'edit', 'move', 'rotate', 'delete', 'source', 'background']
-
-    # visual keys allowed in DS9
-    valid_keys += ['color', 'dash', 'linewidth', 'font', 'dashlist',
-                   'fill', 'textangle', 'symsize']
-
-    # mapped to actual names in DS9
-    key_mappings = {'symbol': 'point', 'linewidth': 'width', 'label': 'text'}
-
-    meta = _to_io_meta(shape_meta, valid_keys, key_mappings)
-
-    if 'font' in meta:
-        meta['font'] += (f" {shape_meta.get('fontsize', 12)} "
-                         f"{shape_meta.get('fontweight', 'normal')} "
-                         f"{shape_meta.get('fontstyle', 'roman')}")
-
-    return meta
 
 
 def _to_crtf_meta(shape_meta):
