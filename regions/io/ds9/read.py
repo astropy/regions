@@ -10,6 +10,7 @@ import warnings
 from astropy.coordinates import Angle, SkyCoord
 import astropy.units as u
 from astropy.utils.data import get_readable_fileobj
+from astropy.utils.exceptions import AstropyUserWarning
 
 from ...core import Regions, RegionMeta, RegionVisual, PixCoord
 from ...core.registry import RegionsRegistry
@@ -106,7 +107,7 @@ def _parse_region_data(region_str):
     allowed_frames_shapes = coordinate_frames + ds9_shapes
     regex_frame_or_shape = re.compile('^#? *([+-]?)([a-zA-Z0-9]+)')
 
-    for line in _split_lines(region_str):
+    for line in _split_lines(region_str):  # split on semicolons & newlines
         # skip blank lines
         if not line:
             continue
@@ -116,13 +117,13 @@ def _parse_region_data(region_str):
                 and not line.startswith(('# text(', '# composite('))):
             continue
 
-        orig_line = line
+        original_line = line  # used to parse text and tag fields (keep case)
         line = line.lower()
 
         # ds9 region files can have multiple (including successive)
         # global lines
         if line.startswith('global'):
-            global_meta.update(_parse_metadata(orig_line[7:]))
+            global_meta.update(_parse_metadata(original_line[7:]))
             continue
 
         match = regex_frame_or_shape.search(line)
@@ -143,8 +144,9 @@ def _parse_region_data(region_str):
             shape = frame_or_shape
 
             if shape in unsupported_shapes:
-                warnings.warn(f'DS9 shape {shape} is unsupported, '
-                              'skipping the corresponding region.')
+                warnings.warn(f'DS9 shape "{shape}" is unsupported, '
+                              'skipping the corresponding region.',
+                              AstropyUserWarning)
                 continue
 
             # a frame must be defined before any shape(s)
@@ -154,7 +156,8 @@ def _parse_region_data(region_str):
 
             if frame in unsupported_frames:
                 warnings.warn(f'DS9 coordinate frame {frame} is unsupported, '
-                              'skipping the corresponding region.')
+                              'skipping the corresponding region.',
+                              AstropyUserWarning)
                 continue
 
             if shape == 'composite':
@@ -173,7 +176,8 @@ def _parse_region_data(region_str):
                 include = 1
             include_meta = {'include': include}
 
-            params_str, meta_str = _parse_shape(shape, match.span(), orig_line)
+            params_str, meta_str = _parse_shape(shape, match.span(),
+                                                original_line)
 
             meta, visual = _define_region_metadata(shape, global_meta,
                                                    composite_meta,
@@ -213,7 +217,7 @@ def _parse_metadata(line):
                 metadata[key].append(val)
             else:
                 warnings.warn(f'Found duplicate metadata for "{key}", '
-                              'skipping')
+                              'skipping', AstropyUserWarning)
     return metadata
 
 
@@ -238,7 +242,7 @@ def _define_region_metadata(shape, global_meta, composite_meta, include_meta,
             if key == 'line' and '1' not in value:  # ignore this special case
                 continue
             warnings.warn(f'DS9 meta "{key}={value}" is unsupported and '
-                          'will be dropped')
+                          'will be dropped', AstropyUserWarning)
 
         try:
             value = int(value)
@@ -266,7 +270,7 @@ def _translate_visual_metadata(visual_meta, shape):
     if int(dash) == 1:
         if shape == 'point':
             warnings.warn('dashed lines are unsupported for DS9 point '
-                          'regions')
+                          'regions', AstropyUserWarning)
 
         if dashlist is not None:
             dashes = tuple(int(i) for i in dashlist.split())
@@ -344,7 +348,8 @@ def _parse_pixel_coord(param_str):
     invalid_chars = ('d', 'r', 'p', ':', 'h', 'm', 's')
     for char in invalid_chars:
         if char in param_str:
-            warnings.warn('Cannot parse pixel region position coordinates')
+            warnings.warn('Cannot parse pixel region position coordinates',
+                          AstropyUserWarning)
             return None
 
     if param_str[-1] == 'i':
@@ -358,7 +363,8 @@ def _parse_sky_coord(param_str, frame, index):
     invalid_chars = ('i', 'p')
     for char in invalid_chars:
         if char in param_str:
-            warnings.warn('Cannot parse sky region position coordinates')
+            warnings.warn('Cannot parse sky region position coordinates',
+                          AstropyUserWarning)
             return None
 
     if param_str[-1] == 'r':
@@ -391,7 +397,8 @@ def _parse_angle(param_str):
     invalid_chars = ('p', 'i')
     for char in invalid_chars:
         if char in param_str:
-            warnings.warn('Cannot parse sky region parameter')
+            warnings.warn('Cannot parse sky region parameter',
+                          AstropyUserWarning)
             return None
 
     unit_mapping = {'"': u.arcsec,
@@ -410,7 +417,8 @@ def _parse_size(region_type, param_str):
         invalid_chars = ('"', "'", 'd', 'r', 'p')
         for char in invalid_chars:
             if char in param_str:
-                warnings.warn('Cannot parse pixel region parameters')
+                warnings.warn('Cannot parse pixel region parameters',
+                              AstropyUserWarning)
                 return None
 
         if param_str[-1] == 'i':
