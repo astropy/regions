@@ -71,7 +71,6 @@ def _parse_ds9(region_str):
         A list of `~regions.Region` objects.
     """
     region_data = _parse_region_data(region_str)
-    return region_data
 
     regions = []
     for region_data_ in region_data:
@@ -628,10 +627,16 @@ def _parse_shape_params(region_data):
     if n_annulus > 1:
         tmp_params = []
         for i in range(n_annulus):
-            idx = (i + 1) * 2
-            params = [shape_params[0], shape_params[1], shape_params[idx],
-                      shape_params[idx + 1], shape_params[idx + 2],
-                      shape_params[idx + 3], shape_params[-1]]
+            if shape in ('ellipse', 'box'):
+                idx = (i + 1) * 2
+                params = [shape_params[0], shape_params[1], shape_params[idx],
+                          shape_params[idx + 1], shape_params[idx + 2],
+                          shape_params[idx + 3], shape_params[-1]]
+            else:
+                idx = i + 2
+                params = [shape_params[0], shape_params[1], shape_params[idx],
+                          shape_params[idx + 1]]
+
             tmp_params.append(params)
         shape_params = tmp_params
     else:
@@ -642,8 +647,6 @@ def _parse_shape_params(region_data):
             shape = 'ellipse_annulus'
         elif shape == 'box':
             shape = 'rectangle_annulus'
-        else:
-            raise ValueError('cannot parse shape parameters')
 
     return shape, shape_params
 
@@ -735,13 +738,7 @@ def _make_region(region_data):
     for shape_params in region_params:
         # for Text region, we need to add meta['text'] to params
         if shape == 'text':
-            #print(region_data.meta)
-            #print(region_data.meta['text'])
             shape_params.append(region_data.meta['text'])
-
-        #print(region_type, shape, shape_params)
-        #print(shape_to_region[region_type][shape])
-        print(region_type, shape, shape_params)
 
         region = shape_to_region[region_type][shape](*shape_params)
         region.meta = RegionMeta(region_data.meta)
