@@ -590,14 +590,16 @@ def _parse_shape_params(region_data):
               if val]  # split values on space or comma
 
     nparams = len(params)
-    is_annulus = False
     n_annulus = 0
+
     if shape in ('ellipse', 'box') and nparams > 5:
         if nparams % 2 != 1:
             raise ValueError(f'incorrect number of parameters ({nparams}) '
                              f'for shape "{shape}"')
-        is_annulus = True
-        n_annulus += (nparams - 5) // 2
+        n_annulus = ((nparams - 3) // 2) - 1
+
+    if shape in ('annulus',):
+        n_annulus = nparams - 3
 
     if shape in ('ellipse', 'box', 'annulus'):
         # deepcopy to "reset" the cycle iterators
@@ -623,20 +625,19 @@ def _parse_shape_params(region_data):
 
         shape_params.append(param)
 
-    # if nshapes > 1:
-    #     tmp_params = []
-    #     for i in range(nshapes):
-    #         idx = (i + 1) * 2
-    #         params = [shape_params[0], shape_params[1], shape_params[idx],
-    #                   shape_params[idx + 1], shape_params[-1]]
-    #         tmp_params.append(params)
-    #     shape_params = tmp_params
-    # else:
-    #     shape_params = [shape_params]
+    if n_annulus > 1:
+        tmp_params = []
+        for i in range(n_annulus):
+            idx = (i + 1) * 2
+            params = [shape_params[0], shape_params[1], shape_params[idx],
+                      shape_params[idx + 1], shape_params[idx + 2],
+                      shape_params[idx + 3], shape_params[-1]]
+            tmp_params.append(params)
+        shape_params = tmp_params
+    else:
+        shape_params = [shape_params]
 
-    shape_params = [shape_params]
-
-    if is_annulus:
+    if n_annulus > 0:
         if shape == 'ellipse':
             shape = 'ellipse_annulus'
         elif shape == 'box':
@@ -652,6 +653,11 @@ def _define_pixel_params(shape, shape_params):
         params = [PixCoord(shape_params[0::2], shape_params[1::2])]
     elif shape == 'line':
         params = [PixCoord(*shape_params[0:2]), PixCoord(*shape_params[2:4])]
+    elif shape in ('ellipse_annulus', 'rectangle_annulus'):
+        size_params = shape_params[2:-1]
+        tmp = [size_params[0::2], size_params[1::2]]
+        tmp_flat = [item for sublist in tmp for item in sublist]
+        params = [PixCoord(*shape_params[0:2]), *tmp_flat, shape_params[-1]]
     else:
         params = ([PixCoord(shape_params[0], shape_params[1])]
                   + shape_params[2:])
