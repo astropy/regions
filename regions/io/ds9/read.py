@@ -73,8 +73,6 @@ def _parse_ds9(region_str):
     region_data = _parse_region_data(region_str)
     return region_data
 
-    # FIXME: need to handle (multi)annulus -> multi circ ann,
-    # (multi)ellipse -> multi ell ann, (multi)box -> mult box ann
     regions = []
     for region_data_ in region_data:
         regions.extend(_make_region(region_data_))
@@ -589,15 +587,17 @@ def _parse_shape_params(region_data):
     shape = region_data.shape
     frame = region_data.frame
     params = [val for val in re.split(r'\s|\,', region_data.shape_params)
-              if val]
+              if val]  # split values on space or comma
 
     nparams = len(params)
-    nshapes = 1
+    is_annulus = False
+    n_annulus = 0
     if shape in ('ellipse', 'box') and nparams > 5:
         if nparams % 2 != 1:
             raise ValueError(f'incorrect number of parameters ({nparams}) '
                              f'for shape "{shape}"')
-        nshapes += (nparams - 5) // 2
+        is_annulus = True
+        n_annulus += (nparams - 5) // 2
 
     if shape in ('ellipse', 'box', 'annulus'):
         # deepcopy to "reset" the cycle iterators
@@ -608,7 +608,7 @@ def _parse_shape_params(region_data):
     shape_params = []
     for idx, (param_type, value) in enumerate(zip(shape_template, params)):
         if shape in ('ellipse', 'box') and idx == nparams - 1:
-            param_type = 'angle'
+            param_type = 'angle'  # last parameter is always an angle
 
         if param_type == 'coord':
             param = _parse_coord(region_type, value, frame, idx)
@@ -623,19 +623,28 @@ def _parse_shape_params(region_data):
 
         shape_params.append(param)
 
-    # create multiple shapes for multi-ellipse or multi-box regions
-    if nshapes > 1:
-        tmp_params = []
-        for i in range(nshapes):
-            idx = (i + 1) * 2
-            params = [shape_params[0], shape_params[1], shape_params[idx],
-                      shape_params[idx + 1], shape_params[-1]]
-            tmp_params.append(params)
-        shape_params = tmp_params
-    else:
-        shape_params = [shape_params]
+    # if nshapes > 1:
+    #     tmp_params = []
+    #     for i in range(nshapes):
+    #         idx = (i + 1) * 2
+    #         params = [shape_params[0], shape_params[1], shape_params[idx],
+    #                   shape_params[idx + 1], shape_params[-1]]
+    #         tmp_params.append(params)
+    #     shape_params = tmp_params
+    # else:
+    #     shape_params = [shape_params]
 
-    return shape_params
+    shape_params = [shape_params]
+
+    if is_annulus:
+        if shape == 'ellipse':
+            shape = 'ellipse_annulus'
+        elif shape == 'box':
+            shape = 'rectangle_annulus'
+        else:
+            raise ValueError('cannot parse shape parameters')
+
+    return shape, shape_params
 
 
 def _define_pixel_params(shape, shape_params):
@@ -681,8 +690,8 @@ def _make_region(region_data):
                  'box': RectanglePixelRegion,
                  'polygon': PolygonPixelRegion,
                  'annulus': CircleAnnulusPixelRegion,
-                 'ellipseannulus': EllipseAnnulusPixelRegion,
-                 'rectangleannulus': RectangleAnnulusPixelRegion,
+                 'ellipse_annulus': EllipseAnnulusPixelRegion,
+                 'rectangle_annulus': RectangleAnnulusPixelRegion,
                  'line': LinePixelRegion,
                  'point': PointPixelRegion,
                  'text': TextPixelRegion}
@@ -692,8 +701,8 @@ def _make_region(region_data):
                'box': RectangleSkyRegion,
                'polygon': PolygonSkyRegion,
                'annulus': CircleAnnulusSkyRegion,
-               'ellipseannulus': EllipseAnnulusSkyRegion,
-               'rectangleannulus': RectangleAnnulusSkyRegion,
+               'ellipse_annulus': EllipseAnnulusSkyRegion,
+               'rectangle_annulus': RectangleAnnulusSkyRegion,
                'line': LineSkyRegion,
                'point': PointSkyRegion,
                'text': TextSkyRegion}
@@ -705,8 +714,7 @@ def _make_region(region_data):
     region_type = region_data.region_type
     shape = region_data.shape
     frame = region_data.frame
-
-    shape_params_list = _parse_shape_params(region_data)
+    shape, shape_params_list = _parse_shape_params(region_data)
 
     # define the parameters to initalize a Region
     region_params = []
@@ -716,8 +724,6 @@ def _make_region(region_data):
         else:
             region_params.extend([_define_sky_params(shape, shape_params,
                                                      frame)])
-
-    print('region_params', region_params)
 
     regions = []
     for shape_params in region_params:
