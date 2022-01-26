@@ -30,6 +30,12 @@ from ...shapes import (CirclePixelRegion, CircleSkyRegion,
 __all__ = []
 
 
+class DS9ParserError(Exception):
+    """
+    A custom exception for DS9 parsing errors.
+    """
+
+
 @RegionsRegistry.register(Regions, 'read', 'ds9')
 def _read_ds9(filename, cache=False):
     """
@@ -70,11 +76,15 @@ def _parse_ds9(region_str):
     regions : list
         A list of `~regions.Region` objects.
     """
+    # first parse the input string to generate the raw region data
     region_data = _parse_region_data(region_str)
 
+    # now parse the raw region data into region object(s)
     regions = []
     for region_data_ in region_data:
-        regions.extend(_make_region(region_data_))
+        region = _make_region(region_data_)
+        if region is not None:  # skip region if error during parsing
+            regions.extend(region)
     return regions
 
 
@@ -91,6 +101,7 @@ class _RegionData:
     shape_params: str
     meta: dict
     visual: dict
+    region_str: str
 
 
 def _split_lines(region_str):
@@ -234,7 +245,7 @@ def _parse_region_data(region_str):
                 region_type = 'pixel'
 
             region_data.append(_RegionData(frame, region_type, shape,
-                                           params_str, meta, visual))
+                                           params_str, meta, visual, line))
 
             # reset composite metadata after the composite region ends
             if '||' not in line and composite_meta:
@@ -469,9 +480,8 @@ def _parse_pixel_coord(param_str):
     invalid_chars = ('d', 'r', 'p', ':', 'h', 'm', 's')
     for char in invalid_chars:
         if char in param_str:
-            warnings.warn('Cannot parse pixel region position coordinates',
-                          AstropyUserWarning)
-            return None
+            raise DS9ParserError('Cannot parse pixel region position '
+                                 'coordinates')
 
     if param_str[-1] == 'i':
         param_str = param_str[:-1]
@@ -484,9 +494,8 @@ def _parse_sky_coord(param_str, frame, index):
     invalid_chars = ('i', 'p')
     for char in invalid_chars:
         if char in param_str:
-            warnings.warn('Cannot parse sky region position coordinates',
-                          AstropyUserWarning)
-            return None
+            raise DS9ParserError('Cannot parse sky region position '
+                                 'coordinates')
 
     if param_str[-1] == 'r':
         return Angle(param_str[:-1], unit=u.radian)
@@ -518,9 +527,7 @@ def _parse_angle(param_str):
     invalid_chars = ('p', 'i')
     for char in invalid_chars:
         if char in param_str:
-            warnings.warn('Cannot parse sky region parameter',
-                          AstropyUserWarning)
-            return None
+            raise DS9ParserError('Cannot parse sky region angle parameter')
 
     unit_mapping = {'"': u.arcsec,
                     "'": u.arcmin,
@@ -538,9 +545,9 @@ def _parse_size(region_type, param_str):
         invalid_chars = ('"', "'", 'd', 'r', 'p')
         for char in invalid_chars:
             if char in param_str:
-                warnings.warn('Cannot parse pixel region parameters',
-                              AstropyUserWarning)
-                return None
+                raise DS9ParserError('Cannot parse pixel region size '
+                                     'parameters - must not be in angular '
+                                     'units')
 
         if param_str[-1] == 'i':
             param_str = param_str[:-1]
@@ -723,7 +730,13 @@ def _make_region(region_data):
     region_type = region_data.region_type
     shape = region_data.shape
     frame = region_data.frame
-    shape, shape_params_list = _parse_shape_params(region_data)
+    try:
+        shape, shape_params_list = _parse_shape_params(region_data)
+    except DS9ParserError as err:
+        # raise a warning and skip the region
+        msg = f'{str(err)}: {region_data.region_str}'
+        warnings.warn(msg, AstropyUserWarning)
+        return None
 
     # define the parameters to initalize a Region
     region_params = []
