@@ -410,7 +410,13 @@ def _translate_visual_metadata(shape, visual_meta):
     if font is not None:
         (meta['fontname'], meta['fontsize'], meta['fontweight'],
          meta['fontstyle']) = font.split()
-        meta['fontsize'] = int(meta['fontsize'])
+
+        # fontsize is a str
+        try:
+            meta['fontsize'] = int(meta['fontsize'])
+        except ValueError:
+            raise DS9ParserError('font size must be an integer, got '
+                                 f'{meta["fontsize"]}') from None
         meta['fontstyle'] = meta['fontstyle'].replace('roman', 'normal')
 
     if shape == 'point':
