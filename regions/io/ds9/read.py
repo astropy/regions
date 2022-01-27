@@ -403,7 +403,7 @@ def _translate_visual_metadata(shape, visual_meta):
         (meta['fontname'], meta['fontsize'], meta['fontweight'],
          meta['fontstyle']) = font.split()
         meta['fontsize'] = int(meta['fontsize'])
-        meta['fontstyle'].replace('roman', 'normal')
+        meta['fontstyle'] = meta['fontstyle'].replace('roman', 'normal')
 
     if shape == 'point':
         width = meta.pop('width', None)
