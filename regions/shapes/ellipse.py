@@ -265,7 +265,7 @@ class EllipsePixelRegion(PixelRegion):
         from .utils import MPL_VERSION
 
         if hasattr(self, '_mpl_selector'):
-            raise Exception('Cannot attach more than one selector to a region.')
+            raise AttributeError('Cannot attach more than one selector to a region.')
 
         if self.angle.value != 0:
             raise NotImplementedError('Cannot create matplotlib selector for rotated ellipse.')

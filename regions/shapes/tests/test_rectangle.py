@@ -154,7 +154,7 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
 
             assert_equal(mask, 0)
 
-        with pytest.raises(Exception, match=('Cannot attach more than one selector to a region.')):
+        with pytest.raises(AttributeError, match=('Cannot attach more than one selector to a reg')):
             region.as_mpl_selector(ax)
 
     @pytest.mark.skipif(MPL_VERSION < 33, reason='requires `do_event`')
