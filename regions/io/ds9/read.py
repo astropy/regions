@@ -268,9 +268,15 @@ def _parse_metadata(metadata_str):
     metadata : dict
         The region metadata as a dictionary.
     """
+    # {.*?}    # all chars in curly braces
+    # \'.*?\'  # all chars in single quotes
+    # \".*?\"  # all chars in double quotes
+    # [-?\d+\.?\d*\s]+\s?  # ([-/+]floats [whitespace]) incl. repeats
+    #                        (e.g., dashlist=8 3, width=3, textangle=18.35)
+    # [^=\s]+\s*[0-9]*  # (all chars [whitespace] digits)
+    #                     (e.g., point=diamond 42)
     metadata_regex = re.compile(r'([a-zA-Z]+)\s*=\s*({.*?}|\'.*?\'|\".*?\"|'
-                                r'[0-9\s]+\s?|[^=\s]+\s*[0-9]*)')
-
+                                r'[-?\d+\.?\d*\s]+\s?|[^=\s]+\s*[0-9]*)')
     metadata = {}
     for key, val in metadata_regex.findall(metadata_str):
         val = val.strip().strip("'").strip('"').lstrip('{').rstrip('}')
@@ -339,7 +345,9 @@ def _define_region_metadata(shape, global_meta, composite_meta, include_meta,
                           'will be dropped', AstropyUserWarning)
 
         try:
-            value = int(value)
+            value = float(value)
+            if value.is_integer():
+                value = int(value)
         except (ValueError, TypeError):
             pass
 
