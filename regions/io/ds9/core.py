@@ -31,7 +31,7 @@ else:
              4, 4, 4, 4, 4, 4, 4, 79, 1, 2, 2, 2, 2, 79]
     boxcircle = mpath.Path(vertices, codes)
 
-    arrow_verts = [[-1, -1], [1, -1], [-1, 1], [1, -1], [1, 1]]
+    arrow_verts = [[-1, 0], [0, 0], [-1, 1], [0, 0], [0, 1]]
     arrow = mpath.Path(arrow_verts, codes=None)
 
 # mapping to matplotlib marker symbols, also compatible with CRTF.
