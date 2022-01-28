@@ -272,6 +272,52 @@ to a :class:`~regions.SkyRegion`, call the
     radius: 18.55481729935556 arcsec
 
 
+.. _regions-as_mpl_selector:
+
+Selectors for Regions
+---------------------
+
+Several geometric regions (at this time, :class:`~regions.RectanglePixelRegion`,
+:class:`~regions.EllipsePixelRegion` and :class:`~regions.PolygonPixelRegion`)
+provide a method :meth:`~regions.RectanglePixelRegion.as_mpl_selector` to
+create an interactive editable matplotlib widget that will be
+connected to its parent region.
+
+.. plot::
+   :context:
+   :include-source:
+
+    import matplotlib.pyplot as plt
+    import numpy as np
+    from regions import PixCoord, RectanglePixelRegion
+
+    x, y = np.mgrid[-15:16, -10:21]
+    z = np.exp(-(x / 4)**2 - (y / 6)**2)
+    ax = plt.subplot()
+    img = ax.imshow(z)
+
+    rectangle = RectanglePixelRegion(center=PixCoord(x=12, y=15), width=14, height=10)
+    selector = rectangle.as_mpl_selector(ax)
+
+The ``selector`` creates and establishes a link to a matplotlib ``Selector``
+widget that allows manually positioning the ``rectangle`` region at the
+central point, and scaling it by dragging its corner points.
+Several modifier keys as specified by the ``state_modifier_keys`` parameter to
+:class:`matplotlib.widgets.RectangleSelector` provide further control of the
+manipulation of this widget, with the following operations available:
+
+- "move": Move the existing shape from anywhere, default: "space".
+- "clear": Clear the current shape, default: "escape".
+- "square": Make the shape square, default: "shift".
+- "center": Change the shape around its center, default: "ctrl".
+- "rotate": Rotate the shape around its center, default: "r" (toggles, requires Matplotlib 3.6+).
+
+Via the optional ``callback`` parameter this method can be passed a
+custom function that will be called on every update of the region,
+i.e. after every move or resize of the selector.
+For an example of its usage see :ref:`Interactive Mask Control<interactive-masks>`.
+
+
 Multiple Regions
 ----------------
 
