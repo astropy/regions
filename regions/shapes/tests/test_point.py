@@ -10,7 +10,7 @@ import astropy.units as u
 from astropy.utils.data import get_pkg_data_filename
 from astropy.wcs import WCS
 
-from ...core import PixCoord
+from ...core import PixCoord, RegionMeta, RegionVisual
 from ...tests.helpers import make_simple_wcs
 from ..point import PointPixelRegion, PointSkyRegion
 from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
@@ -25,8 +25,9 @@ def wcs_fixture():
 
 
 class TestPointPixelRegion(BaseTestPixelRegion):
-
-    reg = PointPixelRegion(PixCoord(3, 4))
+    meta = RegionMeta({'text': 'test'})
+    visual = RegionVisual({'color': 'blue'})
+    reg = PointPixelRegion(PixCoord(3, 4), meta=meta, visual=visual)
     sample_box = [-2, 8, -1, 9]
     inside = []
     outside = [(3.1, 4.2), (5, 4)]
@@ -37,14 +38,16 @@ class TestPointPixelRegion(BaseTestPixelRegion):
     def test_copy(self):
         reg = self.reg.copy()
         assert reg.center.xy == (3, 4)
-        assert reg.visual == {}
-        assert reg.meta == {}
+        assert reg.meta == self.meta
+        assert reg.visual == self.visual
 
     def test_pix_sky_roundtrip(self):
         wcs = make_simple_wcs(SkyCoord(2 * u.deg, 3 * u.deg), 0.1 * u.deg, 20)
         reg_new = self.reg.to_sky(wcs).to_pixel(wcs)
         assert_allclose(reg_new.center.x, self.reg.center.x)
         assert_allclose(reg_new.center.y, self.reg.center.y)
+        assert reg_new.meta == self.reg.meta
+        assert reg_new.visual == self.reg.visual
 
     @pytest.mark.skipif('not HAS_MATPLOTLIB')
     def test_as_artist(self):
@@ -62,8 +65,9 @@ class TestPointPixelRegion(BaseTestPixelRegion):
 
 
 class TestPointSkyRegion(BaseTestSkyRegion):
-
-    reg = PointSkyRegion(SkyCoord(3, 4, unit='deg'))
+    meta = RegionMeta({'text': 'test'})
+    visual = RegionVisual({'color': 'blue'})
+    reg = PointSkyRegion(SkyCoord(3, 4, unit='deg'), meta=meta, visual=visual)
 
     expected_repr = ('<PointSkyRegion(center=<SkyCoord (ICRS): (ra, dec) '
                      'in deg\n    (3., 4.)>)>')
@@ -73,8 +77,8 @@ class TestPointSkyRegion(BaseTestSkyRegion):
     def test_copy(self):
         reg = self.reg.copy()
         assert_allclose(reg.center.ra.deg, 3)
-        assert reg.visual == {}
-        assert reg.meta == {}
+        assert reg.meta == self.meta
+        assert reg.visual == self.visual
 
     def test_contains(self, wcs):
         position = SkyCoord([1, 2] * u.deg, [3, 4] * u.deg)

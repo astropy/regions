@@ -87,7 +87,7 @@ class PointPixelRegion(PixelRegion):
 
     def to_sky(self, wcs):
         center = pixel_to_skycoord(self.center.x, self.center.y, wcs=wcs)
-        return PointSkyRegion(center)
+        return PointSkyRegion(center, meta=self.meta, visual=self.visual)
 
     @property
     def bounding_box(self):
@@ -182,4 +182,4 @@ class PointSkyRegion(SkyRegion):
     def to_pixel(self, wcs):
         center_x, center_y = skycoord_to_pixel(self.center, wcs=wcs)
         center = PixCoord(center_x, center_y)
-        return PointPixelRegion(center)
+        return PointPixelRegion(center, meta=self.meta, visual=self.visual)
