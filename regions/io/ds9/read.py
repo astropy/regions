@@ -78,6 +78,7 @@ def _parse_ds9(region_str):
     """
     # first parse the input string to generate the raw region data
     region_data = _parse_region_data(region_str)
+    return region_data
 
     # now parse the raw region data into region object(s)
     regions = []
@@ -99,8 +100,7 @@ class _RegionData:
     region_type: str
     shape: str
     shape_params: str
-    meta: dict
-    visual: dict
+    raw_meta: dict
     region_str: str
 
 
@@ -236,16 +236,15 @@ def _parse_region_data(region_str):
                                                      match.span())
 
             region_meta = _parse_metadata(meta_str)
-            meta, visual = _define_region_metadata(shape, global_meta,
-                                                   composite_meta,
-                                                   include_meta, region_meta)
+            raw_meta = _define_raw_metadata(shape, global_meta, composite_meta,
+                                            include_meta, region_meta)
 
             region_type = 'sky'
             if frame == 'image':
                 region_type = 'pixel'
 
             region_data.append(_RegionData(frame, region_type, shape,
-                                           params_str, meta, visual, line))
+                                           params_str, raw_meta, line))
 
             # reset composite metadata after the composite region ends
             if '||' not in line and composite_meta:
@@ -273,10 +272,12 @@ def _parse_metadata(metadata_str):
     # \".*?\"  # all chars in double quotes
     # [-?\d+\.?\d*\s]+\s?  # ([-/+]floats [whitespace]) incl. repeats
     #                        (e.g., dashlist=8 3, width=3, textangle=18.35)
-    # [^=\s]+\s*[0-9]*  # (all chars [whitespace] digits)
-    #                     (e.g., point=diamond 42)
+    # [^=\s]+\s*[-?\d+\.?\d*]*   # (all chars (e.g., point=diamond) or
+    #                              (all chars [whitespace] digits)
+    #                                 (e.g., point=diamond 42)
     metadata_regex = re.compile(r'([a-zA-Z]+)\s*=\s*({.*?}|\'.*?\'|\".*?\"|'
-                                r'[-?\d+\.?\d*\s]+\s?|[^=\s]+\s*[0-9]*)')
+                                r'[-?\d+\.?\d*\s]+\s?|'
+                                r'[^=\s]+\s*[-?\d+\.?\d*]*)')
     metadata = {}
     for key, val in metadata_regex.findall(metadata_str):
         val = val.strip().strip("'").strip('"').lstrip('{').rstrip('}')
@@ -294,8 +295,8 @@ def _parse_metadata(metadata_str):
     return metadata
 
 
-def _define_region_metadata(shape, global_meta, composite_meta, include_meta,
-                            region_meta):
+def _define_raw_metadata(shape, global_meta, composite_meta, include_meta,
+                         region_meta):
     """
     Define the meta and visual dictionaries of metadata for the region.
 
@@ -318,9 +319,8 @@ def _define_region_metadata(shape, global_meta, composite_meta, include_meta,
 
     Returns
     -------
-    meta, visual : tuple of dict
-        The meta and visual dictionaries of region metadata. The visual
-        metadata is translated to matplotlib keywords.
+    meta : tuple of dict
+        The (valid) raw metadata extracted from the region file.
     """
     all_meta = global_meta.copy()
     all_meta.update(composite_meta)
@@ -329,33 +329,21 @@ def _define_region_metadata(shape, global_meta, composite_meta, include_meta,
     # metadata overrides the leading "-/+" include symbol
     all_meta.update(region_meta)
 
-    # set default plotting style to 'ds9' when parsing ds9 data
-    all_meta['default_style'] = 'ds9'
-
-    unsupported_meta = ('line', 'vector', 'ruler', 'compass')
-
-    # TODO: include text in visual keys to support text annotations for
-    # all DS9 regions?
-    ds9_visual_keys = ('color', 'dash', 'dashlist', 'fill', 'font', 'point',
-                       'textangle', 'textrotate', 'width', 'default_style')
-
     # valid DS9 point symbols
     valid_points = ('circle', 'box', 'diamond', 'cross', 'x', 'arrow',
                     'boxcircle')
 
-    meta = {}
-    visual = {}
+    # valid DS9 line values
+    valid_lines = ('0 0', '0 1', '1 0', '1 1')
+
+    # binary keys must have values of 0 or 1
+    # NOTE: textrotate is not documented in the DS9 region file spec
+    binary_keys = ('dash', 'select', 'highlite', 'fixed', 'edit', 'move',
+                   'rotate', 'delete', 'include', 'source', 'background',
+                   'fill', 'vector', 'textrotate')
+
+    metadata = {}
     for key, value in all_meta.items():
-        if key in unsupported_meta:
-            if key == 'line' and '1' not in value:  # ignore this special case
-                continue
-            warnings.warn(f'DS9 meta "{key}={value}" is unsupported and '
-                          'will be ignored', AstropyUserWarning)
-
-        if key == 'point' and value not in valid_points:
-            warnings.warn(f'DS9 "{key}={value}" is invalid and will be '
-                          'ignored', AstropyUserWarning)
-
         try:
             value = float(value)
             if value.is_integer():
@@ -363,14 +351,30 @@ def _define_region_metadata(shape, global_meta, composite_meta, include_meta,
         except (ValueError, TypeError):
             pass
 
-        if key in ds9_visual_keys:
-            visual[key] = value
-        else:
-            meta[key] = value
+        is_invalid = False
+        # point value can either be ["symbol int"] or ["symbol"]
+        if key == 'point':
+            val = value.split()
+            if val[0] not in valid_points:
+                is_invalid = True
+            if len(val) == 2:
+                if not float(val[1]).is_integer():
+                    is_invalid = True
 
-    visual = _translate_visual_metadata(shape, visual)
+        if key == 'line' and value not in valid_lines:
+            is_invalid = True
 
-    return meta, visual
+        if key in binary_keys and value not in (0, 1):
+            is_invalid = True
+
+        if is_invalid:
+            warnings.warn(f'DS9 "{key}={value}" is invalid and will be '
+                          'ignored', AstropyUserWarning)
+            continue
+
+        metadata[key] = value
+
+    return metadata
 
 
 def _translate_visual_metadata(shape, visual_meta):
@@ -797,7 +801,7 @@ def _make_region(region_data):
     for shape_params in region_params:
         # for Text region, we need to add meta['text'] to params
         if shape == 'text':
-            shape_params.append(region_data.meta['text'])
+            shape_params.append(region_data.raw_meta['text'])
 
         region = shape_to_region[region_type][shape](*shape_params)
         region.meta = RegionMeta(region_data.meta)
