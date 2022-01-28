@@ -9,7 +9,7 @@ from astropy.utils.exceptions import AstropyUserWarning
 
 from ...core import Region, Regions, PixelRegion, PixCoord
 from ...core.registry import RegionsRegistry
-from .core import ds9_valid_symbols
+from .core import ds9_valid_symbols, ds9_shape_templates
 
 __all__ = []
 
@@ -275,47 +275,18 @@ def _serialize_region_ds9(region, precision=8):
                      'galactic': 'galactic',
                      'geocentrictrueecliptic': 'ecliptic'}
 
-    # mapping from regions shapes to ds9 shape formats
-    # unsupported ds9 shapes:
-    # vector, ruler, compass, projection, panda, epanda, bpanda, composite
-    shape_templates = {'circle': ('circle',
-                                  '{center},{radius}'),
-                       'ellipse': ('ellipse',
-                                   '{center},{width},{height}'
-                                   ',{angle}'),
-                       'rectangle': ('box',
-                                     '{center},{width},{height},{angle}'),
-                       'circleannulus': ('annulus',
-                                         '{center},{inner_radius},'
-                                         '{outer_radius}'),
-                       'ellipseannulus': ('ellipse',
-                                          '{center},{inner_width},'
-                                          '{inner_height},'
-                                          '{outer_width},'
-                                          '{outer_height},{angle}'),
-                       'rectangleannulus': ('box',
-                                            '{center},{inner_width},'
-                                            '{inner_height},{outer_width},'
-                                            '{outer_height},{angle}'),
-                       'polygon': ('polygon',
-                                   '{vertices}'),
-                       'line': ('line',
-                                '{start},{end}'),
-                       'point': ('point', '{center}'),
-                       'text': ('text', '{center}')}
-
     frame = _get_frame_name(region, mapping=frame_mapping)
 
     shape = _get_region_shape(region)
-    if shape not in shape_templates:
+    if shape not in ds9_shape_templates:
         warnings.warn(f'Cannot serialize region shape "{shape}", '
                       'skipping', AstropyUserWarning)
 
     region_params = _get_region_params(region,
-                                       shape_templates[shape],
+                                       ds9_shape_templates[shape],
                                        precision=precision)
 
-    region_type = shape_templates[shape][0]
+    region_type = ds9_shape_templates[shape][0]
     region_str = f'{region_type}({region_params})'
 
     region_meta = _translate_ds9_meta(region, shape)
