@@ -329,11 +329,14 @@ def _define_region_metadata(shape, global_meta, composite_meta, include_meta,
     # metadata overrides the leading "-/+" include symbol
     all_meta.update(region_meta)
 
+    # set default plotting style to 'ds9' when parsing ds9 data
+    all_meta['default_style'] = 'ds9'
+
     unsupported = ('line', 'ruler')
     # TODO: include text in visual keys to support text annotations for
     # all DS9 regions?
     ds9_visual_keys = ('color', 'dash', 'dashlist', 'fill', 'font', 'point',
-                       'textangle', 'textrotate', 'width')
+                       'textangle', 'textrotate', 'width', 'default_style')
 
     meta = {}
     visual = {}
@@ -427,7 +430,9 @@ def _translate_visual_metadata(shape, visual_meta):
     if shape == 'text':
         textangle = meta.pop('textangle', None)
         if textangle is not None:
-            meta['rotation'] = textangle
+            textrotate = meta.pop('textrotate', None)
+            if textrotate != 0:  # rotate if None or 1
+                meta['rotation'] = textangle
 
     if shape not in ('point', 'line', 'text'):
         color = meta.pop('color', None)

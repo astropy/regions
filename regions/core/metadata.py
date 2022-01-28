@@ -117,9 +117,9 @@ class RegionVisual(Meta):
                 kwargs['ha'] = 'center'  # text horizontal alignment
                 kwargs['va'] = 'center'  # text vertical alignment
             elif artist == 'Line2D':
-                from ..io.ds9.core import valid_symbols_ds9
+                from ..io.ds9.core import ds9_valid_symbols
 
-                kwargs['marker'] = valid_symbols_ds9['boxcircle']
+                kwargs['marker'] = ds9_valid_symbols['boxcircle']
                 kwargs['markersize'] = 11
                 kwargs['markeredgecolor'] = kwargs.pop('color')
                 kwargs['fillstyle'] = 'none'
