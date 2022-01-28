@@ -332,20 +332,29 @@ def _define_region_metadata(shape, global_meta, composite_meta, include_meta,
     # set default plotting style to 'ds9' when parsing ds9 data
     all_meta['default_style'] = 'ds9'
 
-    unsupported = ('line', 'ruler')
+    unsupported_meta = ('line', 'vector', 'ruler', 'compass')
+
     # TODO: include text in visual keys to support text annotations for
     # all DS9 regions?
     ds9_visual_keys = ('color', 'dash', 'dashlist', 'fill', 'font', 'point',
                        'textangle', 'textrotate', 'width', 'default_style')
 
+    # valid DS9 point symbols
+    valid_points = ('circle', 'box', 'diamond', 'cross', 'x', 'arrow',
+                    'boxcircle')
+
     meta = {}
     visual = {}
     for key, value in all_meta.items():
-        if key in unsupported:
+        if key in unsupported_meta:
             if key == 'line' and '1' not in value:  # ignore this special case
                 continue
             warnings.warn(f'DS9 meta "{key}={value}" is unsupported and '
-                          'will be dropped', AstropyUserWarning)
+                          'will be ignored', AstropyUserWarning)
+
+        if key == 'point' and value not in valid_points:
+            warnings.warn(f'DS9 "{key}={value}" is invalid and will be '
+                          'ignored', AstropyUserWarning)
 
         try:
             value = float(value)
@@ -384,12 +393,16 @@ def _translate_visual_metadata(shape, visual_meta):
     """
     meta = visual_meta.copy()
 
+    fill = meta.pop('fill', 0)
+    if fill == 1:
+        meta['fill'] = True
+
     dash = meta.pop('dash', 0)
     dashlist = meta.pop('dashlist', None)
     if int(dash) == 1:
         if shape == 'point':
             warnings.warn('dashed lines are unsupported for DS9 point '
-                          'regions', AstropyUserWarning)
+                          'regions and will be ignored', AstropyUserWarning)
 
         if dashlist is not None:
             dashes = tuple(int(i) for i in dashlist.split())
@@ -426,6 +439,10 @@ def _translate_visual_metadata(shape, visual_meta):
         width = meta.pop('width', None)
         if width is not None:
             meta['markeredgewidth'] = width
+    else:
+        invalid = ('marker', 'markersize')
+        for key in invalid:
+            meta.pop(key, None)
 
     if shape == 'text':
         textangle = meta.pop('textangle', None)
@@ -433,6 +450,16 @@ def _translate_visual_metadata(shape, visual_meta):
             textrotate = meta.pop('textrotate', None)
             if textrotate != 0:  # rotate if None or 1
                 meta['rotation'] = textangle
+
+        # remove invalid mpl kwargs for matplotlib.text.Text
+        invalid = ('linestyle', 'linewidth', 'fill')
+        for key in invalid:
+            meta.pop(key, None)
+    else:
+        # these kwarg are valid only for matplotlib.text.Text
+        invalid = ('textangle', 'textrotate')
+        for key in invalid:
+            meta.pop(key, None)
 
     if shape not in ('point', 'line', 'text'):
         color = meta.pop('color', None)
