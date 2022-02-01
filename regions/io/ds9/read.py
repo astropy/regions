@@ -606,7 +606,7 @@ def _define_sky_params(shape, shape_params, frame):
                      'fk5': 'fk5',
                      'fk4': 'fk4',
                      'galactic': 'galactic',
-                     'geocentrictrueecliptic': 'ecliptic'}
+                     'barycentricmeanecliptic': 'ecliptic'}
 
     frame_mapping_rev = {val: key for key, val in frame_mapping.items()}
     frame = frame_mapping_rev[frame]
