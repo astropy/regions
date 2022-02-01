@@ -45,6 +45,16 @@ class TestCircleAnnulusPixelRegion(BaseTestPixelRegion):
         assert reg.meta == self.meta
         assert reg.visual == self.visual
 
+    def test_pix_sky_roundtrip(self):
+        wcs = make_simple_wcs(SkyCoord(2 * u.deg, 3 * u.deg), 0.1 * u.deg, 20)
+        reg_new = self.reg.to_sky(wcs).to_pixel(wcs)
+        assert_allclose(reg_new.center.x, self.reg.center.x)
+        assert_allclose(reg_new.center.y, self.reg.center.y)
+        assert_allclose(reg_new.inner_radius, self.reg.inner_radius)
+        assert_allclose(reg_new.outer_radius, self.reg.outer_radius)
+        assert reg_new.meta == self.reg.meta
+        assert reg_new.visual == self.reg.visual
+
     def test_transformation(self):
         skyannulus = self.reg.to_sky(wcs=self.wcs)
         assert isinstance(skyannulus, CircleAnnulusSkyRegion)
@@ -130,6 +140,19 @@ class TestEllipseAnnulusPixelRegion(BaseTestPixelRegion):
         assert_allclose(reg.angle.to_value("deg"), 0)
         assert reg.meta == self.meta
         assert reg.visual == self.visual
+
+    def test_pix_sky_roundtrip(self):
+        wcs = make_simple_wcs(SkyCoord(2 * u.deg, 3 * u.deg), 0.1 * u.deg, 20)
+        reg_new = self.reg.to_sky(wcs).to_pixel(wcs)
+        assert_allclose(reg_new.center.x, self.reg.center.x)
+        assert_allclose(reg_new.center.y, self.reg.center.y)
+        assert_allclose(reg_new.inner_width, self.reg.inner_width)
+        assert_allclose(reg_new.outer_width, self.reg.outer_width)
+        assert_allclose(reg_new.inner_height, self.reg.inner_height)
+        assert_allclose(reg_new.outer_height, self.reg.outer_height)
+        assert_quantity_allclose(reg_new.angle, self.reg.angle)
+        assert reg_new.meta == self.reg.meta
+        assert reg_new.visual == self.reg.visual
 
     def test_transformation(self):
         skyannulus = self.reg.to_sky(wcs=self.wcs)
@@ -222,6 +245,19 @@ class TestRectangleAnnulusPixelRegion(BaseTestPixelRegion):
         assert_quantity_allclose(reg.outer_height, 8)
         assert reg.meta == self.meta
         assert reg.visual == self.visual
+
+    def test_pix_sky_roundtrip(self):
+        wcs = make_simple_wcs(SkyCoord(2 * u.deg, 3 * u.deg), 0.1 * u.deg, 20)
+        reg_new = self.reg.to_sky(wcs).to_pixel(wcs)
+        assert_allclose(reg_new.center.x, self.reg.center.x)
+        assert_allclose(reg_new.center.y, self.reg.center.y)
+        assert_allclose(reg_new.inner_width, self.reg.inner_width)
+        assert_allclose(reg_new.outer_width, self.reg.outer_width)
+        assert_allclose(reg_new.inner_height, self.reg.inner_height)
+        assert_allclose(reg_new.outer_height, self.reg.outer_height)
+        assert_quantity_allclose(reg_new.angle, self.reg.angle)
+        assert reg_new.meta == self.reg.meta
+        assert reg_new.visual == self.reg.visual
 
     def test_transformation(self):
         skyannulus = self.reg.to_sky(wcs=self.wcs)
