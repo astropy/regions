@@ -321,6 +321,6 @@ and averaged flux, which is updated live in the text field of the plot as well.
 
     ellipse = EllipsePixelRegion(center=PixCoord(x=126, y=1031), width=8, height=4,
                                  angle=-0*u.deg, visual={'color': 'yellow'})
-    selector = ellipse.as_mpl_selector(ax, callback=update_sel, use_data_coordinates=True)
+    selector = ellipse.as_mpl_selector(ax, callback=update_sel)
 
     hdulist.close()
