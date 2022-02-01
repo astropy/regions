@@ -10,7 +10,7 @@ import numpy as np
 from numpy.testing import assert_allclose
 import pytest
 
-from ...core import PixCoord
+from ...core import PixCoord, RegionMeta, RegionVisual
 from ...tests.helpers import make_simple_wcs
 from ..circle import CirclePixelRegion, CircleSkyRegion
 from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
@@ -25,7 +25,9 @@ def wcs_fixture():
 
 
 class TestCirclePixelRegion(BaseTestPixelRegion):
-    reg = CirclePixelRegion(PixCoord(3, 4), radius=2)
+    meta = RegionMeta({'text': 'test'})
+    visual = RegionVisual({'color': 'blue'})
+    reg = CirclePixelRegion(PixCoord(3, 4), radius=2, meta=meta, visual=visual)
     sample_box = [0, 6, 1, 7]
     inside = [(3, 4)]
     outside = [(3, 0)]
@@ -38,8 +40,8 @@ class TestCirclePixelRegion(BaseTestPixelRegion):
         reg = self.reg.copy()
         assert reg.center.xy == (3, 4)
         assert reg.radius == 2
-        assert reg.visual == {}
-        assert reg.meta == {}
+        assert reg.meta == self.meta
+        assert reg.visual == self.visual
 
     def test_pix_sky_roundtrip(self):
         wcs = make_simple_wcs(SkyCoord(2 * u.deg, 3 * u.deg), 0.1 * u.deg, 20)
@@ -60,7 +62,10 @@ class TestCirclePixelRegion(BaseTestPixelRegion):
 
 
 class TestCircleSkyRegion(BaseTestSkyRegion):
-    reg = CircleSkyRegion(SkyCoord(3 * u.deg, 4 * u.deg), 2 * u.arcsec)
+    meta = RegionMeta({'text': 'test'})
+    visual = RegionVisual({'color': 'blue'})
+    reg = CircleSkyRegion(SkyCoord(3 * u.deg, 4 * u.deg), 2 * u.arcsec,
+                          meta=meta, visual=visual)
 
     expected_repr = ('<CircleSkyRegion(center=<SkyCoord (ICRS): (ra, dec) in '
                      'deg\n    (3., 4.)>, radius=2.0 arcsec)>')
@@ -72,8 +77,8 @@ class TestCircleSkyRegion(BaseTestSkyRegion):
         reg = self.reg.copy()
         assert_allclose(reg.center.ra.deg, 3)
         assert_allclose(reg.radius.to_value("arcsec"), 2)
-        assert reg.visual == {}
-        assert reg.meta == {}
+        assert reg.meta == self.meta
+        assert reg.visual == self.visual
 
     def test_transformation(self, wcs):
         skycoord = SkyCoord(3 * u.deg, 4 * u.deg, frame='galactic')

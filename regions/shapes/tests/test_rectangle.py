@@ -11,7 +11,7 @@ from astropy.tests.helper import assert_quantity_allclose
 from astropy.utils.data import get_pkg_data_filename
 from astropy.wcs import WCS
 
-from ...core import PixCoord
+from ...core import PixCoord, RegionMeta, RegionVisual
 from ...tests.helpers import make_simple_wcs
 from ..rectangle import RectanglePixelRegion, RectangleSkyRegion
 from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
@@ -55,9 +55,10 @@ def test_corners():
 
 
 class TestRectanglePixelRegion(BaseTestPixelRegion):
-
+    meta = RegionMeta({'text': 'test'})
+    visual = RegionVisual({'color': 'blue'})
     reg = RectanglePixelRegion(center=PixCoord(3, 4), width=4, height=3,
-                               angle=5 * u.deg)
+                               angle=5 * u.deg, meta=meta, visual=visual)
     sample_box = [-2, 8, -1, 9]
     inside = [(4.5, 4)]
     outside = [(5, 2.5)]
@@ -73,8 +74,8 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
         assert reg.width == 4
         assert reg.height == 3
         assert_allclose(reg.angle.to_value("deg"), 5)
-        assert reg.visual == {}
-        assert reg.meta == {}
+        assert reg.meta == self.meta
+        assert reg.visual == self.visual
 
     def test_pix_sky_roundtrip(self):
         wcs = make_simple_wcs(SkyCoord(2 * u.deg, 3 * u.deg), 0.1 * u.deg, 20)
@@ -207,10 +208,11 @@ def test_rectangular_pixel_region_bbox():
 
 
 class TestRectangleSkyRegion(BaseTestSkyRegion):
-
+    meta = RegionMeta({'text': 'test'})
+    visual = RegionVisual({'color': 'blue'})
     reg = RectangleSkyRegion(center=SkyCoord(3, 4, unit='deg'),
                              width=4 * u.deg, height=3 * u.deg,
-                             angle=5 * u.deg)
+                             angle=5 * u.deg, meta=meta, visual=visual)
 
     expected_repr = ('<RectangleSkyRegion(center=<SkyCoord (ICRS): (ra, dec) '
                      'in deg\n    (3., 4.)>, width=4.0 deg, height=3.0 deg, '
@@ -225,8 +227,8 @@ class TestRectangleSkyRegion(BaseTestSkyRegion):
         assert_allclose(reg.width.to_value('deg'), 4)
         assert_allclose(reg.height.to_value('deg'), 3)
         assert_allclose(reg.angle.to_value('deg'), 5)
-        assert reg.visual == {}
-        assert reg.meta == {}
+        assert reg.meta == self.meta
+        assert reg.visual == self.visual
 
     def test_contains(self, wcs):
         position = SkyCoord([1, 3] * u.deg, [2, 4] * u.deg)

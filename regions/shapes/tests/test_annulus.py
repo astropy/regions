@@ -6,7 +6,7 @@ from astropy.tests.helper import assert_quantity_allclose
 import numpy as np
 from numpy.testing import assert_allclose
 
-from ...core.core import PixCoord
+from ...core import PixCoord, RegionMeta, RegionVisual
 from ...tests.helpers import make_simple_wcs
 from ..annulus import (CircleAnnulusPixelRegion, CircleAnnulusSkyRegion,
                        EllipseAnnulusPixelRegion, EllipseAnnulusSkyRegion,
@@ -15,8 +15,10 @@ from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
 
 
 class TestCircleAnnulusPixelRegion(BaseTestPixelRegion):
+    meta = RegionMeta({'text': 'test'})
+    visual = RegionVisual({'color': 'blue'})
     reg = CircleAnnulusPixelRegion(PixCoord(3, 4), inner_radius=2,
-                                   outer_radius=3)
+                                   outer_radius=3, meta=meta, visual=visual)
     sample_box = [0, 6, 1, 7]
     inside = [(3, 2)]
     outside = [(3, 0)]
@@ -40,8 +42,8 @@ class TestCircleAnnulusPixelRegion(BaseTestPixelRegion):
         assert reg.center.xy == (3, 4)
         assert reg.inner_radius == 2
         assert reg.outer_radius == 3
-        assert reg.visual == {}
-        assert reg.meta == {}
+        assert reg.meta == self.meta
+        assert reg.visual == self.visual
 
     def test_transformation(self):
         skyannulus = self.reg.to_sky(wcs=self.wcs)
@@ -53,8 +55,11 @@ class TestCircleAnnulusPixelRegion(BaseTestPixelRegion):
 
 
 class TestCircleAnnulusSkyRegion(BaseTestSkyRegion):
+    meta = RegionMeta({'text': 'test'})
+    visual = RegionVisual({'color': 'blue'})
     reg = CircleAnnulusSkyRegion(SkyCoord(3 * u.deg, 4 * u.deg),
-                                 20 * u.arcsec, 30 * u.arcsec)
+                                 20 * u.arcsec, 30 * u.arcsec, meta=meta,
+                                 visual=visual)
     skycoord = SkyCoord(3 * u.deg, 4 * u.deg, frame='icrs')
     wcs = make_simple_wcs(skycoord, 5 * u.arcsec, 20)
 
@@ -75,8 +80,8 @@ class TestCircleAnnulusSkyRegion(BaseTestSkyRegion):
         assert_allclose(reg.center.ra.deg, 3)
         assert_allclose(reg.inner_radius.to_value("arcsec"), 20)
         assert_allclose(reg.outer_radius.to_value("arcsec"), 30)
-        assert reg.visual == {}
-        assert reg.meta == {}
+        assert reg.meta == self.meta
+        assert reg.visual == self.visual
 
     def test_contains(self):
         assert not self.reg.contains(self.skycoord, self.wcs)
@@ -89,7 +94,10 @@ class TestCircleAnnulusSkyRegion(BaseTestSkyRegion):
 
 
 class TestEllipseAnnulusPixelRegion(BaseTestPixelRegion):
-    reg = EllipseAnnulusPixelRegion(PixCoord(3, 4), 2, 5, 5, 8)
+    meta = RegionMeta({'text': 'test'})
+    visual = RegionVisual({'color': 'blue'})
+    reg = EllipseAnnulusPixelRegion(PixCoord(3, 4), 2, 5, 5, 8, meta=meta,
+                                    visual=visual)
     sample_box = [1, 6, 0, 9]
     inside = [(3, 7)]
     outside = [(3, 4)]
@@ -120,8 +128,8 @@ class TestEllipseAnnulusPixelRegion(BaseTestPixelRegion):
         assert reg.outer_width == 5
         assert reg.outer_height == 8
         assert_allclose(reg.angle.to_value("deg"), 0)
-        assert reg.visual == {}
-        assert reg.meta == {}
+        assert reg.meta == self.meta
+        assert reg.visual == self.visual
 
     def test_transformation(self):
         skyannulus = self.reg.to_sky(wcs=self.wcs)
@@ -134,9 +142,12 @@ class TestEllipseAnnulusPixelRegion(BaseTestPixelRegion):
 
 
 class TestEllipseAnnulusSkyRegion(BaseTestSkyRegion):
+    meta = RegionMeta({'text': 'test'})
+    visual = RegionVisual({'color': 'blue'})
     skycoord = SkyCoord(3 * u.deg, 4 * u.deg, frame='icrs')
     reg = EllipseAnnulusSkyRegion(skycoord, 20 * u.arcsec, 50 * u.arcsec,
-                                  50 * u.arcsec, 80 * u.arcsec)
+                                  50 * u.arcsec, 80 * u.arcsec, meta=meta,
+                                  visual=visual)
     wcs = make_simple_wcs(skycoord, 5 * u.arcsec, 20)
 
     expected_repr = ('<EllipseAnnulusSkyRegion(center=<SkyCoord (ICRS): '
@@ -161,8 +172,8 @@ class TestEllipseAnnulusSkyRegion(BaseTestSkyRegion):
         assert_allclose(reg.outer_width.to_value("arcsec"), 50)
         assert_allclose(reg.outer_height.to_value("arcsec"), 80)
         assert_allclose(reg.angle.to_value("deg"), 0)
-        assert reg.visual == {}
-        assert reg.meta == {}
+        assert reg.meta == self.meta
+        assert reg.visual == self.visual
 
     def test_contains(self):
         assert not self.reg.contains(self.skycoord, self.wcs)
@@ -175,7 +186,10 @@ class TestEllipseAnnulusSkyRegion(BaseTestSkyRegion):
 
 
 class TestRectangleAnnulusPixelRegion(BaseTestPixelRegion):
-    reg = RectangleAnnulusPixelRegion(PixCoord(3, 4), 2, 5, 5, 8)
+    meta = RegionMeta({'text': 'test'})
+    visual = RegionVisual({'color': 'blue'})
+    reg = RectangleAnnulusPixelRegion(PixCoord(3, 4), 2, 5, 5, 8, meta=meta,
+                                      visual=visual)
     sample_box = [1, 6, 0, 9]
     inside = [(3, 7)]
     outside = [(3, 4)]
@@ -206,6 +220,8 @@ class TestRectangleAnnulusPixelRegion(BaseTestPixelRegion):
         assert_quantity_allclose(reg.inner_height, 5)
         assert_quantity_allclose(reg.outer_width, 5)
         assert_quantity_allclose(reg.outer_height, 8)
+        assert reg.meta == self.meta
+        assert reg.visual == self.visual
 
     def test_transformation(self):
         skyannulus = self.reg.to_sky(wcs=self.wcs)
@@ -218,9 +234,12 @@ class TestRectangleAnnulusPixelRegion(BaseTestPixelRegion):
 
 
 class TestRectangleAnnulusSkyRegion(BaseTestSkyRegion):
+    meta = RegionMeta({'text': 'test'})
+    visual = RegionVisual({'color': 'blue'})
     skycoord = SkyCoord(3 * u.deg, 4 * u.deg, frame='icrs')
     reg = RectangleAnnulusSkyRegion(skycoord, 20 * u.arcsec, 50 * u.arcsec,
-                                    50 * u.arcsec, 80 * u.arcsec)
+                                    50 * u.arcsec, 80 * u.arcsec, meta=meta,
+                                    visual=visual)
     wcs = make_simple_wcs(skycoord, 5 * u.arcsec, 20)
 
     expected_repr = ('<RectangleAnnulusSkyRegion(center=<SkyCoord (ICRS): '
@@ -245,8 +264,8 @@ class TestRectangleAnnulusSkyRegion(BaseTestSkyRegion):
         assert_allclose(reg.outer_width.to_value("arcsec"), 50)
         assert_allclose(reg.outer_height.to_value("arcsec"), 80)
         assert_allclose(reg.angle.to_value("deg"), 0)
-        assert reg.visual == {}
-        assert reg.meta == {}
+        assert reg.meta == self.meta
+        assert reg.visual == self.visual
 
     def test_contains(self):
         assert not self.reg.contains(self.skycoord, self.wcs)
