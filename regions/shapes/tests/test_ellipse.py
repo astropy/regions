@@ -11,7 +11,7 @@ import astropy.units as u
 from astropy.utils.data import get_pkg_data_filename
 from astropy.wcs import WCS
 
-from ...core import PixCoord
+from ...core import PixCoord, RegionMeta, RegionVisual
 from ...tests.helpers import make_simple_wcs
 from ..ellipse import EllipsePixelRegion, EllipseSkyRegion
 from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
@@ -26,8 +26,10 @@ def wcs_fixture():
 
 
 class TestEllipsePixelRegion(BaseTestPixelRegion):
+    meta = RegionMeta({'text': 'test'})
+    visual = RegionVisual({'color': 'blue'})
     reg = EllipsePixelRegion(center=PixCoord(3, 4), width=4, height=3,
-                             angle=5 * u.deg)
+                             angle=5 * u.deg, meta=meta, visual=visual)
     sample_box = [-2, 8, -1, 9]
     inside = [(4.5, 4)]
     outside = [(5, 4)]
@@ -43,8 +45,8 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
         assert reg.width == 4
         assert reg.height == 3
         assert_allclose(reg.angle.to_value("deg"), 5)
-        assert reg.visual == {}
-        assert reg.meta == {}
+        assert reg.meta == self.meta
+        assert reg.visual == self.visual
 
     def test_pix_sky_roundtrip(self):
         wcs = make_simple_wcs(SkyCoord(2 * u.deg, 3 * u.deg), 0.1 * u.deg, 20)
@@ -54,6 +56,8 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
         assert_allclose(reg_new.width, self.reg.width)
         assert_allclose(reg_new.height, self.reg.height)
         assert_quantity_allclose(reg_new.angle, self.reg.angle)
+        assert reg_new.meta == self.reg.meta
+        assert reg_new.visual == self.reg.visual
 
     @pytest.mark.skipif('not HAS_MATPLOTLIB')
     def test_as_artist(self):
@@ -175,12 +179,11 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
 
 
 class TestEllipseSkyRegion(BaseTestSkyRegion):
-    reg = EllipseSkyRegion(
-        center=SkyCoord(3, 4, unit='deg'),
-        width=4 * u.deg,
-        height=3 * u.deg,
-        angle=5 * u.deg,
-    )
+    meta = RegionMeta({'text': 'test'})
+    visual = RegionVisual({'color': 'blue'})
+    reg = EllipseSkyRegion(center=SkyCoord(3, 4, unit='deg'), width=4 * u.deg,
+                           height=3 * u.deg, angle=5 * u.deg, meta=meta,
+                           visual=visual)
 
     expected_repr = ('<EllipseSkyRegion(center=<SkyCoord (ICRS): (ra, dec) '
                      'in deg\n    (3., 4.)>, width=4.0 deg, height=3.0 deg,'
@@ -195,8 +198,8 @@ class TestEllipseSkyRegion(BaseTestSkyRegion):
         assert_allclose(reg.width.to_value("deg"), 4)
         assert_allclose(reg.height.to_value("deg"), 3)
         assert_allclose(reg.angle.to_value("deg"), 5)
-        assert reg.visual == {}
-        assert reg.meta == {}
+        assert reg.meta == self.meta
+        assert reg.visual == self.visual
 
     def test_dimension_center(self):
         center = SkyCoord([1, 2] * u.deg, [3, 4] * u.deg)

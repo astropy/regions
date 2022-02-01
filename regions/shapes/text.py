@@ -59,7 +59,8 @@ class TextPixelRegion(PointPixelRegion):
 
     def to_sky(self, wcs):
         center = pixel_to_skycoord(self.center.x, self.center.y, wcs=wcs)
-        return TextSkyRegion(center, self.text)
+        return TextSkyRegion(center, self.text, meta=self.meta,
+                             visual=self.visual)
 
     def as_artist(self, origin=(0, 0), **kwargs):
         """
@@ -117,4 +118,5 @@ class TextSkyRegion(PointSkyRegion):
     def to_pixel(self, wcs):
         center_x, center_y = skycoord_to_pixel(self.center, wcs=wcs)
         center = PixCoord(center_x, center_y)
-        return TextPixelRegion(center, self.text, self.meta, self.visual)
+        return TextPixelRegion(center, self.text, meta=self.meta,
+                               visual=self.visual)

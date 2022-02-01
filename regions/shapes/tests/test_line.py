@@ -11,7 +11,7 @@ import astropy.units as u
 from astropy.utils.data import get_pkg_data_filename
 from astropy.wcs import WCS
 
-from ...core import PixCoord
+from ...core import PixCoord, RegionMeta, RegionVisual
 from ...tests.helpers import make_simple_wcs
 from ..line import LinePixelRegion, LineSkyRegion
 from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
@@ -26,8 +26,10 @@ def wcs_fixture():
 
 
 class TestLinePixelRegion(BaseTestPixelRegion):
-
-    reg = LinePixelRegion(PixCoord(3, 4), PixCoord(4, 4))
+    meta = RegionMeta({'text': 'test'})
+    visual = RegionVisual({'color': 'blue'})
+    reg = LinePixelRegion(PixCoord(3, 4), PixCoord(4, 4), meta=meta,
+                          visual=visual)
     sample_box = [-2, 8, -1, 9]
     inside = []
     outside = [(3.1, 4.2), (5, 4)]
@@ -41,8 +43,8 @@ class TestLinePixelRegion(BaseTestPixelRegion):
         reg = self.reg.copy()
         assert reg.start.xy == (3, 4)
         assert reg.end.xy == (4, 4)
-        assert reg.visual == {}
-        assert reg.meta == {}
+        assert reg.meta == self.meta
+        assert reg.visual == self.visual
 
     def test_pix_sky_roundtrip(self):
         wcs = make_simple_wcs(SkyCoord(2 * u.deg, 3 * u.deg), 0.1 * u.deg, 20)
@@ -51,6 +53,8 @@ class TestLinePixelRegion(BaseTestPixelRegion):
         assert_allclose(reg_new.start.y, self.reg.start.y)
         assert_allclose(reg_new.end.x, self.reg.end.x)
         assert_allclose(reg_new.end.y, self.reg.end.y)
+        assert reg_new.meta == self.reg.meta
+        assert reg_new.visual == self.reg.visual
 
     @pytest.mark.skipif('not HAS_MATPLOTLIB')
     def test_as_artist(self):
@@ -64,10 +68,11 @@ class TestLinePixelRegion(BaseTestPixelRegion):
 
 
 class TestLineSkyRegion(BaseTestSkyRegion):
-
+    meta = RegionMeta({'text': 'test'})
+    visual = RegionVisual({'color': 'blue'})
     start = SkyCoord(3 * u.deg, 4 * u.deg, frame='galactic')
     end = SkyCoord(3 * u.deg, 5 * u.deg, frame='galactic')
-    reg = LineSkyRegion(start, end)
+    reg = LineSkyRegion(start, end, meta=meta, visual=visual)
 
     expected_repr = ('<LineSkyRegion(start=<SkyCoord (Galactic): (l, b) '
                      'in deg\n    (3., 4.)>, end=<SkyCoord (Galactic): '
@@ -80,8 +85,8 @@ class TestLineSkyRegion(BaseTestSkyRegion):
         reg = self.reg.copy()
         assert_allclose(reg.start.b.deg, 4)
         assert_allclose(reg.end.b.deg, 5)
-        assert reg.visual == {}
-        assert reg.meta == {}
+        assert reg.meta == self.meta
+        assert reg.visual == self.visual
 
     def test_transformation(self, wcs):
         pixline = self.reg.to_pixel(wcs)

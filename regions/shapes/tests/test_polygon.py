@@ -9,7 +9,7 @@ from astropy.coordinates import SkyCoord
 import astropy.units as u
 from astropy.tests.helper import assert_quantity_allclose
 
-from ...core import PixCoord, BoundingBox
+from ...core import PixCoord, RegionMeta, RegionVisual, BoundingBox
 from ...tests.helpers import make_simple_wcs
 from ..._utils.examples import make_example_dataset
 from ..polygon import (PolygonPixelRegion, RegularPolygonPixelRegion,
@@ -26,8 +26,10 @@ def wcs_fixture():
 
 
 class TestPolygonPixelRegion(BaseTestPixelRegion):
-
-    reg = PolygonPixelRegion(PixCoord([1, 3, 1], [1, 1, 4]))
+    meta = RegionMeta({'text': 'test'})
+    visual = RegionVisual({'color': 'blue'})
+    reg = PolygonPixelRegion(PixCoord([1, 3, 1], [1, 1, 4]), meta=meta,
+                             visual=visual)
     sample_box = [0, 4, 0, 5]
     inside = [(2, 2)]
     outside = [(3, 2), (3, 3)]
@@ -50,14 +52,16 @@ class TestPolygonPixelRegion(BaseTestPixelRegion):
         reg = self.reg.copy()
         assert_allclose(reg.vertices.x, [1, 3, 1])
         assert_allclose(reg.vertices.y, [1, 1, 4])
-        assert reg.visual == {}
-        assert reg.meta == {}
+        assert reg.meta == self.meta
+        assert reg.visual == self.visual
 
     def test_pix_sky_roundtrip(self):
         wcs = make_simple_wcs(SkyCoord(2 * u.deg, 3 * u.deg), 0.1 * u.deg, 20)
         reg_new = self.reg.to_sky(wcs).to_pixel(wcs)
         assert_allclose(reg_new.vertices.x, self.reg.vertices.x)
         assert_allclose(reg_new.vertices.y, self.reg.vertices.y)
+        assert reg_new.meta == self.reg.meta
+        assert reg_new.visual == self.reg.visual
 
     def test_bounding_box(self):
         bbox = self.reg.bounding_box
@@ -117,8 +121,10 @@ class TestPolygonPixelRegion(BaseTestPixelRegion):
 
 
 class TestPolygonSkyRegion(BaseTestSkyRegion):
-
-    reg = PolygonSkyRegion(SkyCoord([3, 4, 3] * u.deg, [3, 4, 4] * u.deg))
+    meta = RegionMeta({'text': 'test'})
+    visual = RegionVisual({'color': 'blue'})
+    reg = PolygonSkyRegion(SkyCoord([3, 4, 3] * u.deg, [3, 4, 4] * u.deg),
+                           meta=meta, visual=visual)
 
     expected_repr = ('<PolygonSkyRegion(vertices=<SkyCoord (ICRS): (ra, '
                      'dec) in deg\n    [(3., 3.), (4., 4.), (3., 4.)]>)>')
@@ -128,8 +134,8 @@ class TestPolygonSkyRegion(BaseTestSkyRegion):
     def test_copy(self):
         reg = self.reg.copy()
         assert_allclose(reg.vertices.ra.deg, [3, 4, 3])
-        assert reg.visual == {}
-        assert reg.meta == {}
+        assert reg.meta == self.meta
+        assert reg.visual == self.visual
 
     def test_transformation(self, wcs):
 
@@ -161,8 +167,10 @@ class TestPolygonSkyRegion(BaseTestSkyRegion):
 
 
 class TestRegionPolygonPixelRegion(BaseTestPixelRegion):
-
-    reg = RegularPolygonPixelRegion(PixCoord(50, 50), 8, 20, angle=25*u.deg)
+    meta = RegionMeta({'text': 'test'})
+    visual = RegionVisual({'color': 'blue'})
+    reg = RegularPolygonPixelRegion(PixCoord(50, 50), 8, 20, angle=25*u.deg,
+                                    meta=meta, visual=visual)
     inside = [(40, 40)]
     outside = [(20, 20), (80, 90)]
     expected_area = 1131.37085
@@ -180,8 +188,8 @@ class TestRegionPolygonPixelRegion(BaseTestPixelRegion):
         y_expected = copy(self.reg.vertices.y)
         assert_allclose(reg.vertices.x, x_expected)
         assert_allclose(reg.vertices.y, y_expected)
-        assert reg.visual == {}
-        assert reg.meta == {}
+        assert reg.meta == self.meta
+        assert reg.visual == self.visual
 
     def test_bounding_box(self):
         bbox = self.reg.bounding_box

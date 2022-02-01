@@ -30,6 +30,9 @@ Bug Fixes
 - Fixed an issue where compound region colors were being set correctly.
   [#389]
 
+- Fixed an issue where sky/pixel conversions did not preserve ``meta``
+  and ``visual`` data for some regions. [#420]
+
 API Changes
 -----------
 

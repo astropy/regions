@@ -192,7 +192,7 @@ class CircleAnnulusSkyRegion(SkyRegion):
         inner_radius = (self.inner_radius / pixscale).to(u.pix).value
         outer_radius = (self.outer_radius / pixscale).to(u.pix).value
         return CircleAnnulusPixelRegion(center, inner_radius, outer_radius,
-                                        self.meta, self.visual)
+                                        meta=self.meta, visual=self.visual)
 
 
 class AsymmetricAnnulusPixelRegion(AnnulusPixelRegion):
