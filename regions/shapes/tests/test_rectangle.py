@@ -85,6 +85,8 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
         assert_allclose(reg_new.width, self.reg.width)
         assert_allclose(reg_new.height, self.reg.height)
         assert_quantity_allclose(reg_new.angle, self.reg.angle)
+        assert reg_new.meta == self.reg.meta
+        assert reg_new.visual == self.reg.visual
 
     @pytest.mark.skipif('not HAS_MATPLOTLIB')
     def test_as_artist(self):

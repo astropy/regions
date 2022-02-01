@@ -48,6 +48,8 @@ class TestTextPixelRegion(BaseTestPixelRegion):
         reg_new = self.reg.to_sky(wcs).to_pixel(wcs)
         assert_allclose(reg_new.center.x, self.reg.center.x)
         assert_allclose(reg_new.center.y, self.reg.center.y)
+        assert reg_new.meta == self.reg.meta
+        assert reg_new.visual == self.reg.visual
 
     def test_rotate(self):
         reg = self.reg.rotate(PixCoord(2, 3), 90 * u.deg)

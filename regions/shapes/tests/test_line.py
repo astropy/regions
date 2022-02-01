@@ -53,6 +53,8 @@ class TestLinePixelRegion(BaseTestPixelRegion):
         assert_allclose(reg_new.start.y, self.reg.start.y)
         assert_allclose(reg_new.end.x, self.reg.end.x)
         assert_allclose(reg_new.end.y, self.reg.end.y)
+        assert reg_new.meta == self.reg.meta
+        assert reg_new.visual == self.reg.visual
 
     @pytest.mark.skipif('not HAS_MATPLOTLIB')
     def test_as_artist(self):

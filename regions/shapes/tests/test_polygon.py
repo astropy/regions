@@ -60,6 +60,8 @@ class TestPolygonPixelRegion(BaseTestPixelRegion):
         reg_new = self.reg.to_sky(wcs).to_pixel(wcs)
         assert_allclose(reg_new.vertices.x, self.reg.vertices.x)
         assert_allclose(reg_new.vertices.y, self.reg.vertices.y)
+        assert reg_new.meta == self.reg.meta
+        assert reg_new.visual == self.reg.visual
 
     def test_bounding_box(self):
         bbox = self.reg.bounding_box
