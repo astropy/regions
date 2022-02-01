@@ -273,3 +273,54 @@ statistics::
     >>> import numpy as np
     >>> np.average(data, weights=mask)  # doctest: +FLOAT_CMP
     9364.012674888021
+
+
+.. _interactive-masks:
+
+Interactive Mask Control
+------------------------
+
+In the last example we will show how to use a
+:ref:`Matplotlib selector<regions-as_mpl_selector>` widget with a custom
+``callback`` function for creating a mask and updating it interactively through
+the selector.
+We first create an :class:`~regions.EllipsePixelRegion` and add an ``as_mpl_selector``
+property linked to the Matplotlib axes. This can be moved around to
+position it on different sources, and resized just like its Rectangle
+counterpart, using the handles of the bounding box. 
+
+The user-defined callback function here generates a mask from this region and overlays
+it on the image as an alpha filter (keeping the areas outside shaded).
+We will use this mask as an aperture as well to calculate integrated
+and averaged flux, which is updated live in the text field of the plot as well. 
+
+.. plot::
+   :context:
+   :include-source:
+   :align: center
+
+    from astropy import units as u
+    from regions import PixCoord, EllipsePixelRegion
+
+    hdulist = fits.open(filename)
+    hdu = hdulist[0]
+
+    plt.clf()
+    ax = plt.subplot(1, 1, 1)
+    im = ax.imshow(hdu.data, cmap=plt.cm.viridis, interpolation='nearest', origin='lower')
+    text = ax.text(122, 1002, '', size='small', color='yellow')
+    ax.set_xlim(120, 180)
+    ax.set_ylim(1000, 1059)
+
+    def update_sel(region):
+        mask = region.to_mask(mode='subpixels', subpixels=10)
+        im.set_alpha((mask.to_image(hdu.data.shape) + 1) / 2)
+        total = mask.multiply(hdu.data).sum()
+        mean = np.average(hdu.data, weights=mask.to_image(hdu.data.shape))
+        text.set_text(f'Total: {total:g}\nMean: {mean:g}')
+
+    ellipse = EllipsePixelRegion(center=PixCoord(x=126, y=1031), width=8, height=4,
+                                 angle=-0*u.deg, visual={'color': 'yellow'})
+    selector = ellipse.as_mpl_selector(ax, callback=update_sel, use_data_coordinates=True)
+
+    hdulist.close()
