@@ -16,6 +16,8 @@ New Features
 
 - Added a ``RegularPolygonPixelRegion`` class. [#398]
 
+- Added the ability to compare ``Region`` objects for equality. [#421]
+
 Bug Fixes
 ---------
 
