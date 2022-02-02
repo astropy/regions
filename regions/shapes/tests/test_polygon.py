@@ -119,6 +119,12 @@ class TestPolygonPixelRegion(BaseTestPixelRegion):
         reg2 = PolygonPixelRegion(relverts, origin=origin)
         assert_equal(reg1.vertices, reg2.vertices)
 
+    def test_eq(self):
+        reg = self.reg.copy()
+        assert reg == self.reg
+        reg.vertices = PixCoord([1, 3, 1], [1, 1, 6])
+        assert reg != self.reg
+
 
 class TestPolygonSkyRegion(BaseTestSkyRegion):
     meta = RegionMeta({'text': 'test'})
@@ -164,6 +170,12 @@ class TestPolygonSkyRegion(BaseTestSkyRegion):
         # 1,2 is outside, 3.25,3.75 should be inside the triangle...
         assert all(self.reg.contains(position, wcs)
                    == np.array([False, True], dtype='bool'))
+
+    def test_eq(self):
+        reg = self.reg.copy()
+        assert reg == self.reg
+        reg.vertices = SkyCoord([3, 4, 3], [3, 4, 6], unit='deg')
+        assert reg != self.reg
 
 
 class TestRegionPolygonPixelRegion(BaseTestPixelRegion):
@@ -247,3 +259,9 @@ class TestRegionPolygonPixelRegion(BaseTestPixelRegion):
                   64.14213562, 70.]
         assert_allclose(reg.vertices.x, x_vert)
         assert_allclose(reg.vertices.y, y_vert)
+
+    def test_eq(self):
+        reg = self.reg.copy()
+        assert reg == self.reg
+        reg.radius = 25.
+        assert reg != self.reg

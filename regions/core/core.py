@@ -3,6 +3,8 @@ import abc
 import copy
 import operator
 
+import numpy as np
+
 from .metadata import RegionMeta, RegionVisual
 from .pixcoord import PixCoord
 from .registry import RegionsRegistry
@@ -70,11 +72,13 @@ class Region(abc.ABC):
         # if they directly convertible (e.g., 1. * u.deg == 60. * u.arcmin)
         try:
             for param in self_params:
-                if getattr(self, param) != getattr(other, param):
+                # np.any is used for SkyCoord array comparisons
+                if np.any(getattr(self, param) != getattr(other, param)):
                     return False
         except TypeError:
             # TypeError is raised from SkyCoord comparison when they do
-            # not have equivalent frames
+            # not have equivalent frames. Here return False instead of
+            # the TypeError.
             return False
 
         return True
