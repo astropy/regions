@@ -63,6 +63,12 @@ class TestCircleAnnulusPixelRegion(BaseTestPixelRegion):
         reg = self.reg.rotate(PixCoord(2, 3), 90 * u.deg)
         assert_allclose(reg.center.xy, (1, 4))
 
+    def test_eq(self):
+        reg = self.reg.copy()
+        assert reg == self.reg
+        reg.inner_radius = 3
+        assert reg != self.reg
+
 
 class TestCircleAnnulusSkyRegion(BaseTestSkyRegion):
     meta = RegionMeta({'text': 'test'})
@@ -101,6 +107,12 @@ class TestCircleAnnulusSkyRegion(BaseTestSkyRegion):
     def test_transformation(self):
         pixannulus = self.reg.to_pixel(wcs=self.wcs)
         assert isinstance(pixannulus, CircleAnnulusPixelRegion)
+
+    def test_eq(self):
+        reg = self.reg.copy()
+        assert reg == self.reg
+        reg.inner_radius = 10 * u.arcsec
+        assert reg != self.reg
 
 
 class TestEllipseAnnulusPixelRegion(BaseTestPixelRegion):
@@ -163,6 +175,12 @@ class TestEllipseAnnulusPixelRegion(BaseTestPixelRegion):
         assert_allclose(reg.center.xy, (1, 4))
         assert_allclose(reg.angle.to_value("deg"), 90)
 
+    def test_eq(self):
+        reg = self.reg.copy()
+        assert reg == self.reg
+        reg.outer_height = 10
+        assert reg != self.reg
+
 
 class TestEllipseAnnulusSkyRegion(BaseTestSkyRegion):
     meta = RegionMeta({'text': 'test'})
@@ -206,6 +224,12 @@ class TestEllipseAnnulusSkyRegion(BaseTestSkyRegion):
     def test_transformation(self):
         pixannulus = self.reg.to_pixel(wcs=self.wcs)
         assert isinstance(pixannulus, EllipseAnnulusPixelRegion)
+
+    def test_eq(self):
+        reg = self.reg.copy()
+        assert reg == self.reg
+        reg.outer_height = 85 * u.arcsec
+        assert reg != self.reg
 
 
 class TestRectangleAnnulusPixelRegion(BaseTestPixelRegion):
@@ -268,6 +292,12 @@ class TestRectangleAnnulusPixelRegion(BaseTestPixelRegion):
         assert_allclose(reg.center.xy, (1, 4))
         assert_allclose(reg.angle.to_value("deg"), 90)
 
+    def test_eq(self):
+        reg = self.reg.copy()
+        assert reg == self.reg
+        reg.outer_height = 10
+        assert reg != self.reg
+
 
 class TestRectangleAnnulusSkyRegion(BaseTestSkyRegion):
     meta = RegionMeta({'text': 'test'})
@@ -311,3 +341,9 @@ class TestRectangleAnnulusSkyRegion(BaseTestSkyRegion):
     def test_transformation(self):
         pixannulus = self.reg.to_pixel(wcs=self.wcs)
         assert isinstance(pixannulus, RectangleAnnulusPixelRegion)
+
+    def test_eq(self):
+        reg = self.reg.copy()
+        assert reg == self.reg
+        reg.outer_height = 85 * u.arcsec
+        assert reg != self.reg

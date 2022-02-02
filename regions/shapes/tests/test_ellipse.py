@@ -67,6 +67,17 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
         assert_allclose(patch.height, 3)
         assert_allclose(patch.angle, 5)
 
+    def test_rotate(self):
+        reg = self.reg.rotate(PixCoord(2, 3), 90 * u.deg)
+        assert_allclose(reg.center.xy, (1, 4))
+        assert_allclose(reg.angle.to_value("deg"), 95)
+
+    def test_eq(self):
+        reg = self.reg.copy()
+        assert reg == self.reg
+        reg.width = 3
+        assert reg != self.reg
+
     def test_region_bbox(self):
         a = 7
         b = 3
@@ -94,11 +105,6 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
         reg = EllipsePixelRegion(PixCoord(50, 50), width=0, height=10,
                                  angle=0. * u.deg)
         assert reg.bounding_box.shape == (11, 1)
-
-    def test_rotate(self):
-        reg = self.reg.rotate(PixCoord(2, 3), 90 * u.deg)
-        assert_allclose(reg.center.xy, (1, 4))
-        assert_allclose(reg.angle.to_value("deg"), 95)
 
     @pytest.mark.skipif(MPL_VERSION < 33, reason='requires `do_event`')
     @pytest.mark.parametrize('sync', (False, True))
@@ -296,3 +302,9 @@ class TestEllipseSkyRegion(BaseTestSkyRegion):
         # 1,2 is outside, 3,4 is the center and is inside
         assert all(self.reg.contains(position, wcs)
                    == np.array([False, True], dtype='bool'))
+
+    def test_eq(self):
+        reg = self.reg.copy()
+        assert reg == self.reg
+        reg.width = 3 * u.deg
+        assert reg != self.reg

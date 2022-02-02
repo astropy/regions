@@ -55,6 +55,12 @@ class TestTextPixelRegion(BaseTestPixelRegion):
         reg = self.reg.rotate(PixCoord(2, 3), 90 * u.deg)
         assert_allclose(reg.center.xy, (1, 4))
 
+    def test_eq(self):
+        reg = self.reg.copy()
+        assert reg == self.reg
+        reg.text = 'Hello World!'
+        assert reg != self.reg
+
 
 class TestTextSkyRegion(BaseTestSkyRegion):
     meta = RegionMeta({'text': 'test'})
@@ -78,3 +84,9 @@ class TestTextSkyRegion(BaseTestSkyRegion):
         # Nothing is in a text region
         assert all(self.reg.contains(position, wcs)
                    == np.array([False, False], dtype='bool'))
+
+    def test_eq(self):
+        reg = self.reg.copy()
+        assert reg == self.reg
+        reg.text = 'Hello World!'
+        assert reg != self.reg

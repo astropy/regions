@@ -103,6 +103,12 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
         assert_allclose(reg.center.xy, (1, 4))
         assert_allclose(reg.angle.to_value('deg'), 95)
 
+    def test_eq(self):
+        reg = self.reg.copy()
+        assert reg == self.reg
+        reg.angle = 35 * u.deg
+        assert reg != self.reg
+
     @pytest.mark.skipif(MPL_VERSION < 33, reason='requires `do_event`')
     @pytest.mark.parametrize('sync', (False, True))
     def test_as_mpl_selector(self, sync):
@@ -318,3 +324,9 @@ class TestRectangleSkyRegion(BaseTestSkyRegion):
         # 1,2 is outside, 3,4 is the center and is inside
         assert all(self.reg.contains(position, wcs)
                    == np.array([False, True], dtype='bool'))
+
+    def test_eq(self):
+        reg = self.reg.copy()
+        assert reg == self.reg
+        reg.angle = 10 * u.deg
+        assert reg != self.reg
