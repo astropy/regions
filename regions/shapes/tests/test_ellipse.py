@@ -235,6 +235,7 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
             mask[:] = reg.to_mask(mode='subpixels', subpixels=10).to_image(data.shape)
 
         region = self.reg.copy(angle=0 * u.deg)
+        region.visual = {'color': 'red'}
 
         if MPL_VERSION < 35 and 'grab_range' in userargs:
             userargs['maxdist'] = userargs.pop('grab_range')
@@ -244,7 +245,7 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
                 selector = region.as_mpl_selector(ax, callback=update_mask, **userargs)
         else:
             selector = region.as_mpl_selector(ax, callback=update_mask, **userargs)
-            assert region._mpl_selector.artists[0].get_edgecolor() == (0, 0, 0, 1)
+            assert region._mpl_selector.artists[0].get_edgecolor() == (1, 0, 0, 1)
 
             if 'props' in userargs:
                 assert region._mpl_selector.artists[0].get_facecolor() == (0, 0, 1, 1)

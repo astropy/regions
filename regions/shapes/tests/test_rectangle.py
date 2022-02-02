@@ -244,7 +244,7 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
                 selector = region.as_mpl_selector(ax, callback=update_mask, **userargs)
         else:
             selector = region.as_mpl_selector(ax, callback=update_mask, **userargs)
-            assert region._mpl_selector.artists[0].get_edgecolor() == (0, 0, 0, 1)
+            assert region._mpl_selector.artists[0].get_edgecolor() == (0, 0, 1, 1)
 
             if 'props' in userargs:
                 assert region._mpl_selector.artists[0].get_facecolor() == (0, 0, 1, 1)
