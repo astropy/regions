@@ -68,9 +68,14 @@ class Region(abc.ABC):
         # now check the parameter values
         # Note that Quantity comparisons allow for different units
         # if they directly convertible (e.g., 1. * u.deg == 60. * u.arcmin)
-        for param in self_params:
-            if getattr(self, param) != getattr(other, param):
-                return False
+        try:
+            for param in self_params:
+                if getattr(self, param) != getattr(other, param):
+                    return False
+        except TypeError:
+            # TypeError is raised from SkyCoord comparison when they do
+            # not have equivalent frames
+            return False
 
         return True
 
