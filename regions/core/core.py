@@ -3,6 +3,8 @@ import abc
 import copy
 import operator
 
+import numpy as np
+
 from .metadata import RegionMeta, RegionVisual
 from .pixcoord import PixCoord
 from .registry import RegionsRegistry
@@ -45,6 +47,47 @@ class Region(abc.ABC):
             for param in self._params:
                 cls_info.append((param, getattr(self, param)))
         return '\n'.join([f'{key}: {val}' for key, val in cls_info])
+
+    def __eq__(self, other):
+        """
+        Equality operator for Region.
+
+        All Region properties are compared for strict equality except
+        for Quantity parameters, which allow for different units if they
+        are directly convertible.
+        """
+        if not isinstance(other, self.__class__):
+            return False
+
+        meta_params = ['meta', 'visual']
+        self_params = list(self._params) + meta_params
+        other_params = list(other._params) + meta_params
+
+        # check that both have identical parameters
+        if self_params != other_params:
+            return False
+
+        # now check the parameter values
+        # Note that Quantity comparisons allow for different units
+        # if they directly convertible (e.g., 1. * u.deg == 60. * u.arcmin)
+        try:
+            for param in self_params:
+                # np.any is used for SkyCoord array comparisons
+                if np.any(getattr(self, param) != getattr(other, param)):
+                    return False
+        except TypeError:
+            # TypeError is raised from SkyCoord comparison when they do
+            # not have equivalent frames. Here return False instead of
+            # the TypeError.
+            return False
+
+        return True
+
+    def __ne__(self, other):
+        """
+        Inequality operator for Region.
+        """
+        return not (self == other)
 
     @abc.abstractmethod
     def intersection(self, other):

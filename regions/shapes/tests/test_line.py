@@ -66,6 +66,12 @@ class TestLinePixelRegion(BaseTestPixelRegion):
         assert_allclose(reg.start.xy, (1, 4))
         assert_allclose(reg.end.xy, (1, 5))
 
+    def test_eq(self):
+        reg = self.reg.copy()
+        assert reg == self.reg
+        reg.start = PixCoord(1, 2)
+        assert reg != self.reg
+
 
 class TestLineSkyRegion(BaseTestSkyRegion):
     meta = RegionMeta({'text': 'test'})
@@ -110,3 +116,11 @@ class TestLineSkyRegion(BaseTestSkyRegion):
         # lines do not contain things
         assert all(self.reg.contains(position, wcs)
                    == np.array([False, False], dtype='bool'))
+
+    def test_eq(self):
+        reg = self.reg.copy()
+        assert reg == self.reg
+        reg.start = SkyCoord(1 * u.deg, 2 * u.deg, frame='galactic')
+        assert reg != self.reg
+        reg.start = SkyCoord(3 * u.deg, 4 * u.deg, frame='icrs')
+        assert reg != self.reg
