@@ -171,7 +171,8 @@ def _parse_raw_data(region_str):
         frame_or_shape = match.groups()[1]
 
         if frame_or_shape not in allowed_frames_shapes:
-            raise ValueError(f'Unable to parse line "{line}".')
+            warnings.warn(f'Unable to parse line "{line}", skipping.',
+                          AstropyUserWarning)
 
         if frame_or_shape in coordinate_frames:
             # NOTE: frame value persists for subsequent regions until changed
@@ -601,15 +602,17 @@ def _define_pixel_params(shape, shape_params):
 
 
 def _define_sky_params(shape, shape_params, frame):
+    # map ds9 frames to astropy frames
     frame_mapping = {'image': 'image',
                      'icrs': 'icrs',
                      'fk5': 'fk5',
+                     'j2000': 'fk5',
                      'fk4': 'fk4',
+                     'b1950': 'fk4',
                      'galactic': 'galactic',
-                     'barycentricmeanecliptic': 'ecliptic'}
+                     'ecliptic': 'barycentricmeanecliptic'}
 
-    frame_mapping_rev = {val: key for key, val in frame_mapping.items()}
-    frame = frame_mapping_rev[frame]
+    frame = frame_mapping[frame]
 
     if shape == 'polygon':
         params = [SkyCoord(shape_params[0::2], shape_params[1::2],
