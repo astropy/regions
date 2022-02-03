@@ -445,7 +445,7 @@ def _parse_sky_coord(param_str, frame, index):
         return Angle(param_str)
 
     elif ':' in param_str:
-        if index % 2 == 0 and frame not in ('galactic',):
+        if index % 2 == 0 and frame not in ('galactic', 'ecliptic'):
             return Angle(param_str, u.hourangle)
         else:
             return Angle(param_str, u.degree)
