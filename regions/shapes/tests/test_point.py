@@ -14,7 +14,7 @@ from ...core import PixCoord, RegionMeta, RegionVisual
 from ...tests.helpers import make_simple_wcs
 from ..point import PointPixelRegion, PointSkyRegion
 from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
-from .utils import HAS_MATPLOTLIB  # noqa
+from ..utils import HAS_MATPLOTLIB  # noqa
 
 
 @pytest.fixture(scope='session', name='wcs')

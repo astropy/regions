@@ -234,6 +234,10 @@ class RectanglePixelRegion(PixelRegion):
             region is updated. This only has an effect if ``sync`` is
             `True`. If a callback is set, it is called for the first
             time once the selector has been created.
+        drag_from_anywhere : bool, optional
+            If `True`, the selector can be moved by clicking anywhere within
+            its bounds, else only at the central anchor
+            (only available with matplotlib 3.5 upwards; default: `False`).
         **kwargs : dict
             Additional keyword arguments are passed to
             `matplotlib.widgets.RectangleSelector`.
@@ -251,10 +255,10 @@ class RectanglePixelRegion(PixelRegion):
         ``selector.set_active(True)`` or ``selector.set_active(False)``.
         """
         from matplotlib.widgets import RectangleSelector
+        from .utils import MPL_VERSION
 
         if hasattr(self, '_mpl_selector'):
-            raise Exception('Cannot attach more than one selector to a '
-                            'region.')
+            raise AttributeError('Cannot attach more than one selector to a region.')
 
         if self.angle.value != 0:
             raise NotImplementedError('Cannot create matplotlib selector for '
@@ -266,12 +270,18 @@ class RectanglePixelRegion(PixelRegion):
             def sync_callback(*args, **kwargs):
                 pass
 
-        self._mpl_selector = RectangleSelector(
-            ax, sync_callback, interactive=True,
-            rectprops={'edgecolor': self.visual.get('color', 'black'),
-                       'facecolor': 'none',
-                       'linewidth': self.visual.get('linewidth', 1),
-                       'linestyle': self.visual.get('linestyle', 'solid')})
+        rectprops = {'edgecolor': self.visual.get('color', 'black'),
+                     'facecolor': 'none',
+                     'linewidth': self.visual.get('linewidth', 1),
+                     'linestyle': self.visual.get('linestyle', 'solid')}
+        rectprops.update(kwargs.pop('props', dict()))
+        # `rectprops` renamed `props` in mpl 3.5 and deprecated for 3.7.
+        if MPL_VERSION < 35:
+            kwargs.update({'rectprops': rectprops})
+        else:
+            kwargs.update({'props': rectprops})
+
+        self._mpl_selector = RectangleSelector(ax, sync_callback, interactive=True, **kwargs)
 
         self._mpl_selector.extents = (self.center.x - self.width / 2,
                                       self.center.x + self.width / 2,

@@ -15,7 +15,7 @@ from ..._utils.examples import make_example_dataset
 from ..polygon import (PolygonPixelRegion, RegularPolygonPixelRegion,
                        PolygonSkyRegion)
 from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
-from .utils import HAS_MATPLOTLIB  # noqa
+from ..utils import HAS_MATPLOTLIB  # noqa
 
 
 @pytest.fixture(scope='session', name='wcs')

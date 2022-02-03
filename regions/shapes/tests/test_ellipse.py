@@ -15,7 +15,7 @@ from ...core import PixCoord, RegionMeta, RegionVisual
 from ...tests.helpers import make_simple_wcs
 from ..ellipse import EllipsePixelRegion, EllipseSkyRegion
 from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
-from .utils import HAS_MATPLOTLIB  # noqa
+from ..utils import HAS_MATPLOTLIB, MPL_VERSION  # noqa
 
 
 @pytest.fixture(scope='session', name='wcs')
@@ -100,13 +100,12 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
         assert_allclose(reg.center.xy, (1, 4))
         assert_allclose(reg.angle.to_value("deg"), 95)
 
-    # TODO: Is this MatplotlibDeprecationWarning something to worry about?
-    @pytest.mark.filterwarnings(r"ignore:The 'rectprops' parameter of "
-                                r"__init__\(\) has been renamed 'props'")
+    @pytest.mark.skipif(MPL_VERSION < 33, reason='requires `do_event`')
     @pytest.mark.parametrize('sync', (False, True))
     def test_as_mpl_selector(self, sync):
 
         plt = pytest.importorskip('matplotlib.pyplot')
+        from matplotlib.testing.widgets import do_event
 
         data = np.random.random((16, 16))
         mask = np.zeros_like(data)
@@ -115,39 +114,23 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
         ax.imshow(data)
 
         def update_mask(reg):
-            mask[:] = reg.to_mask(mode='subpixels',
-                                  subpixels=10).to_image(data.shape)
+            mask[:] = reg.to_mask(mode='subpixels', subpixels=10).to_image(data.shape)
 
         # For now this will only work with unrotated ellipses. Once this
         # works with rotated ellipses, the following exception check can
         # be removed as well as the ``angle=0 * u.deg`` in the call to
         # copy() below.
         with pytest.raises(NotImplementedError,
-                           match=('Cannot create matplotlib selector for '
-                                  'rotated ellipse.')):
+                           match=('Cannot create matplotlib selector for rotated ellipse.')):
             self.reg.as_mpl_selector(ax)
 
         region = self.reg.copy(angle=0 * u.deg)
 
         selector = region.as_mpl_selector(ax, callback=update_mask, sync=sync)  # noqa
 
-        from matplotlib.backend_bases import MouseEvent, MouseButton
-
-        x, y = ax.transData.transform([[7.3, 4.4]])[0]
-        ax.figure.canvas.callbacks.process('button_press_event',
-                                           MouseEvent('button_press_event',
-                                                      ax.figure.canvas, x, y,
-                                                      button=MouseButton.LEFT))
-        x, y = ax.transData.transform([[9.3, 5.4]])[0]
-        ax.figure.canvas.callbacks.process('motion_notify_event',
-                                           MouseEvent('button_press_event',
-                                                      ax.figure.canvas, x, y,
-                                                      button=MouseButton.LEFT))
-        x, y = ax.transData.transform([[9.3, 5.4]])[0]
-        ax.figure.canvas.callbacks.process('button_release_event',
-                                           MouseEvent('button_press_event',
-                                                      ax.figure.canvas, x, y,
-                                                      button=MouseButton.LEFT))
+        do_event(selector, 'press', xdata=7.3, ydata=4.4, button=1)
+        do_event(selector, 'onmove', xdata=9.3, ydata=5.4, button=1)
+        do_event(selector, 'release', xdata=9.3, ydata=5.4, button=1)
 
         ax.figure.canvas.draw()
 
@@ -159,9 +142,7 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
             assert_allclose(region.height, 1)
             assert_quantity_allclose(region.angle, 0 * u.deg)
 
-            assert_equal(mask,
-                         region.to_mask(mode='subpixels',
-                                        subpixels=10).to_image(data.shape))
+            assert_equal(mask, region.to_mask(mode='subpixels', subpixels=10).to_image(data.shape))
 
         else:
 
@@ -173,9 +154,109 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
 
             assert_equal(mask, 0)
 
-        with pytest.raises(Exception, match=('Cannot attach more than one '
-                                             'selector to a region.')):
+        with pytest.raises(AttributeError, match=('Cannot attach more than one selector to a reg')):
             region.as_mpl_selector(ax)
+
+    @pytest.mark.skipif(MPL_VERSION < 33, reason='requires `do_event`')
+    @pytest.mark.parametrize('anywhere', (False, True))
+    def test_mpl_selector_drag(self, anywhere):
+        """Test dragging of entire region from central handle and anywhere."""
+
+        plt = pytest.importorskip('matplotlib.pyplot')
+        from matplotlib.testing.widgets import do_event
+
+        data = np.random.random((16, 16))
+        mask = np.zeros_like(data)
+
+        ax = plt.subplot(1, 1, 1)
+        ax.imshow(data)
+
+        def update_mask(reg):
+            mask[:] = reg.to_mask(mode='subpixels', subpixels=10).to_image(data.shape)
+
+        region = self.reg.copy(angle=0 * u.deg)
+
+        if anywhere and MPL_VERSION < 35:
+            pytest.skip('Requires `drag_from_anywhere` kwarg')
+        elif MPL_VERSION < 35:
+            selector = region.as_mpl_selector(ax, callback=update_mask)
+        else:
+            selector = region.as_mpl_selector(ax, callback=update_mask, drag_from_anywhere=anywhere)
+            assert selector.drag_from_anywhere is anywhere
+            assert region._mpl_selector.drag_from_anywhere is anywhere
+
+        # click_and_drag(selector, start=(3, 4), end=(3.5, 4.5))
+        do_event(selector, 'press', xdata=3, ydata=4, button=1)
+        do_event(selector, 'onmove', xdata=3.5, ydata=4.5, button=1)
+        do_event(selector, 'release', xdata=3.5, ydata=4.5, button=1)
+
+        ax.figure.canvas.draw()
+
+        assert_allclose(region.center.x, 3.5)
+        assert_allclose(region.center.y, 4.5)
+        assert_allclose(region.width, 4)
+        assert_allclose(region.height, 3)
+
+        do_event(selector, 'press', xdata=3.25, ydata=4.25, button=1)
+        do_event(selector, 'onmove', xdata=4.25, ydata=5.25, button=1)
+        do_event(selector, 'release', xdata=4.25, ydata=5.25, button=1)
+
+        ax.figure.canvas.draw()
+
+        # For drag_from_anywhere=False this will have created a new 1x1 rectangle.
+        if anywhere:
+            assert_allclose(region.center.x, 4.5)
+            assert_allclose(region.center.y, 5.5)
+            assert_allclose(region.width, 4)
+            assert_allclose(region.height, 3)
+        else:
+            assert_allclose(region.center.x, 4.5)
+            assert_allclose(region.center.y, 5.5)
+
+        assert_equal(mask, region.to_mask(mode='subpixels', subpixels=10).to_image(data.shape))
+
+    @pytest.mark.parametrize('userargs',
+                             ({'useblit': True},
+                              {'grab_range': 20, 'minspanx': 5,  'minspany': 4},
+                              {'props': {'facecolor': 'blue', 'linewidth': 2}},
+                              {'twit': 'gumby'}))
+    def test_mpl_selector_kwargs(self, userargs):
+        """Test that additional kwargs are passed to selector."""
+
+        plt = pytest.importorskip('matplotlib.pyplot')
+
+        data = np.random.random((16, 16))
+        mask = np.zeros_like(data)
+
+        ax = plt.subplot(1, 1, 1)
+        ax.imshow(data)
+
+        def update_mask(reg):
+            mask[:] = reg.to_mask(mode='subpixels', subpixels=10).to_image(data.shape)
+
+        region = self.reg.copy(angle=0 * u.deg)
+        region.visual = {'color': 'red'}
+
+        if MPL_VERSION < 35 and 'grab_range' in userargs:
+            userargs['maxdist'] = userargs.pop('grab_range')
+
+        if 'twit' in userargs:
+            with pytest.raises(TypeError, match=(r'__init__.. got an unexpected keyword argument')):
+                selector = region.as_mpl_selector(ax, callback=update_mask, **userargs)
+        else:
+            selector = region.as_mpl_selector(ax, callback=update_mask, **userargs)
+            assert region._mpl_selector.artists[0].get_edgecolor() == (1, 0, 0, 1)
+
+            if 'props' in userargs:
+                assert region._mpl_selector.artists[0].get_facecolor() == (0, 0, 1, 1)
+                assert region._mpl_selector.artists[0].get_linewidth() == 2
+            else:
+                assert region._mpl_selector.artists[0].get_facecolor() == (0, 0, 0, 0)
+                assert region._mpl_selector.artists[0].get_linewidth() == 1
+
+                for key, val in userargs.items():
+                    assert getattr(region._mpl_selector, key) == val
+                    assert getattr(selector, key) == val
 
 
 class TestEllipseSkyRegion(BaseTestSkyRegion):
