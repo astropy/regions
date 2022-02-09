@@ -109,10 +109,26 @@ def _translate_visual_metadata(shape, visual_meta):
 
     font = meta.pop('font', None)
     if font is not None:
-        (meta['fontname'], meta['fontsize'], meta['fontweight'],
-         meta['fontstyle']) = font.split()
+        vals = font.split()
+        if len(vals) == 4:
+            (meta['fontname'], meta['fontsize'], meta['fontweight'],
+             meta['fontstyle']) = vals
+        if len(vals) == 3:
+            meta['fontname'], meta['fontsize'], meta['fontweight'] = vals
+        if len(vals) == 2:
+            meta['fontname'], meta['fontsize'] = vals
+        if len(vals) == 1:
+            meta['fontname'] = vals[0]
 
-        # fontsize is a str
+        # define default font values (helvetica 10 normal roman)
+        if 'fontsize' not in meta:
+            meta['fontsize'] = '10'
+        if 'fontweight' not in meta:
+            meta['fontweight'] = 'normal'
+        if 'fontstyle' not in meta:
+            meta['fontstyle'] = 'normal'
+
+        # fontsize is a string
         try:
             meta['fontsize'] = int(meta['fontsize'])
         except ValueError:
