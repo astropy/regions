@@ -130,19 +130,23 @@ def _parse_raw_data(region_str):
     frame = None
     region_data = []
 
-    ds9_shapes = ['circle', 'ellipse', 'box', 'annulus', 'polygon', 'line',
-                  'point', 'text', 'composite']
-    unsupported_shapes = ['vector', 'ruler', 'compass', 'projection',
-                          'epanda', 'bpanda']
-
-    coordinate_frames = ['image', 'icrs', 'fk5', 'j2000', 'fk4', 'b1950',
-                         'galactic', 'ecliptic']
-    unsupported_frames = ['linear', 'amplifier', 'detector', 'physical']
+    supported_frames = ['image', 'icrs', 'fk5', 'j2000', 'fk4', 'b1950',
+                        'galactic', 'ecliptic']
+    unsupported_frames = ['linear', 'amplifier', 'detector', 'physical',
+                          'tile']
     wcs_frames = ['wcs', 'wcs0'] + [f'wcs{letter}'
                                     for letter in string.ascii_lowercase]
     unsupported_frames += wcs_frames
 
-    allowed_frames_shapes = coordinate_frames + ds9_shapes
+    supported_shapes = ['circle', 'ellipse', 'box', 'annulus', 'polygon',
+                        'line', 'point', 'text', 'composite']
+    unsupported_shapes = ['vector', 'ruler', 'compass', 'projection',
+                          'epanda', 'bpanda']
+
+    supported_frames_shapes = supported_frames + supported_shapes
+    unsupported_frames_shapes = unsupported_frames + unsupported_shapes
+    valid_frames_shapes = supported_frames_shapes + unsupported_frames_shapes
+
     regex_frame_or_shape = re.compile('^#? *([+-]?)([a-zA-Z0-9]+)')
 
     for line in _split_lines(region_str):  # split on semicolons & newlines
@@ -170,33 +174,32 @@ def _parse_raw_data(region_str):
         include_symbol = match.groups()[0]
         frame_or_shape = match.groups()[1]
 
-        if frame_or_shape not in allowed_frames_shapes:
-            warnings.warn(f'Unable to parse line "{line}", skipping.',
-                          AstropyUserWarning)
+        if frame_or_shape not in valid_frames_shapes:
+            warnings.warn(f'"{frame_or_shape}" frame or shape is not a valid '
+                          'frame or region shape; unable to parse line '
+                          f'"{line}", skipping.', AstropyUserWarning)
+            continue
 
-        if frame_or_shape in coordinate_frames:
+        if frame_or_shape in unsupported_frames_shapes:
+            warnings.warn(f'"{frame_or_shape}" frame or shape is not '
+                          'supported by the regions package, skipping.',
+                          AstropyUserWarning)
+            if frame_or_shape in unsupported_frames:
+                frame = None
+            continue
+
+        if frame_or_shape in supported_frames:
             # NOTE: frame value persists for subsequent regions until changed
             frame = frame_or_shape
             continue
 
-        if frame_or_shape in ds9_shapes:
+        if frame_or_shape in supported_shapes:
             shape = frame_or_shape
-
-            if shape in unsupported_shapes:
-                warnings.warn(f'DS9 shape "{shape}" is unsupported, '
-                              'skipping the corresponding region.',
-                              AstropyUserWarning)
-                continue
 
             # a frame must be defined before any shape(s)
             if frame is None:
-                raise ValueError('Coordinate frame was not found for region '
-                                 f'"{line}".')
-
-            if frame in unsupported_frames:
-                warnings.warn(f'DS9 coordinate frame {frame} is unsupported, '
-                              'skipping the corresponding region.',
-                              AstropyUserWarning)
+                warnings.warn('A coordinate frame was not found for region: '
+                              f'"{line}", skipping.', AstropyUserWarning)
                 continue
 
             if shape == 'composite':
