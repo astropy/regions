@@ -160,7 +160,8 @@ class CompoundPixelRegion(PixelRegion):
             patch = mpatches.PathPatch(path, **mpl_kwargs)
             return patch
         else:
-            raise NotImplementedError
+            raise ValueError('unable to convert region to matplotlib '
+                             f'artist: {self}')
 
     @property
     def bounding_box(self):
