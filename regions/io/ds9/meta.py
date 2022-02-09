@@ -42,7 +42,7 @@ def _split_raw_metadata(raw_metadata):
             if key == 'line' and '1' not in value:
                 continue
             warnings.warn(f'DS9 meta "{key}={value}" is unsupported and '
-                          'will be dropped', AstropyUserWarning)
+                          'will be ignored', AstropyUserWarning)
 
         if key in ds9_visual_keys:
             visual[key] = value
@@ -76,21 +76,24 @@ def _translate_visual_metadata(shape, visual_meta):
     meta = visual_meta.copy()
 
     fill = meta.pop('fill', 0)
-    if fill == 1:
+    # fill=1 is supported in DS9 only for the circle, ellipse, and box
+    # shapes
+    if fill == 1 and shape in ('circle', 'ellipse', 'box'):
         meta['fill'] = True
 
     dash = meta.pop('dash', 0)
     dashlist = meta.pop('dashlist', None)
     if int(dash) == 1:
-        if shape == 'point':
-            warnings.warn('dashed lines are unsupported for DS9 point '
-                          'regions and will be ignored', AstropyUserWarning)
-
         if dashlist is not None:
             dashes = tuple(int(i) for i in dashlist.split())
             meta['linestyle'] = (0, dashes)
         else:
             meta['linestyle'] = 'dashed'
+
+        if shape == 'point':
+            warnings.warn('dashed lines are unsupported for DS9 point '
+                          'regions and will be ignored', AstropyUserWarning)
+            meta.pop('linestyle', None)
 
     # "point=symbol [size]"; size is optional, symbol is not
     point = meta.pop('point', None)
