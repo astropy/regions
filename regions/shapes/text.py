@@ -3,11 +3,11 @@
 This module defines text regions in both pixel and sky coordinates.
 """
 
-from astropy.wcs.utils import pixel_to_skycoord, skycoord_to_pixel
+from astropy.wcs.utils import pixel_to_skycoord
 
 from .point import PointPixelRegion, PointSkyRegion
-from ..core import PixCoord
 from ..core.attributes import ScalarPixCoord, ScalarSkyCoord
+from .._utils.wcs_helpers import pixel_scale_angle_at_skycoord
 
 __all__ = ['TextSkyRegion', 'TextPixelRegion']
 
@@ -61,8 +61,18 @@ class TextPixelRegion(PointPixelRegion):
 
     def to_sky(self, wcs):
         center = pixel_to_skycoord(self.center.x, self.center.y, wcs=wcs)
+
+        # rotation value is relative to the coordinate system axes;
+        # convert from counterclockwise angle from the positive x axis
+        # to angle relative to North axis
+        visual = self.visual
+        if 'rotation' in self.visual:
+            _, _, angle = pixel_scale_angle_at_skycoord(center, wcs)
+            visual = visual.copy()
+            visual['rotation'] -= angle.to('deg').value - 90.
+
         return TextSkyRegion(center, self.text, meta=self.meta.copy(),
-                             visual=self.visual.copy())
+                             visual=visual.copy())
 
     def as_artist(self, origin=(0, 0), **kwargs):
         """
@@ -121,7 +131,14 @@ class TextSkyRegion(PointSkyRegion):
         self.text = text
 
     def to_pixel(self, wcs):
-        center_x, center_y = skycoord_to_pixel(self.center, wcs=wcs)
-        center = PixCoord(center_x, center_y)
+        center, _, angle = pixel_scale_angle_at_skycoord(self.center, wcs)
+
+        # rotation value is relative to the coordinate system axes;
+        # convert to counterclockwise angle from the positive x axis
+        visual = self.visual
+        if 'rotation' in self.visual:
+            visual = visual.copy()
+            visual['rotation'] += angle.to('deg').value - 90.
+
         return TextPixelRegion(center, self.text, meta=self.meta.copy(),
-                               visual=self.visual.copy())
+                               visual=visual.copy())
