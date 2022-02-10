@@ -136,6 +136,9 @@ class CircleAnnulusPixelRegion(AnnulusPixelRegion):
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
 
+        if inner_radius >= outer_radius:
+            raise ValueError('outer_radius must be greater than inner_radius')
+
     @property
     def _inner_region(self):
         return self._component_class(self.center, self.inner_radius,
@@ -187,6 +190,9 @@ class CircleAnnulusSkyRegion(SkyRegion):
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
 
+        if inner_radius >= outer_radius:
+            raise ValueError('outer_radius must be greater than inner_radius')
+
     def to_pixel(self, wcs):
         center, pixscale, _ = pixel_scale_angle_at_skycoord(self.center, wcs)
         inner_radius = (self.inner_radius / pixscale).to(u.pix).value
@@ -210,10 +216,10 @@ class AsymmetricAnnulusPixelRegion(AnnulusPixelRegion):
         The position of the center of the annulus.
     inner_width : float
         The inner width of the annulus (before rotation) in pixels.
-    inner_height : float
-        The inner height of the annulus (before rotation) in pixels.
     outer_width : float
         The outer width of the annulus (before rotation) in pixels.
+    inner_height : float
+        The inner height of the annulus (before rotation) in pixels.
     outer_height : float
         The outer height of the annulus (before rotation) in pixels.
     angle : `~astropy.units.Quantity`, optional
@@ -222,7 +228,7 @@ class AsymmetricAnnulusPixelRegion(AnnulusPixelRegion):
         axis.
     """
 
-    _params = ('center', 'inner_width', 'inner_height', 'outer_width',
+    _params = ('center', 'inner_width', 'outer_width', 'inner_height',
                'outer_height', 'angle')
     center = ScalarPix('center')
     inner_width = ScalarLength('inner_width')
@@ -242,6 +248,11 @@ class AsymmetricAnnulusPixelRegion(AnnulusPixelRegion):
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
 
+        if inner_width >= outer_width:
+            raise ValueError('outer_width must be greater than inner_width')
+        if inner_height >= outer_height:
+            raise ValueError('outer_height must be greater than inner_height')
+
     @property
     def _inner_region(self):
         return self._component_class(self.center, self.inner_width,
@@ -258,12 +269,12 @@ class AsymmetricAnnulusPixelRegion(AnnulusPixelRegion):
         center = pixel_to_skycoord(self.center.x, self.center.y, wcs)
         _, pixscale, north_angle = pixel_scale_angle_at_skycoord(center, wcs)
         inner_width = (self.inner_width * u.pix * pixscale).to(u.arcsec)
-        inner_height = (self.inner_height * u.pix * pixscale).to(u.arcsec)
         outer_width = (self.outer_width * u.pix * pixscale).to(u.arcsec)
+        inner_height = (self.inner_height * u.pix * pixscale).to(u.arcsec)
         outer_height = (self.outer_height * u.pix * pixscale).to(u.arcsec)
         angle = self.angle - (north_angle - 90 * u.deg)
 
-        return (center, inner_width, inner_height, outer_width, outer_height,
+        return (center, inner_width, outer_width, inner_height, outer_height,
                 angle)
 
 
@@ -279,10 +290,10 @@ class AsymmetricAnnulusSkyRegion(SkyRegion):
         The position of the center of the annulus.
     inner_width : `~astropy.units.Quantity`
         The inner width of the annulus (before rotation) as an angle.
-    inner_height : `~astropy.units.Quantity`
-        The inner height of the annulus (before rotation) as an angle.
     outer_width : `~astropy.units.Quantity`
         The outer width of the annulus (before rotation) as an angle.
+    inner_height : `~astropy.units.Quantity`
+        The inner height of the annulus (before rotation) as an angle.
     outer_height : `~astropy.units.Quantity`
         The outer height of the annulus (before rotation) as an angle.
     angle : `~astropy.units.Quantity`, optional
@@ -296,7 +307,7 @@ class AsymmetricAnnulusSkyRegion(SkyRegion):
         region.
     """
 
-    _params = ('center', 'inner_width', 'inner_height', 'outer_width',
+    _params = ('center', 'inner_width', 'outer_width', 'inner_height',
                'outer_height', 'angle')
 
     center = ScalarSky('center')
@@ -317,17 +328,22 @@ class AsymmetricAnnulusSkyRegion(SkyRegion):
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
 
+        if inner_width >= outer_width:
+            raise ValueError('outer_width must be greater than inner_width')
+        if inner_height >= outer_height:
+            raise ValueError('outer_height must be greater than inner_height')
+
     def to_pixel_args(self, wcs):
         center, pixscale, north_angle = pixel_scale_angle_at_skycoord(
             self.center, wcs)
         center = PixCoord(center.x, center.y)
         inner_width = (self.inner_width / pixscale).to(u.pix).value
-        inner_height = (self.inner_height / pixscale).to(u.pix).value
         outer_width = (self.outer_width / pixscale).to(u.pix).value
+        inner_height = (self.inner_height / pixscale).to(u.pix).value
         outer_height = (self.outer_height / pixscale).to(u.pix).value
         angle = self.angle + (north_angle - 90 * u.deg)
 
-        return (center, inner_width, inner_height, outer_width, outer_height,
+        return (center, inner_width, outer_width, inner_height, outer_height,
                 angle)
 
 
@@ -342,11 +358,11 @@ class EllipseAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
     inner_width : float
         The inner width of the elliptical annulus (before rotation) in
         pixels.
-    inner_height : float
-        The inner height of the elliptical annulus (before rotation) in
-        pixels.
     outer_width : float
         The outer width of the elliptical annulus (before rotation) in
+        pixels.
+    inner_height : float
+        The inner height of the elliptical annulus (before rotation) in
         pixels.
     outer_height : float
         The outer height of the elliptical annulus (before rotation) in
@@ -372,8 +388,8 @@ class EllipseAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
 
         x, y = 6, 6
         inner_width = 5.5
-        inner_height = 3.5
         outer_width = 8.5
+        inner_height = 3.5
         outer_height = 6.5
         angle = Angle("45deg")
 
@@ -381,8 +397,8 @@ class EllipseAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
 
         center = PixCoord(x=x, y=y)
         reg = EllipseAnnulusPixelRegion(center=center, inner_width=inner_width,
-                                        inner_height=inner_height,
                                         outer_width=outer_width,
+                                        inner_height=inner_height,
                                         outer_height=outer_height, angle=angle)
         patch = reg.as_artist(facecolor='none', edgecolor='red', lw=2)
         ax.add_patch(patch)
@@ -411,11 +427,11 @@ class EllipseAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
     inner_width : `~astropy.units.Quantity`
         The inner width of the elliptical annulus (before rotation) as
         an angle.
-    inner_height : `~astropy.units.Quantity`
-        The inner height of the elliptical annulus (before rotation) as
-        an angle.
     outer_width : `~astropy.units.Quantity`
         The outer width of the elliptical annulus (before rotation) as
+        an angle.
+    inner_height : `~astropy.units.Quantity`
+        The inner height of the elliptical annulus (before rotation) as
         an angle.
     outer_height : `~astropy.units.Quantity`
         The outer height of the elliptical annulus (before rotation) as
@@ -450,11 +466,11 @@ class RectangleAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
     inner_width : float
         The inner width of the rectangular annulus (before rotation) in
         pixels.
-    inner_height : float
-        The inner height of the rectangular annulus (before rotation) in
-        pixels.
     outer_width : float
         The outer width of the rectangular annulus (before rotation) in
+        pixels.
+    inner_height : float
+        The inner height of the rectangular annulus (before rotation) in
         pixels.
     outer_height : float
         The outer height of the rectangular annulus (before rotation) in
@@ -480,8 +496,8 @@ class RectangleAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
 
         x, y = 6, 6
         inner_width = 5.5
-        inner_height = 3.5
         outer_width = 8.5
+        inner_height = 3.5
         outer_height = 6.5
         angle = Angle("45deg")
 
@@ -490,8 +506,8 @@ class RectangleAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
         center = PixCoord(x=x, y=y)
         reg = RectangleAnnulusPixelRegion(center=center,
                                           inner_width=inner_width,
-                                          inner_height=inner_height,
                                           outer_width=outer_width,
+                                          inner_height=inner_height,
                                           outer_height=outer_height,
                                           angle=angle)
         patch = reg.as_artist(facecolor='none', edgecolor='red', lw=2)
@@ -522,11 +538,11 @@ class RectangleAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
     inner_width : `~astropy.units.Quantity`
         The inner width of the rectangular annulus (before rotation) as
         an angle.
-    inner_height : `~astropy.units.Quantity`
-        The inner height of the rectangular annulus (before rotation) as
-        an angle.
     outer_width : `~astropy.units.Quantity`
         The outer width of the rectangular annulus (before rotation) as
+        an angle.
+    inner_height : `~astropy.units.Quantity`
+        The inner height of the rectangular annulus (before rotation) as
         an angle.
     outer_height : `~astropy.units.Quantity`
         The outer height of the rectangular annulus (before rotation) as

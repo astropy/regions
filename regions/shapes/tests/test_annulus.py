@@ -131,11 +131,11 @@ class TestEllipseAnnulusPixelRegion(BaseTestPixelRegion):
     outside = [(3, 4)]
     expected_area = 7.5 * np.pi
     expected_repr = ('<EllipseAnnulusPixelRegion(center=PixCoord(x=3, y=4), '
-                     'inner_width=2, inner_height=5, outer_width=5, '
+                     'inner_width=2, outer_width=5, inner_height=5, '
                      'outer_height=8, angle=0.0 deg)>')
     expected_str = ('Region: EllipseAnnulusPixelRegion\ncenter: '
-                    'PixCoord(x=3, y=4)\ninner_width: 2\ninner_height: 5\n'
-                    'outer_width: 5\nouter_height: 8\nangle: 0.0 deg')
+                    'PixCoord(x=3, y=4)\ninner_width: 2\nouter_width: 5\n'
+                    'inner_height: 5\nouter_height: 8\nangle: 0.0 deg')
 
     skycoord = SkyCoord(3 * u.deg, 4 * u.deg, frame='icrs')
     wcs = make_simple_wcs(skycoord, 5 * u.arcsec, 20)
@@ -205,12 +205,13 @@ class TestEllipseAnnulusSkyRegion(BaseTestSkyRegion):
 
     expected_repr = ('<EllipseAnnulusSkyRegion(center=<SkyCoord (ICRS): '
                      '(ra, dec) in deg\n    (3., 4.)>, inner_width=20.0 '
-                     'arcsec, inner_height=50.0 arcsec, outer_width=50.0 '
+                     'arcsec, outer_width=50.0 arcsec, inner_height=50.0 '
                      'arcsec, outer_height=80.0 arcsec, angle=0.0 deg)>')
     expected_str = ('Region: EllipseAnnulusSkyRegion\ncenter: <SkyCoord '
                     '(ICRS): (ra, dec) in deg\n    (3., 4.)>\ninner_width: '
-                    '20.0 arcsec\ninner_height: 50.0 arcsec\nouter_width: '
-                    '50.0 arcsec\nouter_height: 80.0 arcsec\nangle: 0.0 deg')
+                    '20.0 arcsec\nouter_width: 50.0 arcsec\n'
+                    'inner_height: 50.0 arcsec\nouter_height: '
+                    '80.0 arcsec\nangle: 0.0 deg')
 
     def test_init(self):
         assert_quantity_allclose(self.reg.center.ra, self.skycoord.ra)
@@ -254,11 +255,11 @@ class TestRectangleAnnulusPixelRegion(BaseTestPixelRegion):
     outside = [(3, 4)]
     expected_area = 30
     expected_repr = ('<RectangleAnnulusPixelRegion(center=PixCoord(x=3, y=4), '
-                     'inner_width=2, inner_height=5, outer_width=5, '
+                     'inner_width=2, outer_width=5, inner_height=5, '
                      'outer_height=8, angle=0.0 deg)>')
     expected_str = ('Region: RectangleAnnulusPixelRegion\ncenter: '
-                    'PixCoord(x=3, y=4)\ninner_width: 2\ninner_height: 5\n'
-                    'outer_width: 5\nouter_height: 8\nangle: 0.0 deg')
+                    'PixCoord(x=3, y=4)\ninner_width: 2\nouter_width: 5\n'
+                    'inner_height: 5\nouter_height: 8\nangle: 0.0 deg')
 
     skycoord = SkyCoord(3 * u.deg, 4 * u.deg, frame='icrs')
     wcs = make_simple_wcs(skycoord, 5 * u.arcsec, 20)
@@ -328,12 +329,13 @@ class TestRectangleAnnulusSkyRegion(BaseTestSkyRegion):
 
     expected_repr = ('<RectangleAnnulusSkyRegion(center=<SkyCoord (ICRS): '
                      '(ra, dec) in deg\n    (3., 4.)>, inner_width=20.0 '
-                     'arcsec, inner_height=50.0 arcsec, outer_width=50.0 '
+                     'arcsec, outer_width=50.0 arcsec, inner_height=50.0 '
                      'arcsec, outer_height=80.0 arcsec, angle=0.0 deg)>')
     expected_str = ('Region: RectangleAnnulusSkyRegion\ncenter: <SkyCoord '
                     '(ICRS): (ra, dec) in deg\n    (3., 4.)>\ninner_width: '
-                    '20.0 arcsec\ninner_height: 50.0 arcsec\nouter_width: '
-                    '50.0 arcsec\nouter_height: 80.0 arcsec\nangle: 0.0 deg')
+                    '20.0 arcsec\nouter_width: 50.0 arcsec\n'
+                    'inner_height: 50.0 arcsec\nouter_height: 80.0 arcsec\n'
+                    'angle: 0.0 deg')
 
     def test_init(self):
         assert_quantity_allclose(self.reg.center.ra, self.skycoord.ra)
