@@ -13,7 +13,7 @@ from astropy.utils.exceptions import AstropyUserWarning
 
 from ...core import Regions, RegionMeta, RegionVisual, PixCoord
 from ...core.registry import RegionsRegistry
-from .core import (ds9_shape_to_region, ds9_params_template,
+from .core import (ds9_frame_map, ds9_shape_to_region, ds9_params_template,
                    DS9ParserError)
 from .meta import _split_raw_metadata, _translate_visual_metadata
 
@@ -590,49 +590,37 @@ def _parse_shape_params(region_data):
     return shape, shape_params
 
 
-def _define_pixel_params(shape, shape_params):
+def _define_coords(region_type, params, frame=None):
+    if region_type == 'pixel':
+        coords = PixCoord(*params)
+    else:
+        coords = SkyCoord(*params, frame=frame)
+    return coords
+
+
+def _define_region_params(region_type, shape, shape_params, frame=None):
+    if frame is not None:
+        frame = ds9_frame_map[frame]
+
     if shape == 'polygon':
-        params = [PixCoord(shape_params[0::2], shape_params[1::2])]
+        coord_params = (shape_params[0::2], shape_params[1::2])
+        params = [_define_coords(region_type, coord_params, frame=frame)]
+
     elif shape == 'line':
-        params = [PixCoord(*shape_params[0:2]), PixCoord(*shape_params[2:4])]
+        params = [_define_coords(region_type, shape_params[0:2], frame=frame),
+                  _define_coords(region_type, shape_params[2:4], frame=frame)]
+
     elif shape in ('ellipse_annulus', 'rectangle_annulus'):
         size_params = shape_params[2:-1]
         tmp = [size_params[0::2], size_params[1::2]]
         tmp_flat = [item for sublist in tmp for item in sublist]
-        params = [PixCoord(*shape_params[0:2]), *tmp_flat, shape_params[-1]]
+        params = [_define_coords(region_type, shape_params[0:2], frame=frame),
+                  *tmp_flat, shape_params[-1]]
+
     else:
-        params = ([PixCoord(shape_params[0], shape_params[1])]
-                  + shape_params[2:])
-    return params
+        params = ([_define_coords(region_type, shape_params[0:2],
+                                  frame=frame)] + shape_params[2:])
 
-
-def _define_sky_params(shape, shape_params, frame):
-    # map ds9 frames to astropy frames
-    frame_mapping = {'image': 'image',
-                     'icrs': 'icrs',
-                     'fk5': 'fk5',
-                     'j2000': 'fk5',
-                     'fk4': 'fk4',
-                     'b1950': 'fk4',
-                     'galactic': 'galactic',
-                     'ecliptic': 'barycentricmeanecliptic'}
-
-    frame = frame_mapping[frame]
-
-    if shape == 'polygon':
-        params = [SkyCoord(shape_params[0::2], shape_params[1::2],
-                           frame=frame)]
-    elif shape == 'line':
-        params = [SkyCoord(*shape_params[0:2], frame=frame),
-                  SkyCoord(*shape_params[2:4], frame=frame)]
-    elif shape in ('ellipse_annulus', 'rectangle_annulus'):
-        size_params = shape_params[2:-1]
-        tmp = [size_params[0::2], size_params[1::2]]
-        tmp_flat = [item for sublist in tmp for item in sublist]
-        params = [SkyCoord(*shape_params[0:2]), *tmp_flat, shape_params[-1]]
-    else:
-        params = ([SkyCoord(shape_params[0], shape_params[1],
-                            frame=frame)] + shape_params[2:])
     return params
 
 
@@ -655,11 +643,9 @@ def _make_region(region_data):
     region_type = region_data.region_type
     region_params = []
     for shape_params in shape_params_list:
-        if region_type == 'pixel':
-            region_params.extend([_define_pixel_params(shape, shape_params)])
-        else:
-            region_params.extend([_define_sky_params(shape, shape_params,
-                                                     region_data.frame)])
+        region_params.extend([_define_region_params(region_type, shape,
+                                                    shape_params,
+                                                    region_data.frame)])
 
     # separate the metadata and visual metadata and then translate the
     # visual metadata to valid mpl kwargs for the particular region

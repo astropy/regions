@@ -19,11 +19,15 @@ from ..._utils.optional_deps import HAS_MATPLOTLIB
 __all__ = []
 
 
-class DS9ParserError(Exception):
-    """
-    A custom exception for DS9 parsing errors.
-    """
-
+# mappings from DS9 frames to astropy coordinates frames
+ds9_frame_map = {'image': 'image',
+                 'icrs': 'icrs',
+                 'fk5': 'fk5',
+                 'j2000': 'fk5',
+                 'fk4': 'fk4',
+                 'b1950': 'fk4',
+                 'galactic': 'galactic',
+                 'ecliptic': 'barycentricmeanecliptic'}
 
 # mappings from DS9 shape to region class
 pixel_map = {'circle': CirclePixelRegion,
@@ -132,3 +136,9 @@ ds9_valid_symbols = {'circle': 'o',
                      'cross': '+',
                      'arrow': arrow,
                      'boxcircle': boxcircle}
+
+
+class DS9ParserError(Exception):
+    """
+    A custom exception for DS9 parsing errors.
+    """
