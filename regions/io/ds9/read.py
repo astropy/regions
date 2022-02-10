@@ -231,8 +231,10 @@ def _parse_raw_data(region_str):
             if frame == 'image':
                 region_type = 'pixel'
 
-            region_data.append(_RegionData(frame, region_type, shape,
-                                           params_str, raw_meta, line))
+            # composite shape is used only to extract metadata
+            if shape != 'composite':
+                region_data.append(_RegionData(frame, region_type, shape,
+                                               params_str, raw_meta, line))
 
             # reset composite metadata after the composite region ends
             if '||' not in line and composite_meta:

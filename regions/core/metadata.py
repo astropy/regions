@@ -53,10 +53,11 @@ class RegionMeta(Meta):
     A dictionary subclass that holds the meta attributes of the region.
     """
 
-    valid_keys = ['background', 'comment', 'corr', 'delete', 'edit', 'fixed',
-                  'frame', 'highlite', 'include', 'label', 'line', 'move',
-                  'name', 'range', 'restfreq', 'rotate', 'select', 'source',
-                  'tag', 'text', 'type', 'veltype', 'textrotate']
+    valid_keys = ['background', 'comment', 'composite', 'corr', 'delete',
+                  'edit', 'fixed', 'frame', 'highlite', 'include', 'label',
+                  'line', 'move', 'name', 'range', 'restfreq', 'rotate',
+                  'select', 'source', 'tag', 'text', 'textrotate', 'type',
+                  'veltype']
 
     key_mapping = {}
 
