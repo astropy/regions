@@ -13,9 +13,9 @@ from astropy.wcs import WCS
 
 from ...core import PixCoord, RegionMeta, RegionVisual
 from ...tests.helpers import make_simple_wcs
+from ..._utils.optional_deps import HAS_MATPLOTLIB, MPL_VERSION  # noqa
 from ..ellipse import EllipsePixelRegion, EllipseSkyRegion
 from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
-from ..utils import HAS_MATPLOTLIB, MPL_VERSION  # noqa
 
 
 @pytest.fixture(scope='session', name='wcs')
