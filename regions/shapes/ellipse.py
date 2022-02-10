@@ -116,7 +116,8 @@ class EllipsePixelRegion(PixelRegion):
         width = Angle(self.width * u.pix * pixscale, 'arcsec')
         return EllipseSkyRegion(center, width, height,
                                 angle=self.angle - (north_angle - 90 * u.deg),
-                                meta=self.meta, visual=self.visual)
+                                meta=self.meta.copy(),
+                                visual=self.visual.copy())
 
     @property
     def bounding_box(self):
@@ -369,4 +370,5 @@ class EllipseSkyRegion(SkyRegion):
         width = (self.width / pixscale).to(u.pixel).value
         angle = self.angle + (north_angle - 90 * u.deg)
         return EllipsePixelRegion(center, width, height, angle=angle,
-                                  meta=self.meta, visual=self.visual)
+                                  meta=self.meta.copy(),
+                                  visual=self.visual.copy())
