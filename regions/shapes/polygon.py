@@ -103,8 +103,8 @@ class PolygonPixelRegion(PixelRegion):
 
     def to_sky(self, wcs):
         vertices_sky = pixel_to_skycoord(self.vertices.x, self.vertices.y, wcs)
-        return PolygonSkyRegion(vertices=vertices_sky, meta=self.meta,
-                                visual=self.visual)
+        return PolygonSkyRegion(vertices=vertices_sky, meta=self.meta.copy(),
+                                visual=self.visual.copy())
 
     @property
     def bounding_box(self):
@@ -363,5 +363,5 @@ class PolygonSkyRegion(SkyRegion):
     def to_pixel(self, wcs):
         x, y = skycoord_to_pixel(self.vertices, wcs)
         vertices_pix = PixCoord(x, y)
-        return PolygonPixelRegion(vertices_pix, meta=self.meta,
-                                  visual=self.visual)
+        return PolygonPixelRegion(vertices_pix, meta=self.meta.copy(),
+                                  visual=self.visual.copy())

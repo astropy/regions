@@ -63,6 +63,12 @@ class TestPolygonPixelRegion(BaseTestPixelRegion):
         assert reg_new.meta == self.reg.meta
         assert reg_new.visual == self.reg.visual
 
+        # test that converted region meta and visual are copies and not views
+        reg_new.meta['text'] = 'new'
+        reg_new.visual['color'] = 'green'
+        assert reg_new.meta['text'] != self.reg.meta['text']
+        assert reg_new.visual['color'] != self.reg.visual['color']
+
     def test_bounding_box(self):
         bbox = self.reg.bounding_box
         assert bbox == BoundingBox(ixmin=1, ixmax=4, iymin=1, iymax=5)

@@ -92,8 +92,8 @@ class CompoundPixelRegion(PixelRegion):
         skyreg1 = self.region1.to_sky(wcs=wcs)
         skyreg2 = self.region2.to_sky(wcs=wcs)
         return CompoundSkyRegion(region1=skyreg1, operator=self.operator,
-                                 region2=skyreg2, meta=self.meta,
-                                 visual=self.visual)
+                                 region2=skyreg2, meta=self.meta.copy(),
+                                 visual=self.visual.copy())
 
     @staticmethod
     def _make_annulus_path(patch_inner, patch_outer):
@@ -249,8 +249,8 @@ class CompoundSkyRegion(SkyRegion):
         pixreg1 = self.region1.to_pixel(wcs=wcs)
         pixreg2 = self.region2.to_pixel(wcs=wcs)
         return CompoundPixelRegion(region1=pixreg1, operator=self.operator,
-                                   region2=pixreg2, meta=self.meta,
-                                   visual=self.visual)
+                                   region2=pixreg2, meta=self.meta.copy(),
+                                   visual=self.visual.copy())
 
     def as_artist(self, ax, **kwargs):
         raise NotImplementedError

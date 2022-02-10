@@ -18,6 +18,8 @@ New Features
 
 - Added the ability to compare ``Region`` objects for equality. [#421]
 
+- Added a ``copy`` method to ``RegionMeta`` and ``RegionVisual``. [#424]
+
 Bug Fixes
 ---------
 
@@ -33,7 +35,8 @@ Bug Fixes
   [#389]
 
 - Fixed an issue where sky/pixel conversions did not preserve ``meta``
-  and ``visual`` data for some regions. [#420]
+  and ``visual`` data for some regions. [#420, #424]
+
 
 API Changes
 -----------

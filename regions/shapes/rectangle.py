@@ -112,7 +112,8 @@ class RectanglePixelRegion(PixelRegion):
         height = Angle(self.height * u.pix * pixscale, 'arcsec')
         angle = self.angle - (north_angle - 90 * u.deg)
         return RectangleSkyRegion(center, width, height, angle=angle,
-                                  meta=self.meta, visual=self.visual)
+                                  meta=self.meta.copy(),
+                                  visual=self.visual.copy())
 
     @property
     def bounding_box(self):
@@ -317,8 +318,8 @@ class RectanglePixelRegion(PixelRegion):
         """
         x, y = self.corners.T
         vertices = PixCoord(x=x, y=y)
-        return PolygonPixelRegion(vertices=vertices, meta=self.meta,
-                                  visual=self.visual)
+        return PolygonPixelRegion(vertices=vertices, meta=self.meta.copy(),
+                                  visual=self.visual.copy())
 
     def _lower_left_xy(self):
         """
@@ -408,4 +409,5 @@ class RectangleSkyRegion(SkyRegion):
         height = (self.height / pixscale).to(u.pix).value
         angle = self.angle + (north_angle - 90 * u.deg)
         return RectanglePixelRegion(center, width, height, angle=angle,
-                                    meta=self.meta, visual=self.visual)
+                                    meta=self.meta.copy(),
+                                    visual=self.visual.copy())

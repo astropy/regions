@@ -152,7 +152,7 @@ class CircleAnnulusPixelRegion(AnnulusPixelRegion):
         inner_radius = self.inner_radius * u.pix * pixscale
         outer_radius = self.outer_radius * u.pix * pixscale
         return CircleAnnulusSkyRegion(center, inner_radius, outer_radius,
-                                      self.meta, self.visual)
+                                      self.meta.copy(), self.visual.copy())
 
 
 class CircleAnnulusSkyRegion(SkyRegion):
@@ -192,7 +192,8 @@ class CircleAnnulusSkyRegion(SkyRegion):
         inner_radius = (self.inner_radius / pixscale).to(u.pix).value
         outer_radius = (self.outer_radius / pixscale).to(u.pix).value
         return CircleAnnulusPixelRegion(center, inner_radius, outer_radius,
-                                        meta=self.meta, visual=self.visual)
+                                        meta=self.meta.copy(),
+                                        visual=self.visual.copy())
 
 
 class AsymmetricAnnulusPixelRegion(AnnulusPixelRegion):
@@ -394,8 +395,9 @@ class EllipseAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
     _component_class = EllipsePixelRegion
 
     def to_sky(self, wcs):
-        return EllipseAnnulusSkyRegion(
-            *self.to_sky_args(wcs), meta=self.meta, visual=self.visual)
+        return EllipseAnnulusSkyRegion(*self.to_sky_args(wcs),
+                                       meta=self.meta.copy(),
+                                       visual=self.visual.copy())
 
 
 class EllipseAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
@@ -432,8 +434,9 @@ class EllipseAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
     _component_class = EllipseSkyRegion
 
     def to_pixel(self, wcs):
-        return EllipseAnnulusPixelRegion(
-            *self.to_pixel_args(wcs), meta=self.meta, visual=self.visual)
+        return EllipseAnnulusPixelRegion(*self.to_pixel_args(wcs),
+                                         meta=self.meta.copy(),
+                                         visual=self.visual.copy())
 
 
 class RectangleAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
@@ -502,8 +505,9 @@ class RectangleAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
     _component_class = RectanglePixelRegion
 
     def to_sky(self, wcs):
-        return RectangleAnnulusSkyRegion(
-            *self.to_sky_args(wcs), meta=self.meta, visual=self.visual)
+        return RectangleAnnulusSkyRegion(*self.to_sky_args(wcs),
+                                         meta=self.meta.copy(),
+                                         visual=self.visual.copy())
 
 
 class RectangleAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
@@ -541,5 +545,6 @@ class RectangleAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
     _component_class = RectangleSkyRegion
 
     def to_pixel(self, wcs):
-        return RectangleAnnulusPixelRegion(
-            *self.to_pixel_args(wcs), meta=self.meta, visual=self.visual)
+        return RectangleAnnulusPixelRegion(*self.to_pixel_args(wcs),
+                                           meta=self.meta.copy(),
+                                           visual=self.visual.copy())

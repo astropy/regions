@@ -90,8 +90,8 @@ class CirclePixelRegion(PixelRegion):
         center = pixel_to_skycoord(self.center.x, self.center.y, wcs)
         _, pixscale, _ = pixel_scale_angle_at_skycoord(center, wcs)
         radius = Angle(self.radius * u.pix * pixscale, 'arcsec')
-        return CircleSkyRegion(center, radius, meta=self.meta,
-                               visual=self.visual)
+        return CircleSkyRegion(center, radius, meta=self.meta.copy(),
+                               visual=self.visual.copy())
 
     @property
     def bounding_box(self):
@@ -213,5 +213,5 @@ class CircleSkyRegion(SkyRegion):
     def to_pixel(self, wcs):
         center, pixscale, _ = pixel_scale_angle_at_skycoord(self.center, wcs)
         radius = (self.radius / pixscale).to(u.pix).value
-        return CirclePixelRegion(center, radius, meta=self.meta,
-                                 visual=self.visual)
+        return CirclePixelRegion(center, radius, meta=self.meta.copy(),
+                                 visual=self.visual.copy())

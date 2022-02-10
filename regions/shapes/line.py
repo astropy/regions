@@ -84,7 +84,8 @@ class LinePixelRegion(PixelRegion):
     def to_sky(self, wcs):
         start = pixel_to_skycoord(self.start.x, self.start.y, wcs)
         end = pixel_to_skycoord(self.end.x, self.end.y, wcs)
-        return LineSkyRegion(start, end, meta=self.meta, visual=self.visual)
+        return LineSkyRegion(start, end, meta=self.meta.copy(),
+                             visual=self.visual.copy())
 
     @property
     def bounding_box(self):
@@ -198,4 +199,5 @@ class LineSkyRegion(SkyRegion):
         start = PixCoord(start_x, start_y)
         end_x, end_y = skycoord_to_pixel(self.end, wcs=wcs)
         end = PixCoord(end_x, end_y)
-        return LinePixelRegion(start, end, meta=self.meta, visual=self.visual)
+        return LinePixelRegion(start, end, meta=self.meta.copy(),
+                               visual=self.visual.copy())

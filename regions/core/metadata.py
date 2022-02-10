@@ -2,6 +2,7 @@
 """
 This module proves classes to handle region metadata.
 """
+from copy import deepcopy
 
 __all__ = ['Meta', 'RegionMeta', 'RegionVisual']
 
@@ -39,6 +40,12 @@ class Meta(dict):
     def __getitem__(self, item):
         item = self.key_mapping.get(item, item)
         return super().__getitem__(item)
+
+    def copy(self):
+        """
+        Make a deep copy of this object.
+        """
+        return deepcopy(self)
 
 
 class RegionMeta(Meta):

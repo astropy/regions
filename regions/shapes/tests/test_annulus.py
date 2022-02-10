@@ -55,6 +55,12 @@ class TestCircleAnnulusPixelRegion(BaseTestPixelRegion):
         assert reg_new.meta == self.reg.meta
         assert reg_new.visual == self.reg.visual
 
+        # test that converted region meta and visual are copies and not views
+        reg_new.meta['text'] = 'new'
+        reg_new.visual['color'] = 'green'
+        assert reg_new.meta['text'] != self.reg.meta['text']
+        assert reg_new.visual['color'] != self.reg.visual['color']
+
     def test_transformation(self):
         skyannulus = self.reg.to_sky(wcs=self.wcs)
         assert isinstance(skyannulus, CircleAnnulusSkyRegion)
@@ -165,6 +171,12 @@ class TestEllipseAnnulusPixelRegion(BaseTestPixelRegion):
         assert_quantity_allclose(reg_new.angle, self.reg.angle)
         assert reg_new.meta == self.reg.meta
         assert reg_new.visual == self.reg.visual
+
+        # test that converted region meta and visual are copies and not views
+        reg_new.meta['text'] = 'new'
+        reg_new.visual['color'] = 'green'
+        assert reg_new.meta['text'] != self.reg.meta['text']
+        assert reg_new.visual['color'] != self.reg.visual['color']
 
     def test_transformation(self):
         skyannulus = self.reg.to_sky(wcs=self.wcs)
@@ -282,6 +294,12 @@ class TestRectangleAnnulusPixelRegion(BaseTestPixelRegion):
         assert_quantity_allclose(reg_new.angle, self.reg.angle)
         assert reg_new.meta == self.reg.meta
         assert reg_new.visual == self.reg.visual
+
+        # test that converted region meta and visual are copies and not views
+        reg_new.meta['text'] = 'new'
+        reg_new.visual['color'] = 'green'
+        assert reg_new.meta['text'] != self.reg.meta['text']
+        assert reg_new.visual['color'] != self.reg.visual['color']
 
     def test_transformation(self):
         skyannulus = self.reg.to_sky(wcs=self.wcs)
