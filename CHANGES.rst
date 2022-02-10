@@ -37,6 +37,12 @@ Bug Fixes
 - Fixed an issue where sky/pixel conversions did not preserve ``meta``
   and ``visual`` data for some regions. [#420, #424]
 
+- Fixed an issue with elliptical and rectangular annulus regions where
+  the outer width/height could be smaller than the inner width/height.
+  [#425]
+
+- Fixed an issue converting elliptical and rectangular annulus regions
+  between pixel and sky regions. [#425]
 
 API Changes
 -----------
