@@ -51,6 +51,12 @@ class TestTextPixelRegion(BaseTestPixelRegion):
         assert reg_new.meta == self.reg.meta
         assert reg_new.visual == self.reg.visual
 
+        # test that converted region meta and visual are copies and not views
+        reg_new.meta['text'] = 'new'
+        reg_new.visual['color'] = 'green'
+        assert reg_new.meta['text'] != self.reg.meta['text']
+        assert reg_new.visual['color'] != self.reg.visual['color']
+
     def test_rotate(self):
         reg = self.reg.rotate(PixCoord(2, 3), 90 * u.deg)
         assert_allclose(reg.center.xy, (1, 4))

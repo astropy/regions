@@ -49,6 +49,12 @@ class TestPointPixelRegion(BaseTestPixelRegion):
         assert reg_new.meta == self.reg.meta
         assert reg_new.visual == self.reg.visual
 
+        # test that converted region meta and visual are copies and not views
+        reg_new.meta['text'] = 'new'
+        reg_new.visual['color'] = 'green'
+        assert reg_new.meta['text'] != self.reg.meta['text']
+        assert reg_new.visual['color'] != self.reg.visual['color']
+
     @pytest.mark.skipif('not HAS_MATPLOTLIB')
     def test_as_artist(self):
         artist = self.reg.as_artist()
