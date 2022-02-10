@@ -269,12 +269,12 @@ class AsymmetricAnnulusPixelRegion(AnnulusPixelRegion):
         center = pixel_to_skycoord(self.center.x, self.center.y, wcs)
         _, pixscale, north_angle = pixel_scale_angle_at_skycoord(center, wcs)
         inner_width = (self.inner_width * u.pix * pixscale).to(u.arcsec)
-        inner_height = (self.inner_height * u.pix * pixscale).to(u.arcsec)
         outer_width = (self.outer_width * u.pix * pixscale).to(u.arcsec)
+        inner_height = (self.inner_height * u.pix * pixscale).to(u.arcsec)
         outer_height = (self.outer_height * u.pix * pixscale).to(u.arcsec)
         angle = self.angle - (north_angle - 90 * u.deg)
 
-        return (center, inner_width, inner_height, outer_width, outer_height,
+        return (center, inner_width, outer_width, inner_height, outer_height,
                 angle)
 
 
@@ -338,12 +338,12 @@ class AsymmetricAnnulusSkyRegion(SkyRegion):
             self.center, wcs)
         center = PixCoord(center.x, center.y)
         inner_width = (self.inner_width / pixscale).to(u.pix).value
-        inner_height = (self.inner_height / pixscale).to(u.pix).value
         outer_width = (self.outer_width / pixscale).to(u.pix).value
+        inner_height = (self.inner_height / pixscale).to(u.pix).value
         outer_height = (self.outer_height / pixscale).to(u.pix).value
         angle = self.angle + (north_angle - 90 * u.deg)
 
-        return (center, inner_width, inner_height, outer_width, outer_height,
+        return (center, inner_width, outer_width, inner_height, outer_height,
                 angle)
 
 
