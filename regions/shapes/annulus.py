@@ -136,6 +136,9 @@ class CircleAnnulusPixelRegion(AnnulusPixelRegion):
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
 
+        if inner_radius >= outer_radius:
+            raise ValueError('outer_radius must be greater than inner_radius')
+
     @property
     def _inner_region(self):
         return self._component_class(self.center, self.inner_radius,
@@ -186,6 +189,9 @@ class CircleAnnulusSkyRegion(SkyRegion):
         self.outer_radius = outer_radius
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
+
+        if inner_radius >= outer_radius:
+            raise ValueError('outer_radius must be greater than inner_radius')
 
     def to_pixel(self, wcs):
         center, pixscale, _ = pixel_scale_angle_at_skycoord(self.center, wcs)
@@ -241,6 +247,11 @@ class AsymmetricAnnulusPixelRegion(AnnulusPixelRegion):
         self.angle = angle
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
+
+        if inner_width >= outer_width:
+            raise ValueError('outer_width must be greater than inner_width')
+        if inner_height >= outer_height:
+            raise ValueError('outer_height must be greater than inner_height')
 
     @property
     def _inner_region(self):
@@ -316,6 +327,11 @@ class AsymmetricAnnulusSkyRegion(SkyRegion):
         self.angle = angle
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
+
+        if inner_width >= outer_width:
+            raise ValueError('outer_width must be greater than inner_width')
+        if inner_height >= outer_height:
+            raise ValueError('outer_height must be greater than inner_height')
 
     def to_pixel_args(self, wcs):
         center, pixscale, north_angle = pixel_scale_angle_at_skycoord(
