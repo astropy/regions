@@ -62,7 +62,6 @@ def _parse_ds9(region_str):
     """
     # first parse the input string to generate the raw region data
     region_data = _parse_raw_data(region_str)
-    #return region_data
 
     # now parse the raw region data into region object(s)
     regions = []
@@ -70,7 +69,7 @@ def _parse_ds9(region_str):
         region = _make_region(region_data_)
         if region is not None:  # skip region if error during parsing
             regions.extend(region)
-    return regions
+    return Regions(regions)
 
 
 @dataclass
