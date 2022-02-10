@@ -16,14 +16,9 @@ from astropy.utils.exceptions import AstropyUserWarning
 
 from ....core import Regions
 from ....shapes.circle import CircleSkyRegion
+from ...._utils.optional_deps import HAS_MATPLOTLIB  # noqa
 from ..core import DS9RegionParserWarning
 from ..read import _DS9Parser
-
-try:
-    import matplotlib  # noqa
-    HAS_MATPLOTLIB = True
-except ImportError:
-    HAS_MATPLOTLIB = False
 
 
 def test_read():
