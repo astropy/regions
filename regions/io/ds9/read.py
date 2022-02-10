@@ -625,6 +625,11 @@ def _define_sky_params(shape, shape_params, frame):
     elif shape == 'line':
         params = [SkyCoord(*shape_params[0:2], frame=frame),
                   SkyCoord(*shape_params[2:4], frame=frame)]
+    elif shape in ('ellipse_annulus', 'rectangle_annulus'):
+        size_params = shape_params[2:-1]
+        tmp = [size_params[0::2], size_params[1::2]]
+        tmp_flat = [item for sublist in tmp for item in sublist]
+        params = [SkyCoord(*shape_params[0:2]), *tmp_flat, shape_params[-1]]
     else:
         params = ([SkyCoord(shape_params[0], shape_params[1],
                             frame=frame)] + shape_params[2:])
