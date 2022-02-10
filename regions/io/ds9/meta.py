@@ -76,9 +76,9 @@ def _translate_visual_metadata(shape, visual_meta):
     meta = visual_meta.copy()
 
     fill = meta.pop('fill', 0)
-    # fill=1 is supported in DS9 only for the circle, ellipse, and box
-    # shapes
-    if fill == 1 and shape in ('circle', 'ellipse', 'box'):
+    # fill=1 is supported in DS9 only for the circle, ellipse, box, and
+    # polygon shapes
+    if fill == 1 and shape in ('circle', 'ellipse', 'box', 'polygon'):
         meta['fill'] = True
 
     dash = meta.pop('dash', 0)
