@@ -4,12 +4,13 @@ This module defines a class for a rectangular bounding box.
 """
 
 from astropy.io.fits.util import _is_int
+from astropy.utils.decorators import deprecated
 import numpy as np
 
-__all__ = ['BoundingBox']
+__all__ = ['RegionBoundingBox', 'BoundingBox']
 
 
-class BoundingBox:
+class RegionBoundingBox:
     """
     A rectangular bounding box in integer (not float) pixel indices.
 
@@ -24,20 +25,20 @@ class BoundingBox:
 
     Examples
     --------
-    >>> from regions import BoundingBox
+    >>> from regions import RegionBoundingBox
 
-    >>> # constructing a BoundingBox like this is cryptic:
-    >>> bbox = BoundingBox(1, 10, 2, 20)
+    >>> # constructing a RegionBoundingBox like this is cryptic:
+    >>> bbox = RegionBoundingBox(1, 10, 2, 20)
 
     >>> # it's better to use keyword arguments for readability:
-    >>> bbox = BoundingBox(ixmin=1, ixmax=10, iymin=2, iymax=20)
+    >>> bbox = RegionBoundingBox(ixmin=1, ixmax=10, iymin=2, iymax=20)
     >>> bbox  # nice repr, useful for interactive work
-    BoundingBox(ixmin=1, ixmax=10, iymin=2, iymax=20)
+    RegionBoundingBox(ixmin=1, ixmax=10, iymin=2, iymax=20)
 
     >>> # sometimes it's useful to check if two bounding boxes are the same
-    >>> bbox == BoundingBox(ixmin=1, ixmax=10, iymin=2, iymax=20)
+    >>> bbox == RegionBoundingBox(ixmin=1, ixmax=10, iymin=2, iymax=20)
     True
-    >>> bbox == BoundingBox(ixmin=7, ixmax=10, iymin=2, iymax=20)
+    >>> bbox == RegionBoundingBox(ixmin=7, ixmax=10, iymin=2, iymax=20)
     False
 
     >>> # "center" and "shape" can be useful when working with numpy arrays
@@ -46,7 +47,8 @@ class BoundingBox:
     >>> bbox.shape  # numpy order: (y, x)
     (18, 9)
 
-    >>> # "extent" is useful when plotting the BoundingBox with matplotlib
+    >>> # "extent" is useful when plotting the RegionBoundingBox with
+    >>> # matplotlib
     >>> bbox.extent  # matplotlib order: (x, y)
     (0.5, 9.5, 1.5, 19.5)
     """
@@ -86,9 +88,9 @@ class BoundingBox:
         - pixel 1: from 0.5 to 1.5
         - pixel 2: from 1.5 to 2.5
 
-        In addition, because `BoundingBox` upper limits are exclusive
-        (by definition), 1 is added to the upper pixel edges.  See
-        examples below.
+        In addition, because `RegionBoundingBox` upper limits are
+        exclusive (by definition), 1 is added to the upper pixel edges.
+        See examples below.
 
         Parameters
         ----------
@@ -99,18 +101,20 @@ class BoundingBox:
 
         Returns
         -------
-        bbox : `BoundingBox` object
-            The minimal ``BoundingBox`` object fully containing the
-            input rectangle coordinates.
+        bbox : `RegionBoundingBox` object
+            The minimal ``RegionBoundingBox`` object fully containing
+            the input rectangle coordinates.
 
         Examples
         --------
-        >>> from regions import BoundingBox
-        >>> BoundingBox.from_float(xmin=1.0, xmax=10.0, ymin=2.0, ymax=20.0)
-        BoundingBox(ixmin=1, ixmax=11, iymin=2, iymax=21)
+        >>> from regions import RegionBoundingBox
+        >>> RegionBoundingBox.from_float(xmin=1.0, xmax=10.0,
+        ...                              ymin=2.0, ymax=20.0)
+        RegionBoundingBox(ixmin=1, ixmax=11, iymin=2, iymax=21)
 
-        >>> BoundingBox.from_float(xmin=1.4, xmax=10.4, ymin=1.6, ymax=10.6)
-        BoundingBox(ixmin=1, ixmax=11, iymin=2, iymax=12)
+        >>> RegionBoundingBox.from_float(xmin=1.4, xmax=10.4,
+        ...                              ymin=1.6, ymax=10.6)
+        RegionBoundingBox(ixmin=1, ixmax=11, iymin=2, iymax=12)
         """
         ixmin = int(np.floor(xmin + 0.5))
         ixmax = int(np.ceil(xmax + 0.5))
@@ -120,9 +124,9 @@ class BoundingBox:
         return cls(ixmin, ixmax, iymin, iymax)
 
     def __eq__(self, other):
-        if not isinstance(other, BoundingBox):
-            raise TypeError('Can compare BoundingBox only to another '
-                            'BoundingBox.')
+        if not isinstance(other, RegionBoundingBox):
+            raise TypeError('Can compare RegionBoundingBox only to another '
+                            'RegionBoundingBox.')
 
         return ((self.ixmin == other.ixmin)
                 and (self.ixmax == other.ixmax)
@@ -241,8 +245,8 @@ class BoundingBox:
 
             import numpy as np
             import matplotlib.pyplot as plt
-            from regions import BoundingBox
-            bbox = BoundingBox(2, 7, 3, 8)
+            from regions import RegionBoundingBox
+            bbox = RegionBoundingBox(2, 7, 3, 8)
             fig = plt.figure()
             ax = fig.add_subplot(1, 1, 1)
             rng = np.random.default_rng(0)
@@ -270,8 +274,8 @@ class BoundingBox:
 
     def plot(self, origin=(0, 0), ax=None, **kwargs):
         """
-        Plot the `BoundingBox` on a matplotlib `~matplotlib.axes.Axes`
-        instance.
+        Plot the `RegionBoundingBox` on a matplotlib
+        `~matplotlib.axes.Axes` instance.
 
         Parameters
         ----------
@@ -294,50 +298,51 @@ class BoundingBox:
 
     def union(self, other):
         """
-        Return a `BoundingBox` representing the union of this
-        `BoundingBox` with another `BoundingBox`.
+        Return a `RegionBoundingBox` representing the union of this
+        `RegionBoundingBox` with another `RegionBoundingBox`.
 
         Parameters
         ----------
-        other : `~regions.BoundingBox`
-            The `BoundingBox` to join with this one.
+        other : `~regions.RegionBoundingBox`
+            The `RegionBoundingBox` to join with this one.
 
         Returns
         -------
-        result : `~regions.BoundingBox`
-            A `BoundingBox` representing the union of the input
-            `BoundingBox` with this one.
+        result : `~regions.RegionBoundingBox`
+            A `RegionBoundingBox` representing the union of the input
+            `RegionBoundingBox` with this one.
         """
-        if not isinstance(other, BoundingBox):
-            raise TypeError('BoundingBox can be joined only with another '
-                            'BoundingBox.')
+        if not isinstance(other, RegionBoundingBox):
+            raise TypeError('RegionBoundingBox can be joined only with '
+                            'another RegionBoundingBox.')
 
         ixmin = min((self.ixmin, other.ixmin))
         ixmax = max((self.ixmax, other.ixmax))
         iymin = min((self.iymin, other.iymin))
         iymax = max((self.iymax, other.iymax))
 
-        return BoundingBox(ixmin=ixmin, ixmax=ixmax, iymin=iymin, iymax=iymax)
+        return RegionBoundingBox(ixmin=ixmin, ixmax=ixmax, iymin=iymin,
+                                 iymax=iymax)
 
     def intersection(self, other):
         """
-        Return a `BoundingBox` representing the intersection of this
-        `BoundingBox` with another `BoundingBox`.
+        Return a `RegionBoundingBox` representing the intersection of
+        this `RegionBoundingBox` with another `RegionBoundingBox`.
 
         Parameters
         ----------
-        other : `~regions.BoundingBox`
-            The `BoundingBox` to intersect with this one.
+        other : `~regions.RegionBoundingBox`
+            The `RegionBoundingBox` to intersect with this one.
 
         Returns
         -------
-        result : `~regions.BoundingBox`
-            A `BoundingBox` representing the intersection of the input
-            `BoundingBox` with this one.
+        result : `~regions.RegionBoundingBox`
+            A `RegionBoundingBox` representing the intersection of the
+            input `RegionBoundingBox` with this one.
         """
-        if not isinstance(other, BoundingBox):
-            raise TypeError('BoundingBox can be intersected only with '
-                            'another BoundingBox.')
+        if not isinstance(other, RegionBoundingBox):
+            raise TypeError('RegionBoundingBox can be intersected only with '
+                            'another RegionBoundingBox.')
 
         ixmin = max(self.ixmin, other.ixmin)
         ixmax = min(self.ixmax, other.ixmax)
@@ -346,4 +351,24 @@ class BoundingBox:
         if ixmax < ixmin or iymax < iymin:
             return None
 
-        return BoundingBox(ixmin=ixmin, ixmax=ixmax, iymin=iymin, iymax=iymax)
+        return RegionBoundingBox(ixmin=ixmin, ixmax=ixmax, iymin=iymin,
+                                 iymax=iymax)
+
+
+@deprecated('0.6', alternative='`RegionBoundingBox`')
+class BoundingBox(RegionBoundingBox):
+    """
+    A rectangular bounding box in integer (not float) pixel indices.
+
+    Parameters
+    ----------
+    ixmin, ixmax, iymin, iymax : int
+        The bounding box pixel indices.  Note that the upper values
+        (``iymax`` and ``ixmax``) are exclusive as for normal slices in
+        Python.  The lower values (``ixmin`` and ``iymin``) must not be
+        greater than the respective upper values (``ixmax`` and
+        ``iymax``).
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)

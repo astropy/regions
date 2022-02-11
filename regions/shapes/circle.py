@@ -12,7 +12,7 @@ import numpy as np
 
 from ..core.attributes import (ScalarPix, ScalarLength, QuantityLength,
                                ScalarSky)
-from ..core.bounding_box import BoundingBox
+from ..core.bounding_box import RegionBoundingBox
 from ..core.core import PixelRegion, SkyRegion
 from ..core.mask import RegionMask
 from ..core.metadata import RegionMeta, RegionVisual
@@ -95,13 +95,13 @@ class CirclePixelRegion(PixelRegion):
 
     @property
     def bounding_box(self):
-        """Bounding box (`~regions.BoundingBox`)."""
+        """Bounding box (`~regions.RegionBoundingBox`)."""
         xmin = self.center.x - self.radius
         xmax = self.center.x + self.radius
         ymin = self.center.y - self.radius
         ymax = self.center.y + self.radius
 
-        return BoundingBox.from_float(xmin, xmax, ymin, ymax)
+        return RegionBoundingBox.from_float(xmin, xmax, ymin, ymax)
 
     def to_mask(self, mode='center', subpixels=1):
         self._validate_mode(mode, subpixels)

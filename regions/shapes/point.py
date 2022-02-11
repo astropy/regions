@@ -7,7 +7,7 @@ from astropy.wcs.utils import pixel_to_skycoord, skycoord_to_pixel
 import numpy as np
 
 from ..core.attributes import ScalarPix, ScalarSky
-from ..core.bounding_box import BoundingBox
+from ..core.bounding_box import RegionBoundingBox
 from ..core.core import PixelRegion, SkyRegion
 from ..core.metadata import RegionMeta, RegionVisual
 from ..core.pixcoord import PixCoord
@@ -92,8 +92,8 @@ class PointPixelRegion(PixelRegion):
 
     @property
     def bounding_box(self):
-        return BoundingBox.from_float(self.center.x, self.center.x,
-                                      self.center.y, self.center.y)
+        return RegionBoundingBox.from_float(self.center.x, self.center.x,
+                                            self.center.y, self.center.y)
 
     def to_mask(self, mode='center', subpixels=5):
         # TODO: needs to be implemented

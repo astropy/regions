@@ -8,7 +8,7 @@ import numpy as np
 from numpy.testing import assert_allclose, assert_almost_equal
 import pytest
 
-from ..bounding_box import BoundingBox
+from ..bounding_box import RegionBoundingBox
 from ..mask import RegionMask
 from ..pixcoord import PixCoord
 from ...shapes import CirclePixelRegion, CircleAnnulusPixelRegion
@@ -19,13 +19,13 @@ POSITIONS = [(-20, -20), (-20, 20), (20, -20), (60, 60)]
 def test_mask_input_shapes():
     with pytest.raises(ValueError):
         mask_data = np.ones((10, 10))
-        bbox = BoundingBox(5, 10, 5, 10)
+        bbox = RegionBoundingBox(5, 10, 5, 10)
         RegionMask(mask_data, bbox)
 
 
 def test_mask_array():
     mask_data = np.ones((10, 10))
-    bbox = BoundingBox(5, 15, 5, 15)
+    bbox = RegionBoundingBox(5, 15, 5, 15)
     mask = RegionMask(mask_data, bbox)
     data = np.array(mask)
     assert_allclose(data, mask.data)
@@ -41,7 +41,7 @@ def test_mask_get_overlap_slices():
 
 def test_mask_cutout_shape():
     mask_data = np.ones((10, 10))
-    bbox = BoundingBox(5, 15, 5, 15)
+    bbox = RegionBoundingBox(5, 15, 5, 15)
     mask = RegionMask(mask_data, bbox)
 
     with pytest.raises(ValueError):

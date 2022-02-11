@@ -95,11 +95,11 @@ As we've seen above, the :class:`~regions.RegionMask` object has a
 ``data`` attribute that contains a Numpy array with the mask values.
 However, if you have, for example, a small circluar region with a radius
 of 3 pixels at a pixel position of (1000, 1000), it would be inefficient
-to store a large mask array that has a size to cover this position
-(most of the mask values would be zero). Instead, we store the mask
-using the minimal array that contains the region mask along with a
-``bbox`` attribute that is a :class:`~regions.BoundingBox` object used
-to indicate where the mask should be applied in an image.
+to store a large mask array that has a size to cover this position (most
+of the mask values would be zero). Instead, we store the mask using
+the minimal array that contains the region mask along with a ``bbox``
+attribute that is a :class:`~regions.RegionBoundingBox` object used to
+indicate where the mask should be applied in an image.
 
 
 Defining a region mask within an image
@@ -287,12 +287,12 @@ the selector.
 We first create an :class:`~regions.EllipsePixelRegion` and add an ``as_mpl_selector``
 property linked to the Matplotlib axes. This can be moved around to
 position it on different sources, and resized just like its Rectangle
-counterpart, using the handles of the bounding box. 
+counterpart, using the handles of the bounding box.
 
 The user-defined callback function here generates a mask from this region and overlays
 it on the image as an alpha filter (keeping the areas outside shaded).
 We will use this mask as an aperture as well to calculate integrated
-and averaged flux, which is updated live in the text field of the plot as well. 
+and averaged flux, which is updated live in the text field of the plot as well.
 
 .. plot::
    :context:
