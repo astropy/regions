@@ -65,6 +65,9 @@ API Changes
   set to 'mpl' or None, then the matplotlib defaults will be used, with
   the exception that fill is turned off for Patch and Line2D artists.
 
+- Renamed the ``BoundingBox`` class to ``RegionBoundingBox``. The old
+  name is deprecated. [#427]
+
 
 0.5 (2021-07-20)
 ================
