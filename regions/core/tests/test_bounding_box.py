@@ -9,12 +9,7 @@ import pytest
 from ..bounding_box import BoundingBox
 from ..pixcoord import PixCoord
 from ...shapes import RectanglePixelRegion
-
-try:
-    import matplotlib  # noqa
-    HAS_MATPLOTLIB = True
-except ImportError:
-    HAS_MATPLOTLIB = False
+from ..._utils.optional_deps import HAS_MATPLOTLIB  # noqa
 
 
 def test_bounding_box_init():

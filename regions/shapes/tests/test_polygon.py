@@ -12,10 +12,10 @@ from astropy.tests.helper import assert_quantity_allclose
 from ...core import PixCoord, RegionMeta, RegionVisual, BoundingBox
 from ...tests.helpers import make_simple_wcs
 from ..._utils.examples import make_example_dataset
+from ..._utils.optional_deps import HAS_MATPLOTLIB  # noqa
 from ..polygon import (PolygonPixelRegion, RegularPolygonPixelRegion,
                        PolygonSkyRegion)
 from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
-from ..utils import HAS_MATPLOTLIB  # noqa
 
 
 @pytest.fixture(scope='session', name='wcs')

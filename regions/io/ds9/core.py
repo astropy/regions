@@ -2,11 +2,7 @@
 
 from astropy.utils.exceptions import AstropyUserWarning
 
-try:
-    import matplotlib  # noqa
-    HAS_MATPLOTLIB = True
-except ImportError:
-    HAS_MATPLOTLIB = False
+from ..._utils.optional_deps import HAS_MATPLOTLIB
 
 __all__ = ['DS9RegionParserWarning', 'DS9RegionParserError']
 
