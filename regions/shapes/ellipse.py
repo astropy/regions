@@ -12,7 +12,7 @@ import numpy as np
 
 from ..core.attributes import (ScalarPix, ScalarLength, QuantityLength,
                                ScalarSky)
-from ..core.bounding_box import BoundingBox
+from ..core.bounding_box import RegionBoundingBox
 from ..core.core import PixelRegion, SkyRegion
 from ..core.mask import RegionMask
 from ..core.metadata import RegionMeta, RegionVisual
@@ -122,8 +122,8 @@ class EllipsePixelRegion(PixelRegion):
     @property
     def bounding_box(self):
         """
-        The minimal bounding box (`~regions.BoundingBox`) enclosing the
-        exact elliptical region.
+        The minimal bounding box (`~regions.RegionBoundingBox`)
+        enclosing the exact elliptical region.
         """
         # We use the solution described in
         # https://stackoverflow.com/a/14163413
@@ -141,7 +141,7 @@ class EllipsePixelRegion(PixelRegion):
         ymin = self.center.y - dy
         ymax = self.center.y + dy
 
-        return BoundingBox.from_float(xmin, xmax, ymin, ymax)
+        return RegionBoundingBox.from_float(xmin, xmax, ymin, ymax)
 
     def to_mask(self, mode='center', subpixels=5):
         # NOTE: assumes this class represents a single circle

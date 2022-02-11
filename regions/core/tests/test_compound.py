@@ -11,7 +11,7 @@ import astropy.units as u
 from astropy.coordinates import SkyCoord
 
 from ...shapes import CircleSkyRegion, CirclePixelRegion
-from ...core import PixCoord, BoundingBox, CompoundPixelRegion
+from ...core import PixCoord, RegionBoundingBox, CompoundPixelRegion
 from ...tests.helpers import make_simple_wcs
 
 
@@ -108,7 +108,7 @@ class TestCompoundPixel:
 
     def test_bounding_box(self):
         bbox = (self.c1 | self.c2).bounding_box
-        assert bbox == BoundingBox(1, 16, 1, 10)
+        assert bbox == RegionBoundingBox(1, 16, 1, 10)
 
 
 def test_compound_sky():

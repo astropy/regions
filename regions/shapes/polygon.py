@@ -9,7 +9,7 @@ import numpy as np
 
 from ..core.attributes import (OneDPix, OneDSky, ScalarPix, ScalarLength,
                                QuantityLength)
-from ..core.bounding_box import BoundingBox
+from ..core.bounding_box import RegionBoundingBox
 from ..core.core import PixelRegion, SkyRegion
 from ..core.mask import RegionMask
 from ..core.metadata import RegionMeta, RegionVisual
@@ -112,7 +112,7 @@ class PolygonPixelRegion(PixelRegion):
         xmax = self.vertices.x.max()
         ymin = self.vertices.y.min()
         ymax = self.vertices.y.max()
-        return BoundingBox.from_float(xmin, xmax, ymin, ymax)
+        return RegionBoundingBox.from_float(xmin, xmax, ymin, ymax)
 
     def to_mask(self, mode='center', subpixels=5):
         self._validate_mode(mode, subpixels)

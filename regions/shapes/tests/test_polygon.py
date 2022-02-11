@@ -9,7 +9,7 @@ from astropy.coordinates import SkyCoord
 import astropy.units as u
 from astropy.tests.helper import assert_quantity_allclose
 
-from ...core import PixCoord, RegionMeta, RegionVisual, BoundingBox
+from ...core import PixCoord, RegionMeta, RegionVisual, RegionBoundingBox
 from ...tests.helpers import make_simple_wcs
 from ..._utils.examples import make_example_dataset
 from ..._utils.optional_deps import HAS_MATPLOTLIB  # noqa
@@ -71,7 +71,7 @@ class TestPolygonPixelRegion(BaseTestPixelRegion):
 
     def test_bounding_box(self):
         bbox = self.reg.bounding_box
-        assert bbox == BoundingBox(ixmin=1, ixmax=4, iymin=1, iymax=5)
+        assert bbox == RegionBoundingBox(ixmin=1, ixmax=4, iymin=1, iymax=5)
 
     def test_to_mask(self):
         # The true area of this polygon is 3
@@ -85,7 +85,8 @@ class TestPolygonPixelRegion(BaseTestPixelRegion):
         # so we only assert on it once here, not in the other cases below
         mask = self.reg.to_mask(mode='center', subpixels=1)
         assert 2 <= np.sum(mask.data) <= 6
-        assert mask.bbox == BoundingBox(ixmin=1, ixmax=4, iymin=1, iymax=5)
+        assert mask.bbox == RegionBoundingBox(ixmin=1, ixmax=4, iymin=1,
+                                              iymax=5)
         assert mask.data.shape == (4, 3)
 
         # Test more cases for to_mask
@@ -211,7 +212,8 @@ class TestRegionPolygonPixelRegion(BaseTestPixelRegion):
 
     def test_bounding_box(self):
         bbox = self.reg.bounding_box
-        assert bbox == BoundingBox(ixmin=31, ixmax=70, iymin=31, iymax=70)
+        assert bbox == RegionBoundingBox(ixmin=31, ixmax=70, iymin=31,
+                                         iymax=70)
 
     def test_to_mask(self):
         # The true area of this polygon is 3
@@ -225,8 +227,8 @@ class TestRegionPolygonPixelRegion(BaseTestPixelRegion):
         # so we only assert on it once here, not in the other cases below
         mask = self.reg.to_mask(mode='center', subpixels=1)
         assert 1130 <= np.sum(mask.data) <= 1135
-        assert mask.bbox == BoundingBox(ixmin=31, ixmax=70, iymin=31,
-                                        iymax=70)
+        assert mask.bbox == RegionBoundingBox(ixmin=31, ixmax=70, iymin=31,
+                                              iymax=70)
         assert mask.data.shape == (39, 39)
 
         # Test more cases for to_mask

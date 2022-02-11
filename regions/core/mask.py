@@ -22,7 +22,7 @@ class RegionMask:
         truncated) array that is the direct output of one of the
         low-level "geometry" functions.
 
-    bbox : `regions.BoundingBox`
+    bbox : `regions.RegionBoundingBox`
         The bounding box object defining the region minimal bounding
         box.
 

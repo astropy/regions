@@ -7,7 +7,7 @@ from astropy.wcs.utils import pixel_to_skycoord, skycoord_to_pixel
 import numpy as np
 
 from ..core.attributes import ScalarPix, ScalarSky
-from ..core.bounding_box import BoundingBox
+from ..core.bounding_box import RegionBoundingBox
 from ..core.core import PixelRegion, SkyRegion
 from ..core.metadata import RegionMeta, RegionVisual
 from ..core.pixcoord import PixCoord
@@ -94,7 +94,7 @@ class LinePixelRegion(PixelRegion):
         ymin = min(self.start.y, self.end.y)
         ymax = max(self.start.y, self.end.y)
 
-        return BoundingBox.from_float(xmin, xmax, ymin, ymax)
+        return RegionBoundingBox.from_float(xmin, xmax, ymin, ymax)
 
     def to_mask(self, mode='center', subpixels=5):
         # TODO: needs to be implemented
