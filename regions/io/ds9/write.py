@@ -174,10 +174,12 @@ def _get_region_params(region, shape_template, precision=8):
                 value = value_str[:-1]
 
         elif isinstance(value, SkyCoord):
-            value = value.to_string(precision=precision)
+            val = value.to_string(precision=precision)
             # polygon region has multiple SkyCoord
             if not value.isscalar:
-                value = ' '.join(value)
+                value = ' '.join(val)
+            else:
+                value = val
             value = value.replace(' ', ',')
 
         elif isinstance(value, Angle):
