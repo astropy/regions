@@ -57,10 +57,14 @@ def _serialize_ds9(regions, precision=8):
 
     # add line for each region
     for region, region_meta in zip(region_data, metadata):
-        meta_str = _make_meta_str(region_meta)
         if global_frame is None:
             output += f'{region["frame"]}; '
-        output += f'{region["region"]} # {meta_str}\n'
+
+        meta_str = _make_meta_str(region_meta)
+        if meta_str:
+            meta_str = f' # {meta_str}'
+
+        output += f'{region["region"]}{meta_str}\n'
 
     return output
 
@@ -230,8 +234,12 @@ def _translate_ds9_meta(region, shape):
     marker = meta.pop('marker', None)
     if marker is not None:
         symbol_map = {y: x for x, y in ds9_valid_symbols.items()}
-        markersize = meta.pop('markersize', 11)  # default 11
-        meta['point'] = f'{symbol_map[marker]} {markersize}'
+        if marker in symbol_map:
+            markersize = meta.pop('markersize', 11)  # default 11
+            meta['point'] = f'{symbol_map[marker]} {markersize}'
+        else:
+            warnings.warn(f'Unable to serialize marker "{marker}"',
+                          AstropyUserWarning)
 
     fontname = meta.pop('fontname', None)
     if fontname is not None:

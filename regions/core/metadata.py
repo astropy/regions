@@ -156,8 +156,7 @@ class RegionVisual(Meta):
                       'textangle': 'rotation'}
 
         elif artist == 'Line2D':
-            keymap = {'symbol': 'marker',
-                      'symsize': 'markersize',
+            keymap = {'symsize': 'markersize',
                       'color': 'markeredgecolor',
                       'linewidth': 'markeredgewidth',
                       'fill': 'fillstyle'}
