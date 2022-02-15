@@ -57,7 +57,7 @@ class ScalarPixCoord(RegionAttribute):
 
     def _validate(self, value):
         if not (isinstance(value, PixCoord) and value.isscalar):
-            raise ValueError(f'The {self.name} must be a scalar PixCoord')
+            raise ValueError(f'{self.name!r} must be a scalar PixCoord')
 
 
 class OneDPixCoord(RegionAttribute):
@@ -68,7 +68,7 @@ class OneDPixCoord(RegionAttribute):
     def _validate(self, value):
         if not (isinstance(value, PixCoord) and not value.isscalar
                 and value.x.ndim == 1):
-            raise ValueError(f'The {self.name} must be a 1D PixCoord')
+            raise ValueError(f'{self.name!r} must be a 1D PixCoord')
 
 
 class PositiveScalar(RegionAttribute):
@@ -79,7 +79,7 @@ class PositiveScalar(RegionAttribute):
 
     def _validate(self, value):
         if not np.isscalar(value) or value <= 0:
-            raise ValueError(f'{self.name} must be a positive scalar')
+            raise ValueError(f'{self.name!r} must be a positive scalar')
 
 
 class ScalarSkyCoord(RegionAttribute):
@@ -90,7 +90,7 @@ class ScalarSkyCoord(RegionAttribute):
 
     def _validate(self, value):
         if not (isinstance(value, SkyCoord) and value.isscalar):
-            raise ValueError(f'The {self.name} must be a scalar SkyCoord')
+            raise ValueError(f'{self.name!r} must be a scalar SkyCoord')
 
 
 class OneDSkyCoord(RegionAttribute):
@@ -101,7 +101,7 @@ class OneDSkyCoord(RegionAttribute):
 
     def _validate(self, value):
         if not (isinstance(value, SkyCoord) and value.ndim == 1):
-            raise ValueError(f'The {self.name} must be a 1D SkyCoord')
+            raise ValueError(f'{self.name!r} must be a 1D SkyCoord')
 
 
 class ScalarAngle(RegionAttribute):
@@ -113,12 +113,12 @@ class ScalarAngle(RegionAttribute):
     def _validate(self, value):
         if isinstance(value, Quantity):
             if not value.isscalar:
-                raise ValueError(f'{self.name} must be a scalar')
+                raise ValueError(f'{self.name!r} must be a scalar')
 
             if not value.unit.physical_type == 'angle':
-                raise ValueError(f'{self.name} must have angular units')
+                raise ValueError(f'{self.name!r} must have angular units')
         else:
-            raise ValueError(f'{self.name} must be a scalar angle')
+            raise ValueError(f'{self.name!r} must be a scalar angle')
 
 
 class PositiveScalarAngle(RegionAttribute):
@@ -130,15 +130,15 @@ class PositiveScalarAngle(RegionAttribute):
     def _validate(self, value):
         if isinstance(value, Quantity):
             if not value.isscalar:
-                raise ValueError(f'{self.name} must be a scalar')
+                raise ValueError(f'{self.name!r} must be a scalar')
 
             if not value.unit.physical_type == 'angle':
-                raise ValueError(f'{self.name} must have angular units')
+                raise ValueError(f'{self.name!r} must have angular units')
 
             if not value > 0:
-                raise ValueError(f'{self.name} must be strictly positive')
+                raise ValueError(f'{self.name!r} must be strictly positive')
         else:
-            raise ValueError(f'{self.name} must be a positive scalar angle')
+            raise ValueError(f'{self.name!r} must be a positive scalar angle')
 
 
 class RegionType(RegionAttribute):
@@ -152,5 +152,5 @@ class RegionType(RegionAttribute):
 
     def _validate(self, value):
         if not isinstance(value, self.regionclass):
-            raise ValueError(f'The {self.name} must be a '
+            raise ValueError(f'{self.name!r} must be a '
                              f'{self.regionclass.__name__} object')
