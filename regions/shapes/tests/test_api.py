@@ -138,7 +138,7 @@ def test_attribute_validation_pixel_regions(region):
             for val in invalid_values.get(attr, None):
                 with pytest.raises(ValueError) as excinfo:
                     setattr(region, attr, val)
-                assert f'The {attr} must be' in str(excinfo.value)
+                assert f'{attr!r} must' in str(excinfo.value)
 
 
 @pytest.mark.parametrize('region', SKY_REGIONS, ids=ids_func)
@@ -170,4 +170,4 @@ def test_attribute_validation_sky_regions(region):
             for val in invalid_values.get(attr, None):
                 with pytest.raises(ValueError) as excinfo:
                     setattr(region, attr, val)
-                assert f'The {attr} must be' in str(excinfo.value)
+                assert f'{attr!r} must' in str(excinfo.value)
