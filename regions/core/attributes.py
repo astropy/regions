@@ -15,7 +15,7 @@ from .pixcoord import PixCoord
 __all__ = []
 
 
-class RegionAttr(abc.ABC):
+class RegionAttribute(abc.ABC):
     """
     Base descriptor class for region attribute validation.
     """
@@ -45,7 +45,7 @@ class RegionAttr(abc.ABC):
         pass
 
 
-class ScalarPix(RegionAttr):
+class ScalarPix(RegionAttribute):
     """
     Descriptor class for `~regions.PixelRegion`, which takes a scalar
     `~regions.PixCoord` object.
@@ -57,7 +57,7 @@ class ScalarPix(RegionAttr):
                              'object')
 
 
-class OneDPix(RegionAttr):
+class OneDPix(RegionAttribute):
     """
     Descriptor class for `~regions.PixelRegion`, which takes a
     one-dimensional `regions.PixCoord` object.
@@ -69,19 +69,18 @@ class OneDPix(RegionAttr):
             raise ValueError(f'The {self.name} must be a 1D PixCoord object')
 
 
-class ScalarLength(RegionAttr):
+class PositiveScalar(RegionAttribute):
     """
-    Descriptor class for `~regions.PixelRegion`, which takes a scalar
-    python/numpy number.
+    Descriptor class to check that value is a strictly positive (> 0)
+    scalar.
     """
 
     def _validate(self, value):
-        if not np.isscalar(value):
-            raise ValueError(
-                f'The {self.name} must be a scalar numpy/python number')
+        if not np.isscalar(value) or value <= 0:
+            raise ValueError(f'{self.name} must be a positive scalar')
 
 
-class ScalarSky(RegionAttr):
+class ScalarSky(RegionAttribute):
     """
     Descriptor class for `~regions.SkyRegion`, which takes a scalar
     `~astropy.coordinates.SkyCoord` object.
@@ -93,7 +92,7 @@ class ScalarSky(RegionAttr):
                              'object')
 
 
-class OneDSky(RegionAttr):
+class OneDSky(RegionAttribute):
     """
     Descriptor class for `~regions.SkyRegion`, which takes a
     one-dimensional `~astropy.coordinates.SkyCoord` object.
@@ -104,7 +103,7 @@ class OneDSky(RegionAttr):
             raise ValueError(f'The {self.name} must be a 1D SkyCoord object')
 
 
-class QuantityLength(RegionAttr):
+class QuantityLength(RegionAttribute):
     """
     Descriptor class for `~regions.SkyRegion`, which takes a scalar
     `~astropy.units.Quantity` object.
@@ -116,7 +115,7 @@ class QuantityLength(RegionAttr):
                              'Quantity object')
 
 
-class RegionType(RegionAttr):
+class RegionType(RegionAttribute):
     """
     Descriptor class for compound pixel and sky regions.
     """

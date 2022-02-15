@@ -8,7 +8,7 @@ import astropy.units as u
 from astropy.wcs.utils import pixel_to_skycoord
 import numpy as np
 
-from ..core.attributes import (ScalarPix, ScalarLength, QuantityLength,
+from ..core.attributes import (ScalarPix, PositiveScalar, QuantityLength,
                                ScalarSky)
 from ..core.bounding_box import RegionBoundingBox
 from ..core.core import PixelRegion, SkyRegion
@@ -73,8 +73,8 @@ class RectanglePixelRegion(PixelRegion):
 
     _params = ('center', 'width', 'height', 'angle')
     center = ScalarPix('center')
-    width = ScalarLength('width')
-    height = ScalarLength('height')
+    width = PositiveScalar('width')
+    height = PositiveScalar('height')
     angle = QuantityLength('angle')
     mpl_artist = 'Patch'
 
