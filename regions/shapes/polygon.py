@@ -8,7 +8,7 @@ from astropy.wcs.utils import pixel_to_skycoord, skycoord_to_pixel
 import numpy as np
 
 from ..core.attributes import (OneDPixCoord, ScalarPixCoord, PositiveScalar,
-                               ScalarAngle, OneDSky)
+                               ScalarAngle, OneDSkyCoord)
 from ..core.bounding_box import RegionBoundingBox
 from ..core.core import PixelRegion, SkyRegion
 from ..core.mask import RegionMask
@@ -353,7 +353,7 @@ class PolygonSkyRegion(SkyRegion):
     """
 
     _params = ('vertices',)
-    vertices = OneDSky('vertices')
+    vertices = OneDSkyCoord('vertices')
 
     def __init__(self, vertices, meta=None, visual=None):
         self.vertices = vertices

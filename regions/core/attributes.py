@@ -82,27 +82,26 @@ class PositiveScalar(RegionAttribute):
             raise ValueError(f'{self.name} must be a positive scalar')
 
 
-class ScalarSky(RegionAttribute):
+class ScalarSkyCoord(RegionAttribute):
     """
-    Descriptor class for `~regions.SkyRegion`, which takes a scalar
-    `~astropy.coordinates.SkyCoord` object.
+    Descriptor class to check that value is a scalar
+    `~astropy.coordinates.SkyCoord`.
     """
 
     def _validate(self, value):
         if not (isinstance(value, SkyCoord) and value.isscalar):
-            raise ValueError(f'The {self.name} must be a scalar SkyCoord '
-                             'object')
+            raise ValueError(f'The {self.name} must be a scalar SkyCoord')
 
 
-class OneDSky(RegionAttribute):
+class OneDSkyCoord(RegionAttribute):
     """
-    Descriptor class for `~regions.SkyRegion`, which takes a
-    one-dimensional `~astropy.coordinates.SkyCoord` object.
+    Descriptor class to check that value is a 1D
+    `~astropy.coordinates.SkyCoord`.
     """
 
     def _validate(self, value):
         if not (isinstance(value, SkyCoord) and value.ndim == 1):
-            raise ValueError(f'The {self.name} must be a 1D SkyCoord object')
+            raise ValueError(f'The {self.name} must be a 1D SkyCoord')
 
 
 class ScalarAngle(RegionAttribute):

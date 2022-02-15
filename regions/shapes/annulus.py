@@ -10,7 +10,8 @@ import astropy.units as u
 from astropy.wcs.utils import pixel_to_skycoord
 
 from ..core.attributes import (ScalarPixCoord, PositiveScalar,
-                               PositiveScalarAngle, ScalarAngle, ScalarSky)
+                               PositiveScalarAngle, ScalarAngle,
+                               ScalarSkyCoord)
 from ..core.compound import CompoundPixelRegion
 from ..core.core import PixelRegion, SkyRegion
 from ..core.metadata import RegionMeta, RegionVisual
@@ -178,7 +179,7 @@ class CircleAnnulusSkyRegion(SkyRegion):
     """
 
     _params = ('center', 'inner_radius', 'outer_radius')
-    center = ScalarSky('center')
+    center = ScalarSkyCoord('center')
     inner_radius = PositiveScalarAngle('inner_radius')
     outer_radius = PositiveScalarAngle('outer_radius')
 
@@ -310,7 +311,7 @@ class AsymmetricAnnulusSkyRegion(SkyRegion):
     _params = ('center', 'inner_width', 'outer_width', 'inner_height',
                'outer_height', 'angle')
 
-    center = ScalarSky('center')
+    center = ScalarSkyCoord('center')
     inner_width = PositiveScalarAngle('inner_width')
     outer_width = PositiveScalarAngle('outer_width')
     inner_height = PositiveScalarAngle('inner_height')

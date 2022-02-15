@@ -9,7 +9,8 @@ from astropy.wcs.utils import pixel_to_skycoord
 import numpy as np
 
 from ..core.attributes import (ScalarPixCoord, PositiveScalar,
-                               PositiveScalarAngle, ScalarAngle, ScalarSky)
+                               PositiveScalarAngle, ScalarAngle,
+                               ScalarSkyCoord)
 from ..core.bounding_box import RegionBoundingBox
 from ..core.core import PixelRegion, SkyRegion
 from ..core.mask import RegionMask
@@ -388,7 +389,7 @@ class RectangleSkyRegion(SkyRegion):
     """
 
     _params = ('center', 'width', 'height', 'angle')
-    center = ScalarSky('center')
+    center = ScalarSkyCoord('center')
     width = PositiveScalarAngle('width')
     height = PositiveScalarAngle('height')
     angle = ScalarAngle('angle')
