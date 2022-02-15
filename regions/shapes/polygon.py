@@ -7,8 +7,8 @@ import astropy.units as u
 from astropy.wcs.utils import pixel_to_skycoord, skycoord_to_pixel
 import numpy as np
 
-from ..core.attributes import (OneDPix, OneDSky, ScalarPix, PositiveScalar,
-                               ScalarAngle)
+from ..core.attributes import (OneDPixCoord, ScalarPixCoord, PositiveScalar,
+                               ScalarAngle, OneDSky)
 from ..core.bounding_box import RegionBoundingBox
 from ..core.core import PixelRegion, SkyRegion
 from ..core.mask import RegionMask
@@ -61,7 +61,7 @@ class PolygonPixelRegion(PixelRegion):
     """
 
     _params = ('vertices',)
-    vertices = OneDPix('vertices')
+    vertices = OneDPixCoord('vertices')
     mpl_artist = 'Patch'
 
     def __init__(self, vertices, meta=None, visual=None,
@@ -282,7 +282,7 @@ class RegularPolygonPixelRegion(PolygonPixelRegion):
     """
 
     _params = ('center', 'nvertices', 'radius', 'angle')
-    center = ScalarPix('center')
+    center = ScalarPixCoord('center')
     nvertices = PositiveScalar('nvertices')
     radius = PositiveScalar('radius')
     angle = ScalarAngle('angle')

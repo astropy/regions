@@ -10,8 +10,8 @@ import astropy.units as u
 from astropy.wcs.utils import pixel_to_skycoord
 import numpy as np
 
-from ..core.attributes import (ScalarPix, PositiveScalar, PositiveScalarAngle,
-                               ScalarAngle, ScalarSky)
+from ..core.attributes import (ScalarPixCoord, PositiveScalar,
+                               PositiveScalarAngle, ScalarAngle, ScalarSky)
 from ..core.bounding_box import RegionBoundingBox
 from ..core.core import PixelRegion, SkyRegion
 from ..core.mask import RegionMask
@@ -74,7 +74,7 @@ class EllipsePixelRegion(PixelRegion):
     """
 
     _params = ('center', 'width', 'height', 'angle')
-    center = ScalarPix('center')
+    center = ScalarPixCoord('center')
     width = PositiveScalar('width')
     height = PositiveScalar('height')
     angle = ScalarAngle('angle')

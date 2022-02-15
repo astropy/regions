@@ -18,6 +18,11 @@ __all__ = []
 class RegionAttribute(abc.ABC):
     """
     Base descriptor class for region attribute validation.
+
+    Parameters
+    ----------
+    name : str
+        The name of the attribute.
     """
 
     def __init__(self, name):
@@ -42,31 +47,28 @@ class RegionAttribute(abc.ABC):
 
         An exception is raised if the value is invalid.
         """
-        pass
+        raise NotImplementedError
 
 
-class ScalarPix(RegionAttribute):
+class ScalarPixCoord(RegionAttribute):
     """
-    Descriptor class for `~regions.PixelRegion`, which takes a scalar
-    `~regions.PixCoord` object.
+    Descriptor class to check that value is a scalar `~regions.PixCoord`.
     """
 
     def _validate(self, value):
         if not (isinstance(value, PixCoord) and value.isscalar):
-            raise ValueError(f'The {self.name} must be a scalar PixCoord '
-                             'object')
+            raise ValueError(f'The {self.name} must be a scalar PixCoord')
 
 
-class OneDPix(RegionAttribute):
+class OneDPixCoord(RegionAttribute):
     """
-    Descriptor class for `~regions.PixelRegion`, which takes a
-    one-dimensional `regions.PixCoord` object.
+    Descriptor class to check that value is a 1D `~regions.PixCoord`.
     """
 
     def _validate(self, value):
         if not (isinstance(value, PixCoord) and not value.isscalar
                 and value.x.ndim == 1):
-            raise ValueError(f'The {self.name} must be a 1D PixCoord object')
+            raise ValueError(f'The {self.name} must be a 1D PixCoord')
 
 
 class PositiveScalar(RegionAttribute):
@@ -142,11 +144,11 @@ class PositiveScalarAngle(RegionAttribute):
 
 class RegionType(RegionAttribute):
     """
-    Descriptor class for compound pixel and sky regions.
+    Descriptor class to check the region type of value.
     """
 
     def __init__(self, name, regionclass):
-        self.name = name
+        super().__init__(name)
         self.regionclass = regionclass
 
     def _validate(self, value):

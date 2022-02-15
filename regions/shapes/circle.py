@@ -10,8 +10,8 @@ import astropy.units as u
 from astropy.wcs.utils import pixel_to_skycoord
 import numpy as np
 
-from ..core.attributes import (ScalarPix, PositiveScalar, PositiveScalarAngle,
-                               ScalarSky)
+from ..core.attributes import (ScalarPixCoord, PositiveScalar,
+                               PositiveScalarAngle, ScalarSky)
 from ..core.bounding_box import RegionBoundingBox
 from ..core.core import PixelRegion, SkyRegion
 from ..core.mask import RegionMask
@@ -63,7 +63,7 @@ class CirclePixelRegion(PixelRegion):
     """
 
     _params = ('center', 'radius')
-    center = ScalarPix('center')
+    center = ScalarPixCoord('center')
     radius = PositiveScalar('radius')
     mpl_artist = 'Patch'
 

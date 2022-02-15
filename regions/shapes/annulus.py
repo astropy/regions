@@ -9,8 +9,8 @@ import operator
 import astropy.units as u
 from astropy.wcs.utils import pixel_to_skycoord
 
-from ..core.attributes import (ScalarPix, PositiveScalar, PositiveScalarAngle,
-                               ScalarAngle, ScalarSky)
+from ..core.attributes import (ScalarPixCoord, PositiveScalar,
+                               PositiveScalarAngle, ScalarAngle, ScalarSky)
 from ..core.compound import CompoundPixelRegion
 from ..core.core import PixelRegion, SkyRegion
 from ..core.metadata import RegionMeta, RegionVisual
@@ -124,7 +124,7 @@ class CircleAnnulusPixelRegion(AnnulusPixelRegion):
 
     _component_class = CirclePixelRegion
     _params = ('center', 'inner_radius', 'outer_radius')
-    center = ScalarPix('center')
+    center = ScalarPixCoord('center')
     inner_radius = PositiveScalar('inner_radius')
     outer_radius = PositiveScalar('outer_radius')
 
@@ -230,7 +230,7 @@ class AsymmetricAnnulusPixelRegion(AnnulusPixelRegion):
 
     _params = ('center', 'inner_width', 'outer_width', 'inner_height',
                'outer_height', 'angle')
-    center = ScalarPix('center')
+    center = ScalarPixCoord('center')
     inner_width = PositiveScalar('inner_width')
     outer_width = PositiveScalar('outer_width')
     inner_height = PositiveScalar('inner_height')
