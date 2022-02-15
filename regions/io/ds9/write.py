@@ -164,13 +164,14 @@ def _get_region_params(region, shape_template, precision=8):
 
         if isinstance(value, PixCoord):
             # pixels; ds9's origin is (1, 1)
-            # TODO: apply precision to pixel coordinates?
             if value.isscalar:
-                value = f'{value.x + 1},{value.y + 1}'
+                value = (f'{value.x + 1:0.{precision}f},'
+                         f'{value.y + 1:0.{precision}f}')
             else:
                 value_str = ''
                 for val in value:
-                    value_str += f'{val.x + 1},{val.y + 1},'
+                    value_str += (f'{val.x + 1:0.{precision}f},'
+                                  f'{val.y + 1:0.{precision}f}')
                 value = value_str[:-1]
 
         elif isinstance(value, SkyCoord):
