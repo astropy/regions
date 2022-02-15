@@ -103,16 +103,41 @@ class OneDSky(RegionAttribute):
             raise ValueError(f'The {self.name} must be a 1D SkyCoord object')
 
 
-class QuantityLength(RegionAttribute):
+class ScalarAngle(RegionAttribute):
     """
-    Descriptor class for `~regions.SkyRegion`, which takes a scalar
-    `~astropy.units.Quantity` object.
+    Descriptor class to check that value is a scalar angle, either an
+    astropy Angle or Quantity with angular units.
     """
 
     def _validate(self, value):
-        if not (isinstance(value, Quantity) and value.isscalar):
-            raise ValueError(f'The {self.name} must be a scalar astropy '
-                             'Quantity object')
+        if isinstance(value, Quantity):
+            if not value.isscalar:
+                raise ValueError(f'{self.name} must be a scalar')
+
+            if not value.unit.physical_type == 'angle':
+                raise ValueError(f'{self.name} must have angular units')
+        else:
+            raise ValueError(f'{self.name} must be a scalar angle')
+
+
+class PositiveScalarAngle(RegionAttribute):
+    """
+    Descriptor class to check that value is a strictly positive scalar
+    angle, either an astropy Angle or Quantity with angular units.
+    """
+
+    def _validate(self, value):
+        if isinstance(value, Quantity):
+            if not value.isscalar:
+                raise ValueError(f'{self.name} must be a scalar')
+
+            if not value.unit.physical_type == 'angle':
+                raise ValueError(f'{self.name} must have angular units')
+
+            if not value > 0:
+                raise ValueError(f'{self.name} must be strictly positive')
+        else:
+            raise ValueError(f'{self.name} must be a positive scalar angle')
 
 
 class RegionType(RegionAttribute):

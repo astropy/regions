@@ -8,7 +8,7 @@ from astropy.wcs.utils import pixel_to_skycoord, skycoord_to_pixel
 import numpy as np
 
 from ..core.attributes import (OneDPix, OneDSky, ScalarPix, PositiveScalar,
-                               QuantityLength)
+                               ScalarAngle)
 from ..core.bounding_box import RegionBoundingBox
 from ..core.core import PixelRegion, SkyRegion
 from ..core.mask import RegionMask
@@ -285,7 +285,7 @@ class RegularPolygonPixelRegion(PolygonPixelRegion):
     center = ScalarPix('center')
     nvertices = PositiveScalar('nvertices')
     radius = PositiveScalar('radius')
-    angle = QuantityLength('angle')
+    angle = ScalarAngle('angle')
 
     def __init__(self, center, nvertices, radius, angle=0. * u.deg,
                  meta=None, visual=None):

@@ -130,7 +130,7 @@ class LinePixelRegion(PixelRegion):
         y = self.start.y - origin[1]
         dx = self.end.x - self.start.x
         dy = self.end.y - self.start.y
-        kwargs.setdefault("width", 0.1)
+        kwargs.setdefault('width', 0.1)
 
         mpl_kwargs = self.visual.define_mpl_kwargs(self.mpl_artist)
         mpl_kwargs.update(kwargs)

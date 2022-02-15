@@ -9,8 +9,8 @@ import operator
 import astropy.units as u
 from astropy.wcs.utils import pixel_to_skycoord
 
-from ..core.attributes import (ScalarPix, PositiveScalar, QuantityLength,
-                               ScalarSky)
+from ..core.attributes import (ScalarPix, PositiveScalar, PositiveScalarAngle,
+                               ScalarAngle, ScalarSky)
 from ..core.compound import CompoundPixelRegion
 from ..core.core import PixelRegion, SkyRegion
 from ..core.metadata import RegionMeta, RegionVisual
@@ -51,7 +51,7 @@ class AnnulusPixelRegion(PixelRegion, abc.ABC):
     def as_artist(self, origin=(0, 0), **kwargs):
         return self._compound_region.as_artist(origin, **kwargs)
 
-    def to_mask(self, mode="center", subpixels=5):
+    def to_mask(self, mode='center', subpixels=5):
         return self._compound_region.to_mask(mode, subpixels)
 
     def rotate(self, center, angle):
@@ -179,8 +179,8 @@ class CircleAnnulusSkyRegion(SkyRegion):
 
     _params = ('center', 'inner_radius', 'outer_radius')
     center = ScalarSky('center')
-    inner_radius = QuantityLength('inner_radius')
-    outer_radius = QuantityLength('outer_radius')
+    inner_radius = PositiveScalarAngle('inner_radius')
+    outer_radius = PositiveScalarAngle('outer_radius')
 
     def __init__(self, center, inner_radius, outer_radius, meta=None,
                  visual=None):
@@ -235,7 +235,7 @@ class AsymmetricAnnulusPixelRegion(AnnulusPixelRegion):
     outer_width = PositiveScalar('outer_width')
     inner_height = PositiveScalar('inner_height')
     outer_height = PositiveScalar('outer_height')
-    angle = QuantityLength('angle')
+    angle = ScalarAngle('angle')
 
     def __init__(self, center, inner_width, outer_width, inner_height,
                  outer_height, angle=0 * u.deg, meta=None, visual=None):
@@ -311,11 +311,11 @@ class AsymmetricAnnulusSkyRegion(SkyRegion):
                'outer_height', 'angle')
 
     center = ScalarSky('center')
-    inner_width = QuantityLength('inner_width')
-    outer_width = QuantityLength('outer_width')
-    inner_height = QuantityLength('inner_height')
-    outer_height = QuantityLength('outer_height')
-    angle = QuantityLength('angle')
+    inner_width = PositiveScalarAngle('inner_width')
+    outer_width = PositiveScalarAngle('outer_width')
+    inner_height = PositiveScalarAngle('inner_height')
+    outer_height = PositiveScalarAngle('outer_height')
+    angle = ScalarAngle('angle')
 
     def __init__(self, center, inner_width, outer_width, inner_height,
                  outer_height, angle=0 * u.deg, meta=None, visual=None):
@@ -391,7 +391,7 @@ class EllipseAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
         outer_width = 8.5
         inner_height = 3.5
         outer_height = 6.5
-        angle = Angle("45deg")
+        angle = Angle('45deg')
 
         fig, ax = plt.subplots(1, 1)
 
@@ -499,7 +499,7 @@ class RectangleAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
         outer_width = 8.5
         inner_height = 3.5
         outer_height = 6.5
-        angle = Angle("45deg")
+        angle = Angle('45deg')
 
         fig, ax = plt.subplots(1, 1)
 

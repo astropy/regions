@@ -10,7 +10,7 @@ import astropy.units as u
 from astropy.wcs.utils import pixel_to_skycoord
 import numpy as np
 
-from ..core.attributes import (ScalarPix, PositiveScalar, QuantityLength,
+from ..core.attributes import (ScalarPix, PositiveScalar, PositiveScalarAngle,
                                ScalarSky)
 from ..core.bounding_box import RegionBoundingBox
 from ..core.core import PixelRegion, SkyRegion
@@ -202,7 +202,7 @@ class CircleSkyRegion(SkyRegion):
 
     _params = ('center', 'radius')
     center = ScalarSky('center')
-    radius = QuantityLength("radius")
+    radius = PositiveScalarAngle('radius')
 
     def __init__(self, center, radius, meta=None, visual=None):
         self.center = center
