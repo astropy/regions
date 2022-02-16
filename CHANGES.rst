@@ -44,6 +44,10 @@ Bug Fixes
 - Fixed an issue converting elliptical and rectangular annulus regions
   between pixel and sky regions. [#425]
 
+- Fixed the string representations of ``TextPixelRegion`` and
+  ``TextSkyRegion`` to include quotes around the text parameter value.
+  [#429]
+
 API Changes
 -----------
 
