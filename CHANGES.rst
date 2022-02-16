@@ -68,6 +68,9 @@ API Changes
 - Renamed the ``BoundingBox`` class to ``RegionBoundingBox``. The old
   name is deprecated. [#427]
 
+- A ``ValueError`` is raised if the radius, width, or height region
+  parameters are not strictly positive (> 0). [#430]
+
 
 0.5 (2021-07-20)
 ================
