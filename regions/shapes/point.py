@@ -6,7 +6,7 @@ This module defines point regions in both pixel and sky coordinates.
 from astropy.wcs.utils import pixel_to_skycoord, skycoord_to_pixel
 import numpy as np
 
-from ..core.attributes import ScalarPix, ScalarSky
+from ..core.attributes import ScalarPixCoord, ScalarSkyCoord
 from ..core.bounding_box import RegionBoundingBox
 from ..core.core import PixelRegion, SkyRegion
 from ..core.metadata import RegionMeta, RegionVisual
@@ -61,7 +61,7 @@ class PointPixelRegion(PixelRegion):
     """
 
     _params = ('center',)
-    center = ScalarPix('center')
+    center = ScalarPixCoord('center')
     mpl_artist = 'Line2D'
 
     def __init__(self, center, meta=None, visual=None):
@@ -166,7 +166,7 @@ class PointSkyRegion(SkyRegion):
     """
 
     _params = ('center',)
-    center = ScalarSky('center')
+    center = ScalarSkyCoord('center')
 
     def __init__(self, center, meta=None, visual=None):
         self.center = center

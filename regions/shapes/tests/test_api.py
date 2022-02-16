@@ -115,13 +115,15 @@ def test_sky_to_pix(region):
 @pytest.mark.parametrize('region', PIXEL_REGIONS, ids=ids_func)
 def test_attribute_validation_pixel_regions(region):
     invalid_values = dict(center=[PixCoord([1, 2], [2, 3]), 1,
-                                  SkyCoord(1 * u.deg, 2 * u.deg)],
-                          radius=[u.Quantity("1deg"), [1], PixCoord(1, 2)],
+                                  SkyCoord(1 * u.deg, 2 * u.deg),
+                                  (10, 10), (10 * u.deg, 10 * u.deg)],
+                          radius=[u.Quantity("1deg"), [1], PixCoord(1, 2),
+                                  3 * u.km, 0.0, -10.],
                           angle=[u.Quantity([1 * u.deg, 2 * u.deg]), 2,
-                                 PixCoord(1, 2)],
+                                 PixCoord(1, 2), 3 * u.km],
                           vertices=[u.Quantity("1"), 2, PixCoord(1, 2),
-                                    PixCoord([[1, 2]], [[2, 3]])]
-                          )
+                                    PixCoord([[1, 2]], [[2, 3]]), 3 * u.km,
+                                    (10, 10), (10 * u.deg, 10 * u.deg)])
     invalid_values['width'] = invalid_values['radius']
     invalid_values['height'] = invalid_values['radius']
     invalid_values['inner_height'] = invalid_values['radius']
@@ -138,21 +140,25 @@ def test_attribute_validation_pixel_regions(region):
             for val in invalid_values.get(attr, None):
                 with pytest.raises(ValueError) as excinfo:
                     setattr(region, attr, val)
-                assert f'The {attr} must be' in str(excinfo.value)
+                assert f'{attr!r} must' in str(excinfo.value)
 
 
 @pytest.mark.parametrize('region', SKY_REGIONS, ids=ids_func)
 def test_attribute_validation_sky_regions(region):
     invalid_values = dict(center=[PixCoord([1, 2], [2, 3]), 1,
-                                  SkyCoord([1 * u.deg], [2 * u.deg])],
+                                  SkyCoord([1 * u.deg], [2 * u.deg]),
+                                  (10, 10), (10 * u.deg, 10 * u.deg)],
                           radius=[u.Quantity([1 * u.deg, 5 * u.deg]),
-                                  [1], SkyCoord(1 * u.deg, 2 * u.deg), 1],
+                                  [1], SkyCoord(1 * u.deg, 2 * u.deg),
+                                  1, 3 * u.km, 0.0 * u.deg, -10. * u.deg],
                           angle=[u.Quantity([1 * u.deg, 2 * u.deg]), 2,
-                                 SkyCoord(1 * u.deg, 2 * u.deg)],
+                                 SkyCoord(1 * u.deg, 2 * u.deg), 3. * u.km],
                           vertices=[u.Quantity("1deg"), 2,
                                     SkyCoord(1 * u.deg, 2 * u.deg),
                                     SkyCoord([[1 * u.deg, 2 * u.deg]],
-                                             [[2 * u.deg, 3 * u.deg]])])
+                                             [[2 * u.deg, 3 * u.deg]]),
+                                    3 * u.km, (10, 10),
+                                    (10 * u.deg, 10 * u.deg)])
 
     invalid_values['width'] = invalid_values['radius']
     invalid_values['height'] = invalid_values['radius']
@@ -170,4 +176,4 @@ def test_attribute_validation_sky_regions(region):
             for val in invalid_values.get(attr, None):
                 with pytest.raises(ValueError) as excinfo:
                     setattr(region, attr, val)
-                assert f'The {attr} must be' in str(excinfo.value)
+                assert f'{attr!r} must' in str(excinfo.value)

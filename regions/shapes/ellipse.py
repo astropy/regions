@@ -10,8 +10,9 @@ import astropy.units as u
 from astropy.wcs.utils import pixel_to_skycoord
 import numpy as np
 
-from ..core.attributes import (ScalarPix, ScalarLength, QuantityLength,
-                               ScalarSky)
+from ..core.attributes import (ScalarPixCoord, PositiveScalar,
+                               PositiveScalarAngle, ScalarAngle,
+                               ScalarSkyCoord)
 from ..core.bounding_box import RegionBoundingBox
 from ..core.core import PixelRegion, SkyRegion
 from ..core.mask import RegionMask
@@ -74,10 +75,10 @@ class EllipsePixelRegion(PixelRegion):
     """
 
     _params = ('center', 'width', 'height', 'angle')
-    center = ScalarPix('center')
-    width = ScalarLength('width')
-    height = ScalarLength('height')
-    angle = QuantityLength('angle')
+    center = ScalarPixCoord('center')
+    width = PositiveScalar('width')
+    height = PositiveScalar('height')
+    angle = ScalarAngle('angle')
     mpl_artist = 'Patch'
 
     def __init__(self, center, width, height, angle=0. * u.deg, meta=None,
@@ -349,10 +350,10 @@ class EllipseSkyRegion(SkyRegion):
     """
 
     _params = ('center', 'width', 'height', 'angle')
-    center = ScalarSky('center')
-    width = QuantityLength('width')
-    height = QuantityLength('height')
-    angle = QuantityLength('angle')
+    center = ScalarSkyCoord('center')
+    width = PositiveScalarAngle('width')
+    height = PositiveScalarAngle('height')
+    angle = ScalarAngle('angle')
 
     def __init__(self, center, width, height, angle=0. * u.deg, meta=None,
                  visual=None):

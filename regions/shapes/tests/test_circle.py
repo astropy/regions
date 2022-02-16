@@ -74,6 +74,10 @@ class TestCirclePixelRegion(BaseTestPixelRegion):
         reg.radius = 3
         assert reg != self.reg
 
+    def test_zero_size(self):
+        with pytest.raises(ValueError):
+            CirclePixelRegion(PixCoord(50, 50), radius=0)
+
 
 class TestCircleSkyRegion(BaseTestSkyRegion):
     meta = RegionMeta({'text': 'test'})
@@ -117,7 +121,7 @@ class TestCircleSkyRegion(BaseTestSkyRegion):
         radius = 2 * u.arcsec
         with pytest.raises(ValueError) as excinfo:
             CircleSkyRegion(center, radius)
-        estr = 'The center must be a scalar SkyCoord object'
+        estr = "'center' must be a scalar SkyCoord"
         assert estr in str(excinfo.value)
 
     def test_contains(self, wcs):
@@ -131,3 +135,7 @@ class TestCircleSkyRegion(BaseTestSkyRegion):
         assert reg == self.reg
         reg.radius = 3 * u.arcsec
         assert reg != self.reg
+
+    def test_zero_size(self):
+        with pytest.raises(ValueError):
+            CircleSkyRegion(SkyCoord(3 * u.deg, 4 * u.deg), 0. * u.arcsec)

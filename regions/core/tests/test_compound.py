@@ -4,6 +4,7 @@ Tests for the compound module.
 """
 
 import operator
+import pytest
 import numpy as np
 from numpy.testing import assert_allclose
 
@@ -109,6 +110,12 @@ class TestCompoundPixel:
     def test_bounding_box(self):
         bbox = (self.c1 | self.c2).bounding_box
         assert bbox == RegionBoundingBox(1, 16, 1, 10)
+
+    def test_invalid(self):
+        with pytest.raises(ValueError):
+            self.c1 | 1.0
+        with pytest.raises(ValueError):
+            self.c1 | PixCoord(1.0, 2.0)
 
 
 def test_compound_sky():

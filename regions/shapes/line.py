@@ -6,7 +6,7 @@ This module defines line regions in both pixel and sky coordinates.
 from astropy.wcs.utils import pixel_to_skycoord, skycoord_to_pixel
 import numpy as np
 
-from ..core.attributes import ScalarPix, ScalarSky
+from ..core.attributes import ScalarPixCoord, ScalarSkyCoord
 from ..core.bounding_box import RegionBoundingBox
 from ..core.core import PixelRegion, SkyRegion
 from ..core.metadata import RegionMeta, RegionVisual
@@ -56,8 +56,8 @@ class LinePixelRegion(PixelRegion):
     """
 
     _params = ('start', 'end')
-    start = ScalarPix('start')
-    end = ScalarPix('end')
+    start = ScalarPixCoord('start')
+    end = ScalarPixCoord('end')
     mpl_artist = 'Patch'
 
     def __init__(self, start, end, meta=None, visual=None):
@@ -130,7 +130,7 @@ class LinePixelRegion(PixelRegion):
         y = self.start.y - origin[1]
         dx = self.end.x - self.start.x
         dy = self.end.y - self.start.y
-        kwargs.setdefault("width", 0.1)
+        kwargs.setdefault('width', 0.1)
 
         mpl_kwargs = self.visual.define_mpl_kwargs(self.mpl_artist)
         mpl_kwargs.update(kwargs)
@@ -178,8 +178,8 @@ class LineSkyRegion(SkyRegion):
     """
 
     _params = ('start', 'end')
-    start = ScalarSky('start')
-    end = ScalarSky('end')
+    start = ScalarSkyCoord('start')
+    end = ScalarSkyCoord('end')
 
     def __init__(self, start, end, meta=None, visual=None):
         self.start = start

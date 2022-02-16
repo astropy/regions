@@ -100,17 +100,13 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
         assert reg.bounding_box.shape == (a, b)
 
     def test_region_bbox_zero_size(self):
-        reg = EllipsePixelRegion(PixCoord(50, 50), width=0, height=0,
-                                 angle=0. * u.deg)
-        assert reg.bounding_box.shape == (1, 1)
+        with pytest.raises(ValueError):
+            EllipsePixelRegion(PixCoord(50, 50), width=0, height=0,
+                               angle=0. * u.deg)
 
-        reg = EllipsePixelRegion(PixCoord(50, 50), width=10, height=0,
-                                 angle=0. * u.deg)
-        assert reg.bounding_box.shape == (1, 11)
-
-        reg = EllipsePixelRegion(PixCoord(50, 50), width=0, height=10,
-                                 angle=0. * u.deg)
-        assert reg.bounding_box.shape == (11, 1)
+        with pytest.raises(ValueError):
+            EllipsePixelRegion(PixCoord(50, 50), width=10, height=0,
+                               angle=0. * u.deg)
 
     @pytest.mark.skipif(MPL_VERSION < 33, reason='requires `do_event`')
     @pytest.mark.parametrize('sync', (False, True))
@@ -300,7 +296,7 @@ class TestEllipseSkyRegion(BaseTestSkyRegion):
         height = 3 * u.arcsec
         with pytest.raises(ValueError) as excinfo:
             EllipseSkyRegion(center, width, height)
-        estr = 'The center must be a scalar SkyCoord object'
+        estr = "'center' must be a scalar SkyCoord"
         assert estr in str(excinfo.value)
 
     def test_contains(self, wcs):
