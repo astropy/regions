@@ -37,7 +37,12 @@ class Region(abc.ABC):
         cls_info = []
         if self._params is not None:
             for param in self._params:
-                cls_info.append(f'{param}={getattr(self, param)}')
+                if param == 'text':
+                    # place quotes around text value
+                    keyval = f'{param}={getattr(self, param)!r}'
+                else:
+                    keyval = f'{param}={getattr(self, param)}'
+                cls_info.append(keyval)
         cls_info = ', '.join(cls_info)
         return f'<{prefix}({cls_info})>'
 
@@ -45,7 +50,13 @@ class Region(abc.ABC):
         cls_info = [('Region', self.__class__.__name__)]
         if self._params is not None:
             for param in self._params:
-                cls_info.append((param, getattr(self, param)))
+                if param == 'text':
+                    # place quotes around text value
+                    keyval = (param, repr(getattr(self, param)))
+                else:
+                    keyval = (param, getattr(self, param))
+                cls_info.append(keyval)
+
         return '\n'.join([f'{key}: {val}' for key, val in cls_info])
 
     def __eq__(self, other):
