@@ -206,10 +206,10 @@ class RectanglePixelRegion(PixelRegion):
                          angle=angle, **mpl_kwargs)
 
     def _update_from_mpl_selector(self, *args, **kwargs):
-        # _rect_properties replace _rect_bbox in matplotlib#19864
-        # "Note that if rotation != 0, ``xmin, ymin`` are interpreted as the
+        # _rect_properties replace _rect_bbox in matplotlib#19864, unchanged in #20839.
+        # "Note that if rotation != 0, ``xmin, ymin`` are always interpreted as the
         #  lower corner, and ``xmax, ymax`` are calculated using only width and
-        #  height assuming no rotation."
+        #  height assuming no rotation (as specified for ``selector.extents``)."
 
         xmin, xmax, ymin, ymax = self._mpl_selector.extents
         self.width = xmax - xmin
@@ -220,7 +220,7 @@ class RectanglePixelRegion(PixelRegion):
         else:
             self.center = PixCoord(x=0.5 * (xmin + xmax), y=0.5 * (ymin + ymax))
             rotation = 0
-        self.angle = rotation * u.radian
+        self.angle = rotation * u.deg
 
         if getattr(self, '_mpl_selector_callback', None) is not None:
             self._mpl_selector_callback(self)
@@ -268,12 +268,14 @@ class RectanglePixelRegion(PixelRegion):
         ``selector.set_active(True)`` or ``selector.set_active(False)``.
         """
         from matplotlib.widgets import RectangleSelector
+        from matplotlib import __version__ as MPL_VER_STR
 
         if hasattr(self, '_mpl_selector'):
             raise AttributeError('Cannot attach more than one selector to a region.')
 
         if self.angle.value != 0 and not hasattr(RectangleSelector, 'rotation'):
-            raise NotImplementedError('Cannot create matplotlib selector for rotated rectangle.')
+            raise NotImplementedError('Creating selectors for rotated shapes is not '
+                                      f'yet supported with matplotlib {MPL_VER_STR}.')
 
         if sync:
             sync_callback = self._update_from_mpl_selector
@@ -292,12 +294,12 @@ class RectanglePixelRegion(PixelRegion):
             ax, sync_callback, interactive=True,
             drag_from_anywhere=drag_from_anywhere, **kwargs)
 
-        xy0 = [self.center.x - self.width / 2, self.center.y - self.height / 2]
-        self._mpl_selector.extents = (xy0[0], self.center.x + self.width / 2,
-                                      xy0[1], self.center.y + self.height / 2)
+        dxy = [self.width / 2, self.height / 2]
+        self._mpl_selector.extents = (self.center.x - dxy[0], self.center.x + dxy[0],
+                                      self.center.y - dxy[1], self.center.y + dxy[1])
 
         if self.angle.value != 0:
-            self._mpl_selector.rotation = self.angle.to_value('radian')
+            self._mpl_selector.rotation = self.angle.to_value('deg')
 
         self._mpl_selector.set_active(active)
         self._mpl_selector_callback = callback

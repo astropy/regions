@@ -115,6 +115,7 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
 
         plt = pytest.importorskip('matplotlib.pyplot')
         from matplotlib.testing.widgets import do_event
+        from matplotlib import __version_info__ as MPL_VERSION
 
         rng = np.random.default_rng(0)
         data = rng.random((16, 16))
@@ -130,13 +131,17 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
         # works with rotated ellipses, the following exception check can
         # be removed as well as the ``angle=0 * u.deg`` in the call to
         # copy() below - should (hopefully) be implemented with mpl 3.6.
-        if MPL_VERSION < 36:
+        expected = [8.3, 4.9, 2.0, 1.0]
+        if MPL_VERSION < (3, 6, 0):
             with pytest.raises(NotImplementedError,
-                               match=('Cannot create matplotlib selector for rotated ellipse.')):
+                               match='Creating selectors for rotated shapes is not yet supported'):
                 self.reg.as_mpl_selector(ax)
             angle = 0 * u.deg
         else:
             angle = self.reg.angle
+
+        if not sync:
+            expected = [3, 4, 4, 3]
 
         region = self.reg.copy(angle=angle)
 
@@ -148,24 +153,16 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
 
         ax.figure.canvas.draw()
 
+        assert_allclose(region.center.x, expected[0])
+        assert_allclose(region.center.y, expected[1])
+        assert_allclose(region.width, expected[2])
+        assert_allclose(region.height, expected[3])
+
         if sync:
-
-            assert_allclose(region.center.x, 8.3)
-            assert_allclose(region.center.y, 4.9)
-            assert_allclose(region.width, 2)
-            assert_allclose(region.height, 1)
             assert_quantity_allclose(region.angle, 0 * u.deg)
-
             assert_equal(mask, region.to_mask(mode='subpixels', subpixels=10).to_image(data.shape))
-
         else:
-
-            assert_allclose(region.center.x, 3)
-            assert_allclose(region.center.y, 4)
-            assert_allclose(region.width, 4)
-            assert_allclose(region.height, 3)
             assert_quantity_allclose(region.angle, angle)
-
             assert_equal(mask, 0)
 
         with pytest.raises(AttributeError, match=('Cannot attach more than one selector to a reg')):
