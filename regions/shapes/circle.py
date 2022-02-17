@@ -58,9 +58,9 @@ class CirclePixelRegion(PixelRegion):
     """
 
     _params = ('center', 'radius')
+    _mpl_artist = 'Patch'
     center = ScalarPixCoord('center', description='The center pixel position.')
     radius = PositiveScalar('radius', description='The radius in pixels.')
-    mpl_artist = 'Patch'
 
     def __init__(self, center, radius, meta=None, visual=None):
         self.center = center
@@ -151,7 +151,7 @@ class CirclePixelRegion(PixelRegion):
 
         xy = self.center.x - origin[0], self.center.y - origin[1]
         radius = self.radius
-        mpl_kwargs = self.visual.define_mpl_kwargs(self.mpl_artist)
+        mpl_kwargs = self.visual.define_mpl_kwargs(self._mpl_artist)
         mpl_kwargs.update(kwargs)
 
         return Circle(xy=xy, radius=radius, **mpl_kwargs)

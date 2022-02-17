@@ -60,10 +60,9 @@ class PolygonPixelRegion(PixelRegion):
     """
 
     _params = ('vertices',)
+    _mpl_artist = 'Patch'
     vertices = OneDPixCoord('vertices',
                             description='The vertices of the polygon.')
-
-    mpl_artist = 'Patch'
 
     def __init__(self, vertices, meta=None, visual=None,
                  origin=PixCoord(0, 0)):
@@ -172,7 +171,7 @@ class PolygonPixelRegion(PixelRegion):
         xy = np.vstack([self.vertices.x - origin[0],
                         self.vertices.y - origin[1]]).transpose()
 
-        mpl_kwargs = self.visual.define_mpl_kwargs(self.mpl_artist)
+        mpl_kwargs = self.visual.define_mpl_kwargs(self._mpl_artist)
         mpl_kwargs.update(kwargs)
 
         return Polygon(xy=xy, **mpl_kwargs)

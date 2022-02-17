@@ -50,10 +50,10 @@ class TextPixelRegion(PointPixelRegion):
     """
 
     _params = ('center', 'text')
+    _mpl_artist = 'Text'
     center = ScalarPixCoord('center',
                             description=('The leftmost pixel position before '
                                          'rotation.'))
-    mpl_artist = 'Text'
 
     def __init__(self, center, text, meta=None, visual=None):
         super().__init__(center, meta, visual)
@@ -87,7 +87,7 @@ class TextPixelRegion(PointPixelRegion):
         """
         from matplotlib.text import Text
 
-        mpl_kwargs = self.visual.define_mpl_kwargs(self.mpl_artist)
+        mpl_kwargs = self.visual.define_mpl_kwargs(self._mpl_artist)
         mpl_kwargs.update(kwargs)
 
         return Text(self.center.x - origin[0], self.center.y - origin[1],

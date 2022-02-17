@@ -67,6 +67,7 @@ class RectanglePixelRegion(PixelRegion):
     """
 
     _params = ('center', 'width', 'height', 'angle')
+    _mpl_artist = 'Patch'
     center = ScalarPixCoord('center', description='The center pixel position.')
     width = PositiveScalar('width',
                            description=('The width of the rectangle (before '
@@ -77,7 +78,6 @@ class RectanglePixelRegion(PixelRegion):
     angle = ScalarAngle('angle',
                         description=('The rotation angle measured '
                                      'anti-clockwise.'))
-    mpl_artist = 'Patch'
 
     def __init__(self, center, width, height, angle=0 * u.deg, meta=None,
                  visual=None):
@@ -198,7 +198,7 @@ class RectanglePixelRegion(PixelRegion):
         # matplotlib expects rotation in degrees (anti-clockwise)
         angle = self.angle.to('deg').value
 
-        mpl_kwargs = self.visual.define_mpl_kwargs(self.mpl_artist)
+        mpl_kwargs = self.visual.define_mpl_kwargs(self._mpl_artist)
         mpl_kwargs.update(kwargs)
 
         return Rectangle(xy=xy, width=width, height=height,
