@@ -69,8 +69,8 @@ class RegionVisual(Meta):
 
     valid_keys = ['color', 'dash', 'dashlist', 'fill', 'font', 'fontsize',
                   'fontstyle', 'fontweight', 'labeloff', 'labelpos', 'line',
-                  'linestyle', 'linewidth', 'symbol', 'symsize', 'symthick',
-                  'textangle', 'usetex', 'default_style']
+                  'linestyle', 'linewidth', 'marker', 'symbol', 'symsize',
+                  'symthick', 'textangle', 'usetex', 'default_style']
 
     key_mapping = {'point': 'symbol', 'width': 'linewidth'}
 
