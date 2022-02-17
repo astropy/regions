@@ -73,10 +73,16 @@ class RectanglePixelRegion(PixelRegion):
     """
 
     _params = ('center', 'width', 'height', 'angle')
-    center = ScalarPixCoord('center')
-    width = PositiveScalar('width')
-    height = PositiveScalar('height')
-    angle = ScalarAngle('angle')
+    center = ScalarPixCoord('center', description='The center pixel position.')
+    width = PositiveScalar('width',
+                           description=('The width of the rectangle (before '
+                                        'rotation) in pixels.'))
+    height = PositiveScalar('height',
+                            description=('The height of the rectangle (before '
+                                         'rotation) in pixels.'))
+    angle = ScalarAngle('angle',
+                        description=('The rotation angle measured '
+                                     'anti-clockwise.'))
     mpl_artist = 'Patch'
 
     def __init__(self, center, width, height, angle=0 * u.deg, meta=None,
@@ -389,10 +395,19 @@ class RectangleSkyRegion(SkyRegion):
     """
 
     _params = ('center', 'width', 'height', 'angle')
-    center = ScalarSkyCoord('center')
-    width = PositiveScalarAngle('width')
-    height = PositiveScalarAngle('height')
-    angle = ScalarAngle('angle')
+    center = ScalarSkyCoord('center',
+                            description=('The center position in sky '
+                                         'coordinates.'))
+    width = PositiveScalarAngle('width',
+                                description=('The width of the rectangle '
+                                             '(before rotation) as an angle.'))
+    height = PositiveScalarAngle('height',
+                                 description=('The height of the rectangle '
+                                              '(before rotation) as an '
+                                              'angle.'))
+    angle = ScalarAngle('angle',
+                        description=('The rotation angle measured '
+                                     'anti-clockwise.'))
 
     def __init__(self, center, width, height, angle=0 * u.deg, meta=None,
                  visual=None):

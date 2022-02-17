@@ -61,7 +61,9 @@ class PolygonPixelRegion(PixelRegion):
     """
 
     _params = ('vertices',)
-    vertices = OneDPixCoord('vertices')
+    vertices = OneDPixCoord('vertices',
+                            description='The vertices of the polygon.')
+
     mpl_artist = 'Patch'
 
     def __init__(self, vertices, meta=None, visual=None,
@@ -353,7 +355,9 @@ class PolygonSkyRegion(SkyRegion):
     """
 
     _params = ('vertices',)
-    vertices = OneDSkyCoord('vertices')
+    vertices = OneDSkyCoord('vertices',
+                            description=('The vertices of the polygon as '
+                                         'sky coordinates.'))
 
     def __init__(self, vertices, meta=None, visual=None):
         self.vertices = vertices
