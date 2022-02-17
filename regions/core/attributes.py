@@ -23,10 +23,15 @@ class RegionAttribute(abc.ABC):
     ----------
     name : str
         The name of the attribute.
+
+    description : str, optional
+        The description of the attribute, which will be used as the
+        attribute documentation.
     """
 
-    def __init__(self, name):
+    def __init__(self, name, description=''):
         self.name = name
+        self.__doc__ = description
 
     def __get__(self, instance, owner):
         if instance is None:
@@ -107,7 +112,8 @@ class OneDSkyCoord(RegionAttribute):
 class ScalarAngle(RegionAttribute):
     """
     Descriptor class to check that value is a scalar angle, either an
-    astropy Angle or Quantity with angular units.
+    `~astropy.coordinates.Angle` or `~astropy.units.Quantity` with
+    angular units.
     """
 
     def _validate(self, value):
@@ -123,8 +129,9 @@ class ScalarAngle(RegionAttribute):
 
 class PositiveScalarAngle(RegionAttribute):
     """
-    Descriptor class to check that value is a strictly positive scalar
-    angle, either an astropy Angle or Quantity with angular units.
+    Descriptor class to check that value is a strictly positive
+    scalar angle, either an `~astropy.coordinates.Angle` or
+    `~astropy.units.Quantity` with angular units.
     """
 
     def _validate(self, value):

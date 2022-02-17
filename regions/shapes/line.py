@@ -39,26 +39,22 @@ class LinePixelRegion(PixelRegion):
         from regions import PixCoord, LinePixelRegion
         import matplotlib.pyplot as plt
 
-        x1, y1 = 15, 10
-        x2, y2 = 20, 25
-
         fig, ax = plt.subplots(1, 1)
 
-        start = PixCoord(x=x1, y=y1)
-        end = PixCoord(x=x2, y=y2)
+        start = PixCoord(x=15, y=10)
+        end = PixCoord(x=20, y=25)
         reg = LinePixelRegion(start=start, end=end)
-        patch = reg.as_artist(facecolor='none', edgecolor='red', lw=2)
-        ax.add_patch(patch)
+        reg.plot(ax=ax, edgecolor='red', lw=2)
 
-        plt.xlim(0, 30)
-        plt.ylim(0, 30)
+        ax.set_xlim(0, 30)
+        ax.set_ylim(0, 30)
         ax.set_aspect('equal')
     """
 
     _params = ('start', 'end')
-    start = ScalarPixCoord('start')
-    end = ScalarPixCoord('end')
-    mpl_artist = 'Patch'
+    _mpl_artist = 'Patch'
+    start = ScalarPixCoord('start', description='The start pixel position.')
+    end = ScalarPixCoord('end', description='The end pixel position.')
 
     def __init__(self, start, end, meta=None, visual=None):
         self.start = start
@@ -132,7 +128,7 @@ class LinePixelRegion(PixelRegion):
         dy = self.end.y - self.start.y
         kwargs.setdefault('width', 0.1)
 
-        mpl_kwargs = self.visual.define_mpl_kwargs(self.mpl_artist)
+        mpl_kwargs = self.visual.define_mpl_kwargs(self._mpl_artist)
         mpl_kwargs.update(kwargs)
 
         return Arrow(x, y, dx, dy, **mpl_kwargs)
@@ -178,8 +174,11 @@ class LineSkyRegion(SkyRegion):
     """
 
     _params = ('start', 'end')
-    start = ScalarSkyCoord('start')
-    end = ScalarSkyCoord('end')
+    start = ScalarSkyCoord('start',
+                           description=('The start position as a sky '
+                                        'coordinate.'))
+    end = ScalarSkyCoord('end',
+                         description='The end position as a sky coordinate.')
 
     def __init__(self, start, end, meta=None, visual=None):
         self.start = start

@@ -89,9 +89,9 @@ class CircleAnnulusPixelRegion(AnnulusPixelRegion):
     center : `~regions.PixCoord`
         The position of the center of the annulus.
     inner_radius : float
-        The inner radius of the annulus.
+        The inner radius of the annulus in pixels.
     outer_radius : float
-        The outer radius of the annulus.
+        The outer radius of the annulus in pixels.
     meta : `~regions.RegionMeta`, optional
         A dictionary that stores the meta attributes of this region.
     visual : `~regions.RegionVisual`, optional
@@ -106,28 +106,26 @@ class CircleAnnulusPixelRegion(AnnulusPixelRegion):
         from regions import PixCoord, CircleAnnulusPixelRegion
         import matplotlib.pyplot as plt
 
-        x, y = 6, 6
-        inner_radius = 5.5
-        outer_radius = 8
         fig, ax = plt.subplots(1, 1)
 
-        center = PixCoord(x=x, y=y)
-        reg = CircleAnnulusPixelRegion(center=center,
-                                       inner_radius=inner_radius,
-                                       outer_radius=outer_radius)
-        patch = reg.as_artist(facecolor='none', edgecolor='red', lw=2)
-        ax.add_patch(patch)
+        reg = CircleAnnulusPixelRegion(PixCoord(x=6, y=6),
+                                       inner_radius=5.5,
+                                       outer_radius=8.0)
+        reg.plot(ax=ax, facecolor='none', edgecolor='red', lw=2)
 
-        plt.xlim(-5, 20)
-        plt.ylim(-5, 20)
+        ax.set_xlim(-5, 20)
+        ax.set_ylim(-5, 20)
         ax.set_aspect('equal')
     """
 
     _component_class = CirclePixelRegion
     _params = ('center', 'inner_radius', 'outer_radius')
-    center = ScalarPixCoord('center')
-    inner_radius = PositiveScalar('inner_radius')
-    outer_radius = PositiveScalar('outer_radius')
+    center = ScalarPixCoord('center',
+                            description='The center pixel position.')
+    inner_radius = PositiveScalar('inner_radius',
+                                  description='The inner radius in pixels.')
+    outer_radius = PositiveScalar('outer_radius',
+                                  description='The outer radius in pixels.')
 
     def __init__(self, center, inner_radius, outer_radius, meta=None,
                  visual=None):
@@ -179,9 +177,15 @@ class CircleAnnulusSkyRegion(SkyRegion):
     """
 
     _params = ('center', 'inner_radius', 'outer_radius')
-    center = ScalarSkyCoord('center')
-    inner_radius = PositiveScalarAngle('inner_radius')
-    outer_radius = PositiveScalarAngle('outer_radius')
+    center = ScalarSkyCoord('center',
+                            description=('The center position in sky '
+                                         'coordinates'))
+    inner_radius = PositiveScalarAngle('inner_radius',
+                                       description=('The inner radius as an '
+                                                    'angle.'))
+    outer_radius = PositiveScalarAngle('outer_radius',
+                                       description=('The outer radius as an '
+                                                    'angle.'))
 
     def __init__(self, center, inner_radius, outer_radius, meta=None,
                  visual=None):
@@ -231,12 +235,19 @@ class AsymmetricAnnulusPixelRegion(AnnulusPixelRegion):
 
     _params = ('center', 'inner_width', 'outer_width', 'inner_height',
                'outer_height', 'angle')
-    center = ScalarPixCoord('center')
-    inner_width = PositiveScalar('inner_width')
-    outer_width = PositiveScalar('outer_width')
-    inner_height = PositiveScalar('inner_height')
-    outer_height = PositiveScalar('outer_height')
-    angle = ScalarAngle('angle')
+    center = ScalarPixCoord('center',
+                            description='The center position in pixels.')
+    inner_width = PositiveScalar('inner_width',
+                                 description='The inner width in pixels.')
+    outer_width = PositiveScalar('outer_width',
+                                 description='The outer width in pixels.')
+    inner_height = PositiveScalar('inner_height',
+                                  description='The inner height in pixels.')
+    outer_height = PositiveScalar('outer_height',
+                                  description='The outer height in pixels.')
+    angle = ScalarAngle('angle',
+                        description=('The rotation angle measured '
+                                     'anti-clockwise.'))
 
     def __init__(self, center, inner_width, outer_width, inner_height,
                  outer_height, angle=0 * u.deg, meta=None, visual=None):
@@ -311,12 +322,24 @@ class AsymmetricAnnulusSkyRegion(SkyRegion):
     _params = ('center', 'inner_width', 'outer_width', 'inner_height',
                'outer_height', 'angle')
 
-    center = ScalarSkyCoord('center')
-    inner_width = PositiveScalarAngle('inner_width')
-    outer_width = PositiveScalarAngle('outer_width')
-    inner_height = PositiveScalarAngle('inner_height')
-    outer_height = PositiveScalarAngle('outer_height')
-    angle = ScalarAngle('angle')
+    center = ScalarSkyCoord('center',
+                            description=('The center position in sky '
+                                         'coordinates'))
+    inner_width = PositiveScalarAngle('inner_width',
+                                      description=('The inner width as an '
+                                                   'angle.'))
+    outer_width = PositiveScalarAngle('outer_width',
+                                      description=('The outer width as an '
+                                                   'angle.'))
+    inner_height = PositiveScalarAngle('inner_height',
+                                       description=('The inner height as an '
+                                                    'angle.'))
+    outer_height = PositiveScalarAngle('outer_height',
+                                       description=('The outer height as an '
+                                                    'angle.'))
+    angle = ScalarAngle('angle',
+                        description=('The rotation angle measured '
+                                     'anti-clockwise.'))
 
     def __init__(self, center, inner_width, outer_width, inner_height,
                  outer_height, angle=0 * u.deg, meta=None, visual=None):
@@ -387,25 +410,18 @@ class EllipseAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
         from regions import PixCoord, EllipseAnnulusPixelRegion
         import matplotlib.pyplot as plt
 
-        x, y = 6, 6
-        inner_width = 5.5
-        outer_width = 8.5
-        inner_height = 3.5
-        outer_height = 6.5
-        angle = Angle('45deg')
-
         fig, ax = plt.subplots(1, 1)
 
-        center = PixCoord(x=x, y=y)
-        reg = EllipseAnnulusPixelRegion(center=center, inner_width=inner_width,
-                                        outer_width=outer_width,
-                                        inner_height=inner_height,
-                                        outer_height=outer_height, angle=angle)
-        patch = reg.as_artist(facecolor='none', edgecolor='red', lw=2)
-        ax.add_patch(patch)
+        reg = EllipseAnnulusPixelRegion(PixCoord(6, 6),
+                                        inner_width=5.5,
+                                        outer_width=8.5,
+                                        inner_height=3.5,
+                                        outer_height=6.5,
+                                        angle=Angle('45deg'))
+        reg.plot(ax=ax, facecolor='none', edgecolor='red', lw=2)
 
-        plt.xlim(-5, 20)
-        plt.ylim(-5, 20)
+        ax.set_xlim(-5, 20)
+        ax.set_ylim(-5, 20)
         ax.set_aspect('equal')
     """
 
@@ -495,27 +511,18 @@ class RectangleAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
         from regions import PixCoord, RectangleAnnulusPixelRegion
         import matplotlib.pyplot as plt
 
-        x, y = 6, 6
-        inner_width = 5.5
-        outer_width = 8.5
-        inner_height = 3.5
-        outer_height = 6.5
-        angle = Angle('45deg')
-
         fig, ax = plt.subplots(1, 1)
 
-        center = PixCoord(x=x, y=y)
-        reg = RectangleAnnulusPixelRegion(center=center,
-                                          inner_width=inner_width,
-                                          outer_width=outer_width,
-                                          inner_height=inner_height,
-                                          outer_height=outer_height,
-                                          angle=angle)
-        patch = reg.as_artist(facecolor='none', edgecolor='red', lw=2)
-        ax.add_patch(patch)
+        reg = RectangleAnnulusPixelRegion(PixCoord(x=6, y=6),
+                                          inner_width=5.5,
+                                          outer_width=8.5,
+                                          inner_height=3.5,
+                                          outer_height=6.5,
+                                          angle=Angle('45deg'))
+        reg.plot(ax=ax, facecolor='none', edgecolor='red', lw=2)
 
-        plt.xlim(-5, 20)
-        plt.ylim(-5, 20)
+        ax.set_xlim(-5, 20)
+        ax.set_ylim(-5, 20)
         ax.set_aspect('equal')
     """
 

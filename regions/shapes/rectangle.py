@@ -55,29 +55,29 @@ class RectanglePixelRegion(PixelRegion):
         from regions import PixCoord, RectanglePixelRegion
         import matplotlib.pyplot as plt
 
-        x, y = 15, 10
-        width, height = 8, 5
-        angle = Angle(30, 'deg')
-
         fig, ax = plt.subplots(1, 1)
 
-        center = PixCoord(x=x, y=y)
-        reg = RectanglePixelRegion(center=center, width=width,
-                                   height=height, angle=angle)
-        patch = reg.as_artist(facecolor='none', edgecolor='red', lw=2)
-        ax.add_patch(patch)
+        reg = RectanglePixelRegion(PixCoord(x=15, y=10), width=8,
+                                   height=5, angle=Angle(30, 'deg'))
+        reg.plot(ax=ax, facecolor='none', edgecolor='red', lw=2)
 
-        plt.xlim(0, 30)
-        plt.ylim(0, 20)
+        ax.set_xlim(0, 30)
+        ax.set_ylim(0, 20)
         ax.set_aspect('equal')
     """
 
     _params = ('center', 'width', 'height', 'angle')
-    center = ScalarPixCoord('center')
-    width = PositiveScalar('width')
-    height = PositiveScalar('height')
-    angle = ScalarAngle('angle')
-    mpl_artist = 'Patch'
+    _mpl_artist = 'Patch'
+    center = ScalarPixCoord('center', description='The center pixel position.')
+    width = PositiveScalar('width',
+                           description=('The width of the rectangle (before '
+                                        'rotation) in pixels.'))
+    height = PositiveScalar('height',
+                            description=('The height of the rectangle (before '
+                                         'rotation) in pixels.'))
+    angle = ScalarAngle('angle',
+                        description=('The rotation angle measured '
+                                     'anti-clockwise.'))
 
     def __init__(self, center, width, height, angle=0 * u.deg, meta=None,
                  visual=None):
@@ -198,7 +198,7 @@ class RectanglePixelRegion(PixelRegion):
         # matplotlib expects rotation in degrees (anti-clockwise)
         angle = self.angle.to('deg').value
 
-        mpl_kwargs = self.visual.define_mpl_kwargs(self.mpl_artist)
+        mpl_kwargs = self.visual.define_mpl_kwargs(self._mpl_artist)
         mpl_kwargs.update(kwargs)
 
         return Rectangle(xy=xy, width=width, height=height,
@@ -389,10 +389,19 @@ class RectangleSkyRegion(SkyRegion):
     """
 
     _params = ('center', 'width', 'height', 'angle')
-    center = ScalarSkyCoord('center')
-    width = PositiveScalarAngle('width')
-    height = PositiveScalarAngle('height')
-    angle = ScalarAngle('angle')
+    center = ScalarSkyCoord('center',
+                            description=('The center position in sky '
+                                         'coordinates.'))
+    width = PositiveScalarAngle('width',
+                                description=('The width of the rectangle '
+                                             '(before rotation) as an angle.'))
+    height = PositiveScalarAngle('height',
+                                 description=('The height of the rectangle '
+                                              '(before rotation) as an '
+                                              'angle.'))
+    angle = ScalarAngle('angle',
+                        description=('The rotation angle measured '
+                                     'anti-clockwise.'))
 
     def __init__(self, center, width, height, angle=0 * u.deg, meta=None,
                  visual=None):

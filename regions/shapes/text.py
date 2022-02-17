@@ -7,6 +7,7 @@ from astropy.wcs.utils import pixel_to_skycoord, skycoord_to_pixel
 
 from .point import PointPixelRegion, PointSkyRegion
 from ..core import PixCoord
+from ..core.attributes import ScalarPixCoord, ScalarSkyCoord
 
 __all__ = ['TextSkyRegion', 'TextPixelRegion']
 
@@ -18,7 +19,7 @@ class TextPixelRegion(PointPixelRegion):
     Parameters
     ----------
     center : `~regions.PixCoord`
-        The position of the leftmost point of the text string.
+        The leftmost point of the text string before rotation.
     text : str
         The text string.
     meta : `~regions.RegionMeta`, optional
@@ -35,23 +36,24 @@ class TextPixelRegion(PointPixelRegion):
         from regions import PixCoord, TextPixelRegion, RegionVisual
         import matplotlib.pyplot as plt
 
-        x, y = 15, 10
-        textangle = '30'
-
         fig, ax = plt.subplots(1, 1)
 
-        center = PixCoord(x=x, y=y)
+        center = PixCoord(x=15, y=10)
+        visual = RegionVisual({'textangle': 30})
         reg = TextPixelRegion(center=center, text="Hello World!",
-                              visual=RegionVisual(textangle=textangle))
+                              visual=visual)
         reg.plot(ax=ax)
 
-        plt.xlim(10, 30)
-        plt.ylim(2.5, 20)
+        ax.set_xlim(10, 30)
+        ax.set_ylim(2.5, 20)
         ax.set_aspect('equal')
     """
 
     _params = ('center', 'text')
-    mpl_artist = 'Text'
+    _mpl_artist = 'Text'
+    center = ScalarPixCoord('center',
+                            description=('The leftmost pixel position before '
+                                         'rotation.'))
 
     def __init__(self, center, text, meta=None, visual=None):
         super().__init__(center, meta, visual)
@@ -85,7 +87,7 @@ class TextPixelRegion(PointPixelRegion):
         """
         from matplotlib.text import Text
 
-        mpl_kwargs = self.visual.define_mpl_kwargs(self.mpl_artist)
+        mpl_kwargs = self.visual.define_mpl_kwargs(self._mpl_artist)
         mpl_kwargs.update(kwargs)
 
         return Text(self.center.x - origin[0], self.center.y - origin[1],
@@ -99,7 +101,7 @@ class TextSkyRegion(PointSkyRegion):
     Parameters
     ----------
     center : `~astropy.coordinates.SkyCoord`
-        The position of the leftmost point of the text string.
+        The leftmost position of the text string before rotation.
     text : str
         The text string.
     meta : `~regions.RegionMeta`, optional
@@ -110,6 +112,9 @@ class TextSkyRegion(PointSkyRegion):
     """
 
     _params = ('center', 'text')
+    center = ScalarSkyCoord('center',
+                            description=('The leftmost position before '
+                                         'rotation as a sky coordinate.'))
 
     def __init__(self, center, text, meta=None, visual=None):
         super().__init__(center, meta, visual)

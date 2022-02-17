@@ -32,7 +32,7 @@ class CirclePixelRegion(PixelRegion):
     center : `~regions.PixCoord`
         The center position.
     radius : float
-        The radius.
+        The radius in pixels.
     meta : `~regions.RegionMeta`, optional
         A dictionary that stores the meta attributes of this region.
     visual : `~regions.RegionVisual`, optional
@@ -47,25 +47,20 @@ class CirclePixelRegion(PixelRegion):
         from regions import PixCoord, CirclePixelRegion
         import matplotlib.pyplot as plt
 
-        x, y = 6, 6
-        radius = 5.5
-
         fig, ax = plt.subplots(1, 1)
 
-        center = PixCoord(x=x, y=y)
-        reg = CirclePixelRegion(center=center, radius=radius)
-        patch = reg.as_artist(facecolor='none', edgecolor='red', lw=2)
-        ax.add_patch(patch)
+        reg = CirclePixelRegion(PixCoord(x=8, y=7), radius=3.5)
+        reg.plot(ax=ax, facecolor='none', edgecolor='red', lw=2)
 
-        plt.xlim(0, 15)
-        plt.ylim(0, 15)
+        ax.set_xlim(0, 15)
+        ax.set_ylim(0, 15)
         ax.set_aspect('equal')
     """
 
     _params = ('center', 'radius')
-    center = ScalarPixCoord('center')
-    radius = PositiveScalar('radius')
-    mpl_artist = 'Patch'
+    _mpl_artist = 'Patch'
+    center = ScalarPixCoord('center', description='The center pixel position.')
+    radius = PositiveScalar('radius', description='The radius in pixels.')
 
     def __init__(self, center, radius, meta=None, visual=None):
         self.center = center
@@ -156,7 +151,7 @@ class CirclePixelRegion(PixelRegion):
 
         xy = self.center.x - origin[0], self.center.y - origin[1]
         radius = self.radius
-        mpl_kwargs = self.visual.define_mpl_kwargs(self.mpl_artist)
+        mpl_kwargs = self.visual.define_mpl_kwargs(self._mpl_artist)
         mpl_kwargs.update(kwargs)
 
         return Circle(xy=xy, radius=radius, **mpl_kwargs)
@@ -201,8 +196,10 @@ class CircleSkyRegion(SkyRegion):
     """
 
     _params = ('center', 'radius')
-    center = ScalarSkyCoord('center')
-    radius = PositiveScalarAngle('radius')
+    center = ScalarSkyCoord('center', description=('The center position in '
+                                                   'sky coordinates.'))
+    radius = PositiveScalarAngle('radius',
+                                 description='The radius in angular units.')
 
     def __init__(self, center, radius, meta=None, visual=None):
         self.center = center

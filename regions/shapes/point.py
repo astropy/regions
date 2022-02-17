@@ -39,30 +39,30 @@ class PointPixelRegion(PixelRegion):
         import matplotlib.pyplot as plt
 
         fig, ax = plt.subplots(1, 1)
+
         regs = []
         regs.append(PointPixelRegion(PixCoord(2, 2),
-                    visual=RegionVisual(symbol='D')))
+                    visual=RegionVisual(marker='D')))
         regs.append(PointPixelRegion(PixCoord(2, 3),
-                    visual=RegionVisual(symbol='*')))
+                    visual=RegionVisual(marker='+')))
         regs.append(PointPixelRegion(PixCoord(3, 3),
-                    visual=RegionVisual(symbol='^')))
+                    visual=RegionVisual(marker='^')))
         regs.append(PointPixelRegion(PixCoord(3, 2),
-                    visual=RegionVisual(symbol='*')))
+                    visual=RegionVisual(marker='*')))
         regs.append(PointPixelRegion(PixCoord(2, 4),
-                    visual=RegionVisual(symbol='x')))
+                    visual=RegionVisual(marker='x')))
         regs.append(PointPixelRegion(PixCoord(4, 2)))
-
         for reg in regs:
             reg.plot(ax=ax)
 
-        plt.xlim(0, 6)
-        plt.ylim(0, 6)
+        ax.set_xlim(0, 6)
+        ax.set_ylim(0, 6)
         ax.set_aspect('equal')
     """
 
     _params = ('center',)
-    center = ScalarPixCoord('center')
-    mpl_artist = 'Line2D'
+    _mpl_artist = 'Line2D'
+    center = ScalarPixCoord('center', description='The point pixel position.')
 
     def __init__(self, center, meta=None, visual=None):
         self.center = center
@@ -122,7 +122,7 @@ class PointPixelRegion(PixelRegion):
         """
         from matplotlib.lines import Line2D
 
-        mpl_kwargs = self.visual.define_mpl_kwargs(self.mpl_artist)
+        mpl_kwargs = self.visual.define_mpl_kwargs(self._mpl_artist)
         mpl_kwargs.update(kwargs)
 
         return Line2D([self.center.x - origin[0]],
@@ -166,7 +166,9 @@ class PointSkyRegion(SkyRegion):
     """
 
     _params = ('center',)
-    center = ScalarSkyCoord('center')
+    center = ScalarSkyCoord('center',
+                            description=('The point position as a sky '
+                                         'coordinate.'))
 
     def __init__(self, center, meta=None, visual=None):
         self.center = center

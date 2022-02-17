@@ -48,7 +48,6 @@ class EllipsePixelRegion(PixelRegion):
 
     Examples
     --------
-
     .. plot::
         :include-source:
 
@@ -57,29 +56,30 @@ class EllipsePixelRegion(PixelRegion):
         from astropy.coordinates import Angle
         from regions import PixCoord, EllipsePixelRegion
         import matplotlib.pyplot as plt
-        x0, y0 = 15, 10
-        a, b = 8, 5
-        theta = Angle(30, 'deg')
-        ell = Ellipse2D(amplitude=100., x_0=x0, y_0=y0, a=a, b=b,
-                        theta=theta.radian)
-        y, x = np.mgrid[0:20, 0:30]
-        fig, ax = plt.subplots(1, 1)
-        ax.imshow(ell(x, y), origin='lower', interpolation='none',
-                  cmap='Greys_r')
 
-        center = PixCoord(x=x0, y=y0)
-        reg = EllipsePixelRegion(center=center, width=2*a, height=2*b,
-                                 angle=theta)
-        patch = reg.as_artist(facecolor='none', edgecolor='red', lw=2)
-        ax.add_patch(patch)
+        fig, ax = plt.subplots(1, 1)
+
+        reg = EllipsePixelRegion(PixCoord(15, 10), width=16, height=10,
+                                 angle=Angle(30, 'deg'))
+        reg.plot(ax=ax, facecolor='none', edgecolor='red', lw=2)
+
+        ax.set_xlim(0, 30)
+        ax.set_ylim(0, 20)
+        ax.set_aspect('equal')
     """
 
     _params = ('center', 'width', 'height', 'angle')
-    center = ScalarPixCoord('center')
-    width = PositiveScalar('width')
-    height = PositiveScalar('height')
-    angle = ScalarAngle('angle')
-    mpl_artist = 'Patch'
+    _mpl_artist = 'Patch'
+    center = ScalarPixCoord('center', description='The center pixel position.')
+    width = PositiveScalar('width',
+                           description=('The width of the ellipse (before '
+                                        'rotation) in pixels.'))
+    height = PositiveScalar('height',
+                            description=('The height of the ellipse (before '
+                                         'rotation) in pixels.'))
+    angle = ScalarAngle('angle',
+                        description=('The rotation angle measured '
+                                     'anti-clockwise.'))
 
     def __init__(self, center, width, height, angle=0. * u.deg, meta=None,
                  visual=None):
@@ -205,7 +205,7 @@ class EllipsePixelRegion(PixelRegion):
         # matplotlib expects rotation in degrees (anti-clockwise)
         angle = self.angle.to('deg').value
 
-        mpl_kwargs = self.visual.define_mpl_kwargs(self.mpl_artist)
+        mpl_kwargs = self.visual.define_mpl_kwargs(self._mpl_artist)
         mpl_kwargs.update(kwargs)
 
         return Ellipse(xy=xy, width=width, height=height, angle=angle,
@@ -350,10 +350,19 @@ class EllipseSkyRegion(SkyRegion):
     """
 
     _params = ('center', 'width', 'height', 'angle')
-    center = ScalarSkyCoord('center')
-    width = PositiveScalarAngle('width')
-    height = PositiveScalarAngle('height')
-    angle = ScalarAngle('angle')
+    center = ScalarSkyCoord('center',
+                            description=('The center position in sky '
+                                         'coordinates.'))
+    width = PositiveScalarAngle('width',
+                                description=('The width of the ellipse '
+                                             '(before rotation) as an angle.'))
+    height = PositiveScalarAngle('height',
+                                 description=('The height of the ellipse '
+                                              '(before rotation) as an '
+                                              'angle.'))
+    angle = ScalarAngle('angle',
+                        description=('The rotation angle measured '
+                                     'anti-clockwise.'))
 
     def __init__(self, center, width, height, angle=0. * u.deg, meta=None,
                  visual=None):
