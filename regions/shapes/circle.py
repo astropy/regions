@@ -47,18 +47,13 @@ class CirclePixelRegion(PixelRegion):
         from regions import PixCoord, CirclePixelRegion
         import matplotlib.pyplot as plt
 
-        x, y = 6, 6
-        radius = 5.5
-
         fig, ax = plt.subplots(1, 1)
 
-        center = PixCoord(x=x, y=y)
-        reg = CirclePixelRegion(center=center, radius=radius)
-        patch = reg.as_artist(facecolor='none', edgecolor='red', lw=2)
-        ax.add_patch(patch)
+        reg = CirclePixelRegion(PixCoord(x=8, y=7), radius=3.5)
+        reg.plot(ax=ax, facecolor='none', edgecolor='red', lw=2)
 
-        plt.xlim(0, 15)
-        plt.ylim(0, 15)
+        ax.set_xlim(0, 15)
+        ax.set_ylim(0, 15)
         ax.set_aspect('equal')
     """
 

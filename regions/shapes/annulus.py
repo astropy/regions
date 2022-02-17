@@ -106,20 +106,15 @@ class CircleAnnulusPixelRegion(AnnulusPixelRegion):
         from regions import PixCoord, CircleAnnulusPixelRegion
         import matplotlib.pyplot as plt
 
-        x, y = 6, 6
-        inner_radius = 5.5
-        outer_radius = 8
         fig, ax = plt.subplots(1, 1)
 
-        center = PixCoord(x=x, y=y)
-        reg = CircleAnnulusPixelRegion(center=center,
-                                       inner_radius=inner_radius,
-                                       outer_radius=outer_radius)
-        patch = reg.as_artist(facecolor='none', edgecolor='red', lw=2)
-        ax.add_patch(patch)
+        reg = CircleAnnulusPixelRegion(PixCoord(x=6, y=6),
+                                       inner_radius=5.5,
+                                       outer_radius=8.0)
+        reg.plot(ax=ax, facecolor='none', edgecolor='red', lw=2)
 
-        plt.xlim(-5, 20)
-        plt.ylim(-5, 20)
+        ax.set_xlim(-5, 20)
+        ax.set_ylim(-5, 20)
         ax.set_aspect('equal')
     """
 
@@ -415,25 +410,18 @@ class EllipseAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
         from regions import PixCoord, EllipseAnnulusPixelRegion
         import matplotlib.pyplot as plt
 
-        x, y = 6, 6
-        inner_width = 5.5
-        outer_width = 8.5
-        inner_height = 3.5
-        outer_height = 6.5
-        angle = Angle('45deg')
-
         fig, ax = plt.subplots(1, 1)
 
-        center = PixCoord(x=x, y=y)
-        reg = EllipseAnnulusPixelRegion(center=center, inner_width=inner_width,
-                                        outer_width=outer_width,
-                                        inner_height=inner_height,
-                                        outer_height=outer_height, angle=angle)
-        patch = reg.as_artist(facecolor='none', edgecolor='red', lw=2)
-        ax.add_patch(patch)
+        reg = EllipseAnnulusPixelRegion(PixCoord(6, 6),
+                                        inner_width=5.5,
+                                        outer_width=8.5,
+                                        inner_height=3.5,
+                                        outer_height=6.5,
+                                        angle=Angle('45deg'))
+        reg.plot(ax=ax, facecolor='none', edgecolor='red', lw=2)
 
-        plt.xlim(-5, 20)
-        plt.ylim(-5, 20)
+        ax.set_xlim(-5, 20)
+        ax.set_ylim(-5, 20)
         ax.set_aspect('equal')
     """
 
@@ -523,27 +511,18 @@ class RectangleAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
         from regions import PixCoord, RectangleAnnulusPixelRegion
         import matplotlib.pyplot as plt
 
-        x, y = 6, 6
-        inner_width = 5.5
-        outer_width = 8.5
-        inner_height = 3.5
-        outer_height = 6.5
-        angle = Angle('45deg')
-
         fig, ax = plt.subplots(1, 1)
 
-        center = PixCoord(x=x, y=y)
-        reg = RectangleAnnulusPixelRegion(center=center,
-                                          inner_width=inner_width,
-                                          outer_width=outer_width,
-                                          inner_height=inner_height,
-                                          outer_height=outer_height,
-                                          angle=angle)
-        patch = reg.as_artist(facecolor='none', edgecolor='red', lw=2)
-        ax.add_patch(patch)
+        reg = RectangleAnnulusPixelRegion(PixCoord(x=6, y=6),
+                                          inner_width=5.5,
+                                          outer_width=8.5,
+                                          inner_height=3.5,
+                                          outer_height=6.5,
+                                          angle=Angle('45deg'))
+        reg.plot(ax=ax, facecolor='none', edgecolor='red', lw=2)
 
-        plt.xlim(-5, 20)
-        plt.ylim(-5, 20)
+        ax.set_xlim(-5, 20)
+        ax.set_ylim(-5, 20)
         ax.set_aspect('equal')
     """
 

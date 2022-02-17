@@ -55,20 +55,14 @@ class RectanglePixelRegion(PixelRegion):
         from regions import PixCoord, RectanglePixelRegion
         import matplotlib.pyplot as plt
 
-        x, y = 15, 10
-        width, height = 8, 5
-        angle = Angle(30, 'deg')
-
         fig, ax = plt.subplots(1, 1)
 
-        center = PixCoord(x=x, y=y)
-        reg = RectanglePixelRegion(center=center, width=width,
-                                   height=height, angle=angle)
-        patch = reg.as_artist(facecolor='none', edgecolor='red', lw=2)
-        ax.add_patch(patch)
+        reg = RectanglePixelRegion(PixCoord(x=15, y=10), width=8,
+                                   height=5, angle=Angle(30, 'deg'))
+        reg.plot(ax=ax, facecolor='none', edgecolor='red', lw=2)
 
-        plt.xlim(0, 30)
-        plt.ylim(0, 20)
+        ax.set_xlim(0, 30)
+        ax.set_ylim(0, 20)
         ax.set_aspect('equal')
     """
 

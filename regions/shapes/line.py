@@ -39,19 +39,15 @@ class LinePixelRegion(PixelRegion):
         from regions import PixCoord, LinePixelRegion
         import matplotlib.pyplot as plt
 
-        x1, y1 = 15, 10
-        x2, y2 = 20, 25
-
         fig, ax = plt.subplots(1, 1)
 
-        start = PixCoord(x=x1, y=y1)
-        end = PixCoord(x=x2, y=y2)
+        start = PixCoord(x=15, y=10)
+        end = PixCoord(x=20, y=25)
         reg = LinePixelRegion(start=start, end=end)
-        patch = reg.as_artist(facecolor='none', edgecolor='red', lw=2)
-        ax.add_patch(patch)
+        reg.plot(ax=ax, edgecolor='red', lw=2)
 
-        plt.xlim(0, 30)
-        plt.ylim(0, 30)
+        ax.set_xlim(0, 30)
+        ax.set_ylim(0, 30)
         ax.set_aspect('equal')
     """
 

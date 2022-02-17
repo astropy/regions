@@ -39,24 +39,24 @@ class PointPixelRegion(PixelRegion):
         import matplotlib.pyplot as plt
 
         fig, ax = plt.subplots(1, 1)
+
         regs = []
         regs.append(PointPixelRegion(PixCoord(2, 2),
-                    visual=RegionVisual(symbol='D')))
+                    visual=RegionVisual(marker='D')))
         regs.append(PointPixelRegion(PixCoord(2, 3),
-                    visual=RegionVisual(symbol='*')))
+                    visual=RegionVisual(marker='+')))
         regs.append(PointPixelRegion(PixCoord(3, 3),
-                    visual=RegionVisual(symbol='^')))
+                    visual=RegionVisual(marker='^')))
         regs.append(PointPixelRegion(PixCoord(3, 2),
-                    visual=RegionVisual(symbol='*')))
+                    visual=RegionVisual(marker='*')))
         regs.append(PointPixelRegion(PixCoord(2, 4),
-                    visual=RegionVisual(symbol='x')))
+                    visual=RegionVisual(marker='x')))
         regs.append(PointPixelRegion(PixCoord(4, 2)))
-
         for reg in regs:
             reg.plot(ax=ax)
 
-        plt.xlim(0, 6)
-        plt.ylim(0, 6)
+        ax.set_xlim(0, 6)
+        ax.set_ylim(0, 6)
         ax.set_aspect('equal')
     """
 
