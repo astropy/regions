@@ -10,7 +10,7 @@ from astropy.tests.helper import assert_quantity_allclose
 import astropy.units as u
 from astropy.utils.data import get_pkg_data_filenames
 from astropy.utils.exceptions import AstropyUserWarning
-from numpy.testing import assert_allclose
+from numpy.testing import assert_allclose, assert_equal
 import pytest
 
 from ....core import Regions
@@ -211,17 +211,6 @@ def test_parse_formats():
     assert_quantity_allclose(region7.radius, 2. * u.deg)
 
 
-def test_text_metadata():
-    """
-    Regression test for issue #233: make sure that text metadata is
-    parsed and stored appropriately.
-    """
-    region_str = 'image\ncircle(1.5, 2, 2) # text={this_is_text}'
-    regions = Regions.parse(region_str, format='ds9')
-    assert len(regions) == 1
-    assert regions[0].meta['text'] == 'this_is_text'
-
-
 def test_angle_serialization():
     """
     Regression test for issue #223 to ensure Angle arcsec inputs are
@@ -396,3 +385,173 @@ def test_default_mpl_kwargs():
         assert regions[i].as_artist().get_ha() == 'left'
     assert regions[4].as_artist().get_color() == 'red'
     assert regions[5].as_artist().get_color() == 'black'
+
+
+def test_annulus():
+    region1_str = 'image\nannulus(1, 2, 3, 4)'
+    regions1 = Regions.parse(region1_str, format='ds9')
+    assert len(regions1) == 1
+    assert_equal(regions1[0].center.xy, (0, 1))
+    assert_equal(regions1[0].inner_radius, 3.0)
+    assert_equal(regions1[0].outer_radius, 4.0)
+
+    # multiple annuli
+    region2_str = 'image\nannulus(1, 2, 3, 4, 5, 6)'
+    regions2 = Regions.parse(region2_str, format='ds9')
+    assert len(regions2) == 3
+    assert_equal(regions2[0].center.xy, (0, 1))
+    assert_equal(regions2[0].inner_radius, 3.0)
+    assert_equal(regions2[0].outer_radius, 4.0)
+    assert_equal(regions2[1].center.xy, (0, 1))
+    assert_equal(regions2[1].inner_radius, 4.0)
+    assert_equal(regions2[1].outer_radius, 5.0)
+    assert_equal(regions2[2].center.xy, (0, 1))
+    assert_equal(regions2[2].inner_radius, 5.0)
+    assert_equal(regions2[2].outer_radius, 6.0)
+
+
+def test_ellipse():
+    region1_str = 'image\nellipse (1, 2, 3, 4, 5)'
+    region1 = Regions.parse(region1_str, format='ds9')[0]
+    assert_equal(region1.center.xy, (0, 1))
+    assert_equal(region1.width, 6.0)
+    assert_equal(region1.height, 8.0)
+    assert_equal(region1.angle, 5.0 * u.deg)
+
+    region2_str = 'icrs\nellipse (1, 2, 3, 4, 5)'
+    region2 = Regions.parse(region2_str, format='ds9')[0]
+    assert_equal(region2.center.ra, 1. * u.deg)
+    assert_equal(region2.center.dec, 2. * u.deg)
+    assert_equal(region2.width, 6.0 * u.deg)
+    assert_equal(region2.height, 8.0 * u.deg)
+    assert_equal(region2.angle, 5.0 * u.deg)
+
+    # elliptical annulus
+    region3_str = 'image\nellipse (1, 2, 3, 4, 5, 6, 7)'
+    region3 = Regions.parse(region3_str, format='ds9')[0]
+    assert_equal(region3.center.xy, (0, 1))
+    assert_equal(region3.inner_width, 6.0)
+    assert_equal(region3.inner_height, 8.0)
+    assert_equal(region3.outer_width, 10.0)
+    assert_equal(region3.outer_height, 12.0)
+    assert_equal(region3.angle, 7.0 * u.deg)
+
+    # multiple elliptical annuli
+    region4_str = 'image\nellipse (1, 2, 3, 4, 5, 6, 7, 8, 9)'
+    region4 = Regions.parse(region4_str, format='ds9')
+    assert len(region4) == 2
+    assert_equal(region4[0].center.xy, (0, 1))
+    assert_equal(region4[0].inner_width, 6.0)
+    assert_equal(region4[0].inner_height, 8.0)
+    assert_equal(region4[0].outer_width, 10.0)
+    assert_equal(region4[0].outer_height, 12.0)
+    assert_equal(region4[0].angle, 9.0 * u.deg)
+    assert_equal(region4[1].center.xy, (0, 1))
+    assert_equal(region4[1].inner_width, 10.0)
+    assert_equal(region4[1].inner_height, 12.0)
+    assert_equal(region4[1].outer_width, 14.0)
+    assert_equal(region4[1].outer_height, 16.0)
+    assert_equal(region4[1].angle, 9.0 * u.deg)
+
+
+def test_box():
+    region1_str = 'image\nbox (1, 2, 3, 4, 5)'
+    region1 = Regions.parse(region1_str, format='ds9')[0]
+    assert_equal(region1.center.xy, (0, 1))
+    assert_equal(region1.width, 3.0)
+    assert_equal(region1.height, 4.0)
+    assert_equal(region1.angle, 5.0 * u.deg)
+
+    region2_str = 'icrs\nbox (1, 2, 3, 4, 5)'
+    region2 = Regions.parse(region2_str, format='ds9')[0]
+    assert_equal(region2.center.ra, 1. * u.deg)
+    assert_equal(region2.center.dec, 2. * u.deg)
+    assert_equal(region2.width, 3.0 * u.deg)
+    assert_equal(region2.height, 4.0 * u.deg)
+    assert_equal(region2.angle, 5.0 * u.deg)
+
+    # box (rectangle) annulus
+    region3_str = 'image\nbox (1, 2, 3, 4, 5, 6, 7)'
+    region3 = Regions.parse(region3_str, format='ds9')[0]
+    assert_equal(region3.center.xy, (0, 1))
+    assert_equal(region3.inner_width, 3.0)
+    assert_equal(region3.inner_height, 4.0)
+    assert_equal(region3.outer_width, 5.0)
+    assert_equal(region3.outer_height, 6.0)
+    assert_equal(region3.angle, 7.0 * u.deg)
+
+    # multiple box (rectangle) annuli
+    region4_str = 'image\nbox (1, 2, 3, 4, 5, 6, 7, 8, 9)'
+    region4 = Regions.parse(region4_str, format='ds9')
+    assert len(region4) == 2
+    assert_equal(region4[0].center.xy, (0, 1))
+    assert_equal(region4[0].inner_width, 3.0)
+    assert_equal(region4[0].inner_height, 4.0)
+    assert_equal(region4[0].outer_width, 5.0)
+    assert_equal(region4[0].outer_height, 6.0)
+    assert_equal(region4[0].angle, 9.0 * u.deg)
+    assert_equal(region4[1].center.xy, (0, 1))
+    assert_equal(region4[1].inner_width, 5.0)
+    assert_equal(region4[1].inner_height, 6.0)
+    assert_equal(region4[1].outer_width, 7.0)
+    assert_equal(region4[1].outer_height, 8.0)
+    assert_equal(region4[1].angle, 9.0 * u.deg)
+
+
+def test_invalid_metadata():
+    # test that invalid ds9 metadata raises warnings
+    regstr = ('# Region file format: DS9 version 4.1\n'
+              'global color=green dashlist=8 3 width=1 '
+              'font="helvetica 10 normal roman" select=1 highlite=1 dash=1 '
+              'fixed=0 edit=1 move=1 rotate=1 delete=1 include=1 source=1.1 '
+              'background=0 text={hello world} fill=1.8 point=diamond 11.2 '
+              'textrotate=1 textangle=34 tag={Tag 1} tag={Tag 2} line=3 1\n'
+              'image; circle(100.4,47.2,10.9) # color=red\n'
+              'image; circle(202.4,47.2,10.9) # color=blue point=junk 10\n'
+              'image; circle(302.4,147.2,10.9) # color=cyan point=invalid\n')
+
+    with pytest.warns(AstropyUserWarning) as record:
+        regs = Regions.parse(regstr, format='ds9')
+        assert len(record) == 12
+        assert 'source=1.1' in record[0].message.args[0]
+        assert 'fill=1.8' in record[1].message.args[0]
+        assert 'point=diamond 11.2' in record[2].message.args[0]
+        assert 'line=3 1' in record[3].message.args[0]
+        assert 'point=junk 10' in record[6].message.args[0]
+        assert 'point=invalid' in record[10].message.args[0]
+
+    assert len(regs) == 3
+
+
+def test_unsupported_metadata():
+    regstr = ('image; point(335.5,415.6) # point=diamond 11 color=yellow '
+              'width=2 text={example} dash=1 tag={Tag 1} tag={Tag 2}')
+    with pytest.warns(UserWarning) as record:
+        Regions.parse(regstr, format='ds9')
+        assert len(record) == 1
+        assert 'dashed lines are unsupported' in record[0].message.args[0]
+
+
+def test_text_metadata():
+    # Regression test for issue #233: make sure that text metadata is
+    # parsed and stored appropriately.
+    region_str = 'image\ncircle(1.5, 2, 2) # text={this_is_text}'
+    regions = Regions.parse(region_str, format='ds9')
+    assert len(regions) == 1
+    assert regions[0].meta['text'] == 'this_is_text'
+
+    rstr = 'image; circle(503.6,490.6,31.1) # color=blue text={A, {B}, C}'
+    reg = Regions.parse(rstr, format='ds9')[0]
+    assert reg.meta['text'] == 'A, {B'
+
+    rstr = 'image; circle(503.6,490.6,31.1) # color=blue text={A, {{B}}, C}'
+    reg = Regions.parse(rstr, format='ds9')[0]
+    assert reg.meta['text'] == 'A, {{B'
+
+    rstr = "image; circle(503.6,490.6,31.1) # color=blue text='A, 'B', C'"
+    reg = Regions.parse(rstr, format='ds9')[0]
+    assert reg.meta['text'] == 'A, '
+
+    rstr = 'image; circle(503.6,490.6,31.1) # color=blue text="A, "B", C"'
+    reg = Regions.parse(rstr, format='ds9')[0]
+    assert reg.meta['text'] == 'A, '
