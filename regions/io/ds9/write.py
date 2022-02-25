@@ -1,5 +1,6 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
+from copy import deepcopy
 import os
 import warnings
 
@@ -9,7 +10,8 @@ from astropy.utils.exceptions import AstropyUserWarning
 
 from ...core import Region, Regions, PixelRegion, PixCoord
 from ...core.registry import RegionsRegistry
-from .core import ds9_valid_symbols, ds9_shape_templates
+from .core import ds9_frame_map, ds9_shape_templates
+from .meta import _translate_metadata_to_ds9
 
 __all__ = []
 
@@ -27,7 +29,7 @@ def _serialize_ds9(regions, precision=8):
     # extract common region metadata and place in the global metadata
     all_meta = []
     for region in region_data:
-        region_meta = region['meta']
+        region_meta = deepcopy(region['meta'])
         region_meta.pop('tag', None)  # "tag" cannot be in global metadata
         all_meta.append(region_meta)
 
@@ -127,20 +129,11 @@ def _get_frame_name(region, mapping):
     return mapping[frame]
 
 
-def _remove_invalid_keys(region_meta, valid_keys):
-    # TODO: instead of new dict, del region_meta in-place?
-    meta = {}
-    for key in region_meta:
-        if key in valid_keys:
-            meta[key] = region_meta[key]
-    return meta
-
-
 def _make_meta_str(meta):
     metalist = []
     for key, val in meta.items():
         if key == 'tag':  # can have multiple tags; value is always a list
-            metalist.append(' '.join([f'tag={val}' for val in meta[key]]))
+            metalist.append(' '.join([f'tag={{{val}}}' for val in meta[key]]))
         else:
             metalist.append(f'{key}={val}')
     return ' '.join(metalist)
@@ -175,7 +168,7 @@ def _get_region_params(region, shape_template, precision=8):
                 value_str = ''
                 for val in value:
                     value_str += (f'{val.x + 1:0.{precision}f},'
-                                  f'{val.y + 1:0.{precision}f}')
+                                  f'{val.y + 1:0.{precision}f},')
                 value = value_str[:-1]
 
         elif isinstance(value, SkyCoord):
@@ -209,83 +202,8 @@ def _get_region_params(region, shape_template, precision=8):
     return param_str
 
 
-def _translate_ds9_meta(region, shape):
-    """
-    Translate region metadata to valid ds9 meta keys.
-    """
-    meta = {**region.meta, **region.visual}
-
-    if 'annulus' in shape:
-        # ds9 does not allow fill for annulus regions
-        meta.pop('fill', None)
-
-    if 'text' in meta:
-        meta['text'] = f'{{{meta["text"]}}}'
-
-    linewidth = meta.pop('linewidth', None)
-    if linewidth is not None:
-        meta['width'] = linewidth
-
-    # point region marker width
-    markeredgewidth = meta.pop('markeredgewidth', None)
-    if markeredgewidth is not None:
-        meta['width'] = markeredgewidth
-
-    marker = meta.pop('marker', None)
-    if marker is not None:
-        symbol_map = {y: x for x, y in ds9_valid_symbols.items()}
-        if marker in symbol_map:
-            markersize = meta.pop('markersize', 11)  # default 11
-            meta['point'] = f'{symbol_map[marker]} {markersize}'
-        else:
-            warnings.warn(f'Unable to serialize marker "{marker}"',
-                          AstropyUserWarning)
-
-    fontname = meta.pop('fontname', None)
-    if fontname is not None:
-        fontsize = meta.pop('fontsize', 10)  # default 10
-        fontweight = meta.pop('fontweight', 'normal')  # default normal
-        # default roman
-        fontstyle = meta.pop('fontstyle', 'roman').replace('normal', 'roman')
-        meta['font'] = f'"{fontname} {fontsize} {fontweight} {fontstyle}"'
-
-    linestyle = meta.pop('linestyle', None)
-    if linestyle is not None:
-        meta['dash'] = 1
-    # if linestyle in ('dashed', '--'):
-    if isinstance(linestyle, tuple):
-        meta['dashlist'] = f'{linestyle[1][0]} {linestyle[1][1]}'
-
-        # dashes = meta.pop('dashes', None)
-        # if dashes is not None:
-        #     meta['dashlist'] = f'{dashes[0]} {dashes[1]}'
-
-    rotation = meta.pop('rotation', None)
-    if rotation is not None:
-        meta['textangle'] = rotation
-        # meta['textrotate'] = 1
-
-    # ds9 meta keys
-    meta_keys = ['background', 'delete', 'edit', 'fixed', 'highlite',
-                 'include', 'move', 'rotate', 'select', 'source', 'tag',
-                 'text']
-    visual_keys = ['color', 'dash', 'dashlist', 'fill', 'font', 'point',
-                   'textangle', 'textrotate', 'width']
-    valid_keys = meta_keys + visual_keys
-    meta = _remove_invalid_keys(meta, valid_keys)
-
-    return meta
-
-
 def _serialize_region_ds9(region, precision=8):
-    # mapping from astropy frames to ds9 frames
-    frame_mapping = {'image': 'image',
-                     'icrs': 'icrs',
-                     'fk5': 'fk5',
-                     'fk4': 'fk4',
-                     'galactic': 'galactic',
-                     'geocentrictrueecliptic': 'ecliptic'}
-
+    frame_mapping = {v: k for k, v in ds9_frame_map.items()}
     frame = _get_frame_name(region, mapping=frame_mapping)
 
     shape = _get_region_shape(region)
@@ -300,6 +218,6 @@ def _serialize_region_ds9(region, precision=8):
     region_type = ds9_shape_templates[shape][0]
     region_str = f'{region_type}({region_params})'
 
-    region_meta = _translate_ds9_meta(region, shape)
+    region_meta = _translate_metadata_to_ds9(region, shape)
 
     return {'frame': frame, 'region': region_str, 'meta': region_meta}

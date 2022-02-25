@@ -15,7 +15,7 @@ from ...core import Regions, RegionMeta, RegionVisual, PixCoord
 from ...core.registry import RegionsRegistry
 from .core import (ds9_frame_map, ds9_shape_to_region, ds9_params_template,
                    DS9ParserError)
-from .meta import _split_raw_metadata, _translate_visual_metadata
+from .meta import _split_raw_metadata, _translate_ds9_to_visual
 
 __all__ = []
 
@@ -207,9 +207,10 @@ def _parse_raw_data(region_str):
                     raise ValueError('unable to parse line with composite '
                                      f'shape: "{line}"')
                 # composite metadata applies to all regions within the
-                # composite shape; this will always contain at least
-                # "composite=1"
+                # composite shape
                 composite_meta = _parse_metadata(line[idx + 2:].strip())
+                # remove "composite=1" since we split the composite
+                composite_meta.pop('composite', None)
 
             # NOTE: include=1/0 in metadata overrides the leading
             #       "-/+" symbol
@@ -649,7 +650,7 @@ def _make_region(region_data):
     # separate the metadata and visual metadata and then translate the
     # visual metadata to valid mpl kwargs for the particular region
     meta, visual = _split_raw_metadata(region_data.raw_meta)
-    visual = _translate_visual_metadata(shape, visual)
+    visual = _translate_ds9_to_visual(shape, visual)
 
     regions = []
     for shape_params in region_params:

@@ -38,11 +38,12 @@ def _split_raw_metadata(raw_metadata):
     visual = {}
     for key, value in raw_metadata.items():
         if key in unsupported_meta:
-            # ignore this special case because line=0 0 (no arrows) works
-            if key == 'line' and '1' not in value:
-                continue
-            warnings.warn(f'DS9 meta "{key}={value}" is unsupported and '
-                          'will be ignored', AstropyUserWarning)
+            # don't warn for "line=0 0" (no arrows) because it works,
+            # but skip adding it to metadata
+            if key != 'line' or '1' in value:
+                warnings.warn(f'DS9 meta "{key}={value}" is unsupported and '
+                              'will be ignored', AstropyUserWarning)
+            continue
 
         if key in ds9_visual_keys:
             visual[key] = value
@@ -55,7 +56,7 @@ def _split_raw_metadata(raw_metadata):
     return meta, visual
 
 
-def _translate_visual_metadata(shape, visual_meta):
+def _translate_ds9_to_visual(shape, visual_meta):
     """
     Translate ds9 visual metadata to dictionary of matplotlib keywords.
 
@@ -167,5 +168,103 @@ def _translate_visual_metadata(shape, visual_meta):
         if color is not None:
             meta['facecolor'] = color
             meta['edgecolor'] = color
+
+    return meta
+
+
+def _remove_invalid_keys(region_meta, valid_keys):
+    # TODO: instead of new dict, del region_meta in-place?
+    meta = {}
+    for key in region_meta:
+        if key in valid_keys:
+            meta[key] = region_meta[key]
+    return meta
+
+
+def _translate_metadata_to_ds9(region, shape):
+    """
+    Translate region metadata to valid ds9 meta keys.
+    """
+    meta = {**region.meta, **region.visual}
+
+    if 'annulus' in shape:
+        # ds9 does not allow fill for annulus regions
+        meta.pop('fill', None)
+
+    fill = meta.pop('fill', None)
+    if fill is not None:
+        meta['fill'] = int(fill)
+
+    if 'text' in meta:
+        meta['text'] = f'{{{meta["text"]}}}'
+
+    edgecolor = meta.pop('edgecolor', None)
+    facecolor = meta.pop('facecolor', None)
+    color = None
+    if edgecolor is not None:
+        color = edgecolor
+    if facecolor is not None:
+        if facecolor != color:
+            warnings.warn('facecolor and edgecolor are different, edgecolor '
+                          'will be used', AstropyUserWarning)
+        if color is None:
+            color = facecolor
+    if color is not None:
+        meta['color'] = color
+
+    linewidth = meta.pop('linewidth', None)
+    if linewidth is not None:
+        meta['width'] = linewidth
+
+    # point region marker width
+    markeredgewidth = meta.pop('markeredgewidth', None)
+    if markeredgewidth is not None:
+        meta['width'] = markeredgewidth
+
+    marker = meta.pop('marker', None)
+    if marker is not None:
+        symbol_map = {y: x for x, y in ds9_valid_symbols.items()}
+        if marker in symbol_map:
+            markersize = meta.pop('markersize', None)
+            msize = ''
+            if markersize is not None:
+                msize = f' {markersize}'
+            meta['point'] = f'{symbol_map[marker]}{msize}'
+        else:
+            warnings.warn(f'Unable to serialize marker "{marker}"',
+                          AstropyUserWarning)
+
+    fontname = meta.pop('fontname', None)
+    if fontname is not None:
+        fontsize = meta.pop('fontsize', 10)  # default 10
+        fontweight = meta.pop('fontweight', 'normal')  # default normal
+        # default roman
+        fontstyle = meta.pop('fontstyle', 'roman').replace('normal', 'roman')
+        meta['font'] = f'"{fontname} {fontsize} {fontweight} {fontstyle}"'
+
+    linestyle = meta.pop('linestyle', None)
+    if linestyle is not None:
+        meta['dash'] = 1
+    # if linestyle in ('dashed', '--'):
+    if isinstance(linestyle, tuple):
+        meta['dashlist'] = f'{linestyle[1][0]} {linestyle[1][1]}'
+
+        # dashes = meta.pop('dashes', None)
+        # if dashes is not None:
+        #     meta['dashlist'] = f'{dashes[0]} {dashes[1]}'
+
+    rotation = meta.pop('rotation', None)
+    if rotation is not None:
+        meta['textangle'] = rotation
+        # meta['textrotate'] = 1
+
+    # ds9 meta keys
+    meta_keys = ['background', 'delete', 'edit', 'fixed', 'highlite',
+                 'include', 'move', 'rotate', 'select', 'source', 'tag',
+                 'text']
+    visual_keys = ['color', 'dash', 'dashlist', 'fill', 'font', 'point',
+                   'textangle', 'textrotate', 'width']
+    valid_keys = meta_keys + visual_keys
+    meta = _remove_invalid_keys(meta, valid_keys)
 
     return meta

@@ -12,8 +12,6 @@ from ...shapes import (CirclePixelRegion, CircleSkyRegion,
                        PointPixelRegion, PointSkyRegion,
                        TextPixelRegion, TextSkyRegion)
 
-from astropy.utils.exceptions import AstropyUserWarning
-
 from ..._utils.optional_deps import HAS_MATPLOTLIB
 
 __all__ = []
