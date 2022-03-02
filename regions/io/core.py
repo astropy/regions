@@ -1,13 +1,13 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
 import numbers
-import string
 from warnings import warn
 
 from astropy.coordinates import (Angle, SkyCoord, UnitSphericalRepresentation,
                                  frame_transform_graph)
 from astropy.table import Table
 import astropy.units as u
+from astropy.utils.exceptions import AstropyUserWarning
 import numpy as np
 
 from ..shapes import (CirclePixelRegion, CircleSkyRegion,
@@ -610,7 +610,6 @@ def _to_shape_list(region_list, coordinate_system='fk5'):
             coord = []
             for val in regions_attributes[reg_type]:
                 coord.append(getattr(region, val))
-
 
         if coordinate_system:
             coordsys = coordinate_system
