@@ -10,6 +10,7 @@ from astropy.utils.exceptions import AstropyUserWarning
 
 from ...core import Region, Regions, PixelRegion, PixCoord
 from ...core.registry import RegionsRegistry
+from ...shapes import RegularPolygonPixelRegion
 from .core import ds9_frame_map, ds9_shape_templates
 from .meta import _translate_metadata_to_ds9
 
@@ -21,6 +22,8 @@ __all__ = []
 def _serialize_ds9(regions, precision=8):
     region_data = []
     for region in regions:
+        if isinstance(region, RegularPolygonPixelRegion):
+            region = region.to_polygon()
         region_data.append(_serialize_region_ds9(region, precision=precision))
 
     # ds9 file header
@@ -105,7 +108,6 @@ def _write_ds9(regions, filename, *, precision=8, overwrite=False):
 def _get_region_shape(region):
     shape = region.__class__.__name__.lower().replace('skyregion', '')
     shape = shape.replace('pixelregion', '')
-    shape = shape.replace('regularpolygon', 'polygon')
     return shape
 
 

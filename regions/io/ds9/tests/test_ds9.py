@@ -15,7 +15,8 @@ from numpy.testing import assert_allclose, assert_equal
 import pytest
 
 from ....core import Region, Regions, PixCoord, RegionVisual
-from ....shapes import CirclePixelRegion, CircleSkyRegion, PointPixelRegion
+from ....shapes import (CirclePixelRegion, CircleSkyRegion, PointPixelRegion,
+                        RegularPolygonPixelRegion)
 from ...._utils.optional_deps import HAS_MATPLOTLIB  # noqa
 
 
@@ -642,3 +643,10 @@ def test_unsupported_marker():
     with pytest.warns(AstropyUserWarning):
         region.serialize(format='ds9')
 
+
+def test_serialize_regularpolygon():
+    region = RegularPolygonPixelRegion(PixCoord(10, 10), 4, 20)
+    poly_region = region.to_polygon()
+    result1 = region.serialize(format='ds9')
+    result2 = poly_region.serialize(format='ds9')
+    assert result1 == result2
