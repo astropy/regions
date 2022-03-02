@@ -273,3 +273,10 @@ class TestRegionPolygonPixelRegion(BaseTestPixelRegion):
         assert reg == self.reg
         reg.radius = 25.
         assert reg != self.reg
+
+    def test_to_polygon(self):
+        polyreg = self.reg.to_polygon()
+        assert polyreg.vertices == self.reg.vertices
+        assert polyreg.meta == self.meta
+        assert polyreg.visual == self.visual
+        assert polyreg.origin == PixCoord(0, 0)
