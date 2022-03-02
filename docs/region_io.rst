@@ -171,3 +171,12 @@ formats and methods for the :class:`~regions.Region` subclasses::
       crtf    No       Yes   No   Yes           Yes
        ds9    No       Yes   No   Yes           Yes
       fits    No       Yes   No   Yes           Yes
+
+
+Region File Format Limitations
+==============================
+
+.. toctree::
+    :maxdepth: 1
+
+    ds9_io

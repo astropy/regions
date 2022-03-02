@@ -70,7 +70,7 @@ ds9_params_template = {'point': ('coord', 'coord'),
 
 # mapping from regions shapes to ds9 shape formats
 # unsupported ds9 shapes:
-# vector, ruler, compass, projection, panda, epanda, bpanda, composite
+# vector, ruler, compass, projection, panda, epanda, bpanda
 ds9_shape_templates = {'circle': ('circle',
                                   '{center},{radius}'),
                        'ellipse': ('ellipse',

@@ -140,7 +140,7 @@ def _parse_raw_data(region_str):
     supported_shapes = ['circle', 'ellipse', 'box', 'annulus', 'polygon',
                         'line', 'point', 'text', 'composite']
     unsupported_shapes = ['vector', 'ruler', 'compass', 'projection',
-                          'epanda', 'bpanda']
+                          'panda', 'epanda', 'bpanda']
 
     supported_frames_shapes = supported_frames + supported_shapes
     unsupported_frames_shapes = unsupported_frames + unsupported_shapes
