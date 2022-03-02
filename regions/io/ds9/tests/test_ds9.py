@@ -14,8 +14,8 @@ from astropy.utils.exceptions import AstropyUserWarning
 from numpy.testing import assert_allclose, assert_equal
 import pytest
 
-from ....core import Region, Regions, PixCoord
-from ....shapes.circle import CircleSkyRegion
+from ....core import Region, Regions, PixCoord, RegionVisual
+from ....shapes import CirclePixelRegion, CircleSkyRegion, PointPixelRegion
 from ...._utils.optional_deps import HAS_MATPLOTLIB  # noqa
 
 
@@ -621,3 +621,24 @@ def test_text_metadata():
     rstr = 'image; circle(503.6,490.6,31.1) # color=blue text="A, "B", C"'
     reg = Regions.parse(rstr, format='ds9')[0]
     assert reg.meta['text'] == 'A, '
+
+
+def test_mixed_coord():
+    with pytest.raises(ValueError):
+        CirclePixelRegion(PixCoord(10, 20), Angle(1, 'arcsec'))
+
+
+def test_unsupported_marker():
+    """
+    Test that warning is issued when serializing a valid matplotlib marker,
+    but unsupported by DS9.
+    """
+    region = PointPixelRegion(PixCoord(2, 2), visual=RegionVisual(marker='^'))
+    with pytest.warns(AstropyUserWarning):
+        region.serialize(format='ds9')
+
+    region = PointPixelRegion(PixCoord(2, 2),
+                              visual=RegionVisual(marker='$f_{init}$'))
+    with pytest.warns(AstropyUserWarning):
+        region.serialize(format='ds9')
+
