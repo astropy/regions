@@ -20,6 +20,18 @@ New Features
 
 - Added a ``copy`` method to ``RegionMeta`` and ``RegionVisual``. [#424]
 
+- Added the ability to handle DS9 elliptical and rectangular annuli and
+  multi-annuli regions. [#436]
+
+- Added the ability to handle DS9 composite regions. [#436]
+
+- Added the ability to serialize sky regions in the DS9 file format using
+  the coordinate frame of the ``SkyCoord`` object. [#436]
+
+- Added the ability to serialize multiple regions in the DS9 file format
+  that have different coordinate frames. [#436]
+
+
 Bug Fixes
 ---------
 
@@ -48,6 +60,11 @@ Bug Fixes
   ``TextSkyRegion`` to include quotes around the text parameter value.
   [#429]
 
+- Fixed many issues with the DS9 parser and serializer in not
+  consistently handling or preserving the region coordinate frame
+  or region parameter units. [#436]
+
+
 API Changes
 -----------
 
@@ -74,6 +91,14 @@ API Changes
 
 - A ``ValueError`` is raised if the radius, width, or height region
   parameters are not strictly positive (> 0). [#430]
+
+- Added a ``precision`` keyword to the DS9 serializer and writer to
+  specify the number of decimal places in output numbers. [#436]
+
+- The ``errors`` keyword was removed from the DS9 parser and reader and
+  the ``coordsys``, ``radunit``, and ``fmt`` keywords were removed from
+  the DS9 serializer and writer.  The new ``precision`` keyword can be
+  used when serializing and writing DS9 regions. [#436]
 
 
 0.5 (2021-07-20)

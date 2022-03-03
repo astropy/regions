@@ -53,10 +53,11 @@ class RegionMeta(Meta):
     A dictionary subclass that holds the meta attributes of the region.
     """
 
-    valid_keys = ['background', 'comment', 'corr', 'delete', 'edit', 'fixed',
-                  'frame', 'highlite', 'include', 'label', 'line', 'move',
-                  'name', 'range', 'restfreq', 'rotate', 'select', 'source',
-                  'tag', 'text', 'type', 'veltype']
+    valid_keys = ['background', 'comment', 'composite', 'corr', 'delete',
+                  'edit', 'fixed', 'frame', 'highlite', 'include', 'label',
+                  'line', 'move', 'name', 'range', 'restfreq', 'rotate',
+                  'select', 'source', 'tag', 'text', 'textrotate', 'type',
+                  'veltype']
 
     key_mapping = {}
 
@@ -67,10 +68,13 @@ class RegionVisual(Meta):
     region.
     """
 
-    valid_keys = ['color', 'dash', 'dashlist', 'fill', 'font', 'fontsize',
+    valid_keys = ['color', 'dash', 'dashlist', 'fill', 'font',
+                  'fontname', 'fontsize',
                   'fontstyle', 'fontweight', 'labeloff', 'labelpos', 'line',
-                  'linestyle', 'linewidth', 'marker', 'symbol', 'symsize',
-                  'symthick', 'textangle', 'usetex', 'default_style']
+                  'linestyle', 'linewidth', 'marker', 'markersize', 'symbol',
+                  'symsize', 'symthick', 'textangle', 'textrotate', 'usetex',
+                  'default_style', 'dashes', 'markeredgewidth', 'rotation',
+                  'facecolor', 'edgecolor']
 
     key_mapping = {'point': 'symbol', 'width': 'linewidth'}
 
@@ -114,9 +118,9 @@ class RegionVisual(Meta):
                 kwargs['ha'] = 'center'  # text horizontal alignment
                 kwargs['va'] = 'center'  # text vertical alignment
             elif artist == 'Line2D':
-                from ..io.ds9.core import valid_symbols_ds9
+                from ..io.ds9.core import ds9_valid_symbols
 
-                kwargs['marker'] = valid_symbols_ds9['boxcircle']
+                kwargs['marker'] = ds9_valid_symbols['boxcircle']
                 kwargs['markersize'] = 11
                 kwargs['markeredgecolor'] = kwargs.pop('color')
                 kwargs['fillstyle'] = 'none'
@@ -144,8 +148,6 @@ class RegionVisual(Meta):
         result : dict
             A dictionary of matplotlib keyword arguments.
         """
-        kwargs = {}
-
         if artist == 'Text':
             keymap = {'font': 'family',
                       'fontstyle': 'style',
@@ -154,8 +156,7 @@ class RegionVisual(Meta):
                       'textangle': 'rotation'}
 
         elif artist == 'Line2D':
-            keymap = {'symbol': 'marker',
-                      'symsize': 'markersize',
+            keymap = {'symsize': 'markersize',
                       'color': 'markeredgecolor',
                       'linewidth': 'markeredgewidth',
                       'fill': 'fillstyle'}
@@ -204,4 +205,18 @@ class RegionVisual(Meta):
 
         kwargs = self._define_default_mpl_kwargs(artist)
         kwargs.update(self._to_mpl_kwargs(artist))
+
+        remove_keys = []
+        if artist != 'Text':
+            remove_keys.extend(['fontname', 'fontsize', 'fontweight',
+                                'fontstyle'])
+        else:
+            remove_keys.extend(['linewidth'])
+
+        for key in remove_keys:
+            kwargs.pop(key, None)
+
+        if 'fontstyle' in kwargs:
+            kwargs['fontstyle'].replace('roman', 'normal')
+
         return kwargs

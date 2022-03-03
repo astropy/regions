@@ -29,7 +29,7 @@ def test_read_fileobj(filename, encoding):
     assert isinstance(result, Regions)
 
 
-@pytest.mark.parametrize('file_type', ['crtf', 'ds9'])
+@pytest.mark.parametrize('file_type', ['crtf'])
 def test_write_format(file_type, tmpdir):
     infilename = get_pkg_data_filename('../crtf/tests/data/CRTFgeneral.crtf')
     outfilename = str(tmpdir / 'region')

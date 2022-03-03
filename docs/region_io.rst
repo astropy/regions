@@ -116,7 +116,7 @@ parsed for the ``fits`` format::
     >>> print(regions)
     [<CirclePixelRegion(center=PixCoord(x=146.1, y=253.17), radius=3.1)>]
     >>> print(regions[0].visual)
-    {'color': 'green', 'default_style': 'ds9'}
+    {'default_style': 'ds9', 'facecolor': 'green', 'edgecolor': 'green'}
 
 
 Serialize
@@ -153,8 +153,8 @@ As an example, let's create a :class:`~regions.CircleSkyRegion` object::
 
 To serialize the region::
 
-    >>> region.serialize(format='ds9')
-    '# Region file format: DS9 astropy/regions\nfk5\ncircle(202.469575,47.195258,0.010000)\n'
+    >>> region.serialize(format='ds9', precision=8)
+    '# Region file format: DS9 astropy/regions\nj2000\ncircle(202.46957500,47.19525833,0.01000000)\n'
 
 To write the region to a region file:
 
@@ -171,3 +171,12 @@ formats and methods for the :class:`~regions.Region` subclasses::
       crtf    No       Yes   No   Yes           Yes
        ds9    No       Yes   No   Yes           Yes
       fits    No       Yes   No   Yes           Yes
+
+
+Region File Format Limitations
+==============================
+
+.. toctree::
+    :maxdepth: 1
+
+    ds9_io

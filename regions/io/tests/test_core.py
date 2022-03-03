@@ -6,34 +6,6 @@ import pytest
 
 from ..core import _to_shape_list
 from ..crtf.read import _CRTFParser
-from ..ds9.read import _DS9Parser
-
-
-def test_shape_ds9():
-    reg_str = 'galactic\ncircle(42,43,3) # color=green'
-
-    parser = _DS9Parser(reg_str)
-    shape1 = parser.shapes[0]
-    region = parser.shapes.to_regions()
-    shape2 = _to_shape_list(region, 'galactic')[0]
-
-    assert shape1.coordsys == shape2.coordsys
-    assert shape1.region_type == shape2.region_type
-    assert shape1.include == shape2.include
-    assert shape1.coord == shape2.coord
-    assert dict(shape1.meta) == dict(shape2.meta)
-    assert shape1.composite == shape2.composite
-
-    # Checks for pixel offset since DS9 has a origin=1 pixel system
-    reg_str = 'image\nbox(1, 2, 3, 4, 5)'
-
-    parser = _DS9Parser(reg_str)
-    shape = parser.shapes[0]
-
-    assert shape.coord[0] == 0
-    assert shape.coord[1] == 1
-    assert_quantity_allclose(shape.coord[2:-1], [Quantity('3'), Quantity('4')])
-    assert_quantity_allclose(shape.coord[-1], Quantity('5deg'))
 
 
 def test_shape_crtf():
@@ -78,30 +50,6 @@ def test_valid_shape():
 
     estr = '"hello" is not a valid coordinate reference frame'
     assert estr in str(excinfo.value)
-
-
-def test_valid_ellipse_ds9():
-    reg_str1 = 'image\nellipse (1, 2, 3, 4, 5)'
-    reg_str2 = 'fk5\nellipse (1, 2, 3, 4, 5)'
-    reg_str3 = 'image\nellipse (1, 2, 3, 4, 5, 6, 7)'  # Elliptical Annulus
-
-    shape1 = _DS9Parser(reg_str1, 'warn').shapes[0]
-    shape2 = _DS9Parser(reg_str2, 'warn').shapes[0]
-    shape3 = _DS9Parser(reg_str3, 'warn').shapes[0]
-
-    assert_quantity_allclose(shape1.coord[:2], [0, 1])
-    assert_quantity_allclose(shape2.coord[:2],
-                             [Quantity('1deg'), Quantity('2deg')])
-    assert_quantity_allclose(shape3.coord[:2], [0, 1])
-
-    assert_quantity_allclose(shape1.coord[2:-1], [6, 8])
-    assert_quantity_allclose(shape2.coord[2:-1],
-                             [Quantity('6deg'), Quantity('8deg')])
-    assert_quantity_allclose(shape3.coord[2:-1], [6, 8, 10, 12])
-
-    assert_quantity_allclose(shape1.coord[-1], Quantity('5deg'))
-    assert_quantity_allclose(shape2.coord[-1], Quantity('5deg'))
-    assert_quantity_allclose(shape3.coord[-1], Quantity('7deg'))
 
 
 def test_valid_ellipse_crtf():

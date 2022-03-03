@@ -336,6 +336,14 @@ class RegularPolygonPixelRegion(PolygonPixelRegion):
         angle = self.angle + angle
         return self.copy(center=center, angle=angle)
 
+    def to_polygon(self):
+        """
+        Return a `PolygonPixelRegion` of this region.
+        """
+        return PolygonPixelRegion(self.vertices, origin=PixCoord(0, 0),
+                                  meta=self.meta.copy(),
+                                  visual=self.visual.copy())
+
 
 class PolygonSkyRegion(SkyRegion):
     """
