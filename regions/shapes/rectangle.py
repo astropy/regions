@@ -68,13 +68,13 @@ class RectanglePixelRegion(PixelRegion):
 
     _params = ('center', 'width', 'height', 'angle')
     _mpl_artist = 'Patch'
-    center = ScalarPixCoord(description='The center pixel position.')
-    width = PositiveScalar(description=('The width of the rectangle (before '
-                                        'rotation) in pixels.'))
-    height = PositiveScalar(description=('The height of the rectangle (before '
-                                         'rotation) in pixels.'))
-    angle = ScalarAngle(description=('The rotation angle measured '
-                                     'anti-clockwise.'))
+    center = ScalarPixCoord('The center pixel position as a PixCoord.')
+    width = PositiveScalar('The width of the rectangle (before rotation) in '
+                           'pixels as a float.')
+    height = PositiveScalar('The height of the rectangle (before rotation) '
+                            'in pixels as a float.')
+    angle = ScalarAngle('The rotation angle measured anti-clockwise as a '
+                        'Quantity angle.')
 
     def __init__(self, center, width, height, angle=0 * u.deg, meta=None,
                  visual=None):
@@ -386,15 +386,13 @@ class RectangleSkyRegion(SkyRegion):
     """
 
     _params = ('center', 'width', 'height', 'angle')
-    center = ScalarSkyCoord(description=('The center position in sky '
-                                         'coordinates.'))
-    width = PositiveScalarAngle(description=('The width of the rectangle '
-                                             '(before rotation) as an angle.'))
-    height = PositiveScalarAngle(description=('The height of the rectangle '
-                                              '(before rotation) as an '
-                                              'angle.'))
-    angle = ScalarAngle(description=('The rotation angle measured '
-                                     'anti-clockwise.'))
+    center = ScalarSkyCoord('The center position as a SkyCoord.')
+    width = PositiveScalarAngle('The width of the rectangle (before rotation) '
+                                'as a Quantity angle.')
+    height = PositiveScalarAngle('The height of the rectangle (before '
+                                 'rotation) as a Quantity angle.')
+    angle = ScalarAngle('The rotation angle measured anti-clockwise as a '
+                        'Quantity angle.')
 
     def __init__(self, center, width, height, angle=0 * u.deg, meta=None,
                  visual=None):

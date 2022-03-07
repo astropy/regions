@@ -21,13 +21,12 @@ class RegionAttribute(abc.ABC):
 
     Parameters
     ----------
-    description : str, optional
-        The description of the attribute, which will be used as the
-        attribute documentation.
+    doc : str, optional
+        The documentation string for the attribute.
     """
 
-    def __init__(self, description=''):
-        self.__doc__ = description
+    def __init__(self, doc=''):
+        self.__doc__ = doc
 
     def __set_name__(self, owner, name):
         self.name = name

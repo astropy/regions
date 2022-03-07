@@ -120,9 +120,9 @@ class CircleAnnulusPixelRegion(AnnulusPixelRegion):
 
     _component_class = CirclePixelRegion
     _params = ('center', 'inner_radius', 'outer_radius')
-    center = ScalarPixCoord(description='The center pixel position.')
-    inner_radius = PositiveScalar(description='The inner radius in pixels.')
-    outer_radius = PositiveScalar(description='The outer radius in pixels.')
+    center = ScalarPixCoord('The center pixel position as a PixCoord.')
+    inner_radius = PositiveScalar('The inner radius in pixels as a float.')
+    outer_radius = PositiveScalar('The outer radius in pixels as a float.')
 
     def __init__(self, center, inner_radius, outer_radius, meta=None,
                  visual=None):
@@ -174,12 +174,9 @@ class CircleAnnulusSkyRegion(SkyRegion):
     """
 
     _params = ('center', 'inner_radius', 'outer_radius')
-    center = ScalarSkyCoord(description=('The center position in sky '
-                                         'coordinates'))
-    inner_radius = PositiveScalarAngle(description=('The inner radius as an '
-                                                    'angle.'))
-    outer_radius = PositiveScalarAngle(description=('The outer radius as an '
-                                                    'angle.'))
+    center = ScalarSkyCoord('The center position as a SkyCoord.')
+    inner_radius = PositiveScalarAngle('The inner radius as a Quantity angle.')
+    outer_radius = PositiveScalarAngle('The outer radius as a Quantity angle.')
 
     def __init__(self, center, inner_radius, outer_radius, meta=None,
                  visual=None):
@@ -229,13 +226,17 @@ class AsymmetricAnnulusPixelRegion(AnnulusPixelRegion):
 
     _params = ('center', 'inner_width', 'outer_width', 'inner_height',
                'outer_height', 'angle')
-    center = ScalarPixCoord(description='The center position in pixels.')
-    inner_width = PositiveScalar(description='The inner width in pixels.')
-    outer_width = PositiveScalar(description='The outer width in pixels.')
-    inner_height = PositiveScalar(description='The inner height in pixels.')
-    outer_height = PositiveScalar( description='The outer height in pixels.')
-    angle = ScalarAngle(description=('The rotation angle measured '
-                                     'anti-clockwise.'))
+    center = ScalarPixCoord('The center pixel position as a PixCoord.')
+    inner_width = PositiveScalar('The inner width (before rotation) in '
+                                 'pixels as a float.')
+    outer_width = PositiveScalar('The outer width (before rotation) in '
+                                 'pixels as a float.')
+    inner_height = PositiveScalar('The inner height (before rotation) in '
+                                  'pixels as a float.')
+    outer_height = PositiveScalar('The outer height (before rotation) in '
+                                  'pixels as a float.')
+    angle = ScalarAngle('The rotation angle measured anti-clockwise as a '
+                        'Quantity angle.')
 
     def __init__(self, center, inner_width, outer_width, inner_height,
                  outer_height, angle=0 * u.deg, meta=None, visual=None):
@@ -310,18 +311,17 @@ class AsymmetricAnnulusSkyRegion(SkyRegion):
     _params = ('center', 'inner_width', 'outer_width', 'inner_height',
                'outer_height', 'angle')
 
-    center = ScalarSkyCoord(description=('The center position in sky '
-                                         'coordinates'))
-    inner_width = PositiveScalarAngle(description=('The inner width as an '
-                                                   'angle.'))
-    outer_width = PositiveScalarAngle(description=('The outer width as an '
-                                                   'angle.'))
-    inner_height = PositiveScalarAngle(description=('The inner height as an '
-                                                    'angle.'))
-    outer_height = PositiveScalarAngle(description=('The outer height as an '
-                                                    'angle.'))
-    angle = ScalarAngle(description=('The rotation angle measured '
-                                     'anti-clockwise.'))
+    center = ScalarSkyCoord('The center position as a SkyCoord.')
+    inner_width = PositiveScalarAngle('The inner width (before rotation) as '
+                                      'a Quantity angle.')
+    outer_width = PositiveScalarAngle('The outer width (before rotation) as '
+                                      'a Quantity angle.')
+    inner_height = PositiveScalarAngle('The inner height (before rotation) '
+                                       'as a Quantity angle.')
+    outer_height = PositiveScalarAngle('The outer height (before rotation) '
+                                       'as a Quantity angle.')
+    angle = ScalarAngle('The rotation angle measured anti-clockwise as a'
+                        'Quantity angle.')
 
     def __init__(self, center, inner_width, outer_width, inner_height,
                  outer_height, angle=0 * u.deg, meta=None, visual=None):

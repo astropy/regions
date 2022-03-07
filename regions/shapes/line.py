@@ -53,8 +53,8 @@ class LinePixelRegion(PixelRegion):
 
     _params = ('start', 'end')
     _mpl_artist = 'Patch'
-    start = ScalarPixCoord(description='The start pixel position.')
-    end = ScalarPixCoord(description='The end pixel position.')
+    start = ScalarPixCoord('The start pixel position as a PixCoord.')
+    end = ScalarPixCoord('The end pixel position as a PixCoord.')
 
     def __init__(self, start, end, meta=None, visual=None):
         self.start = start
@@ -174,9 +174,8 @@ class LineSkyRegion(SkyRegion):
     """
 
     _params = ('start', 'end')
-    start = ScalarSkyCoord(description=('The start position as a sky '
-                                        'coordinate.'))
-    end = ScalarSkyCoord(description='The end position as a sky coordinate.')
+    start = ScalarSkyCoord('The start position as a SkyCoord.')
+    end = ScalarSkyCoord('The end position as a SkyCoord.')
 
     def __init__(self, start, end, meta=None, visual=None):
         self.start = start
