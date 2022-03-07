@@ -77,12 +77,17 @@ class OneDPixCoord(RegionAttribute):
 class PositiveScalar(RegionAttribute):
     """
     Descriptor class to check that value is a strictly positive (> 0)
-    scalar.
+    scalar float/int (not `~astropy.units.Quantity`).
     """
 
     def _validate(self, value):
+        if isinstance(value, Quantity):
+            raise ValueError(f'{self.name!r} must be a scalar integer or '
+                             'float')
+
         if not np.isscalar(value) or value <= 0:
-            raise ValueError(f'{self.name!r} must be a positive scalar')
+            raise ValueError(f'{self.name!r} must be a strictly positive '
+                             'scalar')
 
 
 class ScalarSkyCoord(RegionAttribute):
@@ -143,7 +148,8 @@ class PositiveScalarAngle(RegionAttribute):
             if not value > 0:
                 raise ValueError(f'{self.name!r} must be strictly positive')
         else:
-            raise ValueError(f'{self.name!r} must be a positive scalar angle')
+            raise ValueError(f'{self.name!r} must be a strictly positive '
+                             'scalar angle')
 
 
 class RegionType(RegionAttribute):
