@@ -51,8 +51,7 @@ class TextPixelRegion(PointPixelRegion):
 
     _params = ('center', 'text')
     _mpl_artist = 'Text'
-    center = ScalarPixCoord('center',
-                            description=('The leftmost pixel position before '
+    center = ScalarPixCoord(description=('The leftmost pixel position before '
                                          'rotation.'))
 
     def __init__(self, center, text, meta=None, visual=None):
@@ -122,8 +121,7 @@ class TextSkyRegion(PointSkyRegion):
     """
 
     _params = ('center', 'text')
-    center = ScalarSkyCoord('center',
-                            description=('The leftmost position before '
+    center = ScalarSkyCoord(description=('The leftmost position before '
                                          'rotation as a sky coordinate.'))
 
     def __init__(self, center, text, meta=None, visual=None):
