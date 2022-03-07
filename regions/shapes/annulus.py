@@ -407,6 +407,20 @@ class EllipseAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
         ax.set_aspect('equal')
     """
 
+    # duplicated from AsymmetricAnnulusPixelRegion because otherwise Sphinx
+    # ignores the docstrings in the parent class
+    center = ScalarPixCoord('The center pixel position as a PixCoord.')
+    inner_width = PositiveScalar('The inner width (before rotation) in '
+                                 'pixels as a float.')
+    outer_width = PositiveScalar('The outer width (before rotation) in '
+                                 'pixels as a float.')
+    inner_height = PositiveScalar('The inner height (before rotation) in '
+                                  'pixels as a float.')
+    outer_height = PositiveScalar('The outer height (before rotation) in '
+                                  'pixels as a float.')
+    angle = ScalarAngle('The rotation angle measured anti-clockwise as a '
+                        'Quantity angle.')
+
     _component_class = EllipsePixelRegion
 
     def to_sky(self, wcs):
@@ -445,6 +459,20 @@ class EllipseAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
         A dictionary that stores the visual meta attributes of this
         region.
     """
+
+    # duplicated from AsymmetricAnnulusSkyRegion because otherwise Sphinx
+    # ignores the docstrings in the parent class
+    center = ScalarSkyCoord('The center position as a SkyCoord.')
+    inner_width = PositiveScalarAngle('The inner width (before rotation) as '
+                                      'a Quantity angle.')
+    outer_width = PositiveScalarAngle('The outer width (before rotation) as '
+                                      'a Quantity angle.')
+    inner_height = PositiveScalarAngle('The inner height (before rotation) '
+                                       'as a Quantity angle.')
+    outer_height = PositiveScalarAngle('The outer height (before rotation) '
+                                       'as a Quantity angle.')
+    angle = ScalarAngle('The rotation angle measured anti-clockwise as a'
+                        'Quantity angle.')
 
     _component_class = EllipseSkyRegion
 
@@ -508,6 +536,20 @@ class RectangleAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
         ax.set_aspect('equal')
     """
 
+    # duplicated from AsymmetricAnnulusPixelRegion because otherwise Sphinx
+    # ignores the docstrings in the parent class
+    center = ScalarPixCoord('The center pixel position as a PixCoord.')
+    inner_width = PositiveScalar('The inner width (before rotation) in '
+                                 'pixels as a float.')
+    outer_width = PositiveScalar('The outer width (before rotation) in '
+                                 'pixels as a float.')
+    inner_height = PositiveScalar('The inner height (before rotation) in '
+                                  'pixels as a float.')
+    outer_height = PositiveScalar('The outer height (before rotation) in '
+                                  'pixels as a float.')
+    angle = ScalarAngle('The rotation angle measured anti-clockwise as a '
+                        'Quantity angle.')
+
     _component_class = RectanglePixelRegion
 
     def to_sky(self, wcs):
@@ -547,6 +589,20 @@ class RectangleAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
         A dictionary that stores the visual meta attributes of this
         region.
     """
+
+    # duplicated from AsymmetricAnnulusSkyRegion because otherwise Sphinx
+    # ignores the docstrings in the parent class
+    center = ScalarSkyCoord('The center position as a SkyCoord.')
+    inner_width = PositiveScalarAngle('The inner width (before rotation) as '
+                                      'a Quantity angle.')
+    outer_width = PositiveScalarAngle('The outer width (before rotation) as '
+                                      'a Quantity angle.')
+    inner_height = PositiveScalarAngle('The inner height (before rotation) '
+                                       'as a Quantity angle.')
+    outer_height = PositiveScalarAngle('The outer height (before rotation) '
+                                       'as a Quantity angle.')
+    angle = ScalarAngle('The rotation angle measured anti-clockwise as a'
+                        'Quantity angle.')
 
     _component_class = RectangleSkyRegion
 
