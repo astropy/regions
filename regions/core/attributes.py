@@ -43,7 +43,7 @@ class RegionAttribute(abc.ABC):
         instance.__dict__[self.name] = value
 
     def __delete__(self, instance):
-        del instance.__dict__[self.name]  # pragma: no cover
+        raise AttributeError(f'cannot delete {self.name!r}')
 
     @abc.abstractmethod
     def _validate(self, value):

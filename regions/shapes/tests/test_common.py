@@ -18,6 +18,12 @@ class BaseTestRegion:
     def test_str(self):
         assert str(self.reg) == self.expected_str
 
+    def test_del(self):
+        # test that Region shape attributes (descriptors) cannot be
+        # deleted)
+        with pytest.raises(AttributeError):
+            delattr(self, self._params[0])
+
 
 class BaseTestPixelRegion(BaseTestRegion):
 
