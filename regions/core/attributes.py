@@ -21,17 +21,15 @@ class RegionAttribute(abc.ABC):
 
     Parameters
     ----------
-    name : str
-        The name of the attribute.
-
-    description : str, optional
-        The description of the attribute, which will be used as the
-        attribute documentation.
+    doc : str, optional
+        The documentation string for the attribute.
     """
 
-    def __init__(self, name, description=''):
+    def __init__(self, doc=''):
+        self.__doc__ = doc
+
+    def __set_name__(self, owner, name):
         self.name = name
-        self.__doc__ = description
 
     def __get__(self, instance, owner):
         if instance is None:
@@ -43,7 +41,7 @@ class RegionAttribute(abc.ABC):
         instance.__dict__[self.name] = value
 
     def __delete__(self, instance):
-        del instance.__dict__[self.name]  # pragma: no cover
+        raise AttributeError(f'cannot delete {self.name!r}')
 
     @abc.abstractmethod
     def _validate(self, value):
@@ -79,12 +77,17 @@ class OneDPixCoord(RegionAttribute):
 class PositiveScalar(RegionAttribute):
     """
     Descriptor class to check that value is a strictly positive (> 0)
-    scalar.
+    scalar float/int (not `~astropy.units.Quantity`).
     """
 
     def _validate(self, value):
+        if isinstance(value, Quantity):
+            raise ValueError(f'{self.name!r} must be a scalar integer or '
+                             'float')
+
         if not np.isscalar(value) or value <= 0:
-            raise ValueError(f'{self.name!r} must be a positive scalar')
+            raise ValueError(f'{self.name!r} must be a strictly positive '
+                             'scalar')
 
 
 class ScalarSkyCoord(RegionAttribute):
@@ -145,7 +148,8 @@ class PositiveScalarAngle(RegionAttribute):
             if not value > 0:
                 raise ValueError(f'{self.name!r} must be strictly positive')
         else:
-            raise ValueError(f'{self.name!r} must be a positive scalar angle')
+            raise ValueError(f'{self.name!r} must be a strictly positive '
+                             'scalar angle')
 
 
 class RegionType(RegionAttribute):

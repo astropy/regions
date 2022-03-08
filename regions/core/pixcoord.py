@@ -52,45 +52,39 @@ class PixCoord:
         return self.__class__(copy.deepcopy(self.x), copy.deepcopy(self.y))
 
     @staticmethod
-    def _validate(val, name, expected='any'):
+    def _validate(obj, name, expected='any'):
         """
-        Validate that a given object is an appropriate `PixCoord`.
-
-        This is used for input validation throughout the regions
-        package, especially in the ``__init__`` method of pixel region
-        classes.
+        Validate that a given object is a valid `PixCoord`.
 
         Parameters
         ----------
-        val : `PixCoord`
+        obj : `PixCoord`
             The object to check.
         name : str
-            Parameter name (used for error messages).
-
-        expected : {'any', 'scalar', 'not scalar'}
+            The parameter name used for error messages.
+        expected : {'any', 'scalar', 'array'}
             What kind of PixCoord to check for.
 
         Returns
         -------
-        val : `PixCoord`
-            The input object (at the moment unmodified, might do fix-ups
-            here later).
+        obj : `PixCoord`
+            The input object, if valid.
         """
-        if not isinstance(val, PixCoord):
-            raise TypeError(f'{name} must be a PixCoord')
+        if not isinstance(obj, PixCoord):
+            raise TypeError(f'{name!r} must be a PixCoord')
 
         if expected == 'any':
             pass
         elif expected == 'scalar':
-            if not val.isscalar:
-                raise ValueError(f'{name} must be a scalar PixCoord')
-        elif expected == 'not scalar':
-            if val.isscalar:
-                raise ValueError(f'{name} must be a non-scalar PixCoord')
+            if not obj.isscalar:
+                raise ValueError(f'{name!r} must be a scalar PixCoord')
+        elif expected == 'array':
+            if obj.isscalar:
+                raise ValueError(f'{name!r} must be a PixCoord array')
         else:
-            raise ValueError(f'Invalid argument for `expected`: {expected}')
+            raise ValueError(f'Invalid value for "expected": {expected!r}')
 
-        return val
+        return obj
 
     @property
     def isscalar(self):
