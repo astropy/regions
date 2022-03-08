@@ -290,8 +290,10 @@ class RegionBoundingBox:
 
         Returns
         -------
-        ax : `~matplotlib.axes.Axes`
-            Axes on which the patch is added.
+        patch : `matplotlib.patches.Patch`
+            The matplotlib patch object for the plotted bounding box.
+            The patch can be used, for example, when adding a plot
+            legend.
         """
         reg = self.to_region()
         return reg.plot(origin=origin, ax=ax, **kwargs)
