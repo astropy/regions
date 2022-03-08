@@ -393,8 +393,10 @@ class PixelRegion(Region):
 
         Returns
         -------
-        ax : `~matplotlib.axes.Axes`
-            The axes on which the patch was added.
+        artist : `matplotlib.artist.Artist`
+            The matplotlib artist (typically a `~matplotlib.patches.Patch`
+            object) for the plotted region. The artist can be used, for
+            example, when adding a plot legend.
         """
         import matplotlib.pyplot as plt
 
@@ -404,7 +406,7 @@ class PixelRegion(Region):
         artist = self.as_artist(origin=origin, **kwargs)
         ax.add_artist(artist)
 
-        return ax
+        return artist
 
 
 class SkyRegion(Region):
