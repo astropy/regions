@@ -111,8 +111,10 @@ class CircleAnnulusPixelRegion(AnnulusPixelRegion):
         reg = CircleAnnulusPixelRegion(PixCoord(x=6, y=6),
                                        inner_radius=5.5,
                                        outer_radius=8.0)
-        reg.plot(ax=ax, facecolor='none', edgecolor='red', lw=2)
+        patch = reg.plot(ax=ax, facecolor='none', edgecolor='red', lw=2,
+                         label='Circle Annulus')
 
+        ax.legend(handles=(patch,), loc='upper center')
         ax.set_xlim(-5, 20)
         ax.set_ylim(-5, 20)
         ax.set_aspect('equal')
@@ -406,8 +408,10 @@ class EllipseAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
                                         inner_height=3.5,
                                         outer_height=6.5,
                                         angle=Angle('45deg'))
-        reg.plot(ax=ax, facecolor='none', edgecolor='red', lw=2)
+        patch = reg.plot(ax=ax, facecolor='none', edgecolor='red', lw=2,
+                         label='Ellipse Annulus')
 
+        ax.legend(handles=(patch,), loc='upper center')
         ax.set_xlim(-5, 20)
         ax.set_ylim(-5, 20)
         ax.set_aspect('equal')
@@ -535,8 +539,10 @@ class RectangleAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
                                           inner_height=3.5,
                                           outer_height=6.5,
                                           angle=Angle('45deg'))
-        reg.plot(ax=ax, facecolor='none', edgecolor='red', lw=2)
+        patch = reg.plot(ax=ax, facecolor='none', edgecolor='red', lw=2,
+                         label='Rectangle Annulus')
 
+        ax.legend(handles=(patch,), loc='upper center')
         ax.set_xlim(-5, 20)
         ax.set_ylim(-5, 20)
         ax.set_aspect('equal')
