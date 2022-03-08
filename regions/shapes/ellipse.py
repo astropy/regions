@@ -112,8 +112,11 @@ class EllipsePixelRegion(PixelRegion):
         _, pixscale, north_angle = pixel_scale_angle_at_skycoord(center, wcs)
         height = Angle(self.height * u.pix * pixscale, 'arcsec')
         width = Angle(self.width * u.pix * pixscale, 'arcsec')
-        return EllipseSkyRegion(center, width, height,
-                                angle=self.angle - (north_angle - 90 * u.deg),
+        # region sky angles are defined relative to the WCS longitude axis;
+        # photutils aperture sky angles are defined as the PA of the
+        # semimajor axis (i.e., relative to the WCS latitude axis)
+        angle = self.angle - (north_angle - 90 * u.deg)
+        return EllipseSkyRegion(center, width, height, angle=angle,
                                 meta=self.meta.copy(),
                                 visual=self.visual.copy())
 
@@ -369,6 +372,9 @@ class EllipseSkyRegion(SkyRegion):
             self.center, wcs)
         height = (self.height / pixscale).to(u.pixel).value
         width = (self.width / pixscale).to(u.pixel).value
+        # region sky angles are defined relative to the WCS longitude axis;
+        # photutils aperture sky angles are defined as the PA of the
+        # semimajor axis (i.e., relative to the WCS latitude axis)
         angle = self.angle + (north_angle - 90 * u.deg)
         return EllipsePixelRegion(center, width, height, angle=angle,
                                   meta=self.meta.copy(),

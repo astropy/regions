@@ -108,6 +108,9 @@ class RectanglePixelRegion(PixelRegion):
         _, pixscale, north_angle = pixel_scale_angle_at_skycoord(center, wcs)
         width = Angle(self.width * u.pix * pixscale, 'arcsec')
         height = Angle(self.height * u.pix * pixscale, 'arcsec')
+        # region sky angles are defined relative to the WCS longitude axis;
+        # photutils aperture sky angles are defined as the PA of the
+        # semimajor axis (i.e., relative to the WCS latitude axis)
         angle = self.angle - (north_angle - 90 * u.deg)
         return RectangleSkyRegion(center, width, height, angle=angle,
                                   meta=self.meta.copy(),
@@ -408,6 +411,9 @@ class RectangleSkyRegion(SkyRegion):
             self.center, wcs)
         width = (self.width / pixscale).to(u.pix).value
         height = (self.height / pixscale).to(u.pix).value
+        # region sky angles are defined relative to the WCS longitude axis;
+        # photutils aperture sky angles are defined as the PA of the
+        # semimajor axis (i.e., relative to the WCS latitude axis)
         angle = self.angle + (north_angle - 90 * u.deg)
         return RectanglePixelRegion(center, width, height, angle=angle,
                                     meta=self.meta.copy(),

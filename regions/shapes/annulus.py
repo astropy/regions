@@ -273,6 +273,9 @@ class AsymmetricAnnulusPixelRegion(AnnulusPixelRegion):
         outer_width = (self.outer_width * u.pix * pixscale).to(u.arcsec)
         inner_height = (self.inner_height * u.pix * pixscale).to(u.arcsec)
         outer_height = (self.outer_height * u.pix * pixscale).to(u.arcsec)
+        # region sky angles are defined relative to the WCS longitude axis;
+        # photutils aperture sky angles are defined as the PA of the
+        # semimajor axis (i.e., relative to the WCS latitude axis)
         angle = self.angle - (north_angle - 90 * u.deg)
 
         return (center, inner_width, outer_width, inner_height, outer_height,
@@ -347,6 +350,9 @@ class AsymmetricAnnulusSkyRegion(SkyRegion):
         outer_width = (self.outer_width / pixscale).to(u.pix).value
         inner_height = (self.inner_height / pixscale).to(u.pix).value
         outer_height = (self.outer_height / pixscale).to(u.pix).value
+        # region sky angles are defined relative to the WCS longitude axis;
+        # photutils aperture sky angles are defined as the PA of the
+        # semimajor axis (i.e., relative to the WCS latitude axis)
         angle = self.angle + (north_angle - 90 * u.deg)
 
         return (center, inner_width, outer_width, inner_height, outer_height,
