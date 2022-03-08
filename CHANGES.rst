@@ -100,6 +100,10 @@ API Changes
   the DS9 serializer and writer.  The new ``precision`` keyword can be
   used when serializing and writing DS9 regions. [#436]
 
+- The ``PixelRegion.plot()`` method now returns a
+  ``matplotlib.artist.Artist`` object, which can be used in plot legends.
+  [#441]
+
 
 0.5 (2021-07-20)
 ================
