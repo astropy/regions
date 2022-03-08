@@ -8,6 +8,7 @@ from numpy.testing import assert_equal, assert_allclose
 import pytest
 
 from ...core.pixcoord import PixCoord
+from ..._utils.optional_deps import HAS_MATPLOTLIB  # noqa
 
 
 class BaseTestRegion:
@@ -22,7 +23,7 @@ class BaseTestRegion:
         # test that Region shape attributes (descriptors) cannot be
         # deleted)
         with pytest.raises(AttributeError):
-            delattr(self, self._params[0])
+            delattr(self.reg, self.reg._params[0])
 
 
 class BaseTestPixelRegion(BaseTestRegion):
@@ -71,6 +72,12 @@ class BaseTestPixelRegion(BaseTestRegion):
         assert actual.shape == (3, len(x))
         assert_equal(actual[:, :len(self.inside)], True)
         assert_equal(actual[:, len(self.inside):], False)
+
+    @pytest.mark.skipif('not HAS_MATPLOTLIB')
+    def test_plot(self):
+        from matplotlib.artist import Artist
+        artist = self.reg.plot()
+        assert isinstance(artist, Artist)
 
 
 class BaseTestSkyRegion(BaseTestRegion):
