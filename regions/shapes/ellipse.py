@@ -335,7 +335,7 @@ class EllipseSkyRegion(SkyRegion):
     center : `~astropy.coordinates.SkyCoord`
         The position of the center of the ellipse.
     width : `~astropy.units.Quantity`
-        The width  (twice the semimajor axis) of the ellipse (before rotation) as an angle.
+        The width (twice the semimajor axis) of the ellipse (before rotation) as an angle.
     height : `~astropy.units.Quantity`
         The height (twice the semiminor axis) of the ellipse (before rotation) as an angle.
     angle : `~astropy.units.Quantity`, optional
