@@ -1,0 +1,25 @@
+.. These are ReST substitutions and links that can be used throughout the docs
+.. (and docstrings) because they are added to ``docs/conf.py::rst_epilog``.
+
+.. ------------------------------------------------------------------
+.. RST SUBSITUTIONS
+
+.. NumPy
+.. |ndarray| replace:: :class:`numpy.ndarray`
+
+.. Astropy
+.. |Angle| replace:: `astropy.coordinates.Angle`
+.. |Latitude| replace:: `astropy.coordinates.Latitude`
+.. |Longitude| replace:: :class:`astropy.coordinates.Longitude`
+.. |SkyCoord| replace:: :class:`astropy.coordinates.SkyCoord`
+.. |Table| replace:: :class:`astropy.table.Table`
+.. |QTable| replace:: :class:`astropy.table.QTable`
+.. |Quantity| replace:: :class:`astropy.units.Quantity`
+.. |Unit| replace:: :class:`astropy.units.UnitBase`
+
+.. Regions
+.. |PixCoord| replace:: `~regions.PixCoord`
+
+.. Matplotlib
+.. _Matplotlib: https://matplotlib.org/
+.. |Patch| replace:: `~matplotlib.patches.Patch`
