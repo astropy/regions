@@ -33,9 +33,9 @@ class EllipsePixelRegion(PixelRegion):
     center : `~regions.PixCoord`
         The position of the center of the ellipse.
     width : float
-        The width (semimajor axis) of the ellipse (before rotation) in pixels.
+        The width (twice the semimajor axis) of the ellipse (before rotation) in pixels.
     height : float
-        The height (semiminor axis) of the ellipse (before rotation) in pixels.
+        The height (twice the semiminor axis) of the ellipse (before rotation) in pixels.
     angle : `~astropy.units.Quantity`, optional
         The rotation angle of the ellipse, measured anti-clockwise. If
         set to zero (the default), the width axis is lined up with the x
@@ -335,9 +335,9 @@ class EllipseSkyRegion(SkyRegion):
     center : `~astropy.coordinates.SkyCoord`
         The position of the center of the ellipse.
     width : `~astropy.units.Quantity`
-        The width  (semimajor axis) of the ellipse (before rotation) as an angle.
+        The width  (twice the semimajor axis) of the ellipse (before rotation) as an angle.
     height : `~astropy.units.Quantity`
-        The height (semiminor axis) of the ellipse (before rotation) as an angle.
+        The height (twice the semiminor axis) of the ellipse (before rotation) as an angle.
     angle : `~astropy.units.Quantity`, optional
         The rotation angle of the ellipse, measured anti-clockwise. If
         set to zero (the default), the width axis is lined up with the
