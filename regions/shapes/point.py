@@ -62,7 +62,7 @@ class PointPixelRegion(PixelRegion):
 
     _params = ('center',)
     _mpl_artist = 'Line2D'
-    center = ScalarPixCoord('The point pixel position as a PixCoord.')
+    center = ScalarPixCoord('The point pixel position as a |PixCoord|.')
 
     def __init__(self, center, meta=None, visual=None):
         self.center = center
@@ -166,7 +166,7 @@ class PointSkyRegion(SkyRegion):
     """
 
     _params = ('center',)
-    center = ScalarSkyCoord('The point position as a SkyCoord.')
+    center = ScalarSkyCoord('The point position as a |SkyCoord|.')
 
     def __init__(self, center, meta=None, visual=None):
         self.center = center

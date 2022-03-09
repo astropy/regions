@@ -280,7 +280,7 @@ class PixelRegion(Region):
     @abc.abstractmethod
     def area(self):
         """
-        The area of the region.
+        The exact analytical area of the region shape.
         """
         raise NotImplementedError
 
