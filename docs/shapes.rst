@@ -162,17 +162,21 @@ Polygon
 .. This is not available yet, for now see `spherical_geometry`_ for
 .. spherical polygons and `Shapely`_ for pixel polygons.
 
-`~regions.PolygonSkyRegion` and `~regions.PolygonPixelRegion`
+`~regions.PolygonSkyRegion`, `~regions.PolygonPixelRegion`, and
+`~regions.RegularPolygonPixelRegion`
 
 .. code-block:: python
 
     >>> from astropy.coordinates import SkyCoord
     >>> from regions import PixCoord, PolygonSkyRegion, PolygonPixelRegion
+    >>> from regions import RegularPolygonPixelRegion
 
     >>> vertices = SkyCoord([1, 2, 2], [1, 1, 2], unit='deg', frame='fk5')
     >>> region_sky = PolygonSkyRegion(vertices=vertices)
     >>> vertices = PixCoord(x=[1, 2, 2], y=[1, 1, 2])
     >>> region_pix = PolygonPixelRegion(vertices=vertices)
+    >>> center = PixCoord(25, 25)
+    >>> region2_pix = RegularPolygonPixelRegion(center, 6, 15)
 
 
 Point

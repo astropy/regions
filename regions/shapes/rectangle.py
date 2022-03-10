@@ -70,13 +70,13 @@ class RectanglePixelRegion(PixelRegion):
 
     _params = ('center', 'width', 'height', 'angle')
     _mpl_artist = 'Patch'
-    center = ScalarPixCoord('The center pixel position as a PixCoord.')
+    center = ScalarPixCoord('The center pixel position as a |PixCoord|.')
     width = PositiveScalar('The width of the rectangle (before rotation) in '
                            'pixels as a float.')
     height = PositiveScalar('The height of the rectangle (before rotation) '
                             'in pixels as a float.')
     angle = ScalarAngle('The rotation angle measured anti-clockwise as a '
-                        'Quantity angle.')
+                        '|Quantity| angle.')
 
     def __init__(self, center, width, height, angle=0 * u.deg, meta=None,
                  visual=None):
@@ -391,13 +391,13 @@ class RectangleSkyRegion(SkyRegion):
     """
 
     _params = ('center', 'width', 'height', 'angle')
-    center = ScalarSkyCoord('The center position as a SkyCoord.')
+    center = ScalarSkyCoord('The center position as a |SkyCoord|.')
     width = PositiveScalarAngle('The width of the rectangle (before rotation) '
-                                'as a Quantity angle.')
+                                'as a |Quantity| angle.')
     height = PositiveScalarAngle('The height of the rectangle (before '
-                                 'rotation) as a Quantity angle.')
+                                 'rotation) as a |Quantity| angle.')
     angle = ScalarAngle('The rotation angle measured anti-clockwise as a '
-                        'Quantity angle.')
+                        '|Quantity| angle.')
 
     def __init__(self, center, width, height, angle=0 * u.deg, meta=None,
                  visual=None):

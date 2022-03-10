@@ -61,7 +61,7 @@ class CirclePixelRegion(PixelRegion):
 
     _params = ('center', 'radius')
     _mpl_artist = 'Patch'
-    center = ScalarPixCoord('The center pixel position as a PixCoord.')
+    center = ScalarPixCoord('The center pixel position as a |PixCoord|.')
     radius = PositiveScalar('The radius in pixels as a float.')
 
     def __init__(self, center, radius, meta=None, visual=None):
@@ -198,8 +198,8 @@ class CircleSkyRegion(SkyRegion):
     """
 
     _params = ('center', 'radius')
-    center = ScalarSkyCoord('The center position as a SkyCoord.')
-    radius = PositiveScalarAngle('The radius as a Quantity angle.')
+    center = ScalarSkyCoord('The center position as a |SkyCoord|.')
+    radius = PositiveScalarAngle('The radius as a |Quantity| angle.')
 
     def __init__(self, center, radius, meta=None, visual=None):
         self.center = center

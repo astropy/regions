@@ -72,13 +72,13 @@ class EllipsePixelRegion(PixelRegion):
 
     _params = ('center', 'width', 'height', 'angle')
     _mpl_artist = 'Patch'
-    center = ScalarPixCoord('The center pixel position as a PixCoord.')
+    center = ScalarPixCoord('The center pixel position as a |PixCoord|.')
     width = PositiveScalar('The width of the ellipse (before rotation) in '
                            'pixels as a float.')
     height = PositiveScalar('The height of the ellipse (before rotation) in '
                             'pixels as a float.')
     angle = ScalarAngle('The rotation angle measured anti-clockwise as a '
-                        'Quantity angle.')
+                        '|Quantity| angle.')
 
     def __init__(self, center, width, height, angle=0. * u.deg, meta=None,
                  visual=None):
@@ -91,7 +91,6 @@ class EllipsePixelRegion(PixelRegion):
 
     @property
     def area(self):
-        """Region area (float)"""
         return math.pi / 4 * self.width * self.height
 
     def contains(self, pixcoord):
@@ -352,13 +351,13 @@ class EllipseSkyRegion(SkyRegion):
     """
 
     _params = ('center', 'width', 'height', 'angle')
-    center = ScalarSkyCoord('The center position as a SkyCoord.')
+    center = ScalarSkyCoord('The center position as a |SkyCoord|.')
     width = PositiveScalarAngle('The width of the ellipse (before rotation) '
-                                'as a Quantity angle.')
+                                'as a |Quantity| angle.')
     height = PositiveScalarAngle('The height of the ellipse (before rotation) '
-                                 'as a Quantity angle.')
+                                 'as a |Quantity| angle.')
     angle = ScalarAngle('The rotation angle measured anti-clockwise as a '
-                        'Quantity angle.')
+                        '|Quantity| angle.')
 
     def __init__(self, center, width, height, angle=0. * u.deg, meta=None,
                  visual=None):

@@ -63,8 +63,7 @@ class PolygonPixelRegion(PixelRegion):
 
     _params = ('vertices',)
     _mpl_artist = 'Patch'
-    vertices = OneDPixCoord('The vertices of the polygon as a PixCoord '
-                            'array.')
+    vertices = OneDPixCoord('The vertices of the polygon as a |PixCoord| array.')
 
     def __init__(self, vertices, meta=None, visual=None,
                  origin=PixCoord(0, 0)):
@@ -284,10 +283,12 @@ class RegularPolygonPixelRegion(PolygonPixelRegion):
     """
 
     _params = ('center', 'nvertices', 'radius', 'angle')
-    center = ScalarPixCoord('center')
-    nvertices = PositiveScalar('nvertices')
-    radius = PositiveScalar('radius')
-    angle = ScalarAngle('angle')
+    center = ScalarPixCoord('The center pixel position as a |PixCoord|.')
+    nvertices = PositiveScalar('The number of polygon vertices.')
+    radius = PositiveScalar('The distance from the center to any vertex in '
+                            'pixels as a float.')
+    angle = ScalarAngle('The rotation angle measured anti-clockwise as a '
+                        '|Quantity| angle.')
 
     def __init__(self, center, nvertices, radius, angle=0. * u.deg,
                  meta=None, visual=None):
@@ -363,8 +364,7 @@ class PolygonSkyRegion(SkyRegion):
     """
 
     _params = ('vertices',)
-    vertices = OneDSkyCoord('The vertices of the polygon as a SkyCoord '
-                            'array.')
+    vertices = OneDSkyCoord('The vertices of the polygon as a |SkyCoord| array.')
 
     def __init__(self, vertices, meta=None, visual=None):
         self.vertices = vertices
