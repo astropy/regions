@@ -114,6 +114,14 @@ def test_bounding_box_as_artist():
 
 
 @pytest.mark.skipif('not HAS_MATPLOTLIB')
+def test_bounding_box_plot():
+    from matplotlib.patches import Patch
+    bbox = RegionBoundingBox(1, 10, 2, 20)
+    patch = bbox.plot()
+    assert isinstance(patch, Patch)
+
+
+@pytest.mark.skipif('not HAS_MATPLOTLIB')
 def test_bounding_box_to_region():
     bbox = RegionBoundingBox(1, 10, 2, 20)
     region = RectanglePixelRegion(PixCoord(5.0, 10.5), width=9., height=18.)
@@ -122,13 +130,6 @@ def test_bounding_box_to_region():
     assert bbox_region.width == region.width
     assert bbox_region.height == region.height
     assert bbox_region.angle == region.angle
-
-
-@pytest.mark.skipif('not HAS_MATPLOTLIB')
-def test_bounding_box_plot():
-    # TODO: check the content of the plot
-    bbox = RegionBoundingBox(1, 10, 2, 20)
-    bbox.plot()
 
 
 def test_bounding_box_union():
