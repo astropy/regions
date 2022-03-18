@@ -1,33 +1,32 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
-from astropy.utils.exceptions import AstropyUserWarning
+from ...shapes import (CirclePixelRegion, EllipsePixelRegion,
+                       RectanglePixelRegion, PolygonPixelRegion,
+                       CircleAnnulusPixelRegion, EllipseAnnulusPixelRegion,
+                       PointPixelRegion)
 
-__all__ = ['FITSRegionParserWarning', 'FITSRegionParserError']
+__all__ = []
 
 
-class FITSRegionParserWarning(AstropyUserWarning):
+# mappings from FITS shape to region class and column names/indices
+shape_map = {'point': (PointPixelRegion, ('X0', 'Y0')),
+             'circle': (CirclePixelRegion, ('X0', 'Y0', 'R0')),
+             'ellipse': (EllipsePixelRegion,
+                         ('X0', 'Y0', 'R0', 'R1', 'ROTANG0')),
+             'annulus': (CircleAnnulusPixelRegion, ('X0', 'Y0', 'R0', 'R1')),
+             'elliptannulus': (EllipseAnnulusPixelRegion,
+                               ('X0', 'Y0', 'R0', 'R1', 'R2', 'R3',
+                                'ROTANG0')),
+             'box': (RectanglePixelRegion, ('X0', 'Y0', 'R0', 'R1')),
+             'rotbox': (RectanglePixelRegion,
+                        ('X0', 'Y0', 'R0', 'R1', 'ROTANG0')),
+             'rectangle': (RectanglePixelRegion, ('X0', 'X1', 'Y0', 'Y1')),
+             'rotrectangle': (RectanglePixelRegion,
+                              ('X0', 'X1', 'Y0', 'Y1', 'ROTANG0')),
+             'polygon': (PolygonPixelRegion, ('X', 'Y'))}
+
+
+class FITSParserError(Exception):
     """
-    A generic warning class for FITS region parsing.
+    A custom exception for FITS parsing errors.
     """
-
-
-class FITSRegionParserError(ValueError):
-    """
-    A generic error class for FITS region parsing.
-    """
-
-
-language_spec = {'CIRCLE': ['X0', 'Y0', 'R0'],
-                 'POINT': ['X0', 'Y0'],
-                 'BOX': ['X0', 'Y0', 'R0', 'R1'],
-                 'ANNULUS': ['X0', 'Y0', 'R0', 'R1'],
-                 'ELLIPSE': ['X0', 'Y0', 'R0', 'R1', 'ROTANG0'],
-                 'ELLIPTANNULUS': ['X0', 'Y0', 'R0', 'R1', 'R2', 'R3',
-                                   'ROTANG0'],
-                 'ROTBOX': ['X0', 'Y0', 'R0', 'R1', 'ROTANG0'],
-                 'RECTANGLE': ['X0', 'X1', 'Y0', 'Y1'],
-                 'ROTRECTANGLE': ['X0', 'X1', 'Y0', 'Y1', 'ROTANG0'],
-                 'POLYGON': ['X', 'Y'],
-                 'PIE': ['X0', 'Y0', 'ROTANG0', 'ROTANG1']
-                 }
-language_spec['SECTOR'] = language_spec['PIE']
