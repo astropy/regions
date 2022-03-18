@@ -15,8 +15,7 @@ import pytest
 from ....core import Regions
 from ....shapes import CircleSkyRegion
 from ...core import _to_shape_list
-from ..core import FITSRegionParserError
-from ..read import _FITSRegionParser
+from ..core import FITSParserError
 
 implemented_region_types = ('ellipse', 'circle', 'box', 'polygon', 'point',
                             'annulus', 'elliptannulus')
