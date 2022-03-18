@@ -37,8 +37,9 @@ def _read_ds9(filename, cache=False):
 
     Returns
     -------
-    regions : list
-        A list of `~regions.Region` objects.
+    regions : `regions.Regions`
+        A `Regions` object containing a list of `~regions.Region`
+        objects.
     """
     with get_readable_fileobj(filename, cache=cache) as fh:
         region_string = fh.read()
@@ -57,8 +58,9 @@ def _parse_ds9(region_str):
 
     Returns
     -------
-    regions : list
-        A list of `~regions.Region` objects.
+    regions : `regions.Regions`
+        A `Regions` object containing a list of `~regions.Region`
+        objects.
     """
     # first parse the input string to generate the raw region data
     region_data = _parse_raw_data(region_str)
