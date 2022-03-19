@@ -52,6 +52,22 @@ def _write_fits(regions, filename, header=None, overwrite=False):
         `OSError` if False and the output file exists. Default is False.
     """
     output = _serialize_fits(regions)
+
+    if header is None:
+        hdudoc = ('ASC-FITS-REGION-1.2: Rots, McDowell: FITS REGION '
+                  'Binary Table Design')
+        header = dict([('EXTNAME', 'REGION'),
+                       ('EXTVER', 1),
+                       ('EXTLEVEL', 1),
+                       ('HDUNAME', 'REGION'),
+                       ('HDUCLASS', 'ASC'),
+                       ('HDUCLAS1', 'REGION'),
+                       ('HDUCLAS2', 'STANDARD'),
+                       ('HDUVERS', '1.2.0'),
+                       ('HDUDOC', hdudoc),
+                       ('CONTENT', 'REGION'),
+                       ('ORIGIN', f'astropy/regions')])
+
     bin_table = fits.BinTableHDU(data=output, header=header)
     bin_table.writeto(filename, overwrite=overwrite)
 
