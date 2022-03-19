@@ -112,6 +112,8 @@ def _make_column(arrays):
             arr = np.pad(arr, (0, pad_width), mode='constant')
         if not isinstance(arr[0], u.Quantity):
             arr <<= u.pix
+        if arr_size == 1 and pad_width == 0:
+            arr = arr[0]  # use scalars instead of len-1 arrays
         data.append(arr)
 
     data = u.Quantity(data)
