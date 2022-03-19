@@ -23,10 +23,13 @@ def _serialize_fits(regions):
         if isinstance(region, SkyRegion):
             warnings.warn('Sky regions cannot be serialized to the FITS '
                           'region format, skipping.', AstropyUserWarning)
+            continue
         region_data.append(_serialize_region_fits(region))
 
-    fits_table = _make_table(region_data)
-    return fits_table
+    if region_data:
+        fits_table = _make_table(region_data)
+        return fits_table
+    return QTable()
 
 
 @RegionsRegistry.register(Region, 'write', 'fits')

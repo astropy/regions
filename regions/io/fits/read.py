@@ -87,7 +87,7 @@ def get_shape(region_row):
     valid_shapes = supported_shapes + unsupported_shapes
 
     if shape not in valid_shapes:
-        raise ValueError(f'{shape!r} is not a valid FITS region shape')
+        raise FITSParserError(f'{shape!r} is not a valid FITS region shape')
     if shape not in supported_shapes:
         warnings.warn(f'{shape!r} is not supported by the regions package, '
                       'skipping.', AstropyUserWarning)
@@ -177,7 +177,7 @@ def parse_table(region_table):
 
     for column in region_table.colnames:
         if column not in valid_columns:
-            raise FITSParserError(f'{column} is not a valid column name')
+            raise FITSParserError(f'{column!r} is not a valid column name')
 
     regions = []
     for row in region_table:
