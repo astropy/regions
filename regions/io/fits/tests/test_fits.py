@@ -3,124 +3,86 @@
 Tests for the fits subpackage.
 """
 
+import warnings
+
 from astropy.coordinates import SkyCoord
 from astropy.io import fits
 import astropy.units as u
-from astropy.utils.data import get_pkg_data_filename
-from astropy.table import Table
+from astropy.utils.data import get_pkg_data_filenames
+from astropy.utils.exceptions import AstropyUserWarning
+from astropy.table import QTable
 from astropy.wcs import WCS
 from numpy.testing import assert_allclose
 import pytest
 
-from ....core import Regions
-from ....shapes import CircleSkyRegion
-from ...core import _to_shape_list
+from ....core import Regions, PixCoord
+from ....shapes import CirclePixelRegion, CircleSkyRegion
+from ....tests.helpers import assert_region_allclose
 from ..core import FITSParserError
 
-implemented_region_types = ('ellipse', 'circle', 'box', 'polygon', 'point',
-                            'annulus', 'elliptannulus')
 
+def test_roundtrip(tmpdir):
+    filenames = get_pkg_data_filenames('data', pattern='*.fits')
 
-@pytest.mark.parametrize('filename', ['data/fits_region.fits'])
-def test_file_fits(filename):
-    filename = get_pkg_data_filename(filename)
-    table = Table.read(filename)
-    shapes = _FITSRegionParser(table, 'warn').shapes
+    # AstropyUserWarning will be emitted only for some of the files
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore', AstropyUserWarning)
+        # Check that all test files are readable
+        for filename in filenames:
+            regions = Regions.read(filename, format='fits')
 
-    assert shapes[0].region_type == 'circle'
-    assert shapes[1].region_type == 'rectangle'
-    assert shapes[2].region_type == 'ellipse'
-    assert shapes[3].region_type == 'rectangle'
-    assert shapes[4].region_type == 'circleannulus'
-    assert shapes[5].region_type == 'point'
-    assert shapes[6].region_type == 'point'
-    assert shapes[7].region_type == 'polygon'
-    assert shapes[8].region_type == 'rectangle'
-
-    for x in range(8):
-        assert_allclose(shapes[x].coord[:2],
-                        [table['X'][x][0], table['Y'][x][0]])
-
-    assert_allclose(shapes[7].coord, [1, 5, 2, 6, 3, 7, 4, 8])
-
-    assert_allclose(shapes[0].coord[2:], [table['R'][0][0]])
-
-    for x in range(1, 4):
-        assert_allclose([val.value for val in shapes[x].coord[2:]],
-                        list(table['R'][x][:2]) + [table['ROTANG'][x]])
-
-    regs = Regions(shapes.to_regions())
-    table_output = regs.serialize(format='fits')
-    shape_output = _FITSRegionParser(table_output).shapes
-
-    for i, shape in enumerate(shapes):
-        assert shape.region_type == shape_output[i].region_type
-        assert shape.coord == shape_output[i].coord
-        assert shape.meta == shape_output[i].meta
-
-    # Reading the regions directly from file and converting to sky
-    # regions.
-    regs_sky = Regions.read(filename, format='fits')
-    with fits.open(filename) as hdulist:
-        header = hdulist[1].header
-        wcs = WCS(header, keysel=['image', 'binary', 'pixel'])
-        regs_pix = [reg.to_pixel(wcs) for reg in regs_sky]
-        shapes_roundtrip = _to_shape_list(regs_pix, 'image')
-
-    for i, shape in enumerate(shapes):
-        assert shape.region_type == shapes_roundtrip[i].region_type
-        assert_allclose(shape.coord[:-1], shapes_roundtrip[i].coord[:-1])
+    tempfile = tmpdir.join('tmp.fits').strpath
+    regions.write(tempfile, format='fits', overwrite=True)
+    regions2 = Regions.read(tempfile, format='fits')
+    for reg1, reg2 in zip(regions, regions2):
+        assert_region_allclose(reg1, reg2)
 
 
 def test_only_pixel_regions():
     reg_sky = CircleSkyRegion(SkyCoord(1, 2, unit='deg'), 5 * u.deg)
     reg = Regions([reg_sky])
 
-    with pytest.raises(TypeError) as excinfo:
-        reg.serialize(format='fits')
+    match = 'Sky regions cannot be serialized'
+    with pytest.warns(AstropyUserWarning, match=match):
+        result = reg.serialize(format='fits')
+        assert len(result) == 0
 
-    estr = 'Every region must be a pixel region'
-    assert estr in str(excinfo.value)
+    reg_pix = CirclePixelRegion(PixCoord(10, 10), 5)
+    reg = Regions([reg_sky, reg_pix])
+    match = 'Sky regions cannot be serialized'
+    with pytest.warns(AstropyUserWarning, match=match):
+        result = reg.serialize(format='fits')
+        assert len(result) == 1
 
 
 def test_valid_columns():
-    t = Table([[1, 2, 3]], names=('a'))
-
-    with pytest.raises(FITSRegionParserError) as excinfo:
+    t = QTable([[1, 2, 3]], names=('a'))
+    with pytest.raises(FITSParserError) as excinfo:
         Regions.parse(t, format='fits')
-
-    estr = 'This table has an invalid column name: "a"'
-    assert estr in str(excinfo.value)
+        estr = "'a' is not a valid column name"
+        assert estr in str(excinfo.value)
 
 
 def test_valid_row():
-    x = [1]
-    y = [2]
+    x = [1] * u.pix
+    y = [2] * u.pix
     shapes = ['CIRCLE']
-    t = Table([x, y, shapes], names=('X', 'Y', 'SHAPE'))
-    t['X'].unit = 'pix'
-    t['Y'].unit = 'pix'
+    tbl = QTable([x, y, shapes], names=('X', 'Y', 'SHAPE'))
+    match = 'Table columns are missing'
+    with pytest.warns(AstropyUserWarning, match=match):
+        Regions.parse(tbl, format='fits')
 
-    with pytest.raises(FITSRegionParserError) as excinfo:
-        Regions.parse(t, format='fits')
+    # test invald shape
+    shapes = ['INVALID']
+    tbl2 = QTable([x, y, shapes], names=('X', 'Y', 'SHAPE'))
+    with pytest.raises(FITSParserError) as excinfo:
+        Regions.parse(tbl2, format='fits')
+        estr = "'invalid' is not a valid FITS region shape"
+        assert estr in str(excinfo.value)
 
-    estr = 'The column "R" is missing in the table'
-    assert estr in str(excinfo.value)
-
-    t[0]['SHAPE'] = 'INVAL'
-
-    with pytest.raises(FITSRegionParserError) as excinfo:
-        Regions.parse(t, format='fits')
-
-    estr = '"INVAL" is not a valid FITS Region type'
-    assert estr in str(excinfo.value)
-
-    t['ROTANG'] = [[20, 30]]
-    t['ROTANG'].unit = 'deg'
-    t[0]['SHAPE'] = 'PIE'
-
-    with pytest.raises(FITSRegionParserError) as excinfo:
-        Regions.parse(t, format='fits')
-
-    estr = '"PIE" is currently not supported'
-    assert estr in str(excinfo.value)
+    shapes = ['PIE']
+    rotang = [[20, 30]] * u.deg
+    tbl3 = QTable([x, y, shapes, rotang], names=('X', 'Y', 'SHAPE', 'ROTANG'))
+    match = "'pie' is not supported"
+    with pytest.warns(AstropyUserWarning, match=match):
+        Regions.parse(tbl3, format='fits')
