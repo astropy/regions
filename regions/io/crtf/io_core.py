@@ -8,20 +8,20 @@ from astropy.coordinates import (Angle, SkyCoord, UnitSphericalRepresentation,
 import astropy.units as u
 from astropy.utils.exceptions import AstropyUserWarning
 
-from ..shapes import (CirclePixelRegion, CircleSkyRegion,
-                      EllipsePixelRegion, EllipseSkyRegion,
-                      RectanglePixelRegion, RectangleSkyRegion,
-                      PolygonPixelRegion, RegularPolygonPixelRegion,
-                      PolygonSkyRegion,
-                      CircleAnnulusPixelRegion, CircleAnnulusSkyRegion,
-                      EllipseAnnulusPixelRegion, EllipseAnnulusSkyRegion,
-                      RectangleAnnulusPixelRegion, RectangleAnnulusSkyRegion,
-                      LinePixelRegion, LineSkyRegion,
-                      PointPixelRegion, PointSkyRegion,
-                      TextPixelRegion, TextSkyRegion)
-from ..core.core import PixCoord, SkyRegion
-from ..core.metadata import RegionMeta, RegionVisual
-from .crtf.core import CRTFRegionParserWarning
+from ...shapes import (CirclePixelRegion, CircleSkyRegion,
+                       EllipsePixelRegion, EllipseSkyRegion,
+                       RectanglePixelRegion, RectangleSkyRegion,
+                       PolygonPixelRegion, RegularPolygonPixelRegion,
+                       PolygonSkyRegion,
+                       CircleAnnulusPixelRegion, CircleAnnulusSkyRegion,
+                       EllipseAnnulusPixelRegion, EllipseAnnulusSkyRegion,
+                       RectangleAnnulusPixelRegion, RectangleAnnulusSkyRegion,
+                       LinePixelRegion, LineSkyRegion,
+                       PointPixelRegion, PointSkyRegion,
+                       TextPixelRegion, TextSkyRegion)
+from ...core.core import PixCoord, SkyRegion
+from ...core.metadata import RegionMeta, RegionVisual
+from ..crtf.core import CRTFRegionParserWarning
 
 __all__ = []
 

@@ -4,7 +4,7 @@ import os
 
 from ...core import Region, Regions
 from ...core.registry import RegionsRegistry
-from ..core import _to_shape_list
+from .io_core import _to_shape_list
 
 __all__ = []
 

@@ -2,8 +2,6 @@
 """
 This subpackage provides tools for reading and writing region files.
 """
-from .core import *  # noqa
-
 from .ds9.connect import *  # noqa
 from .ds9.core import *  # noqa
 from .ds9.read import *  # noqa

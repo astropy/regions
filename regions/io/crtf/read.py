@@ -11,7 +11,7 @@ from astropy.utils.data import get_readable_fileobj
 
 from ...core import Regions
 from ...core.registry import RegionsRegistry
-from ..core import _Shape, _ShapeList, reg_mapping
+from .io_core import _Shape, _ShapeList, reg_mapping
 from .core import (CRTFRegionParserError, CRTFRegionParserWarning,
                    valid_symbols)
 
