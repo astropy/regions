@@ -86,6 +86,10 @@ def _serialize_region_fits(region):
         elif param == 'angle':
             rotang = value
         else:
+            # ellipse region is defined by full axis lengths, but
+            # FITS regions file uses semi-axis lengths
+            if shape == 'ellipse':
+                value /= 2.0
             shape_params.append(value)
 
     if not shape_params:
