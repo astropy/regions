@@ -10,6 +10,7 @@ from astropy.utils.exceptions import AstropyUserWarning
 import numpy as np
 
 from ...core import Region, Regions, SkyRegion
+from ...shapes import RegularPolygonPixelRegion
 from ...core.registry import RegionsRegistry
 
 __all__ = []
@@ -24,7 +25,9 @@ def _serialize_fits(regions):
             warnings.warn('Sky regions cannot be serialized to the FITS '
                           'region format, skipping.', AstropyUserWarning)
             continue
-        region_data.append(_serialize_region_fits(region))
+        regdata = _serialize_region_fits(region)
+        if regdata is not None:
+            region_data.append(regdata)
 
     if region_data:
         fits_table = _make_table(region_data)
@@ -69,7 +72,7 @@ def _write_fits(regions, filename, header=None, overwrite=False):
                        ('HDUVERS', '1.2.0'),
                        ('HDUDOC', hdudoc),
                        ('CONTENT', 'REGION'),
-                       ('ORIGIN', f'astropy/regions')])
+                       ('ORIGIN', 'astropy/regions')])
 
     bin_table = fits.BinTableHDU(data=output, header=header)
     bin_table.writeto(filename, overwrite=overwrite)
@@ -88,8 +91,25 @@ class _RegionData:
 
 
 def _serialize_region_fits(region):
+    if isinstance(region, RegularPolygonPixelRegion):
+        region = region.to_polygon()
+
+    region_clsname = region.__class__.__name__
+
+    unsupported_regions = ('RectangleAnnulusPixelRegion',
+                           'LinePixelRegion', 'TextPixelRegion',
+                           'CompoundPixelRegion')
+    if region_clsname in unsupported_regions:
+        warnings.warn(f'({region_clsname} cannot be serialized using the '
+                      'FITS format, skipping.', AstropyUserWarning)
+        return None
+
     # translate region class to FITS shape name
-    shape = region.__class__.__name__.lower().replace('pixelregion', '')
+    shape = region_clsname.lower().replace('pixelregion', '')
+
+    if region.meta.get('include', None) == 0:
+        shape = f'!{shape}'
+
     region_map = {'circleannulus': 'annulus',
                   'ellipseannulus': 'elliptannulus',
                   'rectangle': 'rotbox'}
