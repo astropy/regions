@@ -6,17 +6,16 @@ Tests for the fits subpackage.
 import warnings
 
 from astropy.coordinates import SkyCoord
-from astropy.io import fits
 import astropy.units as u
 from astropy.utils.data import get_pkg_data_filenames
 from astropy.utils.exceptions import AstropyUserWarning
 from astropy.table import QTable
-from astropy.wcs import WCS
-from numpy.testing import assert_allclose
 import pytest
 
 from ....core import Regions, PixCoord
-from ....shapes import CirclePixelRegion, CircleSkyRegion
+from ....shapes import (CirclePixelRegion, CircleSkyRegion,
+                        RectangleAnnulusPixelRegion, LinePixelRegion,
+                        TextPixelRegion)
 from ....tests.helpers import assert_region_allclose
 from ..core import FITSParserError
 
@@ -61,6 +60,20 @@ def test_valid_columns():
         Regions.parse(t, format='fits')
         estr = "'a' is not a valid column name"
         assert estr in str(excinfo.value)
+
+
+def test_invalid_regions():
+    center = PixCoord(42, 43)
+    region1 = RectangleAnnulusPixelRegion(center, 4.2, 5.2, 7.2, 8.2,
+                                          angle=15 * u.deg)
+    region2 = LinePixelRegion(start=center, end=PixCoord(x=52, y=53))
+    region3 = TextPixelRegion(center, text='Example Text')
+    regions = (region1, region2, region3)
+
+    match = 'cannot be serialized using the FITS format'
+    for reg in regions:
+        with pytest.warns(AstropyUserWarning, match=match):
+            _ = reg.serialize(format='fits')
 
 
 def test_valid_row():
