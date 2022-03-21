@@ -224,9 +224,9 @@ The text regions can be used to annotate a text string on an image.
     >>> from regions import PixCoord, TextSkyRegion, TextPixelRegion
 
     >>> center_sky = SkyCoord(42, 43, unit='deg', frame='fk5')
-    >>> point_sky = TextSkyRegion(center=center_sky, text='Demo Text')
-    >>> point_pix = TextPixelRegion(center=PixCoord(x=42, y=43),
-    ...                             text='Demo Text')
+    >>> region_sky = TextSkyRegion(center=center_sky, text='Demo Text')
+    >>> region_pix = TextPixelRegion(center=PixCoord(x=42, y=43),
+    ...                              text='Demo Text')
 
 
 Region Transformations
