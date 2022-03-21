@@ -31,6 +31,9 @@ New Features
 - Added the ability to serialize multiple regions in the DS9 file format
   that have different coordinate frames. [#436]
 
+- Added the ability to parse FITS region ``rectangle`` and
+  ``rotrectangle`` shapes. [#444]
+
 
 Bug Fixes
 ---------
@@ -63,6 +66,12 @@ Bug Fixes
 - Fixed many issues with the DS9 parser and serializer in not
   consistently handling or preserving the region coordinate frame
   or region parameter units. [#436]
+
+- Fixed handling of FITS shapes that are preceded by an exclamation
+  mark. [#444]
+
+- Fixed a bug where written FITS region files could not be read back in.
+  [#444]
 
 
 API Changes
@@ -103,6 +112,10 @@ API Changes
 - The ``PixelRegion.plot()`` method now returns a
   ``matplotlib.artist.Artist`` object, which can be used in plot legends.
   [#441]
+
+- FITS region files are now always parsed and serialized as
+  ``PixelRegion`` objects. They can be converted to ``SkyRegion``
+  objects using a WCS object. [#444]
 
 
 0.5 (2021-07-20)
@@ -168,7 +181,7 @@ Bug Fixes
   space after the region name. [#271]
 
 - Fixed an issue where the CRTF file parser was too restrictive about
-  requiring the last and first poly coordinates to be the same.
+  requiring the last and first polynomial coordinates to be the same.
   [#359, #362]
 
 - Fixed a bug where an ``EllipsePixelRegion`` with zero height and/or
