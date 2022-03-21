@@ -165,8 +165,18 @@ def parse_row(region_row):
 
     shape_params = get_shape_params(shape, region_row, shape_columns)
     region = region_cls(*shape_params)
+
+    meta = {}
     if include == 0:
         meta = {'include': include}
+        region.meta = RegionMeta(meta)
+
+    shape_key = 'COMPONENT'
+    if shape_key in region_row.colnames:
+        component = int(region_row[shape_key])
+        meta = {'component': component}
+
+    if meta:
         region.meta = RegionMeta(meta)
 
     return region

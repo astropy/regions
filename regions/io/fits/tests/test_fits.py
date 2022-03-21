@@ -10,9 +10,11 @@ import astropy.units as u
 from astropy.utils.data import get_pkg_data_filenames
 from astropy.utils.exceptions import AstropyUserWarning
 from astropy.table import QTable
+import numpy as np
+from numpy.testing import assert_equal
 import pytest
 
-from ....core import Regions, PixCoord
+from ....core import Regions, PixCoord, RegionMeta
 from ....shapes import (CirclePixelRegion, CircleSkyRegion,
                         RectangleAnnulusPixelRegion, LinePixelRegion,
                         TextPixelRegion)
@@ -99,3 +101,33 @@ def test_valid_row():
     match = "'pie' is not supported"
     with pytest.warns(AstropyUserWarning, match=match):
         Regions.parse(tbl3, format='fits')
+
+
+def test_components():
+    center = PixCoord(10, 10)
+    regions = Regions((CirclePixelRegion(center, 3),
+                       CirclePixelRegion(center, 5),
+                       CirclePixelRegion(center, 7),
+                       CirclePixelRegion(center, 9)))
+    tbl1 = regions.serialize(format='fits')
+    assert 'COMPONENT' not in tbl1.colnames
+
+    components = [None, None, None, None]
+    for region, component in zip(regions, components):
+        region.meta = RegionMeta({'component': component})
+    tbl2 = regions.serialize(format='fits')
+    assert 'COMPONENT' not in tbl2.colnames
+
+    components = np.arange(4)
+    for region, component in zip(regions, components):
+        region.meta = RegionMeta({'component': component})
+    tbl3 = regions.serialize(format='fits')
+    assert 'COMPONENT' in tbl3.colnames
+    assert_equal(tbl3['COMPONENT'], components)
+
+    components = [1, 2, None, 4]
+    for region, component in zip(regions, components):
+        region.meta = RegionMeta({'component': component})
+    tbl4 = regions.serialize(format='fits')
+    assert 'COMPONENT' in tbl4.colnames
+    assert_equal(tbl4['COMPONENT'], [1, 2, 5, 4])

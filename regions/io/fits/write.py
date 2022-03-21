@@ -88,6 +88,7 @@ class _RegionData:
     y: np.ndarray
     r: np.ndarray
     rotang: np.ndarray
+    component: int
 
 
 def _serialize_region_fits(region):
@@ -136,8 +137,11 @@ def _serialize_region_fits(region):
     if rotang is None:
         rotang = u.Quantity(0, 'deg')
 
+    component = region.meta.get('component', None)
+
     return _RegionData(shape, np.atleast_1d(x), np.atleast_1d(y),
-                       np.atleast_1d(shape_params), np.atleast_1d(rotang))
+                       np.atleast_1d(shape_params), np.atleast_1d(rotang),
+                       component)
 
 
 def _make_column(arrays):
@@ -160,13 +164,37 @@ def _make_column(arrays):
     return data
 
 
+def _define_components(region_data):
+    components = np.array([regdata.component for regdata in region_data])
+
+    none_idx = [i for i, item in enumerate(components) if item is None]
+    if not none_idx:
+        return components
+
+    comps = [i for i in components if i is not None]
+    if comps:
+        start_component = np.max(comps) + 1
+        components[none_idx] = np.arange(len(none_idx)) + start_component
+    else:
+        # all components are set to None - do not write a COMPONENT
+        # column
+        components = None
+
+    return components
+
+
 def _make_table(region_data):
     tbl = QTable()
     attrs = ('shape', 'x', 'y', 'r', 'rotang')
 
     for attr in attrs:
         arrays = [getattr(data, attr) for data in region_data]
-        if attr != 'shape':
+        if attr not in ('shape',):
             arrays = _make_column(arrays)
         tbl[attr.upper()] = arrays
+
+    components = _define_components(region_data)
+    if components is not None:
+        tbl['COMPONENT'] = components
+
     return tbl
