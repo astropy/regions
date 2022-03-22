@@ -180,3 +180,4 @@ Region File Format Limitations
     :maxdepth: 1
 
     ds9_io
+    fits_io

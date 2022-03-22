@@ -9,6 +9,7 @@ from astropy.units import Quantity
 from astropy.utils.exceptions import AstropyUserWarning
 
 from ...core import Region, Regions, PixelRegion, PixCoord
+from ...core import CompoundPixelRegion, CompoundSkyRegion
 from ...core.registry import RegionsRegistry
 from ...shapes import RegularPolygonPixelRegion
 from .core import ds9_frame_map, ds9_shape_templates
@@ -22,8 +23,13 @@ __all__ = []
 def _serialize_ds9(regions, precision=8):
     region_data = []
     for region in regions:
+        if isinstance(region, (CompoundPixelRegion, CompoundSkyRegion)):
+            warnings.warn('Cannot serialize a compound region, skipping',
+                          AstropyUserWarning)
+
         if isinstance(region, RegularPolygonPixelRegion):
             region = region.to_polygon()
+
         region_data.append(_serialize_region_ds9(region, precision=precision))
 
     # ds9 file header
