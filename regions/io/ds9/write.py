@@ -21,6 +21,9 @@ __all__ = []
 @RegionsRegistry.register(Region, 'serialize', 'ds9')
 @RegionsRegistry.register(Regions, 'serialize', 'ds9')
 def _serialize_ds9(regions, precision=8):
+    if not regions:
+        return ''
+
     region_data = []
     for region in regions:
         if isinstance(region, (CompoundPixelRegion, CompoundSkyRegion)):

@@ -595,3 +595,8 @@ def test_serialize_regularpolygon():
     result1 = region.serialize(format='ds9')
     result2 = poly_region.serialize(format='ds9')
     assert result1 == result2
+
+
+def test_serialize_empty_list():
+    regions = Regions([])
+    assert regions.serialize(format='ds9') == ''
