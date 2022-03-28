@@ -10,6 +10,8 @@ New Features
 Bug Fixes
 ---------
 
+- Fixed an issue with the CRTF for certain malformed input. [#448]
+
 API Changes
 -----------
 
