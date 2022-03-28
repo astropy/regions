@@ -12,6 +12,9 @@ Bug Fixes
 
 - Fixed an issue with the CRTF for certain malformed input. [#448]
 
+- Fixed a bug where DS9 serialization of an empty list raised an error.
+  [#449]
+
 API Changes
 -----------
 
