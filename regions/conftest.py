@@ -4,18 +4,6 @@
 # packagename.test
 
 try:
-    import pytest_arraydiff
-except ImportError:
-    raise ImportError("The pytest-arraydiff package is required to run the "
-                      "tests. You can install it with: pip install "
-                      "pytest-arraydiff.")
-else:
-    # We need to remove pytest_arraydiff from the namespace otherwise pytest
-    # gets confused, because it tries to interpret pytest_* as a special
-    # function name.
-    del pytest_arraydiff
-
-try:
     from pytest_astropy_header.display import (PYTEST_HEADER_MODULES,
                                                TESTED_VERSIONS)
     ASTROPY_HEADER = True
