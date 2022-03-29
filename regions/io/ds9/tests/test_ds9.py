@@ -30,12 +30,14 @@ def test_roundtrip(tmpdir):
         # Check that all test files are readable
         for filename in filenames:
             regions = Regions.read(filename, format='ds9')
+            assert len(regions) > 0
 
-    tempfile = tmpdir.join('tmp.ds9').strpath
-    regions.write(tempfile, format='ds9', overwrite=True, precision=20)
-    regions2 = Regions.read(tempfile, format='ds9')
-    for reg1, reg2 in zip(regions, regions2):
-        assert_region_allclose(reg1, reg2)
+            tempfile = tmpdir.join('tmp.ds9').strpath
+            regions.write(tempfile, format='ds9', overwrite=True, precision=20)
+            regions2 = Regions.read(tempfile, format='ds9')
+            assert len(regions2) > 0
+            for reg1, reg2 in zip(regions, regions2):
+                assert_region_allclose(reg1, reg2)
 
 
 def test_serialize():
