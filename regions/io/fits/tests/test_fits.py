@@ -31,12 +31,13 @@ def test_roundtrip(tmpdir):
         # Check that all test files are readable
         for filename in filenames:
             regions = Regions.read(filename, format='fits')
+            assert len(regions) > 0
 
-    tempfile = tmpdir.join('tmp.fits').strpath
-    regions.write(tempfile, format='fits', overwrite=True)
-    regions2 = Regions.read(tempfile, format='fits')
-    for reg1, reg2 in zip(regions, regions2):
-        assert_region_allclose(reg1, reg2)
+        tempfile = tmpdir.join('tmp.fits').strpath
+        regions.write(tempfile, format='fits', overwrite=True)
+        regions2 = Regions.read(tempfile, format='fits')
+        for reg1, reg2 in zip(regions, regions2):
+            assert_region_allclose(reg1, reg2)
 
 
 def test_only_pixel_regions():
