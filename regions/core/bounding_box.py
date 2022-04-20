@@ -4,10 +4,9 @@ This module defines a class for a rectangular bounding box.
 """
 
 from astropy.io.fits.util import _is_int
-from astropy.utils.decorators import deprecated
 import numpy as np
 
-__all__ = ['RegionBoundingBox', 'BoundingBox']
+__all__ = ['RegionBoundingBox']
 
 
 class RegionBoundingBox:
@@ -355,22 +354,3 @@ class RegionBoundingBox:
 
         return RegionBoundingBox(ixmin=ixmin, ixmax=ixmax, iymin=iymin,
                                  iymax=iymax)
-
-
-@deprecated('0.6', alternative='`RegionBoundingBox`')
-class BoundingBox(RegionBoundingBox):
-    """
-    A rectangular bounding box in integer (not float) pixel indices.
-
-    Parameters
-    ----------
-    ixmin, ixmax, iymin, iymax : int
-        The bounding box pixel indices.  Note that the upper values
-        (``iymax`` and ``ixmax``) are exclusive as for normal slices in
-        Python.  The lower values (``ixmin`` and ``iymin``) must not be
-        greater than the respective upper values (``ixmax`` and
-        ``iymax``).
-    """
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
