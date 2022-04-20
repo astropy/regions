@@ -21,48 +21,7 @@ To transform between sky and pixel regions, a `world coordinate system
 
 Regions also provides a unified interface for reading,
 writing, parsing, and serializing regions data in different
-formats, including `CRTF (CASA Region Text Format)
-<https://casa.nrao.edu/casadocs/casa-6.1.0/imaging/image-analysis/region
--file-format>`_, `DS9 Region Format
-<http://ds9.si.edu/doc/ref/region.html>`_, and `FITS Region Binary Table
-<https://fits.gsfc.nasa.gov/registry/region.html>`_.
-
-Example Dataset
----------------
-
-Throughout the documentation, we will be working with the same example
-dataset and assume that you have run `~regions.make_example_dataset` to
-create example ``dataset`` and ``wcs`` objects like this:
-
-.. code-block:: python
-
-    >>> from regions import make_example_dataset
-    >>> dataset = make_example_dataset(data='simulated')
-    >>> wcs = dataset.wcs
-
-For image examples, we will use the ``wcs`` and ``image`` attributes.
-For example positions, we will use the ``source_table`` and
-``event_table`` attributes.
-
-In your own analyses, you will usually load image data and WCS objects
-from file or compute them with a Python script. We don't do this here,
-because we wanted to make this tutorial independent of any example data
-files, to help you get started quickly.
-
-The example image was created to illustrate some of the key issues
-when working with regions. It represents an all-sky image in Aitoff
-(``AIT``) projection, which means that there are pixels at the edge of
-the image that don't correspond to positions on the sky. And the pixels
-are huge, roughly :math:`10 \times 10 \deg`, which means that there are
-well-visible differences between sky and pixel regions, caused by the
-WCS projection.
-
-Before we start diving into coding with regions, here's an image that
-illustrates our example counts image, with source positions and a few
-regions overplotted:
-
-.. plot:: plot_example.py
-    :include-source: false
+formats, including the `DS9 Region Format <http://ds9.si.edu/doc/ref/region.html>`_, `CRTF (CASA Region Text Format) <https://casa.nrao.edu/casadocs/casa-6.1.0/imaging/image-analysis/region -file-format>`_, and `FITS Region Binary Table <https://fits.gsfc.nasa.gov/registry/region.html>`_ format.
 
 
 .. _getting_started-coord:
@@ -70,19 +29,12 @@ regions overplotted:
 Coordinates
 -----------
 
-This regions package uses :class:`~astropy.coordinates.SkyCoord` objects
-to represent sky coordinates.
+Pixel Coordinates
+~~~~~~~~~~~~~~~~~
 
-.. code-block:: python
-
-    >>> from astropy.coordinates import SkyCoord
-    >>> skycoord = SkyCoord(42, 43, unit='deg', frame='galactic')
-    >>> skycoord
-    <SkyCoord (Galactic): (l, b) in deg
-        (42., 43.)>
-
-To represent pixel coordinates, :class:`~regions.PixCoord` objects are
-used.
+:class:`~regions.PixCoord` objects are used to represent pixel
+coordinates. Pixel coordinates are defined with a scalar or an array of
+``x`` and ``y`` Cartesian coordinates:
 
 .. code-block:: python
 
@@ -97,17 +49,86 @@ used.
     >>> pixcoord.xy
     (42, 43)
 
-`~astropy.coordinates.SkyCoord` is a very powerful and complex class
-(different representations, a coordinate transformation tree) that is
-documented extensively in the `astropy.coordinates` docs.
+`~regions.PixCoord` objects can also represent arrays of pixel
+coordinates. These work in the same way as single-value coordinates, but
+they store multiple coordinates in a single object. Let's create a 1D
+array of pixel coordinates:
 
-In contrast, `~regions.PixCoord` is a small and simple helper class.
-The pixel coordinate is always represented as cartesian coordinate data
-members ``x`` and ``y``. A pixel coordinate doesn't have a frame and is
-not connected to the `astropy.coordinates` transformation tree.
+.. code-block:: python
 
-A WCS object is used to transform back and forth between sky and pixel
-coordinates:
+    >>> pixcoord = PixCoord(x=[0, 1], y=[2, 3])
+    >>> pixcoord
+    PixCoord(x=[0 1], y=[2 3])
+    >>> pixcoord.x
+    array([0, 1])
+    >>> pixcoord.y
+    array([2, 3])
+    >>> pixcoord.xy
+    (array([0, 1]), array([2, 3]))
+
+Let's now create a 2D array of pixel coordinates:
+
+.. code-block:: python
+
+    >>> pixcoord = PixCoord(x=[[1, 2, 3], [4, 5, 6]],
+    ...                     y=[[11, 12, 13], [14, 15, 16]])
+    >>> pixcoord
+    PixCoord(x=[[1 2 3]
+     [4 5 6]], y=[[11 12 13]
+     [14 15 16]])
+
+
+Sky Coordinates
+~~~~~~~~~~~~~~~
+
+:class:`~astropy.coordinates.SkyCoord` objects are used to represent
+sky coordinates. `~astropy.coordinates.SkyCoord` is a very powerful
+class that provides a flexible interface for celestial coordinate
+representation, manipulation, and transformation between systems. See
+the extensive :ref:`astropy-coordinates` documentation for more details.
+
+Let's create a single sky coordinate:
+
+.. code-block:: python
+
+    >>> from astropy.coordinates import SkyCoord
+    >>> skycoord = SkyCoord(42, 43, unit='deg', frame='galactic')
+    >>> skycoord
+    <SkyCoord (Galactic): (l, b) in deg
+        (42., 43.)>
+
+Sky coordinates also support array coordinates. These work in the same
+way as single-value coordinates, but they store multiple coordinates in
+a single object:
+
+.. code-block:: python
+
+    >>> skycoord = SkyCoord(ra=[10, 11, 12], dec=[41, 42, 43], unit='deg')
+    >>> skycoord
+    <SkyCoord (ICRS): (ra, dec) in deg
+    [(10., 41.), (11., 42.), (12., 43.)]>
+
+To represent angles both on the sky and in an image,
+`~astropy.coordinates.Angle` objects or `~astropy.units.Quantity`
+objects with angular units can be used.
+
+
+Pixel/Sky Coordinate Transformations
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To transform between pixel and sky coordinates, a `world coordinate system
+<https://docs.astropy.org/en/stable/wcs/wcsapi.html>`_ object (e.g.,
+`astropy.wcs.WCS`) is needed.
+
+Let's start by creating a WCS object:
+
+.. code-block:: python
+
+    >>> from regions import make_example_dataset
+    >>> dataset = make_example_dataset(data='simulated')
+    >>> wcs = dataset.wcs
+
+Now let's use this WCS to convert between sky and pixel coordinates:
 
 .. code-block:: python
 
@@ -119,48 +140,60 @@ coordinates:
     <SkyCoord (Galactic): (l, b) in deg
         (42., 43.)>
 
-It is also possible to create `~astropy.coordinates.SkyCoord` and
-`~regions.PixCoord` objects that represent arrays of pixel coordinates.
-With such coordinates, operations like transforming between sky and
-pixel or region containment checks work as expected (i.e., they return
-arrays of the same shape as the inputs, and perform operations on array
-entries independently).
+
+Pixel Regions
+-------------
+
+Pixel regions are regions that are defined using pixel coordinates and
+sizes in pixels. The regions package provides a set of "pixel-based"
+regions classes, for example, `~regions.CirclePixelRegion`:
 
 .. code-block:: python
 
-    # One-dimensional array of pixel coordinates
-    >>> pixcoord = PixCoord(x=[0, 1], y=[2, 3])
-    >>> pixcoord
-    PixCoord(x=[0 1], y=[2 3])
+    >>> from regions import PixCoord, CirclePixelRegion
+    >>> center = PixCoord(x=42, y=43)
+    >>> radius = 4.2
+    >>> region = CirclePixelRegion(center, radius)
 
-    # Two-dimensional array pixel coordinates:
-    >>> pixcoord = PixCoord(x=[[1, 2, 3], [4, 5, 6]],
-    ...                     y=[[11, 12, 13], [14, 15, 16]])
-    >>> print(pixcoord)
-    PixCoord(x=[[1 2 3]
-     [4 5 6]], y=[[11 12 13]
-     [14 15 16]])
+You can print the region to get some information about its properties:
 
-To represent angles both on the sky and in an image,
-`~astropy.coordinates.Angle` objects or `~astropy.units.Quantity`
-objects with angular units can be used.
+.. code-block:: python
+
+    >>> print(region)
+    Region: CirclePixelRegion
+    center: PixCoord(x=42, y=43)
+    radius: 4.2
+
+You can access its properties via attributes:
+
+.. code-block:: python
+
+   >>> region.center
+   PixCoord(x=42, y=43)
+   >>> region.radius
+   4.2
+
+See the :ref:`shapes` documentation for the complete list of pixel-based
+regions and to learn more about :class:`~regions.Region` objects and
+their capabilities.
 
 
-Sky regions
+Sky Regions
 -----------
 
 Sky regions are regions that are defined using celestial coordinates.
-Note that these are **not** defined as regions on the celestial sphere,
-but rather are meant to represent shapes on an image, but simply defined
-using celestial coordinates as opposed to pixel coordinates.
+Please note they are **not** defined as regions on the celestial sphere,
+but rather are meant to represent shapes on an image. They simply use
+sky coordinates instead of pixel coordinates to define their position.
+The remaining shape parameters are converted to pixels using the pixel
+scale of the image.
 
-This is how to create a sky region:
+Let's create a sky region:
 
 .. code-block:: python
 
     >>> from astropy.coordinates import Angle, SkyCoord
     >>> from regions import CircleSkyRegion
-
     >>> center = SkyCoord(42, 43, unit='deg')
     >>> radius = Angle(3, 'deg')
     >>> region = CircleSkyRegion(center, radius)
@@ -172,12 +205,11 @@ Alternatively, one can define the radius using a
 
     >>> import astropy.units as u
     >>> from regions import CircleSkyRegion
-
     >>> center = SkyCoord(42, 43, unit='deg')
     >>> radius = 3.0 * u.deg
     >>> region = CircleSkyRegion(center, radius)
 
-You can print the regions to get some info about its properties:
+You can print the region to get some information about its properties:
 
 .. code-block:: python
 
@@ -187,47 +219,16 @@ You can print the regions to get some info about its properties:
         (42., 43.)>
     radius: 3.0 deg
 
-To see a list of all available sky regions, you can go to the API docs
-or in IPython print the list using:
-
-.. code-block:: none
-
-    In [1]: import regions
-    In [2]: regions.*SkyRegion?
-
-
-Pixel regions
--------------
-
-In some cases you might instead want to directly represent a region in
-pixel coordinates. For those, there's a `~regions.PixCoord` class to
-represent an (x, y) pixel coordinate and a set of "pixel-based region"
-classes. One example is `~regions.CirclePixelRegion`:
+You can access its properties via attributes:
 
 .. code-block:: python
 
-    >>> from regions import PixCoord, CirclePixelRegion
+   >>> region.center
+    <SkyCoord (ICRS): (ra, dec) in deg
+        (42., 43.)>
+   >>> region.radius
+   <Quantity 3. deg>
 
-    >>> center = PixCoord(x=42, y=43)
-    >>> radius = 4.2
-    >>> region = CirclePixelRegion(center, radius)
-
-You can print the regions to get some info about its properties:
-
-.. code-block:: python
-
-    >>> print(region)
-    Region: CirclePixelRegion
-    center: PixCoord(x=42, y=43)
-    radius: 4.2
-
-To see a list of all available sky regions, you can go to the API docs
-or in IPython print the list using:
-
-.. code-block:: none
-
-    In [1]: import regions
-    In [2]: regions.*PixelRegion?
-
-To learn more about :class:`~regions.Region` objects and their
-capabilities see the :ref:`shapes` documentation.
+See the :ref:`shapes` documentation for the complete list of pixel-based
+regions and to learn more about :class:`~regions.Region` objects and
+their capabilities.
