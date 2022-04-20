@@ -18,12 +18,12 @@ Bug Fixes
 API Changes
 -----------
 
+- Removed the deprecated ``BoundingBox`` class. Use
+  ``RegionBoundingBox`` instead. [#456]
+
 
 0.6 (2022-03-21)
 ================
-
-General
--------
 
 New Features
 ------------
@@ -54,7 +54,6 @@ New Features
 
 - Added the ability to parse FITS region ``rectangle`` and
   ``rotrectangle`` shapes. [#444]
-
 
 Bug Fixes
 ---------
@@ -93,7 +92,6 @@ Bug Fixes
 
 - Fixed a bug where written FITS region files could not be read back in.
   [#444]
-
 
 API Changes
 -----------
@@ -299,7 +297,7 @@ See also: `regions v0.4 merged pull requests list on Github <https://github.com/
 0.3 (2018-09-09)
 ================
 
-New features
+New Features
 ------------
 
 - Changed ``as_patch`` to ``as_artist`` to accommodate non-patch artists [#218]
