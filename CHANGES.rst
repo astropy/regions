@@ -17,6 +17,9 @@ Bug Fixes
 - Fixed a bug where DS9 serialization of an empty list raised an error.
   [#449]
 
+- Added validation to ``RegionMeta`` and ``RegionVisual`` ``update`` and
+  ``setdefault`` methods. [#463]
+
 API Changes
 -----------
 
