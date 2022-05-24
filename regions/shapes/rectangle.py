@@ -10,7 +10,8 @@ import numpy as np
 
 from ..core.attributes import (ScalarPixCoord, PositiveScalar,
                                PositiveScalarAngle, ScalarAngle,
-                               ScalarSkyCoord)
+                               ScalarSkyCoord, RegionMetaDescr,
+                               RegionVisualDescr)
 from ..core.bounding_box import RegionBoundingBox
 from ..core.core import PixelRegion, SkyRegion
 from ..core.mask import RegionMask
@@ -40,10 +41,10 @@ class RectanglePixelRegion(PixelRegion):
         The rotation angle of the rectangle, measured anti-clockwise. If
         set to zero (the default), the width axis is lined up with the x
         axis.
-    meta : `~regions.RegionMeta`, optional
-        A dictionary that stores the meta attributes of this region.
-    visual : `~regions.RegionVisual`, optional
-        A dictionary that stores the visual meta attributes of this
+    meta : `~regions.RegionMeta` or `dict`, optional
+        A dictionary that stores the meta attributes of the region.
+    visual : `~regions.RegionVisual` or `dict`, optional
+        A dictionary that stores the visual meta attributes of the
         region.
 
     Examples
@@ -77,6 +78,8 @@ class RectanglePixelRegion(PixelRegion):
                             'in pixels as a float.')
     angle = ScalarAngle('The rotation angle measured anti-clockwise as a '
                         '|Quantity| angle.')
+    meta = RegionMetaDescr('The meta attributes as a |RegionMeta|')
+    visual = RegionVisualDescr('The visual attributes as a |RegionVisual|.')
 
     def __init__(self, center, width, height, angle=0 * u.deg, meta=None,
                  visual=None):
@@ -219,7 +222,7 @@ class RectanglePixelRegion(PixelRegion):
     def as_mpl_selector(self, ax, active=True, sync=True, callback=None,
                         **kwargs):
         """
-        A matplotlib editable widget for this region
+        A matplotlib editable widget for the region
         (`matplotlib.widgets.RectangleSelector`).
 
         Parameters
@@ -383,10 +386,10 @@ class RectangleSkyRegion(SkyRegion):
         The rotation angle of the rectangle, measured anti-clockwise. If
         set to zero (the default), the width axis is lined up with the
         longitude axis of the celestial coordinates.
-    meta : `~regions.RegionMeta`, optional
-        A dictionary that stores the meta attributes of this region.
-    visual : `~regions.RegionVisual`, optional
-        A dictionary that stores the visual meta attributes of this
+    meta : `~regions.RegionMeta` or `dict`, optional
+        A dictionary that stores the meta attributes of the region.
+    visual : `~regions.RegionVisual` or `dict`, optional
+        A dictionary that stores the visual meta attributes of the
         region.
     """
 
@@ -398,6 +401,8 @@ class RectangleSkyRegion(SkyRegion):
                                  'rotation) as a |Quantity| angle.')
     angle = ScalarAngle('The rotation angle measured anti-clockwise as a '
                         '|Quantity| angle.')
+    meta = RegionMetaDescr('The meta attributes as a |RegionMeta|')
+    visual = RegionVisualDescr('The visual attributes as a |RegionVisual|.')
 
     def __init__(self, center, width, height, angle=0 * u.deg, meta=None,
                  visual=None):
