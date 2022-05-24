@@ -6,7 +6,8 @@ This module defines text regions in both pixel and sky coordinates.
 from astropy.wcs.utils import pixel_to_skycoord
 
 from .point import PointPixelRegion, PointSkyRegion
-from ..core.attributes import ScalarPixCoord, ScalarSkyCoord
+from ..core.attributes import (ScalarPixCoord, ScalarSkyCoord,
+                               RegionMetaDescr, RegionVisualDescr)
 from .._utils.wcs_helpers import pixel_scale_angle_at_skycoord
 
 __all__ = ['TextSkyRegion', 'TextPixelRegion']
@@ -22,10 +23,10 @@ class TextPixelRegion(PointPixelRegion):
         The leftmost point of the text string before rotation.
     text : str
         The text string.
-    meta : `~regions.RegionMeta`, optional
-        A dictionary that stores the meta attributes of this region.
-    visual : `~regions.RegionVisual`, optional
-        A dictionary that stores the visual meta attributes of this
+    meta : `~regions.RegionMeta` or `dict`, optional
+        A dictionary that stores the meta attributes of the region.
+    visual : `~regions.RegionVisual` or `dict`, optional
+        A dictionary that stores the visual meta attributes of the
         region.
 
     Examples
@@ -53,6 +54,8 @@ class TextPixelRegion(PointPixelRegion):
     _mpl_artist = 'Text'
     center = ScalarPixCoord('The leftmost pixel position (before rotation) '
                             'as a |PixCoord|.')
+    meta = RegionMetaDescr('The meta attributes as a |RegionMeta|')
+    visual = RegionVisualDescr('The visual attributes as a |RegionVisual|.')
 
     def __init__(self, center, text, meta=None, visual=None):
         super().__init__(center, meta, visual)
@@ -113,16 +116,18 @@ class TextSkyRegion(PointSkyRegion):
         The leftmost position of the text string before rotation.
     text : str
         The text string.
-    meta : `~regions.RegionMeta`, optional
-        A dictionary that stores the meta attributes of this region.
-    visual : `~regions.RegionVisual`, optional
-        A dictionary that stores the visual meta attributes of this
+    meta : `~regions.RegionMeta` or `dict`, optional
+        A dictionary that stores the meta attributes of the region.
+    visual : `~regions.RegionVisual` or `dict`, optional
+        A dictionary that stores the visual meta attributes of the
         region.
     """
 
     _params = ('center', 'text')
     center = ScalarSkyCoord('The leftmost position (before rotation) as a '
                             '|SkyCoord|.')
+    meta = RegionMetaDescr('The meta attributes as a |RegionMeta|')
+    visual = RegionVisualDescr('The visual attributes as a |RegionVisual|.')
 
     def __init__(self, center, text, meta=None, visual=None):
         super().__init__(center, meta, visual)

@@ -6,7 +6,8 @@ This module defines line regions in both pixel and sky coordinates.
 from astropy.wcs.utils import pixel_to_skycoord, skycoord_to_pixel
 import numpy as np
 
-from ..core.attributes import ScalarPixCoord, ScalarSkyCoord
+from ..core.attributes import (ScalarPixCoord, ScalarSkyCoord,
+                               RegionMetaDescr, RegionVisualDescr)
 from ..core.bounding_box import RegionBoundingBox
 from ..core.core import PixelRegion, SkyRegion
 from ..core.metadata import RegionMeta, RegionVisual
@@ -25,10 +26,10 @@ class LinePixelRegion(PixelRegion):
         The start position.
     end : `~regions.PixCoord`
         The end position.
-    meta : `~regions.RegionMeta`, optional
-        A dictionary that stores the meta attributes of this region.
-    visual : `~regions.RegionVisual`, optional
-        A dictionary that stores the visual meta attributes of this
+    meta : `~regions.RegionMeta` or `dict`, optional
+        A dictionary that stores the meta attributes of the region.
+    visual : `~regions.RegionVisual` or `dict`, optional
+        A dictionary that stores the visual meta attributes of the
         region.
 
     Examples
@@ -56,6 +57,8 @@ class LinePixelRegion(PixelRegion):
     _mpl_artist = 'Patch'
     start = ScalarPixCoord('The start pixel position as a |PixCoord|.')
     end = ScalarPixCoord('The end pixel position as a |PixCoord|.')
+    meta = RegionMetaDescr('The meta attributes as a |RegionMeta|')
+    visual = RegionVisualDescr('The visual attributes as a |RegionVisual|.')
 
     def __init__(self, start, end, meta=None, visual=None):
         self.start = start
@@ -167,16 +170,18 @@ class LineSkyRegion(SkyRegion):
         The start position.
     end : `~astropy.coordinates.SkyCoord`
         The end position.
-    meta : `~regions.RegionMeta`, optional
-        A dictionary that stores the meta attributes of this region.
-    visual : `~regions.RegionVisual`, optional
-        A dictionary that stores the visual meta attributes of this
+    meta : `~regions.RegionMeta` or `dict`, optional
+        A dictionary that stores the meta attributes of the region.
+    visual : `~regions.RegionVisual` or `dict`, optional
+        A dictionary that stores the visual meta attributes of the
         region.
     """
 
     _params = ('start', 'end')
     start = ScalarSkyCoord('The start position as a |SkyCoord|.')
     end = ScalarSkyCoord('The end position as a |SkyCoord|.')
+    meta = RegionMetaDescr('The meta attributes as a |RegionMeta|')
+    visual = RegionVisualDescr('The visual attributes as a |RegionVisual|.')
 
     def __init__(self, start, end, meta=None, visual=None):
         self.start = start
