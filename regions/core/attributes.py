@@ -11,6 +11,7 @@ from astropy.units import Quantity
 import numpy as np
 
 from .pixcoord import PixCoord
+from .metadata import RegionMeta, RegionVisual
 
 __all__ = []
 
@@ -165,3 +166,42 @@ class RegionType(RegionAttribute):
         if not isinstance(value, self.regionclass):
             raise ValueError(f'{self.name!r} must be a '
                              f'{self.regionclass.__name__} object')
+
+
+class RegionMetaDescr(RegionAttribute):
+    """
+    Descriptor class for the region meta dictionary.
+
+    If input as a pure `dict`, it will be converted to a `RegionMeta`
+    object.
+    """
+    def __set__(self, instance, value):
+        # RegionMeta subclasses dict
+        if type(value) == dict:  # pylint: disable=C0123
+            value = RegionMeta(value)
+        super().__set__(instance, value)
+
+    def _validate(self, value):
+        if not isinstance(value, RegionMeta):
+            raise ValueError(f'{self.name!r} must be a dict or RegionMeta '
+                             'object')
+
+
+class RegionVisualDescr(RegionAttribute):
+    """
+    Descriptor class for the region visual dictionary.
+
+    If input as a pure `dict`, it will be converted to a `RegionVisual`
+    object.
+    """
+
+    def __set__(self, instance, value):
+        # RegionVisual subclasses dict
+        if type(value) == dict:  # pylint: disable=C0123
+            value = RegionVisual(value)
+        super().__set__(instance, value)
+
+    def _validate(self, value):
+        if not isinstance(value, RegionVisual):
+            raise ValueError(f'{self.name!r} must be a dict or RegionVisual '
+                             'object')
