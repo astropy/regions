@@ -19,6 +19,8 @@
 
 .. Regions
 .. |PixCoord| replace:: `~regions.PixCoord`
+.. |RegionMeta| replace:: `~regions.RegionMeta`
+.. |RegionVisual| replace:: `~regions.RegionVisual`
 
 .. Matplotlib
 .. _Matplotlib: https://matplotlib.org/
