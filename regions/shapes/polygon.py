@@ -8,7 +8,8 @@ from astropy.wcs.utils import pixel_to_skycoord, skycoord_to_pixel
 import numpy as np
 
 from ..core.attributes import (OneDPixCoord, ScalarPixCoord, PositiveScalar,
-                               ScalarAngle, OneDSkyCoord)
+                               ScalarAngle, OneDSkyCoord, RegionMetaDescr,
+                               RegionVisualDescr)
 from ..core.bounding_box import RegionBoundingBox
 from ..core.core import PixelRegion, SkyRegion
 from ..core.mask import RegionMask
@@ -29,10 +30,10 @@ class PolygonPixelRegion(PixelRegion):
     ----------
     vertices : `~regions.PixCoord`
         The vertices of the polygon.
-    meta : `~regions.RegionMeta`, optional
-        A dictionary that stores the meta attributes of this region.
-    visual : `~regions.RegionVisual`, optional
-        A dictionary that stores the visual meta attributes of this
+    meta : `~regions.RegionMeta` or `dict`, optional
+        A dictionary that stores the meta attributes of the region.
+    visual : `~regions.RegionVisual` or `dict`, optional
+        A dictionary that stores the visual meta attributes of the
         region.
     origin : `~regions.PixCoord`, optional
         The origin for polynomial vertices. Using this keyword allows
@@ -63,7 +64,10 @@ class PolygonPixelRegion(PixelRegion):
 
     _params = ('vertices',)
     _mpl_artist = 'Patch'
-    vertices = OneDPixCoord('The vertices of the polygon as a |PixCoord| array.')
+    vertices = OneDPixCoord('The vertices of the polygon as a |PixCoord| '
+                            'array.')
+    meta = RegionMetaDescr('The meta attributes as a |RegionMeta|')
+    visual = RegionVisualDescr('The visual attributes as a |RegionVisual|.')
 
     def __init__(self, vertices, meta=None, visual=None,
                  origin=PixCoord(0, 0)):
@@ -223,10 +227,10 @@ class RegularPolygonPixelRegion(PolygonPixelRegion):
         The rotation angle of the polygon, measured anti-clockwise. If
         set to zero (the default), the polygon will point "up" following
         the `matplotlib.patches.RegularPolygon` convention.
-    meta : `~regions.RegionMeta`, optional
-        A dictionary that stores the meta attributes of this region.
-    visual : `~regions.RegionVisual`, optional
-        A dictionary that stores the visual meta attributes of this
+    meta : `~regions.RegionMeta` or `dict`, optional
+        A dictionary that stores the meta attributes of the region.
+    visual : `~regions.RegionVisual` or `dict`, optional
+        A dictionary that stores the visual meta attributes of the
         region.
 
     Attributes
@@ -289,6 +293,8 @@ class RegularPolygonPixelRegion(PolygonPixelRegion):
                             'pixels as a float.')
     angle = ScalarAngle('The rotation angle measured anti-clockwise as a '
                         '|Quantity| angle.')
+    meta = RegionMetaDescr('The meta attributes as a |RegionMeta|')
+    visual = RegionVisualDescr('The visual attributes as a |RegionVisual|.')
 
     def __init__(self, center, nvertices, radius, angle=0. * u.deg,
                  meta=None, visual=None):
@@ -356,15 +362,18 @@ class PolygonSkyRegion(SkyRegion):
     ----------
     vertices : `~astropy.coordinates.SkyCoord`
         The vertices of the polygon.
-    meta : `~regions.RegionMeta`, optional
-        A dictionary that stores the meta attributes of this region.
-    visual : `~regions.RegionVisual`, optional
-        A dictionary that stores the visual meta attributes of this
+    meta : `~regions.RegionMeta` or `dict`, optional
+        A dictionary that stores the meta attributes of the region.
+    visual : `~regions.RegionVisual` or `dict`, optional
+        A dictionary that stores the visual meta attributes of the
         region.
     """
 
     _params = ('vertices',)
-    vertices = OneDSkyCoord('The vertices of the polygon as a |SkyCoord| array.')
+    vertices = OneDSkyCoord('The vertices of the polygon as a |SkyCoord| '
+                            'array.')
+    meta = RegionMetaDescr('The meta attributes as a |RegionMeta|')
+    visual = RegionVisualDescr('The visual attributes as a |RegionVisual|.')
 
     def __init__(self, vertices, meta=None, visual=None):
         self.vertices = vertices

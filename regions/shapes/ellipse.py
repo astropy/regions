@@ -12,7 +12,8 @@ import numpy as np
 
 from ..core.attributes import (ScalarPixCoord, PositiveScalar,
                                PositiveScalarAngle, ScalarAngle,
-                               ScalarSkyCoord)
+                               ScalarSkyCoord, RegionMetaDescr,
+                               RegionVisualDescr)
 from ..core.bounding_box import RegionBoundingBox
 from ..core.core import PixelRegion, SkyRegion
 from ..core.mask import RegionMask
@@ -40,10 +41,10 @@ class EllipsePixelRegion(PixelRegion):
         The rotation angle of the ellipse, measured anti-clockwise. If
         set to zero (the default), the width axis is lined up with the x
         axis.
-    meta : `~regions.RegionMeta`, optional
-        A dictionary that stores the meta attributes of this region.
-    visual : `~regions.RegionVisual`, optional
-        A dictionary that stores the visual meta attributes of this
+    meta : `~regions.RegionMeta` or `dict`, optional
+        A dictionary that stores the meta attributes of the region.
+    visual : `~regions.RegionVisual` or `dict`, optional
+        A dictionary that stores the visual meta attributes of the
         region.
 
     Examples
@@ -79,6 +80,8 @@ class EllipsePixelRegion(PixelRegion):
                             'pixels as a float.')
     angle = ScalarAngle('The rotation angle measured anti-clockwise as a '
                         '|Quantity| angle.')
+    meta = RegionMetaDescr('The meta attributes as a |RegionMeta|')
+    visual = RegionVisualDescr('The visual attributes as a |RegionVisual|.')
 
     def __init__(self, center, width, height, angle=0. * u.deg, meta=None,
                  visual=None):
@@ -179,7 +182,7 @@ class EllipsePixelRegion(PixelRegion):
 
     def as_artist(self, origin=(0, 0), **kwargs):
         """
-        Return a matplotlib patch object for this region
+        Return a matplotlib patch object for the region
         (`matplotlib.patches.Ellipse`).
 
         Parameters
@@ -343,10 +346,10 @@ class EllipseSkyRegion(SkyRegion):
         The rotation angle of the ellipse, measured anti-clockwise. If
         set to zero (the default), the width axis is lined up with the
         longitude axis of the celestial coordinates.
-    meta : `~regions.RegionMeta`, optional
-        A dictionary that stores the meta attributes of this region.
-    visual : `~regions.RegionVisual`, optional
-        A dictionary that stores the visual meta attributes of this
+    meta : `~regions.RegionMeta` or `dict`, optional
+        A dictionary that stores the meta attributes of the region.
+    visual : `~regions.RegionVisual` or `dict`, optional
+        A dictionary that stores the visual meta attributes of the
         region.
     """
 
@@ -358,6 +361,8 @@ class EllipseSkyRegion(SkyRegion):
                                  'as a |Quantity| angle.')
     angle = ScalarAngle('The rotation angle measured anti-clockwise as a '
                         '|Quantity| angle.')
+    meta = RegionMetaDescr('The meta attributes as a |RegionMeta|')
+    visual = RegionVisualDescr('The visual attributes as a |RegionVisual|.')
 
     def __init__(self, center, width, height, angle=0. * u.deg, meta=None,
                  visual=None):

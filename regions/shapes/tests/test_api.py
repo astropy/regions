@@ -3,6 +3,7 @@
 The tests in this file simply check what functionality is currently
 implemented and doesn't check anything about correctness.
 """
+from collections import OrderedDict
 import itertools
 
 from astropy.coordinates import SkyCoord
@@ -12,6 +13,7 @@ import pytest
 
 from ...core.core import PixelRegion, Region, SkyRegion
 from ...core.mask import RegionMask
+from ...core.metadata import RegionMeta, RegionVisual
 from ...core.pixcoord import PixCoord
 from ..annulus import (CircleAnnulusPixelRegion, CircleAnnulusSkyRegion,
                        EllipseAnnulusPixelRegion, EllipseAnnulusSkyRegion,
@@ -177,3 +179,22 @@ def test_attribute_validation_sky_regions(region):
                 with pytest.raises(ValueError) as excinfo:
                     setattr(region, attr, val)
                 assert f'{attr!r} must' in str(excinfo.value)
+
+
+@pytest.mark.parametrize('region', PIXEL_REGIONS + SKY_REGIONS, ids=ids_func)
+def test_metadata(region):
+    region.meta = {'text': 'hello'}
+    region.visual = {'color': 'blue'}
+    assert isinstance(region.meta, RegionMeta)
+    assert isinstance(region.visual, RegionVisual)
+
+    # dict subclasses are allowed
+    region.meta = OrderedDict({'text': 'hello'})
+    region.visual = OrderedDict({'color': 'blue'})
+    assert isinstance(region.meta, RegionMeta)
+    assert isinstance(region.visual, RegionVisual)
+
+    with pytest.raises(ValueError):
+        region.meta = 1
+    with pytest.raises(ValueError):
+        region.visual = 'blue'

@@ -11,7 +11,8 @@ from astropy.wcs.utils import pixel_to_skycoord
 
 from ..core.attributes import (ScalarPixCoord, PositiveScalar,
                                PositiveScalarAngle, ScalarAngle,
-                               ScalarSkyCoord)
+                               ScalarSkyCoord, RegionMetaDescr,
+                               RegionVisualDescr)
 from ..core.compound import CompoundPixelRegion
 from ..core.core import PixelRegion, SkyRegion
 from ..core.metadata import RegionMeta, RegionVisual
@@ -92,10 +93,10 @@ class CircleAnnulusPixelRegion(AnnulusPixelRegion):
         The inner radius of the annulus in pixels.
     outer_radius : float
         The outer radius of the annulus in pixels.
-    meta : `~regions.RegionMeta`, optional
-        A dictionary that stores the meta attributes of this region.
-    visual : `~regions.RegionVisual`, optional
-        A dictionary that stores the visual meta attributes of this
+    meta : `~regions.RegionMeta` or `dict`, optional
+        A dictionary that stores the meta attributes of the region.
+    visual : `~regions.RegionVisual` or `dict`, optional
+        A dictionary that stores the visual meta attributes of the
         region.
 
     Examples
@@ -125,6 +126,8 @@ class CircleAnnulusPixelRegion(AnnulusPixelRegion):
     center = ScalarPixCoord('The center pixel position as a |PixCoord|.')
     inner_radius = PositiveScalar('The inner radius in pixels as a float.')
     outer_radius = PositiveScalar('The outer radius in pixels as a float.')
+    meta = RegionMetaDescr('The meta attributes as a |RegionMeta|')
+    visual = RegionVisualDescr('The visual attributes as a |RegionVisual|.')
 
     def __init__(self, center, inner_radius, outer_radius, meta=None,
                  visual=None):
@@ -168,10 +171,10 @@ class CircleAnnulusSkyRegion(SkyRegion):
         The inner radius of the annulus in angular units.
     outer_radius : `~astropy.units.Quantity`
         The outer radius of the annulus in angular units.
-    meta : `~regions.RegionMeta`, optional
-        A dictionary that stores the meta attributes of this region.
-    visual : `~regions.RegionVisual`, optional
-        A dictionary that stores the visual meta attributes of this
+    meta : `~regions.RegionMeta` or `dict`, optional
+        A dictionary that stores the meta attributes of the region.
+    visual : `~regions.RegionVisual` or `dict`, optional
+        A dictionary that stores the visual meta attributes of the
         region.
     """
 
@@ -181,6 +184,8 @@ class CircleAnnulusSkyRegion(SkyRegion):
                                        'angle.')
     outer_radius = PositiveScalarAngle('The outer radius as a |Quantity| '
                                        'angle.')
+    meta = RegionMetaDescr('The meta attributes as a |RegionMeta|')
+    visual = RegionVisualDescr('The visual attributes as a |RegionVisual|.')
 
     def __init__(self, center, inner_radius, outer_radius, meta=None,
                  visual=None):
@@ -241,6 +246,8 @@ class AsymmetricAnnulusPixelRegion(AnnulusPixelRegion):
                                   'pixels as a float.')
     angle = ScalarAngle('The rotation angle measured anti-clockwise as a '
                         '|Quantity| angle.')
+    meta = RegionMetaDescr('The meta attributes as a |RegionMeta|')
+    visual = RegionVisualDescr('The visual attributes as a |RegionVisual|.')
 
     def __init__(self, center, inner_width, outer_width, inner_height,
                  outer_height, angle=0 * u.deg, meta=None, visual=None):
@@ -308,10 +315,10 @@ class AsymmetricAnnulusSkyRegion(SkyRegion):
         The rotation angle of the annulus, measured anti-clockwise. If
         set to zero (the default), the width axis is lined up with the
         longitude axis of the celestial coordinates
-    meta : `~regions.RegionMeta`, optional
-        A dictionary that stores the meta attributes of this region.
-    visual : `~regions.RegionVisual`, optional
-        A dictionary that stores the visual meta attributes of this
+    meta : `~regions.RegionMeta` or `dict`, optional
+        A dictionary that stores the meta attributes of the region.
+    visual : `~regions.RegionVisual` or `dict`, optional
+        A dictionary that stores the visual meta attributes of the
         region.
     """
 
@@ -329,6 +336,8 @@ class AsymmetricAnnulusSkyRegion(SkyRegion):
                                        'as a |Quantity| angle.')
     angle = ScalarAngle('The rotation angle measured anti-clockwise as a'
                         '|Quantity| angle.')
+    meta = RegionMetaDescr('The meta attributes as a |RegionMeta|')
+    visual = RegionVisualDescr('The visual attributes as a |RegionVisual|.')
 
     def __init__(self, center, inner_width, outer_width, inner_height,
                  outer_height, angle=0 * u.deg, meta=None, visual=None):
@@ -387,10 +396,10 @@ class EllipseAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
         The rotation angle of the elliptical annulus, measured
         anti-clockwise. If set to zero (the default), the width axis is
         lined up with the x axis.
-    meta : `~regions.RegionMeta`, optional
-        A dictionary that stores the meta attributes of this region.
-    visual : `~regions.RegionVisual`, optional
-        A dictionary that stores the visual meta attributes of this
+    meta : `~regions.RegionMeta` or `dict`, optional
+        A dictionary that stores the meta attributes of the region.
+    visual : `~regions.RegionVisual` or `dict`, optional
+        A dictionary that stores the visual meta attributes of the
         region.
 
     Examples
@@ -465,10 +474,10 @@ class EllipseAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
         The rotation angle of the elliptical annulus, measured
         anti-clockwise. If set to zero (the default), the width axis is
         lined up with the longitude axis of the celestial coordinates
-    meta : `~regions.RegionMeta`, optional
-        A dictionary that stores the meta attributes of this region.
-    visual : `~regions.RegionVisual`, optional
-        A dictionary that stores the visual meta attributes of this
+    meta : `~regions.RegionMeta` or `dict`, optional
+        A dictionary that stores the meta attributes of the region.
+    visual : `~regions.RegionVisual` or `dict`, optional
+        A dictionary that stores the visual meta attributes of the
         region.
     """
 
@@ -518,10 +527,10 @@ class RectangleAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
         The rotation angle of the rectangular annulus, measured
         anti-clockwise. If set to zero (the default), the width axis is
         lined up with the x axis.
-    meta : `~regions.RegionMeta`, optional
-        A dictionary that stores the meta attributes of this region.
-    visual : `~regions.RegionVisual`, optional
-        A dictionary that stores the visual meta attributes of this
+    meta : `~regions.RegionMeta` or `dict`, optional
+        A dictionary that stores the meta attributes of the region.
+    visual : `~regions.RegionVisual` or `dict`, optional
+        A dictionary that stores the visual meta attributes of the
         region.
 
     Examples
@@ -597,10 +606,10 @@ class RectangleAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
         The rotation angle of the rectangular annulus, measured
         anti-clockwise. If set to zero (the default), the width axis is
         lined up with the longitude axis of the celestial coordinates
-    meta : `~regions.RegionMeta`, optional
-        A dictionary that stores the meta attributes of this region.
-    visual : `~regions.RegionVisual`, optional
-        A dictionary that stores the visual meta attributes of this
+    meta : `~regions.RegionMeta` or `dict`, optional
+        A dictionary that stores the meta attributes of the region.
+    visual : `~regions.RegionVisual` or `dict`, optional
+        A dictionary that stores the visual meta attributes of the
         region.
     """
 

@@ -6,7 +6,8 @@ This module defines point regions in both pixel and sky coordinates.
 from astropy.wcs.utils import pixel_to_skycoord, skycoord_to_pixel
 import numpy as np
 
-from ..core.attributes import ScalarPixCoord, ScalarSkyCoord
+from ..core.attributes import (ScalarPixCoord, ScalarSkyCoord,
+                               RegionMetaDescr, RegionVisualDescr)
 from ..core.bounding_box import RegionBoundingBox
 from ..core.core import PixelRegion, SkyRegion
 from ..core.metadata import RegionMeta, RegionVisual
@@ -24,10 +25,10 @@ class PointPixelRegion(PixelRegion):
     ----------
     center : `~regions.PixCoord`
         The position of the point.
-    meta : `~regions.RegionMeta`, optional
-        A dictionary that stores the meta attributes of this region.
-    visual : `~regions.RegionVisual`, optional
-        A dictionary that stores the visual meta attributes of this
+    meta : `~regions.RegionMeta` or `dict`, optional
+        A dictionary that stores the meta attributes of the region.
+    visual : `~regions.RegionVisual` or `dict`, optional
+        A dictionary that stores the visual meta attributes of the
         region.
 
     Examples
@@ -63,6 +64,8 @@ class PointPixelRegion(PixelRegion):
     _params = ('center',)
     _mpl_artist = 'Line2D'
     center = ScalarPixCoord('The point pixel position as a |PixCoord|.')
+    meta = RegionMetaDescr('The meta attributes as a |RegionMeta|')
+    visual = RegionVisualDescr('The visual attributes as a |RegionVisual|.')
 
     def __init__(self, center, meta=None, visual=None):
         self.center = center
@@ -158,15 +161,17 @@ class PointSkyRegion(SkyRegion):
     ----------
     center : `~astropy.coordinates.SkyCoord`
         The position of the point.
-    meta : `regions.RegionMeta`, optional
-        A dictionary that stores the meta attributes of this region.
-    visual : `~regions.RegionVisual`, optional
-        A dictionary that stores the visual meta attributes of this
+    meta : `~regions.RegionMeta` or `dict`, optional
+        A dictionary that stores the meta attributes of the region.
+    visual : `~regions.RegionVisual` or `dict`, optional
+        A dictionary that stores the visual meta attributes of the
         region.
     """
 
     _params = ('center',)
     center = ScalarSkyCoord('The point position as a |SkyCoord|.')
+    meta = RegionMetaDescr('The meta attributes as a |RegionMeta|')
+    visual = RegionVisualDescr('The visual attributes as a |RegionVisual|.')
 
     def __init__(self, center, meta=None, visual=None):
         self.center = center

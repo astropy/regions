@@ -11,7 +11,8 @@ from astropy.wcs.utils import pixel_to_skycoord
 import numpy as np
 
 from ..core.attributes import (ScalarPixCoord, PositiveScalar,
-                               PositiveScalarAngle, ScalarSkyCoord)
+                               PositiveScalarAngle, ScalarSkyCoord,
+                               RegionMetaDescr, RegionVisualDescr)
 from ..core.bounding_box import RegionBoundingBox
 from ..core.core import PixelRegion, SkyRegion
 from ..core.mask import RegionMask
@@ -33,10 +34,10 @@ class CirclePixelRegion(PixelRegion):
         The center position.
     radius : float
         The radius in pixels.
-    meta : `~regions.RegionMeta`, optional
-        A dictionary that stores the meta attributes of this region.
-    visual : `~regions.RegionVisual`, optional
-        A dictionary that stores the visual meta attributes of this
+    meta : `~regions.RegionMeta` or `dict`, optional
+        A dictionary that stores the meta attributes of the region.
+    visual : `~regions.RegionVisual` or `dict`, optional
+        A dictionary that stores the visual meta attributes of the
         region.
 
     Examples
@@ -63,6 +64,8 @@ class CirclePixelRegion(PixelRegion):
     _mpl_artist = 'Patch'
     center = ScalarPixCoord('The center pixel position as a |PixCoord|.')
     radius = PositiveScalar('The radius in pixels as a float.')
+    meta = RegionMetaDescr('The meta attributes as a |RegionMeta|')
+    visual = RegionVisualDescr('The visual attributes as a |RegionVisual|.')
 
     def __init__(self, center, radius, meta=None, visual=None):
         self.center = center
@@ -190,16 +193,18 @@ class CircleSkyRegion(SkyRegion):
         The center position.
     radius : `~astropy.units.Quantity`
         The radius in angular units.
-    meta : `~regions.RegionMeta`, optional
-        A dictionary that stores the meta attributes of this region.
-    visual : `~regions.RegionVisual`, optional
-        A dictionary that stores the visual meta attributes of this
+    meta : `~regions.RegionMeta` or `dict`, optional
+        A dictionary that stores the meta attributes of the region.
+    visual : `~regions.RegionVisual` or `dict`, optional
+        A dictionary that stores the visual meta attributes of the
         region.
     """
 
     _params = ('center', 'radius')
     center = ScalarSkyCoord('The center position as a |SkyCoord|.')
     radius = PositiveScalarAngle('The radius as a |Quantity| angle.')
+    meta = RegionMetaDescr('The meta attributes as a |RegionMeta|')
+    visual = RegionVisualDescr('The visual attributes as a |RegionVisual|.')
 
     def __init__(self, center, radius, meta=None, visual=None):
         self.center = center

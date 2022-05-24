@@ -7,6 +7,8 @@ General
 New Features
 ------------
 
+- Region meta and visual metadata can be now input as a ``dict``. [#462]
+
 Bug Fixes
 ---------
 
