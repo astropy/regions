@@ -3,6 +3,7 @@
 The tests in this file simply check what functionality is currently
 implemented and doesn't check anything about correctness.
 """
+from collections import OrderedDict
 import itertools
 
 from astropy.coordinates import SkyCoord
@@ -184,6 +185,12 @@ def test_attribute_validation_sky_regions(region):
 def test_metadata(region):
     region.meta = {'text': 'hello'}
     region.visual = {'color': 'blue'}
+    assert isinstance(region.meta, RegionMeta)
+    assert isinstance(region.visual, RegionVisual)
+
+    # dict subclasses are allowed
+    region.meta = OrderedDict({'text': 'hello'})
+    region.visual = OrderedDict({'color': 'blue'})
     assert isinstance(region.meta, RegionMeta)
     assert isinstance(region.visual, RegionVisual)
 

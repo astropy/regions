@@ -177,7 +177,7 @@ class RegionMetaDescr(RegionAttribute):
     """
     def __set__(self, instance, value):
         # RegionMeta subclasses dict
-        if type(value) == dict:  # pylint: disable=C0123
+        if isinstance(value, dict) and not isinstance(value, RegionMeta):
             value = RegionMeta(value)
         super().__set__(instance, value)
 
@@ -197,7 +197,7 @@ class RegionVisualDescr(RegionAttribute):
 
     def __set__(self, instance, value):
         # RegionVisual subclasses dict
-        if type(value) == dict:  # pylint: disable=C0123
+        if isinstance(value, dict) and not isinstance(value, RegionVisual):
             value = RegionVisual(value)
         super().__set__(instance, value)
 
