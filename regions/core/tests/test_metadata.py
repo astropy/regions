@@ -23,6 +23,12 @@ def test_region_meta():
 
     with pytest.raises(KeyError):
         RegionMeta({'invalid': 1})
+    with pytest.raises(KeyError):
+        meta.update({'invalid': 1})
+    with pytest.raises(KeyError):
+        meta.update(invalid=1)
+    with pytest.raises(KeyError):
+        meta.setdefault('invalid', 1)
 
 
 def test_region_visual():
@@ -41,6 +47,12 @@ def test_region_visual():
 
     with pytest.raises(KeyError):
         RegionVisual({'invalid': 1})
+    with pytest.raises(KeyError):
+        meta.update({'invalid': 1})
+    with pytest.raises(KeyError):
+        meta.update(invalid=1)
+    with pytest.raises(KeyError):
+        meta.setdefault('invalid', 1)
 
 
 def test_region_visual_mpl_kwargs():

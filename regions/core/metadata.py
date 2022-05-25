@@ -41,6 +41,21 @@ class Meta(dict):
         item = self.key_mapping.get(item, item)
         return super().__getitem__(item)
 
+    def update(self, *args, **kwargs):
+        if args:
+            if len(args) > 1:
+                raise ValueError('Only one argument can be input')
+            other = dict(args[0])
+            for key in other:
+                self[key] = other[key]
+        for key in kwargs:
+            self[key] = kwargs[key]
+
+    def setdefault(self, key, value=None):
+        if key not in self:
+            self[key] = value
+        return self[key]
+
     def copy(self):
         """
         Make a deep copy of this object.

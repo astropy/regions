@@ -1,0 +1,3 @@
+# region.core.metadata
+# From https://github.com/numpy/numpydoc/issues/275
+py:class None.  Update D from dict/iterable E and F.
