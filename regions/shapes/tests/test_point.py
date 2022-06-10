@@ -95,8 +95,8 @@ class TestPointSkyRegion(BaseTestSkyRegion):
     def test_contains(self, wcs):
         position = SkyCoord([1, 2] * u.deg, [3, 4] * u.deg)
         # points do not contain things
-        assert all(self.reg.contains(position, wcs)
-                   == np.array([False, False], dtype='bool'))
+        assert_allclose(self.reg.contains(position, wcs),
+                    np.array([False, False], dtype='bool'))
 
     def test_eq(self):
         reg = self.reg.copy()
