@@ -54,7 +54,7 @@ of the file and the file format, e.g.:
     >>> from regions import Regions
     >>> regions = Regions.read('my_regions.reg', format='ds9')
 
-It is also possible to load tables directly from the internet using
+It is also possible to load regions directly from the internet using
 URLs, e.g.:
 
 .. doctest-skip::
