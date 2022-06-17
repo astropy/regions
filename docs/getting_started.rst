@@ -19,9 +19,13 @@ To transform between sky and pixel regions, a `world coordinate system
 <https://docs.astropy.org/en/stable/wcs/wcsapi.html>`_ object (e.g.,
 `astropy.wcs.WCS`) is needed.
 
-Regions also provides a unified interface for reading,
-writing, parsing, and serializing regions data in different
-formats, including the `DS9 Region Format <http://ds9.si.edu/doc/ref/region.html>`_, `CRTF (CASA Region Text Format) <https://casa.nrao.edu/casadocs/casa-6.1.0/imaging/image-analysis/region -file-format>`_, and `FITS Region Binary Table <https://fits.gsfc.nasa.gov/registry/region.html>`_ format.
+Regions also provides a unified interface for reading, writing,
+parsing, and serializing regions data in different formats, including
+the `DS9 Region Format <http://ds9.si.edu/doc/ref/region.html>`_,
+`CRTF (CASA Region Text Format)
+<https://casadocs.readthedocs.io/en/stable/notebooks/image_analysis.html
+#Region-File-Format>`_, and `FITS Region Binary Table
+<https://fits.gsfc.nasa.gov/registry/region.html>`_ format.
 
 
 .. _getting_started-coord:
