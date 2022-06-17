@@ -25,7 +25,7 @@ filename suffix for a particular format.
 ============  ==============  ========================
    Format       Suffix           Description
 ============  ==============  ========================
-       crtf   .crtf           `CASA Region Text Format <https://casa.nrao.edu/casadocs/casa-6.1.0/imaging/image-analysis/region-file-format>`_
+       crtf   .crtf           `CASA Region Text Format <https://casadocs.readthedocs.io/en/stable/notebooks/image_analysis.html#Region-File-Format>`_
         ds9   .reg, .ds9      `DS9 Region Format <http://ds9.si.edu/doc/ref/region.html>`_
        fits   .fits           `FITS Region Binary Table <https://fits.gsfc.nasa.gov/registry/region.html>`_
 ============  ==============  ========================
