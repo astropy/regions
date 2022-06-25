@@ -52,8 +52,6 @@ class EllipsePixelRegion(PixelRegion):
     .. plot::
         :include-source:
 
-        import numpy as np
-        from astropy.modeling.models import Ellipse2D
         from astropy.coordinates import Angle
         from regions import PixCoord, EllipsePixelRegion
         import matplotlib.pyplot as plt

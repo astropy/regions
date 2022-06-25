@@ -45,7 +45,7 @@ def is_fits(methodname, filepath):
                     warnings.simplefilter('ignore')
                     with fits.open(filepath):
                         return True
-            except IOError:
+            except OSError:
                 return False
 
     else:

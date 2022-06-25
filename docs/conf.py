@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 #
 # Documentation build configuration file.
@@ -54,7 +53,7 @@ plot_formats = ['png', 'hires.png', 'pdf', 'svg']
 
 # This is added to the end of RST files - a good place to put
 # substitutions to be used globally.
-with open('common_links.txt', 'r') as fh:
+with open('common_links.txt') as fh:
     rst_epilog += fh.read()
 
 
@@ -131,7 +130,7 @@ htmlhelp_basename = project + 'doc'
 # -- Options for LaTeX output -------------------------------------------------
 # Grouping the document tree into LaTeX files. List of tuples (source
 # start file, target name, title, author, documentclass [howto/manual]).
-latex_documents = [('index', project + '.tex', project + u' Documentation',
+latex_documents = [('index', project + '.tex', project + ' Documentation',
                     author, 'manual')]
 # latex_logo = '_static/regions_banner.pdf'
 
@@ -139,7 +138,7 @@ latex_documents = [('index', project + '.tex', project + u' Documentation',
 # -- Options for manual page output -------------------------------------------
 # One entry per manual page. List of tuples (source start file, name,
 # description, authors, manual section).
-man_pages = [('index', project.lower(), project + u' Documentation',
+man_pages = [('index', project.lower(), project + ' Documentation',
               [author], 1)]
 
 
