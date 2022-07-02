@@ -639,7 +639,7 @@ def _make_region(region_data):
         warnings.warn(msg, AstropyUserWarning)
         return None
 
-    # define the parameters to initalize a Region
+    # define the parameters to initialize a Region
     # NOTE: region_params can be longer than region_data for
     # multi-annulus regions
     region_type = region_data.region_type

@@ -88,7 +88,7 @@ def test_valid_row():
     with pytest.warns(AstropyUserWarning, match=match):
         Regions.parse(tbl, format='fits')
 
-    # test invald shape
+    # test invalid shape
     shapes = ['INVALID']
     tbl2 = QTable([x, y, shapes], names=('X', 'Y', 'SHAPE'))
     with pytest.raises(FITSParserError) as excinfo:
