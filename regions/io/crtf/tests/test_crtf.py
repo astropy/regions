@@ -129,7 +129,9 @@ def test_issue_312_regression():
 
 
 @pytest.mark.parametrize('filename', ['data/CRTFgeneral.crtf',
-                                      'data/CRTFgeneraloutput.crtf'])
+                                      'data/CRTFgeneraloutput.crtf',
+                                      'data/CRTF_labelcolor.crtf'
+                                     ])
 def test_file_crtf(filename):
     filename = get_pkg_data_filename(filename)
     regs = Regions.read(filename, errors='warn', format='crtf')
