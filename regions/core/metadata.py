@@ -84,10 +84,10 @@ class RegionVisual(Meta):
     """
 
     valid_keys = ['color', 'dash', 'dashlist', 'fill', 'font',
-                  'fontname', 'fontsize',
-                  'fontstyle', 'fontweight', 'labeloff', 'labelpos', 'line',
-                  'linestyle', 'linewidth', 'marker', 'markersize', 'symbol',
-                  'symsize', 'symthick', 'textangle', 'textrotate', 'usetex',
+                  'fontname', 'fontsize', 'fontstyle', 'fontweight',
+                  'labeloff', 'labelpos', 'labelcolor', 'line', 'linestyle',
+                  'linewidth', 'marker', 'markersize', 'symbol', 'symsize',
+                  'symthick', 'textangle', 'textrotate', 'usetex',
                   'default_style', 'dashes', 'markeredgewidth', 'rotation',
                   'facecolor', 'edgecolor']
 
