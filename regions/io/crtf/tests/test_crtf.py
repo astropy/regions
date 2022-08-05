@@ -139,6 +139,10 @@ def test_issue_312_regression():
                            'data/CRTF_labelcolor_output.crtf',
                            'fk5', '.6f')])
 def test_file_crtf(filename, outname, coordsys, fmt):
+    """
+    The "labelcolor" example is e regression test for Issue 405
+    The others are just a general serialization self-consistency check.
+    """
     filename = get_pkg_data_filename(filename)
     regs = Regions.read(filename, errors='warn', format='crtf')
     actual_output = regs.serialize(format='crtf', coordsys=coordsys,
