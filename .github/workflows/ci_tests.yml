@@ -35,7 +35,7 @@ jobs:
             tox_env: 'py310-test-alldeps'
           - os: ubuntu-latest
             python: '3.11.0-rc.2'
-            tox_env: 'py311-test-alldeps'
+            tox_env: 'py311-test-devdeps'
           - os: ubuntu-latest
             python: '3.9'
             tox_env: 'py39-test'
