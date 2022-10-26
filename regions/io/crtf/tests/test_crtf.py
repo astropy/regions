@@ -6,6 +6,7 @@ Tests for the crtf subpackage.
 from astropy.coordinates import Angle, SkyCoord
 import astropy.units as u
 from astropy.utils.data import get_pkg_data_filename
+from astropy.tests.helper import assert_quantity_allclose
 import pytest
 
 from ....shapes.circle import CircleSkyRegion
@@ -140,7 +141,7 @@ def test_issue_312_regression():
                            'fk5', '.6f')])
 def test_file_crtf(filename, outname, coordsys, fmt):
     """
-    The "labelcolor" example is e regression test for Issue 405
+    The "labelcolor" example is a regression test for Issue 405
     The others are just a general serialization self-consistency check.
     """
     filename = get_pkg_data_filename(filename)
@@ -216,3 +217,11 @@ def test_angle_serialization():
     expected = ('#CRTFv0\nglobal coord=J2000\ncircle[[10.000009deg, '
                 '20.000002deg], 0.000278deg]\n')
     assert regstr == expected
+
+
+def test_read_sexagesimal_regression407():
+    filename = 'data/crtf_carta_sexagesimal.crtf'
+    filename = get_pkg_data_filename(filename)
+    regs = Regions.read(filename, errors='warn', format='crtf')
+
+    assert_quantity_allclose(regs[0].center.ra, 281.93342096 * u.deg, rtol=1e-9)
