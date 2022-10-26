@@ -1,4 +1,4 @@
-Copyright (c) 2015-2021, Regions developers
+Copyright (c) 2015-2022, Regions developers
 
 All rights reserved.
 
