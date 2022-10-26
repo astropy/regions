@@ -128,16 +128,28 @@ def test_issue_312_regression():
     assert crtfstr.strip()[-1] != ','
 
 
-@pytest.mark.parametrize('filename', ['data/CRTFgeneral.crtf',
-                                      'data/CRTFgeneraloutput.crtf'])
-def test_file_crtf(filename):
+@pytest.mark.parametrize(('filename', 'outname', 'coordsys', 'fmt'),
+                         [('data/CRTFgeneral.crtf',
+                           'data/CRTFgeneraloutput.crtf',
+                           'fk4', '.3f'),
+                          ('data/CRTFgeneraloutput.crtf',
+                           'data/CRTFgeneraloutput.crtf',
+                           'fk4', '.3f'),
+                          ('data/CRTF_labelcolor.crtf',
+                           'data/CRTF_labelcolor_output.crtf',
+                           'fk5', '.6f')])
+def test_file_crtf(filename, outname, coordsys, fmt):
+    """
+    The "labelcolor" example is e regression test for Issue 405
+    The others are just a general serialization self-consistency check.
+    """
     filename = get_pkg_data_filename(filename)
     regs = Regions.read(filename, errors='warn', format='crtf')
-    actual_output = regs.serialize(format='crtf', coordsys='fk4',
-                                   fmt='.3f').strip()
+    actual_output = regs.serialize(format='crtf', coordsys=coordsys,
+                                   fmt=fmt).strip()
 
-    with open(get_pkg_data_filename('data/CRTFgeneraloutput.crtf')) as f:
-        ref_output = f.read().strip()
+    with open(get_pkg_data_filename(outname)) as fh:
+        ref_output = fh.read().strip()
 
     # since metadata is not required to preserve order, we have to do a more
     # complex comparison
