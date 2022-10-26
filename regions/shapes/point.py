@@ -3,7 +3,6 @@
 This module defines point regions in both pixel and sky coordinates.
 """
 
-from astropy.wcs.utils import pixel_to_skycoord, skycoord_to_pixel
 import numpy as np
 
 from ..core.attributes import (ScalarPixCoord, ScalarSkyCoord,
@@ -89,7 +88,7 @@ class PointPixelRegion(PixelRegion):
             return np.logical_not(in_reg)
 
     def to_sky(self, wcs):
-        center = pixel_to_skycoord(self.center.x, self.center.y, wcs=wcs)
+        center = wcs.pixel_to_world(self.center.x, self.center.y)
         return PointSkyRegion(center, meta=self.meta.copy(),
                               visual=self.visual.copy())
 
@@ -186,7 +185,7 @@ class PointSkyRegion(SkyRegion):
             return True
 
     def to_pixel(self, wcs):
-        center_x, center_y = skycoord_to_pixel(self.center, wcs=wcs)
+        center_x, center_y = wcs.world_to_pixel(self.center)
         center = PixCoord(center_x, center_y)
         return PointPixelRegion(center, meta=self.meta.copy(),
                                 visual=self.visual.copy())

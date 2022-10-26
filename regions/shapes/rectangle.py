@@ -5,7 +5,6 @@ This module defines rectangular regions in both pixel and sky coordinates.
 
 from astropy.coordinates import Angle
 import astropy.units as u
-from astropy.wcs.utils import pixel_to_skycoord
 import numpy as np
 
 from ..core.attributes import (ScalarPixCoord, PositiveScalar,
@@ -109,7 +108,7 @@ class RectanglePixelRegion(PixelRegion):
             return np.logical_not(in_rect)
 
     def to_sky(self, wcs):
-        center = pixel_to_skycoord(self.center.x, self.center.y, wcs)
+        center = wcs.pixel_to_world(self.center.x, self.center.y)
         _, pixscale, north_angle = pixel_scale_angle_at_skycoord(center, wcs)
         width = Angle(self.width * u.pix * pixscale, 'arcsec')
         height = Angle(self.height * u.pix * pixscale, 'arcsec')
