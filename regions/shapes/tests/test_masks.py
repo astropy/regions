@@ -7,7 +7,7 @@ import itertools
 import astropy.units as u
 import pytest
 
-from ...core import PixCoord
+from ...core import PixCoord, RegionMask
 from ...shapes.circle import CirclePixelRegion
 from ...shapes.ellipse import EllipsePixelRegion
 from ...shapes.rectangle import RectanglePixelRegion
@@ -50,4 +50,4 @@ def test_to_mask(region, mode):
         mask = region.to_mask(**mode)
     except NotImplementedError:
         pytest.xfail()
-    return mask.data.astype(float)
+    assert isinstance(mask, RegionMask)
