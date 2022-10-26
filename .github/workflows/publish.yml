@@ -1,0 +1,73 @@
+name: Wheel building
+
+on:
+  schedule:
+    # run every Monday at 5am UTC
+    - cron: '0 5 * * 1'
+  push:
+    branches:
+      - '*'
+    tags:
+      - '*'
+      - '!*dev*'
+      - '!*pre*'
+      - '!*post*'
+  # allow manual wheel building with a PR label
+  pull_request:
+  # allow manual wheel building from the Actions UI
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build_and_publish:
+    # This job builds the wheels and publishes them to PyPI for all
+    # tags, except those ending in ".dev". For PRs with the "Build all
+    # wheels" label, wheels are built, but are not uploaded to PyPI.
+
+    permissions:
+      contents: none
+
+    uses: OpenAstronomy/github-actions-workflows/.github/workflows/publish.yml@v1
+
+    if: (github.repository == 'astropy/regions' && (github.event_name == 'push' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || contains(github.event.pull_request.labels.*.name, 'Build all wheels')))
+    with:
+      # We upload to PyPI for all tag pushes, except tags ending in .dev
+      upload_to_pypi: ${{ startsWith(github.ref, 'refs/tags/') && !endsWith(github.ref, '.dev') && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') }}
+
+      test_extras: test
+      test_command: pytest -p no:warnings --pyargs regions
+      targets: |
+        # Linux wheels
+        - cp38-manylinux_x86_64
+        - cp39-manylinux_x86_64
+        - cp310-manylinux_x86_64
+        - cp311-manylinux_x86_64
+
+        # MacOS X wheels
+        # Note that the arm64 wheels are not actually tested so we rely
+        # on local manual testing of these to make sure they are ok.
+        - cp38*macosx_x86_64
+        - cp39*macosx_x86_64
+        - cp310*macosx_x86_64
+        - cp311*macosx_x86_64
+
+        - cp38*macosx_arm64
+        - cp39*macosx_arm64
+        - cp310*macosx_arm64
+        - cp311*macosx_arm64
+
+        # Windows wheels
+        - cp38*win32
+        - cp39*win32
+        - cp310*win32
+        - cp311*win32
+
+        - cp38*win_amd64
+        - cp39*win_amd64
+        - cp310*win_amd64
+        - cp311*win_amd64
+
+    secrets:
+      pypi_token: ${{ secrets.pypi_token }}
