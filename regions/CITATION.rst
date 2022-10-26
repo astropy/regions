@@ -17,35 +17,36 @@ appropriate.
 
 All Regions versions and citation formats can be found at
 https://doi.org/10.5281/zenodo.5826358. For example, for Regions
-v0.5 one would cite Bradley et al. 2022 with the BibTeX entry
-(https://zenodo.org/record/5826359/export/hx):
+v0.6 one would cite Bradley et al. 2022 with the `BibTeX entry
+<https://zenodo.org/record/6374572/export/hx>`_:
 
 .. code-block:: text
 
-    @software{larry_bradley_2022_5826359,
+    @software{larry_bradley_2022_6374572,
     author       = {Larry Bradley and
                     Christoph Deil and
                     Sushobhana Patra and
                     Adam Ginsburg and
                     Thomas Robitaille and
-                    Brigitta Sip{\H o}cz and
+                    Brigitta Sipőcz and
                     Johannes King and
                     P. L. Lim and
+                    Derek Homeier and
                     Leo Singer and
                     Miguel de Val-Borro and
                     Tim Jenness and
                     Matthieu Baumann and
-                    Yash-10 and
+                    Yash Gondhalekar and
                     Axel Donath and
                     Erik Tollerud and
                     Jae-Joon Lee and
                     Katrin Leinweber and
-                    Z\`e Vin{\'{\i}}cius},
-    title        = {astropy/regions: v0.5},
-    month        = jan,
+                    Zé Vinícius},
+    title        = {astropy/regions: v0.6},
+    month        = mar,
     year         = 2022,
     publisher    = {Zenodo},
-    version      = {v0.5},
-    doi          = {10.5281/zenodo.5826359},
-    url          = {https://doi.org/10.5281/zenodo.5826359}
+    version      = {v0.6},
+    doi          = {10.5281/zenodo.6374572},
+    url          = {https://doi.org/10.5281/zenodo.6374572}
     }
