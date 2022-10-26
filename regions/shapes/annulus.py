@@ -7,7 +7,6 @@ import abc
 import operator
 
 import astropy.units as u
-from astropy.wcs.utils import pixel_to_skycoord
 
 from ..core.attributes import (ScalarPixCoord, PositiveScalar,
                                PositiveScalarAngle, ScalarAngle,
@@ -151,7 +150,7 @@ class CircleAnnulusPixelRegion(AnnulusPixelRegion):
                                      self.meta, self.visual)
 
     def to_sky(self, wcs):
-        center = pixel_to_skycoord(self.center.x, self.center.y, wcs)
+        center = wcs.pixel_to_world(self.center.x, self.center.y)
         _, pixscale, _ = pixel_scale_angle_at_skycoord(center, wcs)
         inner_radius = self.inner_radius * u.pix * pixscale
         outer_radius = self.outer_radius * u.pix * pixscale
@@ -278,7 +277,7 @@ class AsymmetricAnnulusPixelRegion(AnnulusPixelRegion):
                                      self.meta, self.visual)
 
     def to_sky_args(self, wcs):
-        center = pixel_to_skycoord(self.center.x, self.center.y, wcs)
+        center = wcs.pixel_to_world(self.center.x, self.center.y)
         _, pixscale, north_angle = pixel_scale_angle_at_skycoord(center, wcs)
         inner_width = (self.inner_width * u.pix * pixscale).to(u.arcsec)
         outer_width = (self.outer_width * u.pix * pixscale).to(u.arcsec)

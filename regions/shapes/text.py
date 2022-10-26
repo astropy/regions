@@ -3,8 +3,6 @@
 This module defines text regions in both pixel and sky coordinates.
 """
 
-from astropy.wcs.utils import pixel_to_skycoord
-
 from .point import PointPixelRegion, PointSkyRegion
 from ..core.attributes import (ScalarPixCoord, ScalarSkyCoord,
                                RegionMetaDescr, RegionVisualDescr)
@@ -62,7 +60,7 @@ class TextPixelRegion(PointPixelRegion):
         self.text = text
 
     def to_sky(self, wcs):
-        center = pixel_to_skycoord(self.center.x, self.center.y, wcs=wcs)
+        center = wcs.pixel_to_world(self.center.x, self.center.y)
 
         # rotation value is relative to the coordinate system axes;
         # convert from counterclockwise angle from the positive x axis

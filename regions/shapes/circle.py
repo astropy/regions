@@ -7,7 +7,6 @@ import math
 
 from astropy.coordinates import Angle
 import astropy.units as u
-from astropy.wcs.utils import pixel_to_skycoord
 import numpy as np
 
 from ..core.attributes import (ScalarPixCoord, PositiveScalar,
@@ -87,7 +86,7 @@ class CirclePixelRegion(PixelRegion):
 
     def to_sky(self, wcs):
         # TODO: write a pixel_to_skycoord_scale_angle
-        center = pixel_to_skycoord(self.center.x, self.center.y, wcs)
+        center = wcs.pixel_to_world(self.center.x, self.center.y)
         _, pixscale, _ = pixel_scale_angle_at_skycoord(center, wcs)
         radius = Angle(self.radius * u.pix * pixscale, 'arcsec')
         return CircleSkyRegion(center, radius, meta=self.meta.copy(),
