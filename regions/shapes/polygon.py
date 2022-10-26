@@ -4,7 +4,6 @@ This module defines polygon regions in both pixel and sky coordinates.
 """
 
 import astropy.units as u
-from astropy.wcs.utils import skycoord_to_pixel
 import numpy as np
 
 from ..core.attributes import (OneDPixCoord, ScalarPixCoord, PositiveScalar,
@@ -381,7 +380,7 @@ class PolygonSkyRegion(SkyRegion):
         self.visual = visual or RegionVisual()
 
     def to_pixel(self, wcs):
-        x, y = skycoord_to_pixel(self.vertices, wcs)
+        x, y = wcs.world_to_pixel(self.vertices)
         vertices_pix = PixCoord(x, y)
         return PolygonPixelRegion(vertices_pix, meta=self.meta.copy(),
                                   visual=self.visual.copy())
