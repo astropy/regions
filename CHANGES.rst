@@ -1,9 +1,6 @@
 0.7 (unreleased)
 ================
 
-General
--------
-
 New Features
 ------------
 
@@ -19,6 +16,11 @@ Bug Fixes
 
 - Added validation to ``RegionMeta`` and ``RegionVisual`` ``update`` and
   ``setdefault`` methods. [#463]
+
+- Fixed an issue reading CRTF file with labelcolor defined. [#473]
+
+- Fixed a bug parsing CRTF files with ":" and "." coordinate separators.
+  [#407]
 
 API Changes
 -----------
