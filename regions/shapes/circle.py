@@ -249,7 +249,8 @@ class CircleSectorPixelRegion(PixelRegion):
 
         fig, ax = plt.subplots(1, 1)
 
-        reg = CircleSectorPixelRegion(PixCoord(x=8, y=7), radius=3.5, angle_start=0 * u.deg, angle_stop=120 * u.deg)
+        reg = CircleSectorPixelRegion(PixCoord(x=8, y=7), radius=3.5, angle_start=0 * u.deg,
+                                      angle_stop=120 * u.deg)
         patch = reg.plot(ax=ax, facecolor='none', edgecolor='red', lw=2,
                          label='Circle')
 
@@ -266,11 +267,12 @@ class CircleSectorPixelRegion(PixelRegion):
     angle_start = ScalarAngle('The start angle measured anti-clockwise as a '
                               '|Quantity| angle.')
     angle_stop = ScalarAngle('The stop angle measured anti-clockwise as a '
-                              '|Quantity| angle.')
+                             '|Quantity| angle.')
     meta = RegionMetaDescr('The meta attributes as a |RegionMeta|')
     visual = RegionVisualDescr('The visual attributes as a |RegionVisual|.')
 
-    def __init__(self, center, radius, angle_start=0 * u.deg, angle_stop=360 * u.deg, meta=None, visual=None):
+    def __init__(self, center, radius, angle_start=0 * u.deg, angle_stop=360 * u.deg,
+                 meta=None, visual=None):
         self.center = center
         self.radius = radius
 
@@ -281,7 +283,7 @@ class CircleSectorPixelRegion(PixelRegion):
         self.angle_stop = angle_stop
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
-    
+
     @property
     def theta(self):
         """Opening angle of the sector (`~astropy.coordinates.Angle`)"""
@@ -297,7 +299,7 @@ class CircleSectorPixelRegion(PixelRegion):
 
         dx = pixcoord.x - self.center.x
         dy = pixcoord.y - self.center.y
-        angle = (Angle(np.arctan2(dy, dx), "rad") - self.angle_start).wrap_at("360d") 
+        angle = (Angle(np.arctan2(dy, dx), "rad") - self.angle_start).wrap_at("360d")
 
         in_angle = (angle > 0 * u.deg) & (angle < self.theta)
         in_sector = in_circle & in_angle
@@ -365,7 +367,8 @@ class CircleSectorPixelRegion(PixelRegion):
         mpl_kwargs = self.visual.define_mpl_kwargs(self._mpl_artist)
         mpl_kwargs.update(kwargs)
 
-        return Wedge(center=center, r=radius, theta1=self.angle_start.to_value("deg"), theta2=self.angle_stop.to_value("deg"), **mpl_kwargs)
+        return Wedge(center=center, r=radius, theta1=self.angle_start.to_value("deg"),
+                     theta2=self.angle_stop.to_value("deg"), **mpl_kwargs)
 
     def rotate(self, center, angle):
         """
