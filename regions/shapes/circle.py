@@ -285,11 +285,11 @@ class CircleSectorPixelRegion(PixelRegion):
     @property
     def theta(self):
         """Opening angle of the sector (`~astropy.coordinates.Angle`)"""
-        return Angle(self.angle_stop - self.angle_start).wrap_at("180d")
+        return self.angle_stop - self.angle_start
 
     @property
     def area(self):
-        return self.radius ** 2 * self.theta.rad / 2.
+        return self.radius ** 2 * self.theta.to_value("rad") / 2.
 
     def contains(self, pixcoord):
         pixcoord = PixCoord._validate(pixcoord, name='pixcoord')
@@ -297,9 +297,9 @@ class CircleSectorPixelRegion(PixelRegion):
 
         dx = pixcoord.x - self.center.x
         dy = pixcoord.y - self.center.y
-        angle = Angle(np.arctan2(dy, dx), "rad").wrap_at("0d")
+        angle = (Angle(np.arctan2(dy, dx), "rad") - self.angle_start).wrap_at("360d") 
 
-        in_angle = (angle > Angle(self.angle_start).wrap_at("0d")) & (angle < Angle(self.angle_stop).wrap_at("0d"))
+        in_angle = (angle > 0 * u.deg) & (angle < self.theta)
         in_sector = in_circle & in_angle
 
         if self.meta.get('include', True):
@@ -323,7 +323,7 @@ class CircleSectorPixelRegion(PixelRegion):
         y_stop = self.radius * np.sin(self.angle_stop)
 
         def wrap(angle):
-            return Angle(angle).wrap_at("0d")
+            return Angle(angle).wrap_at("360d")
 
         cross_0 = wrap(self.angle_start) > wrap(self.angle_stop)
         cross_90 = wrap(self.angle_start - 90 * u.deg) > wrap(self.angle_stop - 90 * u.deg)
