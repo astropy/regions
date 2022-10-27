@@ -11,7 +11,7 @@ Regions is an `Astropy`_ package for region handling.
 Please see the `online documentation
 <https://astropy-regions.readthedocs.io>`_ for `installation
 instructions
-<https://astropy-regions.readthedocs.io/en/stable/installation.html>`_
+<https://astropy-regions.readthedocs.io/en/stable/install.html>`_
 and usage information.
 
 
