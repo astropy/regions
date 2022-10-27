@@ -68,7 +68,7 @@ Circle
     >>> from regions import PixCoord
     >>> from regions import CircleSectorPixelRegion
 
-    >>> region_pix = CircleAnnulusPixelRegion(center=PixCoord(x=42, y=43),
+    >>> region_pix = CircleSectorPixelRegion(center=PixCoord(x=42, y=43),
     ...                                       radius=4.2,
     ...                                       angle_start=0 * u.deg,
     ...                                       angle_stop=120 * u.deg)

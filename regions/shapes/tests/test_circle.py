@@ -150,7 +150,7 @@ class TestCircleSectorPixelRegion(BaseTestPixelRegion):
     inside = [(3, 5)]
     outside = [(2, 4)]
     expected_area = np.pi
-    expected_repr = ('<CircleSectorPixelRegion(center=PixCoord(x=3, y=4), radius=2,'
+    expected_repr = ('<CircleSectorPixelRegion(center=PixCoord(x=3, y=4), radius=2, '
                      'angle_start=30.0 deg, angle_stop=120.0 deg)>')
     expected_str = ('Region: CircleSectorPixelRegion\n'
                     'center: PixCoord(x=3, y=4)\n'
