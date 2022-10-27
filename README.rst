@@ -38,7 +38,7 @@ file for details and an example BibTeX entry.
 License
 -------
 
-Regions is licensed under a 3-clause BSD license.  Please see the
+Regions is licensed under a BSD 3-clause license.  Please see the
 `LICENSE
 <https://github.com/astropy/regions/blob/main/LICENSE.rst>`_ file
 for details.
