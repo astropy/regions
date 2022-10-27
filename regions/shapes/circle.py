@@ -285,7 +285,7 @@ class CircleSectorPixelRegion(PixelRegion):
     @property
     def theta(self):
         """Opening angle of the sector (`~astropy.coordinates.Angle`)"""
-        return self.angle_stop - self.angle_start
+        return Angle(self.angle_stop - self.angle_start).wrap_at("180d")
 
     @property
     def area(self):
