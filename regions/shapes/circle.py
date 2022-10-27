@@ -11,7 +11,7 @@ import numpy as np
 
 from ..core.attributes import (ScalarPixCoord, PositiveScalar,
                                PositiveScalarAngle, ScalarSkyCoord,
-                               RegionMetaDescr, RegionVisualDescr)
+                               RegionMetaDescr, RegionVisualDescr, ScalarAngle)
 from ..core.bounding_box import RegionBoundingBox
 from ..core.core import PixelRegion, SkyRegion
 from ..core.mask import RegionMask
@@ -20,7 +20,7 @@ from ..core.pixcoord import PixCoord
 from .._utils.wcs_helpers import pixel_scale_angle_at_skycoord
 from .._geometry import circular_overlap_grid
 
-__all__ = ['CirclePixelRegion', 'CircleSkyRegion']
+__all__ = ['CirclePixelRegion', 'CircleSkyRegion', 'CircleSectorPixelRegion']
 
 
 class CirclePixelRegion(PixelRegion):
@@ -216,3 +216,176 @@ class CircleSkyRegion(SkyRegion):
         radius = (self.radius / pixscale).to(u.pix).value
         return CirclePixelRegion(center, radius, meta=self.meta.copy(),
                                  visual=self.visual.copy())
+
+
+class CircleSectorPixelRegion(PixelRegion):
+    """
+    A circle sector defined using pixel coordinates.
+
+    Parameters
+    ----------
+    center : `~regions.PixCoord`
+        The center position.
+    radius : float
+        The radius in pixels.
+    angle_start: `~astropy.units.Quantity`, optional
+        The start angle of the sector, measured anti-clockwise.
+    angle_stop : `~astropy.units.Quantity`, optional
+        The stop angle of the sector, measured anti-clockwise.
+    meta : `~regions.RegionMeta` or `dict`, optional
+        A dictionary that stores the meta attributes of the region.
+    visual : `~regions.RegionVisual` or `dict`, optional
+        A dictionary that stores the visual meta attributes of the
+        region.
+
+    Examples
+    --------
+    .. plot::
+        :include-source:
+
+        from astropy import units as u
+        from regions import PixCoord, CircleSectorPixelRegion
+        import matplotlib.pyplot as plt
+
+        fig, ax = plt.subplots(1, 1)
+
+        reg = CircleSectorPixelRegion(PixCoord(x=8, y=7), radius=3.5, angle_start=0 * u.deg, angle_stop=120 * u.deg)
+        patch = reg.plot(ax=ax, facecolor='none', edgecolor='red', lw=2,
+                         label='Circle')
+
+        ax.legend(handles=(patch,), loc='upper center')
+        ax.set_xlim(0, 15)
+        ax.set_ylim(0, 15)
+        ax.set_aspect('equal')
+    """
+
+    _params = ('center', 'radius', 'angle_start', 'angle_stop')
+    _mpl_artist = 'Patch'
+    center = ScalarPixCoord('The center pixel position as a |PixCoord|.')
+    radius = PositiveScalar('The radius in pixels as a float.')
+    angle_start = ScalarAngle('The start angle measured anti-clockwise as a '
+                              '|Quantity| angle.')
+    angle_stop = ScalarAngle('The stop angle measured anti-clockwise as a '
+                              '|Quantity| angle.')
+    meta = RegionMetaDescr('The meta attributes as a |RegionMeta|')
+    visual = RegionVisualDescr('The visual attributes as a |RegionVisual|.')
+
+    def __init__(self, center, radius, angle_start=0 * u.deg, angle_stop=360 * u.deg, meta=None, visual=None):
+        self.center = center
+        self.radius = radius
+
+        if angle_start >= angle_stop:
+            raise ValueError('angle_stop must be greater than angle_start')
+
+        self.angle_start = angle_start
+        self.angle_stop = angle_stop
+        self.meta = meta or RegionMeta()
+        self.visual = visual or RegionVisual()
+    
+    @property
+    def theta(self):
+        """Opening angle of the sector (`~astropy.coordinates.Angle`)"""
+        return self.angle_stop - self.angle_start
+
+    @property
+    def area(self):
+        return self.radius ** 2 * self.theta.rad / 2.
+
+    def contains(self, pixcoord):
+        pixcoord = PixCoord._validate(pixcoord, name='pixcoord')
+        in_circle = self.center.separation(pixcoord) < self.radius
+
+        dx = pixcoord.x - self.center.x
+        dy = pixcoord.y - self.center.y
+        angle = Angle(np.arctan2(dy, dx), "rad").wrap_at("0d")
+
+        in_angle = (angle > Angle(self.angle_start).wrap_at("0d")) & (angle < Angle(self.angle_stop).wrap_at("0d"))
+        in_sector = in_circle & in_angle
+
+        if self.meta.get('include', True):
+            return in_sector
+        else:
+            return np.logical_not(in_sector)
+
+    def to_sky(self, wcs):
+        raise NotImplementedError
+
+    def to_mask(self, **kwargs):
+        raise NotImplementedError
+
+    @property
+    def bounding_box(self):
+        """Bounding box (`~regions.RegionBoundingBox`)."""
+        x_start = self.radius * np.cos(self.angle_start)
+        y_start = self.radius * np.sin(self.angle_start)
+
+        x_stop = self.radius * np.cos(self.angle_stop)
+        y_stop = self.radius * np.sin(self.angle_stop)
+
+        def wrap(angle):
+            return Angle(angle).wrap_at("0d")
+
+        cross_0 = wrap(self.angle_start) > wrap(self.angle_stop)
+        cross_90 = wrap(self.angle_start - 90 * u.deg) > wrap(self.angle_stop - 90 * u.deg)
+        cross_180 = wrap(self.angle_start - 180 * u.deg) > wrap(self.angle_stop - 180 * u.deg)
+        cross_270 = wrap(self.angle_start - 270 * u.deg) > wrap(self.angle_stop - 270 * u.deg)
+
+        xmin = self.center.x + min(np.where(cross_180, -self.radius, min(x_start, x_stop)), 0)
+        xmax = self.center.x + max(np.where(cross_0, self.radius, max(x_start, x_stop)), 0)
+        ymin = self.center.y + min(np.where(cross_270, -self.radius, min(y_start, y_stop)), 0)
+        ymax = self.center.y + max(np.where(cross_90, self.radius, max(y_start, y_stop)), 0)
+
+        return RegionBoundingBox.from_float(xmin, xmax, ymin, ymax)
+
+    def as_artist(self, origin=(0, 0), **kwargs):
+        """
+        Return a matplotlib patch object for this region
+        (`matplotlib.patches.Wedge).
+
+        Parameters
+        ----------
+        origin : array_like, optional
+            The ``(x, y)`` pixel position of the origin of the displayed
+            image.
+
+        **kwargs : dict
+            Any keyword arguments accepted by
+            `~matplotlib.patches.Circle`. These keywords will override
+            any visual meta attributes of this region.
+
+        Returns
+        -------
+        artist : `~matplotlib.patches.Wedge`
+            A matplotlib circle patch.
+        """
+        from matplotlib.patches import Wedge
+
+        center = self.center.x - origin[0], self.center.y - origin[1]
+        radius = self.radius
+        mpl_kwargs = self.visual.define_mpl_kwargs(self._mpl_artist)
+        mpl_kwargs.update(kwargs)
+
+        return Wedge(center=center, r=radius, theta1=self.angle_start.to_value("deg"), theta2=self.angle_stop.to_value("deg"), **mpl_kwargs)
+
+    def rotate(self, center, angle):
+        """
+        Rotate the region.
+
+        Positive ``angle`` corresponds to counter-clockwise rotation.
+
+        Parameters
+        ----------
+        center : `~regions.PixCoord`
+            The rotation center point.
+        angle : `~astropy.coordinates.Angle`
+            The rotation angle.
+
+        Returns
+        -------
+        region : `CirclePixelRegion`
+            The rotated region (which is an independent copy).
+        """
+        center = self.center.rotate(center, angle)
+        angle_start = self.angle_start + angle
+        angle_stop = self.angle_stop + angle
+        return self.copy(center=center, angle_start=angle_start, angle_stop=angle_stop)
