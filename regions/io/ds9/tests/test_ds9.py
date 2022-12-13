@@ -6,19 +6,19 @@ Tests for the ds9 subpackage.
 import os
 import warnings
 
+import astropy.units as u
+import pytest
 from astropy.coordinates import Angle, SkyCoord
 from astropy.tests.helper import assert_quantity_allclose
-import astropy.units as u
 from astropy.utils.data import get_pkg_data_filenames
 from astropy.utils.exceptions import AstropyUserWarning
 from numpy.testing import assert_allclose, assert_equal
-import pytest
 
-from ....core import Regions, PixCoord, RegionVisual
-from ....shapes import (CirclePixelRegion, CircleSkyRegion, PointPixelRegion,
-                        RegularPolygonPixelRegion)
-from ....tests.helpers import assert_region_allclose
-from ...._utils.optional_deps import HAS_MATPLOTLIB
+from regions._utils.optional_deps import HAS_MATPLOTLIB
+from regions.core import PixCoord, Regions, RegionVisual
+from regions.shapes import (CirclePixelRegion, CircleSkyRegion,
+                            PointPixelRegion, RegularPolygonPixelRegion)
+from regions.tests.helpers import assert_region_allclose
 
 
 def test_roundtrip(tmpdir):

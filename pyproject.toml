@@ -6,3 +6,8 @@ requires = ['setuptools',
             'oldest-supported-numpy',
             'extension-helpers']
 build-backend = 'setuptools.build_meta'
+
+[tool.isort]
+    skip_glob = ['regions/*__init__.py*']
+    known_first_party = ['regions']
+    use_parentheses = true

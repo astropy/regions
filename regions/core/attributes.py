@@ -6,12 +6,12 @@ validation of region classes.
 
 import abc
 
+import numpy as np
 from astropy.coordinates import SkyCoord
 from astropy.units import Quantity
-import numpy as np
 
-from .pixcoord import PixCoord
-from .metadata import RegionMeta, RegionVisual
+from regions.core.metadata import RegionMeta, RegionVisual
+from regions.core.pixcoord import PixCoord
 
 __all__ = []
 
@@ -175,6 +175,7 @@ class RegionMetaDescr(RegionAttribute):
     If input as a pure `dict`, it will be converted to a `RegionMeta`
     object.
     """
+
     def __set__(self, instance, value):
         # RegionMeta subclasses dict
         if isinstance(value, dict) and not isinstance(value, RegionMeta):

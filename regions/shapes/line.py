@@ -5,12 +5,12 @@ This module defines line regions in both pixel and sky coordinates.
 
 import numpy as np
 
-from ..core.attributes import (ScalarPixCoord, ScalarSkyCoord,
-                               RegionMetaDescr, RegionVisualDescr)
-from ..core.bounding_box import RegionBoundingBox
-from ..core.core import PixelRegion, SkyRegion
-from ..core.metadata import RegionMeta, RegionVisual
-from ..core.pixcoord import PixCoord
+from regions.core.attributes import (RegionMetaDescr, RegionVisualDescr,
+                                     ScalarPixCoord, ScalarSkyCoord)
+from regions.core.bounding_box import RegionBoundingBox
+from regions.core.core import PixelRegion, SkyRegion
+from regions.core.metadata import RegionMeta, RegionVisual
+from regions.core.pixcoord import PixCoord
 
 __all__ = ['LinePixelRegion', 'LineSkyRegion']
 

@@ -3,10 +3,10 @@ import operator as op
 
 import numpy as np
 
-from .attributes import RegionType
-from .core import PixelRegion, SkyRegion
-from .mask import RegionMask
-from .metadata import RegionMeta, RegionVisual
+from regions.core.attributes import RegionType
+from regions.core.core import PixelRegion, SkyRegion
+from regions.core.mask import RegionMask
+from regions.core.metadata import RegionMeta, RegionVisual
 
 __all__ = ['CompoundPixelRegion', 'CompoundSkyRegion']
 

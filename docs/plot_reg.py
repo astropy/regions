@@ -1,11 +1,10 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
-from astropy.utils.data import get_pkg_data_filename
 from astropy.io import fits
+from astropy.utils.data import get_pkg_data_filename
 from matplotlib import pyplot as plt
 
 from regions import Regions
-
 
 image_file = get_pkg_data_filename('tutorials/FITS-images/HorseHead.fits')
 image_data = fits.getdata(image_file, ext=0, memmap=False)

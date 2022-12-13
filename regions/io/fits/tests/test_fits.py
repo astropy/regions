@@ -5,21 +5,21 @@ Tests for the fits subpackage.
 
 import warnings
 
-from astropy.coordinates import SkyCoord
 import astropy.units as u
+import numpy as np
+import pytest
+from astropy.coordinates import SkyCoord
+from astropy.table import QTable
 from astropy.utils.data import get_pkg_data_filenames
 from astropy.utils.exceptions import AstropyUserWarning
-from astropy.table import QTable
-import numpy as np
 from numpy.testing import assert_equal
-import pytest
 
-from ....core import Regions, PixCoord, RegionMeta
-from ....shapes import (CirclePixelRegion, CircleSkyRegion,
-                        RectangleAnnulusPixelRegion, LinePixelRegion,
-                        TextPixelRegion)
-from ....tests.helpers import assert_region_allclose
-from ..core import FITSParserError
+from regions.core import PixCoord, RegionMeta, Regions
+from regions.io.fits.core import FITSParserError
+from regions.shapes import (CirclePixelRegion, CircleSkyRegion,
+                            LinePixelRegion, RectangleAnnulusPixelRegion,
+                            TextPixelRegion)
+from regions.tests.helpers import assert_region_allclose
 
 
 def test_roundtrip(tmpdir):

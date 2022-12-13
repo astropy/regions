@@ -3,8 +3,8 @@
 This module defines a class for a rectangular bounding box.
 """
 
-from astropy.io.fits.util import _is_int
 import numpy as np
+from astropy.io.fits.util import _is_int
 
 __all__ = ['RegionBoundingBox']
 
@@ -264,8 +264,8 @@ class RegionBoundingBox:
         Return a `~regions.RectanglePixelRegion` that
         represents the bounding box.
         """
-        from ..shapes import RectanglePixelRegion
-        from .pixcoord import PixCoord
+        from regions.core.pixcoord import PixCoord
+        from regions.shapes import RectanglePixelRegion
 
         xypos = PixCoord(*self.center[::-1])
         height, width = self.shape

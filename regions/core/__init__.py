@@ -3,11 +3,11 @@
 This subpackage provides the core functionality for regions.
 """
 
-from .attributes import *  # noqa
-from .bounding_box import *  # noqa
-from .compound import *  # noqa
-from .core import *  # noqa
-from .mask import *  # noqa
-from .metadata import *  # noqa
-from .pixcoord import *  # noqa
-from .regions import *  # noqa
+from .attributes import *  # noqa: F401, F403
+from .bounding_box import *  # noqa: F401, F403
+from .compound import *  # noqa: F401, F403
+from .core import *  # noqa: F401, F403
+from .mask import *  # noqa: F401, F403
+from .metadata import *  # noqa: F401, F403
+from .pixcoord import *  # noqa: F401, F403
+from .regions import *  # noqa: F401, F403

@@ -12,13 +12,14 @@
 # the global Astropy configuration which is loaded here before anything
 # else. See astropy.sphinx.conf for which values are set there.
 
-from configparser import ConfigParser
-from datetime import datetime
 import os
 import sys
+from configparser import ConfigParser
+from datetime import datetime
 
 try:
-    from sphinx_astropy.conf.v1 import *  # noqa
+    from sphinx_astropy.conf.v1 import *  # noqa: F403
+    from sphinx_astropy.conf.v1 import rst_epilog  # noqa: E402
 except ImportError:
     print('ERROR: the documentation requires the sphinx-astropy package to '
           'be installed')
@@ -38,16 +39,16 @@ highlight_language = 'python3'
 needs_sphinx = '1.7'
 
 # Extend astropy intersphinx_mapping with packages we use here
-intersphinx_mapping['photutils'] = ('https://photutils.readthedocs.io/en/stable/', None)  # noqa
-#intersphinx_mapping['shapely'] = ('https://shapely.readthedocs.io/en/stable/', None)  # noqa
+intersphinx_mapping['photutils'] = ('https://photutils.readthedocs.io/en/stable/', None)  # noqa: F405
+# intersphinx_mapping['shapely'] = ('https://shapely.readthedocs.io/en/stable/', None)
 
 # Exclude astropy intersphinx_mapping for unused packages
-del intersphinx_mapping['scipy']  # noqa
-del intersphinx_mapping['h5py']  # noqa
+del intersphinx_mapping['scipy']  # noqa: F405
+del intersphinx_mapping['h5py']  # noqa: F405
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns.append('_templates')  # noqa
+exclude_patterns.append('_templates')  # noqa: F405
 
 plot_formats = ['png', 'hires.png', 'pdf', 'svg']
 

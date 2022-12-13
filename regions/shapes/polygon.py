@@ -6,16 +6,17 @@ This module defines polygon regions in both pixel and sky coordinates.
 import astropy.units as u
 import numpy as np
 
-from ..core.attributes import (OneDPixCoord, ScalarPixCoord, PositiveScalar,
-                               ScalarAngle, OneDSkyCoord, RegionMetaDescr,
-                               RegionVisualDescr)
-from ..core.bounding_box import RegionBoundingBox
-from ..core.core import PixelRegion, SkyRegion
-from ..core.mask import RegionMask
-from ..core.metadata import RegionMeta, RegionVisual
-from ..core.pixcoord import PixCoord
-from .._geometry import polygonal_overlap_grid
-from .._geometry.pnpoly import points_in_polygon
+from regions._geometry import polygonal_overlap_grid
+from regions._geometry.pnpoly import points_in_polygon
+from regions.core.attributes import (OneDPixCoord, OneDSkyCoord,
+                                     PositiveScalar, RegionMetaDescr,
+                                     RegionVisualDescr, ScalarAngle,
+                                     ScalarPixCoord)
+from regions.core.bounding_box import RegionBoundingBox
+from regions.core.core import PixelRegion, SkyRegion
+from regions.core.mask import RegionMask
+from regions.core.metadata import RegionMeta, RegionVisual
+from regions.core.pixcoord import PixCoord
 
 __all__ = ['PolygonPixelRegion', 'RegularPolygonPixelRegion',
            'PolygonSkyRegion']

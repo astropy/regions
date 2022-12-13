@@ -1,18 +1,16 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 import itertools
 
-from ...shapes import (CirclePixelRegion, CircleSkyRegion,
-                       EllipsePixelRegion, EllipseSkyRegion,
-                       RectanglePixelRegion, RectangleSkyRegion,
-                       PolygonPixelRegion, PolygonSkyRegion,
-                       CircleAnnulusPixelRegion, CircleAnnulusSkyRegion,
-                       EllipseAnnulusPixelRegion, EllipseAnnulusSkyRegion,
-                       RectangleAnnulusPixelRegion, RectangleAnnulusSkyRegion,
-                       LinePixelRegion, LineSkyRegion,
-                       PointPixelRegion, PointSkyRegion,
-                       TextPixelRegion, TextSkyRegion)
-
-from ..._utils.optional_deps import HAS_MATPLOTLIB
+from regions._utils.optional_deps import HAS_MATPLOTLIB
+from regions.shapes import (CircleAnnulusPixelRegion, CircleAnnulusSkyRegion,
+                            CirclePixelRegion, CircleSkyRegion,
+                            EllipseAnnulusPixelRegion, EllipseAnnulusSkyRegion,
+                            EllipsePixelRegion, EllipseSkyRegion,
+                            LinePixelRegion, LineSkyRegion, PointPixelRegion,
+                            PointSkyRegion, PolygonPixelRegion,
+                            PolygonSkyRegion, RectangleAnnulusPixelRegion,
+                            RectangleAnnulusSkyRegion, RectanglePixelRegion,
+                            RectangleSkyRegion, TextPixelRegion, TextSkyRegion)
 
 __all__ = []
 

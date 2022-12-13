@@ -1,21 +1,21 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
+import astropy.units as u
 import numpy as np
-from numpy.testing import assert_allclose, assert_equal
 import pytest
-
 from astropy.coordinates import SkyCoord
 from astropy.io import fits
 from astropy.tests.helper import assert_quantity_allclose
-import astropy.units as u
 from astropy.utils.data import get_pkg_data_filename
 from astropy.wcs import WCS
+from numpy.testing import assert_allclose, assert_equal
 
-from ...core import PixCoord, RegionMeta, RegionVisual
-from ...tests.helpers import make_simple_wcs
-from ..._utils.optional_deps import HAS_MATPLOTLIB, MPL_VERSION
-from ..ellipse import EllipsePixelRegion, EllipseSkyRegion
-from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
+from regions._utils.optional_deps import HAS_MATPLOTLIB, MPL_VERSION
+from regions.core import PixCoord, RegionMeta, RegionVisual
+from regions.shapes.ellipse import EllipsePixelRegion, EllipseSkyRegion
+from regions.shapes.tests.test_common import (BaseTestPixelRegion,
+                                              BaseTestSkyRegion)
+from regions.tests.helpers import make_simple_wcs
 
 
 @pytest.fixture(scope='session', name='wcs')
@@ -136,7 +136,7 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
 
         region = self.reg.copy(angle=0 * u.deg)
 
-        selector = region.as_mpl_selector(ax, callback=update_mask, sync=sync)  # noqa
+        selector = region.as_mpl_selector(ax, callback=update_mask, sync=sync)
 
         do_event(selector, 'press', xdata=7.3, ydata=4.4, button=1)
         do_event(selector, 'onmove', xdata=9.3, ydata=5.4, button=1)
@@ -227,7 +227,7 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
 
     @pytest.mark.parametrize('userargs',
                              ({'useblit': True},
-                              {'grab_range': 20, 'minspanx': 5,  'minspany': 4},
+                              {'grab_range': 20, 'minspanx': 5, 'minspany': 4},
                               {'props': {'facecolor': 'blue', 'linewidth': 2}},
                               {'twit': 'gumby'}))
     def test_mpl_selector_kwargs(self, userargs):

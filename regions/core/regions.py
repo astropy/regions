@@ -3,8 +3,8 @@
 This module provides a Regions class.
 """
 
-from .core import Region
-from .registry import RegionsRegistry
+from regions.core.core import Region
+from regions.core.registry import RegionsRegistry
 
 __all__ = ['Regions']
 __doctest_skip__ = ['Regions.read', 'Regions.write', 'Regions.parse',

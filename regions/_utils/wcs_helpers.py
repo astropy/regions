@@ -7,7 +7,7 @@ This module provides WCS helper tools.
 import astropy.units as u
 import numpy as np
 
-from ..core.pixcoord import PixCoord
+from regions.core.pixcoord import PixCoord
 
 
 def pixel_scale_angle_at_skycoord(skycoord, wcs, offset=1 * u.arcsec):

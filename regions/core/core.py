@@ -5,9 +5,9 @@ import operator
 
 import numpy as np
 
-from .metadata import RegionMeta, RegionVisual
-from .pixcoord import PixCoord
-from .registry import RegionsRegistry
+from regions.core.metadata import RegionMeta, RegionVisual
+from regions.core.pixcoord import PixCoord
+from regions.core.registry import RegionsRegistry
 
 __all__ = ['Region', 'PixelRegion', 'SkyRegion']
 __doctest_skip__ = ['Region.serialize', 'Region.write']
@@ -219,7 +219,7 @@ class PixelRegion(Region):
         Return a region representing the intersection of this region
         with ``other``.
         """
-        from .compound import CompoundPixelRegion
+        from regions.core.compound import CompoundPixelRegion
         return CompoundPixelRegion(region1=self, region2=other,
                                    operator=operator.and_)
 
@@ -228,7 +228,7 @@ class PixelRegion(Region):
         Return the union of the two regions minus any areas contained in
         the intersection of the two regions.
         """
-        from .compound import CompoundPixelRegion
+        from regions.core.compound import CompoundPixelRegion
         return CompoundPixelRegion(region1=self, region2=other,
                                    operator=operator.xor)
 
@@ -237,7 +237,7 @@ class PixelRegion(Region):
         Return a region representing the union of this region with
         ``other``.
         """
-        from .compound import CompoundPixelRegion
+        from regions.core.compound import CompoundPixelRegion
         return CompoundPixelRegion(region1=self, region2=other,
                                    operator=operator.or_)
 
@@ -419,7 +419,7 @@ class SkyRegion(Region):
         Return a region representing the intersection of this region
         with ``other``.
         """
-        from .compound import CompoundSkyRegion
+        from regions.core.compound import CompoundSkyRegion
         return CompoundSkyRegion(region1=self, region2=other,
                                  operator=operator.and_)
 
@@ -428,7 +428,7 @@ class SkyRegion(Region):
         Return the union of the two regions minus any areas contained in
         the intersection of the two regions.
         """
-        from .compound import CompoundSkyRegion
+        from regions.core.compound import CompoundSkyRegion
         return CompoundSkyRegion(region1=self, region2=other,
                                  operator=operator.xor)
 
@@ -437,7 +437,7 @@ class SkyRegion(Region):
         Return a region representing the union of this region with
         ``other``.
         """
-        from .compound import CompoundSkyRegion
+        from regions.core.compound import CompoundSkyRegion
         return CompoundSkyRegion(region1=self, region2=other,
                                  operator=operator.or_)
 

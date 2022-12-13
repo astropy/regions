@@ -1,19 +1,19 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
-from copy import deepcopy
 import os
 import warnings
+from copy import deepcopy
 
 from astropy.coordinates import Angle, SkyCoord
 from astropy.units import Quantity
 from astropy.utils.exceptions import AstropyUserWarning
 
-from ...core import Region, Regions, PixelRegion, PixCoord
-from ...core import CompoundPixelRegion, CompoundSkyRegion
-from ...core.registry import RegionsRegistry
-from ...shapes import RegularPolygonPixelRegion
-from .core import ds9_frame_map, ds9_shape_templates
-from .meta import _translate_metadata_to_ds9
+from regions.core import (CompoundPixelRegion, CompoundSkyRegion, PixCoord,
+                          PixelRegion, Region, Regions)
+from regions.core.registry import RegionsRegistry
+from regions.io.ds9.core import ds9_frame_map, ds9_shape_templates
+from regions.io.ds9.meta import _translate_metadata_to_ds9
+from regions.shapes import RegularPolygonPixelRegion
 
 __all__ = []
 

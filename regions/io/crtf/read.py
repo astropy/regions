@@ -5,15 +5,15 @@ import itertools
 import re
 from warnings import warn
 
-from astropy.coordinates import Angle, frame_transform_graph
 import astropy.units as u
+from astropy.coordinates import Angle, frame_transform_graph
 from astropy.utils.data import get_readable_fileobj
 
-from ...core import Regions
-from ...core.registry import RegionsRegistry
-from .io_core import _Shape, _ShapeList, reg_mapping
-from .core import (CRTFRegionParserError, CRTFRegionParserWarning,
-                   valid_symbols)
+from regions.core import Regions
+from regions.core.registry import RegionsRegistry
+from regions.io.crtf.core import (CRTFRegionParserError,
+                                  CRTFRegionParserWarning, valid_symbols)
+from regions.io.crtf.io_core import _Shape, _ShapeList, reg_mapping
 
 __all__ = []
 
@@ -34,16 +34,16 @@ regex_coordinate = re.compile(r'\[([\w.+-:]*?)\s*[,]\s*([\w.+-:]*?)\]')
 regex_length = re.compile(r'(?:\[[^=\]]*\])+[,]\s*([^\[]*)\]')
 
 # Extracts each 'parameter=value' pair
-regex_meta = re.compile(r'(?:(\w+)\s*=[\s\'\"]*([^,\[\]]+?)[\'\",]+)|(?:(\w+)\s*=\s*\[(.*?)\])')  # noqa
+regex_meta = re.compile(r'(?:(\w+)\s*=[\s\'\"]*([^,\[\]]+?)[\'\",]+)|(?:(\w+)\s*=\s*\[(.*?)\])')  # noqa: E501
 
 # Region format which segregates the include ('+'|'-') parameter, the
 # kind of definition ('ann' for annotations or '' for regions) and region
 # type.
-regex_region = re.compile(r'(?P<include>[+-])?(?P<type>ann(?=\s))?\s*(?P<regiontype>[a-z]*?)\s?\[[^=]*]')  # noqa
+regex_region = re.compile(r'(?P<include>[+-])?(?P<type>ann(?=\s))?\s*(?P<regiontype>[a-z]*?)\s?\[[^=]*]')  # noqa: E501
 
 # Line format which checks the validity of the line and segregates the
 # meta attributes from the region format.
-regex_line = re.compile(r'(?P<region>[+-]?(?:ann(?=\s))?\s*[a-z]+?\s?\[[^=]+\])(?:\s*,?\s*(?P<parameters>.*))?')  # noqa
+regex_line = re.compile(r'(?P<region>[+-]?(?:ann(?=\s))?\s*[a-z]+?\s?\[[^=]+\])(?:\s*,?\s*(?P<parameters>.*))?')  # noqa: E501
 
 
 @RegionsRegistry.register(Regions, 'read', 'crtf')

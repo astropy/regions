@@ -1,7 +1,7 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
 try:
-    import matplotlib  # noqa
+    import matplotlib
     HAS_MATPLOTLIB = True
     MPL_VERSION = getattr(matplotlib, '__version__', None)
     if MPL_VERSION is None:

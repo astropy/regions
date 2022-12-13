@@ -4,16 +4,16 @@ Tests for the compound module.
 """
 
 import operator
-import pytest
-import numpy as np
-from numpy.testing import assert_allclose
 
 import astropy.units as u
+import numpy as np
+import pytest
 from astropy.coordinates import SkyCoord
+from numpy.testing import assert_allclose
 
-from ...shapes import CircleSkyRegion, CirclePixelRegion
-from ...core import PixCoord, RegionBoundingBox, CompoundPixelRegion
-from ...tests.helpers import make_simple_wcs
+from regions.core import CompoundPixelRegion, PixCoord, RegionBoundingBox
+from regions.shapes import CirclePixelRegion, CircleSkyRegion
+from regions.tests.helpers import make_simple_wcs
 
 
 class TestCompoundPixel:

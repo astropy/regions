@@ -1,20 +1,20 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
+import astropy.units as u
 import numpy as np
-from numpy.testing import assert_allclose
 import pytest
-
 from astropy.coordinates import SkyCoord
 from astropy.io import fits
-import astropy.units as u
 from astropy.utils.data import get_pkg_data_filename
 from astropy.wcs import WCS
+from numpy.testing import assert_allclose
 
-from ...core import PixCoord, RegionMeta, RegionVisual
-from ...tests.helpers import make_simple_wcs
-from ..._utils.optional_deps import HAS_MATPLOTLIB
-from ..point import PointPixelRegion, PointSkyRegion
-from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
+from regions._utils.optional_deps import HAS_MATPLOTLIB
+from regions.core import PixCoord, RegionMeta, RegionVisual
+from regions.shapes.point import PointPixelRegion, PointSkyRegion
+from regions.shapes.tests.test_common import (BaseTestPixelRegion,
+                                              BaseTestSkyRegion)
+from regions.tests.helpers import make_simple_wcs
 
 
 @pytest.fixture(scope='session', name='wcs')
