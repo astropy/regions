@@ -19,6 +19,7 @@ from datetime import datetime
 
 try:
     from sphinx_astropy.conf.v1 import *  # noqa: F403
+    from sphinx_astropy.conf.v1 import rst_epilog  # noqa: E402
 except ImportError:
     print('ERROR: the documentation requires the sphinx-astropy package to '
           'be installed')
@@ -39,7 +40,7 @@ needs_sphinx = '1.7'
 
 # Extend astropy intersphinx_mapping with packages we use here
 intersphinx_mapping['photutils'] = ('https://photutils.readthedocs.io/en/stable/', None)  # noqa: F405
-#intersphinx_mapping['shapely'] = ('https://shapely.readthedocs.io/en/stable/', None)
+# intersphinx_mapping['shapely'] = ('https://shapely.readthedocs.io/en/stable/', None)
 
 # Exclude astropy intersphinx_mapping for unused packages
 del intersphinx_mapping['scipy']  # noqa: F405
