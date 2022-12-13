@@ -1,12 +1,12 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
+import numpy as np
 from astropy.coordinates import SkyCoord
 from astropy.io import fits
 from astropy.table import Table
 from astropy.table import vstack as table_vstack
 from astropy.utils import lazyproperty
 from astropy.wcs import WCS
-import numpy as np
 
 from ..core.pixcoord import PixCoord
 

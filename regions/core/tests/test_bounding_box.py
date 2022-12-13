@@ -3,13 +3,13 @@
 Tests for the bounding_box module.
 """
 
-from numpy.testing import assert_allclose
 import pytest
+from numpy.testing import assert_allclose
 
+from ..._utils.optional_deps import HAS_MATPLOTLIB
+from ...shapes import RectanglePixelRegion
 from ..bounding_box import RegionBoundingBox
 from ..pixcoord import PixCoord
-from ...shapes import RectanglePixelRegion
-from ..._utils.optional_deps import HAS_MATPLOTLIB
 
 
 def test_bounding_box_init():

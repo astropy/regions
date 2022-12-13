@@ -2,10 +2,10 @@
 """
 Example script illustrating compound regions.
 """
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+from astropy.coordinates import Angle, SkyCoord
 
-from astropy.coordinates import SkyCoord, Angle
 from regions import CircleSkyRegion, make_example_dataset
 
 # load example dataset to get skymap

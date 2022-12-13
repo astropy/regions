@@ -1,9 +1,9 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
-from astropy.coordinates import SkyCoord
 import astropy.units as u
-from astropy.tests.helper import assert_quantity_allclose
 import numpy as np
+from astropy.coordinates import SkyCoord
+from astropy.tests.helper import assert_quantity_allclose
 from numpy.testing import assert_allclose
 
 from ...core import PixCoord, RegionMeta, RegionVisual

@@ -8,10 +8,10 @@ import operator
 
 import astropy.units as u
 
-from ..core.attributes import (ScalarPixCoord, PositiveScalar,
-                               PositiveScalarAngle, ScalarAngle,
-                               ScalarSkyCoord, RegionMetaDescr,
-                               RegionVisualDescr)
+from .._utils.wcs_helpers import pixel_scale_angle_at_skycoord
+from ..core.attributes import (PositiveScalar, PositiveScalarAngle,
+                               RegionMetaDescr, RegionVisualDescr, ScalarAngle,
+                               ScalarPixCoord, ScalarSkyCoord)
 from ..core.compound import CompoundPixelRegion
 from ..core.core import PixelRegion, SkyRegion
 from ..core.metadata import RegionMeta, RegionVisual
@@ -19,7 +19,6 @@ from ..core.pixcoord import PixCoord
 from ..shapes.circle import CirclePixelRegion
 from ..shapes.ellipse import EllipsePixelRegion, EllipseSkyRegion
 from ..shapes.rectangle import RectanglePixelRegion, RectangleSkyRegion
-from .._utils.wcs_helpers import pixel_scale_angle_at_skycoord
 
 __all__ = ['AnnulusPixelRegion', 'AsymmetricAnnulusPixelRegion',
            'AsymmetricAnnulusSkyRegion',

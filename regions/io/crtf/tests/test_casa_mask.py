@@ -3,17 +3,18 @@
 import pickle
 import tempfile
 
-from astropy.coordinates import SkyCoord
 import astropy.units as u
 import pytest
+from astropy.coordinates import SkyCoord
 
 from ....shapes.ellipse import EllipseSkyRegion
 from ..write import _write_crtf
 
 try:
-    from casatools import image, simulator
-    from casatools import measures as me
     from casatasks import tclean
+    from casatools import image
+    from casatools import measures as me
+    from casatools import simulator
     HAS_CASATOOLS = True
 except ImportError:
     HAS_CASATOOLS = False

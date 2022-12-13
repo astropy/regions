@@ -5,13 +5,13 @@ Tests for the mask module.
 
 import astropy.units as u
 import numpy as np
-from numpy.testing import assert_allclose, assert_almost_equal
 import pytest
+from numpy.testing import assert_allclose, assert_almost_equal
 
+from ...shapes import CircleAnnulusPixelRegion, CirclePixelRegion
 from ..bounding_box import RegionBoundingBox
 from ..mask import RegionMask
 from ..pixcoord import PixCoord
-from ...shapes import CirclePixelRegion, CircleAnnulusPixelRegion
 
 POSITIONS = [(-20, -20), (-20, 20), (20, -20), (60, 60)]
 

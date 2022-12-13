@@ -1,20 +1,20 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
-from copy import deepcopy
-from dataclasses import dataclass
 import re
 import string
 import warnings
+from copy import deepcopy
+from dataclasses import dataclass
 
-from astropy.coordinates import Angle, SkyCoord
 import astropy.units as u
+from astropy.coordinates import Angle, SkyCoord
 from astropy.utils.data import get_readable_fileobj
 from astropy.utils.exceptions import AstropyUserWarning
 
-from ...core import Regions, RegionMeta, RegionVisual, PixCoord
+from ...core import PixCoord, RegionMeta, Regions, RegionVisual
 from ...core.registry import RegionsRegistry
-from .core import (ds9_frame_map, ds9_shape_to_region, ds9_params_template,
-                   DS9ParserError)
+from .core import (DS9ParserError, ds9_frame_map, ds9_params_template,
+                   ds9_shape_to_region)
 from .meta import _split_raw_metadata, _translate_ds9_to_visual
 
 __all__ = []

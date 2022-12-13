@@ -3,8 +3,8 @@
 This module defines a class for a rectangular bounding box.
 """
 
-from astropy.io.fits.util import _is_int
 import numpy as np
+from astropy.io.fits.util import _is_int
 
 __all__ = ['RegionBoundingBox']
 

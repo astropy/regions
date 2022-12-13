@@ -6,14 +6,12 @@ handling.
 
 # Affiliated packages may add whatever they like to this file, but
 # should keep this content at the top.
-# ----------------------------------------------------------------------------
 from ._astropy_init import *  # noqa
-# ----------------------------------------------------------------------------
 
+from ._utils.examples import *  # noqa
 from .core import *  # noqa
 from .io import *  # noqa
 from .shapes import *  # noqa
-from ._utils.examples import *  # noqa
 
 
 # Set the bibtex entry to the article referenced in CITATION.rst.

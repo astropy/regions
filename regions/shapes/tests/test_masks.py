@@ -10,8 +10,8 @@ import pytest
 from ...core import PixCoord, RegionMask
 from ...shapes.circle import CirclePixelRegion
 from ...shapes.ellipse import EllipsePixelRegion
-from ...shapes.rectangle import RectanglePixelRegion
 from ...shapes.polygon import PolygonPixelRegion
+from ...shapes.rectangle import RectanglePixelRegion
 
 REGIONS = [CirclePixelRegion(PixCoord(3.981987, 4.131378), radius=3.3411),
            EllipsePixelRegion(PixCoord(5.981987, 4.131378), width=10.4466,

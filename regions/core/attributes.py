@@ -6,12 +6,12 @@ validation of region classes.
 
 import abc
 
+import numpy as np
 from astropy.coordinates import SkyCoord
 from astropy.units import Quantity
-import numpy as np
 
-from .pixcoord import PixCoord
 from .metadata import RegionMeta, RegionVisual
+from .pixcoord import PixCoord
 
 __all__ = []
 

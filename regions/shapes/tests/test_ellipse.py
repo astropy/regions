@@ -1,19 +1,18 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
+import astropy.units as u
 import numpy as np
-from numpy.testing import assert_allclose, assert_equal
 import pytest
-
 from astropy.coordinates import SkyCoord
 from astropy.io import fits
 from astropy.tests.helper import assert_quantity_allclose
-import astropy.units as u
 from astropy.utils.data import get_pkg_data_filename
 from astropy.wcs import WCS
+from numpy.testing import assert_allclose, assert_equal
 
+from ..._utils.optional_deps import HAS_MATPLOTLIB, MPL_VERSION
 from ...core import PixCoord, RegionMeta, RegionVisual
 from ...tests.helpers import make_simple_wcs
-from ..._utils.optional_deps import HAS_MATPLOTLIB, MPL_VERSION
 from ..ellipse import EllipsePixelRegion, EllipseSkyRegion
 from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
 

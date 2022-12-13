@@ -1,20 +1,20 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
 from copy import copy
-import numpy as np
-from numpy.testing import assert_allclose, assert_equal
-import pytest
 
-from astropy.coordinates import SkyCoord
 import astropy.units as u
+import numpy as np
+import pytest
+from astropy.coordinates import SkyCoord
 from astropy.tests.helper import assert_quantity_allclose
+from numpy.testing import assert_allclose, assert_equal
 
-from ...core import PixCoord, RegionMeta, RegionVisual, RegionBoundingBox
-from ...tests.helpers import make_simple_wcs
 from ..._utils.examples import make_example_dataset
 from ..._utils.optional_deps import HAS_MATPLOTLIB
-from ..polygon import (PolygonPixelRegion, RegularPolygonPixelRegion,
-                       PolygonSkyRegion)
+from ...core import PixCoord, RegionBoundingBox, RegionMeta, RegionVisual
+from ...tests.helpers import make_simple_wcs
+from ..polygon import (PolygonPixelRegion, PolygonSkyRegion,
+                       RegularPolygonPixelRegion)
 from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
 
 

@@ -3,13 +3,13 @@
 The tests in this file simply check what functionality is currently
 implemented and doesn't check anything about correctness.
 """
-from collections import OrderedDict
 import itertools
+from collections import OrderedDict
 
-from astropy.coordinates import SkyCoord
 import astropy.units as u
-from astropy.wcs import WCS
 import pytest
+from astropy.coordinates import SkyCoord
+from astropy.wcs import WCS
 
 from ...core.core import PixelRegion, Region, SkyRegion
 from ...core.mask import RegionMask

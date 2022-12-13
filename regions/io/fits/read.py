@@ -2,13 +2,13 @@
 
 import warnings
 
+import astropy.units as u
+import numpy as np
 from astropy.io import fits
 from astropy.table import QTable
-import astropy.units as u
 from astropy.utils.exceptions import AstropyUserWarning
-import numpy as np
 
-from ...core import Regions, RegionMeta, PixCoord
+from ...core import PixCoord, RegionMeta, Regions
 from ...core.registry import RegionsRegistry
 from .core import FITSParserError, shape_map
 

@@ -1,17 +1,17 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
-from dataclasses import dataclass
 import warnings
+from dataclasses import dataclass
 
+import astropy.units as u
+import numpy as np
 from astropy.io import fits
 from astropy.table import QTable
-import astropy.units as u
 from astropy.utils.exceptions import AstropyUserWarning
-import numpy as np
 
 from ...core import Region, Regions, SkyRegion
-from ...shapes import RegularPolygonPixelRegion
 from ...core.registry import RegionsRegistry
+from ...shapes import RegularPolygonPixelRegion
 
 __all__ = []
 

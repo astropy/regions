@@ -5,13 +5,12 @@ This module defines point regions in both pixel and sky coordinates.
 
 import numpy as np
 
-from ..core.attributes import (ScalarPixCoord, ScalarSkyCoord,
-                               RegionMetaDescr, RegionVisualDescr)
+from ..core.attributes import (RegionMetaDescr, RegionVisualDescr,
+                               ScalarPixCoord, ScalarSkyCoord)
 from ..core.bounding_box import RegionBoundingBox
 from ..core.core import PixelRegion, SkyRegion
 from ..core.metadata import RegionMeta, RegionVisual
 from ..core.pixcoord import PixCoord
-
 
 __all__ = ['PointPixelRegion', 'PointSkyRegion']
 

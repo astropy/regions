@@ -3,22 +3,20 @@
 This module defines rectangular regions in both pixel and sky coordinates.
 """
 
-from astropy.coordinates import Angle
 import astropy.units as u
 import numpy as np
+from astropy.coordinates import Angle
 
-from ..core.attributes import (ScalarPixCoord, PositiveScalar,
-                               PositiveScalarAngle, ScalarAngle,
-                               ScalarSkyCoord, RegionMetaDescr,
-                               RegionVisualDescr)
+from .._geometry import rectangular_overlap_grid
+from .._utils.wcs_helpers import pixel_scale_angle_at_skycoord
+from ..core.attributes import (PositiveScalar, PositiveScalarAngle,
+                               RegionMetaDescr, RegionVisualDescr, ScalarAngle,
+                               ScalarPixCoord, ScalarSkyCoord)
 from ..core.bounding_box import RegionBoundingBox
 from ..core.core import PixelRegion, SkyRegion
 from ..core.mask import RegionMask
 from ..core.metadata import RegionMeta, RegionVisual
 from ..core.pixcoord import PixCoord
-from .._geometry import rectangular_overlap_grid
-from .._utils.wcs_helpers import pixel_scale_angle_at_skycoord
-
 from .polygon import PolygonPixelRegion
 
 __all__ = ['RectanglePixelRegion', 'RectangleSkyRegion']
@@ -261,6 +259,7 @@ class RectanglePixelRegion(PixelRegion):
         ``selector.set_active(True)`` or ``selector.set_active(False)``.
         """
         from matplotlib.widgets import RectangleSelector
+
         from .._utils.optional_deps import MPL_VERSION
 
         if hasattr(self, '_mpl_selector'):

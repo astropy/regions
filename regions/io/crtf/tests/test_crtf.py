@@ -3,18 +3,17 @@
 Tests for the crtf subpackage.
 """
 
-from astropy.coordinates import Angle, SkyCoord
 import astropy.units as u
-from astropy.utils.data import get_pkg_data_filename
-from astropy.tests.helper import assert_quantity_allclose
 import pytest
+from astropy.coordinates import Angle, SkyCoord
+from astropy.tests.helper import assert_quantity_allclose
+from astropy.utils.data import get_pkg_data_filename
 
+from ....core import Regions
 from ....shapes.circle import CircleSkyRegion
 from ....shapes.ellipse import EllipseSkyRegion
-from ....core import Regions
 from ..core import CRTFRegionParserError
 from ..read import _CRTFParser
-
 
 implemented_region_types = ('ellipse', 'circle', 'rectangle', 'poly', 'point',
                             'text', 'symbol')

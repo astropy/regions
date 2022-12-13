@@ -3,10 +3,10 @@
 This module defines text regions in both pixel and sky coordinates.
 """
 
-from .point import PointPixelRegion, PointSkyRegion
-from ..core.attributes import (ScalarPixCoord, ScalarSkyCoord,
-                               RegionMetaDescr, RegionVisualDescr)
 from .._utils.wcs_helpers import pixel_scale_angle_at_skycoord
+from ..core.attributes import (RegionMetaDescr, RegionVisualDescr,
+                               ScalarPixCoord, ScalarSkyCoord)
+from .point import PointPixelRegion, PointSkyRegion
 
 __all__ = ['TextSkyRegion', 'TextPixelRegion']
 

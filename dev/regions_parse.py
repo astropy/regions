@@ -2,9 +2,10 @@
 
 from pathlib import Path
 
-from astropy import log
 import click
 import pyregion
+from astropy import log
+
 from regions import read_ds9
 
 log.setLevel('DEBUG')

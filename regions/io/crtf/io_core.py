@@ -3,24 +3,23 @@
 import numbers
 from warnings import warn
 
+import astropy.units as u
 from astropy.coordinates import (Angle, SkyCoord, UnitSphericalRepresentation,
                                  frame_transform_graph)
-import astropy.units as u
 from astropy.utils.exceptions import AstropyUserWarning
 
-from ...shapes import (CirclePixelRegion, CircleSkyRegion,
-                       EllipsePixelRegion, EllipseSkyRegion,
-                       RectanglePixelRegion, RectangleSkyRegion,
-                       PolygonPixelRegion, RegularPolygonPixelRegion,
-                       PolygonSkyRegion,
-                       CircleAnnulusPixelRegion, CircleAnnulusSkyRegion,
-                       EllipseAnnulusPixelRegion, EllipseAnnulusSkyRegion,
-                       RectangleAnnulusPixelRegion, RectangleAnnulusSkyRegion,
-                       LinePixelRegion, LineSkyRegion,
-                       PointPixelRegion, PointSkyRegion,
-                       TextPixelRegion, TextSkyRegion)
 from ...core.core import PixCoord, SkyRegion
 from ...core.metadata import RegionMeta, RegionVisual
+from ...shapes import (CircleAnnulusPixelRegion, CircleAnnulusSkyRegion,
+                       CirclePixelRegion, CircleSkyRegion,
+                       EllipseAnnulusPixelRegion, EllipseAnnulusSkyRegion,
+                       EllipsePixelRegion, EllipseSkyRegion, LinePixelRegion,
+                       LineSkyRegion, PointPixelRegion, PointSkyRegion,
+                       PolygonPixelRegion, PolygonSkyRegion,
+                       RectangleAnnulusPixelRegion, RectangleAnnulusSkyRegion,
+                       RectanglePixelRegion, RectangleSkyRegion,
+                       RegularPolygonPixelRegion, TextPixelRegion,
+                       TextSkyRegion)
 from ..crtf.core import CRTFRegionParserWarning
 
 __all__ = []
