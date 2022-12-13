@@ -142,7 +142,7 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
 
         region = self.reg.copy(angle=0 * u.deg)
 
-        selector = region.as_mpl_selector(ax, callback=update_mask, sync=sync)  # noqa
+        selector = region.as_mpl_selector(ax, callback=update_mask, sync=sync)
 
         do_event(selector, 'press', xdata=7.3, ydata=4.4, button=1)
         do_event(selector, 'onmove', xdata=9.3, ydata=5.4, button=1)
