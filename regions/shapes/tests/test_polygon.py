@@ -189,7 +189,7 @@ class TestPolygonSkyRegion(BaseTestSkyRegion):
 class TestRegionPolygonPixelRegion(BaseTestPixelRegion):
     meta = RegionMeta({'text': 'test'})
     visual = RegionVisual({'color': 'blue'})
-    reg = RegularPolygonPixelRegion(PixCoord(50, 50), 8, 20, angle=25*u.deg,
+    reg = RegularPolygonPixelRegion(PixCoord(50, 50), 8, 20, angle=25 * u.deg,
                                     meta=meta, visual=visual)
     inside = [(40, 40)]
     outside = [(20, 20), (80, 90)]

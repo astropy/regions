@@ -232,7 +232,7 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
 
     @pytest.mark.parametrize('userargs',
                              ({'useblit': True},
-                              {'grab_range': 20, 'minspanx': 5,  'minspany': 4},
+                              {'grab_range': 20, 'minspanx': 5, 'minspany': 4},
                               {'props': {'facecolor': 'blue', 'linewidth': 2}},
                               {'twit': 'gumby'}))
     def test_mpl_selector_kwargs(self, userargs):

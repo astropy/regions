@@ -175,6 +175,7 @@ class RegionMetaDescr(RegionAttribute):
     If input as a pure `dict`, it will be converted to a `RegionMeta`
     object.
     """
+
     def __set__(self, instance, value):
         # RegionMeta subclasses dict
         if isinstance(value, dict) and not isinstance(value, RegionMeta):
