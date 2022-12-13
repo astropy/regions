@@ -1,6 +1,6 @@
 .. include:: references.txt
 
-.. testsetup:
+.. testsetup::
     >>> from regions import make_example_dataset
     >>> dataset = make_example_dataset(data='simulated')
     >>> wcs = dataset.wcs
