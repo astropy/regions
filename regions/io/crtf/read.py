@@ -34,16 +34,16 @@ regex_coordinate = re.compile(r'\[([\w.+-:]*?)\s*[,]\s*([\w.+-:]*?)\]')
 regex_length = re.compile(r'(?:\[[^=\]]*\])+[,]\s*([^\[]*)\]')
 
 # Extracts each 'parameter=value' pair
-regex_meta = re.compile(r'(?:(\w+)\s*=[\s\'\"]*([^,\[\]]+?)[\'\",]+)|(?:(\w+)\s*=\s*\[(.*?)\])')  # noqa
+regex_meta = re.compile(r'(?:(\w+)\s*=[\s\'\"]*([^,\[\]]+?)[\'\",]+)|(?:(\w+)\s*=\s*\[(.*?)\])')  # noqa: E501
 
 # Region format which segregates the include ('+'|'-') parameter, the
 # kind of definition ('ann' for annotations or '' for regions) and region
 # type.
-regex_region = re.compile(r'(?P<include>[+-])?(?P<type>ann(?=\s))?\s*(?P<regiontype>[a-z]*?)\s?\[[^=]*]')  # noqa
+regex_region = re.compile(r'(?P<include>[+-])?(?P<type>ann(?=\s))?\s*(?P<regiontype>[a-z]*?)\s?\[[^=]*]')  # noqa: E501
 
 # Line format which checks the validity of the line and segregates the
 # meta attributes from the region format.
-regex_line = re.compile(r'(?P<region>[+-]?(?:ann(?=\s))?\s*[a-z]+?\s?\[[^=]+\])(?:\s*,?\s*(?P<parameters>.*))?')  # noqa
+regex_line = re.compile(r'(?P<region>[+-]?(?:ann(?=\s))?\s*[a-z]+?\s?\[[^=]+\])(?:\s*,?\s*(?P<parameters>.*))?')  # noqa: E501
 
 
 @RegionsRegistry.register(Regions, 'read', 'crtf')
