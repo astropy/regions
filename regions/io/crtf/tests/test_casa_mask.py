@@ -19,7 +19,7 @@ except ImportError:
     HAS_CASATOOLS = False
 
 
-@pytest.mark.skipif('not HAS_CASATOOLS')
+@pytest.mark.skipif(not HAS_CASATOOLS, reason='casatools is required')
 def test_casa_masking():
     with tempfile.TemporaryDirectory() as tmpdir:
         # SIMULATE SOME DATA SET

@@ -8,7 +8,7 @@ from numpy.testing import assert_equal, assert_allclose
 import pytest
 
 from ...core.pixcoord import PixCoord
-from ..._utils.optional_deps import HAS_MATPLOTLIB  # noqa
+from ..._utils.optional_deps import HAS_MATPLOTLIB
 
 
 class BaseTestRegion:
@@ -73,7 +73,7 @@ class BaseTestPixelRegion(BaseTestRegion):
         assert_equal(actual[:, :len(self.inside)], True)
         assert_equal(actual[:, len(self.inside):], False)
 
-    @pytest.mark.skipif('not HAS_MATPLOTLIB')
+    @pytest.mark.skipif(not HAS_MATPLOTLIB, reason='matplotlib is required')
     def test_plot(self):
         from matplotlib.artist import Artist
         artist = self.reg.plot()
