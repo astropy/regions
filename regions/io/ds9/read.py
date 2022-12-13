@@ -11,11 +11,11 @@ from astropy.coordinates import Angle, SkyCoord
 from astropy.utils.data import get_readable_fileobj
 from astropy.utils.exceptions import AstropyUserWarning
 
-from ...core import PixCoord, RegionMeta, Regions, RegionVisual
-from ...core.registry import RegionsRegistry
-from .core import (DS9ParserError, ds9_frame_map, ds9_params_template,
-                   ds9_shape_to_region)
-from .meta import _split_raw_metadata, _translate_ds9_to_visual
+from regions.core import PixCoord, RegionMeta, Regions, RegionVisual
+from regions.core.registry import RegionsRegistry
+from regions.io.ds9.core import (DS9ParserError, ds9_frame_map,
+                                 ds9_params_template, ds9_shape_to_region)
+from regions.io.ds9.meta import _split_raw_metadata, _translate_ds9_to_visual
 
 __all__ = []
 

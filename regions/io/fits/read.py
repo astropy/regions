@@ -8,9 +8,9 @@ from astropy.io import fits
 from astropy.table import QTable
 from astropy.utils.exceptions import AstropyUserWarning
 
-from ...core import PixCoord, RegionMeta, Regions
-from ...core.registry import RegionsRegistry
-from .core import FITSParserError, shape_map
+from regions.core import PixCoord, RegionMeta, Regions
+from regions.core.registry import RegionsRegistry
+from regions.io.fits.core import FITSParserError, shape_map
 
 __all__ = []
 

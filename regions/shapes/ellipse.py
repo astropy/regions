@@ -9,16 +9,17 @@ import astropy.units as u
 import numpy as np
 from astropy.coordinates import Angle
 
-from .._geometry import elliptical_overlap_grid
-from .._utils.wcs_helpers import pixel_scale_angle_at_skycoord
-from ..core.attributes import (PositiveScalar, PositiveScalarAngle,
-                               RegionMetaDescr, RegionVisualDescr, ScalarAngle,
-                               ScalarPixCoord, ScalarSkyCoord)
-from ..core.bounding_box import RegionBoundingBox
-from ..core.core import PixelRegion, SkyRegion
-from ..core.mask import RegionMask
-from ..core.metadata import RegionMeta, RegionVisual
-from ..core.pixcoord import PixCoord
+from regions._geometry import elliptical_overlap_grid
+from regions._utils.wcs_helpers import pixel_scale_angle_at_skycoord
+from regions.core.attributes import (PositiveScalar, PositiveScalarAngle,
+                                     RegionMetaDescr, RegionVisualDescr,
+                                     ScalarAngle, ScalarPixCoord,
+                                     ScalarSkyCoord)
+from regions.core.bounding_box import RegionBoundingBox
+from regions.core.core import PixelRegion, SkyRegion
+from regions.core.mask import RegionMask
+from regions.core.metadata import RegionMeta, RegionVisual
+from regions.core.pixcoord import PixCoord
 
 __all__ = ['EllipsePixelRegion', 'EllipseSkyRegion']
 
@@ -264,7 +265,7 @@ class EllipsePixelRegion(PixelRegion):
         """
         from matplotlib.widgets import EllipseSelector
 
-        from .._utils.optional_deps import MPL_VERSION
+        from regions._utils.optional_deps import MPL_VERSION
 
         if hasattr(self, '_mpl_selector'):
             raise AttributeError('Cannot attach more than one selector to a region.')

@@ -7,8 +7,8 @@ import astropy.units as u
 import pytest
 from astropy.coordinates import SkyCoord
 
-from ....shapes.ellipse import EllipseSkyRegion
-from ..write import _write_crtf
+from regions.io.crtf.write import _write_crtf
+from regions.shapes.ellipse import EllipseSkyRegion
 
 try:
     from casatasks import tclean

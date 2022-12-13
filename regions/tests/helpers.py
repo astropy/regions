@@ -7,7 +7,7 @@ from astropy.tests.helper import assert_quantity_allclose
 from astropy.wcs import WCS
 from numpy.testing import assert_allclose
 
-from ..core import PixCoord, Region
+from regions.core import PixCoord, Region
 
 
 def make_simple_wcs(skycoord, resolution, size):

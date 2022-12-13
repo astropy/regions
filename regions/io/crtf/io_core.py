@@ -8,19 +8,19 @@ from astropy.coordinates import (Angle, SkyCoord, UnitSphericalRepresentation,
                                  frame_transform_graph)
 from astropy.utils.exceptions import AstropyUserWarning
 
-from ...core.core import PixCoord, SkyRegion
-from ...core.metadata import RegionMeta, RegionVisual
-from ...shapes import (CircleAnnulusPixelRegion, CircleAnnulusSkyRegion,
-                       CirclePixelRegion, CircleSkyRegion,
-                       EllipseAnnulusPixelRegion, EllipseAnnulusSkyRegion,
-                       EllipsePixelRegion, EllipseSkyRegion, LinePixelRegion,
-                       LineSkyRegion, PointPixelRegion, PointSkyRegion,
-                       PolygonPixelRegion, PolygonSkyRegion,
-                       RectangleAnnulusPixelRegion, RectangleAnnulusSkyRegion,
-                       RectanglePixelRegion, RectangleSkyRegion,
-                       RegularPolygonPixelRegion, TextPixelRegion,
-                       TextSkyRegion)
-from ..crtf.core import CRTFRegionParserWarning
+from regions.core.core import PixCoord, SkyRegion
+from regions.core.metadata import RegionMeta, RegionVisual
+from regions.io.crtf.core import CRTFRegionParserWarning
+from regions.shapes import (CircleAnnulusPixelRegion, CircleAnnulusSkyRegion,
+                            CirclePixelRegion, CircleSkyRegion,
+                            EllipseAnnulusPixelRegion, EllipseAnnulusSkyRegion,
+                            EllipsePixelRegion, EllipseSkyRegion,
+                            LinePixelRegion, LineSkyRegion, PointPixelRegion,
+                            PointSkyRegion, PolygonPixelRegion,
+                            PolygonSkyRegion, RectangleAnnulusPixelRegion,
+                            RectangleAnnulusSkyRegion, RectanglePixelRegion,
+                            RectangleSkyRegion, RegularPolygonPixelRegion,
+                            TextPixelRegion, TextSkyRegion)
 
 __all__ = []
 

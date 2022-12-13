@@ -9,11 +9,11 @@ from astropy.coordinates import Angle, SkyCoord
 from astropy.tests.helper import assert_quantity_allclose
 from astropy.utils.data import get_pkg_data_filename
 
-from ....core import Regions
-from ....shapes.circle import CircleSkyRegion
-from ....shapes.ellipse import EllipseSkyRegion
-from ..core import CRTFRegionParserError
-from ..read import _CRTFParser
+from regions.core import Regions
+from regions.io.crtf.core import CRTFRegionParserError
+from regions.io.crtf.read import _CRTFParser
+from regions.shapes.circle import CircleSkyRegion
+from regions.shapes.ellipse import EllipseSkyRegion
 
 implemented_region_types = ('ellipse', 'circle', 'rectangle', 'poly', 'point',
                             'text', 'symbol')

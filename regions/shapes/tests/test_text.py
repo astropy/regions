@@ -8,10 +8,11 @@ from astropy.utils.data import get_pkg_data_filename
 from astropy.wcs import WCS
 from numpy.testing import assert_allclose
 
-from ...core import PixCoord, RegionMeta, RegionVisual
-from ...tests.helpers import make_simple_wcs
-from ..text import TextPixelRegion, TextSkyRegion
-from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
+from regions.core import PixCoord, RegionMeta, RegionVisual
+from regions.shapes.tests.test_common import (BaseTestPixelRegion,
+                                              BaseTestSkyRegion)
+from regions.shapes.text import TextPixelRegion, TextSkyRegion
+from regions.tests.helpers import make_simple_wcs
 
 
 @pytest.fixture(scope='session', name='wcs')

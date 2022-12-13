@@ -4,7 +4,7 @@ Tests for the metadata module.
 """
 import pytest
 
-from ..metadata import RegionMeta, RegionVisual
+from regions.core.metadata import RegionMeta, RegionVisual
 
 
 def test_region_meta():

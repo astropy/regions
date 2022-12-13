@@ -8,7 +8,7 @@ from astropy.table import vstack as table_vstack
 from astropy.utils import lazyproperty
 from astropy.wcs import WCS
 
-from ..core.pixcoord import PixCoord
+from regions.core.pixcoord import PixCoord
 
 __all__ = ['make_example_dataset']
 

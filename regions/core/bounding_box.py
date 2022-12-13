@@ -264,8 +264,8 @@ class RegionBoundingBox:
         Return a `~regions.RectanglePixelRegion` that
         represents the bounding box.
         """
-        from ..shapes import RectanglePixelRegion
-        from .pixcoord import PixCoord
+        from regions.core.pixcoord import PixCoord
+        from regions.shapes import RectanglePixelRegion
 
         xypos = PixCoord(*self.center[::-1])
         height, width = self.shape

@@ -9,10 +9,11 @@ import astropy.units as u
 from astropy.coordinates import Angle, frame_transform_graph
 from astropy.utils.data import get_readable_fileobj
 
-from ...core import Regions
-from ...core.registry import RegionsRegistry
-from .core import CRTFRegionParserError, CRTFRegionParserWarning, valid_symbols
-from .io_core import _Shape, _ShapeList, reg_mapping
+from regions.core import Regions
+from regions.core.registry import RegionsRegistry
+from regions.io.crtf.core import (CRTFRegionParserError,
+                                  CRTFRegionParserWarning, valid_symbols)
+from regions.io.crtf.io_core import _Shape, _ShapeList, reg_mapping
 
 __all__ = []
 

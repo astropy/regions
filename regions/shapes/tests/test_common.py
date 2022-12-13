@@ -7,8 +7,8 @@ import numpy as np
 import pytest
 from numpy.testing import assert_allclose, assert_equal
 
-from ..._utils.optional_deps import HAS_MATPLOTLIB
-from ...core.pixcoord import PixCoord
+from regions._utils.optional_deps import HAS_MATPLOTLIB
+from regions.core.pixcoord import PixCoord
 
 
 class BaseTestRegion:

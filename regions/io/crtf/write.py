@@ -2,9 +2,9 @@
 
 import os
 
-from ...core import Region, Regions
-from ...core.registry import RegionsRegistry
-from .io_core import _to_shape_list
+from regions.core import Region, Regions
+from regions.core.registry import RegionsRegistry
+from regions.io.crtf.io_core import _to_shape_list
 
 __all__ = []
 

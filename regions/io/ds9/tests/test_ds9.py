@@ -14,11 +14,11 @@ from astropy.utils.data import get_pkg_data_filenames
 from astropy.utils.exceptions import AstropyUserWarning
 from numpy.testing import assert_allclose, assert_equal
 
-from ...._utils.optional_deps import HAS_MATPLOTLIB
-from ....core import PixCoord, Regions, RegionVisual
-from ....shapes import (CirclePixelRegion, CircleSkyRegion, PointPixelRegion,
-                        RegularPolygonPixelRegion)
-from ....tests.helpers import assert_region_allclose
+from regions._utils.optional_deps import HAS_MATPLOTLIB
+from regions.core import PixCoord, Regions, RegionVisual
+from regions.shapes import (CirclePixelRegion, CircleSkyRegion,
+                            PointPixelRegion, RegularPolygonPixelRegion)
+from regions.tests.helpers import assert_region_allclose
 
 
 def test_roundtrip(tmpdir):

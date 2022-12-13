@@ -4,7 +4,7 @@ import warnings
 
 from astropy.utils.exceptions import AstropyUserWarning
 
-from .core import DS9ParserError, ds9_valid_symbols
+from regions.io.ds9.core import DS9ParserError, ds9_valid_symbols
 
 __all__ = []
 

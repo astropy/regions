@@ -2,8 +2,8 @@
 
 from astropy.utils.data import get_readable_fileobj
 
-from ...core import Region, Regions
-from ...core.registry import RegionsRegistry
+from regions.core import Region, Regions
+from regions.core.registry import RegionsRegistry
 
 __all__ = []
 

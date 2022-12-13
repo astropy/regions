@@ -6,12 +6,16 @@ from astropy.coordinates import SkyCoord
 from astropy.tests.helper import assert_quantity_allclose
 from numpy.testing import assert_allclose
 
-from ...core import PixCoord, RegionMeta, RegionVisual
-from ...tests.helpers import make_simple_wcs
-from ..annulus import (CircleAnnulusPixelRegion, CircleAnnulusSkyRegion,
-                       EllipseAnnulusPixelRegion, EllipseAnnulusSkyRegion,
-                       RectangleAnnulusPixelRegion, RectangleAnnulusSkyRegion)
-from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
+from regions.core import PixCoord, RegionMeta, RegionVisual
+from regions.shapes.annulus import (CircleAnnulusPixelRegion,
+                                    CircleAnnulusSkyRegion,
+                                    EllipseAnnulusPixelRegion,
+                                    EllipseAnnulusSkyRegion,
+                                    RectangleAnnulusPixelRegion,
+                                    RectangleAnnulusSkyRegion)
+from regions.shapes.tests.test_common import (BaseTestPixelRegion,
+                                              BaseTestSkyRegion)
+from regions.tests.helpers import make_simple_wcs
 
 
 class TestCircleAnnulusPixelRegion(BaseTestPixelRegion):

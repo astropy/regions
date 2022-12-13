@@ -4,8 +4,8 @@ import pytest
 from astropy.tests.helper import assert_quantity_allclose
 from astropy.units.quantity import Quantity
 
-from ..io_core import _to_shape_list
-from ..read import _CRTFParser
+from regions.io.crtf.io_core import _to_shape_list
+from regions.io.crtf.read import _CRTFParser
 
 
 def test_shape_crtf():

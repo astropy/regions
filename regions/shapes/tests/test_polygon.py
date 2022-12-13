@@ -9,13 +9,14 @@ from astropy.coordinates import SkyCoord
 from astropy.tests.helper import assert_quantity_allclose
 from numpy.testing import assert_allclose, assert_equal
 
-from ..._utils.examples import make_example_dataset
-from ..._utils.optional_deps import HAS_MATPLOTLIB
-from ...core import PixCoord, RegionBoundingBox, RegionMeta, RegionVisual
-from ...tests.helpers import make_simple_wcs
-from ..polygon import (PolygonPixelRegion, PolygonSkyRegion,
-                       RegularPolygonPixelRegion)
-from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
+from regions._utils.examples import make_example_dataset
+from regions._utils.optional_deps import HAS_MATPLOTLIB
+from regions.core import PixCoord, RegionBoundingBox, RegionMeta, RegionVisual
+from regions.shapes.polygon import (PolygonPixelRegion, PolygonSkyRegion,
+                                    RegularPolygonPixelRegion)
+from regions.shapes.tests.test_common import (BaseTestPixelRegion,
+                                              BaseTestSkyRegion)
+from regions.tests.helpers import make_simple_wcs
 
 
 @pytest.fixture(scope='session', name='wcs')

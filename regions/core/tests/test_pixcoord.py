@@ -8,8 +8,8 @@ import numpy as np
 import pytest
 from numpy.testing import assert_allclose, assert_equal
 
-from ..._utils.examples import make_example_dataset
-from ..pixcoord import PixCoord
+from regions._utils.examples import make_example_dataset
+from regions.core.pixcoord import PixCoord
 
 
 @pytest.fixture(scope='session', name='wcs')

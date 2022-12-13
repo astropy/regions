@@ -11,9 +11,9 @@ import pytest
 from astropy.coordinates import SkyCoord
 from numpy.testing import assert_allclose
 
-from ...core import CompoundPixelRegion, PixCoord, RegionBoundingBox
-from ...shapes import CirclePixelRegion, CircleSkyRegion
-from ...tests.helpers import make_simple_wcs
+from regions.core import CompoundPixelRegion, PixCoord, RegionBoundingBox
+from regions.shapes import CirclePixelRegion, CircleSkyRegion
+from regions.tests.helpers import make_simple_wcs
 
 
 class TestCompoundPixel:

@@ -14,11 +14,12 @@ from astropy.utils.data import get_pkg_data_filenames
 from astropy.utils.exceptions import AstropyUserWarning
 from numpy.testing import assert_equal
 
-from ....core import PixCoord, RegionMeta, Regions
-from ....shapes import (CirclePixelRegion, CircleSkyRegion, LinePixelRegion,
-                        RectangleAnnulusPixelRegion, TextPixelRegion)
-from ....tests.helpers import assert_region_allclose
-from ..core import FITSParserError
+from regions.core import PixCoord, RegionMeta, Regions
+from regions.io.fits.core import FITSParserError
+from regions.shapes import (CirclePixelRegion, CircleSkyRegion,
+                            LinePixelRegion, RectangleAnnulusPixelRegion,
+                            TextPixelRegion)
+from regions.tests.helpers import assert_region_allclose
 
 
 def test_roundtrip(tmpdir):

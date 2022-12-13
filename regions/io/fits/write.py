@@ -9,9 +9,9 @@ from astropy.io import fits
 from astropy.table import QTable
 from astropy.utils.exceptions import AstropyUserWarning
 
-from ...core import Region, Regions, SkyRegion
-from ...core.registry import RegionsRegistry
-from ...shapes import RegularPolygonPixelRegion
+from regions.core import Region, Regions, SkyRegion
+from regions.core.registry import RegionsRegistry
+from regions.shapes import RegularPolygonPixelRegion
 
 __all__ = []
 

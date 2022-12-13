@@ -9,11 +9,12 @@ from astropy.utils.data import get_pkg_data_filename
 from astropy.wcs import WCS
 from numpy.testing import assert_allclose
 
-from ..._utils.optional_deps import HAS_MATPLOTLIB
-from ...core import PixCoord, RegionMeta, RegionVisual
-from ...tests.helpers import make_simple_wcs
-from ..point import PointPixelRegion, PointSkyRegion
-from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
+from regions._utils.optional_deps import HAS_MATPLOTLIB
+from regions.core import PixCoord, RegionMeta, RegionVisual
+from regions.shapes.point import PointPixelRegion, PointSkyRegion
+from regions.shapes.tests.test_common import (BaseTestPixelRegion,
+                                              BaseTestSkyRegion)
+from regions.tests.helpers import make_simple_wcs
 
 
 @pytest.fixture(scope='session', name='wcs')

@@ -11,18 +11,21 @@ import pytest
 from astropy.coordinates import SkyCoord
 from astropy.wcs import WCS
 
-from ...core.core import PixelRegion, Region, SkyRegion
-from ...core.mask import RegionMask
-from ...core.metadata import RegionMeta, RegionVisual
-from ...core.pixcoord import PixCoord
-from ..annulus import (CircleAnnulusPixelRegion, CircleAnnulusSkyRegion,
-                       EllipseAnnulusPixelRegion, EllipseAnnulusSkyRegion,
-                       RectangleAnnulusPixelRegion, RectangleAnnulusSkyRegion)
-from ..circle import CirclePixelRegion, CircleSkyRegion
-from ..ellipse import EllipsePixelRegion, EllipseSkyRegion
-from ..point import PointPixelRegion, PointSkyRegion
-from ..polygon import PolygonPixelRegion, PolygonSkyRegion
-from ..rectangle import RectanglePixelRegion, RectangleSkyRegion
+from regions.core.core import PixelRegion, Region, SkyRegion
+from regions.core.mask import RegionMask
+from regions.core.metadata import RegionMeta, RegionVisual
+from regions.core.pixcoord import PixCoord
+from regions.shapes.annulus import (CircleAnnulusPixelRegion,
+                                    CircleAnnulusSkyRegion,
+                                    EllipseAnnulusPixelRegion,
+                                    EllipseAnnulusSkyRegion,
+                                    RectangleAnnulusPixelRegion,
+                                    RectangleAnnulusSkyRegion)
+from regions.shapes.circle import CirclePixelRegion, CircleSkyRegion
+from regions.shapes.ellipse import EllipsePixelRegion, EllipseSkyRegion
+from regions.shapes.point import PointPixelRegion, PointSkyRegion
+from regions.shapes.polygon import PolygonPixelRegion, PolygonSkyRegion
+from regions.shapes.rectangle import RectanglePixelRegion, RectangleSkyRegion
 
 PIXEL_REGIONS = [
     CirclePixelRegion(PixCoord(3, 4), radius=5),

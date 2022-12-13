@@ -10,8 +10,8 @@ import numpy as np
 from astropy.coordinates import SkyCoord
 from astropy.units import Quantity
 
-from .metadata import RegionMeta, RegionVisual
-from .pixcoord import PixCoord
+from regions.core.metadata import RegionMeta, RegionVisual
+from regions.core.pixcoord import PixCoord
 
 __all__ = []
 
