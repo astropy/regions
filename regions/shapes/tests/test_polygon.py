@@ -12,7 +12,7 @@ from astropy.tests.helper import assert_quantity_allclose
 from ...core import PixCoord, RegionMeta, RegionVisual, RegionBoundingBox
 from ...tests.helpers import make_simple_wcs
 from ..._utils.examples import make_example_dataset
-from ..._utils.optional_deps import HAS_MATPLOTLIB  # noqa
+from ..._utils.optional_deps import HAS_MATPLOTLIB
 from ..polygon import (PolygonPixelRegion, RegularPolygonPixelRegion,
                        PolygonSkyRegion)
 from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
@@ -106,7 +106,7 @@ class TestPolygonPixelRegion(BaseTestPixelRegion):
         with pytest.raises(NotImplementedError):
             self.reg.to_mask(mode='exact')
 
-    @pytest.mark.skipif('not HAS_MATPLOTLIB')
+    @pytest.mark.skipif(not HAS_MATPLOTLIB, reason='matplotlib is required')
     def test_as_artist(self):
         patch = self.reg.as_artist()
         expected = [[1, 1], [3, 1], [1, 4], [1, 1]]
@@ -248,7 +248,7 @@ class TestRegionPolygonPixelRegion(BaseTestPixelRegion):
         with pytest.raises(NotImplementedError):
             self.reg.to_mask(mode='exact')
 
-    @pytest.mark.skipif('not HAS_MATPLOTLIB')
+    @pytest.mark.skipif(not HAS_MATPLOTLIB, reason='matplotlib is required')
     def test_as_artist(self):
         patch = self.reg.as_artist()
         expected = [[41.54763477, 68.12615574], [31.20614758, 56.84040287],

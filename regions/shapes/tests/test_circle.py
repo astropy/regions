@@ -12,7 +12,7 @@ import pytest
 
 from ...core import PixCoord, RegionMeta, RegionVisual
 from ...tests.helpers import make_simple_wcs
-from ..._utils.optional_deps import HAS_MATPLOTLIB  # noqa
+from ..._utils.optional_deps import HAS_MATPLOTLIB
 from ..circle import CirclePixelRegion, CircleSkyRegion
 from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
 
@@ -58,7 +58,7 @@ class TestCirclePixelRegion(BaseTestPixelRegion):
         assert reg_new.meta['text'] != self.reg.meta['text']
         assert reg_new.visual['color'] != self.reg.visual['color']
 
-    @pytest.mark.skipif('not HAS_MATPLOTLIB')
+    @pytest.mark.skipif(not HAS_MATPLOTLIB, reason='matplotlib is required')
     def test_as_artist(self):
         patch = self.reg.as_artist()
         assert_allclose(patch.center, (3, 4))

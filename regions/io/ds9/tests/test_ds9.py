@@ -18,7 +18,7 @@ from ....core import Regions, PixCoord, RegionVisual
 from ....shapes import (CirclePixelRegion, CircleSkyRegion, PointPixelRegion,
                         RegularPolygonPixelRegion)
 from ....tests.helpers import assert_region_allclose
-from ...._utils.optional_deps import HAS_MATPLOTLIB  # noqa
+from ...._utils.optional_deps import HAS_MATPLOTLIB
 
 
 def test_roundtrip(tmpdir):
@@ -328,7 +328,7 @@ def test_spaces_metadata():
         assert regions[0].meta == regions[i].meta
 
 
-@pytest.mark.skipif('not HAS_MATPLOTLIB')
+@pytest.mark.skipif(not HAS_MATPLOTLIB, reason='matplotlib is required')
 def test_point_boxcircle():
     import matplotlib.path as mpath
 
@@ -347,7 +347,7 @@ def test_point_boxcircle():
     assert regions[2].as_artist().get_markeredgecolor() == '#00ff00'
 
 
-@pytest.mark.skipif('not HAS_MATPLOTLIB')
+@pytest.mark.skipif(not HAS_MATPLOTLIB, reason='matplotlib is required')
 def test_compound_color():
     region_str = ('# Region file format: DS9 astropy/regions\n'
                   'image\n'
@@ -356,7 +356,7 @@ def test_compound_color():
     assert regions[0].as_artist().get_edgecolor() == (1., 0., 0., 1.)
 
 
-@pytest.mark.skipif('not HAS_MATPLOTLIB')
+@pytest.mark.skipif(not HAS_MATPLOTLIB, reason='matplotlib is required')
 def test_default_mpl_kwargs():
     region_str = ('# Region file format: DS9 astropy/regions\n'
                   'image\n'

@@ -13,7 +13,7 @@ from astropy.wcs import WCS
 
 from ...core import PixCoord, RegionMeta, RegionVisual
 from ...tests.helpers import make_simple_wcs
-from ..._utils.optional_deps import HAS_MATPLOTLIB, MPL_VERSION  # noqa
+from ..._utils.optional_deps import HAS_MATPLOTLIB, MPL_VERSION
 from ..rectangle import RectanglePixelRegion, RectangleSkyRegion
 from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
 
@@ -94,7 +94,7 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
         assert reg_new.meta['text'] != self.reg.meta['text']
         assert reg_new.visual['color'] != self.reg.visual['color']
 
-    @pytest.mark.skipif('not HAS_MATPLOTLIB')
+    @pytest.mark.skipif(not HAS_MATPLOTLIB, reason='matplotlib is required')
     def test_as_artist(self):
         patch = self.reg.as_artist()
         # Note: `reg.center` is the center, `patch.xy` is the lower-left
