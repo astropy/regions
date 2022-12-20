@@ -19,7 +19,7 @@ from datetime import datetime
 
 try:
     from sphinx_astropy.conf.v1 import *  # noqa: F403
-    from sphinx_astropy.conf.v1 import rst_epilog  # noqa: E402
+    from sphinx_astropy.conf.v1 import rst_epilog
 except ImportError:
     print('ERROR: the documentation requires the sphinx-astropy package to '
           'be installed')
