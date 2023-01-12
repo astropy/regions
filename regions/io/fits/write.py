@@ -83,6 +83,7 @@ class _RegionData:
     """
     Class to hold region data.
     """
+
     shape: str
     x: np.ndarray
     y: np.ndarray

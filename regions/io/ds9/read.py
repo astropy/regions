@@ -81,6 +81,7 @@ class _RegionData:
 
     Data for multi-annulus regions is stored in a single object.
     """
+
     frame: str
     region_type: str
     shape: str
