@@ -10,6 +10,7 @@ on:
   schedule:
     # run every Monday at 6am UTC
     - cron: '0 6 * * 1'
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -97,8 +98,8 @@ jobs:
             prefix: ''
 
           - os: ubuntu-latest
-            python: '3.11.0'
-            tox_env: 'py311-test-devdeps'
+            python: '3.11'
+            tox_env: 'py311-test-alldeps-devdeps'
             toxposargs: --remote-data=any
             allow_failure: true
             prefix: '(Allowed failure)'

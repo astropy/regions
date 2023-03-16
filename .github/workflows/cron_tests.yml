@@ -4,6 +4,7 @@ on:
   schedule:
     # run at 6am UTC on Tue-Fri (complete tests are run every Monday)
     - cron: '0 6 * * 2-5'
+  workflow_dispatch:
 
 env:
   TOXARGS: '-v'
@@ -25,7 +26,7 @@ jobs:
             allow_failure: false
 
           - os: ubuntu-latest
-            python: '3.10'
+            python: '3.11'
             tox_env: 'py310-test-alldeps-devdeps'
             toxposargs: --remote-data=any
             allow_failure: false
