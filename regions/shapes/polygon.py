@@ -19,7 +19,7 @@ from regions.core.metadata import RegionMeta, RegionVisual
 from regions.core.pixcoord import PixCoord
 
 __all__ = ['PolygonPixelRegion', 'RegularPolygonPixelRegion',
-           'PolygonSkyRegion']
+           'PolygonSkyRegion', 'SpaceInvaderPixelRegion']
 
 
 class PolygonPixelRegion(PixelRegion):
@@ -385,3 +385,54 @@ class PolygonSkyRegion(SkyRegion):
         vertices_pix = PixCoord(x, y)
         return PolygonPixelRegion(vertices_pix, meta=self.meta.copy(),
                                   visual=self.visual.copy())
+
+
+# TODO: Support more variety.
+class SpaceInvaderPixelRegion(PolygonPixelRegion):
+    """
+    A polygon in pixel coordinates defined in the shape of Space Invader(TM).
+
+    Parameters
+    ----------
+    meta : `~regions.RegionMeta` or `dict`, optional
+        A dictionary that stores the meta attributes of the region.
+    visual : `~regions.RegionVisual` or `dict`, optional
+        A dictionary that stores the visual meta attributes of the
+        region.
+
+    Examples
+    --------
+    .. plot::
+        :include-source:
+
+        import matplotlib.pyplot as plt
+        import numpy as np
+        from regions import SpaceInvaderPixelRegion
+
+        fig, ax = plt.subplots(1, 1)
+
+        reg = SpaceInvaderPixelRegion()
+
+        data = np.arange(10 * 15).reshape((10, 15))
+        ax.imshow(data, cmap='gray', interpolation='nearest', origin='lower')
+        reg.plot(ax=ax, color='red', lw=2.0)
+
+    """
+    def __init__(self, meta=None, visual=None):
+        x = [1.04728634, 1.0204958, 0.94012415, 1.95816496, 1.95816496,
+             2.94941523, 2.92262468, 2.92262468, 3.8870844, 3.96745604,
+             3.02978687, 3.96745604, 4.82475357, 4.74438192, 8.17357203,
+             8.17357203, 8.92370736, 9.88816708, 9.03086955, 9.96853872,
+             9.91495762, 11.04016063, 10.95978898, 10.93299844, 11.9242487,
+             12.00462034, 11.95103925, 11.09374172, 9.96853872, 9.96853872,
+             9.96853872, 9.0576601, 9.004079, 3.77992221, 3.8335033,
+             2.92262468, 3.00299632, 1.77063113, 1.04728634]
+        y = [2.02814867, 3.12281621, 4.19011706, 4.13538369, 5.03848441,
+             5.01111772, 6.10578526, 7.14571942, 7.2004528 , 8.02145345,
+             9.03402092, 9.11612099, 8.10355352, 7.2004528 , 7.17308611,
+             8.24038696, 9.00665424, 9.0887543 , 7.14571942, 7.09098604,
+             6.02368519, 6.10578526, 4.90165096, 4.13538369, 4.02591693,
+             2.9038827, 1.89131523, 3.50594985, 3.53331654, 2.79441595,
+             1.9734153, 2.11024874, 1.17978133, 1.23451471, 2.02814867,
+             2.16498211, 3.47858316, 3.50594985, 2.02814867]
+        super().__init__(PixCoord(x=x, y=y), meta=meta, visual=visual)
