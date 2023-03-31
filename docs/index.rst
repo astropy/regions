@@ -4,7 +4,7 @@
 Astropy Regions
 ###############
 
-**Regions** is an in-development `coordinated package`_ of `Astropy`_
+**regions** is an in-development `coordinated package`_ of `Astropy`_
 for region handling.
 
 To get an overview of available features, see :ref:`getting_started`.
@@ -16,8 +16,8 @@ package.
 * Contributors : https://github.com/astropy/regions/graphs/contributors
 
 .. warning::
-    This ``regions`` package is in an early stage of development. It
-    is neither feature complete nor API stable. That said, please
+    This ``regions`` package is still in an early stage of development. It
+    is not yet feature complete but API should be stable enough by now. That said, please
     have a look and try to use it for your applications. Feedback and
     contributions are welcome!
 
