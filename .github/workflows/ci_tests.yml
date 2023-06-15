@@ -129,4 +129,5 @@ jobs:
       if: ${{ contains(matrix.tox_env, '-cov') }}
       uses: codecov/codecov-action@v3
       with:
+        files: ./coverage.xml
         verbose: true
