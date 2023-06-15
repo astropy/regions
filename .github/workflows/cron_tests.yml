@@ -21,13 +21,13 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            python: '3.10'
+            python: '3.11'
             tox_env: 'linkcheck'
             allow_failure: false
 
           - os: ubuntu-latest
             python: '3.11'
-            tox_env: 'py310-test-alldeps-devdeps'
+            tox_env: 'py311-test-alldeps-devdeps'
             toxposargs: --remote-data=any
             allow_failure: false
 
@@ -56,5 +56,5 @@ jobs:
       if: ${{ contains(matrix.tox_env, '-cov') }}
       uses: codecov/codecov-action@v3
       with:
-        file: ./coverage.xml
+        files: ./coverage.xml
         verbose: true
