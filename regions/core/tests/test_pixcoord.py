@@ -286,3 +286,15 @@ def test_pixcoord_subtraction():
 
     with pytest.raises(ValueError):
         point1 - PixCoord([1, 1, 1], [2, 2, 2])
+
+
+def test_pixcoord_offset_scalar():
+    point = PixCoord(3, 4)
+    new_point = point.directional_offset_by(1, 90 * u.deg)
+    assert_allclose(new_point.xy, (3, 5))
+
+
+def test_pixcoord_offset_array():
+    point = PixCoord([3, 3], [4, 4])
+    new_point = point.directional_offset_by(1, 90 * u.deg)
+    assert_allclose(new_point.xy, ([3, 3], [5, 5]))
