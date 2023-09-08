@@ -5,7 +5,12 @@ build:
   apt_packages:
     - graphviz
   tools:
-    python: "3.10"
+    python: "3.11"
+  jobs:
+    post_checkout:
+      - git fetch --shallow-since=2022-10-01 || true
+    pre_install:
+      - git update-index --assume-unchanged docs/conf.py
 
 sphinx:
   builder: html
