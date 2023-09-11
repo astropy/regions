@@ -31,12 +31,6 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            python: '3.8'
-            tox_env: 'py38-test-alldeps'
-            allow_failure: false
-            prefix: ''
-
-          - os: ubuntu-latest
             python: '3.9'
             tox_env: 'py39-test-alldeps'
             allow_failure: false
@@ -92,8 +86,8 @@ jobs:
             prefix: ''
 
           - os: ubuntu-latest
-            python: '3.8'
-            tox_env: 'py38-test-alldeps-astropylts-numpy118'
+            python: '3.9'
+            tox_env: 'py39-test-alldeps-astropylts-numpy122'
             allow_failure: false
             prefix: ''
 
