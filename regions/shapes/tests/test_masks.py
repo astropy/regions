@@ -51,3 +51,4 @@ def test_to_mask(region, mode):
     except NotImplementedError:
         pytest.xfail()
     assert isinstance(mask, RegionMask)
+    return mask.data.astype(float)
