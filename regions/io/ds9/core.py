@@ -15,6 +15,14 @@ from regions.shapes import (CircleAnnulusPixelRegion, CircleAnnulusSkyRegion,
 __all__ = []
 
 
+def make_region_template():
+    return itertools.chain(('coord', 'coord'), itertools.cycle(('length',)))
+
+
+def make_polygon_template():
+    return itertools.cycle(('coord',))
+
+
 # mappings from DS9 frames to astropy coordinates frames
 ds9_frame_map = {'image': 'image',
                  'icrs': 'icrs',
@@ -56,14 +64,11 @@ ds9_shape_to_region['sky'] = sky_map
 ds9_params_template = {'point': ('coord', 'coord'),
                        'text': ('coord', 'coord'),
                        'circle': ('coord', 'coord', 'length'),
-                       'ellipse': itertools.chain(
-                           ('coord', 'coord'), itertools.cycle(('length',))),
-                       'box': itertools.chain(
-                           ('coord', 'coord'), itertools.cycle(('length',))),
-                       'polygon': itertools.cycle(('coord',)),
                        'line': ('coord', 'coord', 'coord', 'coord'),
-                       'annulus': itertools.chain(
-                           ('coord', 'coord'), itertools.cycle(('length',)))}
+                       'ellipse': make_region_template(),
+                       'annulus': make_region_template(),
+                       'box': make_region_template(),
+                       'polygon': make_polygon_template()}
 
 
 # mapping from regions shapes to ds9 shape formats

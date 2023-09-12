@@ -3,7 +3,6 @@
 import re
 import string
 import warnings
-from copy import deepcopy
 from dataclasses import dataclass
 
 import astropy.units as u
@@ -14,7 +13,8 @@ from astropy.utils.exceptions import AstropyUserWarning
 from regions.core import PixCoord, RegionMeta, Regions, RegionVisual
 from regions.core.registry import RegionsRegistry
 from regions.io.ds9.core import (DS9ParserError, ds9_frame_map,
-                                 ds9_params_template, ds9_shape_to_region)
+                                 ds9_params_template, ds9_shape_to_region,
+                                 make_region_template)
 from regions.io.ds9.meta import _split_raw_metadata, _translate_ds9_to_visual
 
 __all__ = []
@@ -543,8 +543,8 @@ def _parse_shape_params(region_data):
         n_annulus = nparams - 3
 
     if shape in ('ellipse', 'box', 'annulus'):
-        # deepcopy to "reset" the cycle iterators
-        shape_template = deepcopy(ds9_params_template[shape])
+        # reset the cycle iterators
+        shape_template = make_region_template()
     else:
         shape_template = ds9_params_template[shape]
 
