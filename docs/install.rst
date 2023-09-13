@@ -7,18 +7,18 @@ Requirements
 
 Regions has the following strict requirements:
 
-* `Python <https://www.python.org/>`_ 3.8 or later
+* `Python <https://www.python.org/>`_ 3.9 or later
 
-* `Numpy <https://numpy.org/>`_ 1.18 or later
+* `NumPy <https://numpy.org/>`_ 1.22 or later
 
 * `Astropy`_ 5.0 or later
 
 Region also optionally depends on other packages for some features:
 
-* `matplotlib <https://matplotlib.org/>`_ 3.1 or later
+* `Matplotlib <https://matplotlib.org/>`_ 3.5 or later
 
 Regions depends on `pytest-astropy
-<https://github.com/astropy/pytest-astropy>`_ (0.4 or later) and
+<https://github.com/astropy/pytest-astropy>`_ (0.10 or later) and
 `pytest-arraydiff <https://github.com/astropy/pytest-arraydiff>`_ (0.3
 or later) to run the test suite.
 

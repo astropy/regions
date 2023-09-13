@@ -4,6 +4,12 @@
 General
 -------
 
+- The minimum required Python is now 3.9. [#517]
+
+- The minimum required NumPy is now 1.22. [#517]
+
+- The minimum required Matplotlib is now 3.5. [#517]
+
 New Features
 ------------
 

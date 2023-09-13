@@ -23,9 +23,9 @@ classifiers = [
     'Topic :: Scientific/Engineering :: Astronomy',
 ]
 dynamic = ['version']
-requires-python = '>=3.8'
+requires-python = '>=3.9'
 dependencies = [
-    'numpy>=1.18',
+    'numpy>=1.22',
     'astropy>=5.0',
 ]
 
@@ -35,7 +35,7 @@ documentation = 'https://astropy-regions.readthedocs.io/en/stable/'
 
 [project.optional-dependencies]
 all = [
-    'matplotlib>=3.1',
+    'matplotlib>=3.5',
     'shapely',
 ]
 test = [
