@@ -108,6 +108,8 @@ astropy_header = true
 doctest_plus = 'enabled'
 text_file_format = 'rst'
 addopts = '--color=yes --doctest-rst'
+xfail_strict = true
+remote_data_strict = true
 filterwarnings = [
     'error',
     'ignore:numpy\.ufunc size changed:RuntimeWarning',
@@ -119,12 +121,6 @@ filterwarnings = [
 ]
 markers = [
     'array_compare'
-]
-doctest_norecursedirs = [
-    '*/setup_package.py',
-]
-doctest_subpackage_requires = [
-    'docs/plot_*.py = matplotlib>=3.1',
 ]
 
 [tool.coverage.run]
