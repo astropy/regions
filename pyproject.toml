@@ -2,7 +2,7 @@
 name = 'regions'
 description = 'An Astropy coordinated package for region handling'
 readme = 'README.rst'
-license = { file = 'LICENSE.rst' }
+license = {file = 'LICENSE.rst'}
 authors = [
     {name = 'Regions Developers', email = 'astropy.team@gmail.com'},
 ]
