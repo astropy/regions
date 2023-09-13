@@ -1,13 +1,177 @@
+[project]
+name = 'regions'
+description = 'An Astropy coordinated package for region handling'
+readme = 'README.rst'
+license = { file = 'LICENSE.rst' }
+authors = [
+    {name = 'Regions Developers', email = 'astropy.team@gmail.com'},
+]
+keywords = [
+    'astronomy',
+    'astrophysics',
+    'astropy',
+    'regions',
+]
+classifiers = [
+    'Intended Audience :: Science/Research',
+    'License :: OSI Approved :: BSD License',
+    'Natural Language :: English',
+    'Operating System :: OS Independent',
+    'Programming Language :: Cython',
+    'Programming Language :: Python',
+    'Programming Language :: Python :: 3',
+    'Topic :: Scientific/Engineering :: Astronomy',
+]
+dynamic = ['version']
+requires-python = '>=3.8'
+dependencies = [
+    'numpy>=1.18',
+    'astropy>=5.0',
+]
+
+[project.urls]
+homepage = 'https://github.com/astropy/regions'
+documentation = 'https://astropy-regions.readthedocs.io/en/stable/'
+
+[project.optional-dependencies]
+all = [
+    'matplotlib>=3.1',
+    'shapely',
+]
+test = [
+    'pytest-arraydiff',
+    'pytest-astropy>=0.10',
+]
+docs = [
+    'regions[all]',
+    'sphinx-astropy>=1.6',
+    'tomli; python_version < "3.11"',
+]
+
 [build-system]
-requires = ['setuptools',
-            'setuptools_scm>=6.2',
-            'cython==0.29.36',
-            'numpy<1.26.0b1; python_version<"3.12"',
-            'numpy>=1.26.0b1; python_version>="3.12"',
-            'extension-helpers']
+requires = [
+    'setuptools>=61.2',
+    'setuptools_scm>=6.2',
+    'cython>=0.29.36',
+    'numpy<1.26.0b1; python_version<"3.12"',
+    'numpy>=1.26.0b1; python_version>="3.12"',
+    'extension-helpers',
+]
 build-backend = 'setuptools.build_meta'
 
+[tool.extension-helpers]
+use_extension_helpers = true
+
+[tool.setuptools_scm]
+write_to = 'regions/version.py'
+
+[tool.setuptools]
+zip-safe = false
+include-package-data = false
+
+[tool.setuptools.packages.find]
+namespaces = false
+
+[tool.setuptools.package-data]
+'*' = [
+    'data/*',
+]
+'regions' = [
+    'CITATION.rst',
+]
+'regions.shape.tests' = [
+    'reference/*.txt',
+    'data/*.fits',
+]
+'regions.io.crtf.tests' = [
+    'data/*.crtf',
+]
+'regions.io.ds9.tests' = [
+    'data/*.reg',
+]
+'regions.io.fits.tests' = [
+    'data/*.fits',
+]
+
+[tool.pytest.ini_options]
+minversion = 7.0
+testpaths = [
+    'regions',
+    'docs',
+]
+norecursedirs = [
+    'docs[\\/]_build',
+    'docs[\\/]generated',
+    'regions[\\/]extern',
+]
+astropy_header = true
+doctest_plus = 'enabled'
+text_file_format = 'rst'
+addopts = '--color=yes --doctest-rst'
+filterwarnings = [
+    'error',
+    'ignore:numpy\.ufunc size changed:RuntimeWarning',
+    'ignore:numpy\.ndarray size changed:RuntimeWarning',
+    'ignore:unclosed file:ResourceWarning',
+    'ignore:distutils Version classes are deprecated:DeprecationWarning',
+    # TEMP: remove when matplotlib nightly fixes the row_stack deprecations
+    'ignore:`row_stack` alias is deprecated:DeprecationWarning',
+]
+markers = [
+    'array_compare'
+]
+doctest_norecursedirs = [
+    '*/setup_package.py',
+]
+doctest_subpackage_requires = [
+    'docs/plot_*.py = matplotlib>=3.1',
+]
+
+[tool.coverage.run]
+omit = [
+    'regions/_astropy_init*',
+    'regions/conftest.py',
+    'regions/*setup_package*',
+    'regions/tests/*',
+    'regions/*/tests/*',
+    'regions/extern/*',
+    'regions/version*',
+    '*/regions/_astropy_init*',
+    '*/regions/conftest.py',
+    '*/regions/*setup_package*',
+    '*/regions/tests/*',
+    '*/regions/*/tests/*',
+    '*/regions/extern/*',
+    '*/regions/version*',
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    'pragma: no cover',
+    'except ImportError',
+    'raise AssertionError',
+    'raise NotImplementedError',
+    'def main\\(.*\\):',
+    'pragma: py{ignore_python_version}',
+    'def _ipython_key_completions_',
+]
+
+[tool.build-sphinx]
+github_project = 'astropy/regions'
+
 [tool.isort]
-    skip_glob = ['regions/*__init__.py*']
-    known_first_party = ['regions']
-    use_parentheses = true
+skip_glob = [
+    'regions/*__init__.py*',
+]
+known_first_party = [
+    'regions',
+    'extension_helpers',
+]
+use_parentheses = true
+
+[tool.black]
+force-exclude = """
+(
+  .*
+)
+"""
