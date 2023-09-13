@@ -62,7 +62,7 @@ Using conda
 -----------
 
 Regions can be installed with `conda`_ if you have installed
-`Anaconda <https://www.anaconda.com/products/individual>`_ or
+`Anaconda <https://www.anaconda.com/download>`_ or
 `Miniconda <https://docs.conda.io/en/latest/miniconda.html>`_.
 To install Regions using the `conda-forge Anaconda channel
 <https://anaconda.org/conda-forge/regions>`_, run::
