@@ -100,9 +100,8 @@ testpaths = [
     'docs',
 ]
 norecursedirs = [
-    'docs[\\/]_build',
-    'docs[\\/]generated',
-    'regions[\\/]extern',
+    'docs/_build',
+    'extern',
 ]
 astropy_header = true
 doctest_plus = 'enabled'
@@ -112,8 +111,8 @@ xfail_strict = true
 remote_data_strict = true
 filterwarnings = [
     'error',
-    'ignore:numpy\.ufunc size changed:RuntimeWarning',
-    'ignore:numpy\.ndarray size changed:RuntimeWarning',
+    'ignore:numpy.ufunc size changed:RuntimeWarning',
+    'ignore:numpy.ndarray size changed:RuntimeWarning',
     'ignore:unclosed file:ResourceWarning',
     'ignore:distutils Version classes are deprecated:DeprecationWarning',
     # TEMP: remove when matplotlib nightly fixes the row_stack deprecations
