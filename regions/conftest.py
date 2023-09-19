@@ -26,14 +26,10 @@ def pytest_configure(config):
         # Customize the following lines to add/remove entries from the
         # list of packages for which version numbers are displayed when
         # running the tests.
-        PYTEST_HEADER_MODULES['Cython'] = 'Cython'
-        PYTEST_HEADER_MODULES['Numpy'] = 'numpy'
-        PYTEST_HEADER_MODULES['Astropy'] = 'astropy'
-        PYTEST_HEADER_MODULES['Matplotlib'] = 'matplotlib'
-        PYTEST_HEADER_MODULES['Shapely'] = 'shapely'
-        PYTEST_HEADER_MODULES.pop('scipy', None)
-        PYTEST_HEADER_MODULES.pop('Pandas', None)
-        PYTEST_HEADER_MODULES.pop('h5py', None)
+        PYTEST_HEADER_MODULES.clear()
+        deps = ['NumPy', 'Matplotlib', 'Astropy', 'Shapely']
+        for dep in deps:
+            PYTEST_HEADER_MODULES[dep] = dep.lower()
 
         from regions import __version__
         TESTED_VERSIONS['regions'] = __version__
