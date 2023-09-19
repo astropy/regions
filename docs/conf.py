@@ -52,7 +52,7 @@ del intersphinx_mapping['h5py']  # noqa: F405
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns.append('_templates')  # noqa: F405
+# exclude_patterns.append('_templates')
 
 plot_formats = ['png', 'hires.png', 'pdf', 'svg']
 
@@ -66,9 +66,9 @@ project = project_meta['name']
 author = project_meta['authors'][0]['name']
 copyright = f'2015-{datetime.utcnow().year}, {author}'
 
-# The version info for the project you're documenting, acts as replacement for
-# |version| and |release|, also used in various other places throughout the
-# built documents.
+# The version info for the project you're documenting, acts as
+# replacement for |version| and |release|, also used in various other
+# places throughout the built documents.
 __import__(project)
 package = sys.modules[project]
 
@@ -79,11 +79,11 @@ release = package.__version__
 
 # -- Options for HTML output --------------------------------------------------
 # The global astropy configuration uses a custom theme,
-# 'bootstrap-astropy', which is installed along with astropy. A different
-# theme can be used or the options for this theme can be modified by
-# overriding some of the variables set in the global configuration. The
-# variables set in the global configuration are listed below, commented
-# out.
+# 'bootstrap-astropy', which is installed along with astropy. A
+# different theme can be used or the options for this theme can be
+# modified by overriding some of the variables set in the global
+# configuration. The variables set in the global configuration are
+# listed below, commented out.
 
 # Add any paths that contain custom themes here, relative to this
 # directory.
@@ -110,8 +110,8 @@ html_theme_options = {
 # html_logo = ''
 
 # The name of an image file (within the static path) to use as favicon
-# of the docs. This file should be a Windows icon file (.ico) being 16x16
-# or 32x32 pixels large.
+# of the docs. This file should be a Windows icon file (.ico) being
+# 16x16 or 32x32 pixels large.
 # html_favicon = ''
 
 # A "Last built" timestamp is inserted at every page bottom, using the
@@ -177,7 +177,6 @@ linkcheck_retry = 5
 linkcheck_ignore = ['http://data.astropy.org',
                     r'https://github\.com/astropy/regions/(?:issues|pull)/\d+']
 linkcheck_timeout = 180
-linkcheck_anchors = False
 
 # -- Matplotlib plot defaults -------------------------------------------------
 plot_rcparams = {'savefig.bbox': 'tight',
@@ -189,5 +188,4 @@ plot_rcparams = {'savefig.bbox': 'tight',
                  'figure.titlesize': 11,
                  'figure.subplot.wspace': 0.23,
                  'figure.subplot.hspace': 0.23}
-
 plot_apply_rcparams = True
