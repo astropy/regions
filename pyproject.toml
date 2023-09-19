@@ -30,8 +30,8 @@ dependencies = [
 ]
 
 [project.urls]
-homepage = 'https://github.com/astropy/regions'
-documentation = 'https://astropy-regions.readthedocs.io/en/stable/'
+Homepage = 'https://github.com/astropy/regions'
+Documentation = 'https://astropy-regions.readthedocs.io/en/stable/'
 
 [project.optional-dependencies]
 all = [
@@ -53,8 +53,7 @@ requires = [
     'setuptools>=61.2',
     'setuptools_scm>=6.2',
     'cython>=0.29.36',
-    'numpy<1.26.0b1; python_version<"3.12"',
-    'numpy>=1.26.0b1; python_version>="3.12"',
+    'numpy',
     'extension-helpers',
 ]
 build-backend = 'setuptools.build_meta'
@@ -115,8 +114,6 @@ filterwarnings = [
     'ignore:numpy.ndarray size changed:RuntimeWarning',
     'ignore:unclosed file:ResourceWarning',
     'ignore:distutils Version classes are deprecated:DeprecationWarning',
-    # TEMP: remove when matplotlib nightly fixes the row_stack deprecations
-    'ignore:`row_stack` alias is deprecated:DeprecationWarning',
 ]
 markers = [
     'array_compare'
