@@ -27,6 +27,10 @@ class Regions:
     def __init__(self, regions=(), /):
         if regions == ():
             regions = []
+        for item in regions:
+            if not isinstance(item, Region):
+                raise TypeError('Input regions must be a list of Region '
+                                'objects')
         self.regions = regions
 
     def __getitem__(self, index):
