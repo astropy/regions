@@ -61,6 +61,8 @@ class Regions:
         region : `~regions.Region`
             The region to append.
         """
+        if not isinstance(region, Region):
+            raise TypeError('Input region must be a Region object')
         self.regions.append(region)
 
     def extend(self, regions):
@@ -76,6 +78,10 @@ class Regions:
         if isinstance(regions, Regions):
             self.regions.extend(regions.regions)
         else:
+            for item in regions:
+                if not isinstance(item, Region):
+                    raise TypeError('Input regions must be a list of Region '
+                                    'objects')
             self.regions.extend(regions)
 
     def insert(self, index, region):
