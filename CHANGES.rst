@@ -13,11 +13,20 @@ General
 New Features
 ------------
 
+- The ``Regions`` class can now be initialized without any arguments.
+  [#527]
+
+- The ``Regions`` ``extend`` method now can accept another ``Regions``
+  object as input. [#527]
+
 Bug Fixes
 ---------
 
 API Changes
 -----------
+
+- The ``Regions`` class and its ``append`` and ``extend`` methods now
+  raise a ``TypeError`` for invalid inputs. [#527]
 
 
 0.7 (2022-10-27)
