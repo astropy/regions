@@ -66,10 +66,13 @@ class Regions:
 
         Parameters
         ----------
-        regions : list of `~regions.Region`
-            A list of regions to include.
+        regions : `~regions.Regions` or list of `~regions.Region`
+            A `~regions.Regions` object or a list of regions to include.
         """
-        self.regions.extend(regions)
+        if isinstance(regions, Regions):
+            self.regions.extend(regions.regions)
+        else:
+            self.regions.extend(regions)
 
     def insert(self, index, region):
         """
