@@ -24,7 +24,13 @@ class Regions:
         The list of region objects.
     """
 
-    def __init__(self, regions):
+    def __init__(self, regions=(), /):
+        if regions == ():
+            regions = []
+        for item in regions:
+            if not isinstance(item, Region):
+                raise TypeError('Input regions must be a list of Region '
+                                'objects')
         self.regions = regions
 
     def __getitem__(self, index):
@@ -55,6 +61,8 @@ class Regions:
         region : `~regions.Region`
             The region to append.
         """
+        if not isinstance(region, Region):
+            raise TypeError('Input region must be a Region object')
         self.regions.append(region)
 
     def extend(self, regions):
@@ -64,10 +72,17 @@ class Regions:
 
         Parameters
         ----------
-        regions : list of `~regions.Region`
-            A list of regions to include.
+        regions : `~regions.Regions` or list of `~regions.Region`
+            A `~regions.Regions` object or a list of regions to include.
         """
-        self.regions.extend(regions)
+        if isinstance(regions, Regions):
+            self.regions.extend(regions.regions)
+        else:
+            for item in regions:
+                if not isinstance(item, Region):
+                    raise TypeError('Input regions must be a list of Region '
+                                    'objects')
+            self.regions.extend(regions)
 
     def insert(self, index, region):
         """
