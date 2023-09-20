@@ -24,7 +24,9 @@ class Regions:
         The list of region objects.
     """
 
-    def __init__(self, regions):
+    def __init__(self, regions=(), /):
+        if regions == ():
+            regions = []
         self.regions = regions
 
     def __getitem__(self, index):
