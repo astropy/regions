@@ -113,7 +113,8 @@ filterwarnings = [
     'ignore:numpy.ufunc size changed:RuntimeWarning',
     'ignore:numpy.ndarray size changed:RuntimeWarning',
     'ignore:unclosed file:ResourceWarning',
-    'ignore:distutils Version classes are deprecated:DeprecationWarning',
+    # python 3.12 deprecation in matplotlib 3.9dev
+    'ignore:datetime.datetime.utcfromtimestamp\(\) is deprecated:DeprecationWarning',
 ]
 markers = [
     'array_compare'
