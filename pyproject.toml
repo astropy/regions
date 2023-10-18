@@ -115,6 +115,8 @@ filterwarnings = [
     'ignore:unclosed file:ResourceWarning',
     # python 3.12 deprecation in matplotlib 3.9dev
     'ignore:datetime.datetime.utcfromtimestamp\(\) is deprecated:DeprecationWarning',
+    # NumPy 2.0dev deprecations
+    "ignore:.*numpy\\.core.*:DeprecationWarning",
 ]
 markers = [
     'array_compare'
