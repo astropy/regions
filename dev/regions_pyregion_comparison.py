@@ -27,7 +27,7 @@ from regions import DS9RegionParserError, read_ds9
 TEST_FILE_DIR = Path('../regions/io/ds9/tests/data')
 REPETITIONS = 1
 
-p_region_count = re.compile(r"[^=\)]\(")
+p_region_count = re.compile(r'[^=\)]\(')
 
 results = list()
 

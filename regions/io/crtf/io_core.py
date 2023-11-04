@@ -205,9 +205,9 @@ class _ShapeList(list):
             if 'range' in shape.meta:
                 shape.meta['range'] = [str(str(x).replace(' ', '')) for x in
                                        shape.meta['range']]
-                meta_str += f", range={shape.meta['range']}".replace("'", "")
+                meta_str += f", range={shape.meta['range']}".replace("'", '')
             if 'corr' in shape.meta:
-                meta_str += f", corr={shape.meta['corr']}".replace("'", "")
+                meta_str += f", corr={shape.meta['corr']}".replace("'", '')
 
             coord = []
             if coordsys not in ['image', 'physical']:
@@ -233,7 +233,7 @@ class _ShapeList(list):
             if shape.region_type == 'polygon':
                 vals = [f'[{x:{fmt}}deg, {y:{fmt}}deg]'
                         for x, y in zip(coord[::2], coord[1::2])]
-                coord = ", ".join(vals)
+                coord = ', '.join(vals)
                 line = crtf_strings['polygon'].format(include, coord)
 
             elif shape.region_type == 'point':
@@ -256,9 +256,9 @@ class _ShapeList(list):
                 line = crtf_strings[shape.region_type].format(include, *coord)
 
             if meta_str.strip():
-                output += f"{line}, {meta_str}\n"
+                output += f'{line}, {meta_str}\n'
             else:
-                output += f"{line}\n"
+                output += f'{line}\n'
 
         return output
 
@@ -446,7 +446,7 @@ class _Shape:
         elif isinstance(coords[0], PixCoord):
             reg = self.shape_to_pixel_region[self.region_type](*coords)
         else:
-            self._raise_error("No central coordinate")
+            self._raise_error('No central coordinate')
 
         reg.visual = RegionVisual()
         reg.meta = RegionMeta()
@@ -454,7 +454,7 @@ class _Shape:
         # both 'text' and 'label' should be set to the same value, where
         # we default to the 'text' value since that is the one used by
         # ds9 regions
-        label = self.meta.get('text', self.meta.get('label', ""))
+        label = self.meta.get('text', self.meta.get('label', ''))
         if label != '':
             reg.meta['label'] = label
         for key in self.meta:

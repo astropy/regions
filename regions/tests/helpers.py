@@ -21,7 +21,7 @@ def make_simple_wcs(skycoord, resolution, size):
     wcs.wcs.crpix = [crpix, crpix]
     wcs.wcs.cdelt = np.array([-cdelt, cdelt])
     wcs.wcs.crval = [ra, dec]
-    wcs.wcs.ctype = ["RA---TAN", "DEC--TAN"]
+    wcs.wcs.ctype = ['RA---TAN', 'DEC--TAN']
 
     return wcs
 

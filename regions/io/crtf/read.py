@@ -492,7 +492,7 @@ class _CRTFCoordinateParser:
         unit = u.deg
         if len(string_rep.split('.')) >= 3:
             string_rep = string_rep.replace('.', ':', 2)
-        elif string_rep.count(":") == 2:
+        elif string_rep.count(':') == 2:
             unit = u.hour
 
         return Angle(string_rep, unit)
