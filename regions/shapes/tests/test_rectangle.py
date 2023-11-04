@@ -73,7 +73,7 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
         assert reg.center.xy == (3, 4)
         assert reg.width == 4
         assert reg.height == 3
-        assert_allclose(reg.angle.to_value("deg"), 5)
+        assert_allclose(reg.angle.to_value('deg'), 5)
         assert reg.meta == self.meta
         assert reg.visual == self.visual
 

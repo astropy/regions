@@ -3,7 +3,7 @@ ci:
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v4.5.0
     hooks:
       - id: check-added-large-files
         # Prevent giant files from being committed.
@@ -29,6 +29,8 @@ repos:
         # source.
       - id: detect-private-key
         # Checks for the existence of private keys.
+      - id: double-quote-string-fixer
+        # Replace double-quoted strings with single-quoted strings.
       - id: end-of-file-fixer
         # Makes sure files end in a newline and only a newline.
         exclude: ".*(svg.*|extern.*|pkl.*|reg.*)$"
@@ -52,7 +54,7 @@ repos:
         # Enforce that all noqa annotations always occur with specific codes.
 
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.11.1
+    rev: v3.15.0
     hooks:
       - id: pyupgrade
         args: ["--py39-plus"]

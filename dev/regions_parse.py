@@ -21,7 +21,7 @@ def cli():
 
 @cli.command('list-files')
 def list_files():
-    print("Available files")
+    print('Available files')
     for ffile in TEST_FILE_DIR.glob('*.reg'):
         print(ffile.parts[-1])
 

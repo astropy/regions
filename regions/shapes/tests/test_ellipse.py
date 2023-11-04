@@ -44,7 +44,7 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
         assert reg.center.xy == (3, 4)
         assert reg.width == 4
         assert reg.height == 3
-        assert_allclose(reg.angle.to_value("deg"), 5)
+        assert_allclose(reg.angle.to_value('deg'), 5)
         assert reg.meta == self.meta
         assert reg.visual == self.visual
 
@@ -76,7 +76,7 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
     def test_rotate(self):
         reg = self.reg.rotate(PixCoord(2, 3), 90 * u.deg)
         assert_allclose(reg.center.xy, (1, 4))
-        assert_allclose(reg.angle.to_value("deg"), 95)
+        assert_allclose(reg.angle.to_value('deg'), 95)
 
     def test_eq(self):
         reg = self.reg.copy()
@@ -286,9 +286,9 @@ class TestEllipseSkyRegion(BaseTestSkyRegion):
     def test_copy(self):
         reg = self.reg.copy()
         assert_allclose(reg.center.ra.deg, 3)
-        assert_allclose(reg.width.to_value("deg"), 4)
-        assert_allclose(reg.height.to_value("deg"), 3)
-        assert_allclose(reg.angle.to_value("deg"), 5)
+        assert_allclose(reg.width.to_value('deg'), 4)
+        assert_allclose(reg.height.to_value('deg'), 3)
+        assert_allclose(reg.angle.to_value('deg'), 5)
         assert reg.meta == self.meta
         assert reg.visual == self.visual
 

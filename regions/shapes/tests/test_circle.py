@@ -95,7 +95,7 @@ class TestCircleSkyRegion(BaseTestSkyRegion):
     def test_copy(self):
         reg = self.reg.copy()
         assert_allclose(reg.center.ra.deg, 3)
-        assert_allclose(reg.radius.to_value("arcsec"), 2)
+        assert_allclose(reg.radius.to_value('arcsec'), 2)
         assert reg.meta == self.meta
         assert reg.visual == self.visual
 

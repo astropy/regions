@@ -86,7 +86,7 @@ def test_valid_region_syntax():
         Regions.parse(reg_str1, format='crtf')
 
     estr = ("Not in proper format: ('2.3arcsec', '4.5arcsec') should be "
-            "a single length")
+            'a single length')
     assert estr in str(excinfo.value)
 
     reg_str2 = ('symbol[[32.1423deg, 12.1412deg], 12deg], linewidth=2, '
@@ -153,8 +153,8 @@ def test_file_crtf(filename, outname, coordsys, fmt):
 
     # since metadata is not required to preserve order, we have to do a more
     # complex comparison
-    desired_lines = [set(line.split(",")) for line in ref_output.split("\n")]
-    actual_lines = [set(line.split(",")) for line in actual_output.split("\n")]
+    desired_lines = [set(line.split(',')) for line in ref_output.split('\n')]
+    actual_lines = [set(line.split(',')) for line in actual_output.split('\n')]
     for split_line in actual_lines:
         assert split_line in desired_lines
 

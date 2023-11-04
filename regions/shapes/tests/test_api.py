@@ -122,11 +122,11 @@ def test_attribute_validation_pixel_regions(region):
     invalid_values = dict(center=[PixCoord([1, 2], [2, 3]), 1,
                                   SkyCoord(1 * u.deg, 2 * u.deg),
                                   (10, 10), (10 * u.deg, 10 * u.deg)],
-                          radius=[u.Quantity("1deg"), [1], PixCoord(1, 2),
+                          radius=[u.Quantity('1deg'), [1], PixCoord(1, 2),
                                   3 * u.km, 0.0, -10.],
                           angle=[u.Quantity([1 * u.deg, 2 * u.deg]), 2,
                                  PixCoord(1, 2), 3 * u.km],
-                          vertices=[u.Quantity("1"), 2, PixCoord(1, 2),
+                          vertices=[u.Quantity('1'), 2, PixCoord(1, 2),
                                     PixCoord([[1, 2]], [[2, 3]]), 3 * u.km,
                                     (10, 10), (10 * u.deg, 10 * u.deg)])
     invalid_values['width'] = invalid_values['radius']
@@ -158,7 +158,7 @@ def test_attribute_validation_sky_regions(region):
                                   1, 3 * u.km, 0.0 * u.deg, -10. * u.deg],
                           angle=[u.Quantity([1 * u.deg, 2 * u.deg]), 2,
                                  SkyCoord(1 * u.deg, 2 * u.deg), 3. * u.km],
-                          vertices=[u.Quantity("1deg"), 2,
+                          vertices=[u.Quantity('1deg'), 2,
                                     SkyCoord(1 * u.deg, 2 * u.deg),
                                     SkyCoord([[1 * u.deg, 2 * u.deg]],
                                              [[2 * u.deg, 3 * u.deg]]),
