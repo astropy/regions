@@ -93,7 +93,7 @@ Here are what the region masks produced by different modes look like:
 
 As we've seen above, the :class:`~regions.RegionMask` object has a
 ``data`` attribute that contains a Numpy array with the mask values.
-However, if you have, for example, a small circluar region with a radius
+However, if you have, for example, a small circular region with a radius
 of 3 pixels at a pixel position of (1000, 1000), it would be inefficient
 to store a large mask array that has a size to cover this position (most
 of the mask values would be zero). Instead, we store the mask using

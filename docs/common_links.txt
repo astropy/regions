@@ -2,7 +2,7 @@
 .. (and docstrings) because they are added to ``docs/conf.py::rst_epilog``.
 
 .. ------------------------------------------------------------------
-.. RST SUBSITUTIONS
+.. RST SUBSTITUTIONS
 
 .. NumPy
 .. |ndarray| replace:: :class:`numpy.ndarray`

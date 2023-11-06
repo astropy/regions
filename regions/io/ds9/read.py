@@ -310,7 +310,7 @@ def _parse_metadata(metadata_str):
     Returns
     -------
     metadata : dict
-        The reigon metadata as a dictionary.
+        The region metadata as a dictionary.
     """
     # {.*?}    # all chars in curly braces
     # \'.*?\'  # all chars in single quotes
