@@ -78,7 +78,7 @@ namespaces = false
 'regions' = [
     'CITATION.rst',
 ]
-'regions.shape.tests' = [
+'regions.shapes.tests' = [
     'reference/*.txt',
     'data/*.fits',
 ]
