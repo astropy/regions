@@ -78,7 +78,7 @@ namespaces = false
 'regions' = [
     'CITATION.rst',
 ]
-'regions.shape.tests' = [
+'regions.shapes.tests' = [
     'reference/*.txt',
     'data/*.fits',
 ]
@@ -105,7 +105,7 @@ norecursedirs = [
 astropy_header = true
 doctest_plus = 'enabled'
 text_file_format = 'rst'
-addopts = '--color=yes --doctest-rst'
+addopts = '--color=yes --doctest-rst --arraydiff'
 xfail_strict = true
 remote_data_strict = true
 filterwarnings = [
