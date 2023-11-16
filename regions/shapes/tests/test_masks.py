@@ -42,7 +42,7 @@ def label(value):
                         for key, value in sorted(value.items()))
 
 
-@pytest.mark.array_compare(fmt='text', write_kwargs={'fmt': '%12.8e'})
+@pytest.mark.array_compare(file_format='text', write_kwargs={'fmt': '%12.8e'})
 @pytest.mark.parametrize(('region', 'mode'),
                          itertools.product(REGIONS, MODES), ids=label)
 def test_to_mask(region, mode):
