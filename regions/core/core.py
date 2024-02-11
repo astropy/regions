@@ -338,6 +338,26 @@ class PixelRegion(Region):
         """
         raise NotImplementedError
 
+    def to_boolean_array(self, shape):
+        """
+        Return a boolean array of the given shape with the region applied as a mask. In the output array, pixels that are within the region are equal to True and pixels that are outside the region are equal to False.
+
+        Parameters
+        ----------
+        shape : 2-tuple of int
+            The shape of the output array
+
+        Returns
+        -------
+        mask : `~numpy.ndarray` of dtype bool
+            A boolean array of the given shape with True for pixels within the region and False for pixels outside it.
+        """
+
+        if len(shape) != 2:
+            raise ValueError('input shape must have 2 elements.')
+
+        return self.to_mask().to_image(shape).astype(bool)
+
     @staticmethod
     def _validate_mode(mode, subpixels):
         valid_modes = ('center', 'exact', 'subpixels')
