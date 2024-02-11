@@ -278,3 +278,27 @@ class Regions:
         """
         return RegionsRegistry.serialize(self.regions, self.__class__,
                                          format=format, **kwargs)
+
+    def to_boolean_array(self, shape):
+        """
+        Return a boolean array of the given shape with all regions applied as masks. In the output array, pixels that are within the regions are equal to True and pixels that are outside the regions are equal to False.
+
+        Parameters
+        ----------
+        shape : 2-tuple of int
+            The shape of the output array
+
+        Returns
+        -------
+        mask : `~numpy.ndarray` of dtype bool
+            A boolean array of the given shape with True for pixels within the regions and False for pixels outside them.
+        """
+
+        # No need to check for correct shape of parameter 'shape'. This is done for each region individually.
+        # We need to apply a logical_or on all boolean arrays by looping.
+        out_arr = self.regions[0].to_boolean_array(shape)
+
+        for region in self.regions[1:]:
+            out_arr = out_arr | region.to_boolean_array(shape)
+
+        return out_arr
