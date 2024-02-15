@@ -494,3 +494,28 @@ class SkyRegion(Region):
             A pixel region.
         """
         raise NotImplementedError
+
+    def to_boolean_array(self, wcs, shape):
+        """
+        Return a boolean array of the given shape with the region applied as a mask. In the output array, pixels that are within the region are equal to True and pixels that are outside the region are equal to False.
+
+        .. note::
+            This method is similar to calling first :py:meth:`SkyRegion.to_pixel` and then :py:meth:`PixelRegion.to_boolean_array`.
+
+        Parameters
+        ----------
+        wcs : `~astropy.wcs.WCS`
+            The world coordinate system transformation to use to convert
+            between sky and pixel coordinates.
+        shape : 2-tuple of int
+            The shape of the output array.
+
+
+        Returns
+        -------
+        mask : `~numpy.ndarray` of dtype bool
+            A boolean array of the given shape with True for pixels within the region and False for pixels outside it.
+        """
+
+        # No need to perform checks because to_pixel and to_boolean_array will take care of them
+        return self.to_pixel(wcs).to_boolean_array(shape)
