@@ -17,7 +17,8 @@ from numpy.testing import assert_allclose, assert_equal
 from regions._utils.optional_deps import HAS_MATPLOTLIB
 from regions.core import PixCoord, Regions, RegionVisual
 from regions.shapes import (CirclePixelRegion, CircleSkyRegion,
-                            PointPixelRegion, RegularPolygonPixelRegion)
+                            PointPixelRegion, RegularPolygonPixelRegion,
+                            TextPixelRegion)
 from regions.tests.helpers import assert_region_allclose
 
 
@@ -51,6 +52,22 @@ def test_serialize():
                 'circle(42.0000,43.0000,3.0000)\n')
     actual = region.serialize(format='ds9', precision=4)
     assert actual == expected
+
+
+def test_serialize_parse_text():
+    """
+    Test serialization of Text region.
+    """
+    text = 'Example Text'
+    region = TextPixelRegion(PixCoord(42, 43), text=text)
+    expected = ('# Region file format: DS9 astropy/regions\nglobal '
+                f'text={{{text}}}\nimage\ntext(43.0000,44.0000)\n')
+    actual = region.serialize(format='ds9', precision=4)
+    assert actual == expected
+
+    reg = Regions.parse(actual, format='ds9')[0]
+    assert reg.text == text
+    assert 'text' not in reg.meta
 
 
 def test_parse():

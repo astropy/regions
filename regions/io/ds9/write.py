@@ -157,7 +157,7 @@ def _get_region_params(region, shape_template, precision=8):
 
     param = {}
     for param_name in region._params:
-        if param_name in ('text'):
+        if param_name in ('text',):
             continue
 
         value = getattr(region, param_name)

@@ -22,6 +22,10 @@ New Features
 Bug Fixes
 ---------
 
+- Fixed a bug where the text string of ``TextPixelRegion`` and
+  ``TextSkyRegion`` was dropped when serializing or writing
+  to a DS9 file. [#548]
+
 API Changes
 -----------
 
