@@ -657,10 +657,12 @@ def _make_region(region_data):
 
     regions = []
     for shape_params in region_params:
-        # for Text region, we need to add meta['text'] to params;
-        # set to '' if the text meta value was not specified
+        # for Text region, we need to add meta['text'] to params and
+        # remove it from meta; set to '' if the text meta value was not
+        # specified
         if shape == 'text':
             shape_params.append(region_data.raw_meta.get('text', ''))
+            meta.pop('text', None)
 
         region = ds9_shape_to_region[region_type][shape](*shape_params)
 
