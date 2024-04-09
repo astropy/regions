@@ -35,7 +35,7 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            python: '3.11'
+            python: '3.12'
             tox_env: 'linkcheck'
             allow_failure: false
             prefix: ''
@@ -68,7 +68,7 @@ jobs:
       run: tox -e ${{ matrix.tox_env }} -- ${{ matrix.toxposargs }}
     - name: Upload coverage to codecov
       if: ${{ contains(matrix.tox_env, '-cov') }}
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         files: ./coverage.xml
         verbose: true

@@ -23,10 +23,10 @@ classifiers = [
     'Topic :: Scientific/Engineering :: Astronomy',
 ]
 dynamic = ['version']
-requires-python = '>=3.9'
+requires-python = '>=3.10'
 dependencies = [
-    'numpy>=1.22',
-    'astropy>=5.0',
+    'numpy>=1.23',
+    'astropy>=5.1',
 ]
 
 [project.urls]
@@ -40,11 +40,11 @@ all = [
 ]
 test = [
     'pytest-arraydiff',
-    'pytest-astropy>=0.10',
+    'pytest-astropy>=0.11',
 ]
 docs = [
     'regions[all]',
-    'sphinx-astropy>=1.6',
+    'sphinx-astropy>=1.9',
     'tomli; python_version < "3.11"',
 ]
 
