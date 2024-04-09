@@ -6,6 +6,14 @@ General
 
 - Added support for NumPy 2.0.
 
+- The minimum required Python is now 3.10. [#547]
+
+- The minimum required NumPy is now 1.23. [#547]
+
+- The minimum required pytest-astropy is now 0.11. [#547]
+
+- The minimum required sphinx-astropy is now 1.9. [#547]
+
 New Features
 ------------
 
