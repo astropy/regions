@@ -4,6 +4,8 @@
 General
 -------
 
+- Added support for NumPy 2.0.
+
 New Features
 ------------
 
