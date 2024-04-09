@@ -40,12 +40,12 @@ class RegionMask:
         self.bbox = bbox
         self._mask = (self.data == 0)
 
-    def __array__(self):
+    def __array__(self, dtype=None, copy=None):
         """
         Array representation of the mask data array (e.g., for
         matplotlib).
         """
-        return self.data
+        return np.asarray(self.data, dtype=dtype)
 
     @property
     def shape(self):
@@ -82,7 +82,7 @@ class RegionMask:
         """
         return self.bbox.get_overlap_slices(shape)
 
-    def to_image(self, shape):
+    def to_image(self, shape, dtype=float):
         """
         Return an image of the mask in a 2D array of the given shape,
         taking any edge effects into account.
@@ -91,6 +91,13 @@ class RegionMask:
         ----------
         shape : tuple of int
             The ``(ny, nx)`` shape of the output array.
+
+        dtype : data-type, optional
+            The desired data type for the array. This should be a
+            floating data type if the `RegionMask` was created with the
+            "exact" or "subpixel" mode, otherwise the fractional mask
+            weights will be altered. A integer data type may be used if
+            the `RegionMask` was created with the "center" mode.
 
         Returns
         -------
@@ -107,11 +114,11 @@ class RegionMask:
             return None  # no overlap
 
         # insert the mask into the output image
-        image = np.zeros(shape)
+        image = np.zeros(shape, dtype=dtype)
         image[slices_large] = self.data[slices_small]
         return image
 
-    def cutout(self, data, fill_value=0., copy=False):
+    def cutout(self, data, fill_value=0.0, copy=False):
         """
         Create a cutout from the input data over the mask bounding box,
         taking any edge effects into account.
@@ -161,9 +168,7 @@ class RegionMask:
         if cutout_shape == self.shape:
             cutout = data[slices_large]
             if copy:
-                # NOTE: np.copy() doesn't work with Quantity for
-                # astropy 3.2.3
-                cutout = cutout.copy()
+                cutout = np.copy(cutout)
             return cutout
 
         # cutout is always a copy for partial overlap
@@ -180,7 +185,7 @@ class RegionMask:
 
         return cutout
 
-    def multiply(self, data, fill_value=0.):
+    def multiply(self, data, fill_value=0.0):
         """
         Multiply the region mask with the input data, taking any edge
         effects into account.
@@ -220,6 +225,61 @@ class RegionMask:
 
             return weighted_cutout
 
+    def _get_overlap_cutouts(self, shape, mask=None):
+        """
+        Get the aperture mask weights, pixel mask, and slice for the
+        overlap with the input shape.
+
+        If input, the ``mask`` is included in the output pixel mask
+        cutout.
+
+        Parameters
+        ----------
+        shape : tuple of int
+            The shape of data.
+
+        mask : array_like (bool), optional
+            A boolean mask with the same shape as ``shape`` where a
+            `True` value indicates a masked pixel.
+
+        Returns
+        -------
+        slices_large : tuple of slices or `None`
+            A tuple of slice objects for each axis of the large array
+            of given ``shape``, such that ``large_array[slices_large]``
+            extracts the region of the large array that overlaps with
+            the small array. `None` is returned if there is no overlap
+            of the bounding box with the given image shape.
+
+        aper_weights: 2D float `~numpy.ndarray`
+            The cutout aperture mask weights for the overlap.
+
+        pixel_mask: 2D bool `~numpy.ndarray`
+            The cutout pixel mask for the overlap.
+
+        Notes
+        -----
+        This method is separate from ``get_values`` to facilitate
+        applying the same slices, aper_weights, and pixel_mask to
+        multiple associated arrays (e.g., data and error arrays). It is
+        used in this way by the `PixelAperture.do_photometry` method.
+        """
+        if mask is not None:
+            if mask.shape != shape:
+                raise ValueError('mask and data must have the same shape')
+
+        slc_large, slc_small = self.get_overlap_slices(shape)
+        if slc_large is None:  # no overlap
+            return None, None, None
+
+        aper_weights = self.data[slc_small]
+        pixel_mask = (aper_weights > 0)  # good pixels
+
+        if mask is not None:
+            pixel_mask &= ~mask[slc_large]
+
+        return slc_large, aper_weights, pixel_mask
+
     def get_values(self, data, mask=None):
         """
         Get the mask-weighted pixel values from the data as a 1D array.
@@ -246,19 +306,15 @@ class RegionMask:
             input ``data``, the result will be an empty array with shape
             (0,).
         """
-        slc_large, slc_small = self.get_overlap_slices(data.shape)
+        slc_large, aper_weights, pixel_mask = self._get_overlap_cutouts(
+            data.shape, mask=mask)
+
         if slc_large is None:
             return np.array([])
-        cutout = data[slc_large]
-        region_mask = self.data[slc_small]
-        pixel_mask = (region_mask > 0)  # good pixels
-
-        if mask is not None:
-            if mask.shape != data.shape:
-                raise ValueError('mask and data must have the same shape')
-            pixel_mask &= ~mask[slc_large]
 
         # ignore multiplication with non-finite data values
         with warnings.catch_warnings():
             warnings.simplefilter('ignore', RuntimeWarning)
-            return (cutout * region_mask)[pixel_mask]
+            # pixel_mask is used so that pixels value where data = 0 and
+            # aper_weights != 0 are still returned
+            return (data[slc_large] * aper_weights)[pixel_mask]
