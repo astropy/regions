@@ -1,4 +1,4 @@
-0.9 (unreleased)
+0.9 (2024-04-12)
 ================
 
 General
@@ -16,18 +16,12 @@ General
 
 - The minimum required sphinx-astropy is now 1.9. [#547]
 
-New Features
-------------
-
 Bug Fixes
 ---------
 
 - Fixed a bug where the text string of ``TextPixelRegion`` and
   ``TextSkyRegion`` was dropped when serializing or writing
   to a DS9 file. [#548]
-
-API Changes
------------
 
 
 0.8 (2023-11-16)
