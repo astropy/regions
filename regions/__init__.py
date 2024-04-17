@@ -4,14 +4,15 @@ Regions is Astropy coordinated package to provide tools for region
 handling.
 """
 
-# Affiliated packages may add whatever they like to this file, but
-# should keep this content at the top.
-from ._astropy_init import *  # noqa: F401, F403
-
 from ._utils.examples import *  # noqa: F401, F403
 from .core import *  # noqa: F401, F403
 from .io import *  # noqa: F401, F403
 from .shapes import *  # noqa: F401, F403
+
+try:
+    from .version import version as __version__
+except ImportError:
+    __version__ = ''
 
 
 # Set the bibtex entry to the article referenced in CITATION.rst.
