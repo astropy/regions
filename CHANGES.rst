@@ -13,6 +13,9 @@ Bug Fixes
 API Changes
 -----------
 
+- The ``regions.test`` function has been removed. Instead use the
+  ``pytest --pyarg regions`` command. [#1725]
+
 
 0.9 (2024-04-12)
 ================
