@@ -15,6 +15,7 @@
 import os
 import sys
 from datetime import datetime, timezone
+from importlib import metadata
 from pathlib import Path
 
 if sys.version_info < (3, 11):
@@ -32,8 +33,7 @@ except ImportError:
 
 # Get configuration information from pyproject.toml
 with (Path(__file__).parents[1] / 'pyproject.toml').open('rb') as fh:
-    conf = tomllib.load(fh)
-    project_meta = conf['project']
+    project_meta = tomllib.load(fh)['project']
 
 # -- General configuration ----------------------------------------------------
 # By default, highlight as Python 3.
@@ -43,8 +43,10 @@ highlight_language = 'python3'
 needs_sphinx = '3.0'
 
 # Extend astropy intersphinx_mapping with packages we use here
-intersphinx_mapping['photutils'] = ('https://photutils.readthedocs.io/en/stable/', None)  # noqa: F405
-# intersphinx_mapping['shapely'] = ('https://shapely.readthedocs.io/en/stable/', None)
+intersphinx_mapping.update(  # noqa: F405
+    {'photutils': ('https://photutils.readthedocs.io/en/stable/', None),
+     # 'shapely': ('https://shapely.readthedocs.io/en/stable/', None),
+     })
 
 # Exclude astropy intersphinx_mapping for unused packages
 del intersphinx_mapping['scipy']  # noqa: F405
@@ -64,18 +66,16 @@ with open('common_links.txt') as fh:
 # -- Project information ------------------------------------------------------
 project = project_meta['name']
 author = project_meta['authors'][0]['name']
-copyright = f'2015-{datetime.now(tz=timezone.utc).year}, {author}'
+project_copyright = f'2015-{datetime.now(tz=timezone.utc).year}, {author}'
+github_project = 'astropy/regions'
 
 # The version info for the project you're documenting, acts as
 # replacement for |version| and |release|, also used in various other
 # places throughout the built documents.
-__import__(project)
-package = sys.modules[project]
-
+release = metadata.version(project)
 # The short X.Y version.
-version = package.__version__.split('-', 1)[0]
-# The full version, including alpha/beta/rc tags.
-release = package.__version__
+version = '.'.join(release.split('.')[:2])
+dev = 'dev' in release
 
 # -- Options for HTML output --------------------------------------------------
 # The global astropy configuration uses a custom theme,
@@ -129,6 +129,23 @@ htmlhelp_basename = project + 'doc'
 # html_static_path = ['_static']
 # html_style = 'regions.css'
 
+# Set canonical URL from the Read the Docs Domain
+html_baseurl = os.environ.get('READTHEDOCS_CANONICAL_URL', '')
+
+# A dictionary of values to pass into the template engine's context for
+# all pages.
+html_context = {
+    'default_mode': 'light',
+    'to_be_indexed': ['stable', 'latest'],
+    'is_development': dev,
+    'github_user': 'astropy',
+    'github_repo': 'regions',
+    'github_version': 'main',
+    'doc_path': 'docs',
+    # Tell Jinja2 templates the build is running on Read the Docs
+    'READTHEDOCS': os.environ.get('READTHEDOCS', '') == 'True',
+}
+
 # -- Options for LaTeX output -------------------------------------------------
 # Grouping the document tree into LaTeX files. List of tuples (source
 # start file, target name, title, author, documentclass [howto/manual]).
@@ -143,7 +160,6 @@ man_pages = [('index', project.lower(), project + ' Documentation',
               [author], 1)]
 
 # -- Resolving issue number to links in changelog -----------------------------
-github_project = conf['tool']['build-sphinx']['github_project']
 github_issues_url = f'https://github.com/{github_project}/issues/'
 
 # -- Turn on nitpicky mode for sphinx (to warn about references not found) ----
