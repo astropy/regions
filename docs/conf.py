@@ -43,8 +43,10 @@ highlight_language = 'python3'
 needs_sphinx = '3.0'
 
 # Extend astropy intersphinx_mapping with packages we use here
-intersphinx_mapping['photutils'] = ('https://photutils.readthedocs.io/en/stable/', None)  # noqa: F405
-# intersphinx_mapping['shapely'] = ('https://shapely.readthedocs.io/en/stable/', None)
+intersphinx_mapping.update(  # noqa: F405
+    {'photutils': ('https://photutils.readthedocs.io/en/stable/', None),
+     # 'shapely': ('https://shapely.readthedocs.io/en/stable/', None),
+     })
 
 # Exclude astropy intersphinx_mapping for unused packages
 del intersphinx_mapping['scipy']  # noqa: F405
