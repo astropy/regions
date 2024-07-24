@@ -15,12 +15,6 @@ package.
 * Code : `GitHub repository`_
 * Contributors : https://github.com/astropy/regions/graphs/contributors
 
-.. warning::
-    This ``regions`` package is still in an early stage of development. It
-    is not yet feature complete but API should be stable enough by now. That said, please
-    have a look and try to use it for your applications. Feedback and
-    contributions are welcome!
-
 
 Getting Started
 ===============
