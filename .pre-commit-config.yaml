@@ -57,8 +57,7 @@ repos:
     rev: "v0.4.7"
     hooks:
       - id: ruff
-      # args: ["--fix", "--show-fixes"]
-        args: ["--show-fixes"]
+        args: ["--fix", "--show-fixes"]
 
   - repo: https://github.com/asottile/pyupgrade
     rev: v3.17.0
@@ -101,6 +100,11 @@ repos:
         args: ["--write-changes",  "--ignore-words-list", "exten"]
         additional_dependencies:
           - tomli
+
+  - repo: https://github.com/numpy/numpydoc
+    rev: v1.8.0rc2
+    hooks:
+      - id: numpydoc-validation
 
   - repo: https://github.com/PyCQA/docformatter
     rev: v1.7.5
