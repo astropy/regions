@@ -218,7 +218,7 @@ class RectanglePixelRegion(PixelRegion):
     def as_mpl_selector(self, ax, active=True, sync=True, callback=None,
                         **kwargs):
         """
-        A matplotlib editable widget for the region
+        Return a matplotlib editable widget for the region
         (`matplotlib.widgets.RectangleSelector`).
 
         Parameters

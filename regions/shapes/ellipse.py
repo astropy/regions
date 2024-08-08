@@ -222,7 +222,7 @@ class EllipsePixelRegion(PixelRegion):
     def as_mpl_selector(self, ax, active=True, sync=True, callback=None,
                         **kwargs):
         """
-        A matplotlib editable widget for this region
+        Return a matplotlib editable widget for this region
         (`matplotlib.widgets.EllipseSelector`).
 
         Parameters

@@ -102,7 +102,7 @@ class ExampleDataset:
     @lazyproperty
     def image(self):
         """
-        Counts image (`~astropy.io.fits.ImageHDU`).
+        Return a "counts" image (`~astropy.io.fits.ImageHDU`).
         """
         events = self.event_table
         skycoord = SkyCoord(events['GLON'], events['GLAT'], unit='deg',

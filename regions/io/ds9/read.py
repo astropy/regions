@@ -622,7 +622,12 @@ def _define_region_params(region_type, shape, shape_params, frame=None):
 
 def _make_region(region_data):
     """
+    Make a region object from the region data.
+
+    Parameters
+    ----------
     region_data : `_RegionData` instance
+        A `_RegionData` instance.
     """
     try:
         # NOTE: returned shape can be different from region_data.shape
