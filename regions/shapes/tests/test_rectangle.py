@@ -10,7 +10,7 @@ from astropy.utils.data import get_pkg_data_filename
 from astropy.wcs import WCS
 from numpy.testing import assert_allclose, assert_equal
 
-from regions._utils.optional_deps import HAS_MATPLOTLIB, MPL_VERSION
+from regions._utils.optional_deps import HAS_MATPLOTLIB
 from regions.core import PixCoord, RegionMeta, RegionVisual
 from regions.shapes.rectangle import RectanglePixelRegion, RectangleSkyRegion
 from regions.shapes.tests.test_common import (BaseTestPixelRegion,
@@ -115,7 +115,6 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
         reg.angle = 35 * u.deg
         assert reg != self.reg
 
-    @pytest.mark.skipif(MPL_VERSION < 33, reason='requires `do_event`')
     # temporarily disable sync=True test due to random failures
     # @pytest.mark.parametrize('sync', (False, True))
     @pytest.mark.parametrize('sync', (False,))
@@ -171,7 +170,6 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
         with pytest.raises(AttributeError, match=('Cannot attach more than one selector to a reg')):
             region.as_mpl_selector(ax)
 
-    @pytest.mark.skipif(MPL_VERSION < 33, reason='requires `do_event`')
     @pytest.mark.parametrize('anywhere', (False, True))
     def test_mpl_selector_drag(self, anywhere):
         """Test dragging of entire region from central handle and anywhere."""
@@ -191,14 +189,10 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
 
         region = self.reg.copy(angle=0 * u.deg)
 
-        if anywhere and MPL_VERSION < 35:
-            pytest.skip('Requires `drag_from_anywhere` kwarg')
-        elif MPL_VERSION < 35:
-            selector = region.as_mpl_selector(ax, callback=update_mask)
-        else:
-            selector = region.as_mpl_selector(ax, callback=update_mask, drag_from_anywhere=anywhere)
-            assert selector.drag_from_anywhere is anywhere
-            assert region._mpl_selector.drag_from_anywhere is anywhere
+        selector = region.as_mpl_selector(ax, callback=update_mask,
+                                          drag_from_anywhere=anywhere)
+        assert selector.drag_from_anywhere is anywhere
+        assert region._mpl_selector.drag_from_anywhere is anywhere
 
         # click_and_drag(selector, start=(3, 4), end=(3.5, 4.5))
         do_event(selector, 'press', xdata=3, ydata=4, button=1)
@@ -250,9 +244,6 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
             mask[:] = reg.to_mask(mode='subpixels', subpixels=10).to_image(data.shape)
 
         region = self.reg.copy(angle=0 * u.deg)
-
-        if MPL_VERSION < 35 and 'grab_range' in userargs:
-            userargs['maxdist'] = userargs.pop('grab_range')
 
         if 'twit' in userargs:
             with pytest.raises(TypeError, match=(r'__init__.. got an unexpected keyword argument')):

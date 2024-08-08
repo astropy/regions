@@ -261,8 +261,6 @@ class RectanglePixelRegion(PixelRegion):
         """
         from matplotlib.widgets import RectangleSelector
 
-        from regions._utils.optional_deps import MPL_VERSION
-
         if hasattr(self, '_mpl_selector'):
             raise AttributeError('Cannot attach more than one selector to a region.')
 
@@ -281,11 +279,7 @@ class RectanglePixelRegion(PixelRegion):
                      'linewidth': self.visual.get('linewidth', 1),
                      'linestyle': self.visual.get('linestyle', 'solid')}
         rectprops.update(kwargs.pop('props', dict()))
-        # `rectprops` renamed `props` in mpl 3.5 and deprecated for 3.7.
-        if MPL_VERSION < 35:
-            kwargs.update({'rectprops': rectprops})
-        else:
-            kwargs.update({'props': rectprops})
+        kwargs.update({'props': rectprops})
 
         self._mpl_selector = RectangleSelector(ax, sync_callback, interactive=True, **kwargs)
 
