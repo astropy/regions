@@ -159,7 +159,7 @@ class RegionsRegistry:
         if len(rows) == 1:
             return Table()
 
-        cols = list(zip(*rows))
+        cols = list(zip(*rows, strict=True))
         tbl = Table()
         for col in cols:
             tbl[col[0]] = col[1:]

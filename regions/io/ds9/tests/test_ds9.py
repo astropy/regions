@@ -37,7 +37,7 @@ def test_roundtrip(tmpdir):
             regions.write(tempfile, format='ds9', overwrite=True, precision=20)
             regions2 = Regions.read(tempfile, format='ds9')
             assert len(regions2) > 0
-            for reg1, reg2 in zip(regions, regions2):
+            for reg1, reg2 in zip(regions, regions2, strict=True):
                 assert_region_allclose(reg1, reg2)
 
 

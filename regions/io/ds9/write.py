@@ -70,7 +70,7 @@ def _serialize_ds9(regions, precision=8):
         output += f'{global_frame}\n'
 
     # add line for each region
-    for region, region_meta in zip(region_data, metadata):
+    for region, region_meta in zip(region_data, metadata, strict=True):
         if global_frame is None:
             output += f'{region["frame"]}; '
 

@@ -232,7 +232,7 @@ class _ShapeList(list):
 
             if shape.region_type == 'polygon':
                 vals = [f'[{x:{fmt}}deg, {y:{fmt}}deg]'
-                        for x, y in zip(coord[::2], coord[1::2])]
+                        for x, y in zip(coord[::2], coord[1::2], strict=True)]
                 coord = ', '.join(vals)
                 line = crtf_strings['polygon'].format(include, coord)
 
@@ -383,7 +383,7 @@ class _Shape:
         Convert to sky coordinates.
         """
         parsed_angles = []
-        for x, y in zip(self.coord[:-1:2], self.coord[1::2]):
+        for x, y in zip(self.coord[:-1:2], self.coord[1::2], strict=True):
             if isinstance(x, Angle) and isinstance(y, Angle):
                 parsed_angles.append((x, y))
 
@@ -392,7 +392,7 @@ class _Shape:
         if len(parsed_angles) == 0:
             raise ValueError('error parsing region')
 
-        lon, lat = zip(*parsed_angles)
+        lon, lat = zip(*parsed_angles, strict=True)
         if (hasattr(lon, '__len__') and hasattr(lat, '__len__')
                 and len(lon) == 1 and len(lat) == 1):
             # force entries to be scalar if they are length-1

@@ -104,7 +104,7 @@ class PixCoord:
         return len(self.x)
 
     def __iter__(self):
-        for (x, y) in zip(self.x, self.y):
+        for (x, y) in zip(self.x, self.y, strict=True):
             yield PixCoord(x=x, y=y)
 
     def __getitem__(self, key):

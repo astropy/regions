@@ -549,6 +549,7 @@ def _parse_shape_params(region_data):
         shape_template = ds9_params_template[shape]
 
     shape_params = []
+    # TODO: check zip strict=True
     for idx, (param_type, value) in enumerate(zip(shape_template, params)):
         if shape in ('ellipse', 'box') and idx == nparams - 1:
             param_type = 'angle'  # last parameter is always an angle
@@ -693,7 +694,7 @@ def _find_text_delim_idx(region_str):
         start_idx.append(match.span()[1])
 
     idx1 = []
-    for sidx, char in zip(start_idx, delim):
+    for sidx, char in zip(start_idx, delim, strict=True):
         idx1.append(region_str.find(char, sidx))
 
     return idx0, idx1
@@ -732,7 +733,7 @@ def _split_semicolon(region_str):
     semi_idx = [pos for pos, char in enumerate(region_str) if char == ';']
     fidx = []
     for i in semi_idx:
-        for i0, i1 in zip(idx0, idx1):
+        for i0, i1 in zip(idx0, idx1, strict=True):
             if i0 <= i <= i1:
                 break
         else:
@@ -740,4 +741,4 @@ def _split_semicolon(region_str):
     fidx.insert(0, 0)
 
     return [region_str[i:j].rstrip(';')
-            for i, j in zip(fidx, fidx[1:] + [None])]
+            for i, j in zip(fidx, fidx[1:] + [None], strict=True)]

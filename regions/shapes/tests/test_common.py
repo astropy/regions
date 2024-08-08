@@ -55,7 +55,7 @@ class BaseTestPixelRegion(BaseTestRegion):
             assert pixcoord not in self.reg
 
     def test_contains_array_1d(self):
-        pixcoord = PixCoord(*zip(*(self.inside + self.outside)))
+        pixcoord = PixCoord(*zip(*(self.inside + self.outside), strict=True))
         actual = self.reg.contains(pixcoord)
         assert_equal(actual[:len(self.inside)], True)
         assert_equal(actual[len(self.inside):], False)
@@ -65,7 +65,7 @@ class BaseTestPixelRegion(BaseTestRegion):
         assert 'coord must be scalar' in str(excinfo.value)
 
     def test_contains_array_2d(self):
-        x, y = zip(*(self.inside + self.outside))
+        x, y = zip(*(self.inside + self.outside), strict=True)
         pixcoord = PixCoord([x] * 3, [y] * 3)
 
         actual = self.reg.contains(pixcoord)

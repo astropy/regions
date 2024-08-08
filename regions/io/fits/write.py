@@ -150,7 +150,7 @@ def _make_column(arrays):
     arr_size = np.max(arr_sizes)
 
     data = []
-    for (arr, size) in zip(arrays, arr_sizes):
+    for (arr, size) in zip(arrays, arr_sizes, strict=True):
         pad_width = arr_size - size
         if pad_width != 0:
             arr = np.pad(arr, (0, pad_width), mode='constant')
