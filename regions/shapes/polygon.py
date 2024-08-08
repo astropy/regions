@@ -69,11 +69,12 @@ class PolygonPixelRegion(PixelRegion):
     meta = RegionMetaDescr('The meta attributes as a |RegionMeta|')
     visual = RegionVisualDescr('The visual attributes as a |RegionVisual|.')
 
-    def __init__(self, vertices, meta=None, visual=None,
-                 origin=PixCoord(0, 0)):
+    def __init__(self, vertices, meta=None, visual=None, origin=None):
         self._vertices = vertices
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
+        if origin is None:
+            origin = PixCoord(0, 0)
         self.origin = origin
         self.vertices = vertices + origin
 
