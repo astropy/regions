@@ -123,15 +123,14 @@ def _get_region_shape(region):
 def _get_frame_name(region, mapping):
     if isinstance(region, PixelRegion):
         frame = 'image'
+    elif 'center' in region._params:
+        frame = region.center.frame.name
+    elif 'vertices' in region._params:
+        frame = region.vertices.frame.name
+    elif 'start' in region._params:
+        frame = region.start.frame.name
     else:
-        if 'center' in region._params:
-            frame = region.center.frame.name
-        elif 'vertices' in region._params:
-            frame = region.vertices.frame.name
-        elif 'start' in region._params:
-            frame = region.start.frame.name
-        else:
-            raise ValueError(f'Unable to get coordinate frame for {region!r}')
+        raise ValueError(f'Unable to get coordinate frame for {region!r}')
 
     if frame not in mapping:
         warnings.warn(f'Cannot serialize region with frame={frame}, skipping',

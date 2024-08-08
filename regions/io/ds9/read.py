@@ -329,12 +329,11 @@ def _parse_metadata(metadata_str):
             if key == 'tag':
                 val = [val]  # tag value is always a list
             metadata[key] = val
+        elif key == 'tag':
+            metadata[key].append(val)
         else:
-            if key == 'tag':
-                metadata[key].append(val)
-            else:
-                warnings.warn(f'Found duplicate metadata for "{key}", '
-                              'skipping', AstropyUserWarning)
+            warnings.warn(f'Found duplicate metadata for "{key}", '
+                          'skipping', AstropyUserWarning)
     return metadata
 
 

@@ -212,13 +212,11 @@ class _ShapeList(list):
             coord = []
             if coordsys not in ['image', 'physical']:
                 for val in shape.coord:
-                    if isinstance(val, Angle):
+                    if (isinstance(val, Angle)
+                            or (radunit == '' or radunit is None)):
                         coord.append(float(val.value))
                     else:
-                        if radunit == '' or radunit is None:
-                            coord.append(float(val.value))
-                        else:
-                            coord.append(float(val.to(radunit).value))
+                        coord.append(float(val.to(radunit).value))
             else:
                 for val in shape.coord:
                     if isinstance(val, u.Quantity):
