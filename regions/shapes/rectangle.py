@@ -216,7 +216,7 @@ class RectanglePixelRegion(PixelRegion):
             self._mpl_selector_callback(self)
 
     def as_mpl_selector(self, ax, active=True, sync=True, callback=None,
-                        **kwargs):
+                        drag_from_anywhere=False, **kwargs):
         """
         Return a matplotlib editable widget for the region
         (`matplotlib.widgets.RectangleSelector`).
@@ -279,7 +279,9 @@ class RectanglePixelRegion(PixelRegion):
         rectprops.update(kwargs.pop('props', dict()))
         kwargs.update({'props': rectprops})
 
-        self._mpl_selector = RectangleSelector(ax, sync_callback, interactive=True, **kwargs)
+        self._mpl_selector = RectangleSelector(
+            ax, sync_callback, interactive=True,
+            drag_from_anywhere=drag_from_anywhere, **kwargs)
 
         self._mpl_selector.extents = (self.center.x - self.width / 2,
                                       self.center.x + self.width / 2,

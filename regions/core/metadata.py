@@ -10,6 +10,14 @@ __all__ = ['Meta', 'RegionMeta', 'RegionVisual']
 class Meta(dict):
     """
     A base class for region metadata.
+
+    Parameters
+    ----------
+    seq : dict-like, optional
+        A dictionary or other mapping object to initialize the metadata.
+
+    **kwargs
+        Additional keyword arguments to initialize the metadata.
     """
 
     valid_keys = []

@@ -34,9 +34,9 @@ class EllipsePixelRegion(PixelRegion):
     center : `~regions.PixCoord`
         The position of the center of the ellipse.
     width : float
-        The width of the ellipse (before rotation) in pixels
+        The width of the ellipse (before rotation) in pixels.
     height : float
-        The height of the ellipse (before rotation) in pixels
+        The height of the ellipse (before rotation) in pixels.
     angle : `~astropy.units.Quantity`, optional
         The rotation angle of the ellipse, measured anti-clockwise. If
         set to zero (the default), the width axis is lined up with the x
@@ -220,7 +220,7 @@ class EllipsePixelRegion(PixelRegion):
             self._mpl_selector_callback(self)
 
     def as_mpl_selector(self, ax, active=True, sync=True, callback=None,
-                        **kwargs):
+                        drag_from_anywhere=False, **kwargs):
         """
         Return a matplotlib editable widget for this region
         (`matplotlib.widgets.EllipseSelector`).
@@ -282,7 +282,9 @@ class EllipsePixelRegion(PixelRegion):
         rectprops.update(kwargs.pop('props', dict()))
         kwargs.update({'props': rectprops})
 
-        self._mpl_selector = EllipseSelector(ax, sync_callback, interactive=True, **kwargs)
+        self._mpl_selector = EllipseSelector(
+            ax, sync_callback, interactive=True,
+            drag_from_anywhere=drag_from_anywhere, **kwargs)
 
         self._mpl_selector.extents = (self.center.x - self.width / 2,
                                       self.center.x + self.width / 2,

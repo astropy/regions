@@ -157,6 +157,14 @@ class PositiveScalarAngle(RegionAttribute):
 class RegionType(RegionAttribute):
     """
     Descriptor class to check the region type of value.
+
+    Parameters
+    ----------
+    name : str
+        The name of the attribute.
+
+    regionclass : `~regions.Region`
+        The region class to check.
     """
 
     def __init__(self, name, regionclass):

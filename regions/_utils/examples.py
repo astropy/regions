@@ -67,6 +67,11 @@ def make_example_dataset(data='simulated', config=None):
 class ExampleDataset:
     """
     Base class for an example dataset.
+
+    Parameters
+    ----------
+    config : dict or None
+        Configuration options.
     """
 
     def __init__(self, config=None):

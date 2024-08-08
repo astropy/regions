@@ -23,6 +23,11 @@ class Region(abc.ABC):
     def copy(self, **changes):
         """
         Make an independent (deep) copy.
+
+        Parameters
+        ----------
+        **changes : dict
+            Changes to make to the region parameters.
         """
         fields = list(self._params) + ['meta', 'visual']
 
@@ -97,6 +102,11 @@ class Region(abc.ABC):
     def __ne__(self, other):
         """
         Inequality operator for Region.
+
+        Parameters
+        ----------
+        other : `Region`
+            The other region that will be compared.
         """
         return not (self == other)
 
@@ -105,6 +115,11 @@ class Region(abc.ABC):
         """
         Return a region representing the intersection of this region
         with ``other``.
+
+        Parameters
+        ----------
+        other : `Region`
+            The other region to use for the intersection.
         """
         raise NotImplementedError
 
@@ -113,6 +128,11 @@ class Region(abc.ABC):
         """
         Return the union of the two regions minus any areas contained in
         the intersection of the two regions.
+
+        Parameters
+        ----------
+        other : `Region`
+            The other region to use for the symmetric difference.
         """
         raise NotImplementedError
 
@@ -121,6 +141,11 @@ class Region(abc.ABC):
         """
         Return a region representing the union of this region with
         ``other``.
+
+        Parameters
+        ----------
+        other : `Region`
+            The other region to use for the union.
         """
         raise NotImplementedError
 
@@ -218,6 +243,11 @@ class PixelRegion(Region):
         """
         Return a region representing the intersection of this region
         with ``other``.
+
+        Parameters
+        ----------
+        other : `Region`
+            The other region to use for the intersection.
         """
         from regions.core.compound import CompoundPixelRegion
         return CompoundPixelRegion(region1=self, region2=other,
@@ -227,6 +257,11 @@ class PixelRegion(Region):
         """
         Return the union of the two regions minus any areas contained in
         the intersection of the two regions.
+
+        Parameters
+        ----------
+        other : `Region`
+            The other region to use for the symmetric difference.
         """
         from regions.core.compound import CompoundPixelRegion
         return CompoundPixelRegion(region1=self, region2=other,
@@ -236,6 +271,11 @@ class PixelRegion(Region):
         """
         Return a region representing the union of this region with
         ``other``.
+
+        Parameters
+        ----------
+        other : `Region`
+            The other region to use for the union.
         """
         from regions.core.compound import CompoundPixelRegion
         return CompoundPixelRegion(region1=self, region2=other,
@@ -418,6 +458,11 @@ class SkyRegion(Region):
         """
         Return a region representing the intersection of this region
         with ``other``.
+
+        Parameters
+        ----------
+        other : `Region`
+            The other region to use for the intersection.
         """
         from regions.core.compound import CompoundSkyRegion
         return CompoundSkyRegion(region1=self, region2=other,
@@ -427,6 +472,11 @@ class SkyRegion(Region):
         """
         Return the union of the two regions minus any areas contained in
         the intersection of the two regions.
+
+        Parameters
+        ----------
+        other : `Region`
+            The other region to use for the symmetric difference.
         """
         from regions.core.compound import CompoundSkyRegion
         return CompoundSkyRegion(region1=self, region2=other,
@@ -436,6 +486,11 @@ class SkyRegion(Region):
         """
         Return a region representing the union of this region with
         ``other``.
+
+        Parameters
+        ----------
+        other : `Region`
+            The other region to use for the union.
         """
         from regions.core.compound import CompoundSkyRegion
         return CompoundSkyRegion(region1=self, region2=other,
