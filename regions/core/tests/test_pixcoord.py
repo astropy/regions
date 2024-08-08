@@ -206,7 +206,7 @@ def test_equality():
     pc1 = PixCoord(arr[0], arr[1])
     pc2 = PixCoord(arr[0] + 0.0000001, arr[1])
 
-    assert not pc1 == arr
+    assert pc1 != arr
     assert pc1 == PixCoord(arr[0], arr[1])
     assert pc1 == pc2
 
