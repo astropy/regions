@@ -158,6 +158,19 @@ exclude_lines = [
     'def _ipython_key_completions_',
 ]
 
+[tool.repo-review]
+ignore = [
+    'MY',  # ignore MyPy
+    'RF',  # ignore flake8-bugbear
+    'PC110',  # ignore using black or ruff-format in pre-commit
+    'PC111',  # ignore using blacken-docs in pre-commit
+    'PC140',  # ignore using mypy in pre-commit
+    'PC180',  # ignore using prettier in pre-commit
+    'PC190',  # ignore using pre-commit in pre-commit
+    'PC901',  # ignore using custom pre-commit update message
+    'PY005',  # ignore having a tests/ folder
+]
+
 [tool.isort]
 skip_glob = [
     'regions/*__init__.py*',
