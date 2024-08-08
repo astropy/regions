@@ -133,7 +133,7 @@ def _get_frame_name(region, mapping):
         else:
             raise ValueError(f'Unable to get coordinate frame for {region!r}')
 
-    if frame not in mapping.keys():
+    if frame not in mapping:
         warnings.warn(f'Cannot serialize region with frame={frame}, skipping',
                       AstropyUserWarning)
 
