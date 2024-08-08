@@ -403,9 +403,8 @@ def _define_raw_metadata(global_meta, composite_meta, include_meta,
             val = value.split()
             if val[0] not in valid_points:
                 is_invalid = True
-            if len(val) == 2:
-                if not float(val[1]).is_integer():
-                    is_invalid = True
+            if len(val) == 2 and not float(val[1]).is_integer():
+                is_invalid = True
 
         if key == 'line' and value not in valid_lines:
             is_invalid = True
