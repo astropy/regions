@@ -189,7 +189,7 @@ class _ShapeList(list):
             # cannot recognize a region without an inline coordinate
             # specification. It can be, but does not need to be,
             # comma-separated at the start.
-            shape_coordsys = getattr(shape, 'coordsys')
+            shape_coordsys = shape.coordsys
             if shape_coordsys.lower() != coordsys.lower():
                 coord = coordsys_mapping['CRTF'][coordsys.lower()]
                 if meta_str.strip():
