@@ -56,7 +56,8 @@ class RegionAttribute(abc.ABC):
 
 class ScalarPixCoord(RegionAttribute):
     """
-    Descriptor class to check that value is a scalar `~regions.PixCoord`.
+    Descriptor class to check that value is a scalar
+    `~regions.PixCoord`.
     """
 
     def _validate(self, value):
@@ -133,8 +134,8 @@ class ScalarAngle(RegionAttribute):
 
 class PositiveScalarAngle(RegionAttribute):
     """
-    Descriptor class to check that value is a strictly positive
-    scalar angle, either an `~astropy.coordinates.Angle` or
+    Descriptor class to check that value is a strictly positive scalar
+    angle, either an `~astropy.coordinates.Angle` or
     `~astropy.units.Quantity` with angular units.
     """
 

@@ -595,8 +595,8 @@ def test_mixed_coord():
 
 def test_unsupported_marker():
     """
-    Test that warning is issued when serializing a valid matplotlib marker,
-    but unsupported by DS9.
+    Test that warning is issued when serializing a valid matplotlib
+    marker, but unsupported by DS9.
     """
     region = PointPixelRegion(PixCoord(2, 2), visual=RegionVisual(marker='Z'))
     with pytest.warns(AstropyUserWarning):

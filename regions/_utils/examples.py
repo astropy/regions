@@ -88,7 +88,9 @@ class ExampleDataset:
 
     @lazyproperty
     def wcs(self):
-        """World coordinate system (`~astropy.wcs.WCS`)."""
+        """
+        World coordinate system (`~astropy.wcs.WCS`).
+        """
         wcs = WCS(naxis=2)
         wcs.wcs.crval = self.config['crval']
         wcs.wcs.crpix = self.config['crpix']
@@ -99,7 +101,9 @@ class ExampleDataset:
 
     @lazyproperty
     def image(self):
-        """Counts image (`~astropy.io.fits.ImageHDU`)."""
+        """
+        Counts image (`~astropy.io.fits.ImageHDU`).
+        """
         events = self.event_table
         skycoord = SkyCoord(events['GLON'], events['GLAT'], unit='deg',
                             frame='galactic')

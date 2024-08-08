@@ -1,6 +1,7 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """
-This module defines elliptical regions in both pixel and sky coordinates.
+This module defines elliptical regions in both pixel and sky
+coordinates.
 """
 
 import math

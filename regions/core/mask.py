@@ -59,8 +59,8 @@ class RegionMask:
 
     def get_overlap_slices(self, shape):
         """
-        Get slices for the overlapping part of the region mask and a
-        2D array.
+        Get slices for the overlapping part of the region mask and a 2D
+        array.
 
         Parameters
         ----------

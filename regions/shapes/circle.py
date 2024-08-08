@@ -94,7 +94,9 @@ class CirclePixelRegion(PixelRegion):
 
     @property
     def bounding_box(self):
-        """Bounding box (`~regions.RegionBoundingBox`)."""
+        """
+        Bounding box (`~regions.RegionBoundingBox`).
+        """
         xmin = self.center.x - self.radius
         xmax = self.center.x + self.radius
         ymin = self.center.y - self.radius

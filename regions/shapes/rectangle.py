@@ -1,6 +1,7 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """
-This module defines rectangular regions in both pixel and sky coordinates.
+This module defines rectangular regions in both pixel and sky
+coordinates.
 """
 
 import astropy.units as u

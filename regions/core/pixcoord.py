@@ -129,8 +129,8 @@ class PixCoord:
 
     def __eq__(self, other):
         """
-        Checks whether ``other`` is `PixCoord` object and whether
-        their abscissa and ordinate values are equal using
+        Checks whether ``other`` is `PixCoord` object and whether their
+        abscissa and ordinate values are equal using
         `np.testing.assert_allclose` with its default tolerance values.
         """
         if isinstance(other, self.__class__):
