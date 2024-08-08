@@ -177,11 +177,8 @@ class PointSkyRegion(SkyRegion):
         self.visual = visual or RegionVisual()
 
     def contains(self, skycoord, wcs):  # pylint: disable=unused-argument
-        if self.meta.get('include', True):
-            # points never include anything
-            return False
-        else:
-            return True
+        # points never include anything
+        return not self.meta.get('include', True)
 
     def to_pixel(self, wcs):
         center_x, center_y = wcs.world_to_pixel(self.center)
