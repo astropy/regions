@@ -31,7 +31,6 @@ def test_elliptical_overlap_grid(grid_size, maj_size, min_size, angle,
     Test normalization of the overlap grid to make sure that a fully
     enclosed pixel has a value of 1.0.
     """
-
     g = elliptical_overlap_grid(-1.0, 1.0, -1.0, 1.0, grid_size, grid_size,
                                 maj_size, min_size, angle, use_exact,
                                 subsample)

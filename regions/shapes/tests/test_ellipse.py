@@ -172,7 +172,6 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
         """
         Test dragging of entire region from central handle and anywhere.
         """
-
         plt = pytest.importorskip('matplotlib.pyplot')
         from matplotlib.testing.widgets import do_event
 
@@ -232,7 +231,6 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
         """
         Test that additional kwargs are passed to selector.
         """
-
         plt = pytest.importorskip('matplotlib.pyplot')
 
         rng = np.random.default_rng(0)
