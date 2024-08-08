@@ -105,11 +105,8 @@ def _split_lines(region_str):
     lines : list of str
         A list of strings.
     """
-    lines = []
-    for line in region_str.split('\n'):
-        for line_ in _split_semicolon(line):
-            lines.append(line_.strip())
-    return lines
+    return [line_.strip() for line in region_str.split('\n')
+            for line_ in _split_semicolon(line)]
 
 
 def _parse_raw_data(region_str):

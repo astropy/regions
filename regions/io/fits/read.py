@@ -118,9 +118,8 @@ def get_column_values(region_row, colname):
 
 
 def get_shape_params(shape, region_row, shape_columns):
-    values = []
-    for column in shape_columns:
-        values.append(get_column_values(region_row, column))
+    values = [get_column_values(region_row, column)
+              for column in shape_columns]
 
     if 'rectangle' in shape:
         (xmin, xmax, ymin, ymax) = values[0:4]
