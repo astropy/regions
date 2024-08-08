@@ -533,10 +533,8 @@ def _to_shape_list(region_list, coordinate_system='fk5'):
         if coordinate_system:
             coordsys = coordinate_system
         else:
-            if isinstance(region, SkyRegion):
-                coordsys = coord[0].name
-            else:
-                coordsys = 'image'
+            coordsys = (coord[0].name
+                        if isinstance(region, SkyRegion) else 'image')
 
         new_coord = []
         for val in coord:

@@ -127,10 +127,7 @@ class PolygonPixelRegion(PixelRegion):
             mode = 'subpixels'
             subpixels = 1
 
-        if mode == 'subpixels':
-            use_exact = 0
-        else:
-            use_exact = 1
+        use_exact = 0 if mode == 'subpixels' else 1
 
         # Find bounding box and mask size
         bbox = self.bounding_box

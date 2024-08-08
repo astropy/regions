@@ -160,10 +160,7 @@ class RectanglePixelRegion(PixelRegion):
         ymin = float(bbox.iymin) - 0.5 - self.center.y
         ymax = float(bbox.iymax) - 0.5 - self.center.y
 
-        if mode == 'subpixels':
-            use_exact = 0
-        else:
-            use_exact = 1
+        use_exact = 0 if mode == 'subpixels' else 1
 
         fraction = rectangular_overlap_grid(xmin, xmax, ymin, ymax, nx, ny,
                                             self.width, self.height,

@@ -216,11 +216,8 @@ def _parse_raw_data(region_str):
                 composite_meta.pop('composite', None)
 
             # NOTE: include=1/0 in metadata overrides the leading
-            #       "-/+" symbol
-            if include_symbol == '-':
-                include = 0
-            else:  # '+' or ''
-                include = 1
+            #       "-/+" symbol; -: include=0;, + or '': include=1
+            include = 0 if include_symbol == '-' else 1
             include_meta = {'include': include}
 
             params_str, meta_str = _parse_shape_line(shape, original_line,

@@ -70,10 +70,8 @@ class LinePixelRegion(PixelRegion):
         return 0
 
     def contains(self, pixcoord):
-        if pixcoord.isscalar:
-            in_reg = False
-        else:
-            in_reg = np.zeros(pixcoord.x.shape, dtype=bool)
+        in_reg = (False if pixcoord.isscalar
+                  else np.zeros(pixcoord.x.shape, dtype=bool))
 
         if self.meta.get('include', True):
             return in_reg

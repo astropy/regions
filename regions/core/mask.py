@@ -175,10 +175,7 @@ class RegionMask:
             return cutout
 
         # cutout is always a copy for partial overlap
-        if ~np.isfinite(fill_value):
-            dtype = float
-        else:
-            dtype = data.dtype
+        dtype = float if ~np.isfinite(fill_value) else data.dtype
         cutout = np.zeros(self.shape, dtype=dtype)
         cutout[:] = fill_value
         cutout[slices_small] = data[slices_large]
