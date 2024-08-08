@@ -122,7 +122,8 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
         plt = pytest.importorskip('matplotlib.pyplot')
         from matplotlib.testing.widgets import do_event
 
-        data = np.random.random((16, 16))
+        rng = np.random.default_rng(0)
+        data = rng.random((16, 16))
         mask = np.zeros_like(data)
 
         ax = plt.subplot(1, 1, 1)
@@ -180,7 +181,8 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
         from matplotlib.testing.widgets import (
             do_event)  # click_and_drag  # MPL_VERSION >= 36
 
-        data = np.random.random((16, 16))
+        rng = np.random.default_rng(0)
+        data = rng.random((16, 16))
         mask = np.zeros_like(data)
 
         ax = plt.subplot(1, 1, 1)
@@ -238,7 +240,8 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
 
         plt = pytest.importorskip('matplotlib.pyplot')
 
-        data = np.random.random((16, 16))
+        rng = np.random.default_rng(0)
+        data = rng.random((16, 16))
         mask = np.zeros_like(data)
 
         ax = plt.subplot(1, 1, 1)
