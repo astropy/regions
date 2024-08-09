@@ -70,10 +70,8 @@ class LinePixelRegion(PixelRegion):
         return 0
 
     def contains(self, pixcoord):
-        if pixcoord.isscalar:
-            in_reg = False
-        else:
-            in_reg = np.zeros(pixcoord.x.shape, dtype=bool)
+        in_reg = (False if pixcoord.isscalar
+                  else np.zeros(pixcoord.x.shape, dtype=bool))
 
         if self.meta.get('include', True):
             return in_reg
@@ -189,11 +187,8 @@ class LineSkyRegion(SkyRegion):
         self.visual = visual or RegionVisual()
 
     def contains(self, skycoord, wcs):  # pylint: disable=unused-argument
-        if self.meta.get('include', True):
-            # lines never contain anything
-            return False
-        else:
-            return True
+        # lines never contain anything
+        return not self.meta.get('include', True)
 
     def to_pixel(self, wcs):
         start_x, start_y = wcs.world_to_pixel(self.start)

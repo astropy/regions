@@ -20,6 +20,7 @@ class TestCompoundPixel:
     """
     Test compound pixel regions.
     """
+
     # Two circles that overlap in one column
     c1 = CirclePixelRegion(PixCoord(5, 5), 4)
     c2 = CirclePixelRegion(PixCoord(11, 5), 4)

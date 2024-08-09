@@ -274,7 +274,8 @@ class _CRTFRegionParser:
 
     # Maps CASA coordinate frame to appropriate astropy coordinate frames.
     coordsys_mapping = dict(zip(frame_transform_graph.get_names(),
-                                frame_transform_graph.get_names()))
+                                frame_transform_graph.get_names(),
+                                strict=True))
     coordsys_mapping['j2000'] = 'fk5'
     coordsys_mapping['b1950'] = 'fk4'
     coordsys_mapping['supergal'] = 'supergalactic'
@@ -361,6 +362,7 @@ class _CRTFRegionParser:
                                   'parameters for the region '
                                   f'"{self.region_type}"')
 
+        # TODO: check zip strict=True
         for attr_spec, val_str in zip(self.language_spec[self.region_type],
                                       coord_list_str):
             if attr_spec == 'c':

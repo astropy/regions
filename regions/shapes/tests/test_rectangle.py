@@ -122,7 +122,8 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
         plt = pytest.importorskip('matplotlib.pyplot')
         from matplotlib.testing.widgets import do_event
 
-        data = np.random.random((16, 16))
+        rng = np.random.default_rng(0)
+        data = rng.random((16, 16))
         mask = np.zeros_like(data)
 
         ax = plt.subplot(1, 1, 1)
@@ -172,13 +173,15 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
 
     @pytest.mark.parametrize('anywhere', (False, True))
     def test_mpl_selector_drag(self, anywhere):
-        """Test dragging of entire region from central handle and anywhere."""
-
+        """
+        Test dragging of entire region from central handle and anywhere.
+        """
         plt = pytest.importorskip('matplotlib.pyplot')
         from matplotlib.testing.widgets import (
             do_event)  # click_and_drag  # MPL_VERSION >= 36
 
-        data = np.random.random((16, 16))
+        rng = np.random.default_rng(0)
+        data = rng.random((16, 16))
         mask = np.zeros_like(data)
 
         ax = plt.subplot(1, 1, 1)
@@ -230,11 +233,13 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
                               {'props': {'facecolor': 'blue', 'linewidth': 2}},
                               {'twit': 'gumby'}))
     def test_mpl_selector_kwargs(self, userargs):
-        """Test that additional kwargs are passed to selector."""
-
+        """
+        Test that additional kwargs are passed to selector.
+        """
         plt = pytest.importorskip('matplotlib.pyplot')
 
-        data = np.random.random((16, 16))
+        rng = np.random.default_rng(0)
+        data = rng.random((16, 16))
         mask = np.zeros_like(data)
 
         ax = plt.subplot(1, 1, 1)

@@ -59,8 +59,8 @@ class RegionMask:
 
     def get_overlap_slices(self, shape):
         """
-        Get slices for the overlapping part of the region mask and a
-        2D array.
+        Get slices for the overlapping part of the region mask and a 2D
+        array.
 
         Parameters
         ----------
@@ -175,10 +175,7 @@ class RegionMask:
             return cutout
 
         # cutout is always a copy for partial overlap
-        if ~np.isfinite(fill_value):
-            dtype = float
-        else:
-            dtype = data.dtype
+        dtype = float if ~np.isfinite(fill_value) else data.dtype
         cutout = np.zeros(self.shape, dtype=dtype)
         cutout[:] = fill_value
         cutout[slices_small] = data[slices_large]
@@ -267,9 +264,8 @@ class RegionMask:
         multiple associated arrays (e.g., data and error arrays). It is
         used in this way by the `PixelAperture.do_photometry` method.
         """
-        if mask is not None:
-            if mask.shape != shape:
-                raise ValueError('mask and data must have the same shape')
+        if mask is not None and mask.shape != shape:
+            raise ValueError('mask and data must have the same shape')
 
         slc_large, slc_small = self.get_overlap_slices(shape)
         if slc_large is None:  # no overlap

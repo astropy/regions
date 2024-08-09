@@ -94,7 +94,9 @@ class CirclePixelRegion(PixelRegion):
 
     @property
     def bounding_box(self):
-        """Bounding box (`~regions.RegionBoundingBox`)."""
+        """
+        Bounding box (`~regions.RegionBoundingBox`).
+        """
         xmin = self.center.x - self.radius
         xmax = self.center.x + self.radius
         ymin = self.center.y - self.radius
@@ -120,10 +122,7 @@ class CirclePixelRegion(PixelRegion):
         ymin = float(bbox.iymin) - 0.5 - self.center.y
         ymax = float(bbox.iymax) - 0.5 - self.center.y
 
-        if mode == 'subpixels':
-            use_exact = 0
-        else:
-            use_exact = 1
+        use_exact = 0 if mode == 'subpixels' else 1
 
         fraction = circular_overlap_grid(xmin, xmax, ymin, ymax, nx, ny,
                                          self.radius, use_exact, subpixels)

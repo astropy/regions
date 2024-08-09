@@ -45,7 +45,7 @@ def test_valid_crtf_line():
 
 def test_valid_region_type():
     """
-    Checks whether the region type is valid in CRTF format
+    Checks whether the region type is valid in CRTF format.
     """
     reg_str = 'hyperbola[[18h12m24s, -23d11m00s], 2.3arcsec]'
 
@@ -79,7 +79,7 @@ def test_valid_meta_key():
 
 def test_valid_region_syntax():
     """
-    Checks whether the region has valid parameters
+    Checks whether the region has valid parameters.
     """
     reg_str1 = 'circle[[18h12m24s, -23d11m00s], [2.3arcsec,4.5arcsec]'
     with pytest.raises(CRTFRegionParserError) as excinfo:
@@ -140,8 +140,8 @@ def test_issue_312_regression():
                            'fk5', '.6f')])
 def test_file_crtf(filename, outname, coordsys, fmt):
     """
-    The "labelcolor" example is a regression test for Issue 405
-    The others are just a general serialization self-consistency check.
+    The "labelcolor" example is a regression test for Issue 405 The
+    others are just a general serialization self-consistency check.
     """
     filename = get_pkg_data_filename(filename)
     regs = Regions.read(filename, errors='warn', format='crtf')
@@ -180,7 +180,7 @@ def test_crtf_header():
 
 def test_space_after_regname():
     """
-    Regression test for #271: space is allowed
+    Regression test for #271: space is allowed.
     """
     reg_str = 'circle [[42deg, 43deg], 3deg], coord=J2000, color=green'
     reg = Regions.parse(reg_str, format='crtf')[0]

@@ -69,11 +69,12 @@ class PolygonPixelRegion(PixelRegion):
     meta = RegionMetaDescr('The meta attributes as a |RegionMeta|')
     visual = RegionVisualDescr('The visual attributes as a |RegionVisual|.')
 
-    def __init__(self, vertices, meta=None, visual=None,
-                 origin=PixCoord(0, 0)):
+    def __init__(self, vertices, meta=None, visual=None, origin=None):
         self._vertices = vertices
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
+        if origin is None:
+            origin = PixCoord(0, 0)
         self.origin = origin
         self.vertices = vertices + origin
 
@@ -126,10 +127,7 @@ class PolygonPixelRegion(PixelRegion):
             mode = 'subpixels'
             subpixels = 1
 
-        if mode == 'subpixels':
-            use_exact = 0
-        else:
-            use_exact = 1
+        use_exact = 0 if mode == 'subpixels' else 1
 
         # Find bounding box and mask size
         bbox = self.bounding_box

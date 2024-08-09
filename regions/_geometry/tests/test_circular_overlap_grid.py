@@ -25,7 +25,6 @@ def test_circular_overlap_grid(grid_size, circ_size, use_exact, subsample):
     Test normalization of the overlap grid to make sure that a fully
     enclosed pixel has a value of 1.0.
     """
-
     g = circular_overlap_grid(-1.0, 1.0, -1.0, 1.0, grid_size, grid_size,
                               circ_size, use_exact, subsample)
     assert_allclose(g.max(), 1.0)

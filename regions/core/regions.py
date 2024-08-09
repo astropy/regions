@@ -67,8 +67,8 @@ class Regions:
 
     def extend(self, regions):
         """
-        Extend the list of regions by appending elements from the
-        input regions.
+        Extend the list of regions by appending elements from the input
+        regions.
 
         Parameters
         ----------

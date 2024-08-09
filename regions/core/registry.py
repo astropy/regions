@@ -9,13 +9,15 @@ __all__ = []
 
 
 class IORegistryError(Exception):
-    """Exception class for various registry errors."""
+    """
+    Exception class for various registry errors.
+    """
 
 
 class RegionsRegistry:
     """
-    Class to hold a registry to read, write, parse, and serialize regions
-    in various formats.
+    Class to hold a registry to read, write, parse, and serialize
+    regions in various formats.
     """
 
     registry = {}
@@ -157,7 +159,7 @@ class RegionsRegistry:
         if len(rows) == 1:
             return Table()
 
-        cols = list(zip(*rows))
+        cols = list(zip(*rows, strict=True))
         tbl = Table()
         for col in cols:
             tbl[col[0]] = col[1:]

@@ -105,7 +105,14 @@ norecursedirs = [
 astropy_header = true
 doctest_plus = 'enabled'
 text_file_format = 'rst'
-addopts = '--color=yes --doctest-rst --arraydiff'
+addopts = [
+    '-ra',
+    '--color=yes',
+    '--doctest-rst',
+    '--strict-config',
+    '--strict-markers',
+]
+log_cli_level = 'INFO'
 xfail_strict = true
 remote_data_strict = true
 filterwarnings = [
@@ -151,6 +158,17 @@ exclude_lines = [
     'def _ipython_key_completions_',
 ]
 
+[tool.repo-review]
+ignore = [
+    'MY',  # ignore MyPy
+    'PC110',  # ignore using black or ruff-format in pre-commit
+    'PC111',  # ignore using blacken-docs in pre-commit
+    'PC140',  # ignore using mypy in pre-commit
+    'PC180',  # ignore using prettier in pre-commit
+    'PC901',  # ignore using custom pre-commit update message
+    'PY005',  # ignore having a tests/ folder
+]
+
 [tool.isort]
 skip_glob = [
     'regions/*__init__.py*',
@@ -173,3 +191,43 @@ exclude_dirs = ['*/tests/test_casa_mask.py']
 
 [tool.bandit.assert_used]
 skips = ['*_test.py', '*/test_*.py', '*/tests/helpers.py']
+
+[tool.docformatter]
+    wrap-summaries = 72
+    pre-summary-newline = true
+    make-summary-multi-line = true
+
+[tool.ruff.lint]
+select = ['E', 'F', 'UP', 'B', 'SIM', 'PL', 'FLY', 'NPY', 'PERF', 'INT',
+          'RSE', 'Q', 'N', 'W', 'D', 'I']
+ignore = [
+    'E501',
+    'B028',
+    'B905',  # revisit
+    'D100',
+    'D101',
+    'D102',
+    'D103',
+    'D105',
+    'D107',
+    'D200',
+    'D205',
+    'D212',
+    'D404',
+    'I001',
+    'PLR0912',
+    'PLR0913',
+    'PLR0915',
+    'PLR2004',
+    'PLW2901',
+    'Q000',
+    'SIM910',
+    'UP038',
+]
+
+[tool.ruff.lint.per-file-ignores]
+'__init__.py' = ['D104', 'I']
+'docs/conf.py' = ['ERA001', 'INP001', 'TRY400']
+
+[tool.ruff.lint.pydocstyle]
+convention = 'numpy'

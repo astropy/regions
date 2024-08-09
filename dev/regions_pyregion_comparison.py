@@ -1,6 +1,6 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """
-Compare DS9 parsing of the astropy regions package to pyregion
+Compare DS9 parsing of the astropy regions package to pyregion.
 
 This scripts compares the DS9 parsing of the astropy regions package to
 pyregion in two regards.

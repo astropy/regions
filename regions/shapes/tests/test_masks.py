@@ -1,6 +1,7 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """
-This file sets up detailed tests for computing masks with reference images.
+This file sets up detailed tests for computing masks with reference
+images.
 """
 import itertools
 

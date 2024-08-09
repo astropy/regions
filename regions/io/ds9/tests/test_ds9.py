@@ -37,7 +37,7 @@ def test_roundtrip(tmpdir):
             regions.write(tempfile, format='ds9', overwrite=True, precision=20)
             regions2 = Regions.read(tempfile, format='ds9')
             assert len(regions2) > 0
-            for reg1, reg2 in zip(regions, regions2):
+            for reg1, reg2 in zip(regions, regions2, strict=True):
                 assert_region_allclose(reg1, reg2)
 
 
@@ -595,8 +595,8 @@ def test_mixed_coord():
 
 def test_unsupported_marker():
     """
-    Test that warning is issued when serializing a valid matplotlib marker,
-    but unsupported by DS9.
+    Test that warning is issued when serializing a valid matplotlib
+    marker, but unsupported by DS9.
     """
     region = PointPixelRegion(PixCoord(2, 2), visual=RegionVisual(marker='Z'))
     with pytest.warns(AstropyUserWarning):

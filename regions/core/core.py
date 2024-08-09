@@ -345,10 +345,10 @@ class PixelRegion(Region):
             raise ValueError(f'Invalid mask mode: {mode} (should be one '
                              f'of {valid_modes}')
 
-        if mode == 'subpixels':
-            if not isinstance(subpixels, int) or subpixels <= 0:
-                raise ValueError(f'Invalid subpixels value: {subpixels} '
-                                 '(should be a strictly positive integer)')
+        if (mode == 'subpixels'
+                and (not isinstance(subpixels, int) or subpixels <= 0)):
+            raise ValueError(f'Invalid subpixels value: {subpixels} '
+                             '(should be a strictly positive integer)')
 
     @abc.abstractmethod
     def as_artist(self, origin=(0, 0), **kwargs):

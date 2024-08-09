@@ -1,6 +1,7 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """
-This module defines elliptical regions in both pixel and sky coordinates.
+This module defines elliptical regions in both pixel and sky
+coordinates.
 """
 
 import math
@@ -164,10 +165,7 @@ class EllipsePixelRegion(PixelRegion):
         ymin = float(bbox.iymin) - 0.5 - self.center.y
         ymax = float(bbox.iymax) - 0.5 - self.center.y
 
-        if mode == 'subpixels':
-            use_exact = 0
-        else:
-            use_exact = 1
+        use_exact = 0 if mode == 'subpixels' else 1
 
         fraction = elliptical_overlap_grid(xmin, xmax, ymin, ymax, nx, ny,
                                            0.5 * self.width, 0.5 * self.height,
@@ -224,7 +222,7 @@ class EllipsePixelRegion(PixelRegion):
     def as_mpl_selector(self, ax, active=True, sync=True, callback=None,
                         **kwargs):
         """
-        A matplotlib editable widget for this region
+        Return a matplotlib editable widget for this region
         (`matplotlib.widgets.EllipseSelector`).
 
         Parameters
