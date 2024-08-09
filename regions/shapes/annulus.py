@@ -230,6 +230,11 @@ class AsymmetricAnnulusPixelRegion(AnnulusPixelRegion):
         The rotation angle of the annulus, measured anti-clockwise. If
         set to zero (the default), the width axis is lined up with the x
         axis.
+    meta : `~regions.RegionMeta` or `dict`, optional
+        A dictionary that stores the meta attributes of the region.
+    visual : `~regions.RegionVisual` or `dict`, optional
+        A dictionary that stores the visual meta attributes of the
+        region.
     """
 
     _params = ('center', 'inner_width', 'outer_width', 'inner_height',
@@ -313,7 +318,7 @@ class AsymmetricAnnulusSkyRegion(SkyRegion):
     angle : `~astropy.units.Quantity`, optional
         The rotation angle of the annulus, measured anti-clockwise. If
         set to zero (the default), the width axis is lined up with the
-        longitude axis of the celestial coordinates
+        longitude axis of the celestial coordinates.
     meta : `~regions.RegionMeta` or `dict`, optional
         A dictionary that stores the meta attributes of the region.
     visual : `~regions.RegionVisual` or `dict`, optional
@@ -443,6 +448,11 @@ class EllipseAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
 
     _component_class = EllipsePixelRegion
 
+    def __init__(self, center, inner_width, outer_width, inner_height,
+                 outer_height, angle=0 * u.deg, meta=None, visual=None):
+        super().__init__(center, inner_width, outer_width, inner_height,
+                         outer_height, angle, meta, visual)
+
     def to_sky(self, wcs):
         return EllipseAnnulusSkyRegion(*self.to_sky_args(wcs),
                                        meta=self.meta.copy(),
@@ -472,7 +482,7 @@ class EllipseAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
     angle : `~astropy.units.Quantity`, optional
         The rotation angle of the elliptical annulus, measured
         anti-clockwise. If set to zero (the default), the width axis is
-        lined up with the longitude axis of the celestial coordinates
+        lined up with the longitude axis of the celestial coordinates.
     meta : `~regions.RegionMeta` or `dict`, optional
         A dictionary that stores the meta attributes of the region.
     visual : `~regions.RegionVisual` or `dict`, optional
@@ -495,6 +505,11 @@ class EllipseAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
                         '|Quantity| angle.')
 
     _component_class = EllipseSkyRegion
+
+    def __init__(self, center, inner_width, outer_width, inner_height,
+                 outer_height, angle=0 * u.deg, meta=None, visual=None):
+        super().__init__(center, inner_width, outer_width, inner_height,
+                         outer_height, angle, meta, visual)
 
     def to_pixel(self, wcs):
         return EllipseAnnulusPixelRegion(*self.to_pixel_args(wcs),
@@ -574,6 +589,11 @@ class RectangleAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
 
     _component_class = RectanglePixelRegion
 
+    def __init__(self, center, inner_width, outer_width, inner_height,
+                 outer_height, angle=0 * u.deg, meta=None, visual=None):
+        super().__init__(center, inner_width, outer_width, inner_height,
+                         outer_height, angle, meta, visual)
+
     def to_sky(self, wcs):
         return RectangleAnnulusSkyRegion(*self.to_sky_args(wcs),
                                          meta=self.meta.copy(),
@@ -604,7 +624,7 @@ class RectangleAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
     angle : `~astropy.units.Quantity`, optional
         The rotation angle of the rectangular annulus, measured
         anti-clockwise. If set to zero (the default), the width axis is
-        lined up with the longitude axis of the celestial coordinates
+        lined up with the longitude axis of the celestial coordinates.
     meta : `~regions.RegionMeta` or `dict`, optional
         A dictionary that stores the meta attributes of the region.
     visual : `~regions.RegionVisual` or `dict`, optional
@@ -627,6 +647,11 @@ class RectangleAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
                         '|Quantity| angle.')
 
     _component_class = RectangleSkyRegion
+
+    def __init__(self, center, inner_width, outer_width, inner_height,
+                 outer_height, angle=0 * u.deg, meta=None, visual=None):
+        super().__init__(center, inner_width, outer_width, inner_height,
+                         outer_height, angle, meta, visual)
 
     def to_pixel(self, wcs):
         return RectangleAnnulusPixelRegion(*self.to_pixel_args(wcs),

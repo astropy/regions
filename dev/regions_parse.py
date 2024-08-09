@@ -16,7 +16,7 @@ TEST_FILE_DIR = Path('../regions/io/ds9/tests/data')
 @click.group()
 def cli():
     """
-    astropy.regions parser debugging tool.
+    Region parser debugging tool.
     """
     pass
 

@@ -192,6 +192,28 @@ exclude_dirs = ['*/tests/test_casa_mask.py']
 [tool.bandit.assert_used]
 skips = ['*_test.py', '*/test_*.py', '*/tests/helpers.py']
 
+[tool.numpydoc_validation]
+checks = [
+    'all',   # report on all checks, except the below
+    'ES01',  # missing extended summary
+    'EX01',  # missing "Examples"
+    'GL08',  # missing docstring
+    'SA01',  # missing "See Also"
+    'SA04',  # missing "See Also" description
+    'RT02',  # only type in "Returns" section (no name)
+    'SS06',  # single-line summary
+    'RT01',  # do not require return type for lazy properties
+]
+
+# don't report on objects that match any of these regex;
+# remember to use single quotes for regex in TOML
+exclude = [
+    '\._.*',  # private functions/methods
+    '^test_*',  # test code
+    '^conftest.*$',  # pytest configuration
+    '^helpers.*$',  # helper modules
+]
+
 [tool.docformatter]
     wrap-summaries = 72
     pre-summary-newline = true

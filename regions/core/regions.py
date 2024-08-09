@@ -115,6 +115,7 @@ class Regions:
         Returns
         -------
         result : `~regions.Region`
+            The removed region.
         """
         return self.regions.pop(index)
 

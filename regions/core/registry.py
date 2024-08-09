@@ -64,6 +64,26 @@ class RegionsRegistry:
     def read(cls, filename, classobj, format=None, **kwargs):
         """
         Read in a regions file.
+
+        Parameters
+        ----------
+        filename : str
+            The file to read from.
+
+        classobj : class
+            The class to read the regions into.
+
+        format : str, optional
+            The format of the file. If not provided, the format will be
+            identified based on the file name or contents.
+
+        **kwargs : dict, optional
+            Additional keyword arguments to pass to the reader.
+
+        Returns
+        -------
+        regions : classobj
+            The regions object read from the file.
         """
         if format is None:
             format = cls.identify_format(filename, classobj, 'read')
@@ -83,6 +103,26 @@ class RegionsRegistry:
     def parse(cls, data, classobj, format=None, **kwargs):
         """
         Parse a regions string or table.
+
+        Parameters
+        ----------
+        data : str, Table
+            The data to parse.
+
+        classobj : class
+            The class to parse the regions into.
+
+        format : str, optional
+            The format of the data. If not provided, an error will be
+            raised.
+
+        **kwargs : dict, optional
+            Additional keyword arguments to pass to the parser.
+
+        Returns
+        -------
+        regions : classobj
+            The regions object parsed from the data.
         """
         if format is None:
             cls._no_format_error(classobj)
@@ -102,6 +142,24 @@ class RegionsRegistry:
     def write(cls, regions, filename, classobj, format=None, **kwargs):
         """
         Write to a regions file.
+
+        Parameters
+        ----------
+        regions : classobj
+            The regions object to write.
+
+        filename : str
+            The file to write to.
+
+        classobj : class
+            The class of the regions object.
+
+        format : str, optional
+            The format of the file. If not provided, an error will be
+            raised.
+
+        **kwargs : dict, optional
+            Additional keyword arguments to pass to the writer.
         """
         if format is None:
             format = cls.identify_format(filename, classobj, 'write')
@@ -121,6 +179,26 @@ class RegionsRegistry:
     def serialize(cls, regions, classobj, format=None, **kwargs):
         """
         Serialize to a regions string or table.
+
+        Parameters
+        ----------
+        regions : classobj
+            The regions object to serialize.
+
+        classobj : class
+            The class of the regions object.
+
+        format : str, optional
+            The format of the data. If not provided, an error will be
+            raised.
+
+        **kwargs : dict, optional
+            Additional keyword arguments to pass to the serializer.
+
+        Returns
+        -------
+        data : str, Table
+            The data serialized from the regions object.
         """
         if format is None:
             cls._no_format_error(classobj)
@@ -140,6 +218,16 @@ class RegionsRegistry:
     def get_formats(cls, classobj):
         """
         Get the registered I/O formats as a Table.
+
+        Parameters
+        ----------
+        classobj : class
+            The class to get the formats for.
+
+        Returns
+        -------
+        tbl : Table
+            The table of formats.
         """
         filetypes = list({key[2] for key in cls.registry
                           if key[0] == classobj})
