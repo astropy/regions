@@ -1,14 +1,10 @@
-0.10 (unreleased)
+0.10 (2024-09-27)
 =================
 
 General
 -------
 
-New Features
-------------
-
-Bug Fixes
----------
+- Added support for NumPy 2.1.
 
 API Changes
 -----------
