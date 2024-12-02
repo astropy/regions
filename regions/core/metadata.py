@@ -54,10 +54,10 @@ class Meta(dict):
             if len(args) > 1:
                 raise ValueError('Only one argument can be input')
             other = dict(args[0])
-            for key in other:
-                self[key] = other[key]
-        for key in kwargs:
-            self[key] = kwargs[key]
+            for key, value in other.items():
+                self[key] = value
+        for key, value in kwargs.items():
+            self[key] = value
 
     def setdefault(self, key, value=None):
         if key not in self:
