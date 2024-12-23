@@ -200,7 +200,7 @@ class EllipsePixelRegion(PixelRegion):
         xy = self.center.x - origin[0], self.center.y - origin[1]
         width = self.width
         height = self.height
-        # matplotlib expects rotation in degrees (anti-clockwise)
+        # matplotlib expects rotation in degrees (counter-clockwise)
         angle = self.angle.to('deg').value
 
         mpl_kwargs = self.visual.define_mpl_kwargs(self._mpl_artist)
@@ -210,19 +210,19 @@ class EllipsePixelRegion(PixelRegion):
                        **mpl_kwargs)
 
     def _update_from_mpl_selector(self, *args, **kwargs):
-        # _rect_properties replace _rect_bbox in matplotlib#19864, unchanged in #20839.
-        # "Note that if rotation != 0, ``xmin, ymin`` are always interpreted as the
-        #  lower corner, and ``xmax, ymax`` are calculated using only width and
-        #  height assuming no rotation (as specified for ``selector.extents``)."
+        # matplotlib#26833 removed _rect_properties / _rect_bbox,
+        # ``selector.extents`` are now following rotation, i.e. giving min/max x and y
+        # for the _rotated_ rectangle. For proper width and height use bbox edge distances
+        # in both dimensions (take 0|2 as lower|upper x, 1|3 as lower|upper y edge).
 
-        xmin, xmax, ymin, ymax = self._mpl_selector.extents
-        self.width = xmax - xmin
-        self.height = ymax - ymin
+        xec, yec = self._mpl_selector.edge_centers
+        self.width = np.sqrt((xec[2] - xec[0])**2 + (yec[2] - yec[0])**2)
+        self.height = np.sqrt((xec[3] - xec[1])**2 + (yec[3] - yec[1])**2)
+        self.center = PixCoord(*self._mpl_selector.center)
+        # matplotlib defines rotation counter-clockwise (available from 3.6.0 on)
         if hasattr(self._mpl_selector, 'rotation'):
-            rotation = self._mpl_selector.rotation
-            self.center = PixCoord(*self._mpl_selector.center)
+            rotation = -self._mpl_selector.rotation
         else:
-            self.center = PixCoord(x=0.5 * (xmin + xmax), y=0.5 * (ymin + ymax))
             rotation = 0
         self.angle = rotation * u.deg
 
@@ -303,7 +303,7 @@ class EllipsePixelRegion(PixelRegion):
                                       xy0[1], self.center.y + self.height / 2)
 
         if self.angle.value != 0:
-            self._mpl_selector.rotation = self.angle.to_value('deg')
+            self._mpl_selector.rotation = -self.angle.to_value('deg')
 
         self._mpl_selector.set_active(active)
         self._mpl_selector_callback = callback
