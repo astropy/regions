@@ -160,10 +160,8 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
 
         ax.figure.canvas.draw()
 
-        assert_allclose(region.center.x, expected[0])
-        assert_allclose(region.center.y, expected[1])
-        assert_allclose(region.width, expected[2])
-        assert_allclose(region.height, expected[3])
+        assert_allclose(region.center.xy, expected[:2], atol=1e-12, rtol=0)
+        assert_allclose((region.width, region.height), expected[2:], atol=1e-12, rtol=0)
 
         if sync:
             assert_quantity_allclose(region.angle, 0 * u.deg)
@@ -176,13 +174,74 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
             region.as_mpl_selector(ax)
 
     @pytest.mark.parametrize('anywhere', (False, True))
-    def test_mpl_selector_drag(self, anywhere):
+    @pytest.mark.parametrize('rotate', (0, 20))
+    def test_mpl_selector_drag(self, anywhere, rotate):
         """
         Test dragging of entire region from central handle and anywhere.
         """
         plt = pytest.importorskip('matplotlib.pyplot')
-        from matplotlib.testing.widgets import (
-            do_event)  # click_and_drag  # MPL_VERSION >= 36
+        from matplotlib.testing.widgets import do_event  # click_and_drag  # MPL_VERSION >= 36
+        from matplotlib import __version_info__ as MPL_VERSION
+
+        if rotate != 0 and MPL_VERSION < (3, 6, 0):
+            pytest.xfail('Creating selectors for rotated shapes is not yet supported')
+
+        rng = np.random.default_rng(0)
+        data = rng.random((16, 16))
+        mask = np.zeros_like(data)
+
+        ax = plt.subplot(1, 1, 1)
+        ax.imshow(data)
+
+        def update_mask(reg):
+            mask[:] = reg.to_mask(mode='subpixels', subpixels=10).to_image(data.shape)
+
+        region = self.reg.copy(angle=rotate * u.deg)
+
+        selector = region.as_mpl_selector(ax, callback=update_mask,
+                                          drag_from_anywhere=anywhere)
+
+        assert selector.drag_from_anywhere is anywhere
+        assert region._mpl_selector.drag_from_anywhere is anywhere
+        assert_allclose(region.center.xy, (3.0, 4.0), atol=1e-12, rtol=0)
+        assert_allclose(region.angle.value, rotate, atol=1e-12, rtol=0)
+        assert_allclose(selector.center, (3.0, 4.0), atol=1e-12, rtol=0)
+        if MPL_VERSION >= (3, 6, 0):
+            assert_allclose(selector.rotation, -rotate, atol=1e-12, rtol=0)
+
+        # click_and_drag(selector, start=(3, 4), end=(3.5, 4.5))
+        do_event(selector, 'press', xdata=3.0, ydata=4.0, button=1)
+        do_event(selector, 'onmove', xdata=3.5, ydata=4.5, button=1)
+        do_event(selector, 'release', xdata=3.5, ydata=4.5, button=1)
+
+        ax.figure.canvas.draw()
+
+        assert_allclose(region.center.xy, (3.5, 4.5), atol=1e-12, rtol=0)
+        assert_allclose((region.width, region.height), (4, 3), atol=1e-12, rtol=0)
+
+        # click_and_drag from outside centre handle, but inside region
+        do_event(selector, 'press', xdata=3.0, ydata=5.0, button=1)
+        do_event(selector, 'onmove', xdata=4.0, ydata=7.0, button=1)
+        do_event(selector, 'release', xdata=4.0, ydata=7.0, button=1)
+
+        ax.figure.canvas.draw()
+
+        # For drag_from_anywhere=False this will have created a new 1x2 rectangle.
+        if anywhere:
+            assert_allclose(region.center.xy, (4.5, 6.5), atol=1e-12, rtol=0)
+            assert_allclose((region.width, region.height), (4, 3), atol=1e-12, rtol=0)
+        else:
+            assert_allclose(region.center.xy, (3.5, 6.0), atol=1e-12, rtol=0)
+            assert_allclose((region.width, region.height), (1, 2), atol=1e-12, rtol=0)
+
+        assert_equal(mask, region.to_mask(mode='subpixels', subpixels=10).to_image(data.shape))
+
+    def test_mpl_selector_resize(self):
+        """
+        Test resizing of region on edge and corner handles.
+        """
+        plt = pytest.importorskip('matplotlib.pyplot')
+        from matplotlib.testing.widgets import do_event
 
         rng = np.random.default_rng(0)
         data = rng.random((16, 16))
@@ -196,38 +255,28 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
 
         region = self.reg.copy(angle=0 * u.deg)
 
-        selector = region.as_mpl_selector(ax, callback=update_mask,
-                                          drag_from_anywhere=anywhere)
-        assert selector.drag_from_anywhere is anywhere
-        assert region._mpl_selector.drag_from_anywhere is anywhere
+        selector = region.as_mpl_selector(ax, callback=update_mask)
+        assert region._mpl_selector.drag_from_anywhere is False
 
-        # click_and_drag(selector, start=(3, 4), end=(3.5, 4.5))
-        do_event(selector, 'press', xdata=3, ydata=4, button=1)
-        do_event(selector, 'onmove', xdata=3.5, ydata=4.5, button=1)
-        do_event(selector, 'release', xdata=3.5, ydata=4.5, button=1)
+        # click_and_drag(selector, start=(5, 4), end=(6, 4)) (drag right edge +1)
+        do_event(selector, 'press', xdata=5, ydata=4, button=1)
+        do_event(selector, 'onmove', xdata=6, ydata=4, button=1)
+        do_event(selector, 'release', xdata=6, ydata=4, button=1)
 
         ax.figure.canvas.draw()
 
-        assert_allclose(region.center.x, 3.5)
-        assert_allclose(region.center.y, 4.5)
-        assert_allclose(region.width, 4)
-        assert_allclose(region.height, 3)
+        assert_allclose(region.center.xy, (3.5, 4.0), atol=1e-12, rtol=0)
+        assert_allclose((region.width, region.height), (5, 3), atol=1e-12, rtol=0)
 
-        do_event(selector, 'press', xdata=3.25, ydata=4.25, button=1)
-        do_event(selector, 'onmove', xdata=4.25, ydata=5.25, button=1)
-        do_event(selector, 'release', xdata=4.25, ydata=5.25, button=1)
+        # click_and_drag(selector, start=(6, 5.5), end=(7, 7.5)) (upper right corner +1|+2)
+        do_event(selector, 'press', xdata=6, ydata=5.5, button=1)
+        do_event(selector, 'onmove', xdata=7, ydata=7.5, button=1)
+        do_event(selector, 'release', xdata=7, ydata=7.5, button=1)
 
         ax.figure.canvas.draw()
 
-        # For drag_from_anywhere=False this will have created a new 1x1 rectangle.
-        if anywhere:
-            assert_allclose(region.center.x, 4.5)
-            assert_allclose(region.center.y, 5.5)
-            assert_allclose(region.width, 4)
-            assert_allclose(region.height, 3)
-        else:
-            assert_allclose(region.center.x, 4.5)
-            assert_allclose(region.center.y, 5.5)
+        assert_allclose(region.center.xy, (4, 5), atol=1e-12, rtol=0)
+        assert_allclose((region.width, region.height), (6, 5), atol=1e-12, rtol=0)
 
         assert_equal(mask, region.to_mask(mode='subpixels', subpixels=10).to_image(data.shape))
 
