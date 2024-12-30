@@ -120,8 +120,8 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
     @pytest.mark.parametrize('sync', (False,))
     def test_as_mpl_selector(self, sync):
         plt = pytest.importorskip('matplotlib.pyplot')
+        from matplotlib import __version_info__ as MPL_VERSION  # noqa: N812
         from matplotlib.testing.widgets import do_event
-        from matplotlib import __version_info__ as MPL_VERSION
 
         rng = np.random.default_rng(0)
         data = rng.random((16, 16))
@@ -180,8 +180,9 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
         Test dragging of entire region from central handle and anywhere.
         """
         plt = pytest.importorskip('matplotlib.pyplot')
-        from matplotlib.testing.widgets import do_event  # click_and_drag  # MPL_VERSION >= 36
-        from matplotlib import __version_info__ as MPL_VERSION
+        from matplotlib import __version_info__ as MPL_VERSION  # noqa: N812
+        # if MPL_VERSION >= 36:
+        from matplotlib.testing.widgets import do_event  # click_and_drag
 
         if rotate != 0 and MPL_VERSION < (3, 6, 0):
             pytest.xfail('Creating selectors for rotated shapes is not yet supported')
@@ -220,9 +221,9 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
         assert_allclose((region.width, region.height), (4, 3), atol=1e-12, rtol=0)
 
         # click_and_drag from outside centre handle, but inside region
-        do_event(selector, 'press', xdata=3.0, ydata=5.0, button=1)
-        do_event(selector, 'onmove', xdata=4.0, ydata=7.0, button=1)
-        do_event(selector, 'release', xdata=4.0, ydata=7.0, button=1)
+        do_event(selector, 'press', xdata=2.5, ydata=5.0, button=1)
+        do_event(selector, 'onmove', xdata=3.5, ydata=7.0, button=1)
+        do_event(selector, 'release', xdata=3.5, ydata=7.0, button=1)
 
         ax.figure.canvas.draw()
 
@@ -231,7 +232,7 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
             assert_allclose(region.center.xy, (4.5, 6.5), atol=1e-12, rtol=0)
             assert_allclose((region.width, region.height), (4, 3), atol=1e-12, rtol=0)
         else:
-            assert_allclose(region.center.xy, (3.5, 6.0), atol=1e-12, rtol=0)
+            assert_allclose(region.center.xy, (3.0, 6.0), atol=1e-12, rtol=0)
             assert_allclose((region.width, region.height), (1, 2), atol=1e-12, rtol=0)
 
         assert_equal(mask, region.to_mask(mode='subpixels', subpixels=10).to_image(data.shape))
@@ -277,6 +278,85 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
 
         assert_allclose(region.center.xy, (4, 5), atol=1e-12, rtol=0)
         assert_allclose((region.width, region.height), (6, 5), atol=1e-12, rtol=0)
+
+        assert_equal(mask, region.to_mask(mode='subpixels', subpixels=10).to_image(data.shape))
+
+    def test_mpl_selector_rotate(self):
+        """
+        Test rotating region on corner handles and by setting angle.
+        """
+        plt = pytest.importorskip('matplotlib.pyplot')
+        from matplotlib.testing.widgets import do_event
+
+        rng = np.random.default_rng(0)
+        data = rng.random((16, 16))
+        mask = np.zeros_like(data)
+
+        ax = plt.subplot(1, 1, 1)
+        ax.imshow(data)
+
+        def update_mask(reg):
+            mask[:] = reg.to_mask(mode='subpixels', subpixels=10).to_image(data.shape)
+
+        region = self.reg.copy(angle=0 * u.deg)
+        selector = region.as_mpl_selector(ax, callback=update_mask)
+
+        # Need rotation implementation from matplotlib#26833, hopefully to change once released
+        if not hasattr(selector, '_geometry_state'):
+            pytest.xfail('Rotating selectors is not yet supported')
+
+        assert region._mpl_selector.drag_from_anywhere is False
+        assert_allclose(region.center.xy, (3.0, 4.0), atol=1e-12, rtol=0)
+        assert_allclose((region.width, region.height), (4, 3), atol=1e-12, rtol=0)
+        assert_quantity_allclose(region.angle, 0 * u.deg)
+        assert_allclose(region._mpl_selector.rotation, 0.0, atol=1e-12)
+        assert_allclose(region.corners, [(1, 2.5), (5, 2.5), (5, 5.5), (1, 5.5)],
+                        atol=1e-12, rtol=0)
+
+        # Rotate counter-clockwise using top-right corner
+        do_event(selector, 'on_key_press', key='r')
+        do_event(selector, 'press', xdata=5, ydata=5.5, button=1)
+        do_event(selector, 'onmove', xdata=4, ydata=6, button=1)
+        do_event(selector, 'release', xdata=4, ydata=6, button=1)
+        do_event(selector, 'on_key_press', key='r')
+
+        ax.figure.canvas.draw()
+
+        assert_allclose(region.center.xy, (3.0, 4.0), atol=1e-12, rtol=0)
+        assert_allclose((region.width, region.height), (4, 3), atol=1e-12, rtol=0)
+        assert_allclose(region._mpl_selector.rotation, -26.56, atol=0.01)
+        assert_quantity_allclose(region.angle, 26.56 * u.deg, rtol=0.001)
+        assert_allclose(region.corners, [(1.88, 1.76), (5.46, 3.55), (4.12, 6.24), (0.54, 4.45)],
+                        atol=1e-2, rtol=0)
+
+        assert_equal(mask, region.to_mask(mode='subpixels', subpixels=10).to_image(data.shape))
+
+        # click_and_drag(selector, start=(3, 4), end=(7, 6))  # (shift center +3|+2)
+        do_event(selector, 'press', xdata=3, ydata=4, button=1)
+        do_event(selector, 'onmove', xdata=6, ydata=6, button=1)
+        do_event(selector, 'release', xdata=6, ydata=6, button=1)
+
+        ax.figure.canvas.draw()
+
+        assert_allclose(region.center.xy, (6, 6), atol=1e-12, rtol=0)
+        assert_allclose((region.width, region.height), (4, 3), atol=1e-12, rtol=0)
+        assert_allclose(region._mpl_selector.rotation, -26.56, atol=0.01)
+        assert_quantity_allclose(region.angle, 26.56 * u.deg, rtol=0.001)
+        assert_allclose(region.corners, [(4.88, 3.76), (8.46, 5.55), (7.12, 8.24), (3.54, 6.45)],
+                        atol=1e-2, rtol=0)
+
+        assert_equal(mask, region.to_mask(mode='subpixels', subpixels=10).to_image(data.shape))
+
+        # and de-rotate shifted rectangle
+        region._mpl_selector.rotation = 0.0
+        region._update_from_mpl_selector()
+
+        assert_allclose(region.center.xy, (6, 6), atol=1e-2, rtol=0)
+        assert_allclose((region.width, region.height), (4, 3), atol=1e-12, rtol=0)
+        assert_quantity_allclose(region.angle, 0 * u.deg, atol=1e-12 * u.deg)
+        assert_allclose(region._mpl_selector.rotation, 0.0, atol=1e-12)
+        assert_allclose(region.corners, [(4, 4.5), (8, 4.5), (8, 7.5), (4, 7.5)],
+                        atol=1e-12, rtol=0)
 
         assert_equal(mask, region.to_mask(mode='subpixels', subpixels=10).to_image(data.shape))
 

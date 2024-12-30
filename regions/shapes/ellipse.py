@@ -271,8 +271,8 @@ class EllipsePixelRegion(PixelRegion):
         you can enable/disable the selector at any point by calling
         ``selector.set_active(True)`` or ``selector.set_active(False)``.
         """
+        from matplotlib import __version__ as MPL_VER_STR  # noqa: N812
         from matplotlib.widgets import EllipseSelector
-        from matplotlib import __version__ as MPL_VER_STR
 
         if hasattr(self, '_mpl_selector'):
             raise AttributeError('Cannot attach more than one selector to a region.')
