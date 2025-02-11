@@ -49,6 +49,13 @@ jobs:
             allow_failure: false
             prefix: ''
 
+          - os: ubuntu-24.04-arm
+            python: '3.12'
+            tox_env: 'py312-test-alldeps'
+            toxposargs: --remote-data=any
+            allow_failure: false
+            prefix: ''
+
           - os: macos-latest
             python: '3.12'
             tox_env: 'py312-test-alldeps'
