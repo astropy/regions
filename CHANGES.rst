@@ -242,11 +242,11 @@ General
   APE 17 guidelines. The main changes are that the ``python setup.py
   test`` and ``python setup.py build_docs`` commands will no longer
   work. The easiest way to replicate these commands is to install the
-  tox (https://tox.readthedocs.io) package and run ``tox -e test`` and
-  ``tox -e build_docs``. It is also possible to run pytest and sphinx
-  directly. Other significant changes include switching to setuptools_scm
-  to manage the version number, and adding a ``pyproject.toml`` to opt in
-  to isolated builds as described in PEP 517/518. [#315]
+  tox package and run ``tox -e test`` and ``tox -e build_docs``. It is
+  also possible to run pytest and sphinx directly. Other significant
+  changes include switching to setuptools_scm to manage the version
+  number, and adding a ``pyproject.toml`` to opt in to isolated builds
+  as described in PEP 517/518. [#315]
 
 - Bump the minimum required version of Astropy to 3.2.
 
