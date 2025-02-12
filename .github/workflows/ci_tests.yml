@@ -32,6 +32,12 @@ jobs:
         include:
           - os: ubuntu-latest
             python: '3.10'
+            tox_env: 'py310-test-oldestdeps'
+            allow_failure: false
+            prefix: ''
+
+          - os: ubuntu-latest
+            python: '3.10'
             tox_env: 'py310-test-alldeps'
             allow_failure: false
             prefix: ''
@@ -39,13 +45,6 @@ jobs:
           - os: ubuntu-latest
             python: '3.11'
             tox_env: 'py311-test-alldeps'
-            allow_failure: false
-            prefix: ''
-
-          - os: ubuntu-latest
-            python: '3.12'
-            tox_env: 'py312-test-alldeps-cov'
-            toxposargs: --remote-data=any
             allow_failure: false
             prefix: ''
 
@@ -68,8 +67,23 @@ jobs:
             prefix: ''
 
           - os: ubuntu-latest
-            python: '3.13'
-            tox_env: 'py313-test'
+            python: '3.12'
+            tox_env: 'py312-test'
+            toxposargs: --remote-data=any
+            allow_failure: false
+            prefix: ''
+
+          - os: ubuntu-latest
+            python: '3.12'
+            tox_env: 'py312-test-alldeps-cov'
+            toxposargs: --remote-data=any
+            allow_failure: false
+            prefix: ''
+
+          - os: ubuntu-24.04-arm
+            python: '3.12'
+            tox_env: 'py312-test-alldeps'
+            toxposargs: --remote-data=any
             allow_failure: false
             prefix: ''
 
@@ -92,8 +106,8 @@ jobs:
             prefix: ''
 
           - os: ubuntu-latest
-            python: '3.10'
-            tox_env: 'py310-test-oldestdeps'
+            python: '3.13'
+            tox_env: 'py313-test-alldeps'
             allow_failure: false
             prefix: ''
 
@@ -123,7 +137,7 @@ jobs:
         python -c "import setuptools; print(f'setuptools {setuptools.__version__}')"
         python -c "import tox; print(f'tox {tox.__version__}')"
     - name: Run tests
-      run: tox -e ${{ matrix.tox_env }} -- ${{ matrix.toxposargs }}
+      run: python -m tox -e ${{ matrix.tox_env }} -- ${{ matrix.toxposargs }}
     - name: Upload coverage to codecov
       if: ${{ contains(matrix.tox_env, '-cov') }}
       uses: codecov/codecov-action@13ce06bfc6bbe3ecf90edbbf1bc32fe5978ca1d3  # v5.3.1

@@ -59,7 +59,7 @@ jobs:
           python -c "import setuptools; print(f'setuptools {setuptools.__version__}')"
           python -c "import tox; print(f'tox {tox.__version__}')"
       - name: Run tests
-        run: tox -e ${{ matrix.tox_env }} -- ${{ matrix.toxposargs }}
+        run: python -m tox -e ${{ matrix.tox_env }} -- ${{ matrix.toxposargs }}
 
 
   test_more_architectures:
@@ -67,7 +67,7 @@ jobs:
     # we include them just in the weekly cron. These also serve as a test
     # of using system libraries and using pytest directly.
 
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     name: More architectures
     if: (github.repository == 'astropy/regions' && (github.event_name == 'schedule' || github.event_name == 'push' || github.event_name == 'workflow_dispatch' || contains(github.event.pull_request.labels.*.name, 'Arch CI')))
     env:
@@ -77,7 +77,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - arch: aarch64
           - arch: s390x
           - arch: ppc64le
           - arch: armv7
