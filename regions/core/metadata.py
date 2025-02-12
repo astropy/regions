@@ -50,6 +50,17 @@ class Meta(dict):
         return super().__getitem__(item)
 
     def update(self, *args, **kwargs):
+        """
+        Update the metadata with the input dictionary.
+
+        Parameters
+        ----------
+        *args : dict-like
+            A dictionary or other mapping object to update the metadata.
+
+        **kwargs : dict-like
+            Additional keyword arguments to update the metadata.
+        """
         if args:
             if len(args) > 1:
                 raise ValueError('Only one argument can be input')
