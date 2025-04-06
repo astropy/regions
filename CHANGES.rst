@@ -125,6 +125,9 @@ New Features
 
 - Added the DS9 'boxcircle' point symbol. [#387]
 
+- Enable rotation of the ``as_mpl_selector`` widgets for rectangular
+  and ellipse regions with matplotlib versions supporting this. [#390]
+
 - Added the ability to add and subtract ``PixCoord`` objects. [#396]
 
 - Added an ``origin`` keyword to ``PolygonPixelRegion`` to allow
