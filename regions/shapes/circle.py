@@ -5,20 +5,21 @@ This module defines circular regions in both pixel and sky coordinates.
 
 import math
 
-from astropy.coordinates import Angle
 import astropy.units as u
 import numpy as np
+from astropy.coordinates import Angle
 
-from ..core.attributes import (ScalarPixCoord, PositiveScalar,
-                               PositiveScalarAngle, ScalarSkyCoord,
-                               RegionMetaDescr, RegionVisualDescr, ScalarAngle)
-from ..core.bounding_box import RegionBoundingBox
-from ..core.core import PixelRegion, SkyRegion
-from ..core.mask import RegionMask
-from ..core.metadata import RegionMeta, RegionVisual
-from ..core.pixcoord import PixCoord
-from .._utils.wcs_helpers import pixel_scale_angle_at_skycoord
-from .._geometry import circular_overlap_grid
+from regions._geometry import circular_overlap_grid
+from regions._utils.wcs_helpers import pixel_scale_angle_at_skycoord
+from regions.core.attributes import (PositiveScalar, PositiveScalarAngle,
+                                     RegionMetaDescr, RegionVisualDescr,
+                                     ScalarPixCoord, ScalarSkyCoord)
+from regions.core.bounding_box import RegionBoundingBox
+from regions.core.core import PixelRegion, SkyRegion
+from regions.core.mask import RegionMask
+from regions.core.metadata import RegionMeta, RegionVisual
+from regions.core.pixcoord import PixCoord
+
 
 __all__ = ['CirclePixelRegion', 'CircleSkyRegion', 'CircleSectorPixelRegion']
 
@@ -94,7 +95,9 @@ class CirclePixelRegion(PixelRegion):
 
     @property
     def bounding_box(self):
-        """Bounding box (`~regions.RegionBoundingBox`)."""
+        """
+        Bounding box (`~regions.RegionBoundingBox`).
+        """
         xmin = self.center.x - self.radius
         xmax = self.center.x + self.radius
         ymin = self.center.y - self.radius
@@ -120,10 +123,7 @@ class CirclePixelRegion(PixelRegion):
         ymin = float(bbox.iymin) - 0.5 - self.center.y
         ymax = float(bbox.iymax) - 0.5 - self.center.y
 
-        if mode == 'subpixels':
-            use_exact = 0
-        else:
-            use_exact = 1
+        use_exact = 0 if mode == 'subpixels' else 1
 
         fraction = circular_overlap_grid(xmin, xmax, ymin, ymax, nx, ny,
                                          self.radius, use_exact, subpixels)

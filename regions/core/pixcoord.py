@@ -1,8 +1,8 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 import copy
 
-from astropy.coordinates import SkyCoord
 import numpy as np
+from astropy.coordinates import SkyCoord
 
 __all__ = ['PixCoord']
 
@@ -104,7 +104,7 @@ class PixCoord:
         return len(self.x)
 
     def __iter__(self):
-        for (x, y) in zip(self.x, self.y):
+        for (x, y) in zip(self.x, self.y, strict=True):
             yield PixCoord(x=x, y=y)
 
     def __getitem__(self, key):
@@ -129,8 +129,8 @@ class PixCoord:
 
     def __eq__(self, other):
         """
-        Checks whether ``other`` is `PixCoord` object and whether
-        their abscissa and ordinate values are equal using
+        Check whether ``other`` is `PixCoord` object and whether their
+        abscissa and ordinate values are equal using
         `np.testing.assert_allclose` with its default tolerance values.
         """
         if isinstance(other, self.__class__):

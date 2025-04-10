@@ -3,18 +3,17 @@
 Tests for the crtf subpackage.
 """
 
-from astropy.coordinates import Angle, SkyCoord
 import astropy.units as u
-from astropy.utils.data import get_pkg_data_filename
-from astropy.tests.helper import assert_quantity_allclose
 import pytest
+from astropy.coordinates import Angle, SkyCoord
+from astropy.tests.helper import assert_quantity_allclose
+from astropy.utils.data import get_pkg_data_filename
 
-from ....shapes.circle import CircleSkyRegion
-from ....shapes.ellipse import EllipseSkyRegion
-from ....core import Regions
-from ..core import CRTFRegionParserError
-from ..read import _CRTFParser
-
+from regions.core import Regions
+from regions.io.crtf.core import CRTFRegionParserError
+from regions.io.crtf.read import _CRTFParser
+from regions.shapes.circle import CircleSkyRegion
+from regions.shapes.ellipse import EllipseSkyRegion
 
 implemented_region_types = ('ellipse', 'circle', 'rectangle', 'poly', 'point',
                             'text', 'symbol')
@@ -46,7 +45,7 @@ def test_valid_crtf_line():
 
 def test_valid_region_type():
     """
-    Checks whether the region type is valid in CRTF format
+    Checks whether the region type is valid in CRTF format.
     """
     reg_str = 'hyperbola[[18h12m24s, -23d11m00s], 2.3arcsec]'
 
@@ -80,14 +79,14 @@ def test_valid_meta_key():
 
 def test_valid_region_syntax():
     """
-    Checks whether the region has valid parameters
+    Checks whether the region has valid parameters.
     """
     reg_str1 = 'circle[[18h12m24s, -23d11m00s], [2.3arcsec,4.5arcsec]'
     with pytest.raises(CRTFRegionParserError) as excinfo:
         Regions.parse(reg_str1, format='crtf')
 
     estr = ("Not in proper format: ('2.3arcsec', '4.5arcsec') should be "
-            "a single length")
+            'a single length')
     assert estr in str(excinfo.value)
 
     reg_str2 = ('symbol[[32.1423deg, 12.1412deg], 12deg], linewidth=2, '
@@ -141,8 +140,8 @@ def test_issue_312_regression():
                            'fk5', '.6f')])
 def test_file_crtf(filename, outname, coordsys, fmt):
     """
-    The "labelcolor" example is a regression test for Issue 405
-    The others are just a general serialization self-consistency check.
+    The "labelcolor" example is a regression test for Issue 405 The
+    others are just a general serialization self-consistency check.
     """
     filename = get_pkg_data_filename(filename)
     regs = Regions.read(filename, errors='warn', format='crtf')
@@ -154,8 +153,8 @@ def test_file_crtf(filename, outname, coordsys, fmt):
 
     # since metadata is not required to preserve order, we have to do a more
     # complex comparison
-    desired_lines = [set(line.split(",")) for line in ref_output.split("\n")]
-    actual_lines = [set(line.split(",")) for line in actual_output.split("\n")]
+    desired_lines = [set(line.split(',')) for line in ref_output.split('\n')]
+    actual_lines = [set(line.split(',')) for line in actual_output.split('\n')]
     for split_line in actual_lines:
         assert split_line in desired_lines
 
@@ -181,7 +180,7 @@ def test_crtf_header():
 
 def test_space_after_regname():
     """
-    Regression test for #271: space is allowed
+    Regression test for #271: space is allowed.
     """
     reg_str = 'circle [[42deg, 43deg], 3deg], coord=J2000, color=green'
     reg = Regions.parse(reg_str, format='crtf')[0]

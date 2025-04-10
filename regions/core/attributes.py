@@ -6,12 +6,12 @@ validation of region classes.
 
 import abc
 
+import numpy as np
 from astropy.coordinates import SkyCoord
 from astropy.units import Quantity
-import numpy as np
 
-from .pixcoord import PixCoord
-from .metadata import RegionMeta, RegionVisual
+from regions.core.metadata import RegionMeta, RegionVisual
+from regions.core.pixcoord import PixCoord
 
 __all__ = []
 
@@ -56,7 +56,8 @@ class RegionAttribute(abc.ABC):
 
 class ScalarPixCoord(RegionAttribute):
     """
-    Descriptor class to check that value is a scalar `~regions.PixCoord`.
+    Descriptor class to check that value is a scalar
+    `~regions.PixCoord`.
     """
 
     def _validate(self, value):
@@ -133,8 +134,8 @@ class ScalarAngle(RegionAttribute):
 
 class PositiveScalarAngle(RegionAttribute):
     """
-    Descriptor class to check that value is a strictly positive
-    scalar angle, either an `~astropy.coordinates.Angle` or
+    Descriptor class to check that value is a strictly positive scalar
+    angle, either an `~astropy.coordinates.Angle` or
     `~astropy.units.Quantity` with angular units.
     """
 
@@ -156,6 +157,14 @@ class PositiveScalarAngle(RegionAttribute):
 class RegionType(RegionAttribute):
     """
     Descriptor class to check the region type of value.
+
+    Parameters
+    ----------
+    name : str
+        The name of the attribute.
+
+    regionclass : `~regions.Region`
+        The region class to check.
     """
 
     def __init__(self, name, regionclass):
@@ -175,6 +184,7 @@ class RegionMetaDescr(RegionAttribute):
     If input as a pure `dict`, it will be converted to a `RegionMeta`
     object.
     """
+
     def __set__(self, instance, value):
         # RegionMeta subclasses dict
         if isinstance(value, dict) and not isinstance(value, RegionMeta):

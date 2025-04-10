@@ -93,7 +93,7 @@ Here are what the region masks produced by different modes look like:
 
 As we've seen above, the :class:`~regions.RegionMask` object has a
 ``data`` attribute that contains a Numpy array with the mask values.
-However, if you have, for example, a small circluar region with a radius
+However, if you have, for example, a small circular region with a radius
 of 3 pixels at a pixel position of (1000, 1000), it would be inefficient
 to store a large mask array that has a size to cover this position (most
 of the mask values would be zero). Instead, we store the mask using
@@ -142,7 +142,9 @@ no overlap of the aperture mask with the data.
 
 These masks can be used, for example, as the building blocks for
 photometry, which we demonstrate with a simple example. We start off by
-getting an example image::
+getting an example image:
+
+.. doctest-remote-data::
 
     >>> from astropy.io import fits
     >>> from astropy.utils.data import get_pkg_data_filename
@@ -158,7 +160,9 @@ We then define a circular aperture region::
     >>> aperture = CirclePixelRegion(center, 4.)
 
 We then convert the aperture to a mask and extract a cutout from the
-data, as well as a cutout with the data multiplied by the mask::
+data, as well as a cutout with the data multiplied by the mask:
+
+.. doctest-remote-data::
 
     >>> mask = aperture.to_mask(mode='exact')
     >>> data = mask.cutout(hdu.data)
@@ -168,7 +172,9 @@ Note that ``weighted_data`` will have zeros where the mask is zero; it
 therefore should not be used to compute statistics (see :ref:`Masked
 Statistics <masked_statistics>` below). To get the mask-weighted pixel
 values as a 1D array, excluding the pixels where the mask is zero,
-use the :meth:`~regions.RegionMask.get_values` method::
+use the :meth:`~regions.RegionMask.get_values` method:
+
+.. doctest-remote-data::
 
     >>> weighted_data_1d = mask.get_values(hdu.data)
     >>> hdulist.close()
@@ -268,7 +274,9 @@ Masked Statistics
 `````````````````
 
 Finally, we can use the mask and data values to compute weighted
-statistics::
+statistics:
+
+.. doctest-remote-data::
 
     >>> import numpy as np
     >>> np.average(data, weights=mask)  # doctest: +FLOAT_CMP

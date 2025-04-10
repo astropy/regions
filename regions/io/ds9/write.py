@@ -1,19 +1,19 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
-from copy import deepcopy
 import os
 import warnings
+from copy import deepcopy
 
 from astropy.coordinates import Angle, SkyCoord
 from astropy.units import Quantity
 from astropy.utils.exceptions import AstropyUserWarning
 
-from ...core import Region, Regions, PixelRegion, PixCoord
-from ...core import CompoundPixelRegion, CompoundSkyRegion
-from ...core.registry import RegionsRegistry
-from ...shapes import RegularPolygonPixelRegion
-from .core import ds9_frame_map, ds9_shape_templates
-from .meta import _translate_metadata_to_ds9
+from regions.core import (CompoundPixelRegion, CompoundSkyRegion, PixCoord,
+                          PixelRegion, Region, Regions)
+from regions.core.registry import RegionsRegistry
+from regions.io.ds9.core import ds9_frame_map, ds9_shape_templates
+from regions.io.ds9.meta import _translate_metadata_to_ds9
+from regions.shapes import RegularPolygonPixelRegion
 
 __all__ = []
 
@@ -70,7 +70,7 @@ def _serialize_ds9(regions, precision=8):
         output += f'{global_frame}\n'
 
     # add line for each region
-    for region, region_meta in zip(region_data, metadata):
+    for region, region_meta in zip(region_data, metadata, strict=True):
         if global_frame is None:
             output += f'{region["frame"]}; '
 
@@ -123,17 +123,16 @@ def _get_region_shape(region):
 def _get_frame_name(region, mapping):
     if isinstance(region, PixelRegion):
         frame = 'image'
+    elif 'center' in region._params:
+        frame = region.center.frame.name
+    elif 'vertices' in region._params:
+        frame = region.vertices.frame.name
+    elif 'start' in region._params:
+        frame = region.start.frame.name
     else:
-        if 'center' in region._params:
-            frame = region.center.frame.name
-        elif 'vertices' in region._params:
-            frame = region.vertices.frame.name
-        elif 'start' in region._params:
-            frame = region.start.frame.name
-        else:
-            raise ValueError(f'Unable to get coordinate frame for {region!r}')
+        raise ValueError(f'Unable to get coordinate frame for {region!r}')
 
-    if frame not in mapping.keys():
+    if frame not in mapping:
         warnings.warn(f'Cannot serialize region with frame={frame}, skipping',
                       AstropyUserWarning)
 
@@ -157,7 +156,7 @@ def _get_region_params(region, shape_template, precision=8):
 
     param = {}
     for param_name in region._params:
-        if param_name in ('text'):
+        if param_name in ('text',):
             continue
 
         value = getattr(region, param_name)
@@ -185,10 +184,7 @@ def _get_region_params(region, shape_template, precision=8):
         elif isinstance(value, SkyCoord):
             val = value.to_string(precision=precision)
             # polygon region has multiple SkyCoord
-            if not value.isscalar:
-                value = ' '.join(val)
-            else:
-                value = val
+            value = ' '.join(val) if not value.isscalar else val
             value = value.replace(' ', ',')
 
         elif isinstance(value, Angle):

@@ -3,4 +3,4 @@
 This subpackage provides general-purpose utility functions.
 """
 
-from .wcs_helpers import *  # noqa
+from .wcs_helpers import *  # noqa: F401, F403

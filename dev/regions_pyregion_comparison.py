@@ -1,6 +1,6 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """
-Compare DS9 parsing of the astropy regions package to pyregion
+Compare DS9 parsing of the astropy regions package to pyregion.
 
 This scripts compares the DS9 parsing of the astropy regions package to
 pyregion in two regards.
@@ -14,19 +14,20 @@ The test files are the ones used since PyAstro16 (see
 https://zenodo.org/record/56793).
 """
 
-from pathlib import Path
 import re
 import timeit
+from pathlib import Path
 
-from astropy.table import Table
 import numpy as np
 import pyregion
-from regions import read_ds9, DS9RegionParserError
+from astropy.table import Table
+
+from regions import DS9RegionParserError, read_ds9
 
 TEST_FILE_DIR = Path('../regions/io/ds9/tests/data')
 REPETITIONS = 1
 
-p_region_count = re.compile(r"[^=\)]\(")
+p_region_count = re.compile(r'[^=\)]\(')
 
 results = list()
 

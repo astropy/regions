@@ -1,14 +1,13 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
+import astropy.units as u
+import numpy as np
 from astropy.coordinates import SkyCoord
 from astropy.tests.helper import assert_quantity_allclose
-import astropy.units as u
 from astropy.wcs import WCS
-import numpy as np
-
 from numpy.testing import assert_allclose
 
-from ..core import Region, PixCoord
+from regions.core import PixCoord, Region
 
 
 def make_simple_wcs(skycoord, resolution, size):
@@ -22,7 +21,7 @@ def make_simple_wcs(skycoord, resolution, size):
     wcs.wcs.crpix = [crpix, crpix]
     wcs.wcs.cdelt = np.array([-cdelt, cdelt])
     wcs.wcs.crval = [ra, dec]
-    wcs.wcs.ctype = ["RA---TAN", "DEC--TAN"]
+    wcs.wcs.ctype = ['RA---TAN', 'DEC--TAN']
 
     return wcs
 

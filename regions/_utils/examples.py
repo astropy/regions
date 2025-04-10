@@ -1,14 +1,14 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
+import numpy as np
 from astropy.coordinates import SkyCoord
 from astropy.io import fits
 from astropy.table import Table
 from astropy.table import vstack as table_vstack
 from astropy.utils import lazyproperty
 from astropy.wcs import WCS
-import numpy as np
 
-from ..core.pixcoord import PixCoord
+from regions.core.pixcoord import PixCoord
 
 __all__ = ['make_example_dataset']
 
@@ -67,6 +67,11 @@ def make_example_dataset(data='simulated', config=None):
 class ExampleDataset:
     """
     Base class for an example dataset.
+
+    Parameters
+    ----------
+    config : dict or None
+        Configuration options.
     """
 
     def __init__(self, config=None):
@@ -88,7 +93,9 @@ class ExampleDataset:
 
     @lazyproperty
     def wcs(self):
-        """World coordinate system (`~astropy.wcs.WCS`)."""
+        """
+        World coordinate system (`~astropy.wcs.WCS`).
+        """
         wcs = WCS(naxis=2)
         wcs.wcs.crval = self.config['crval']
         wcs.wcs.crpix = self.config['crpix']
@@ -99,7 +106,9 @@ class ExampleDataset:
 
     @lazyproperty
     def image(self):
-        """Counts image (`~astropy.io.fits.ImageHDU`)."""
+        """
+        Return a "counts" image (`~astropy.io.fits.ImageHDU`).
+        """
         events = self.event_table
         skycoord = SkyCoord(events['GLON'], events['GLAT'], unit='deg',
                             frame='galactic')

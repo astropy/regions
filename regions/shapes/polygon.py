@@ -6,16 +6,17 @@ This module defines polygon regions in both pixel and sky coordinates.
 import astropy.units as u
 import numpy as np
 
-from ..core.attributes import (OneDPixCoord, ScalarPixCoord, PositiveScalar,
-                               ScalarAngle, OneDSkyCoord, RegionMetaDescr,
-                               RegionVisualDescr)
-from ..core.bounding_box import RegionBoundingBox
-from ..core.core import PixelRegion, SkyRegion
-from ..core.mask import RegionMask
-from ..core.metadata import RegionMeta, RegionVisual
-from ..core.pixcoord import PixCoord
-from .._geometry import polygonal_overlap_grid
-from .._geometry.pnpoly import points_in_polygon
+from regions._geometry import polygonal_overlap_grid
+from regions._geometry.pnpoly import points_in_polygon
+from regions.core.attributes import (OneDPixCoord, OneDSkyCoord,
+                                     PositiveScalar, RegionMetaDescr,
+                                     RegionVisualDescr, ScalarAngle,
+                                     ScalarPixCoord)
+from regions.core.bounding_box import RegionBoundingBox
+from regions.core.core import PixelRegion, SkyRegion
+from regions.core.mask import RegionMask
+from regions.core.metadata import RegionMeta, RegionVisual
+from regions.core.pixcoord import PixCoord
 
 __all__ = ['PolygonPixelRegion', 'RegularPolygonPixelRegion',
            'PolygonSkyRegion']
@@ -68,11 +69,12 @@ class PolygonPixelRegion(PixelRegion):
     meta = RegionMetaDescr('The meta attributes as a |RegionMeta|')
     visual = RegionVisualDescr('The visual attributes as a |RegionVisual|.')
 
-    def __init__(self, vertices, meta=None, visual=None,
-                 origin=PixCoord(0, 0)):
+    def __init__(self, vertices, meta=None, visual=None, origin=None):
         self._vertices = vertices
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
+        if origin is None:
+            origin = PixCoord(0, 0)
         self.origin = origin
         self.vertices = vertices + origin
 
@@ -125,10 +127,7 @@ class PolygonPixelRegion(PixelRegion):
             mode = 'subpixels'
             subpixels = 1
 
-        if mode == 'subpixels':
-            use_exact = 0
-        else:
-            use_exact = 1
+        use_exact = 0 if mode == 'subpixels' else 1
 
         # Find bounding box and mask size
         bbox = self.bounding_box

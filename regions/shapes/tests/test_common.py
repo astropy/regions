@@ -4,11 +4,11 @@ Base class for all shape tests.
 """
 
 import numpy as np
-from numpy.testing import assert_equal, assert_allclose
 import pytest
+from numpy.testing import assert_allclose, assert_equal
 
-from ...core.pixcoord import PixCoord
-from ..._utils.optional_deps import HAS_MATPLOTLIB  # noqa
+from regions._utils.optional_deps import HAS_MATPLOTLIB
+from regions.core.pixcoord import PixCoord
 
 
 class BaseTestRegion:
@@ -55,17 +55,17 @@ class BaseTestPixelRegion(BaseTestRegion):
             assert pixcoord not in self.reg
 
     def test_contains_array_1d(self):
-        pixcoord = PixCoord(*zip(*(self.inside + self.outside)))
+        pixcoord = PixCoord(*zip(*(self.inside + self.outside), strict=True))
         actual = self.reg.contains(pixcoord)
         assert_equal(actual[:len(self.inside)], True)
         assert_equal(actual[len(self.inside):], False)
 
         with pytest.raises(ValueError) as excinfo:
-            pixcoord in self.reg
+            assert pixcoord in self.reg
         assert 'coord must be scalar' in str(excinfo.value)
 
     def test_contains_array_2d(self):
-        x, y = zip(*(self.inside + self.outside))
+        x, y = zip(*(self.inside + self.outside), strict=True)
         pixcoord = PixCoord([x] * 3, [y] * 3)
 
         actual = self.reg.contains(pixcoord)
@@ -73,7 +73,7 @@ class BaseTestPixelRegion(BaseTestRegion):
         assert_equal(actual[:, :len(self.inside)], True)
         assert_equal(actual[:, len(self.inside):], False)
 
-    @pytest.mark.skipif('not HAS_MATPLOTLIB')
+    @pytest.mark.skipif(not HAS_MATPLOTLIB, reason='matplotlib is required')
     def test_plot(self):
         from matplotlib.artist import Artist
         artist = self.reg.plot()

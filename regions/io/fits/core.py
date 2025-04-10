@@ -1,9 +1,9 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
-from ...shapes import (CirclePixelRegion, EllipsePixelRegion,
-                       RectanglePixelRegion, PolygonPixelRegion,
-                       CircleAnnulusPixelRegion, EllipseAnnulusPixelRegion,
-                       PointPixelRegion)
+from regions.shapes import (CircleAnnulusPixelRegion, CirclePixelRegion,
+                            EllipseAnnulusPixelRegion, EllipsePixelRegion,
+                            PointPixelRegion, PolygonPixelRegion,
+                            RectanglePixelRegion)
 
 __all__ = []
 

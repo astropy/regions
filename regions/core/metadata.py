@@ -10,6 +10,14 @@ __all__ = ['Meta', 'RegionMeta', 'RegionVisual']
 class Meta(dict):
     """
     A base class for region metadata.
+
+    Parameters
+    ----------
+    seq : dict-like, optional
+        A dictionary or other mapping object to initialize the metadata.
+
+    **kwargs
+        Additional keyword arguments to initialize the metadata.
     """
 
     valid_keys = []
@@ -42,14 +50,25 @@ class Meta(dict):
         return super().__getitem__(item)
 
     def update(self, *args, **kwargs):
+        """
+        Update the metadata with the input dictionary.
+
+        Parameters
+        ----------
+        *args : dict-like
+            A dictionary or other mapping object to update the metadata.
+
+        **kwargs : dict-like
+            Additional keyword arguments to update the metadata.
+        """
         if args:
             if len(args) > 1:
                 raise ValueError('Only one argument can be input')
             other = dict(args[0])
-            for key in other:
-                self[key] = other[key]
-        for key in kwargs:
-            self[key] = kwargs[key]
+            for key, value in other.items():
+                self[key] = value
+        for key, value in kwargs.items():
+            self[key] = value
 
     def setdefault(self, key, value=None):
         if key not in self:
@@ -133,7 +152,7 @@ class RegionVisual(Meta):
                 kwargs['ha'] = 'center'  # text horizontal alignment
                 kwargs['va'] = 'center'  # text vertical alignment
             elif artist == 'Line2D':
-                from ..io.ds9.core import ds9_valid_symbols
+                from regions.io.ds9.core import ds9_valid_symbols
 
                 kwargs['marker'] = ds9_valid_symbols['boxcircle']
                 kwargs['markersize'] = 11

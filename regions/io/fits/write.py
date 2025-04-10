@@ -1,17 +1,17 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
-from dataclasses import dataclass
 import warnings
+from dataclasses import dataclass
 
+import astropy.units as u
+import numpy as np
 from astropy.io import fits
 from astropy.table import QTable
-import astropy.units as u
 from astropy.utils.exceptions import AstropyUserWarning
-import numpy as np
 
-from ...core import Region, Regions, SkyRegion
-from ...shapes import RegularPolygonPixelRegion
-from ...core.registry import RegionsRegistry
+from regions.core import Region, Regions, SkyRegion
+from regions.core.registry import RegionsRegistry
+from regions.shapes import RegularPolygonPixelRegion
 
 __all__ = []
 
@@ -83,6 +83,7 @@ class _RegionData:
     """
     Class to hold region data.
     """
+
     shape: str
     x: np.ndarray
     y: np.ndarray
@@ -149,7 +150,7 @@ def _make_column(arrays):
     arr_size = np.max(arr_sizes)
 
     data = []
-    for (arr, size) in zip(arrays, arr_sizes):
+    for (arr, size) in zip(arrays, arr_sizes, strict=True):
         pad_width = arr_size - size
         if pad_width != 0:
             arr = np.pad(arr, (0, pad_width), mode='constant')

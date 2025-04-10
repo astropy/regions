@@ -1,8 +1,255 @@
+[project]
+name = 'regions'
+description = 'An Astropy coordinated package for region handling'
+readme = 'README.rst'
+license = {file = 'LICENSE.rst'}
+authors = [
+    {name = 'Regions Developers', email = 'astropy.team@gmail.com'},
+]
+keywords = [
+    'astronomy',
+    'astrophysics',
+    'astropy',
+    'regions',
+]
+classifiers = [
+    'Intended Audience :: Science/Research',
+    'License :: OSI Approved :: BSD License',
+    'Natural Language :: English',
+    'Operating System :: OS Independent',
+    'Programming Language :: Cython',
+    'Programming Language :: Python',
+    'Programming Language :: Python :: 3',
+    'Topic :: Scientific/Engineering :: Astronomy',
+]
+dynamic = ['version']
+requires-python = '>=3.10'
+dependencies = [
+    'numpy>=1.23',
+    'astropy>=5.1',
+]
+
+[project.urls]
+Homepage = 'https://github.com/astropy/regions'
+Documentation = 'https://astropy-regions.readthedocs.io/en/stable/'
+
+[project.optional-dependencies]
+all = [
+    'matplotlib>=3.5',
+    'shapely',
+]
+test = [
+    'pytest-arraydiff',
+    'pytest-astropy>=0.11',
+]
+docs = [
+    'regions[all]',
+    'sphinx-astropy>=1.9',
+    'tomli; python_version < "3.11"',
+]
+
 [build-system]
-requires = ['setuptools',
-            'setuptools_scm',
-            'wheel',
-            'cython>=0.29.30',
-            'oldest-supported-numpy',
-            'extension-helpers']
+requires = [
+    'setuptools>=61.2',
+    'setuptools_scm>=6.2',
+    'cython>=3.0.0,<3.1.0',
+    'numpy>=2.0.0rc1',
+    'extension-helpers==1.*',
+]
 build-backend = 'setuptools.build_meta'
+
+[tool.extension-helpers]
+use_extension_helpers = true
+
+[tool.setuptools_scm]
+write_to = 'regions/version.py'
+
+[tool.setuptools]
+zip-safe = false
+include-package-data = false
+
+[tool.setuptools.packages.find]
+namespaces = false
+
+[tool.setuptools.package-data]
+'*' = [
+    'data/*',
+]
+'regions' = [
+    'CITATION.rst',
+]
+'regions.shapes.tests' = [
+    'reference/*.txt',
+    'data/*.fits',
+]
+'regions.io.crtf.tests' = [
+    'data/*.crtf',
+]
+'regions.io.ds9.tests' = [
+    'data/*.reg',
+]
+'regions.io.fits.tests' = [
+    'data/*.fits',
+]
+
+[tool.pytest.ini_options]
+minversion = 7.0
+testpaths = [
+    'regions',
+    'docs',
+]
+norecursedirs = [
+    'docs/_build',
+    'extern',
+]
+astropy_header = true
+doctest_plus = 'enabled'
+text_file_format = 'rst'
+addopts = [
+    '-ra',
+    '--color=yes',
+    '--doctest-rst',
+    '--strict-config',
+    '--strict-markers',
+]
+log_cli_level = 'INFO'
+xfail_strict = true
+remote_data_strict = true
+filterwarnings = [
+    'error',  # turn warnings into exceptions
+    'ignore:numpy.ufunc size changed:RuntimeWarning',
+    'ignore:numpy.ndarray size changed:RuntimeWarning',
+    'ignore:unclosed file:ResourceWarning',
+    # python 3.12 deprecation in matplotlib 3.9dev
+    'ignore:datetime.datetime.utcfromtimestamp\(\) is deprecated:DeprecationWarning',
+    # NumPy 2.0dev deprecations
+    "ignore:.*numpy\\.core.*:DeprecationWarning",
+]
+markers = [
+    'array_compare'
+]
+
+[tool.coverage.run]
+omit = [
+    'regions/_astropy_init*',
+    'regions/conftest.py',
+    'regions/*setup_package*',
+    'regions/tests/*',
+    'regions/*/tests/*',
+    'regions/extern/*',
+    'regions/version*',
+    '*/regions/_astropy_init*',
+    '*/regions/conftest.py',
+    '*/regions/*setup_package*',
+    '*/regions/tests/*',
+    '*/regions/*/tests/*',
+    '*/regions/extern/*',
+    '*/regions/version*',
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    'pragma: no cover',
+    'except ImportError',
+    'raise AssertionError',
+    'raise NotImplementedError',
+    'def main\\(.*\\):',
+    'pragma: py{ignore_python_version}',
+    'def _ipython_key_completions_',
+]
+
+[tool.repo-review]
+ignore = [
+    'MY',  # ignore MyPy
+    'PC110',  # ignore using black or ruff-format in pre-commit
+    'PC111',  # ignore using blacken-docs in pre-commit
+    'PC140',  # ignore using mypy in pre-commit
+    'PC180',  # ignore using prettier in pre-commit
+    'PC901',  # ignore using custom pre-commit update message
+    'PY005',  # ignore having a tests/ folder
+]
+
+[tool.isort]
+skip_glob = [
+    'regions/*__init__.py*',
+]
+known_first_party = [
+    'regions',
+    'extension_helpers',
+]
+use_parentheses = true
+
+[tool.black]
+force-exclude = """
+(
+  .*
+)
+"""
+
+[tool.bandit]
+exclude_dirs = ['*/tests/test_casa_mask.py']
+
+[tool.bandit.assert_used]
+skips = ['*_test.py', '*/test_*.py', '*/tests/helpers.py']
+
+[tool.numpydoc_validation]
+checks = [
+    'all',   # report on all checks, except the below
+    'ES01',  # missing extended summary
+    'EX01',  # missing "Examples"
+    'GL08',  # missing docstring
+    'SA01',  # missing "See Also"
+    'SA04',  # missing "See Also" description
+    'RT02',  # only type in "Returns" section (no name)
+    'SS06',  # single-line summary
+    'RT01',  # do not require return type for lazy properties
+]
+
+# don't report on objects that match any of these regex;
+# remember to use single quotes for regex in TOML
+exclude = [
+    '\._.*',  # private functions/methods
+    '^test_*',  # test code
+    '^conftest.*$',  # pytest configuration
+    '^helpers.*$',  # helper modules
+]
+
+[tool.docformatter]
+    wrap-summaries = 72
+    pre-summary-newline = true
+    make-summary-multi-line = true
+
+[tool.ruff.lint]
+select = ['E', 'F', 'UP', 'B', 'SIM', 'PL', 'FLY', 'NPY', 'PERF', 'INT',
+          'RSE', 'Q', 'N', 'W', 'D', 'I']
+ignore = [
+    'E501',
+    'B028',
+    'B905',  # revisit
+    'D100',
+    'D101',
+    'D102',
+    'D103',
+    'D105',
+    'D107',
+    'D200',
+    'D205',
+    'D212',
+    'D404',
+    'I001',
+    'PLR0912',
+    'PLR0913',
+    'PLR0915',
+    'PLR2004',
+    'PLW2901',
+    'Q000',
+    'SIM910',
+    'UP038',
+]
+
+[tool.ruff.lint.per-file-ignores]
+'__init__.py' = ['D104', 'I']
+'docs/conf.py' = ['ERA001', 'INP001', 'TRY400']
+
+[tool.ruff.lint.pydocstyle]
+convention = 'numpy'

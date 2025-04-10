@@ -3,8 +3,8 @@
 This module provides a Regions class.
 """
 
-from .core import Region
-from .registry import RegionsRegistry
+from regions.core.core import Region
+from regions.core.registry import RegionsRegistry
 
 __all__ = ['Regions']
 __doctest_skip__ = ['Regions.read', 'Regions.write', 'Regions.parse',
@@ -24,7 +24,13 @@ class Regions:
         The list of region objects.
     """
 
-    def __init__(self, regions):
+    def __init__(self, regions=(), /):
+        if regions == ():
+            regions = []
+        for item in regions:
+            if not isinstance(item, Region):
+                raise TypeError('Input regions must be a list of Region '
+                                'objects')
         self.regions = regions
 
     def __getitem__(self, index):
@@ -55,19 +61,28 @@ class Regions:
         region : `~regions.Region`
             The region to append.
         """
+        if not isinstance(region, Region):
+            raise TypeError('Input region must be a Region object')
         self.regions.append(region)
 
     def extend(self, regions):
         """
-        Extend the list of regions by appending elements from the
-        input regions.
+        Extend the list of regions by appending elements from the input
+        regions.
 
         Parameters
         ----------
-        regions : list of `~regions.Region`
-            A list of regions to include.
+        regions : `~regions.Regions` or list of `~regions.Region`
+            A `~regions.Regions` object or a list of regions to include.
         """
-        self.regions.extend(regions)
+        if isinstance(regions, Regions):
+            self.regions.extend(regions.regions)
+        else:
+            for item in regions:
+                if not isinstance(item, Region):
+                    raise TypeError('Input regions must be a list of Region '
+                                    'objects')
+            self.regions.extend(regions)
 
     def insert(self, index, region):
         """
@@ -100,6 +115,7 @@ class Regions:
         Returns
         -------
         result : `~regions.Region`
+            The removed region.
         """
         return self.regions.pop(index)
 

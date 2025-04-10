@@ -3,13 +3,13 @@
 Tests for the bounding_box module.
 """
 
-from numpy.testing import assert_allclose
 import pytest
+from numpy.testing import assert_allclose
 
-from ..bounding_box import RegionBoundingBox
-from ..pixcoord import PixCoord
-from ...shapes import RectanglePixelRegion
-from ..._utils.optional_deps import HAS_MATPLOTLIB  # noqa
+from regions._utils.optional_deps import HAS_MATPLOTLIB
+from regions.core.bounding_box import RegionBoundingBox
+from regions.core.pixcoord import PixCoord
+from regions.shapes import RectanglePixelRegion
 
 
 def test_bounding_box_init():
@@ -103,7 +103,7 @@ def test_bounding_box_extent():
     assert_allclose(bbox.extent, (0.5, 9.5, 1.5, 19.5))
 
 
-@pytest.mark.skipif('not HAS_MATPLOTLIB')
+@pytest.mark.skipif(not HAS_MATPLOTLIB, reason='matplotlib is required')
 def test_bounding_box_as_artist():
     bbox = RegionBoundingBox(1, 10, 2, 20)
     patch = bbox.as_artist()
@@ -113,7 +113,7 @@ def test_bounding_box_as_artist():
     assert_allclose(patch.get_height(), 18)
 
 
-@pytest.mark.skipif('not HAS_MATPLOTLIB')
+@pytest.mark.skipif(not HAS_MATPLOTLIB, reason='matplotlib is required')
 def test_bounding_box_plot():
     from matplotlib.patches import Patch
     bbox = RegionBoundingBox(1, 10, 2, 20)
@@ -121,7 +121,7 @@ def test_bounding_box_plot():
     assert isinstance(patch, Patch)
 
 
-@pytest.mark.skipif('not HAS_MATPLOTLIB')
+@pytest.mark.skipif(not HAS_MATPLOTLIB, reason='matplotlib is required')
 def test_bounding_box_to_region():
     bbox = RegionBoundingBox(1, 10, 2, 20)
     region = RectanglePixelRegion(PixCoord(5.0, 10.5), width=9., height=18.)

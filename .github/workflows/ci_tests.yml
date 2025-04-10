@@ -1,4 +1,4 @@
-name: CI
+name: CI Tests
 
 on:
   push:
@@ -10,6 +10,7 @@ on:
   schedule:
     # run every Monday at 6am UTC
     - cron: '0 6 * * 1'
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -22,7 +23,7 @@ permissions:
   contents: read
 
 jobs:
-  ci-tests:
+  tests:
     name: ${{ matrix.prefix }} ${{ matrix.os }}, ${{ matrix.tox_env }}
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.allow_failure }}
@@ -30,21 +31,14 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            python: '3.8'
-            tox_env: 'py38-test-alldeps'
-            allow_failure: false
-            prefix: ''
-
-          - os: ubuntu-latest
-            python: '3.9'
-            tox_env: 'py39-test-alldeps'
+            python: '3.10'
+            tox_env: 'py310-test-oldestdeps'
             allow_failure: false
             prefix: ''
 
           - os: ubuntu-latest
             python: '3.10'
-            tox_env: 'py310-test-alldeps-cov'
-            toxposargs: --remote-data=any
+            tox_env: 'py310-test-alldeps'
             allow_failure: false
             prefix: ''
 
@@ -55,67 +49,87 @@ jobs:
             prefix: ''
 
           - os: macos-latest
-            python: '3.10'
-            tox_env: 'py310-test-alldeps'
+            python: '3.12'
+            tox_env: 'py312-test-alldeps'
             allow_failure: false
             prefix: ''
+
+          - os: macos-14
+            python: '3.12'
+            tox_env: 'py312-test-alldeps'
+            allow_failure: false
+            prefix: 'M1'
 
           - os: windows-latest
-            python: '3.10'
-            tox_env: 'py310-test-alldeps'
+            python: '3.12'
+            tox_env: 'py312-test-alldeps'
             allow_failure: false
             prefix: ''
 
           - os: ubuntu-latest
-            python: '3.10'
-            tox_env: 'py310-test'
+            python: '3.12'
+            tox_env: 'py312-test'
+            toxposargs: --remote-data=any
             allow_failure: false
             prefix: ''
 
           - os: ubuntu-latest
-            python: '3.10'
+            python: '3.12'
+            tox_env: 'py312-test-alldeps-cov'
+            toxposargs: --remote-data=any
+            allow_failure: false
+            prefix: ''
+
+          - os: ubuntu-24.04-arm
+            python: '3.12'
+            tox_env: 'py312-test-alldeps'
+            toxposargs: --remote-data=any
+            allow_failure: false
+            prefix: ''
+
+          - os: ubuntu-latest
+            python: '3.12'
             tox_env: 'codestyle'
             allow_failure: false
             prefix: ''
 
           - os: ubuntu-latest
-            python: '3.10'
+            python: '3.12'
             tox_env: 'pep517'
             allow_failure: false
             prefix: ''
 
           - os: ubuntu-latest
-            python: '3.10'
+            python: '3.12'
             tox_env: 'bandit'
             allow_failure: false
             prefix: ''
 
           - os: ubuntu-latest
-            python: '3.8'
-            tox_env: 'py38-test-alldeps-astropylts-numpy118'
+            python: '3.13'
+            tox_env: 'py313-test-alldeps'
             allow_failure: false
             prefix: ''
 
           - os: ubuntu-latest
-            python: '3.11.0'
-            tox_env: 'py311-test-devdeps'
+            python: '3.13'
+            tox_env: 'py313-test-devdeps'
             toxposargs: --remote-data=any
             allow_failure: true
             prefix: '(Allowed failure)'
 
     steps:
     - name: Check out repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
       with:
         fetch-depth: 0
     - name: Set up Python ${{ matrix.python }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@8d9ed9ac5c53483de85588cdf95a591a75ab9f55  # v5.5.0
       with:
         python-version: ${{ matrix.python }}
+        allow-prereleases: true
     - name: Install base dependencies
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install tox
+      run: python -m pip install --upgrade pip setuptools tox
     - name: Print Python, pip, setuptools, and tox versions
       run: |
         python -c "import sys; print(f'Python {sys.version}')"
@@ -123,10 +137,10 @@ jobs:
         python -c "import setuptools; print(f'setuptools {setuptools.__version__}')"
         python -c "import tox; print(f'tox {tox.__version__}')"
     - name: Run tests
-      run: tox -e ${{ matrix.tox_env }} -- ${{ matrix.toxposargs }}
+      run: python -m tox -e ${{ matrix.tox_env }} -- ${{ matrix.toxposargs }}
     - name: Upload coverage to codecov
       if: ${{ contains(matrix.tox_env, '-cov') }}
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@0565863a31f2c772f9f0395002a31e3f06189574  # v5.4.0
       with:
-        file: ./coverage.xml
+        files: ./coverage.xml
         verbose: true

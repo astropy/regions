@@ -4,7 +4,7 @@ Regions
 
 |PyPI Version| |Conda Version| |Astropy|
 
-|CI Status| |Codecov Status| |Latest RTD Status| |LGTM Status|
+|CI Status| |Codecov Status| |Latest RTD Status|
 
 Regions is an `Astropy`_ package for region handling.
 
@@ -74,9 +74,5 @@ for details.
 .. |Latest RTD Status| image:: https://img.shields.io/readthedocs/astropy-regions/latest.svg?logo=read%20the%20docs&logoColor=white&label=Docs&version=latest
     :target: https://astropy-regions.readthedocs.io/en/latest/
     :alt: Latest Documentation Status
-
-.. |LGTM Status| image:: https://img.shields.io/lgtm/grade/python/g/astropy/regions.svg?logo=lgtm&logoWidth=18
-    :target: https://lgtm.com/projects/g/astropy/regions/context:python
-    :alt: LGTM Status
 
 .. _Astropy: https://www.astropy.org/

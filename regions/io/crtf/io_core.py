@@ -3,25 +3,24 @@
 import numbers
 from warnings import warn
 
+import astropy.units as u
 from astropy.coordinates import (Angle, SkyCoord, UnitSphericalRepresentation,
                                  frame_transform_graph)
-import astropy.units as u
 from astropy.utils.exceptions import AstropyUserWarning
 
-from ...shapes import (CirclePixelRegion, CircleSkyRegion,
-                       EllipsePixelRegion, EllipseSkyRegion,
-                       RectanglePixelRegion, RectangleSkyRegion,
-                       PolygonPixelRegion, RegularPolygonPixelRegion,
-                       PolygonSkyRegion,
-                       CircleAnnulusPixelRegion, CircleAnnulusSkyRegion,
-                       EllipseAnnulusPixelRegion, EllipseAnnulusSkyRegion,
-                       RectangleAnnulusPixelRegion, RectangleAnnulusSkyRegion,
-                       LinePixelRegion, LineSkyRegion,
-                       PointPixelRegion, PointSkyRegion,
-                       TextPixelRegion, TextSkyRegion)
-from ...core.core import PixCoord, SkyRegion
-from ...core.metadata import RegionMeta, RegionVisual
-from ..crtf.core import CRTFRegionParserWarning
+from regions.core.core import PixCoord, SkyRegion
+from regions.core.metadata import RegionMeta, RegionVisual
+from regions.io.crtf.core import CRTFRegionParserWarning
+from regions.shapes import (CircleAnnulusPixelRegion, CircleAnnulusSkyRegion,
+                            CirclePixelRegion, CircleSkyRegion,
+                            EllipseAnnulusPixelRegion, EllipseAnnulusSkyRegion,
+                            EllipsePixelRegion, EllipseSkyRegion,
+                            LinePixelRegion, LineSkyRegion, PointPixelRegion,
+                            PointSkyRegion, PolygonPixelRegion,
+                            PolygonSkyRegion, RectangleAnnulusPixelRegion,
+                            RectangleAnnulusSkyRegion, RectanglePixelRegion,
+                            RectangleSkyRegion, RegularPolygonPixelRegion,
+                            TextPixelRegion, TextSkyRegion)
 
 __all__ = []
 
@@ -190,7 +189,7 @@ class _ShapeList(list):
             # cannot recognize a region without an inline coordinate
             # specification. It can be, but does not need to be,
             # comma-separated at the start.
-            shape_coordsys = getattr(shape, 'coordsys')
+            shape_coordsys = shape.coordsys
             if shape_coordsys.lower() != coordsys.lower():
                 coord = coordsys_mapping['CRTF'][coordsys.lower()]
                 if meta_str.strip():
@@ -206,20 +205,18 @@ class _ShapeList(list):
             if 'range' in shape.meta:
                 shape.meta['range'] = [str(str(x).replace(' ', '')) for x in
                                        shape.meta['range']]
-                meta_str += f", range={shape.meta['range']}".replace("'", "")
+                meta_str += f", range={shape.meta['range']}".replace("'", '')
             if 'corr' in shape.meta:
-                meta_str += f", corr={shape.meta['corr']}".replace("'", "")
+                meta_str += f", corr={shape.meta['corr']}".replace("'", '')
 
             coord = []
             if coordsys not in ['image', 'physical']:
                 for val in shape.coord:
-                    if isinstance(val, Angle):
+                    if (isinstance(val, Angle)
+                            or (radunit == '' or radunit is None)):
                         coord.append(float(val.value))
                     else:
-                        if radunit == '' or radunit is None:
-                            coord.append(float(val.value))
-                        else:
-                            coord.append(float(val.to(radunit).value))
+                        coord.append(float(val.to(radunit).value))
             else:
                 for val in shape.coord:
                     if isinstance(val, u.Quantity):
@@ -233,8 +230,8 @@ class _ShapeList(list):
 
             if shape.region_type == 'polygon':
                 vals = [f'[{x:{fmt}}deg, {y:{fmt}}deg]'
-                        for x, y in zip(coord[::2], coord[1::2])]
-                coord = ", ".join(vals)
+                        for x, y in zip(coord[::2], coord[1::2], strict=True)]
+                coord = ', '.join(vals)
                 line = crtf_strings['polygon'].format(include, coord)
 
             elif shape.region_type == 'point':
@@ -257,9 +254,9 @@ class _ShapeList(list):
                 line = crtf_strings[shape.region_type].format(include, *coord)
 
             if meta_str.strip():
-                output += f"{line}, {meta_str}\n"
+                output += f'{line}, {meta_str}\n'
             else:
-                output += f"{line}\n"
+                output += f'{line}\n'
 
         return output
 
@@ -384,7 +381,7 @@ class _Shape:
         Convert to sky coordinates.
         """
         parsed_angles = []
-        for x, y in zip(self.coord[:-1:2], self.coord[1::2]):
+        for x, y in zip(self.coord[:-1:2], self.coord[1::2], strict=True):
             if isinstance(x, Angle) and isinstance(y, Angle):
                 parsed_angles.append((x, y))
 
@@ -393,7 +390,7 @@ class _Shape:
         if len(parsed_angles) == 0:
             raise ValueError('error parsing region')
 
-        lon, lat = zip(*parsed_angles)
+        lon, lat = zip(*parsed_angles, strict=True)
         if (hasattr(lon, '__len__') and hasattr(lat, '__len__')
                 and len(lon) == 1 and len(lat) == 1):
             # force entries to be scalar if they are length-1
@@ -447,7 +444,7 @@ class _Shape:
         elif isinstance(coords[0], PixCoord):
             reg = self.shape_to_pixel_region[self.region_type](*coords)
         else:
-            self._raise_error("No central coordinate")
+            self._raise_error('No central coordinate')
 
         reg.visual = RegionVisual()
         reg.meta = RegionMeta()
@@ -455,7 +452,7 @@ class _Shape:
         # both 'text' and 'label' should be set to the same value, where
         # we default to the 'text' value since that is the one used by
         # ds9 regions
-        label = self.meta.get('text', self.meta.get('label', ""))
+        label = self.meta.get('text', self.meta.get('label', ''))
         if label != '':
             reg.meta['label'] = label
         for key in self.meta:
@@ -534,10 +531,8 @@ def _to_shape_list(region_list, coordinate_system='fk5'):
         if coordinate_system:
             coordsys = coordinate_system
         else:
-            if isinstance(region, SkyRegion):
-                coordsys = coord[0].name
-            else:
-                coordsys = 'image'
+            coordsys = (coord[0].name
+                        if isinstance(region, SkyRegion) else 'image')
 
         new_coord = []
         for val in coord:

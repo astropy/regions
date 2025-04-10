@@ -1,18 +1,18 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
+import astropy.units as u
 import numpy as np
-from numpy.testing import assert_allclose
 import pytest
-
 from astropy.coordinates import SkyCoord
 from astropy.io import fits
-import astropy.units as u
 from astropy.utils.data import get_pkg_data_filename
 from astropy.wcs import WCS
+from numpy.testing import assert_allclose
 
-from ...core import PixCoord, RegionMeta, RegionVisual
-from ...tests.helpers import make_simple_wcs
-from ..text import TextPixelRegion, TextSkyRegion
-from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
+from regions.core import PixCoord, RegionMeta, RegionVisual
+from regions.shapes.tests.test_common import (BaseTestPixelRegion,
+                                              BaseTestSkyRegion)
+from regions.shapes.text import TextPixelRegion, TextSkyRegion
+from regions.tests.helpers import make_simple_wcs
 
 
 @pytest.fixture(scope='session', name='wcs')
@@ -25,21 +25,21 @@ def wcs_fixture():
 class TestTextPixelRegion(BaseTestPixelRegion):
     meta = RegionMeta({'text': 'test'})
     visual = RegionVisual({'color': 'blue'})
-    reg = TextPixelRegion(PixCoord(3, 4), "Sample Text", meta=meta,
+    reg = TextPixelRegion(PixCoord(3, 4), 'Sample Text', meta=meta,
                           visual=visual)
     sample_box = [-2, 8, -1, 9]
     inside = []
     outside = [(3.1, 4.2), (5, 4)]
     expected_area = 0
-    expected_repr = ("<TextPixelRegion(center=PixCoord(x=3, y=4), "
+    expected_repr = ('<TextPixelRegion(center=PixCoord(x=3, y=4), '
                      "text='Sample Text')>")
-    expected_str = ("Region: TextPixelRegion\ncenter: PixCoord(x=3, y=4)\n"
+    expected_str = ('Region: TextPixelRegion\ncenter: PixCoord(x=3, y=4)\n'
                     "text: 'Sample Text'")
 
     def test_copy(self):
         reg = self.reg.copy()
         assert reg.center.xy == (3, 4)
-        assert reg.text == "Sample Text"
+        assert reg.text == 'Sample Text'
         assert reg.meta == self.meta
         assert reg.visual == self.visual
 
@@ -71,17 +71,17 @@ class TestTextPixelRegion(BaseTestPixelRegion):
 class TestTextSkyRegion(BaseTestSkyRegion):
     meta = RegionMeta({'text': 'test'})
     visual = RegionVisual({'color': 'blue'})
-    reg = TextSkyRegion(SkyCoord(3, 4, unit='deg'), "Sample Text",
+    reg = TextSkyRegion(SkyCoord(3, 4, unit='deg'), 'Sample Text',
                         meta=meta, visual=visual)
-    expected_repr = ("<TextSkyRegion(center=<SkyCoord (ICRS): (ra, dec) in "
+    expected_repr = ('<TextSkyRegion(center=<SkyCoord (ICRS): (ra, dec) in '
                      "deg\n    (3., 4.)>, text='Sample Text')>")
-    expected_str = ("Region: TextSkyRegion\ncenter: <SkyCoord (ICRS): "
+    expected_str = ('Region: TextSkyRegion\ncenter: <SkyCoord (ICRS): '
                     "(ra, dec) in deg\n    (3., 4.)>\ntext: 'Sample Text'")
 
     def test_copy(self):
         reg = self.reg.copy()
         assert_allclose(reg.center.ra.deg, 3)
-        assert reg.text == "Sample Text"
+        assert reg.text == 'Sample Text'
         assert reg.meta == self.meta
         assert reg.visual == self.visual
 

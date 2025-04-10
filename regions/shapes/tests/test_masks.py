@@ -1,17 +1,18 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """
-This file sets up detailed tests for computing masks with reference images.
+This file sets up detailed tests for computing masks with reference
+images.
 """
 import itertools
 
 import astropy.units as u
 import pytest
 
-from ...core import PixCoord, RegionMask
-from ...shapes.circle import CirclePixelRegion
-from ...shapes.ellipse import EllipsePixelRegion
-from ...shapes.rectangle import RectanglePixelRegion
-from ...shapes.polygon import PolygonPixelRegion
+from regions.core import PixCoord, RegionMask
+from regions.shapes.circle import CirclePixelRegion
+from regions.shapes.ellipse import EllipsePixelRegion
+from regions.shapes.polygon import PolygonPixelRegion
+from regions.shapes.rectangle import RectanglePixelRegion
 
 REGIONS = [CirclePixelRegion(PixCoord(3.981987, 4.131378), radius=3.3411),
            EllipsePixelRegion(PixCoord(5.981987, 4.131378), width=10.4466,
@@ -42,7 +43,7 @@ def label(value):
                         for key, value in sorted(value.items()))
 
 
-@pytest.mark.array_compare(fmt='text', write_kwargs={'fmt': '%12.8e'})
+@pytest.mark.array_compare(file_format='text', write_kwargs={'fmt': '%12.8e'})
 @pytest.mark.parametrize(('region', 'mode'),
                          itertools.product(REGIONS, MODES), ids=label)
 def test_to_mask(region, mode):
@@ -51,3 +52,4 @@ def test_to_mask(region, mode):
     except NotImplementedError:
         pytest.xfail()
     assert isinstance(mask, RegionMask)
+    return mask.data.astype(float)

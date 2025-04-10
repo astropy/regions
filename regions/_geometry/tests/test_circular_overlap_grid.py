@@ -5,11 +5,10 @@ Tests for the circular_overlap_grid module.
 
 import itertools
 
-from numpy.testing import assert_allclose
 import pytest
+from numpy.testing import assert_allclose
 
-from .. import circular_overlap_grid
-
+from regions._geometry import circular_overlap_grid
 
 grid_sizes = [50, 500, 1000]
 circ_sizes = [0.2, 0.4, 0.8]
@@ -26,7 +25,6 @@ def test_circular_overlap_grid(grid_size, circ_size, use_exact, subsample):
     Test normalization of the overlap grid to make sure that a fully
     enclosed pixel has a value of 1.0.
     """
-
     g = circular_overlap_grid(-1.0, 1.0, -1.0, 1.0, grid_size, grid_size,
                               circ_size, use_exact, subsample)
     assert_allclose(g.max(), 1.0)

@@ -5,11 +5,11 @@ Tests for the pixcoord module.
 
 import astropy.units as u
 import numpy as np
-from numpy.testing import assert_equal, assert_allclose
 import pytest
+from numpy.testing import assert_allclose, assert_equal
 
-from ..._utils.examples import make_example_dataset
-from ..pixcoord import PixCoord
+from regions._utils.examples import make_example_dataset
+from regions.core.pixcoord import PixCoord
 
 
 @pytest.fixture(scope='session', name='wcs')
@@ -206,7 +206,7 @@ def test_equality():
     pc1 = PixCoord(arr[0], arr[1])
     pc2 = PixCoord(arr[0] + 0.0000001, arr[1])
 
-    assert not pc1 == arr
+    assert pc1 != arr
     assert pc1 == PixCoord(arr[0], arr[1])
     assert pc1 == pc2
 

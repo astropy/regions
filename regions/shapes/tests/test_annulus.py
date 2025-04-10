@@ -1,17 +1,21 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
-from astropy.coordinates import SkyCoord
 import astropy.units as u
-from astropy.tests.helper import assert_quantity_allclose
 import numpy as np
+from astropy.coordinates import SkyCoord
+from astropy.tests.helper import assert_quantity_allclose
 from numpy.testing import assert_allclose
 
-from ...core import PixCoord, RegionMeta, RegionVisual
-from ...tests.helpers import make_simple_wcs
-from ..annulus import (CircleAnnulusPixelRegion, CircleAnnulusSkyRegion,
-                       EllipseAnnulusPixelRegion, EllipseAnnulusSkyRegion,
-                       RectangleAnnulusPixelRegion, RectangleAnnulusSkyRegion)
-from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
+from regions.core import PixCoord, RegionMeta, RegionVisual
+from regions.shapes.annulus import (CircleAnnulusPixelRegion,
+                                    CircleAnnulusSkyRegion,
+                                    EllipseAnnulusPixelRegion,
+                                    EllipseAnnulusSkyRegion,
+                                    RectangleAnnulusPixelRegion,
+                                    RectangleAnnulusSkyRegion)
+from regions.shapes.tests.test_common import (BaseTestPixelRegion,
+                                              BaseTestSkyRegion)
+from regions.tests.helpers import make_simple_wcs
 
 
 class TestCircleAnnulusPixelRegion(BaseTestPixelRegion):
@@ -100,8 +104,8 @@ class TestCircleAnnulusSkyRegion(BaseTestSkyRegion):
     def test_copy(self):
         reg = self.reg.copy()
         assert_allclose(reg.center.ra.deg, 3)
-        assert_allclose(reg.inner_radius.to_value("arcsec"), 20)
-        assert_allclose(reg.outer_radius.to_value("arcsec"), 30)
+        assert_allclose(reg.inner_radius.to_value('arcsec'), 20)
+        assert_allclose(reg.outer_radius.to_value('arcsec'), 30)
         assert reg.meta == self.meta
         assert reg.visual == self.visual
 
@@ -155,7 +159,7 @@ class TestEllipseAnnulusPixelRegion(BaseTestPixelRegion):
         assert reg.inner_height == 5
         assert reg.outer_width == 5
         assert reg.outer_height == 8
-        assert_allclose(reg.angle.to_value("deg"), 0)
+        assert_allclose(reg.angle.to_value('deg'), 0)
         assert reg.meta == self.meta
         assert reg.visual == self.visual
 
@@ -185,7 +189,7 @@ class TestEllipseAnnulusPixelRegion(BaseTestPixelRegion):
     def test_rotate(self):
         reg = self.reg.rotate(PixCoord(2, 3), 90 * u.deg)
         assert_allclose(reg.center.xy, (1, 4))
-        assert_allclose(reg.angle.to_value("deg"), 90)
+        assert_allclose(reg.angle.to_value('deg'), 90)
 
     def test_eq(self):
         reg = self.reg.copy()
@@ -221,11 +225,11 @@ class TestEllipseAnnulusSkyRegion(BaseTestSkyRegion):
     def test_copy(self):
         reg = self.reg.copy()
         assert_allclose(reg.center.ra.deg, 3)
-        assert_allclose(reg.inner_width.to_value("arcsec"), 20)
-        assert_allclose(reg.inner_height.to_value("arcsec"), 50)
-        assert_allclose(reg.outer_width.to_value("arcsec"), 50)
-        assert_allclose(reg.outer_height.to_value("arcsec"), 80)
-        assert_allclose(reg.angle.to_value("deg"), 0)
+        assert_allclose(reg.inner_width.to_value('arcsec'), 20)
+        assert_allclose(reg.inner_height.to_value('arcsec'), 50)
+        assert_allclose(reg.outer_width.to_value('arcsec'), 50)
+        assert_allclose(reg.outer_height.to_value('arcsec'), 80)
+        assert_allclose(reg.angle.to_value('deg'), 0)
         assert reg.meta == self.meta
         assert reg.visual == self.visual
 
@@ -309,7 +313,7 @@ class TestRectangleAnnulusPixelRegion(BaseTestPixelRegion):
     def test_rotate(self):
         reg = self.reg.rotate(PixCoord(2, 3), 90 * u.deg)
         assert_allclose(reg.center.xy, (1, 4))
-        assert_allclose(reg.angle.to_value("deg"), 90)
+        assert_allclose(reg.angle.to_value('deg'), 90)
 
     def test_eq(self):
         reg = self.reg.copy()
@@ -345,11 +349,11 @@ class TestRectangleAnnulusSkyRegion(BaseTestSkyRegion):
     def test_copy(self):
         reg = self.reg.copy()
         assert_allclose(reg.center.ra.deg, 3)
-        assert_allclose(reg.inner_width.to_value("arcsec"), 20)
-        assert_allclose(reg.inner_height.to_value("arcsec"), 50)
-        assert_allclose(reg.outer_width.to_value("arcsec"), 50)
-        assert_allclose(reg.outer_height.to_value("arcsec"), 80)
-        assert_allclose(reg.angle.to_value("deg"), 0)
+        assert_allclose(reg.inner_width.to_value('arcsec'), 20)
+        assert_allclose(reg.inner_height.to_value('arcsec'), 50)
+        assert_allclose(reg.outer_width.to_value('arcsec'), 50)
+        assert_allclose(reg.outer_height.to_value('arcsec'), 80)
+        assert_allclose(reg.angle.to_value('deg'), 0)
         assert reg.meta == self.meta
         assert reg.visual == self.visual
 

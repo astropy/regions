@@ -5,11 +5,10 @@ Tests for the rectangular_overlap_grid module.
 
 import itertools
 
-from numpy.testing import assert_allclose
 import pytest
+from numpy.testing import assert_allclose
 
-from .. import rectangular_overlap_grid
-
+from regions._geometry import rectangular_overlap_grid
 
 grid_sizes = [50, 500, 1000]
 rect_sizes = [0.2, 0.4, 0.8]
@@ -26,7 +25,6 @@ def test_rectangular_overlap_grid(grid_size, rect_size, angle, subsample):
     Test normalization of the overlap grid to make sure that a fully
     enclosed pixel has a value of 1.0.
     """
-
     g = rectangular_overlap_grid(-1.0, 1.0, -1.0, 1.0, grid_size, grid_size,
                                  rect_size, rect_size, angle, 0, subsample)
     assert_allclose(g.max(), 1.0)

@@ -5,13 +5,12 @@ This module defines point regions in both pixel and sky coordinates.
 
 import numpy as np
 
-from ..core.attributes import (ScalarPixCoord, ScalarSkyCoord,
-                               RegionMetaDescr, RegionVisualDescr)
-from ..core.bounding_box import RegionBoundingBox
-from ..core.core import PixelRegion, SkyRegion
-from ..core.metadata import RegionMeta, RegionVisual
-from ..core.pixcoord import PixCoord
-
+from regions.core.attributes import (RegionMetaDescr, RegionVisualDescr,
+                                     ScalarPixCoord, ScalarSkyCoord)
+from regions.core.bounding_box import RegionBoundingBox
+from regions.core.core import PixelRegion, SkyRegion
+from regions.core.metadata import RegionMeta, RegionVisual
+from regions.core.pixcoord import PixCoord
 
 __all__ = ['PointPixelRegion', 'PointSkyRegion']
 
@@ -76,10 +75,8 @@ class PointPixelRegion(PixelRegion):
         return 0.0
 
     def contains(self, pixcoord):
-        if pixcoord.isscalar:
-            in_reg = False
-        else:
-            in_reg = np.zeros(pixcoord.x.shape, dtype=bool)
+        in_reg = (False if pixcoord.isscalar
+                  else np.zeros(pixcoord.x.shape, dtype=bool))
 
         if self.meta.get('include', True):
             # in_reg = False, always.  Points do not include anything.
@@ -178,11 +175,8 @@ class PointSkyRegion(SkyRegion):
         self.visual = visual or RegionVisual()
 
     def contains(self, skycoord, wcs):  # pylint: disable=unused-argument
-        if self.meta.get('include', True):
-            # points never include anything
-            return False
-        else:
-            return True
+        # points never include anything
+        return not self.meta.get('include', True)
 
     def to_pixel(self, wcs):
         center_x, center_y = wcs.world_to_pixel(self.center)

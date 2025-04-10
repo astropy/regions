@@ -4,7 +4,7 @@ import warnings
 
 from astropy.utils.exceptions import AstropyUserWarning
 
-from .core import ds9_valid_symbols, DS9ParserError
+from regions.io.ds9.core import DS9ParserError, ds9_valid_symbols
 
 __all__ = []
 
@@ -186,6 +186,9 @@ def _translate_metadata_to_ds9(region, shape):
     Translate region metadata to valid ds9 meta keys.
     """
     meta = {**region.meta, **region.visual}
+    # special case for Text regions
+    if 'text' in region._params:
+        meta = {'text': region.text, **meta}
 
     if 'annulus' in shape:
         # ds9 does not allow fill for annulus regions

@@ -3,10 +3,10 @@ import operator as op
 
 import numpy as np
 
-from .attributes import RegionType
-from .core import PixelRegion, SkyRegion
-from .mask import RegionMask
-from .metadata import RegionMeta, RegionVisual
+from regions.core.attributes import RegionType
+from regions.core.core import PixelRegion, SkyRegion
+from regions.core.mask import RegionMask
+from regions.core.metadata import RegionMeta, RegionVisual
 
 __all__ = ['CompoundPixelRegion', 'CompoundSkyRegion']
 
@@ -38,7 +38,7 @@ class CompoundPixelRegion(PixelRegion):
 
     def __init__(self, region1, region2, operator, meta=None, visual=None):
         if not callable(operator):
-            raise TypeError("operator must be callable")
+            raise TypeError('operator must be callable')
 
         self.region1 = region1
         self.region2 = region2
@@ -220,7 +220,7 @@ class CompoundSkyRegion(SkyRegion):
 
     def __init__(self, region1, region2, operator, meta=None, visual=None):
         if not callable(operator):
-            raise TypeError("operator must be callable")
+            raise TypeError('operator must be callable')
 
         self.region1 = region1
         self.region2 = region2

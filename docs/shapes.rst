@@ -1,6 +1,6 @@
 .. include:: references.txt
 
-.. testsetup:
+.. testsetup::
     >>> from regions import make_example_dataset
     >>> dataset = make_example_dataset(data='simulated')
     >>> wcs = dataset.wcs
@@ -296,8 +296,8 @@ to a :class:`~regions.SkyRegion`, call the
 Selectors for Regions
 ---------------------
 
-Several geometric regions (at this time, :class:`~regions.RectanglePixelRegion`,
-:class:`~regions.EllipsePixelRegion` and :class:`~regions.PolygonPixelRegion`)
+Several geometric regions (at this time, :class:`~regions.RectanglePixelRegion`
+and :class:`~regions.EllipsePixelRegion`)
 provide a method :meth:`~regions.RectanglePixelRegion.as_mpl_selector` to
 create an interactive editable matplotlib widget that will be
 connected to its parent region.
@@ -333,7 +333,7 @@ manipulation of this widget, with the following operations available:
 
 Via the optional ``callback`` parameter this method can be passed a
 custom function that will be called on every update of the region,
-i.e. after every move or resize of the selector.
+i.e., after every move or resize of the selector.
 For an example of its usage see :ref:`Interactive Mask Control<interactive-masks>`.
 
 

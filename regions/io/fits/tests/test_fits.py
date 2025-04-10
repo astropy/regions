@@ -5,21 +5,21 @@ Tests for the fits subpackage.
 
 import warnings
 
-from astropy.coordinates import SkyCoord
 import astropy.units as u
+import numpy as np
+import pytest
+from astropy.coordinates import SkyCoord
+from astropy.table import QTable
 from astropy.utils.data import get_pkg_data_filenames
 from astropy.utils.exceptions import AstropyUserWarning
-from astropy.table import QTable
-import numpy as np
 from numpy.testing import assert_equal
-import pytest
 
-from ....core import Regions, PixCoord, RegionMeta
-from ....shapes import (CirclePixelRegion, CircleSkyRegion,
-                        RectangleAnnulusPixelRegion, LinePixelRegion,
-                        TextPixelRegion)
-from ....tests.helpers import assert_region_allclose
-from ..core import FITSParserError
+from regions.core import PixCoord, RegionMeta, Regions
+from regions.io.fits.core import FITSParserError
+from regions.shapes import (CirclePixelRegion, CircleSkyRegion,
+                            LinePixelRegion, RectangleAnnulusPixelRegion,
+                            TextPixelRegion)
+from regions.tests.helpers import assert_region_allclose
 
 
 def test_roundtrip(tmpdir):
@@ -36,7 +36,7 @@ def test_roundtrip(tmpdir):
         tempfile = tmpdir.join('tmp.fits').strpath
         regions.write(tempfile, format='fits', overwrite=True)
         regions2 = Regions.read(tempfile, format='fits')
-        for reg1, reg2 in zip(regions, regions2):
+        for reg1, reg2 in zip(regions, regions2, strict=True):
             assert_region_allclose(reg1, reg2)
 
 
@@ -114,20 +114,20 @@ def test_components():
     assert 'COMPONENT' not in tbl1.colnames
 
     components = [None, None, None, None]
-    for region, component in zip(regions, components):
+    for region, component in zip(regions, components, strict=True):
         region.meta = RegionMeta({'component': component})
     tbl2 = regions.serialize(format='fits')
     assert 'COMPONENT' not in tbl2.colnames
 
     components = np.arange(4)
-    for region, component in zip(regions, components):
+    for region, component in zip(regions, components, strict=True):
         region.meta = RegionMeta({'component': component})
     tbl3 = regions.serialize(format='fits')
     assert 'COMPONENT' in tbl3.colnames
     assert_equal(tbl3['COMPONENT'], components)
 
     components = [1, 2, None, 4]
-    for region, component in zip(regions, components):
+    for region, component in zip(regions, components, strict=True):
         region.meta = RegionMeta({'component': component})
     tbl4 = regions.serialize(format='fits')
     assert 'COMPONENT' in tbl4.colnames

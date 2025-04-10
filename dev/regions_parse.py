@@ -2,9 +2,10 @@
 
 from pathlib import Path
 
-from astropy import log
 import click
 import pyregion
+from astropy import log
+
 from regions import read_ds9
 
 log.setLevel('DEBUG')
@@ -14,13 +15,15 @@ TEST_FILE_DIR = Path('../regions/io/ds9/tests/data')
 
 @click.group()
 def cli():
-    """astropy.regions parser debugging tool."""
+    """
+    Region parser debugging tool.
+    """
     pass
 
 
 @cli.command('list-files')
 def list_files():
-    print("Available files")
+    print('Available files')
     for ffile in TEST_FILE_DIR.glob('*.reg'):
         print(ffile.parts[-1])
 

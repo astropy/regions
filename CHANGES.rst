@@ -1,4 +1,92 @@
-0.7 (unreleased)
+0.11 (unreleased)
+=================
+
+General
+-------
+
+New Features
+------------
+
+Bug Fixes
+---------
+
+API Changes
+-----------
+
+
+0.10 (2024-09-27)
+=================
+
+General
+-------
+
+- Added support for NumPy 2.1.
+
+API Changes
+-----------
+
+- The ``regions.test`` function has been removed. Instead use the
+  ``pytest --pyarg regions`` command. [#1725]
+
+
+0.9 (2024-04-12)
+================
+
+General
+-------
+
+- Added support for NumPy 2.0.
+
+- The minimum required Python is now 3.10. [#547]
+
+- The minimum required NumPy is now 1.23. [#547]
+
+- The minimum required Astropy is now 5.1. [#547]
+
+- The minimum required pytest-astropy is now 0.11. [#547]
+
+- The minimum required sphinx-astropy is now 1.9. [#547]
+
+Bug Fixes
+---------
+
+- Fixed a bug where the text string of ``TextPixelRegion`` and
+  ``TextSkyRegion`` was dropped when serializing or writing
+  to a DS9 file. [#548]
+
+
+0.8 (2023-11-16)
+================
+
+General
+-------
+
+- The minimum required Python is now 3.9. [#517]
+
+- The minimum required NumPy is now 1.22. [#517]
+
+- The minimum required Matplotlib is now 3.5. [#517]
+
+New Features
+------------
+
+- The ``Regions`` class can now be initialized without any arguments.
+  [#527]
+
+- The ``Regions`` ``extend`` method now can accept another ``Regions``
+  object as input. [#527]
+
+Bug Fixes
+---------
+
+API Changes
+-----------
+
+- The ``Regions`` class and its ``append`` and ``extend`` methods now
+  raise a ``TypeError`` for invalid inputs. [#527]
+
+
+0.7 (2022-10-27)
 ================
 
 New Features
@@ -154,11 +242,11 @@ General
   APE 17 guidelines. The main changes are that the ``python setup.py
   test`` and ``python setup.py build_docs`` commands will no longer
   work. The easiest way to replicate these commands is to install the
-  tox (https://tox.readthedocs.io) package and run ``tox -e test`` and
-  ``tox -e build_docs``. It is also possible to run pytest and sphinx
-  directly. Other significant changes include switching to setuptools_scm
-  to manage the version number, and adding a ``pyproject.toml`` to opt in
-  to isolated builds as described in PEP 517/518. [#315]
+  tox package and run ``tox -e test`` and ``tox -e build_docs``. It is
+  also possible to run pytest and sphinx directly. Other significant
+  changes include switching to setuptools_scm to manage the version
+  number, and adding a ``pyproject.toml`` to opt in to isolated builds
+  as described in PEP 517/518. [#315]
 
 - Bump the minimum required version of Astropy to 3.2.
 

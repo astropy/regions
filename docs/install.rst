@@ -7,20 +7,15 @@ Requirements
 
 Regions has the following strict requirements:
 
-* `Python <https://www.python.org/>`_ 3.8 or later
+* `Python <https://www.python.org/>`_ 3.10 or later
 
-* `Numpy <https://numpy.org/>`_ 1.18 or later
+* `NumPy <https://numpy.org/>`_ 1.23 or later
 
-* `Astropy`_ 5.0 or later
+* `Astropy`_ 5.1 or later
 
 Region also optionally depends on other packages for some features:
 
-* `matplotlib <https://matplotlib.org/>`_ 3.1 or later
-
-Regions depends on `pytest-astropy
-<https://github.com/astropy/pytest-astropy>`_ (0.4 or later) and
-`pytest-arraydiff <https://github.com/astropy/pytest-arraydiff>`_ (0.3
-or later) to run the test suite.
+* `Matplotlib <https://matplotlib.org/>`_ 3.5 or later
 
 
 Installing the latest released version
@@ -62,7 +57,7 @@ Using conda
 -----------
 
 Regions can be installed with `conda`_ if you have installed
-`Anaconda <https://www.anaconda.com/products/individual>`_ or
+`Anaconda <https://www.anaconda.com/download>`_ or
 `Miniconda <https://docs.conda.io/en/latest/miniconda.html>`_.
 To install Regions using the `conda-forge Anaconda channel
 <https://anaconda.org/conda-forge/regions>`_, run::
@@ -125,19 +120,16 @@ latest development version from `GitHub`_::
 Testing an installed Regions
 ============================
 
-The easiest way to test your installed version of Regions is running
-correctly is to use the :func:`regions.test` function:
+To test your installed version of Regions, you can run the test suite
+using the `pytest`_ command. Running the test suite requires installing
+the `pytest-astropy <https://github.com/astropy/pytest-astropy>`_ (0.11
+or later) package.
 
-.. doctest-skip::
+To run the test suite, use the following command::
 
-    >>> import regions
-    >>> regions.test()
+    pytest --pyargs photutils
 
-Note that this may not work if you start Python from within the Regions
-source distribution directory.
-
-The tests should run and report any failures,
-which you can report to the `Regions issue tracker
+Any test failures can be reported to the `Regions issue tracker
 <https://github.com/astropy/regions/issues>`_.
 
 
@@ -145,3 +137,4 @@ which you can report to the `Regions issue tracker
 .. _conda: https://docs.conda.io/en/latest/
 .. _GitHub: https://github.com/astropy/regions
 .. _Xcode: https://developer.apple.com/xcode/
+.. _pytest: https://docs.pytest.org/en/latest/

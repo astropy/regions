@@ -3,7 +3,7 @@
 import numpy as np
 from numpy.testing import assert_allclose
 
-from ..examples import make_example_dataset
+from regions._utils.examples import make_example_dataset
 
 
 class TestExampleSimulatedDataset:

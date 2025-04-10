@@ -1,25 +1,25 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """
-This module defines rectangular regions in both pixel and sky coordinates.
+This module defines rectangular regions in both pixel and sky
+coordinates.
 """
 
-from astropy.coordinates import Angle
 import astropy.units as u
 import numpy as np
+from astropy.coordinates import Angle
 
-from ..core.attributes import (ScalarPixCoord, PositiveScalar,
-                               PositiveScalarAngle, ScalarAngle,
-                               ScalarSkyCoord, RegionMetaDescr,
-                               RegionVisualDescr)
-from ..core.bounding_box import RegionBoundingBox
-from ..core.core import PixelRegion, SkyRegion
-from ..core.mask import RegionMask
-from ..core.metadata import RegionMeta, RegionVisual
-from ..core.pixcoord import PixCoord
-from .._geometry import rectangular_overlap_grid
-from .._utils.wcs_helpers import pixel_scale_angle_at_skycoord
-
-from .polygon import PolygonPixelRegion
+from regions._geometry import rectangular_overlap_grid
+from regions._utils.wcs_helpers import pixel_scale_angle_at_skycoord
+from regions.core.attributes import (PositiveScalar, PositiveScalarAngle,
+                                     RegionMetaDescr, RegionVisualDescr,
+                                     ScalarAngle, ScalarPixCoord,
+                                     ScalarSkyCoord)
+from regions.core.bounding_box import RegionBoundingBox
+from regions.core.core import PixelRegion, SkyRegion
+from regions.core.mask import RegionMask
+from regions.core.metadata import RegionMeta, RegionVisual
+from regions.core.pixcoord import PixCoord
+from regions.shapes.polygon import PolygonPixelRegion
 
 __all__ = ['RectanglePixelRegion', 'RectangleSkyRegion']
 
@@ -160,10 +160,7 @@ class RectanglePixelRegion(PixelRegion):
         ymin = float(bbox.iymin) - 0.5 - self.center.y
         ymax = float(bbox.iymax) - 0.5 - self.center.y
 
-        if mode == 'subpixels':
-            use_exact = 0
-        else:
-            use_exact = 1
+        use_exact = 0 if mode == 'subpixels' else 1
 
         fraction = rectangular_overlap_grid(xmin, xmax, ymin, ymax, nx, ny,
                                             self.width, self.height,
@@ -219,9 +216,9 @@ class RectanglePixelRegion(PixelRegion):
             self._mpl_selector_callback(self)
 
     def as_mpl_selector(self, ax, active=True, sync=True, callback=None,
-                        **kwargs):
+                        drag_from_anywhere=False, **kwargs):
         """
-        A matplotlib editable widget for the region
+        Return a matplotlib editable widget for the region
         (`matplotlib.widgets.RectangleSelector`).
 
         Parameters
@@ -261,7 +258,6 @@ class RectanglePixelRegion(PixelRegion):
         ``selector.set_active(True)`` or ``selector.set_active(False)``.
         """
         from matplotlib.widgets import RectangleSelector
-        from .._utils.optional_deps import MPL_VERSION
 
         if hasattr(self, '_mpl_selector'):
             raise AttributeError('Cannot attach more than one selector to a region.')
@@ -281,13 +277,11 @@ class RectanglePixelRegion(PixelRegion):
                      'linewidth': self.visual.get('linewidth', 1),
                      'linestyle': self.visual.get('linestyle', 'solid')}
         rectprops.update(kwargs.pop('props', dict()))
-        # `rectprops` renamed `props` in mpl 3.5 and deprecated for 3.7.
-        if MPL_VERSION < 35:
-            kwargs.update({'rectprops': rectprops})
-        else:
-            kwargs.update({'props': rectprops})
+        kwargs.update({'props': rectprops})
 
-        self._mpl_selector = RectangleSelector(ax, sync_callback, interactive=True, **kwargs)
+        self._mpl_selector = RectangleSelector(
+            ax, sync_callback, interactive=True,
+            drag_from_anywhere=drag_from_anywhere, **kwargs)
 
         self._mpl_selector.extents = (self.center.x - self.width / 2,
                                       self.center.x + self.width / 2,

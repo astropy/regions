@@ -1,21 +1,22 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
 from copy import copy
-import numpy as np
-from numpy.testing import assert_allclose, assert_equal
-import pytest
 
-from astropy.coordinates import SkyCoord
 import astropy.units as u
+import numpy as np
+import pytest
+from astropy.coordinates import SkyCoord
 from astropy.tests.helper import assert_quantity_allclose
+from numpy.testing import assert_allclose, assert_equal
 
-from ...core import PixCoord, RegionMeta, RegionVisual, RegionBoundingBox
-from ...tests.helpers import make_simple_wcs
-from ..._utils.examples import make_example_dataset
-from ..._utils.optional_deps import HAS_MATPLOTLIB  # noqa
-from ..polygon import (PolygonPixelRegion, RegularPolygonPixelRegion,
-                       PolygonSkyRegion)
-from .test_common import BaseTestPixelRegion, BaseTestSkyRegion
+from regions._utils.examples import make_example_dataset
+from regions._utils.optional_deps import HAS_MATPLOTLIB
+from regions.core import PixCoord, RegionBoundingBox, RegionMeta, RegionVisual
+from regions.shapes.polygon import (PolygonPixelRegion, PolygonSkyRegion,
+                                    RegularPolygonPixelRegion)
+from regions.shapes.tests.test_common import (BaseTestPixelRegion,
+                                              BaseTestSkyRegion)
+from regions.tests.helpers import make_simple_wcs
 
 
 @pytest.fixture(scope='session', name='wcs')
@@ -106,7 +107,7 @@ class TestPolygonPixelRegion(BaseTestPixelRegion):
         with pytest.raises(NotImplementedError):
             self.reg.to_mask(mode='exact')
 
-    @pytest.mark.skipif('not HAS_MATPLOTLIB')
+    @pytest.mark.skipif(not HAS_MATPLOTLIB, reason='matplotlib is required')
     def test_as_artist(self):
         patch = self.reg.as_artist()
         expected = [[1, 1], [3, 1], [1, 4], [1, 1]]
@@ -188,7 +189,7 @@ class TestPolygonSkyRegion(BaseTestSkyRegion):
 class TestRegionPolygonPixelRegion(BaseTestPixelRegion):
     meta = RegionMeta({'text': 'test'})
     visual = RegionVisual({'color': 'blue'})
-    reg = RegularPolygonPixelRegion(PixCoord(50, 50), 8, 20, angle=25*u.deg,
+    reg = RegularPolygonPixelRegion(PixCoord(50, 50), 8, 20, angle=25 * u.deg,
                                     meta=meta, visual=visual)
     inside = [(40, 40)]
     outside = [(20, 20), (80, 90)]
@@ -248,7 +249,7 @@ class TestRegionPolygonPixelRegion(BaseTestPixelRegion):
         with pytest.raises(NotImplementedError):
             self.reg.to_mask(mode='exact')
 
-    @pytest.mark.skipif('not HAS_MATPLOTLIB')
+    @pytest.mark.skipif(not HAS_MATPLOTLIB, reason='matplotlib is required')
     def test_as_artist(self):
         patch = self.reg.as_artist()
         expected = [[41.54763477, 68.12615574], [31.20614758, 56.84040287],

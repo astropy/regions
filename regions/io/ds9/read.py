@@ -1,21 +1,21 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
-from copy import deepcopy
-from dataclasses import dataclass
 import re
 import string
 import warnings
+from dataclasses import dataclass
 
-from astropy.coordinates import Angle, SkyCoord
 import astropy.units as u
+from astropy.coordinates import Angle, SkyCoord
 from astropy.utils.data import get_readable_fileobj
 from astropy.utils.exceptions import AstropyUserWarning
 
-from ...core import Regions, RegionMeta, RegionVisual, PixCoord
-from ...core.registry import RegionsRegistry
-from .core import (ds9_frame_map, ds9_shape_to_region, ds9_params_template,
-                   DS9ParserError)
-from .meta import _split_raw_metadata, _translate_ds9_to_visual
+from regions.core import PixCoord, RegionMeta, Regions, RegionVisual
+from regions.core.registry import RegionsRegistry
+from regions.io.ds9.core import (DS9ParserError, ds9_frame_map,
+                                 ds9_params_template, ds9_shape_to_region,
+                                 make_region_template)
+from regions.io.ds9.meta import _split_raw_metadata, _translate_ds9_to_visual
 
 __all__ = []
 
@@ -81,6 +81,7 @@ class _RegionData:
 
     Data for multi-annulus regions is stored in a single object.
     """
+
     frame: str
     region_type: str
     shape: str
@@ -104,11 +105,8 @@ def _split_lines(region_str):
     lines : list of str
         A list of strings.
     """
-    lines = []
-    for line in region_str.split('\n'):
-        for line_ in _split_semicolon(line):
-            lines.append(line_.strip())
-    return lines
+    return [line_.strip() for line in region_str.split('\n')
+            for line_ in _split_semicolon(line)]
 
 
 def _parse_raw_data(region_str):
@@ -215,11 +213,8 @@ def _parse_raw_data(region_str):
                 composite_meta.pop('composite', None)
 
             # NOTE: include=1/0 in metadata overrides the leading
-            #       "-/+" symbol
-            if include_symbol == '-':
-                include = 0
-            else:  # '+' or ''
-                include = 1
+            #       "-/+" symbol; -: include=0;, + or '': include=1
+            include = 0 if include_symbol == '-' else 1
             include_meta = {'include': include}
 
             params_str, meta_str = _parse_shape_line(shape, original_line,
@@ -309,7 +304,7 @@ def _parse_metadata(metadata_str):
     Returns
     -------
     metadata : dict
-        The reigon metadata as a dictionary.
+        The region metadata as a dictionary.
     """
     # {.*?}    # all chars in curly braces
     # \'.*?\'  # all chars in single quotes
@@ -331,12 +326,11 @@ def _parse_metadata(metadata_str):
             if key == 'tag':
                 val = [val]  # tag value is always a list
             metadata[key] = val
+        elif key == 'tag':
+            metadata[key].append(val)
         else:
-            if key == 'tag':
-                metadata[key].append(val)
-            else:
-                warnings.warn(f'Found duplicate metadata for "{key}", '
-                              'skipping', AstropyUserWarning)
+            warnings.warn(f'Found duplicate metadata for "{key}", '
+                          'skipping', AstropyUserWarning)
     return metadata
 
 
@@ -402,9 +396,8 @@ def _define_raw_metadata(global_meta, composite_meta, include_meta,
             val = value.split()
             if val[0] not in valid_points:
                 is_invalid = True
-            if len(val) == 2:
-                if not float(val[1]).is_integer():
-                    is_invalid = True
+            if len(val) == 2 and not float(val[1]).is_integer():
+                is_invalid = True
 
         if key == 'line' and value not in valid_lines:
             is_invalid = True
@@ -542,12 +535,13 @@ def _parse_shape_params(region_data):
         n_annulus = nparams - 3
 
     if shape in ('ellipse', 'box', 'annulus'):
-        # deepcopy to "reset" the cycle iterators
-        shape_template = deepcopy(ds9_params_template[shape])
+        # reset the cycle iterators
+        shape_template = make_region_template()
     else:
         shape_template = ds9_params_template[shape]
 
     shape_params = []
+    # TODO: check zip strict=True
     for idx, (param_type, value) in enumerate(zip(shape_template, params)):
         if shape in ('ellipse', 'box') and idx == nparams - 1:
             param_type = 'angle'  # last parameter is always an angle
@@ -628,7 +622,12 @@ def _define_region_params(region_type, shape, shape_params, frame=None):
 
 def _make_region(region_data):
     """
+    Make a region object from the region data.
+
+    Parameters
+    ----------
     region_data : `_RegionData` instance
+        A `_RegionData` instance.
     """
     try:
         # NOTE: returned shape can be different from region_data.shape
@@ -656,10 +655,12 @@ def _make_region(region_data):
 
     regions = []
     for shape_params in region_params:
-        # for Text region, we need to add meta['text'] to params;
-        # set to '' if the text meta value was not specified
+        # for Text region, we need to add meta['text'] to params and
+        # remove it from meta; set to '' if the text meta value was not
+        # specified
         if shape == 'text':
             shape_params.append(region_data.raw_meta.get('text', ''))
+            meta.pop('text', None)
 
         region = ds9_shape_to_region[region_type][shape](*shape_params)
 
@@ -690,7 +691,7 @@ def _find_text_delim_idx(region_str):
         start_idx.append(match.span()[1])
 
     idx1 = []
-    for sidx, char in zip(start_idx, delim):
+    for sidx, char in zip(start_idx, delim, strict=True):
         idx1.append(region_str.find(char, sidx))
 
     return idx0, idx1
@@ -729,7 +730,7 @@ def _split_semicolon(region_str):
     semi_idx = [pos for pos, char in enumerate(region_str) if char == ';']
     fidx = []
     for i in semi_idx:
-        for i0, i1 in zip(idx0, idx1):
+        for i0, i1 in zip(idx0, idx1, strict=True):
             if i0 <= i <= i1:
                 break
         else:
@@ -737,4 +738,4 @@ def _split_semicolon(region_str):
     fidx.insert(0, 0)
 
     return [region_str[i:j].rstrip(';')
-            for i, j in zip(fidx, fidx[1:] + [None])]
+            for i, j in zip(fidx, fidx[1:] + [None], strict=True)]

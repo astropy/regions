@@ -3,26 +3,29 @@
 The tests in this file simply check what functionality is currently
 implemented and doesn't check anything about correctness.
 """
-from collections import OrderedDict
 import itertools
+from collections import OrderedDict
 
-from astropy.coordinates import SkyCoord
 import astropy.units as u
-from astropy.wcs import WCS
 import pytest
+from astropy.coordinates import SkyCoord
+from astropy.wcs import WCS
 
-from ...core.core import PixelRegion, Region, SkyRegion
-from ...core.mask import RegionMask
-from ...core.metadata import RegionMeta, RegionVisual
-from ...core.pixcoord import PixCoord
-from ..annulus import (CircleAnnulusPixelRegion, CircleAnnulusSkyRegion,
-                       EllipseAnnulusPixelRegion, EllipseAnnulusSkyRegion,
-                       RectangleAnnulusPixelRegion, RectangleAnnulusSkyRegion)
-from ..circle import CirclePixelRegion, CircleSkyRegion
-from ..ellipse import EllipsePixelRegion, EllipseSkyRegion
-from ..point import PointPixelRegion, PointSkyRegion
-from ..polygon import PolygonPixelRegion, PolygonSkyRegion
-from ..rectangle import RectanglePixelRegion, RectangleSkyRegion
+from regions.core.core import PixelRegion, Region, SkyRegion
+from regions.core.mask import RegionMask
+from regions.core.metadata import RegionMeta, RegionVisual
+from regions.core.pixcoord import PixCoord
+from regions.shapes.annulus import (CircleAnnulusPixelRegion,
+                                    CircleAnnulusSkyRegion,
+                                    EllipseAnnulusPixelRegion,
+                                    EllipseAnnulusSkyRegion,
+                                    RectangleAnnulusPixelRegion,
+                                    RectangleAnnulusSkyRegion)
+from regions.shapes.circle import CirclePixelRegion, CircleSkyRegion
+from regions.shapes.ellipse import EllipsePixelRegion, EllipseSkyRegion
+from regions.shapes.point import PointPixelRegion, PointSkyRegion
+from regions.shapes.polygon import PolygonPixelRegion, PolygonSkyRegion
+from regions.shapes.rectangle import RectanglePixelRegion, RectangleSkyRegion
 
 PIXEL_REGIONS = [
     CirclePixelRegion(PixCoord(3, 4), radius=5),
@@ -119,11 +122,11 @@ def test_attribute_validation_pixel_regions(region):
     invalid_values = dict(center=[PixCoord([1, 2], [2, 3]), 1,
                                   SkyCoord(1 * u.deg, 2 * u.deg),
                                   (10, 10), (10 * u.deg, 10 * u.deg)],
-                          radius=[u.Quantity("1deg"), [1], PixCoord(1, 2),
+                          radius=[u.Quantity('1deg'), [1], PixCoord(1, 2),
                                   3 * u.km, 0.0, -10.],
                           angle=[u.Quantity([1 * u.deg, 2 * u.deg]), 2,
                                  PixCoord(1, 2), 3 * u.km],
-                          vertices=[u.Quantity("1"), 2, PixCoord(1, 2),
+                          vertices=[u.Quantity('1'), 2, PixCoord(1, 2),
                                     PixCoord([[1, 2]], [[2, 3]]), 3 * u.km,
                                     (10, 10), (10 * u.deg, 10 * u.deg)])
     invalid_values['width'] = invalid_values['radius']
@@ -155,7 +158,7 @@ def test_attribute_validation_sky_regions(region):
                                   1, 3 * u.km, 0.0 * u.deg, -10. * u.deg],
                           angle=[u.Quantity([1 * u.deg, 2 * u.deg]), 2,
                                  SkyCoord(1 * u.deg, 2 * u.deg), 3. * u.km],
-                          vertices=[u.Quantity("1deg"), 2,
+                          vertices=[u.Quantity('1deg'), 2,
                                     SkyCoord(1 * u.deg, 2 * u.deg),
                                     SkyCoord([[1 * u.deg, 2 * u.deg]],
                                              [[2 * u.deg, 3 * u.deg]]),

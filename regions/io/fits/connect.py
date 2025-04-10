@@ -4,8 +4,8 @@ import warnings
 
 from astropy.io import fits
 
-from ...core import Region, Regions
-from ...core.registry import RegionsRegistry
+from regions.core import Region, Regions
+from regions.core.registry import RegionsRegistry
 
 __all__ = []
 

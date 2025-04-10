@@ -2,15 +2,15 @@
 
 import warnings
 
+import astropy.units as u
+import numpy as np
 from astropy.io import fits
 from astropy.table import QTable
-import astropy.units as u
 from astropy.utils.exceptions import AstropyUserWarning
-import numpy as np
 
-from ...core import Regions, RegionMeta, PixCoord
-from ...core.registry import RegionsRegistry
-from .core import FITSParserError, shape_map
+from regions.core import PixCoord, RegionMeta, Regions
+from regions.core.registry import RegionsRegistry
+from regions.io.fits.core import FITSParserError, shape_map
 
 __all__ = []
 
@@ -111,15 +111,15 @@ def get_column_values(region_row, colname):
 
     try:
         return value[index]
-    except IndexError:
+    except IndexError as exc:
         raise FITSParserError(f'The {colname!r} column must have more '
-                              f'than {index!r} values for the region.')
+                              f'than {index!r} values for the '
+                              'region.') from exc
 
 
 def get_shape_params(shape, region_row, shape_columns):
-    values = []
-    for column in shape_columns:
-        values.append(get_column_values(region_row, column))
+    values = [get_column_values(region_row, column)
+              for column in shape_columns]
 
     if 'rectangle' in shape:
         (xmin, xmax, ymin, ymax) = values[0:4]

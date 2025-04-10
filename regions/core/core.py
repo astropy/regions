@@ -5,9 +5,9 @@ import operator
 
 import numpy as np
 
-from .metadata import RegionMeta, RegionVisual
-from .pixcoord import PixCoord
-from .registry import RegionsRegistry
+from regions.core.metadata import RegionMeta, RegionVisual
+from regions.core.pixcoord import PixCoord
+from regions.core.registry import RegionsRegistry
 
 __all__ = ['Region', 'PixelRegion', 'SkyRegion']
 __doctest_skip__ = ['Region.serialize', 'Region.write']
@@ -23,6 +23,11 @@ class Region(abc.ABC):
     def copy(self, **changes):
         """
         Make an independent (deep) copy.
+
+        Parameters
+        ----------
+        **changes : dict
+            Changes to make to the region parameters.
         """
         fields = list(self._params) + ['meta', 'visual']
 
@@ -97,6 +102,11 @@ class Region(abc.ABC):
     def __ne__(self, other):
         """
         Inequality operator for Region.
+
+        Parameters
+        ----------
+        other : `Region`
+            The other region that will be compared.
         """
         return not (self == other)
 
@@ -105,6 +115,11 @@ class Region(abc.ABC):
         """
         Return a region representing the intersection of this region
         with ``other``.
+
+        Parameters
+        ----------
+        other : `Region`
+            The other region to use for the intersection.
         """
         raise NotImplementedError
 
@@ -113,6 +128,11 @@ class Region(abc.ABC):
         """
         Return the union of the two regions minus any areas contained in
         the intersection of the two regions.
+
+        Parameters
+        ----------
+        other : `Region`
+            The other region to use for the symmetric difference.
         """
         raise NotImplementedError
 
@@ -121,6 +141,11 @@ class Region(abc.ABC):
         """
         Return a region representing the union of this region with
         ``other``.
+
+        Parameters
+        ----------
+        other : `Region`
+            The other region to use for the union.
         """
         raise NotImplementedError
 
@@ -218,8 +243,13 @@ class PixelRegion(Region):
         """
         Return a region representing the intersection of this region
         with ``other``.
+
+        Parameters
+        ----------
+        other : `Region`
+            The other region to use for the intersection.
         """
-        from .compound import CompoundPixelRegion
+        from regions.core.compound import CompoundPixelRegion
         return CompoundPixelRegion(region1=self, region2=other,
                                    operator=operator.and_)
 
@@ -227,8 +257,13 @@ class PixelRegion(Region):
         """
         Return the union of the two regions minus any areas contained in
         the intersection of the two regions.
+
+        Parameters
+        ----------
+        other : `Region`
+            The other region to use for the symmetric difference.
         """
-        from .compound import CompoundPixelRegion
+        from regions.core.compound import CompoundPixelRegion
         return CompoundPixelRegion(region1=self, region2=other,
                                    operator=operator.xor)
 
@@ -236,8 +271,13 @@ class PixelRegion(Region):
         """
         Return a region representing the union of this region with
         ``other``.
+
+        Parameters
+        ----------
+        other : `Region`
+            The other region to use for the union.
         """
-        from .compound import CompoundPixelRegion
+        from regions.core.compound import CompoundPixelRegion
         return CompoundPixelRegion(region1=self, region2=other,
                                    operator=operator.or_)
 
@@ -345,10 +385,10 @@ class PixelRegion(Region):
             raise ValueError(f'Invalid mask mode: {mode} (should be one '
                              f'of {valid_modes}')
 
-        if mode == 'subpixels':
-            if not isinstance(subpixels, int) or subpixels <= 0:
-                raise ValueError(f'Invalid subpixels value: {subpixels} '
-                                 '(should be a strictly positive integer)')
+        if (mode == 'subpixels'
+                and (not isinstance(subpixels, int) or subpixels <= 0)):
+            raise ValueError(f'Invalid subpixels value: {subpixels} '
+                             '(should be a strictly positive integer)')
 
     @abc.abstractmethod
     def as_artist(self, origin=(0, 0), **kwargs):
@@ -418,8 +458,13 @@ class SkyRegion(Region):
         """
         Return a region representing the intersection of this region
         with ``other``.
+
+        Parameters
+        ----------
+        other : `Region`
+            The other region to use for the intersection.
         """
-        from .compound import CompoundSkyRegion
+        from regions.core.compound import CompoundSkyRegion
         return CompoundSkyRegion(region1=self, region2=other,
                                  operator=operator.and_)
 
@@ -427,8 +472,13 @@ class SkyRegion(Region):
         """
         Return the union of the two regions minus any areas contained in
         the intersection of the two regions.
+
+        Parameters
+        ----------
+        other : `Region`
+            The other region to use for the symmetric difference.
         """
-        from .compound import CompoundSkyRegion
+        from regions.core.compound import CompoundSkyRegion
         return CompoundSkyRegion(region1=self, region2=other,
                                  operator=operator.xor)
 
@@ -436,8 +486,13 @@ class SkyRegion(Region):
         """
         Return a region representing the union of this region with
         ``other``.
+
+        Parameters
+        ----------
+        other : `Region`
+            The other region to use for the union.
         """
-        from .compound import CompoundSkyRegion
+        from regions.core.compound import CompoundSkyRegion
         return CompoundSkyRegion(region1=self, region2=other,
                                  operator=operator.or_)
 
