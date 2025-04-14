@@ -200,7 +200,7 @@ class EllipsePixelRegion(PixelRegion):
         xy = self.center.x - origin[0], self.center.y - origin[1]
         width = self.width
         height = self.height
-        # matplotlib expects rotation in degrees (anti-clockwise)
+        # matplotlib expects rotation in degrees (counter-clockwise)
         angle = self.angle.to('deg').value
 
         mpl_kwargs = self.visual.define_mpl_kwargs(self._mpl_artist)
@@ -210,13 +210,23 @@ class EllipsePixelRegion(PixelRegion):
                        **mpl_kwargs)
 
     def _update_from_mpl_selector(self, *args, **kwargs):
-        xmin, xmax, ymin, ymax = self._mpl_selector.extents
-        self.center = PixCoord(x=0.5 * (xmin + xmax),
-                               y=0.5 * (ymin + ymax))
-        self.width = (xmax - xmin)
-        self.height = (ymax - ymin)
-        self.angle = 0. * u.deg
-        if self._mpl_selector_callback is not None:
+        # matplotlib#26833 removed _rect_properties / _rect_bbox,
+        # ``selector.extents`` are now following rotation, i.e. giving min/max x and y
+        # for the _rotated_ rectangle. For proper width and height use bbox edge distances
+        # in both dimensions (take 0|2 as lower|upper x, 1|3 as lower|upper y edge).
+
+        xec, yec = self._mpl_selector.edge_centers
+        self.width = np.sqrt((xec[2] - xec[0])**2 + (yec[2] - yec[0])**2)
+        self.height = np.sqrt((xec[3] - xec[1])**2 + (yec[3] - yec[1])**2)
+        self.center = PixCoord(*self._mpl_selector.center)
+        # matplotlib defines rotation counter-clockwise (available from 3.6.0 on)
+        if hasattr(self._mpl_selector, 'rotation'):
+            rotation = -self._mpl_selector.rotation
+        else:
+            rotation = 0
+        self.angle = rotation * u.deg
+
+        if getattr(self, '_mpl_selector_callback', None) is not None:
             self._mpl_selector_callback(self)
 
     def as_mpl_selector(self, ax, active=True, sync=True, callback=None,
@@ -261,13 +271,15 @@ class EllipsePixelRegion(PixelRegion):
         you can enable/disable the selector at any point by calling
         ``selector.set_active(True)`` or ``selector.set_active(False)``.
         """
+        from matplotlib import __version__ as MPL_VER_STR  # noqa: N812
         from matplotlib.widgets import EllipseSelector
 
         if hasattr(self, '_mpl_selector'):
             raise AttributeError('Cannot attach more than one selector to a region.')
 
-        if self.angle.value != 0:
-            raise NotImplementedError('Cannot create matplotlib selector for rotated ellipse.')
+        if self.angle.value != 0 and not hasattr(EllipseSelector, 'rotation'):
+            raise NotImplementedError('Creating selectors for rotated shapes is not '
+                                      f'yet supported with matplotlib {MPL_VER_STR}.')
 
         if sync:
             sync_callback = self._update_from_mpl_selector
@@ -286,10 +298,13 @@ class EllipsePixelRegion(PixelRegion):
             ax, sync_callback, interactive=True,
             drag_from_anywhere=drag_from_anywhere, **kwargs)
 
-        self._mpl_selector.extents = (self.center.x - self.width / 2,
-                                      self.center.x + self.width / 2,
-                                      self.center.y - self.height / 2,
-                                      self.center.y + self.height / 2)
+        xy0 = [self.center.x - self.width / 2, self.center.y - self.height / 2]
+        self._mpl_selector.extents = (xy0[0], self.center.x + self.width / 2,
+                                      xy0[1], self.center.y + self.height / 2)
+
+        if self.angle.value != 0:
+            self._mpl_selector.rotation = -self.angle.to_value('deg')
+
         self._mpl_selector.set_active(active)
         self._mpl_selector_callback = callback
 
