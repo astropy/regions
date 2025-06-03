@@ -25,8 +25,8 @@ classifiers = [
 dynamic = ['version']
 requires-python = '>=3.11'
 dependencies = [
-    'numpy>=1.23',
-    'astropy>=5.1',
+    'numpy>=1.25',
+    'astropy>=6.0',
 ]
 
 [project.urls]
@@ -35,7 +35,7 @@ Documentation = 'https://astropy-regions.readthedocs.io/en/stable/'
 
 [project.optional-dependencies]
 all = [
-    'matplotlib>=3.5',
+    'matplotlib>=3.8',
     'shapely',
 ]
 test = [
