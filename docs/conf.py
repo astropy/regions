@@ -14,14 +14,10 @@
 
 import os
 import sys
-from datetime import datetime, timezone
+import tomllib
+from datetime import UTC, datetime
 from importlib import metadata
 from pathlib import Path
-
-if sys.version_info < (3, 11):
-    import tomli as tomllib
-else:
-    import tomllib
 
 try:
     from sphinx_astropy.conf.v1 import *  # noqa: F403
@@ -66,7 +62,7 @@ with open('common_links.txt') as fh:
 # -- Project information ------------------------------------------------------
 project = project_meta['name']
 author = project_meta['authors'][0]['name']
-project_copyright = f'2015-{datetime.now(tz=timezone.utc).year}, {author}'
+project_copyright = f'2015-{datetime.now(tz=UTC).year}, {author}'
 github_project = 'astropy/regions'
 
 # The version info for the project you're documenting, acts as
