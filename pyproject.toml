@@ -2,7 +2,7 @@
 name = 'regions'
 description = 'An Astropy coordinated package for region handling'
 readme = 'README.rst'
-license = {file = 'LICENSE.rst'}
+license-files = ['LICENSE.rst']
 authors = [
     {name = 'Regions Developers', email = 'astropy.team@gmail.com'},
 ]
@@ -14,7 +14,6 @@ keywords = [
 ]
 classifiers = [
     'Intended Audience :: Science/Research',
-    'License :: OSI Approved :: BSD License',
     'Natural Language :: English',
     'Operating System :: OS Independent',
     'Programming Language :: Cython',
@@ -25,8 +24,8 @@ classifiers = [
 dynamic = ['version']
 requires-python = '>=3.11'
 dependencies = [
-    'numpy>=1.25',
-    'astropy>=6.0',
+    'numpy >= 1.25',
+    'astropy >= 6.0',
 ]
 
 [project.urls]
@@ -35,26 +34,31 @@ Documentation = 'https://astropy-regions.readthedocs.io/en/stable/'
 
 [project.optional-dependencies]
 all = [
-    'matplotlib>=3.8',
-    'shapely',
+    'matplotlib >= 3.8',
+    'shapely >= 2.0.0',
 ]
 test = [
+    'pytest-astropy >= 0.11',
     'pytest-arraydiff',
-    'pytest-astropy>=0.11',
+    'tox > 4.0',
 ]
 docs = [
     'regions[all]',
+    'sphinx',
     'sphinx-astropy>=1.9',
-    'tomli; python_version < "3.11"',
+]
+dev = [
+    'regions[docs,test]',
+    'pre-commit > 4.0',
 ]
 
 [build-system]
 requires = [
-    'setuptools>=61.2',
-    'setuptools_scm>=6.2',
-    'cython>=3.1.0,<3.2.0',
-    'numpy>=2',
-    'extension-helpers>=1.3,<2',
+    'setuptools >= 77.0',
+    'setuptools_scm >= 8.0',
+    'cython >= 3.1.0,<4',
+    'numpy >= 2.0.0',
+    'extension-helpers >= 1.3,<2',
 ]
 build-backend = 'setuptools.build_meta'
 
@@ -131,14 +135,12 @@ markers = [
 
 [tool.coverage.run]
 omit = [
-    'regions/_astropy_init*',
     'regions/conftest.py',
     'regions/*setup_package*',
     'regions/tests/*',
     'regions/*/tests/*',
     'regions/extern/*',
     'regions/version*',
-    '*/regions/_astropy_init*',
     '*/regions/conftest.py',
     '*/regions/*setup_package*',
     '*/regions/tests/*',

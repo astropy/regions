@@ -4,6 +4,16 @@
 General
 -------
 
+- The minimum required Python is now 3.11. [#598]
+
+- The minimum required NumPy is now 1.25. [#598]
+
+- The minimum required Astropy is now 6.0. [#598]
+
+- The minimum required Matplotlib is now 3.8. [#598]
+
+- The minimum required Shapely is now 2.0. [#601]
+
 New Features
 ------------
 
