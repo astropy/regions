@@ -48,6 +48,10 @@ docs = [
     'sphinx',
     'sphinx-astropy>=1.9',
 ]
+dev = [
+    'regions[docs,test]',
+    'pre-commit > 4.0',
+]
 
 [build-system]
 requires = [
