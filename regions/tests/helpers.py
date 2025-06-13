@@ -11,6 +11,26 @@ from regions.core import PixCoord, Region
 
 
 def make_simple_wcs(skycoord, resolution, size):
+    """
+    Create a simple WCS object based on a SkyCoord, resolution, and
+    size.
+
+    Parameters
+    ----------
+    skycoord : `~astropy.coordinates.SkyCoord`
+        The sky coordinate for the center of the WCS.
+
+    resolution : `~astropy.units.Quantity`
+        The pixel resolution in degrees.
+
+    size : int
+        The size of the WCS in pixels (assumed square).
+
+    Returns
+    -------
+    wcs : `~astropy.wcs.WCS`
+        A WCS object with the specified parameters.
+    """
     crpix = (size + 1) / 2
     cdelt = resolution.to(u.deg).value
     skycoord_icrs = skycoord.transform_to('icrs')
@@ -29,6 +49,18 @@ def make_simple_wcs(skycoord, resolution, size):
 def assert_skycoord_allclose(skycoord1, skycoord2, **kwargs):
     """
     Test that two SkyCoord objects are nearly equal.
+
+    Parameters
+    ----------
+    skycoord1 : `~astropy.coordinates.SkyCoord`
+        First SkyCoord object to compare.
+
+    skycoord2 : `~astropy.coordinates.SkyCoord`
+        Second SkyCoord object to compare.
+
+    **kwargs : dict
+        Additional keyword arguments passed to
+        `astropy.tests.assert_quantity_allclose`.
     """
     for attr in (skycoord1._extra_frameattr_names
                  | skycoord2._extra_frameattr_names):
@@ -51,6 +83,19 @@ def assert_region_allclose(region1, region2, **kwargs):
     Test that two Region objects have parameters which are nearly equal.
 
     Meta and Visual properties are matched identically.
+
+    Parameters
+    ----------
+    region1 : `~regions.core.Region`
+        First Region object to compare.
+
+    region2 : `~regions.core.Region`
+        Second Region object to compare.
+
+    **kwargs : dict
+        Additional keyword arguments passed to
+        `astropy.tests.assert_quantity_allclose` or similar functions
+        for comparing specific parameter types.
     """
     if not (isinstance(region1, Region) and isinstance(region2, Region)):
         raise TypeError('Both inputs must be Region instances')

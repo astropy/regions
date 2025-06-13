@@ -94,6 +94,7 @@ repos:
     rev: v1.8.0
     hooks:
       - id: numpydoc-validation
+        exclude: "extern/"
 
   # temporarily use to the latest PyPI release instead of GitHub
   # https://github.com/PyCQA/docformatter/pull/287#issuecomment-2401028403
@@ -106,6 +107,7 @@ repos:
       additional_dependencies:
         - docformatter == 1.7.5
       args: [--in-place, --config, ./pyproject.toml]
+      exclude: "extern/"
       language: python
       types:
         - python
