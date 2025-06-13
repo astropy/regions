@@ -160,17 +160,6 @@ exclude_lines = [
     'def _ipython_key_completions_',
 ]
 
-[tool.repo-review]
-ignore = [
-    'MY',  # ignore MyPy
-    'PC110',  # ignore using black or ruff-format in pre-commit
-    'PC111',  # ignore using blacken-docs in pre-commit
-    'PC140',  # ignore using mypy in pre-commit
-    'PC180',  # ignore using prettier in pre-commit
-    'PC901',  # ignore using custom pre-commit update message
-    'PY005',  # ignore having a tests/ folder
-]
-
 [tool.isort]
 skip_glob = [
     'regions/*__init__.py*',
@@ -194,10 +183,26 @@ exclude_dirs = ['*/tests/test_casa_mask.py']
 [tool.bandit.assert_used]
 skips = ['*_test.py', '*/test_*.py', '*/tests/helpers.py']
 
+[tool.repo-review]
+ignore = [
+    'MY',  # ignore MyPy
+    'PC110',  # ignore using black or ruff-format in pre-commit
+    'PC111',  # ignore using blacken-docs in pre-commit
+    'PC140',  # ignore using mypy in pre-commit
+    'PC180',  # ignore using prettier in pre-commit
+    'PC901',  # ignore using custom pre-commit update message
+    'PY005',  # ignore having a tests/ folder
+]
+
 [tool.codespell]
 ignore-words-list = """
     exten,
 """
+
+[tool.docformatter]
+    wrap-summaries = 72
+    pre-summary-newline = true
+    make-summary-multi-line = true
 
 [tool.numpydoc_validation]
 checks = [
@@ -220,11 +225,6 @@ exclude = [
     '^conftest.*$',  # pytest configuration
     '^helpers.*$',  # helper modules
 ]
-
-[tool.docformatter]
-    wrap-summaries = 72
-    pre-summary-newline = true
-    make-summary-multi-line = true
 
 [tool.ruff.lint]
 select = ['E', 'F', 'UP', 'B', 'SIM', 'PL', 'FLY', 'NPY', 'PERF', 'INT',
