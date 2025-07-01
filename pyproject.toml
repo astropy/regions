@@ -245,10 +245,12 @@ ignore = [
     'D212',
     'D404',
     'I001',
+    'PLC0415',  # import-outside-top-level
     'PLR0912',
     'PLR0913',
     'PLR0915',
     'PLR2004',
+    'PLW1641',  # eq-without-hash
     'PLW2901',
     'Q000',
     'SIM910',
