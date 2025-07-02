@@ -143,7 +143,7 @@ def _make_meta_str(meta):
     metalist = []
     for key, val in meta.items():
         if key == 'tag':  # can have multiple tags; value is always a list
-            metalist.append(' '.join([f'tag={{{val}}}' for val in meta[key]]))
+            metalist.append(' '.join([f'tag={{{val}}}' for val in val]))
         else:
             metalist.append(f'{key}={val}')
     return ' '.join(metalist)
