@@ -4,12 +4,13 @@ import copy
 import operator
 
 import numpy as np
+from astropy.coordinates.sky_coordinate_parsers import _get_frame_class
 
 from regions.core.metadata import RegionMeta, RegionVisual
 from regions.core.pixcoord import PixCoord
 from regions.core.registry import RegionsRegistry
 
-__all__ = ['Region', 'PixelRegion', 'SkyRegion']
+__all__ = ['Region', 'PixelRegion', 'SkyRegion', 'SphericalSkyRegion']
 __doctest_skip__ = ['Region.serialize', 'Region.write']
 
 
@@ -527,5 +528,205 @@ class SkyRegion(Region):
         -------
         pixel_region : `~regions.PixelRegion`
             A pixel region.
+        """
+        raise NotImplementedError
+
+
+class SphericalSkyRegion(Region):
+    """
+    Base class for all spherical sky regions (compared to the implicitly
+    planar SkyRegions).
+    """
+
+    def intersection(self, other):
+        """
+        Return a region representing the intersection of this region
+        with ``other``.
+
+        Parameters
+        ----------
+        other : `~regions.SphericalSkyRegion`
+            The other region to use for the intersection.
+        """
+        from .compound import CompoundSphericalSkyRegion
+
+        return CompoundSphericalSkyRegion(
+            region1=self, region2=other, operator=operator.and_
+        )
+
+    def symmetric_difference(self, other):
+        """
+        Return the union of the two regions minus any areas contained in
+        the intersection of the two regions.
+
+        Parameters
+        ----------
+        other : `~regions.SphericalSkyRegion`
+            The other region to use for the symmetric difference.
+        """
+        from .compound import CompoundSphericalSkyRegion
+
+        return CompoundSphericalSkyRegion(
+            region1=self, region2=other, operator=operator.xor
+        )
+
+    def union(self, other):
+        """
+        Return a region representing the union of this region with
+        ``other``.
+
+        Parameters
+        ----------
+        other : `~regions.SphericalSkyRegion`
+            The other region to use for the union.
+        """
+        from .compound import CompoundSphericalSkyRegion
+
+        return CompoundSphericalSkyRegion(
+            region1=self, region2=other, operator=operator.or_
+        )
+
+    @staticmethod
+    def _validate_frame(frame):
+        # TODO: handle offset origin transformations
+
+        frame = (
+            _get_frame_class(frame) if isinstance(frame, str) else frame
+        )
+        return frame
+
+    @property
+    def frame(self):
+        """
+        Coordinate frame of the region.
+        """
+        if 'center' in self._params:
+            return self.center.frame
+        elif 'vertices' in self._params:
+            return self.vertices[0].frame
+        else:
+            raise AttributeError(
+                "Either 'center' or 'centroid' must be an attribute/property "
+                'of the SphericalSkyRegion.'
+            )
+
+    @property
+    @abc.abstractmethod
+    def bounding_circle(self):
+        """
+        Bounding circle for the spherical sky region.
+
+        Returns
+        -------
+        circle_sph_sky_region: `~regions.CircleSphericalSkyRegion`
+            A circle spherical sky region object.
+        """
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def contains(self, coord):
+        """
+        Check whether a sky coordinate falls inside the spherical sky
+        region.
+
+        Parameters
+        ----------
+        coord : `~astropy.coordinates.SkyCoord`
+            The position or positions to check.
+        """
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def transform_to(self, frame, merge_attributes=True):
+        """
+        Transform the `SphericalSkyRegion` instance into another
+        instance with a different coordinate reference frame.
+
+        The precise frame transformed to depends on ``merge_attributes``.
+        If `False`, the destination frame is used exactly as passed in.
+        But this is often not quite what one wants.  E.g., suppose one wants to
+        transform an ICRS coordinate that has an obstime attribute to FK4; in
+        this case, one likely would want to use this information. Thus, the
+        default for ``merge_attributes`` is `True`, in which the precedence is
+        as follows: (1) explicitly set (i.e., non-default) values in the
+        destination frame; (2) explicitly set values in the source; (3) default
+        value in the destination frame.
+
+        Note that in either case, any explicitly set attributes on the source
+        |SkyCoord| that are not part of the destination frame's definition are
+        kept (stored on the resulting |SkyCoord|), and thus one can round-trip
+        (e.g., from FK4 to ICRS to FK4 without losing obstime).
+
+        Parameters
+        ----------
+        frame : str, or `~astropy.coordinates.BaseCoordinateFrame` class or instance
+            The frame to transform this coordinate into.
+        merge_attributes : bool, optional
+            Whether the default attributes in the destination frame are allowed
+            to be overridden by explicitly set attributes in the source
+            (see note above; default: `True`).
+
+        Returns
+        -------
+        sph_sky_region : `~regions.SphericalSkyRegion`
+            A new spherical sky region represented in the `frame` frame.
+        """
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def to_sky(
+        self, wcs=None, include_boundary_distortions=False,
+    ):
+        """
+        Convert to a planar `~regions.SkyRegion` instance.
+
+        Parameters
+        ----------
+        wcs : `~astropy.wcs.WCS` instance, optional
+            The world coordinate system transformation to use to convert
+            between sky and pixel coordinates. Required if transforming
+            with boundary distortions (`include_boundary_distortions=True`).
+            Ignored if boundary distortions not included.
+
+        include_boundary_distortions : bool, optional
+            If True, accounts for boundary boundary distortions in spherical to planar
+            conversions, by discretizing the boundary and converting the boundary polygon.
+            Default is False, which converts to an equivalent idealized shape.
+
+        Returns
+        -------
+        sky_region : `~regions.SkyRegion`
+            A planar sky region, with an equivalent shape (if
+            include_boundary_distortions=False), or a discretized polygon of
+            the boundary (if include_boundary_distortions=True).
+        """
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def to_pixel(
+        self, wcs=None, include_boundary_distortions=False,
+    ):
+        """
+        Convert to a planar `~regions.PixelRegion` instance.
+
+        Parameters
+        ----------
+        wcs : `~astropy.wcs.WCS` instance, optional
+            The world coordinate system transformation to use to convert
+            between sky and pixel coordinates. Required if transforming
+            with boundary distortions (`include_boundary_distortions=True`).
+            Ignored if boundary distortions not included.
+
+        include_boundary_distortions : bool, optional
+            If True, accounts for boundary boundary distortions in spherical to planar
+            conversions, by discretizing the boundary and converting the boundary polygon.
+            Default is False, which converts to an equivalent idealized shape.
+
+        Returns
+        -------
+        pixel_region : `~regions.PixelRegion`
+            A pixel region, with an equivalent shape (if
+            include_boundary_distortions=False), or a discretized polygon of
+            the boundary (if include_boundary_distortions=True).
         """
         raise NotImplementedError
