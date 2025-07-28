@@ -10,6 +10,8 @@ import numpy as np
 from astropy.coordinates import Angle
 
 from regions._geometry import circular_overlap_grid
+from regions._utils.spherical_helpers import (
+    get_circle_latitude_tangent_limits, get_circle_longitude_tangent_limits)
 from regions._utils.wcs_helpers import (pixel_to_sky_mean_scale,
                                         sky_to_pixel_mean_scale)
 from regions.core.attributes import (PositiveScalar, PositiveScalarAngle,
@@ -303,18 +305,27 @@ class CircleSphericalSkyRegion(SphericalSkyRegion):
     def bounding_circle(self):
         return self.copy()
 
+    @property
+    def bounding_lonlat(self):
+        lons_arr = get_circle_longitude_tangent_limits(self.center, self.radius)
+        lats_arr = get_circle_latitude_tangent_limits(self.center, self.radius)
+
+        lons_arr, lats_arr = self._validate_lonlat_bounds(lons_arr, lats_arr)
+
+        return lons_arr, lats_arr
+
     def transform_to(self, frame, merge_attributes=True):
         frame = self._validate_frame(frame)
 
         center_transf = self.center.transform_to(
-            frame, merge_attributes=merge_attributes
+            frame, merge_attributes=merge_attributes,
         )
 
         return CircleSphericalSkyRegion(
             center_transf,
             self.radius.copy(),
             self.meta.copy(),
-            self.visual.copy()
+            self.visual.copy(),
         )
 
     def discretize_boundary(self, n_points=100):
@@ -326,7 +337,7 @@ class CircleSphericalSkyRegion(SphericalSkyRegion):
         return PolygonSphericalSkyRegion(bound_verts)
 
     def to_sky(
-        self, wcs=None, include_boundary_distortions=False, discretize_kwargs=None
+        self, wcs=None, include_boundary_distortions=False, discretize_kwargs=None,
     ):
         if discretize_kwargs is None:
             discretize_kwargs = {}
@@ -334,7 +345,7 @@ class CircleSphericalSkyRegion(SphericalSkyRegion):
         if include_boundary_distortions:
             if wcs is None:
                 raise ValueError(
-                    "'wcs' must be set if 'include_boundary_distortions'=True"
+                    "'wcs' must be set if 'include_boundary_distortions'=True",
                 )
             # Requires spherical to cylindrical projection (from WCS) and discretization
             # Use to_pixel(), then apply "small angle approx" to get planar sky.
@@ -345,7 +356,7 @@ class CircleSphericalSkyRegion(SphericalSkyRegion):
             ).to_sky(wcs)
 
         return CircleSkyRegion(
-            self.center, self.radius, meta=self.meta, visual=self.visual
+            self.center, self.radius, meta=self.meta, visual=self.visual,
         )
 
     def to_pixel(
@@ -362,14 +373,14 @@ class CircleSphericalSkyRegion(SphericalSkyRegion):
 
             if wcs is None:
                 raise ValueError(
-                    "'wcs' must be set if 'include_boundary_distortions'=True"
+                    "'wcs' must be set if 'include_boundary_distortions'=True",
                 )
             # Requires spherical to cylindrical projection (from WCS) and discretization
             verts = wcs.world_to_pixel(
-                self.discretize_boundary(**discretize_kwargs).vertices
+                self.discretize_boundary(**discretize_kwargs).vertices,
             )
             return PolygonPixelRegion(
-                PixCoord(*verts), meta=self.meta.copy(), visual=self.visual.copy()
+                PixCoord(*verts), meta=self.meta.copy(), visual=self.visual.copy(),
             )
 
         return self.to_sky().to_pixel(wcs)
