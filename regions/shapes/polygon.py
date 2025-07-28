@@ -11,7 +11,7 @@ from regions._geometry import polygonal_overlap_grid
 from regions._geometry.pnpoly import points_in_polygon
 from regions._utils.spherical_helpers import (
     cross_product_skycoord2skycoord, cross_product_sum_skycoord2skycoord,
-    discretize_all_edge_boundaries)
+    discretize_all_edge_boundaries, get_edge_raw_lonlat_bounds_circ_edges)
 from regions.core.attributes import (OneDPixCoord, OneDSkyCoord,
                                      PositiveScalar, RegionMetaDescr,
                                      RegionVisualDescr, ScalarAngle,
@@ -475,6 +475,16 @@ class PolygonSphericalSkyRegion(SphericalSkyRegion):
         cent = self.centroid
         seps = cent.separation(self.vertices)
         return CircleSphericalSkyRegion(center=cent, radius=np.max(seps))
+
+    @property
+    def bounding_lonlat(self):
+        lons_arr, lats_arr = get_edge_raw_lonlat_bounds_circ_edges(
+            self.vertices, self.centroid, self._edge_circs
+        )
+
+        lons_arr, lats_arr = self._validate_lonlat_bounds(lons_arr, lats_arr)
+
+        return lons_arr, lats_arr
 
     def contains(self, coord):
         return self._compound_region.contains(coord)
