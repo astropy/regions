@@ -2,7 +2,9 @@
 import operator as op
 
 import numpy as np
+from astropy.coordinates import Latitude, Longitude
 
+from regions._utils.spherical_helpers import bounding_lonlat_poles_processing
 from regions.core.attributes import RegionType
 from regions.core.core import PixelRegion, SkyRegion, SphericalSkyRegion
 from regions.core.mask import RegionMask
@@ -334,6 +336,53 @@ class CompoundSphericalSkyRegion(SphericalSkyRegion):
         # TODO:
         # General solution requires finding intersections of boundaries,
         # and then making a bounding circle. Doable with composed
+        # circle boundaries & polygon-specific logic from spherical-geometry
+        # Maybe better to not make bounding_circle and bounding_lonlat
+        # abstract classes of the base SphericalSkyRegion, and only
+        # add as properties to individual explicitly defined classes?
+        raise NotImplementedError
+
+    def _get_edge_raw_lonlat_bounds(self):
+        if self.operator in [op.or_]:
+            lons1, lats1 = self.region1.bounding_lonlat
+            lons2, lats2 = self.region2.bounding_lonlat
+
+            if (lons1 is None) | (lons2 is None):
+                return (
+                    None,
+                    Latitude(np.min(lats1[0], lats2[0]), np.max(lats1[1], lats2[1])),
+                )
+            # Both lon ranges defined:
+            return (
+                Longitude(np.min(lons1[0], lons2[0]), np.max(lons1[1], lons2[1])),
+                Latitude(np.min(lats1[0], lats2[0]), np.max(lats1[1], lats2[1])),
+            )
+        # XOR, Intersection: not implemented
+        raise NotImplementedError
+
+    @property
+    def bounding_lonlat(self):
+        if self.operator in [op.or_]:
+            # Union:
+            # Find min max from constituent bounds
+
+            lons_arr, lats_arr = self._get_edge_raw_lonlat_bounds()
+
+            # Check if shape covers either pole & modify lats arr accordingly:
+            lons_arr, lats_arr = bounding_lonlat_poles_processing(
+                self, lons_arr, lats_arr
+            )
+
+            return lons_arr, lats_arr
+
+        # Disjoint set / XOR:
+        # Not clean
+        # Intersection:
+        # NOT anywhere near as clean. Much better to define for each subclass
+        # that has a compound region as their internal region logic.
+        # TODO:
+        # General solution requires finding intersections of boundaries,
+        # and then making a bounding lonlat. Doable with composed
         # circle boundaries & polygon-specific logic from spherical-geometry
         # Maybe better to not make bounding_circle and bounding_lonlat
         # abstract classes of the base SphericalSkyRegion, and only
