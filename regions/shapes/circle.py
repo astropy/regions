@@ -15,12 +15,12 @@ from regions.core.attributes import (PositiveScalar, PositiveScalarAngle,
                                      RegionMetaDescr, RegionVisualDescr,
                                      ScalarPixCoord, ScalarSkyCoord)
 from regions.core.bounding_box import RegionBoundingBox
-from regions.core.core import PixelRegion, SkyRegion
+from regions.core.core import PixelRegion, SkyRegion, SphericalSkyRegion
 from regions.core.mask import RegionMask
 from regions.core.metadata import RegionMeta, RegionVisual
 from regions.core.pixcoord import PixCoord
 
-__all__ = ['CirclePixelRegion', 'CircleSkyRegion']
+__all__ = ['CirclePixelRegion', 'CircleSkyRegion', 'CircleSphericalSkyRegion']
 
 
 class CirclePixelRegion(PixelRegion):
@@ -215,3 +215,82 @@ class CircleSkyRegion(SkyRegion):
         radius = (self.radius / pixscale).to(u.pix).value
         return CirclePixelRegion(center, radius, meta=self.meta.copy(),
                                  visual=self.visual.copy())
+
+
+class CircleSphericalSkyRegion(SphericalSkyRegion):
+    """
+    Class for a circular sky region, where the circle is interpreted
+    within a spherical geometry reference frame.
+
+    This region is very much akin to the `~regions.CircleSkyRegion`
+    class (and borrows internal attributes following the same structure).
+
+    Parameters
+    ----------
+    center : `~astropy.coordinates.SkyCoord`
+        The center position.
+    radius : `~astropy.units.Quantity`
+        The radius in angular units.
+    meta : `~regions.RegionMeta` or `dict`, optional
+        A dictionary that stores the meta attributes of the region.
+    visual : `~regions.RegionVisual` or `dict`, optional
+        A dictionary that stores the visual meta attributes of the
+        region.
+    """
+
+    _params = ('center', 'radius')
+    center = ScalarSkyCoord('The center position as a |SkyCoord|.')
+    radius = PositiveScalarAngle('The radius as a |Quantity| angle.')
+    meta = RegionMetaDescr('The meta attributes as a |RegionMeta|')
+    visual = RegionVisualDescr('The visual attributes as a |RegionVisual|.')
+
+    def __init__(self, center, radius, meta=None, visual=None):
+        self.center = center
+        self.radius = radius
+        self.meta = meta or RegionMeta()
+        self.visual = visual or RegionVisual()
+
+    def contains(self, coord):
+        in_circle = self.center.separation(coord) < self.radius
+        if self.meta.get('include', True):
+            return in_circle
+        else:
+            return np.logical_not(in_circle)
+
+    @property
+    def bounding_circle(self):
+        return self.copy()
+
+    def transform_to(self, frame, merge_attributes=True):
+        frame = self._validate_frame(frame)
+
+        center_transf = self.center.transform_to(
+            frame, merge_attributes=merge_attributes
+        )
+
+        return CircleSphericalSkyRegion(
+            center_transf,
+            self.radius.copy(),
+            self.meta.copy(),
+            self.visual.copy()
+        )
+
+    def to_sky(
+        self, wcs=None, include_boundary_distortions=False,
+    ):
+        if include_boundary_distortions:
+            raise NotImplementedError
+
+        return CircleSkyRegion(
+            self.center, self.radius, meta=self.meta, visual=self.visual
+        )
+
+    def to_pixel(
+        self,
+        wcs=None,
+        include_boundary_distortions=False,
+    ):
+        if include_boundary_distortions:
+            raise NotImplementedError
+
+        return self.to_sky().to_pixel(wcs)
