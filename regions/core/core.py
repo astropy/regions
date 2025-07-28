@@ -6,6 +6,7 @@ import operator
 import numpy as np
 from astropy.coordinates.sky_coordinate_parsers import _get_frame_class
 
+from regions._utils.spherical_helpers import bounding_lonlat_poles_processing
 from regions.core.metadata import RegionMeta, RegionVisual
 from regions.core.pixcoord import PixCoord
 from regions.core.registry import RegionsRegistry
@@ -620,6 +621,30 @@ class SphericalSkyRegion(Region):
         -------
         circle_sph_sky_region: `~regions.CircleSphericalSkyRegion`
             A circle spherical sky region object.
+        """
+        raise NotImplementedError
+
+    def _validate_lonlat_bounds(self, lons_arr, lats_arr, inner_region=None):
+        # Check if shape covers either pole & modify lats arr accordingly:
+        lons_arr, lats_arr = bounding_lonlat_poles_processing(
+            self, lons_arr, lats_arr, inner_region=inner_region
+        )
+        return lons_arr, lats_arr
+
+    @property
+    @abc.abstractmethod
+    def bounding_lonlat(self):
+        """
+        Bounding longitude and latitude of the spherical sky region, in
+        the region's frame.
+
+        Returns
+        -------
+        lons_arr : list of `~astropy.coordinates.Longitude`
+            List of lower, upper boundary longitude values.
+
+        lons_arr : list of `~astropy.coordinates.Latitude`
+            List of lower, upper boundary latitude values.
         """
         raise NotImplementedError
 

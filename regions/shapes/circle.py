@@ -10,6 +10,8 @@ import numpy as np
 from astropy.coordinates import Angle
 
 from regions._geometry import circular_overlap_grid
+from regions._utils.spherical_helpers import (
+    get_circle_latitude_tangent_limits, get_circle_longitude_tangent_limits)
 from regions._utils.wcs_helpers import pixel_scale_angle_at_skycoord
 from regions.core.attributes import (PositiveScalar, PositiveScalarAngle,
                                      RegionMetaDescr, RegionVisualDescr,
@@ -260,6 +262,15 @@ class CircleSphericalSkyRegion(SphericalSkyRegion):
     @property
     def bounding_circle(self):
         return self.copy()
+
+    @property
+    def bounding_lonlat(self):
+        lons_arr = get_circle_longitude_tangent_limits(self.center, self.radius)
+        lats_arr = get_circle_latitude_tangent_limits(self.center, self.radius)
+
+        lons_arr, lats_arr = self._validate_lonlat_bounds(lons_arr, lats_arr)
+
+        return lons_arr, lats_arr
 
     def transform_to(self, frame, merge_attributes=True):
         frame = self._validate_frame(frame)
