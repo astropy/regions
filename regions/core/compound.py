@@ -4,10 +4,10 @@ import operator as op
 import numpy as np
 
 from regions.core.attributes import RegionType
-from regions.core.core import PixelRegion, SkyRegion
+from regions.core.core import PixelRegion, SkyRegion, SphericalSkyRegion
 from regions.core.mask import RegionMask
 
-__all__ = ['CompoundPixelRegion', 'CompoundSkyRegion']
+__all__ = ['CompoundPixelRegion', 'CompoundSkyRegion', 'CompoundSphericalSkyRegion']
 
 
 class CompoundPixelRegion(PixelRegion):
@@ -254,3 +254,145 @@ class CompoundSkyRegion(SkyRegion):
 
     def as_artist(self, ax, **kwargs):
         raise NotImplementedError
+
+
+class CompoundSphericalSkyRegion(SphericalSkyRegion):
+    """
+    A class that represents the logical combination of two regions in
+    spherical sky coordinates.
+
+    Parameters
+    ----------
+    region1 : `~regions.SphericalSkyRegion`
+       First spherical sky region.
+    region2 : `~regions.SphericalSkyRegion`
+        Second spherical sky region.
+    operator : callable
+        A callable binary operator.
+    meta : `~regions.RegionMeta`, optional
+        A dictionary that stores the meta attributes of this region.
+    visual : `~regions.RegionVisual`, optional
+        A dictionary that stores the visual meta attributes of this
+        region.
+    """
+
+    _params = ('region1', 'region2', 'operator')
+    region1 = RegionType('region1', SphericalSkyRegion)
+    region2 = RegionType('region2', SphericalSkyRegion)
+
+    def __init__(self, region1, region2, operator, meta=None, visual=None):
+        if not callable(operator):
+            raise TypeError('operator must be callable')
+
+        self.region1 = region1
+        self.region2 = region2
+        if meta is None:
+            self.meta = region1.meta
+        else:
+            self.meta = RegionMeta()
+        if visual is None:
+            self.visual = region1.visual
+        else:
+            self.visual = RegionVisual()
+        self._operator = operator
+
+    @property
+    def operator(self):
+        return self._operator
+
+    @property
+    def frame(self):
+        return self.region1.frame
+
+    @property
+    def bounding_circle(self):
+        from regions.shapes.circle import CircleSphericalSkyRegion
+
+        if self.operator in [op.or_]:
+            # Union:
+            # Compute connection between constituent two bounding circles,
+            # then total "span" on either side, then half and get center.
+
+            circ1 = self.region1.bounding_circle
+            circ2 = self.region2.bounding_circle
+
+            pa = circ1.center.position_angle(circ2.center)
+
+            e1 = circ1.center.directional_offset_by(180 + pa, circ1.radius)
+            e2 = circ2.center.directional_offset_by(pa, circ2.radius)
+            sep = e1.separation(e2)
+
+            cnew = e1.directional_offset_by(pa, sep / 2)
+
+            return CircleSphericalSkyRegion(cnew, sep / 2)
+
+        # Disjoint set / XOR:
+        # Not clean
+        # Intersection:
+        # NOT anywhere near as clean. Much better to define for each subclass
+        # that has a compound region as their internal region logic.
+        # TODO:
+        # General solution requires finding intersections of boundaries,
+        # and then making a bounding circle. Doable with composed
+        # circle boundaries & polygon-specific logic from spherical-geometry
+        # Maybe better to not make bounding_circle and bounding_lonlat
+        # abstract classes of the base SphericalSkyRegion, and only
+        # add as properties to individual explicitly defined classes?
+        raise NotImplementedError
+
+    def contains(self, coord):
+        in_reg = self.operator(
+            self.region1.contains(coord), self.region2.contains(coord)
+        )
+        if self.meta.get('include', True):
+            return in_reg
+        else:
+            return np.logical_not(in_reg)
+
+    def transform_to(self, frame, merge_attributes=True):
+        # Transform the consitituent regions then recompose:
+        return self.__class__(
+            self.region1.transform_to(frame, merge_attributes=merge_attributes),
+            self.region2.transform_to(frame, merge_attributes=merge_attributes),
+            self.operator,
+            meta=self.meta,
+            visual=self.visual,
+        )
+
+    def to_sky(
+        self, wcs=None, include_boundary_distortions=False,
+    ):
+        planarreg1 = self.region1.to_sky(
+            wcs=wcs,
+            include_boundary_distortions=include_boundary_distortions,
+        )
+        planarreg2 = self.region2.to_sky(
+            wcs=wcs,
+            include_boundary_distortions=include_boundary_distortions,
+        )
+        return CompoundSkyRegion(
+            region1=planarreg1,
+            region2=planarreg2,
+            operator=self.operator,
+            meta=self.meta.copy(),
+            visual=self.visual.copy(),
+        )
+
+    def to_pixel(
+        self, wcs=None, include_boundary_distortions=False,
+    ):
+        pixreg1 = self.region1.to_pixel(
+            wcs=wcs,
+            include_boundary_distortions=include_boundary_distortions,
+        )
+        pixreg2 = self.region2.to_pixel(
+            wcs=wcs,
+            include_boundary_distortions=include_boundary_distortions,
+        )
+        return CompoundPixelRegion(
+            region1=pixreg1,
+            region2=pixreg2,
+            operator=self.operator,
+            meta=self.meta.copy(),
+            visual=self.visual.copy(),
+        )
