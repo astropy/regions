@@ -275,11 +275,32 @@ class CircleSphericalSkyRegion(SphericalSkyRegion):
             self.visual.copy()
         )
 
+    def discretize_boundary(self, n_points=100):
+        # Avoid circular imports:
+        from .polygon import PolygonSphericalSkyRegion
+        theta = np.linspace(0, 1, num=n_points, endpoint=False) * 360 * u.deg
+        # Need to invert order because of CW convention:
+        bound_verts = self.center.directional_offset_by(theta[::-1], self.radius)
+        return PolygonSphericalSkyRegion(bound_verts)
+
     def to_sky(
-        self, wcs=None, include_boundary_distortions=False,
+        self, wcs=None, include_boundary_distortions=False, discretize_kwargs=None
     ):
+        if discretize_kwargs is None:
+            discretize_kwargs = {}
+
         if include_boundary_distortions:
-            raise NotImplementedError
+            if wcs is None:
+                raise ValueError(
+                    "'wcs' must be set if 'include_boundary_distortions'=True"
+                )
+            # Requires spherical to cylindrical projection (from WCS) and discretization
+            # Use to_pixel(), then apply "small angle approx" to get planar sky.
+            return self.to_pixel(
+                include_boundary_distortions=include_boundary_distortions,
+                wcs=wcs,
+                discretize_kwargs=discretize_kwargs,
+            ).to_sky(wcs)
 
         return CircleSkyRegion(
             self.center, self.radius, meta=self.meta, visual=self.visual
@@ -289,8 +310,24 @@ class CircleSphericalSkyRegion(SphericalSkyRegion):
         self,
         wcs=None,
         include_boundary_distortions=False,
+        discretize_kwargs=None,
     ):
         if include_boundary_distortions:
-            raise NotImplementedError
+            from .polygon import PolygonPixelRegion
+
+            if discretize_kwargs is None:
+                discretize_kwargs = {}
+
+            if wcs is None:
+                raise ValueError(
+                    "'wcs' must be set if 'include_boundary_distortions'=True"
+                )
+            # Requires spherical to cylindrical projection (from WCS) and discretization
+            verts = wcs.world_to_pixel(
+                self.discretize_boundary(**discretize_kwargs).vertices
+            )
+            return PolygonPixelRegion(
+                PixCoord(*verts), meta=self.meta.copy(), visual=self.visual.copy()
+            )
 
         return self.to_sky().to_pixel(wcs)

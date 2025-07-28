@@ -674,8 +674,26 @@ class SphericalSkyRegion(Region):
         raise NotImplementedError
 
     @abc.abstractmethod
+    def discretize_boundary(self, n_points=10):
+        """
+        Discretize the boundary into a PolygonSphericalSkyRegion, as an
+        approximation where all sides follow great circles.
+
+        Parameters
+        ----------
+        n_points : int, optional
+            Number of points along the region's boundary.
+
+        Returns
+        -------
+        poly_sky_region: `~regions.PolygonSphericalSkyRegion`
+            Spherical sky polygon object.
+        """
+        raise NotImplementedError
+
+    @abc.abstractmethod
     def to_sky(
-        self, wcs=None, include_boundary_distortions=False,
+        self, wcs=None, include_boundary_distortions=False, discretize_kwargs=None
     ):
         """
         Convert to a planar `~regions.SkyRegion` instance.
@@ -693,6 +711,10 @@ class SphericalSkyRegion(Region):
             conversions, by discretizing the boundary and converting the boundary polygon.
             Default is False, which converts to an equivalent idealized shape.
 
+        discretize_kwargs : dict, optional
+            Optional keyword arguments to pass to discretize_boundary() method
+            if including boundary distortions.
+
         Returns
         -------
         sky_region : `~regions.SkyRegion`
@@ -704,7 +726,7 @@ class SphericalSkyRegion(Region):
 
     @abc.abstractmethod
     def to_pixel(
-        self, wcs=None, include_boundary_distortions=False,
+        self, wcs=None, include_boundary_distortions=False, discretize_kwargs=None
     ):
         """
         Convert to a planar `~regions.PixelRegion` instance.
@@ -721,6 +743,10 @@ class SphericalSkyRegion(Region):
             If True, accounts for boundary boundary distortions in spherical to planar
             conversions, by discretizing the boundary and converting the boundary polygon.
             Default is False, which converts to an equivalent idealized shape.
+
+        discretize_kwargs : dict, optional
+            Optional keyword arguments to pass to discretize_boundary() method
+            if including boundary distortions.
 
         Returns
         -------
