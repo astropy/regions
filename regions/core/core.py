@@ -781,3 +781,129 @@ class SphericalSkyRegion(Region):
             the boundary (if include_boundary_distortions=True).
         """
         raise NotImplementedError
+
+
+class ComplexSphericalSkyRegion(SphericalSkyRegion):
+    """
+    Base class for complex cases, where the definitional parameters do
+    not transform (including RangeSphericalSkyRegion).
+    """
+
+    # Because the parameters don't transform,
+    # these object cannot be defined simply as "compound regions"
+
+    # So some repr and str methods are changed.
+
+    # (For now, this is just RangeSphericalSkyRegion,
+    # but breaking out these methods/properties to streamline).
+
+    # Instead, a variable set _boundaries is used, containing the
+    # subclass boundary properties. These boundary properties are, in order of preference,
+    # (a) accessed from `_[boundname]`, for transformed instances of subclass shapes that
+    #     don't simply map in parameterization from frame to frame (eg, Range)
+    # (b) derived on-the-fly
+
+    _boundaries = ()
+
+    def __repr__(self):
+        prefix = f'{self.__class__.__name__}'
+        cls_info = []
+
+        _do_params_info = False
+        if (self._params is not None) and ((len(self._params) > 1) | (self._params[0] != 'frame')):
+            # Only do param-based repr if params other than "frame" are set
+            # If only param is "frame", make repr with boundary info
+            _do_params_info = True
+
+        if _do_params_info:
+            for param in self._params:
+                if param == 'text':
+                    # place quotes around text value
+                    keyval = f'{param}={getattr(self, param)!r}'
+                elif param == 'frame':
+                    keyval = f'{param}={repr(getattr(self, param))}'
+                else:
+                    keyval = f'{param}={getattr(self, param)}'
+                cls_info.append(keyval)
+
+            cls_info = ',\n'.join(cls_info)
+            return f'<{prefix}(\n{cls_info}\n)>'
+        else:
+            # First check if "frame" in self._params:
+            if (self._params is not None) and self._params[0] == 'frame':
+                param = 'frame'
+                keyval = f'{param}={repr(getattr(self, param))}'
+                cls_info.append(keyval)
+
+            # If "params" is None, eg for a "transformed"
+            # complex shape which is no longer described by the "high-level"
+            # region parameters, instead give information on the regions
+            # contained within _boundaries info:
+            for bound in self._boundaries:
+                keyval = f'{bound}={repr(getattr(self, bound))}'
+                cls_info.append(keyval)
+
+            cls_info = ',\n'.join(cls_info)
+            return f'<{prefix}(\n{cls_info}\n)>'
+
+    def __str__(self):
+        cls_info = [('Region', self.__class__.__name__)]
+
+        _do_params_info = False
+        if (self._params is not None) and ((len(self._params) > 1) | (self._params[0] != 'frame')):
+            # Only do param-based str if params other than "frame" are set.
+            # If only param is "frame", make str with boundary info
+            _do_params_info = True
+
+        if _do_params_info:
+            for param in self._params:
+                if param in ['text', 'frame']:
+                    keyval = (param, repr(getattr(self, param)))
+                else:
+                    keyval = (param, getattr(self, param))
+                cls_info.append(keyval)
+            return '\n'.join([f'{key}: {val}' for key, val in cls_info])
+        else:
+            # First check if "frame" in self._params:
+            if (self._params is not None) and (self._params[0] == 'frame'):
+                param = 'frame'
+                keyval = (param, repr(getattr(self, param)))
+                cls_info.append(keyval)
+
+            # If "params" is None, eg for a transformed complex shape,
+            # instead give information on the regions contained
+            # within _boundaries info:
+            for bound in self._boundaries:
+                keyval = (bound, repr(getattr(self, bound)))
+                cls_info.append(keyval)
+
+            return '\n'.join([f'{key}: {val}' for key, val in cls_info])
+
+    @property
+    @abc.abstractmethod
+    def _compound_region(self):
+        """
+        Compound region containing composite boundaries for this complex
+        region shape.
+        """
+
+    def copy(self, **changes):
+        # Boundaries: only copy stashed internal attributes "_{bound name}",
+        # as otherwise these are derived on-the-fly.
+        boundaries_interalattr = [f"_{bn}" for bn in list(self._boundaries)]
+        fields = boundaries_interalattr + [
+            '_frame', '_vertices',
+            '_is_original_frame', '_params',
+        ]
+        if self._params is not None:
+            fields += list(self._params)
+
+        for field in fields:
+            if (field not in changes) & hasattr(self, field):
+                changes[field] = copy.deepcopy(getattr(self, field))
+
+        return self.__class__(**changes)
+
+    @property
+    def frame(self):
+        return self._compound_region.frame
