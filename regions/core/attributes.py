@@ -154,6 +154,31 @@ class PositiveScalarAngle(RegionAttribute):
                              'scalar angle')
 
 
+class TwoValAngleorNone(RegionAttribute):
+    """
+    Descriptor class to check that value is a list-like array of length
+    2 or None, with angles having either `~astropy.coordinates.Angle` or
+    `~astropy.units.Quantity` with angular units.
+    """
+
+    def _validate(self, value):
+        if value is None:
+            pass
+        elif isinstance(value, Quantity):
+            if len(value) != 2:
+                raise ValueError(f'{self.name!r} must be length 2')
+
+            if not value.unit.physical_type == 'angle':
+                raise ValueError(f'{self.name!r} must have angular units')
+        elif len(value) == 2:
+            # Check if list-like with individual entries having angular uints:
+            for val in value:
+                if not val.unit.physical_type == 'angle':
+                    raise ValueError(f'{self.name!r} entries must have angular units')
+        else:
+            raise ValueError(f'{self.name!r} must be an angle of length 2')
+
+
 class RegionType(RegionAttribute):
     """
     Descriptor class to check the region type of value.
