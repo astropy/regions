@@ -39,7 +39,8 @@ all = [
 ]
 test = [
     'pytest-astropy >= 0.11',
-    'pytest-arraydiff',
+    'pytest-xdist >= 2.5.0',
+    'pytest-arraydiff >= 0.6.1',
     'tox > 4.0',
 ]
 docs = [
