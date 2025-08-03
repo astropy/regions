@@ -20,6 +20,10 @@ on:
       - '!*post*'
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
@@ -43,14 +47,14 @@ jobs:
       test_command: pytest -p no:warnings --pyargs regions
       targets: |
         # Linux wheels
-        - cp*-manylinux_x86_64
+        - cp3*-manylinux_x86_64
 
         # MacOS X wheels
-        - cp*macosx_x86_64
-        - cp*macosx_arm64
+        - cp3*-macosx_x86_64
+        - cp3*-macosx_arm64
 
         # Windows wheels
-        - cp*win_amd64
+        - cp3*-win_amd64
 
       # Developer wheels
       upload_to_anaconda: ${{ (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') }}
