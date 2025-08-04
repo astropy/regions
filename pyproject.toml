@@ -123,13 +123,6 @@ xfail_strict = true
 remote_data_strict = true
 filterwarnings = [
     'error',  # turn warnings into exceptions
-    'ignore:numpy.ufunc size changed:RuntimeWarning',
-    'ignore:numpy.ndarray size changed:RuntimeWarning',
-    'ignore:unclosed file:ResourceWarning',
-    # python 3.12 deprecation in matplotlib 3.9dev
-    'ignore:datetime.datetime.utcfromtimestamp\(\) is deprecated:DeprecationWarning',
-    # NumPy 2.0dev deprecations
-    "ignore:.*numpy\\.core.*:DeprecationWarning",
 ]
 markers = [
     'array_compare'
