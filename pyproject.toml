@@ -180,7 +180,7 @@ skips = ['*_test.py', '*/test_*.py', '*/tests/helpers.py']
 
 [tool.cibuildwheel]
 # explicitly skip free-threaded builds
-skip = ["cp314t-*"]
+skip = ["cp*t-*"]
 
 [tool.repo-review]
 ignore = [
