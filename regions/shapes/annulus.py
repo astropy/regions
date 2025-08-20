@@ -193,13 +193,6 @@ class CircleAnnulusPixelRegion(AnnulusPixelRegion):
         return self._component_class(self.center, self.outer_radius,
                                      self.meta, self.visual)
 
-    def to_sky(self, wcs):
-        center, mean_scale = pixel_to_sky_mean_scale(self.center, wcs)
-        inner_radius = self.inner_radius * mean_scale * u.arcsec
-        outer_radius = self.outer_radius * mean_scale * u.arcsec
-        return CircleAnnulusSkyRegion(center, inner_radius, outer_radius,
-                                      self.meta.copy(), self.visual.copy())
-
     def to_polygon(self, npoints=100):
         """
         Return a `~regions.CompoundPixelRegion` of two
@@ -223,6 +216,38 @@ class CircleAnnulusPixelRegion(AnnulusPixelRegion):
         return CompoundPixelRegion(inner_polygon, outer_polygon,
                                    operator.xor, self.meta.copy(),
                                    self.visual.copy())
+
+    def to_sky(self, wcs):
+        center, mean_scale = pixel_to_sky_mean_scale(self.center, wcs)
+        inner_radius = self.inner_radius * mean_scale * u.arcsec
+        outer_radius = self.outer_radius * mean_scale * u.arcsec
+        return CircleAnnulusSkyRegion(center, inner_radius, outer_radius,
+                                      self.meta.copy(), self.visual.copy())
+
+    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
+                         discretize_kwargs=None):
+        if discretize_kwargs is None:
+            discretize_kwargs = {}
+
+        if include_boundary_distortions:
+            if wcs is None:
+                raise ValueError(
+                    "'wcs' must be set if 'include_boundary_distortions'=True"
+                )
+            # Requires cylindrical to spherical projection (using WCS) and discretization
+            # Will require implementing discretization in pixel space
+            # to get correct handling of distortions.
+            raise NotImplementedError
+
+            # ### Potential solution:
+            # # Leverage polygon class to_spherical_sky() functionality without
+            # # distortions, as the distortions were already computed in creating
+            # # that polygon approximation
+            # return self.discretize_boundary(**discretize_kwargs).to_spherical_sky(
+            #     wcs=wcs, include_boundary_distortions=False
+            # )
+
+        return self.to_sky(wcs).to_spherical_sky()
 
 
 class CircleAnnulusSkyRegion(SkyRegion):
@@ -264,14 +289,6 @@ class CircleAnnulusSkyRegion(SkyRegion):
         if inner_radius >= outer_radius:
             raise ValueError('outer_radius must be greater than inner_radius')
 
-    def to_pixel(self, wcs):
-        center, mean_scale = sky_to_pixel_mean_scale(self.center, wcs)
-        inner_radius = self.inner_radius.to(u.arcsec).value * mean_scale
-        outer_radius = self.outer_radius.to(u.arcsec).value * mean_scale
-        return CircleAnnulusPixelRegion(center, inner_radius, outer_radius,
-                                        meta=self.meta.copy(),
-                                        visual=self.visual.copy())
-
     def to_polygon(self, wcs, npoints=100):
         """
         Return a `~regions.CompoundSkyRegion` of two
@@ -293,6 +310,37 @@ class CircleAnnulusSkyRegion(SkyRegion):
             annulus.
         """
         return self.to_pixel(wcs).to_polygon(npoints=npoints).to_sky(wcs)
+
+    def to_pixel(self, wcs):
+        center, mean_scale = sky_to_pixel_mean_scale(self.center, wcs)
+        inner_radius = self.inner_radius.to(u.arcsec).value * mean_scale
+        outer_radius = self.outer_radius.to(u.arcsec).value * mean_scale
+        return CircleAnnulusPixelRegion(center, inner_radius, outer_radius,
+                                        meta=self.meta.copy(),
+                                        visual=self.visual.copy())
+
+    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
+                         discretize_kwargs=None):
+        if discretize_kwargs is None:
+            discretize_kwargs = {}
+
+        if include_boundary_distortions:
+            if wcs is None:
+                raise ValueError(
+                    "'wcs' must be set if 'include_boundary_distortions'=True"
+                )
+            # Requires cylindrical to spherical projection (using WCS) and discretization
+            # Will require implementing discretization in pixel space
+            # to get correct handling of distortions.
+            raise NotImplementedError
+
+            # ### Potential solution:
+            # # Leverage polygon class to_spherical_sky() functionality without
+            # # distortions, as the distortions were already computed in creating
+            # # that polygon approximation
+            # return self.to_pixel(wcs).discretize_boundary(**discretize_kwargs).to_spherical_sky(
+            #     wcs=wcs, include_boundary_distortions=False
+            # )
 
 
 class CircleAnnulusSphericalSkyRegion(AnnulusSphericalSkyRegion):
@@ -672,11 +720,6 @@ class EllipseAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
         super().__init__(center, inner_width, outer_width, inner_height,
                          outer_height, angle, meta, visual)
 
-    def to_sky(self, wcs):
-        return EllipseAnnulusSkyRegion(*self.to_sky_args(wcs),
-                                       meta=self.meta.copy(),
-                                       visual=self.visual.copy())
-
     def to_polygon(self, npoints=100):
         """
         Return a `~regions.CompoundPixelRegion` of two
@@ -700,6 +743,15 @@ class EllipseAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
         return CompoundPixelRegion(inner_polygon, outer_polygon,
                                    operator.xor, self.meta.copy(),
                                    self.visual.copy())
+
+    def to_sky(self, wcs):
+        return EllipseAnnulusSkyRegion(*self.to_sky_args(wcs),
+                                       meta=self.meta.copy(),
+                                       visual=self.visual.copy())
+
+    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
+                         discretize_kwargs=None):
+        raise NotImplementedError
 
 
 class EllipseAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
@@ -754,11 +806,6 @@ class EllipseAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
         super().__init__(center, inner_width, outer_width, inner_height,
                          outer_height, angle, meta, visual)
 
-    def to_pixel(self, wcs):
-        return EllipseAnnulusPixelRegion(*self.to_pixel_args(wcs),
-                                         meta=self.meta.copy(),
-                                         visual=self.visual.copy())
-
     def to_polygon(self, wcs, npoints=100):
         """
         Return a `~regions.CompoundSkyRegion` of two
@@ -780,6 +827,15 @@ class EllipseAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
             annulus.
         """
         return self.to_pixel(wcs).to_polygon(npoints=npoints).to_sky(wcs)
+
+    def to_pixel(self, wcs):
+        return EllipseAnnulusPixelRegion(*self.to_pixel_args(wcs),
+                                         meta=self.meta.copy(),
+                                         visual=self.visual.copy())
+
+    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
+                         discretize_kwargs=None):
+        raise NotImplementedError
 
 
 class RectangleAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
@@ -869,11 +925,6 @@ class RectangleAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
         return (center, inner_width, outer_width, inner_height,
                 outer_height, angle)
 
-    def to_sky(self, wcs):
-        return RectangleAnnulusSkyRegion(*self.to_sky_args(wcs),
-                                         meta=self.meta.copy(),
-                                         visual=self.visual.copy())
-
     def to_polygon(self):
         """
         Return a `~regions.CompoundPixelRegion` of two
@@ -891,6 +942,15 @@ class RectangleAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
         return CompoundPixelRegion(inner_polygon, outer_polygon,
                                    operator.xor, self.meta.copy(),
                                    self.visual.copy())
+
+    def to_sky(self, wcs):
+        return RectangleAnnulusSkyRegion(*self.to_sky_args(wcs),
+                                         meta=self.meta.copy(),
+                                         visual=self.visual.copy())
+
+    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
+                         discretize_kwargs=None):
+        raise NotImplementedError
 
 
 class RectangleAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
@@ -956,11 +1016,6 @@ class RectangleAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
         return (center, inner_width, outer_width, inner_height,
                 outer_height, angle)
 
-    def to_pixel(self, wcs):
-        return RectangleAnnulusPixelRegion(*self.to_pixel_args(wcs),
-                                           meta=self.meta.copy(),
-                                           visual=self.visual.copy())
-
     def to_polygon(self, wcs):
         """
         Return a `~regions.CompoundSkyRegion` of two
@@ -979,3 +1034,12 @@ class RectangleAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
             annulus.
         """
         return self.to_pixel(wcs).to_polygon().to_sky(wcs)
+
+    def to_pixel(self, wcs):
+        return RectangleAnnulusPixelRegion(*self.to_pixel_args(wcs),
+                                           meta=self.meta.copy(),
+                                           visual=self.visual.copy())
+
+    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
+                         discretize_kwargs=None):
+        raise NotImplementedError

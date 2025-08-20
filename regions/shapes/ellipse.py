@@ -120,6 +120,10 @@ class EllipsePixelRegion(PixelRegion):
                                 meta=self.meta.copy(),
                                 visual=self.visual.copy())
 
+    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
+                         discretize_kwargs=None):
+        raise NotImplementedError
+
     @property
     def bounding_box(self):
         """
@@ -390,17 +394,6 @@ class EllipseSkyRegion(SkyRegion):
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
 
-    def to_pixel(self, wcs):
-        center, pix_width, pix_height, angle = sky_ellipse_to_pixel_svd(
-            self.center, wcs,
-            self.width.to(u.arcsec).value,
-            self.height.to(u.arcsec).value,
-            self.angle.to(u.rad).value)
-        return EllipsePixelRegion(center, pix_width, pix_height,
-                                  angle=angle,
-                                  meta=self.meta.copy(),
-                                  visual=self.visual.copy())
-
     def to_polygon(self, wcs, npoints=100):
         """
         Return a `~regions.PolygonSkyRegion` that approximates this
@@ -419,3 +412,18 @@ class EllipseSkyRegion(SkyRegion):
             A polygon region approximating the ellipse.
         """
         return self.to_pixel(wcs).to_polygon(npoints=npoints).to_sky(wcs)
+
+    def to_pixel(self, wcs):
+        center, pix_width, pix_height, angle = sky_ellipse_to_pixel_svd(
+            self.center, wcs,
+            self.width.to(u.arcsec).value,
+            self.height.to(u.arcsec).value,
+            self.angle.to(u.rad).value)
+        return EllipsePixelRegion(center, pix_width, pix_height,
+                                  angle=angle,
+                                  meta=self.meta.copy(),
+                                  visual=self.visual.copy())
+
+    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
+                         discretize_kwargs=None):
+        raise NotImplementedError
