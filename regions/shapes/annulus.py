@@ -196,6 +196,31 @@ class CircleAnnulusPixelRegion(AnnulusPixelRegion):
         return CircleAnnulusSkyRegion(center, inner_radius, outer_radius,
                                       self.meta.copy(), self.visual.copy())
 
+    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
+                         discretize_kwargs=None):
+        if discretize_kwargs is None:
+            discretize_kwargs = {}
+
+        if include_boundary_distortions:
+            if wcs is None:
+                raise ValueError(
+                    "'wcs' must be set if 'include_boundary_distortions'=True"
+                )
+            # Requires cylindrical to spherical projection (using WCS) and discretization
+            # Will require implementing discretization in pixel space
+            # to get correct handling of distortions.
+            raise NotImplementedError
+
+            # ### Potential solution:
+            # # Leverage polygon class to_spherical_sky() functionality without
+            # # distortions, as the distortions were already computed in creating
+            # # that polygon approximation
+            # return self.discretize_boundary(**discretize_kwargs).to_spherical_sky(
+            #     wcs=wcs, include_boundary_distortions=False
+            # )
+
+        return self.to_sky(wcs).to_spherical_sky()
+
 
 class CircleAnnulusSkyRegion(SkyRegion):
     """
@@ -243,6 +268,29 @@ class CircleAnnulusSkyRegion(SkyRegion):
         return CircleAnnulusPixelRegion(center, inner_radius, outer_radius,
                                         meta=self.meta.copy(),
                                         visual=self.visual.copy())
+
+    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
+                         discretize_kwargs=None):
+        if discretize_kwargs is None:
+            discretize_kwargs = {}
+
+        if include_boundary_distortions:
+            if wcs is None:
+                raise ValueError(
+                    "'wcs' must be set if 'include_boundary_distortions'=True"
+                )
+            # Requires cylindrical to spherical projection (using WCS) and discretization
+            # Will require implementing discretization in pixel space
+            # to get correct handling of distortions.
+            raise NotImplementedError
+
+            # ### Potential solution:
+            # # Leverage polygon class to_spherical_sky() functionality without
+            # # distortions, as the distortions were already computed in creating
+            # # that polygon approximation
+            # return self.to_pixel(wcs).discretize_boundary(**discretize_kwargs).to_spherical_sky(
+            #     wcs=wcs, include_boundary_distortions=False
+            # )
 
 
 class CircleAnnulusSphericalSkyRegion(AnnulusSphericalSkyRegion):
@@ -634,6 +682,10 @@ class EllipseAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
                                        meta=self.meta.copy(),
                                        visual=self.visual.copy())
 
+    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
+                         discretize_kwargs=None):
+        raise NotImplementedError
+
 
 class EllipseAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
     """
@@ -691,6 +743,10 @@ class EllipseAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
         return EllipseAnnulusPixelRegion(*self.to_pixel_args(wcs),
                                          meta=self.meta.copy(),
                                          visual=self.visual.copy())
+
+    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
+                         discretize_kwargs=None):
+        raise NotImplementedError
 
 
 class RectangleAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
@@ -775,6 +831,10 @@ class RectangleAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
                                          meta=self.meta.copy(),
                                          visual=self.visual.copy())
 
+    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
+                         discretize_kwargs=None):
+        raise NotImplementedError
+
 
 class RectangleAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
     """
@@ -833,3 +893,7 @@ class RectangleAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
         return RectangleAnnulusPixelRegion(*self.to_pixel_args(wcs),
                                            meta=self.meta.copy(),
                                            visual=self.visual.copy())
+
+    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
+                         discretize_kwargs=None):
+        raise NotImplementedError

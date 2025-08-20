@@ -89,6 +89,10 @@ class PointPixelRegion(PixelRegion):
         return PointSkyRegion(center, meta=self.meta.copy(),
                               visual=self.visual.copy())
 
+    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
+                         discretize_kwargs=None):
+        raise NotImplementedError
+
     @property
     def bounding_box(self):
         return RegionBoundingBox.from_float(self.center.x, self.center.x,
@@ -183,3 +187,7 @@ class PointSkyRegion(SkyRegion):
         center = PixCoord(center_x, center_y)
         return PointPixelRegion(center, meta=self.meta.copy(),
                                 visual=self.visual.copy())
+
+    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
+                         discretize_kwargs=None):
+        raise NotImplementedError

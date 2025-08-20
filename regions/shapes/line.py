@@ -84,6 +84,10 @@ class LinePixelRegion(PixelRegion):
         return LineSkyRegion(start, end, meta=self.meta.copy(),
                              visual=self.visual.copy())
 
+    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
+                         discretize_kwargs=None):
+        raise NotImplementedError
+
     @property
     def bounding_box(self):
         xmin = min(self.start.x, self.end.x)
@@ -197,3 +201,7 @@ class LineSkyRegion(SkyRegion):
         end = PixCoord(end_x, end_y)
         return LinePixelRegion(start, end, meta=self.meta.copy(),
                                visual=self.visual.copy())
+
+    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
+                         discretize_kwargs=None):
+        raise NotImplementedError
