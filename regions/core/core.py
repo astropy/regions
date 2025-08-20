@@ -428,6 +428,39 @@ class PixelRegion(Region):
         """
         raise NotImplementedError
 
+    @abc.abstractmethod
+    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
+                         discretize_kwargs=None):
+        """
+        Convert to an equivalent spherical `~regions.SphericalSkyRegion`
+        instance.
+
+        Parameters
+        ----------
+        wcs : `~astropy.wcs.WCS` instance, optional
+            The world coordinate system transformation to use to convert
+            between sky and pixel coordinates. Required if transforming
+            with boundary distortions (`include_boundary_distortions=True`).
+            Ignored if boundary distortions not included.
+
+        include_boundary_distortions : bool, optional
+            If True, accounts for boundary boundary distortions in spherical to planar
+            conversions, by discretizing the boundary and converting the boundary polygon.
+            Default is False, which converts to an equivalent idealized shape.
+
+        discretize_kwargs : dict, optional
+            Optional keyword arguments to pass to discretize_boundary() method
+            if including boundary distortions.
+
+        Returns
+        -------
+        spherical_sky_region : `~regions.SphericalSkyRegion`
+            A spherical sky region, with an equivalent shape (if
+            include_boundary_distortions=False), or a discretized polygon of
+            the boundary (if include_boundary_distortions=True).
+        """
+        raise NotImplementedError
+
     @property
     @abc.abstractmethod
     def area(self):
@@ -653,6 +686,39 @@ class SkyRegion(Region):
         of the WCS transformation is used to compute directional scale
         factors and angle. For WCS without distortions, a local pixel
         scale and angle are computed using offset-based methods.
+        """
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
+                         discretize_kwargs=None):
+        """
+        Convert to an equivalent spherical `~regions.SphericalSkyRegion`
+        instance.
+
+        Parameters
+        ----------
+        wcs : `~astropy.wcs.WCS` instance, optional
+            The world coordinate system transformation to use to convert
+            between sky and pixel coordinates. Required if transforming
+            with boundary distortions (`include_boundary_distortions=True`).
+            Ignored if boundary distortions not included.
+
+        include_boundary_distortions : bool, optional
+            If True, accounts for boundary boundary distortions in spherical to planar
+            conversions, by discretizing the boundary and converting the boundary polygon.
+            Default is False, which converts to an equivalent idealized shape.
+
+        discretize_kwargs : dict, optional
+            Optional keyword arguments to pass to discretize_boundary() method
+            if including boundary distortions.
+
+        Returns
+        -------
+        spherical_sky_region : `~regions.SphericalSkyRegion`
+            A spherical sky region, with an equivalent shape (if
+            include_boundary_distortions=False), or a discretized polygon of
+            the boundary (if include_boundary_distortions=True).
         """
         raise NotImplementedError
 

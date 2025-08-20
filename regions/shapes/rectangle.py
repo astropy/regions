@@ -116,6 +116,10 @@ class RectanglePixelRegion(PixelRegion):
                                   meta=self.meta.copy(),
                                   visual=self.visual.copy())
 
+    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
+                         discretize_kwargs=None):
+        raise NotImplementedError
+
     @property
     def bounding_box(self):
         w2 = self.width / 2.
@@ -403,16 +407,6 @@ class RectangleSkyRegion(SkyRegion):
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
 
-    def to_pixel(self, wcs):
-        center, scale_w, scale_h, angle = sky_to_pixel_scales(
-            self.center, wcs, self.angle.to(u.rad).value)
-        width = self.width.to(u.arcsec).value * scale_w
-        height = self.height.to(u.arcsec).value * scale_h
-        return RectanglePixelRegion(center, width, height,
-                                    angle=angle,
-                                    meta=self.meta.copy(),
-                                    visual=self.visual.copy())
-
     def to_polygon(self, wcs):
         """
         Return a `~regions.PolygonSkyRegion` equivalent to this
@@ -429,3 +423,17 @@ class RectangleSkyRegion(SkyRegion):
             A polygon region equivalent to the rectangle.
         """
         return self.to_pixel(wcs).to_polygon().to_sky(wcs)
+
+    def to_pixel(self, wcs):
+        center, scale_w, scale_h, angle = sky_to_pixel_scales(
+            self.center, wcs, self.angle.to(u.rad).value)
+        width = self.width.to(u.arcsec).value * scale_w
+        height = self.height.to(u.arcsec).value * scale_h
+        return RectanglePixelRegion(center, width, height,
+                                    angle=angle,
+                                    meta=self.meta.copy(),
+                                    visual=self.visual.copy())
+
+    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
+                         discretize_kwargs=None):
+        raise NotImplementedError
