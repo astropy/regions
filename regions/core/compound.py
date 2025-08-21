@@ -274,7 +274,8 @@ class CompoundSkyRegion(SkyRegion):
                                    region2=pixreg2, meta=self.meta.copy(),
                                    visual=self.visual.copy())
 
-    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False, discretize_kwargs=None):
+    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
+                         discretize_kwargs=None):
         sphreg1 = self.region1.to_spherical_sky(
             wcs=wcs,
             include_boundary_distortions=include_boundary_distortions,
