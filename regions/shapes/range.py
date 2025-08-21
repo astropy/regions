@@ -695,7 +695,9 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
         for bound in boundaries:
             # Will be passing directly into internal attributes
             # _longitude_bounds, _latitude_bounds
-            transformed[f"_{bound}"] = getattr(self, bound).transform_to(frame, merge_attributes=merge_attributes)
+            transformed[f"_{bound}"] = getattr(self, bound).transform_to(
+                frame, merge_attributes=merge_attributes
+            )
 
         # Also transform vertices:
         for field in ['_vertices']:
@@ -705,7 +707,9 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
                 # get the on-the-fly-derived verts.
                 verts = self.vertices
             if verts is not None:
-                transformed[field] = verts.transform_to(frame, merge_attributes=merge_attributes)
+                transformed[field] = verts.transform_to(
+                    frame, merge_attributes=merge_attributes
+                )
             else:
                 transformed[field] = None
 
