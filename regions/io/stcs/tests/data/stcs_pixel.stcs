@@ -1,0 +1,5 @@
+# STC-S test file with pixel coordinates
+Circle IMAGE UNKNOWN 100.5 200.3 15.0
+Ellipse IMAGE UNKNOWN 300.0 400.0 20.0 10.0 30.0
+Box IMAGE UNKNOWN 500.0 600.0 50.0 25.0 45.0
+Position IMAGE UNKNOWN 750.0 850.0

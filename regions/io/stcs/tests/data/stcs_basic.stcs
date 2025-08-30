@@ -1,0 +1,15 @@
+# STC-S test file with basic shapes
+# Test basic circle
+Circle ICRS BARYCENTER 180.0 10.0 0.5
+
+# Test ellipse
+Ellipse ICRS BARYCENTER 150.0 -20.0 1.0 0.5 45.0
+
+# Test box/rectangle
+Box ICRS BARYCENTER 120.0 30.0 2.0 1.0 0.0
+
+# Test polygon
+Polygon ICRS BARYCENTER 45.0 45.0 50.0 45.0 50.0 50.0 45.0 50.0
+
+# Test position/point
+Position FK5 GEOCENTER 85.0 -15.0

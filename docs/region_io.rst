@@ -28,6 +28,7 @@ filename suffix for a particular format.
        crtf   .crtf           `CASA Region Text Format <https://casadocs.readthedocs.io/en/stable/notebooks/image_analysis.html#Region-File-Format>`_
         ds9   .reg, .ds9      `DS9 Region Format <http://ds9.si.edu/doc/ref/region.html>`_
        fits   .fits           `FITS Region Binary Table <https://fits.gsfc.nasa.gov/registry/region.html>`_
+       stcs   .stcs, .stc     `STC-S Region Format <https://www.ivoa.net/documents/Notes/STC-S/20091030/NOTE-STC-S-1.33-20091030.html>`_
 ============  ==============  ========================
 
 Use the :meth:`~regions.Regions.get_formats` method to get the
@@ -40,6 +41,7 @@ registered I/O formats as a :class:`~astropy.table.Table`::
       crtf   Yes       Yes  Yes   Yes           Yes
        ds9   Yes       Yes  Yes   Yes           Yes
       fits   Yes       Yes  Yes   Yes           Yes
+      stcs   Yes       Yes  Yes   Yes           Yes
 
 
 Read
@@ -171,6 +173,7 @@ formats and methods for the :class:`~regions.Region` subclasses::
       crtf    No       Yes   No   Yes           Yes
        ds9    No       Yes   No   Yes           Yes
       fits    No       Yes   No   Yes           Yes
+      stcs    No       Yes   No   Yes           Yes
 
 
 Region File Format Limitations
@@ -181,3 +184,4 @@ Region File Format Limitations
 
     ds9_io
     fits_io
+    stcs_io
