@@ -158,8 +158,8 @@ def _serialize_circle(region, frame, refpos, unit, precision):
         center_lat = format_coordinate(region.center.y, precision)
         radius = format_coordinate(region.radius, precision)
     else:
-        center_lon = format_coordinate(region.center.ra.to('degree').value, precision)
-        center_lat = format_coordinate(region.center.dec.to('degree').value, precision)
+        center_lon = format_coordinate(region.center.transform_to(frame).lon.to('degree').value, precision)
+        center_lat = format_coordinate(region.center.transform_to(frame).lat.to('degree').value, precision)
         radius = format_coordinate(region.radius.to('degree').value, precision)
 
     return f"Circle {frame} {refpos} {center_lon} {center_lat} {radius}"
@@ -174,8 +174,8 @@ def _serialize_ellipse(region, frame, refpos, unit, precision):
         semi_minor = format_coordinate(region.height / 2, precision)
         angle = format_coordinate(region.angle.to('degree').value, precision)
     else:
-        center_lon = format_coordinate(region.center.ra.to('degree').value, precision)
-        center_lat = format_coordinate(region.center.dec.to('degree').value, precision)
+        center_lon = format_coordinate(region.center.transform_to(frame).lon.to('degree').value, precision)
+        center_lat = format_coordinate(region.center.transform_to(frame).lat.to('degree').value, precision)
         semi_major = format_coordinate((region.width / 2).to('degree').value, precision)
         semi_minor = format_coordinate((region.height / 2).to('degree').value, precision)
         angle = format_coordinate(region.angle.to('degree').value, precision)
@@ -192,8 +192,8 @@ def _serialize_box(region, frame, refpos, unit, precision):
         height = format_coordinate(region.height, precision)
         angle = format_coordinate(region.angle.to('degree').value, precision)
     else:
-        center_lon = format_coordinate(region.center.ra.to('degree').value, precision)
-        center_lat = format_coordinate(region.center.dec.to('degree').value, precision)
+        center_lon = format_coordinate(region.center.transform_to(frame).lon.to('degree').value, precision)
+        center_lat = format_coordinate(region.center.transform_to(frame).lat.to('degree').value, precision)
         width = format_coordinate(region.width.to('degree').value, precision)
         height = format_coordinate(region.height.to('degree').value, precision)
         angle = format_coordinate(region.angle.to('degree').value, precision)
@@ -212,8 +212,8 @@ def _serialize_polygon(region, frame, refpos, unit, precision):
     else:
         vertices_str = []
         for vertex in region.vertices:
-            lon = format_coordinate(vertex.ra.to('degree').value, precision)
-            lat = format_coordinate(vertex.dec.to('degree').value, precision)
+            lon = format_coordinate(vertex.transform_to(frame).lon.to('degree').value, precision)
+            lat = format_coordinate(vertex.transform_to(frame).lat.to('degree').value, precision)
             vertices_str.extend([lon, lat])
 
     vertices_coords = ' '.join(vertices_str)
@@ -226,8 +226,8 @@ def _serialize_position(region, frame, refpos, unit, precision):
         center_lon = format_coordinate(region.center.x, precision)
         center_lat = format_coordinate(region.center.y, precision)
     else:
-        center_lon = format_coordinate(region.center.ra.to('degree').value, precision)
-        center_lat = format_coordinate(region.center.dec.to('degree').value, precision)
+        center_lon = format_coordinate(region.center.transform_to(frame).lon.to('degree').value, precision)
+        center_lat = format_coordinate(region.center.transform_to(frame).lat.to('degree').value, precision)
 
     return f"Position {frame} {refpos} {center_lon} {center_lat}"
 
