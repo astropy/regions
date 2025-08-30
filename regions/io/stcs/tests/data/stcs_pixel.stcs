@@ -1,4 +1,11 @@
 # STC-S test file with pixel coordinates
+# Examples created based on the IVOA STC-S standard specification:
+# https://www.ivoa.net/documents/Notes/STC-S/20091030/NOTE-STC-S-1.33-20091030.html
+#
+# These examples demonstrate the IMAGE coordinate frame for pixel-based
+# regions, designed to test the astropy-regions STC-S I/O module's
+# handling of pixel coordinate systems.
+
 Circle IMAGE UNKNOWN 100.5 200.3 15.0
 Ellipse IMAGE UNKNOWN 300.0 400.0 20.0 10.0 30.0
 Box IMAGE UNKNOWN 500.0 600.0 50.0 25.0 45.0

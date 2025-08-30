@@ -1,12 +1,19 @@
-# STC-S test file with complex regions based on cds-stc-rust examples
-# Example from the Rust implementation documentation
+# STC-S test file with complex regions and coordinate systems
+#
+# Some examples inspired by the CDS STC-S Rust implementation:
+# https://github.com/cds-astro/cds-stc-rust/
+#
+# Additional examples created based on the IVOA STC-S standard to test
+# various coordinate systems (ICRS, GALACTIC, FK5) and reference positions
+# (TOPOCENTER, BARYCENTER, GEOCENTER).
 
+# Example demonstrating TOPOCENTER reference position
 Circle ICRS TOPOCENTER 147.6 69.9 0.4
 
-# Time and position example (simplified to spatial only)
+# Position example (spatial coordinates only, temporal coordinates excluded)
 Position ICRS BARYCENTER 147.3 69.3
 
-# Complex example with multiple shapes
+# Examples with various coordinate systems and reference positions
 Circle ICRS GEOCENTER 179.0 -11.5 0.5
 Ellipse GALACTIC BARYCENTER 90.0 45.0 2.0 1.0 60.0
 Box FK5 TOPOCENTER 30.0 60.0 0.5 0.3 15.0
