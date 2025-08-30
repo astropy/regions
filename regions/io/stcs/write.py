@@ -9,7 +9,7 @@ from astropy.units import Quantity
 from regions.core import (PixelRegion, Region, Regions, SkyRegion)
 from regions.core.registry import RegionsRegistry
 from regions.io.stcs.core import (format_coordinate, region_to_stcs_shape,
-                                  stcs_templates)
+                                  stcs_frame_map, stcs_templates)
 from regions.shapes import RegularPolygonPixelRegion
 
 __all__ = []
@@ -114,25 +114,54 @@ def _serialize_region_stcs(region, precision=8):
     is_pixel = isinstance(region, PixelRegion)
     is_sky = isinstance(region, SkyRegion)
 
-    if is_pixel:
-        frame = 'IMAGE'
-        refpos = 'UNKNOWN'
-        unit = 'pixel'
-    elif is_sky:
-        # Get frame from region's coordinate system
-        if hasattr(region, 'center') and hasattr(region.center, 'frame'):
-            frame_name = region.center.frame.name.upper()
-            frame = {'ICRS': 'ICRS', 'FK5': 'FK5', 'FK4': 'FK4',
-                    'GALACTIC': 'GALACTIC', 'GEOCENTRICTRUEECLIPTIC': 'ECLIPTIC'}.get(frame_name, 'ICRS')
-        else:
-            frame = 'ICRS'
-        refpos = 'BARYCENTER'
+    # Check for STC-S metadata first (for round-trip consistency)
+    frame = None
+    refpos = None
+    unit = None
 
-        # Determine unit from region coordinates
-        if hasattr(region, 'center'):
-            unit = _get_coordinate_unit(region.center)
-        else:
-            unit = 'degree'
+    if hasattr(region, 'meta') and region.meta:
+        # Extract frame from metadata
+        if 'frame' in region.meta:
+            frame = region.meta['frame']
+
+        # Extract refpos and unit from comment metadata
+        if 'comment' in region.meta:
+            comment = region.meta['comment']
+            import re
+            refpos_match = re.search(r'stcs_refpos=(\w+)', comment)
+            unit_match = re.search(r'stcs_unit=(\w+)', comment)
+            if refpos_match:
+                refpos = refpos_match.group(1)
+            if unit_match:
+                unit = unit_match.group(1)
+
+    # Fall back to defaults if not found in metadata
+    if is_pixel:
+        if frame is None:
+            frame = 'IMAGE'
+        if refpos is None:
+            refpos = 'UNKNOWN'
+        if unit is None:
+            unit = 'pixel'
+    elif is_sky:
+        # Get frame from region's coordinate system if not in metadata
+        if frame is None:
+            if hasattr(region, 'center') and hasattr(region.center, 'frame'):
+                frame_name = region.center.frame.name.upper()
+                frame = {'ICRS': 'ICRS', 'FK5': 'FK5', 'FK4': 'FK4',
+                        'GALACTIC': 'GALACTIC', 'GEOCENTRICTRUEECLIPTIC': 'ECLIPTIC'}.get(frame_name, 'ICRS')
+            else:
+                frame = 'ICRS'
+
+        if refpos is None:
+            refpos = 'BARYCENTER'
+
+        # Determine unit from region coordinates if not in metadata
+        if unit is None:
+            if hasattr(region, 'center'):
+                unit = _get_coordinate_unit(region.center)
+            else:
+                unit = 'degree'
     else:
         raise ValueError(f"Unknown region coordinate type: {region}")
 
@@ -158,8 +187,12 @@ def _serialize_circle(region, frame, refpos, unit, precision):
         center_lat = format_coordinate(region.center.y, precision)
         radius = format_coordinate(region.radius, precision)
     else:
-        center_lon = format_coordinate(region.center.transform_to(frame).lon.to('degree').value, precision)
-        center_lat = format_coordinate(region.center.transform_to(frame).lat.to('degree').value, precision)
+        # Convert STC-S frame string to astropy frame
+        astropy_frame = stcs_frame_map.get(frame, 'icrs')
+        transformed_coord = region.center.transform_to(astropy_frame)
+        # Use spherical coordinates to get longitude and latitude generically
+        center_lon = format_coordinate(transformed_coord.spherical.lon.to('degree').value, precision)
+        center_lat = format_coordinate(transformed_coord.spherical.lat.to('degree').value, precision)
         radius = format_coordinate(region.radius.to('degree').value, precision)
 
     return f"Circle {frame} {refpos} {center_lon} {center_lat} {radius}"
@@ -174,8 +207,12 @@ def _serialize_ellipse(region, frame, refpos, unit, precision):
         semi_minor = format_coordinate(region.height / 2, precision)
         angle = format_coordinate(region.angle.to('degree').value, precision)
     else:
-        center_lon = format_coordinate(region.center.transform_to(frame).lon.to('degree').value, precision)
-        center_lat = format_coordinate(region.center.transform_to(frame).lat.to('degree').value, precision)
+        # Convert STC-S frame string to astropy frame
+        astropy_frame = stcs_frame_map.get(frame, 'icrs')
+        transformed_coord = region.center.transform_to(astropy_frame)
+        # Use spherical coordinates to get longitude and latitude generically
+        center_lon = format_coordinate(transformed_coord.spherical.lon.to('degree').value, precision)
+        center_lat = format_coordinate(transformed_coord.spherical.lat.to('degree').value, precision)
         semi_major = format_coordinate((region.width / 2).to('degree').value, precision)
         semi_minor = format_coordinate((region.height / 2).to('degree').value, precision)
         angle = format_coordinate(region.angle.to('degree').value, precision)
@@ -192,8 +229,12 @@ def _serialize_box(region, frame, refpos, unit, precision):
         height = format_coordinate(region.height, precision)
         angle = format_coordinate(region.angle.to('degree').value, precision)
     else:
-        center_lon = format_coordinate(region.center.transform_to(frame).lon.to('degree').value, precision)
-        center_lat = format_coordinate(region.center.transform_to(frame).lat.to('degree').value, precision)
+        # Convert STC-S frame string to astropy frame
+        astropy_frame = stcs_frame_map.get(frame, 'icrs')
+        transformed_coord = region.center.transform_to(astropy_frame)
+        # Use spherical coordinates to get longitude and latitude generically
+        center_lon = format_coordinate(transformed_coord.spherical.lon.to('degree').value, precision)
+        center_lat = format_coordinate(transformed_coord.spherical.lat.to('degree').value, precision)
         width = format_coordinate(region.width.to('degree').value, precision)
         height = format_coordinate(region.height.to('degree').value, precision)
         angle = format_coordinate(region.angle.to('degree').value, precision)
@@ -212,8 +253,12 @@ def _serialize_polygon(region, frame, refpos, unit, precision):
     else:
         vertices_str = []
         for vertex in region.vertices:
-            lon = format_coordinate(vertex.transform_to(frame).lon.to('degree').value, precision)
-            lat = format_coordinate(vertex.transform_to(frame).lat.to('degree').value, precision)
+            # Convert STC-S frame string to astropy frame for vertex transformation
+            astropy_frame = stcs_frame_map.get(frame, 'icrs')
+            transformed_vertex = vertex.transform_to(astropy_frame)
+            # Use spherical coordinates to get longitude and latitude generically
+            lon = format_coordinate(transformed_vertex.spherical.lon.to('degree').value, precision)
+            lat = format_coordinate(transformed_vertex.spherical.lat.to('degree').value, precision)
             vertices_str.extend([lon, lat])
 
     vertices_coords = ' '.join(vertices_str)
@@ -226,8 +271,12 @@ def _serialize_position(region, frame, refpos, unit, precision):
         center_lon = format_coordinate(region.center.x, precision)
         center_lat = format_coordinate(region.center.y, precision)
     else:
-        center_lon = format_coordinate(region.center.transform_to(frame).lon.to('degree').value, precision)
-        center_lat = format_coordinate(region.center.transform_to(frame).lat.to('degree').value, precision)
+        # Convert STC-S frame string to astropy frame
+        astropy_frame = stcs_frame_map.get(frame, 'icrs')
+        transformed_coord = region.center.transform_to(astropy_frame)
+        # Use spherical coordinates to get longitude and latitude generically
+        center_lon = format_coordinate(transformed_coord.spherical.lon.to('degree').value, precision)
+        center_lat = format_coordinate(transformed_coord.spherical.lat.to('degree').value, precision)
 
     return f"Position {frame} {refpos} {center_lon} {center_lat}"
 
