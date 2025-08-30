@@ -1,8 +1,6 @@
-# STC-S test file with complex regions and coordinate systems
-#
+# Region file format: STC-S astropy/regions
 # Some examples inspired by the CDS STC-S Rust implementation:
 # https://github.com/cds-astro/cds-stc-rust/
-#
 # Additional examples created based on the IVOA STC-S standard to test
 # various coordinate systems (ICRS, GALACTIC, FK5) and reference positions
 # (TOPOCENTER, BARYCENTER, GEOCENTER).
