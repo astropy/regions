@@ -41,7 +41,7 @@ registered I/O formats as a :class:`~astropy.table.Table`::
       crtf   Yes       Yes  Yes   Yes           Yes
        ds9   Yes       Yes  Yes   Yes           Yes
       fits   Yes       Yes  Yes   Yes           Yes
-      stcs   Yes       Yes  Yes   Yes           Yes
+      stcs   Yes       Yes  Yes   Yes      Extension only
 
 
 Read
@@ -173,7 +173,7 @@ formats and methods for the :class:`~regions.Region` subclasses::
       crtf    No       Yes   No   Yes           Yes
        ds9    No       Yes   No   Yes           Yes
       fits    No       Yes   No   Yes           Yes
-      stcs    No       Yes   No   Yes           Yes
+      stcs    No       Yes   No   Yes      Extension only
 
 
 Region File Format Limitations

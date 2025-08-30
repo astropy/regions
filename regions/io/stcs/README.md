@@ -33,10 +33,12 @@ The STC-S format provides a string representation for astronomical regions that 
 
 ### Reading STC-S Files
 
+**Important:** STC-S files cannot be reliably auto-detected and require explicit format specification.
+
 ```python
 from regions import Regions
 
-# Read from file
+# Read from file - MUST specify format='stcs'
 regions = Regions.read('regions.stcs', format='stcs')
 
 # Parse STC-S string directly
@@ -208,19 +210,26 @@ Test data files are located in `regions/io/stcs/tests/data/`.
 
 ## Contributing
 
-When contributing to the STC-S module:
-
-1. Follow the existing code style and patterns from the DS9 module
-2. Add comprehensive tests for new functionality
-3. Update documentation and examples
-4. Ensure round-trip conversions work correctly
-5. Test with various coordinate systems and shapes
-
 ## Known Limitations
 
-- Complex STC-S features like time coordinates are not yet supported
+### Auto-detection Limitations
+
+- **STC-S files cannot be auto-detected** from content alone, as they lack unique file signatures and use keywords that also appear in DS9, CRTF, and other region formats
+- You must always specify `format='stcs'` explicitly when reading STC-S files
+- Auto-detection only works based on file extensions (`.stcs`, `.stc`, `.stcs.txt`, `.stc.txt`)
+
+### Feature Limitations
+
+- Some STC-S features, like time coordinates, are not yet supported
 - Union, intersection, and other compound operations are not implemented
-- Some advanced STC-S syntax elements are not parsed
+- Advanced STC-S syntax elements are not parsed, including:
+  - Time coordinates and temporal intervals (e.g., `Time TT TOPOCENTER 2000-01-01T12:00:00 2000-01-02T12:00:00`)
+  - Spectral coordinates (e.g., `Spectral TOPOCENTER 1420.4 MHz`)
+  - Redshift specifications (e.g., `RedshiftInterval BARYCENTER VELOCITY OPTICAL 200.0 2300.0`)
+  - Unit specifications (e.g., `unit deg arcsec`)
+  - Complex compound operations (e.g., `Union`, `Intersection`, `Difference`, `Not`)
+  - Error bounds and uncertainties (e.g., `Error 0.1 0.1`)
+  - Resolution and pixel size specifications
 - Error handling could be more detailed for malformed input
 
 ## Future Enhancements
@@ -228,6 +237,4 @@ When contributing to the STC-S module:
 - Support for temporal coordinates and regions
 - Compound region operations (Union, Intersection, etc.)
 - More comprehensive error messages
-- Support for additional coordinate systems
 - Integration with STC XML format
-- Performance optimizations for large files
