@@ -62,7 +62,7 @@ def pixel_scale_angle_at_skycoord(skycoord, wcs, offset=1 * u.arcsec):
 
     dx = x_offset - x
     dy = y_offset - y
-    scale = offset.to(u.arcsec) / (np.hypot(dx, dy) * u.pixel)
-    angle = (np.arctan2(dy, dx) * u.radian).to(u.deg)
+    scale = offset.to(u.arcsec) / (np.hypot(dx, dy) << u.pixel)
+    angle = (np.arctan2(dy, dx) << u.radian).to(u.deg)
 
     return pixcoord, scale, angle
