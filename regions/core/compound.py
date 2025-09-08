@@ -1,6 +1,7 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 import operator as op
 
+import astropy.units as u
 import numpy as np
 from astropy.coordinates import Latitude, Longitude
 
@@ -360,7 +361,7 @@ class CompoundSphericalSkyRegion(SphericalSkyRegion):
 
             pa = circ1.center.position_angle(circ2.center)
 
-            e1 = circ1.center.directional_offset_by(180 + pa, circ1.radius)
+            e1 = circ1.center.directional_offset_by(180 * u.deg + pa, circ1.radius)
             e2 = circ2.center.directional_offset_by(pa, circ2.radius)
             sep = e1.separation(e2)
 
@@ -386,17 +387,22 @@ class CompoundSphericalSkyRegion(SphericalSkyRegion):
         if self.operator in [op.or_]:
             lons1, lats1 = self.region1.bounding_lonlat
             lons2, lats2 = self.region2.bounding_lonlat
-
             if (lons1 is None) | (lons2 is None):
-                return (
-                    None,
-                    Latitude(np.min(lats1[0], lats2[0]), np.max(lats1[1], lats2[1])),
-                )
+                return (None,
+                        Latitude([np.min([lats1[0].to(u.deg).value,
+                                          lats2[0].to(u.deg).value]) * u.deg,
+                                  np.max([lats1[1].to(u.deg).value,
+                                          lats2[1].to(u.deg).value]) * u.deg]).to(u.deg))
             # Both lon ranges defined:
-            return (
-                Longitude(np.min(lons1[0], lons2[0]), np.max(lons1[1], lons2[1])),
-                Latitude(np.min(lats1[0], lats2[0]), np.max(lats1[1], lats2[1])),
-            )
+            return (Longitude([np.min([lons1[0].to(u.deg).value,
+                                       lons2[0].to(u.deg).value]) * u.deg,
+                               np.max([lons1[1].to(u.deg).value,
+                                       lons2[1].to(u.deg).value]) * u.deg]).to(u.deg),
+                    Latitude([np.min([lats1[0].to(u.deg).value,
+                                      lats2[0].to(u.deg).value]) * u.deg,
+                              np.max([lats1[1].to(u.deg).value,
+                                      lats2[1].to(u.deg).value]) * u.deg]).to(u.deg))
+
         # XOR, Intersection: not implemented
         raise NotImplementedError
 

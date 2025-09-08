@@ -8,13 +8,23 @@ import operator
 import astropy.units as u
 import numpy as np
 import pytest
-from astropy.coordinates import SkyCoord
+from astropy.coordinates import Latitude, Longitude, SkyCoord
 from numpy.testing import assert_allclose
 
-from regions.core import (CompoundPixelRegion, CompoundSkyRegion, PixCoord,
+from regions._utils.examples import make_example_dataset
+from regions.core import (CompoundPixelRegion, CompoundSkyRegion,
+                          CompoundSphericalSkyRegion, PixCoord,
                           RegionBoundingBox)
-from regions.shapes import CirclePixelRegion, CircleSkyRegion
+from regions.shapes import (CirclePixelRegion, CircleSkyRegion,
+                            CircleSphericalSkyRegion)
 from regions.tests.helpers import make_simple_wcs
+
+
+@pytest.fixture(scope='session', name='wcs')
+def fixture_wcs():
+    config = dict(crpix=(18, 9), cdelt=(-10, 10), shape=(18, 36))
+    dataset = make_example_dataset(config=config)
+    return dataset.wcs
 
 
 class TestCompoundPixel:
@@ -60,12 +70,18 @@ class TestCompoundPixel:
         assert reg.region2.meta == {}
         assert reg.region2.visual == {}
 
-    def test_union(self):
+    def test_union(self, wcs):
         union = self.c1 | self.c2
         assert isinstance(union, CompoundPixelRegion)
         mask = union.to_mask()
         assert_allclose(mask.data[:, 7], [0, 0, 1, 1, 1, 1, 1, 0, 0])
         assert_allclose(mask.data[:, 6], [0, 1, 1, 1, 1, 1, 1, 1, 0])
+
+        union_to_sphsky = union.to_spherical_sky(wcs)
+        assert isinstance(union_to_sphsky, CompoundSphericalSkyRegion)
+
+        union_to_sky = union.to_sky(wcs)
+        assert isinstance(union_to_sky, CompoundSkyRegion)
 
     def test_intersection(self):
         intersection = self.c1 & self.c2
@@ -169,3 +185,77 @@ def test_compound_sky():
     meta = {'test_meta': True}
     compound = CompoundSkyRegion(c1, c2, operator.and_, meta=meta)
     assert compound.meta['test_meta']
+    union_to_sphsky = union.to_spherical_sky(wcs)
+    assert isinstance(union_to_sphsky, CompoundSphericalSkyRegion)
+
+    union_to_pixel = union.to_pixel(wcs)
+    assert isinstance(union_to_pixel, CompoundPixelRegion)
+
+
+def test_compound_spherical_sky(wcs):
+    skycoord1 = SkyCoord(0 * u.deg, 0 * u.deg, frame='galactic')
+    c1 = CircleSphericalSkyRegion(skycoord1, 1 * u.deg)
+
+    skycoord2 = SkyCoord(1 * u.deg, 1 * u.deg, frame='galactic')
+    c2 = CircleSphericalSkyRegion(skycoord2, 0.5 * u.deg)
+
+    test_coord1 = SkyCoord(1.2 * u.deg, 1.2 * u.deg, frame='galactic')
+    test_coord2 = SkyCoord(0.5 * u.deg, 0.5 * u.deg, frame='galactic')
+    test_coord3 = SkyCoord(0.7 * u.deg, 0.7 * u.deg, frame='galactic')
+    test_coord4 = SkyCoord(2 * u.deg, 5 * u.deg, frame='galactic')
+
+    assert c2.contains(test_coord1) and not c1.contains(test_coord1)
+    assert not c2.contains(test_coord2) and c1.contains(test_coord2)
+    assert c1.contains(test_coord3) and c2.contains(test_coord3)
+    assert (not c2.contains(test_coord4)
+            and not c1.contains(test_coord4))
+
+    coords = SkyCoord([test_coord1, test_coord2, test_coord3, test_coord4],
+                      frame='galactic')
+
+    union = c1 | c2
+    assert (union.contains(coords) == [True, True, True, False]).all()
+
+    intersection = c1 & c2
+    assert ((intersection.contains(coords)
+             == [False, False, True, False]).all())
+
+    diff = c1 ^ c2
+    assert (diff.contains(coords) == [True, True, False, False]).all()
+
+    c3 = CircleSphericalSkyRegion(test_coord4, 0.1 * u.deg)
+    union = c1 | c2 | c3
+    assert (union.contains(coords) == [True, True, True, True]).all()
+
+    intersection = c1 & c2 & c3
+    assert ((intersection.contains(coords)
+             == [False, False, False, False]).all())
+
+    diff = c1 ^ c2 ^ c3
+    assert (diff.contains(coords) == [True, True, False, True]).all()
+    assert 'Compound' in str(union)
+
+    union_to_sky = union.to_sky(wcs)
+    assert isinstance(union_to_sky, CompoundSkyRegion)
+
+    union_to_pixel = union.to_pixel(wcs)
+    assert isinstance(union_to_pixel, CompoundPixelRegion)
+
+    assert isinstance(union.bounding_circle, CircleSphericalSkyRegion)
+
+    bound_lonlat = union.bounding_lonlat
+    assert isinstance(bound_lonlat[0], Longitude)
+    assert isinstance(bound_lonlat[1], Latitude)
+
+    assert isinstance(union.transform_to('icrs'),
+                      CompoundSphericalSkyRegion)
+
+    assert isinstance(union.discretize_boundary(n_points=2),
+                      CompoundSphericalSkyRegion)
+
+    skycoord4 = SkyCoord(1 * u.deg, 89 * u.deg, frame='galactic')
+    c4 = CircleSphericalSkyRegion(skycoord4, 2.5 * u.deg)
+    union = c1 | c4
+    bound_lonlat = union.bounding_lonlat
+    assert bound_lonlat[0] is None
+    assert isinstance(bound_lonlat[1], Latitude)
