@@ -170,13 +170,20 @@ class TwoValAngleorNone(RegionAttribute):
 
             if not value.unit.physical_type == 'angle':
                 raise ValueError(f'{self.name!r} must have angular units')
-        elif len(value) == 2:
-            # Check if list-like with individual entries having angular uints:
-            for val in value:
-                if not val.unit.physical_type == 'angle':
-                    raise ValueError(f'{self.name!r} entries must have angular units')
         else:
-            raise ValueError(f'{self.name!r} must be an angle of length 2')
+            try:
+                if len(value) == 2:
+                    # Check if list-like with individual entries having angular units:
+                    for val in value:
+                        if isinstance(val, Quantity):
+                            if not val.unit.physical_type == 'angle':
+                                raise ValueError(f'{self.name!r} must have angular units')
+                        else:
+                            raise ValueError(f'{self.name!r} must be an angle of length 2')
+                else:
+                    raise ValueError(f'{self.name!r} must be an angle of length 2')
+            except TypeError:
+                raise ValueError(f'{self.name!r} must be an angle of length 2') from None
 
 
 class RegionType(RegionAttribute):

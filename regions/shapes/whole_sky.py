@@ -7,6 +7,7 @@ compound region logic and over-the-pole logic.
 import numpy as np
 
 from regions.core.core import SphericalSkyRegion
+from regions.core.metadata import RegionMeta, RegionVisual
 
 
 class WholeSphericalSkyRegion(SphericalSkyRegion):
@@ -15,7 +16,19 @@ class WholeSphericalSkyRegion(SphericalSkyRegion):
 
     Implemented to handle compound region logic, particularly with
     ranges and over-the-pole pole logic.
+
+    Parameters
+    ----------
+    meta : `~regions.RegionMeta` or `dict`, optional
+        A dictionary that stores the meta attributes of the region.
+    visual : `~regions.RegionVisual` or `dict`, optional
+        A dictionary that stores the visual meta attributes of the
+        region.
     """
+
+    def __init__(self, meta=None, visual=None):
+        self.meta = meta or RegionMeta()
+        self.visual = visual or RegionVisual()
 
     def contains(self, coord):
         if coord.isscalar:
@@ -37,6 +50,10 @@ class WholeSphericalSkyRegion(SphericalSkyRegion):
         # TODO: handle offset origin transformations
 
         return self.__class__()
+
+    def discretize_boundary(self, n_points=100):
+        # Not defined
+        raise NotImplementedError('Not defined.')
 
     def to_sky(
         self,

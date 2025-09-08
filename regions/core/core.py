@@ -673,7 +673,7 @@ class SphericalSkyRegion(Region):
             return self.vertices[0].frame
         else:
             raise AttributeError(
-                "Either 'center' or 'centroid' must be an attribute/property "
+                "Either 'center' or 'vertices' must be an attribute/property "
                 'of the SphericalSkyRegion.'
             )
 
@@ -960,7 +960,7 @@ class ComplexSphericalSkyRegion(SphericalSkyRegion):
         fields = boundaries_interalattr + [
             '_frame', '_vertices',
             '_is_original_frame', '_params',
-        ]
+        ] + ['meta', 'visual']
         if self._params is not None:
             fields += list(self._params)
 
@@ -972,4 +972,7 @@ class ComplexSphericalSkyRegion(SphericalSkyRegion):
 
     @property
     def frame(self):
-        return self._compound_region.frame
+        frame = getattr(self, '_frame', None)
+        if frame is None:
+            return self._compound_region.frame
+        return frame

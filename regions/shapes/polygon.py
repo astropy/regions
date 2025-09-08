@@ -6,6 +6,8 @@ import operator
 
 import astropy.units as u
 import numpy as np
+from astropy.coordinates import SkyCoord
+from astropy.stats import circmean
 
 from regions._geometry import polygonal_overlap_grid
 from regions._geometry.pnpoly import points_in_polygon
@@ -139,6 +141,10 @@ class PolygonPixelRegion(PixelRegion):
             # return self.to_pixel(wcs).discretize_boundary(**discretize_kwargs).to_spherical_sky(
             #     wcs=wcs, include_boundary_distortions=False
             # )
+
+        # TODO: ensure vertices are in CW order,
+        # as implicitly a planar -> spherical polygon will not be the
+        # "large" complement polygon on the sphere?
 
         return self.to_sky(wcs).to_spherical_sky()
 
@@ -437,6 +443,10 @@ class PolygonSkyRegion(SkyRegion):
             #     wcs=wcs, include_boundary_distortions=False
             # )
 
+        # TODO: ensure vertices are in CW order,
+        # as implicitly a planar -> spherical polygon will not be the
+        # "large" complement polygon on the sphere?
+
         return PolygonSphericalSkyRegion(
             self.vertices,
             self.meta.copy(),
@@ -513,15 +523,45 @@ class PolygonSphericalSkyRegion(SphericalSkyRegion):
         Region centroid.
 
         Defined as the point equidistant from all vertices.
+
+        However, if this is not contained within the polygon, instead
+        use the average of the vertices' positions.
         """
         # Calculate from cross products of vertices with cartesian representation
         # verts are in CW order:
-        centroid_mindist = cross_product_sum_skycoord2skycoord(self.vertices)
+        # Minimum distance
+        centroid_mindist = self.centroid_mindist
 
         if not self.contains(centroid_mindist):
-            raise ValueError
+            return self.centroid_avg
 
         return centroid_mindist
+
+    @property
+    def centroid_mindist(self):
+        """
+        Region centroid, defined as the point equidistant from all
+        vertices (minimum distance).
+        """
+        # Calculate from cross products of vertices with cartesian representation
+        # verts are in CW order:
+        # Minimum distance
+        return cross_product_sum_skycoord2skycoord(self.vertices)
+
+    @property
+    def centroid_avg(self):
+        """
+        Region centroid, taking the average of the vertices'
+        coordinates.
+        """
+        verts_sph = self.vertices.represent_as('spherical')
+
+        lons = verts_sph.lon
+        lats = verts_sph.lat
+
+        lon = circmean(lons)
+        lat = np.average(lats)
+        return SkyCoord(lon, lat, frame=self.frame)
 
     @property
     def bounding_circle(self):
