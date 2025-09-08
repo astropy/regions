@@ -342,6 +342,11 @@ class CircleAnnulusSkyRegion(SkyRegion):
             #     wcs=wcs, include_boundary_distortions=False
             # )
 
+        return CircleAnnulusSphericalSkyRegion(
+            self.center, self.inner_radius, self.outer_radius,
+            self.meta.copy(), self.visual.copy()
+        )
+
 
 class CircleAnnulusSphericalSkyRegion(AnnulusSphericalSkyRegion):
     """

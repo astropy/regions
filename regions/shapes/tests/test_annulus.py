@@ -2,20 +2,36 @@
 
 import astropy.units as u
 import numpy as np
-from astropy.coordinates import SkyCoord
+import pytest
+from astropy.coordinates import Latitude, Longitude, SkyCoord
+from astropy.io import fits
 from astropy.tests.helper import assert_quantity_allclose
+from astropy.utils.data import get_pkg_data_filename
+from astropy.wcs import WCS
 from numpy.testing import assert_allclose
 
 from regions.core import PixCoord, RegionMeta, RegionVisual
+from regions.core.compound import (CompoundPixelRegion, CompoundSkyRegion,
+                                   CompoundSphericalSkyRegion)
 from regions.shapes.annulus import (CircleAnnulusPixelRegion,
                                     CircleAnnulusSkyRegion,
+                                    CircleAnnulusSphericalSkyRegion,
                                     EllipseAnnulusPixelRegion,
                                     EllipseAnnulusSkyRegion,
                                     RectangleAnnulusPixelRegion,
                                     RectangleAnnulusSkyRegion)
+from regions.shapes.circle import CircleSphericalSkyRegion
 from regions.shapes.tests.test_common import (BaseTestPixelRegion,
-                                              BaseTestSkyRegion)
+                                              BaseTestSkyRegion,
+                                              BaseTestSphericalSkyRegion)
 from regions.tests.helpers import make_simple_wcs
+
+
+@pytest.fixture(scope='session', name='wcs')
+def wcs_fixture():
+    filename = get_pkg_data_filename('data/example_header.fits')
+    header = fits.getheader(filename)
+    return WCS(header)
 
 
 class TestCircleAnnulusPixelRegion(BaseTestPixelRegion):
@@ -69,6 +85,24 @@ class TestCircleAnnulusPixelRegion(BaseTestPixelRegion):
         skyannulus = self.reg.to_sky(wcs=self.wcs)
         assert isinstance(skyannulus, CircleAnnulusSkyRegion)
 
+    def test_sph_transformation(self, wcs):
+        sphskyann = self.reg.to_spherical_sky(wcs,
+                                              include_boundary_distortions=False)
+        assert isinstance(sphskyann, CircleAnnulusSphericalSkyRegion)
+
+        try:
+            sphskyann = self.reg.to_spherical_sky(wcs,
+                                                  include_boundary_distortions=True)
+            assert isinstance(sphskyann, CompoundSphericalSkyRegion)
+        except NotImplementedError:
+            pytest.xfail()
+
+    def test_sph_transformation_no_wcs(self):
+        with pytest.raises(ValueError) as excinfo:
+            _ = self.reg.to_spherical_sky(include_boundary_distortions=True)
+        estr = "'wcs' must be set if 'include_boundary_distortions'=True"
+        assert estr in str(excinfo.value)
+
     def test_rotate(self):
         reg = self.reg.rotate(PixCoord(2, 3), 90 * u.deg)
         assert_allclose(reg.center.xy, (1, 4))
@@ -118,11 +152,158 @@ class TestCircleAnnulusSkyRegion(BaseTestSkyRegion):
         pixannulus = self.reg.to_pixel(wcs=self.wcs)
         assert isinstance(pixannulus, CircleAnnulusPixelRegion)
 
+    def test_sph_transformation(self, wcs):
+        sphskyann = self.reg.to_spherical_sky(wcs,
+                                              include_boundary_distortions=False)
+        assert isinstance(sphskyann, CircleAnnulusSphericalSkyRegion)
+
+        try:
+            sphskyann = self.reg.to_spherical_sky(wcs,
+                                                  include_boundary_distortions=True)
+            assert isinstance(sphskyann, CompoundSphericalSkyRegion)
+        except NotImplementedError:
+            pytest.xfail()
+
+    def test_sph_transformation_no_wcs(self):
+        with pytest.raises(ValueError) as excinfo:
+            _ = self.reg.to_spherical_sky(include_boundary_distortions=True)
+        estr = "'wcs' must be set if 'include_boundary_distortions'=True"
+        assert estr in str(excinfo.value)
+
     def test_eq(self):
         reg = self.reg.copy()
         assert reg == self.reg
         reg.inner_radius = 10 * u.arcsec
         assert reg != self.reg
+
+
+class TestCircleAnnulusSphericalSkyRegion(BaseTestSphericalSkyRegion):
+    inside = [(3 * u.deg, 4.006 * u.deg)]
+    outside = [(3 * u.deg, 7 * u.deg)]
+    meta = RegionMeta({'text': 'test'})
+    visual = RegionVisual({'color': 'blue'})
+    reg = CircleAnnulusSphericalSkyRegion(SkyCoord(3 * u.deg, 4 * u.deg),
+                                          20 * u.arcsec, 30 * u.arcsec, meta=meta,
+                                          visual=visual)
+    skycoord = SkyCoord(3 * u.deg, 4 * u.deg, frame='icrs')
+    wcs = make_simple_wcs(skycoord, 5 * u.arcsec, 20)
+
+    expected_repr = ('<CircleAnnulusSphericalSkyRegion(center=<SkyCoord (ICRS): '
+                     '(ra, dec) in deg\n    (3., 4.)>, inner_radius=20.0 '
+                     'arcsec, outer_radius=30.0 arcsec)>')
+    expected_str = ('Region: CircleAnnulusSphericalSkyRegion\ncenter: <SkyCoord '
+                    '(ICRS): (ra, dec) in deg\n    (3., 4.)>\ninner_radius: '
+                    '20.0 arcsec\nouter_radius: 30.0 arcsec')
+
+    def test_init(self):
+        assert_quantity_allclose(self.reg.center.ra, self.skycoord.ra)
+        assert_quantity_allclose(self.reg.inner_radius, 20 * u.arcsec)
+        assert_quantity_allclose(self.reg.outer_radius, 30 * u.arcsec)
+
+    def test_valid_radii(self):
+        with pytest.raises(ValueError) as excinfo:
+            _ = CircleAnnulusSphericalSkyRegion(SkyCoord(3 * u.deg, 4 * u.deg),
+                                                30 * u.arcsec, 20 * u.arcsec)
+        estr = 'outer_radius must be greater than inner_radius'
+        assert estr in str(excinfo.value)
+
+    def test_copy(self):
+        reg = self.reg.copy()
+        assert_allclose(reg.center.ra.deg, 3)
+        assert_allclose(reg.inner_radius.to_value('arcsec'), 20)
+        assert_allclose(reg.outer_radius.to_value('arcsec'), 30)
+        assert reg.meta == self.meta
+        assert reg.visual == self.visual
+
+    def test_contains(self):
+        assert not self.reg.contains(self.skycoord)
+        test_coord = SkyCoord(3 * u.deg, 10 * u.deg, frame='icrs')
+        assert not self.reg.contains(test_coord)
+
+    def test_transformation(self):
+        pixannulus = self.reg.to_pixel(wcs=self.wcs)
+        assert isinstance(pixannulus, CircleAnnulusPixelRegion)
+
+        skyannulus = self.reg.to_sky(wcs=self.wcs)
+        assert isinstance(skyannulus, CircleAnnulusSkyRegion)
+
+        polysky = self.reg.to_sky(self.wcs, include_boundary_distortions=True)
+        assert isinstance(polysky, CompoundSkyRegion)
+
+        polypix = self.reg.to_pixel(self.wcs, include_boundary_distortions=True)
+        assert isinstance(polypix, CompoundPixelRegion)
+
+    def test_transformation_no_wcs(self):
+        with pytest.raises(ValueError) as excinfo:
+            _ = self.reg.to_sky(include_boundary_distortions=True)
+        estr = "'wcs' must be set if 'include_boundary_distortions'=True"
+        assert estr in str(excinfo.value)
+
+        with pytest.raises(ValueError) as excinfo:
+            _ = self.reg.to_pixel(include_boundary_distortions=True)
+        estr = "'wcs' must be set if 'include_boundary_distortions'=True"
+        assert estr in str(excinfo.value)
+
+    def test_frame_transformation(self):
+        reg2 = self.reg.transform_to('galactic')
+        assert reg2.center == self.reg.center.transform_to('galactic')
+        assert_allclose(reg2.inner_radius.to_value('arcsec'), 20)
+        assert isinstance(reg2, CircleAnnulusSphericalSkyRegion)
+        assert reg2.frame.name == 'galactic'
+
+    def test_eq(self):
+        reg = self.reg.copy()
+        assert reg == self.reg
+        reg.inner_radius = 10 * u.arcsec
+        assert reg != self.reg
+
+    def test_bounding_circle(self):
+        skycoord = SkyCoord(3 * u.deg, 4 * u.deg)
+        circ = CircleSphericalSkyRegion(skycoord, 30 * u.arcsec,
+                                        meta=self.meta,
+                                        visual=self.visual)
+
+        bounding_circle = self.reg.bounding_circle
+        assert bounding_circle == circ
+
+    def test_bounding_lonlat(self):
+        skycoord = SkyCoord(3 * u.deg, 0 * u.deg)
+        reg = CircleAnnulusSphericalSkyRegion(skycoord,
+                                              20 * u.arcsec,
+                                              30 * u.arcsec)
+        bounding_lonlat = reg.bounding_lonlat
+
+        assert_quantity_allclose(bounding_lonlat[0],
+                                 Longitude([3. * u.deg - 30 * u.arcsec,
+                                            3. * u.deg + 30 * u.arcsec]))
+
+        assert_quantity_allclose(bounding_lonlat[1],
+                                 Latitude([-30 * u.arcsec,
+                                           30 * u.arcsec]))
+
+        skycoord2 = SkyCoord(3 * u.deg, 90 * u.deg)
+        reg2 = CircleAnnulusSphericalSkyRegion(skycoord2,
+                                               20 * u.arcsec,
+                                               30 * u.arcsec)
+        bounding_lonlat2 = reg2.bounding_lonlat
+
+        assert bounding_lonlat2[0] is None
+
+        assert_quantity_allclose(bounding_lonlat2[1],
+                                 Latitude([90 * u.deg - 30 * u.arcsec,
+                                           90 * u.deg - 20 * u.arcsec]))
+
+        skycoord3 = SkyCoord(3 * u.deg, -90 * u.deg)
+        reg3 = CircleAnnulusSphericalSkyRegion(skycoord3,
+                                               20 * u.arcsec,
+                                               30 * u.arcsec)
+        bounding_lonlat3 = reg3.bounding_lonlat
+
+        assert bounding_lonlat3[0] is None
+
+        assert_quantity_allclose(bounding_lonlat3[1],
+                                 Latitude([-90 * u.deg + 20 * u.arcsec,
+                                           -90 * u.deg + 30 * u.arcsec]))
 
 
 class TestEllipseAnnulusPixelRegion(BaseTestPixelRegion):
