@@ -71,7 +71,10 @@ def cross_product_sum_skycoord2skycoord(coos):
     c_cart = crosssum / crosssum.norm()
     _, lat, lon = cartesian_to_spherical(c_cart.x, c_cart.y, c_cart.z)
 
-    return SkyCoord(lon, lat, frame=coos.frame)
+    # Ensure internal data representation format is consistent
+    # with input coordinate convention:
+    unit = coos[0].represent_as('spherical').lon.unit
+    return SkyCoord(lon.to(unit), lat.to(unit), frame=coos.frame)
 
 
 def bounding_lonlat_poles_processing(region, lons_arr, lats_arr, inner_region=None):
@@ -128,9 +131,8 @@ def bounding_lonlat_poles_processing(region, lons_arr, lats_arr, inner_region=No
     # Inner region set: annulus logic:
     pole_contains = inner_region.contains(poles)
     if np.any(pole_contains):
-        lons_arr = None
-
-        _, lats_raw_inner = inner_region._edge_raw_lonlat_bounds
+        lats_raw_inner = get_circle_latitude_tangent_limits(inner_region.center,
+                                                            inner_region.radius)
 
         # S pole:
         if pole_contains[0]:
@@ -372,8 +374,19 @@ def get_edge_raw_lonlat_bounds_circ_edges(vertices, centroid, gcs):
     # Consider lon/lat of vertices: may produce min/max bounds:
     vrepr = vertices.represent_as('spherical')
 
-    lons_list = vrepr.lon
-    lats_list = vrepr.lat
+    # lons_list = vrepr.lon
+    # lats_list = vrepr.lat
+
+    # Special handling:
+    # Exclude vertices from longitude bounds if any is on a pole
+    lons_list = []
+    lats_list = []
+    for v in vrepr:
+        if np.abs(v.lat.to(u.deg).deg) < 90:
+            lons_list.append(v.lon)
+            lats_list.append(v.lat)
+    lons_list = Longitude(lons_list, unit=u.radian)
+    lats_list = Latitude(lats_list, unit=u.radian)
 
     # Need to also check for "out bulging" from edges,
     # as far as latitude/lon bounds:

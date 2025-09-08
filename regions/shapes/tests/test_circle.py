@@ -3,7 +3,7 @@
 import astropy.units as u
 import numpy as np
 import pytest
-from astropy.coordinates import SkyCoord
+from astropy.coordinates import Latitude, Longitude, SkyCoord
 from astropy.io import fits
 from astropy.tests.helper import assert_quantity_allclose
 from astropy.utils.data import get_pkg_data_filename
@@ -12,9 +12,13 @@ from numpy.testing import assert_allclose
 
 from regions._utils.optional_deps import HAS_MATPLOTLIB
 from regions.core import PixCoord, RegionMeta, RegionVisual
-from regions.shapes.circle import CirclePixelRegion, CircleSkyRegion
+from regions.shapes.circle import (CirclePixelRegion, CircleSkyRegion,
+                                   CircleSphericalSkyRegion)
+from regions.shapes.polygon import (PolygonPixelRegion, PolygonSkyRegion,
+                                    PolygonSphericalSkyRegion)
 from regions.shapes.tests.test_common import (BaseTestPixelRegion,
-                                              BaseTestSkyRegion)
+                                              BaseTestSkyRegion,
+                                              BaseTestSphericalSkyRegion)
 from regions.tests.helpers import make_simple_wcs
 
 
@@ -58,6 +62,24 @@ class TestCirclePixelRegion(BaseTestPixelRegion):
         reg_new.visual['color'] = 'green'
         assert reg_new.meta['text'] != self.reg.meta['text']
         assert reg_new.visual['color'] != self.reg.visual['color']
+
+    def test_sph_transformation(self, wcs):
+        sphskycircle = self.reg.to_spherical_sky(wcs,
+                                                 include_boundary_distortions=False)
+        assert isinstance(sphskycircle, CircleSphericalSkyRegion)
+
+        try:
+            sphskycircle = self.reg.to_spherical_sky(wcs,
+                                                     include_boundary_distortions=True)
+            assert isinstance(sphskycircle, PolygonSphericalSkyRegion)
+        except NotImplementedError:
+            pytest.xfail()
+
+    def test_sph_transformation_no_wcs(self):
+        with pytest.raises(ValueError) as excinfo:
+            _ = self.reg.to_spherical_sky(include_boundary_distortions=True)
+        estr = "'wcs' must be set if 'include_boundary_distortions'=True"
+        assert estr in str(excinfo.value)
 
     @pytest.mark.skipif(not HAS_MATPLOTLIB, reason='matplotlib is required')
     def test_as_artist(self):
@@ -117,6 +139,23 @@ class TestCircleSkyRegion(BaseTestSkyRegion):
                                  skycircle2.center.data.lat)
         assert_quantity_allclose(skycircle2.radius, skycircle.radius)
 
+        sphskycircle = self.reg.to_spherical_sky(wcs,
+                                                 include_boundary_distortions=False)
+        assert isinstance(sphskycircle, CircleSphericalSkyRegion)
+
+        try:
+            sphskycircle = self.reg.to_spherical_sky(wcs,
+                                                     include_boundary_distortions=True)
+            assert isinstance(sphskycircle, PolygonSphericalSkyRegion)
+        except NotImplementedError:
+            pytest.xfail()
+
+    def test_sph_transformation_no_wcs(self):
+        with pytest.raises(ValueError) as excinfo:
+            _ = self.reg.to_spherical_sky(include_boundary_distortions=True)
+        estr = "'wcs' must be set if 'include_boundary_distortions'=True"
+        assert estr in str(excinfo.value)
+
     def test_dimension_center(self):
         center = SkyCoord([1, 2] * u.deg, [3, 4] * u.deg)
         radius = 2 * u.arcsec
@@ -140,3 +179,111 @@ class TestCircleSkyRegion(BaseTestSkyRegion):
     def test_zero_size(self):
         with pytest.raises(ValueError):
             CircleSkyRegion(SkyCoord(3 * u.deg, 4 * u.deg), 0. * u.arcsec)
+
+
+class TestCircleSphericalSkyRegion(BaseTestSphericalSkyRegion):
+    inside = [(3 * u.deg, 4 * u.deg)]
+    outside = [(3 * u.deg, 0 * u.deg)]
+    meta = RegionMeta({'text': 'test'})
+    visual = RegionVisual({'color': 'blue'})
+    reg = CircleSphericalSkyRegion(SkyCoord(3 * u.deg, 4 * u.deg), 2 * u.arcsec,
+                                   meta=meta, visual=visual)
+
+    expected_repr = ('<CircleSphericalSkyRegion(center=<SkyCoord (ICRS): (ra, dec) in '
+                     'deg\n    (3., 4.)>, radius=2.0 arcsec)>')
+    expected_str = ('Region: CircleSphericalSkyRegion\ncenter: <SkyCoord (ICRS): '
+                    '(ra, dec) in deg\n    (3., 4.)>\nradius: 2.0 '
+                    'arcsec')
+
+    def test_copy(self):
+        reg = self.reg.copy()
+        assert_allclose(reg.center.ra.deg, 3)
+        assert_allclose(reg.radius.to_value('arcsec'), 2)
+        assert reg.meta == self.meta
+        assert reg.visual == self.visual
+
+    def test_transformation(self, wcs):
+        skycoord = SkyCoord(3 * u.deg, 4 * u.deg, frame='galactic')
+        sphskycircle = CircleSphericalSkyRegion(skycoord, 2 * u.arcsec)
+
+        pixcircle = sphskycircle.to_pixel(wcs)
+
+        assert_allclose(pixcircle.center.x, -50.5)
+        assert_allclose(pixcircle.center.y, 299.5)
+        assert_allclose(pixcircle.radius, 0.027777777777828305)
+
+        skycircle = sphskycircle.to_sky(wcs)
+        assert isinstance(skycircle, CircleSkyRegion)
+
+        sphskycircle2 = pixcircle.to_spherical_sky(wcs)
+
+        assert_quantity_allclose(sphskycircle.center.data.lon,
+                                 sphskycircle2.center.data.lon)
+        assert_quantity_allclose(sphskycircle.center.data.lat,
+                                 sphskycircle2.center.data.lat)
+        assert_quantity_allclose(sphskycircle2.radius, sphskycircle.radius)
+
+        polysky = sphskycircle.to_sky(wcs, include_boundary_distortions=True)
+        assert isinstance(polysky, PolygonSkyRegion)
+
+        polypix = sphskycircle.to_pixel(wcs, include_boundary_distortions=True)
+        assert isinstance(polypix, PolygonPixelRegion)
+
+    def test_transformation_no_wcs(self):
+        with pytest.raises(ValueError) as excinfo:
+            _ = self.reg.to_sky(include_boundary_distortions=True)
+        estr = "'wcs' must be set if 'include_boundary_distortions'=True"
+        assert estr in str(excinfo.value)
+
+        with pytest.raises(ValueError) as excinfo:
+            _ = self.reg.to_pixel(include_boundary_distortions=True)
+        estr = "'wcs' must be set if 'include_boundary_distortions'=True"
+        assert estr in str(excinfo.value)
+
+    def test_frame_transformation(self):
+        skycoord = SkyCoord(3 * u.deg, 4 * u.deg, frame='galactic')
+        reg = CircleSphericalSkyRegion(skycoord, 2 * u.arcsec)
+
+        reg2 = reg.transform_to('icrs')
+        assert reg2.center == skycoord.transform_to('icrs')
+        assert_allclose(reg2.radius.to_value('arcsec'), 2)
+        assert isinstance(reg2, CircleSphericalSkyRegion)
+        assert reg2.frame.name == 'icrs'
+
+    def test_dimension_center(self):
+        center = SkyCoord([1, 2] * u.deg, [3, 4] * u.deg)
+        radius = 2 * u.arcsec
+        with pytest.raises(ValueError) as excinfo:
+            CircleSphericalSkyRegion(center, radius)
+        estr = "'center' must be a scalar SkyCoord"
+        assert estr in str(excinfo.value)
+
+    def test_eq(self):
+        reg = self.reg.copy()
+        assert reg == self.reg
+        reg.radius = 3 * u.arcsec
+        assert reg != self.reg
+
+    def test_zero_size(self):
+        with pytest.raises(ValueError):
+            CircleSkyRegion(SkyCoord(3 * u.deg, 4 * u.deg), 0. * u.arcsec)
+
+    def test_bounding_circle(self):
+        skycoord = SkyCoord(3 * u.deg, 4 * u.deg, frame='galactic')
+        reg = CircleSphericalSkyRegion(skycoord, 2 * u.arcsec)
+
+        bounding_circle = reg.bounding_circle
+        assert bounding_circle == reg
+
+    def test_bounding_lonlat(self):
+        skycoord = SkyCoord(3 * u.deg, 0 * u.deg, frame='galactic')
+        reg = CircleSphericalSkyRegion(skycoord, 2 * u.arcsec)
+        bounding_lonlat = reg.bounding_lonlat
+
+        assert_quantity_allclose(bounding_lonlat[0],
+                                 Longitude([3. * u.deg - 2 * u.arcsec,
+                                            3. * u.deg + 2 * u.arcsec]))
+
+        assert_quantity_allclose(bounding_lonlat[1],
+                                 Latitude([-2 * u.arcsec,
+                                           2 * u.arcsec]))

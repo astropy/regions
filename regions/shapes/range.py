@@ -162,45 +162,20 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
 
         meta_params = ['meta', 'visual']
         intern_params = ['_frame', '_vertices', '_is_original_frame', '_params']
-        if self._params is not None:
-            self_params = (
-                list(self._params) + [f"_{bn}" for bn in list(self._boundaries)]
-                + intern_params + meta_params
-            )
-        else:
-            self_params = (
-                [f"_{bn}" for bn in list(self._boundaries)]
-                + intern_params + meta_params
-            )
-
-        if other._params is not None:
-            other_params = (
-                list(other._params) + [f"_{bn}" for bn in list(other._boundaries)]
-                + intern_params + meta_params
-            )
-        else:
-            other_params = (
-                [f"_{bn}" for bn in list(other._boundaries)]
-                + intern_params + meta_params
-            )
-
-        # check that both have identical parameters
-        if self_params != other_params:
-            return False
+        params_list = (
+            list(self._params) + [f"_{bn}" for bn in list(self._boundaries)]
+            + intern_params + meta_params
+        )
 
         # now check the parameter values
         # Note that Quantity comparisons allow for different units
         # if they directly convertible (e.g., 1. * u.deg == 60. * u.arcmin)
-        try:
-            for param in self_params:
-                # np.any is used for SkyCoord array comparisons
-                if np.any(getattr(self, param) != getattr(other, param)):
-                    return False
-        except TypeError:
-            # TypeError is raised from SkyCoord comparison when they do
-            # not have equivalent frames. Here return False instead of
-            # the TypeError.
-            return False
+        for param in params_list:
+            # np.any is used for SkyCoord array comparisons
+            if np.any(getattr(self, param) != getattr(other, param)):
+                return False
+        # Note frame comparisons are done directly, so no
+        # catching of TypeError is necessary
 
         return True
 
@@ -255,6 +230,8 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
 
         # Define north pole: 0 lon, 90 lat
         c_pole = SkyCoord(0 * u.deg, 90 * u.deg, frame=self.frame)
+        # Define south pole:
+        c_pole_s = SkyCoord(0 * u.deg, -90 * u.deg, frame=self.frame)
 
         lat_arr = self.latitude_range.copy()
 
@@ -279,37 +256,33 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
         elif lat_arr[1] == Angle(90 * u.deg):
             if _wraps_poles:
                 # Check if it wrapped pole, with input [90*u.deg, X*u.deg]:
-                # equivalent to [-90*u.deg, X*u.deg], and is a negated simple circle
-                # Radius from input X*u.deg constraint is in outer_rad after swap
-                CompoundSphericalSkyRegion(
-                    WholeSphericalSkyRegion(),
-                    CircleSphericalSkyRegion(
-                        c_pole, outer_rad, self.meta, self.visual
-                    ),
-                    operator.xor, self.meta, self.visual
+                # equivalent to [-90*u.deg, X*u.deg], and is a
+                # simple circle centered at S pole:
+                lat_bounds = CircleSphericalSkyRegion(
+                    c_pole_s, lat_arr[0] + 90.0 * u.deg,
+                    self.meta, self.visual
                 )
             else:
                 # Simple circle case:
-                return CircleSphericalSkyRegion(
+                lat_bounds = CircleSphericalSkyRegion(
                     c_pole, outer_rad, self.meta, self.visual
                 )
+            return lat_bounds
         elif lat_arr[0] == Angle(-90 * u.deg):
             if _wraps_poles:
                 # Check if it wrapped pole, with input [X*u.deg, -90*u.deg],
                 # equivalent to [X*u.deg, 90*u.deg], and is a simple circle
                 # Radius from input X*u.deg constraint is in inner_rad after swap
-                CircleSphericalSkyRegion(
+                lat_bounds = CircleSphericalSkyRegion(
                     c_pole, inner_rad, self.meta, self.visual
                 )
             else:
-                # Negated simple circle
-                return CompoundSphericalSkyRegion(
-                    WholeSphericalSkyRegion(),
-                    CircleSphericalSkyRegion(
-                        c_pole, inner_rad, self.meta, self.visual
-                    ),
-                    operator.xor, self.meta, self.visual
+                # Simple circle centered at S pole:
+                lat_bounds = CircleSphericalSkyRegion(
+                    c_pole_s, lat_arr[1] + 90.0 * u.deg,
+                    self.meta, self.visual
                 )
+            return lat_bounds
 
         # True annular range:
         if _wraps_poles:
@@ -333,15 +306,21 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
         # Number of vertices for boundary:
         # lat-only: 0 (annulus)
         # lon-only: 2 (lune)
-        # both: 4 (range)
+        # both: 4 (range), unless one touches the pole: 3
 
         # Only compute params once:
         lon_bounds = self.longitude_bounds
         lat_bounds = self.latitude_bounds
 
         if (lon_bounds is not None) & (lat_bounds is not None):
-            # 4 vertices:
-            nverts = 4
+            if isinstance(lat_bounds, CompoundSphericalSkyRegion):
+                nverts = 6
+                # pole-wrapping gives 2 disjoint triangles
+            elif isinstance(lat_bounds, CircleAnnulusSphericalSkyRegion):
+                # 4 vertices:
+                nverts = 4
+            elif isinstance(lat_bounds, CircleSphericalSkyRegion):
+                nverts = 3
         elif (lon_bounds is not None) & (lat_bounds is None):
             # 2 vertices:
             nverts = 2
@@ -359,6 +338,9 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
         """
         bound_nverts = self._bound_nverts
 
+        if bound_nverts == 6:
+            raise NotImplementedError
+
         if bound_nverts == 4:
             return [
                 self.longitude_bounds._circle_1,
@@ -366,9 +348,12 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
                 self.longitude_bounds._circle_2,
                 self.latitude_bounds._inner_region,
             ]
-
-        # Otherwise, return None
-        return None
+        if bound_nverts == 3:
+            return [
+                self.longitude_bounds._circle_1,
+                self.latitude_bounds,
+                self.longitude_bounds._circle_2,
+            ]
 
     @property
     def _compound_region(self):
@@ -384,10 +369,6 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
         )
 
     @property
-    def frame(self):
-        return self._frame
-
-    @property
     def longitude_bounds(self):
         """
         Longitude bounds of the range spherical sky region.
@@ -395,12 +376,6 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
         Defined as a spherical lune, or None if no longitude bound set.
         """
         # If only boundaries are set: get bounds from internal attribute:
-        if (
-            (self.longitude_range is not None)
-            & (getattr(self, '_longitude_bounds', None) is not None)
-        ):
-            raise ValueError('Both longitude_range and _longitude_bounds set!')
-
         if getattr(self, '_longitude_bounds', None) is not None:
             return self._longitude_bounds
 
@@ -416,12 +391,6 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
         a pole), or None if no latitude bound set.
         """
         # If only boundaries are set: get bounds from internal attribute:
-        if (
-            (self.latitude_range is not None)
-            & (getattr(self, '_latitude_bounds', None) is not None)
-        ):
-            raise ValueError('Both latitude_range and _latitude_bounds set!')
-
         if getattr(self, '_latitude_bounds', None) is not None:
             return self._latitude_bounds
 
@@ -459,7 +428,10 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
         """
         bound_nverts = self._bound_nverts
 
-        if bound_nverts == 4:
+        if bound_nverts == 6:
+            raise NotImplementedError
+
+        if (bound_nverts == 4) | (bound_nverts == 3):
             # Both lon and lat bounds
             verts_sph = self.vertices.represent_as('spherical')
 
@@ -495,20 +467,23 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
         """
         bound_nverts = self._bound_nverts
 
-        if bound_nverts == 4:
+        if bound_nverts == 6:
+            raise NotImplementedError
+
+        if (bound_nverts == 4) | (bound_nverts == 3):
             # If both lon/lat bounds:
             # Calculate from sum of cross products of vertices with cartesian representation
             # verts are in CW order:
             centroid_mindist = cross_product_sum_skycoord2skycoord(self.vertices)
 
-            if not self.contains(centroid_mindist):
+            if ((not self.contains(centroid_mindist))
+               and (not self.latitude_bounds.contains(centroid_mindist))):
                 # If it's not contained, check if it's because it's
                 # outside the latitude range: if so, instead just use avg centroid:
-                if not self.latitude_bounds.contains(centroid_mindist):
-                    # Problem of very elongated bounds at high latitude --
-                    # end up outside range. If so, fall back to average
-                    return self.centroid_avg
-                raise ValueError
+
+                # Problem of very elongated bounds at high latitude --
+                # end up outside range. If so, fall back to average
+                return self.centroid_avg
 
             return centroid_mindist
         elif bound_nverts == 2:
@@ -539,6 +514,9 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
         else:
             bound_nverts = self._bound_nverts
 
+            if bound_nverts == 6:
+                raise NotImplementedError
+
             if bound_nverts == 4:
                 # Both lon/lat bounds:on the fly construct from the lon/lat range attrib
                 # Longitude min is on the right, so derive CW from lower right corner.
@@ -559,7 +537,40 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
                 ]
                 return SkyCoord(verts_lon, verts_lat, frame=self.frame)
 
-            if bound_nverts == 2:
+            elif bound_nverts == 3:
+                # Both lon/lat bounds:on the fly construct from the lon/lat range attrib
+                # Longitude min is on the right, so derive CW from lower right corner.
+                # However, ONE of the vertices is on a pole.
+
+                # Note this is never called for transformed instances,
+                # which have vertices info stashed in _vertices.
+
+                if np.abs(self.latitude_range[0].to(u.deg).value) == 90:
+                    verts_lon = [
+                        self.longitude_range[0],
+                        self.longitude_range[1],
+                        self.longitude_range[0]
+                    ]
+                    verts_lat = [
+                        self.latitude_range[0],
+                        self.latitude_range[1],
+                        self.latitude_range[1],
+                    ]
+
+                elif np.abs(self.latitude_range[1].to(u.deg).value) == 90:
+                    verts_lon = [
+                        self.longitude_range[0],
+                        self.longitude_range[1],
+                        self.longitude_range[0]
+                    ]
+                    verts_lat = [
+                        self.latitude_range[0],
+                        self.latitude_range[0],
+                        self.latitude_range[1],
+                    ]
+                return SkyCoord(verts_lon, verts_lat, frame=self.frame)
+
+            elif bound_nverts == 2:
                 # 2 vertices: directly return from lune itself.
                 return self.longitude_bounds.vertices
             elif bound_nverts == 0:
@@ -572,39 +583,46 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
         if bound_nverts == 0:
             # No vertices: only an annulus:
             # Use the annulus bounding circle:
-            return self.latitude_bounds.bounding_circle()
+            return self.latitude_bounds.bounding_circle
         elif bound_nverts == 2:
             # Lune: get lune bounding circle
-            return self.longitude_bounds.bounding_circle()
+            return self.longitude_bounds.bounding_circle
         elif bound_nverts == 4:
             # Quadrilateral: use max of seps to vertices:
-            cent = copy.deepcopy(self.centroid_mindist)
+            cent = self.centroid_mindist
             seps = cent.separation(self.vertices)
             return CircleSphericalSkyRegion(center=cent, radius=np.max(seps))
-        else:
-            raise ValueError
+        elif bound_nverts == 6:
+            raise NotImplementedError
 
     @property
     def bounding_lonlat(self):
         bound_nverts = self._bound_nverts
         if bound_nverts == 0:
             # Only an annulus: Use the annulus bounding lonlat:
-            return self.latitude_bounds.bounding_lonlat()
+            return self.latitude_bounds.bounding_lonlat
 
         if bound_nverts == 2:
             # Lune: get lune bounding lonlat
-            return self.longitude_bounds.bounding_lonlat()
+            return self.longitude_bounds.bounding_lonlat
 
-        if bound_nverts == 4:
+        if (bound_nverts == 4) | (bound_nverts == 3):
             # Only used for both lon+lat bounds,
             # otherwise directly calls lon or lat bounding_lonlat()
             lons_arr, lats_arr = get_edge_raw_lonlat_bounds_circ_edges(
                 self.vertices, self.centroid, self._edge_circs,
             )
 
-            lons_arr, lats_arr = self._validate_lonlat_bounds(lons_arr, lats_arr)
+            # If original frame: keep lon bounds if touching a pole
+            # Only validate and change if not the original frame
+            # (eg, when the region could cap the pole)
+            if not self._is_original_frame:
+                lons_arr, lats_arr = self._validate_lonlat_bounds(lons_arr, lats_arr)
 
             return lons_arr, lats_arr
+
+        if bound_nverts == 6:
+            raise NotImplementedError
 
     def contains(self, coord):
         if self._is_original_frame:
@@ -695,9 +713,13 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
         for bound in boundaries:
             # Will be passing directly into internal attributes
             # _longitude_bounds, _latitude_bounds
-            transformed[f"_{bound}"] = getattr(self, bound).transform_to(
-                frame, merge_attributes=merge_attributes
-            )
+            bound_orig = getattr(self, bound)
+            if bound_orig is not None:
+                transformed[f"_{bound}"] = bound_orig.transform_to(
+                    frame, merge_attributes=merge_attributes
+                )
+            else:
+                transformed[f"_{bound}"] = getattr(self, bound)
 
         # Also transform vertices:
         for field in ['_vertices']:
@@ -725,11 +747,13 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
             return self.latitude_bounds.discretize_boundary(n_points=n_points)
         elif bound_nverts == 2:
             return self.longitude_bounds.discretize_boundary(n_points=n_points)
-        elif bound_nverts == 4:
+        elif (bound_nverts == 4) | (bound_nverts == 3):
             bound_verts = discretize_all_edge_boundaries(
                 self.vertices, self._edge_circs, self.centroid, n_points
             )
             return PolygonSphericalSkyRegion(bound_verts)
+        elif bound_nverts == 6:
+            raise NotImplementedError
 
     def to_sky(
             self,
@@ -774,6 +798,7 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
                 )
             # Requires spherical to cylindrical projection (from WCS) and discretization
             disc_bound = self.discretize_boundary(**discretize_kwargs)
+            # Anticipating complex, wrapped over the poles case:
             if isinstance(disc_bound, CompoundSphericalSkyRegion):
                 return disc_bound.to_pixel(wcs)
 
