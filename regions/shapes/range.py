@@ -44,13 +44,13 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
         The coordinate frame for the specified range region.
 
     longitude_range : length 2 list-like of `~astropy.coordinates.Angle` or
-        `~astropy.unit.Quantity` or None
+        `~astropy.units.Quantity` or None
         Longitude range in region. Spans from first to second entries
         (in increasing longitude value), so inverting the order will select
         the complement longitude range.
 
     latitude_range : length 2 list-like of `~astropy.coordinates.Angle` or
-        `~astropy.unit.Quantity` or None
+        `~astropy.units.Quantity` or None
         Latitude range in region. Spans from first to second entries
         (in increasing latitude value), so inverting the order will select
         the complement latitude range.
