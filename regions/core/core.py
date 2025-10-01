@@ -11,7 +11,8 @@ from regions.core.metadata import RegionMeta, RegionVisual
 from regions.core.pixcoord import PixCoord
 from regions.core.registry import RegionsRegistry
 
-__all__ = ['Region', 'PixelRegion', 'SkyRegion', 'SphericalSkyRegion']
+__all__ = ['Region', 'PixelRegion', 'SkyRegion',
+           'SphericalSkyRegion', 'ComplexSphericalSkyRegion']
 __doctest_skip__ = ['Region.serialize', 'Region.write']
 
 
@@ -330,7 +331,7 @@ class PixelRegion(Region):
         wcs : `~astropy.wcs.WCS` instance, optional
             The world coordinate system transformation to use to convert
             between sky and pixel coordinates. Required if transforming
-            with boundary distortions (`include_boundary_distortions=True`).
+            with boundary distortions (if ``include_boundary_distortions`` is True).
             Ignored if boundary distortions not included.
 
         include_boundary_distortions : bool, optional
@@ -346,8 +347,8 @@ class PixelRegion(Region):
         -------
         spherical_sky_region : `~regions.SphericalSkyRegion`
             A spherical sky region, with an equivalent shape (if
-            include_boundary_distortions=False), or a discretized polygon of
-            the boundary (if include_boundary_distortions=True).
+            ``include_boundary_distortions`` is False), or a discretized polygon of
+            the boundary (if ``include_boundary_distortions`` is True).
         """
         raise NotImplementedError
 
@@ -577,7 +578,7 @@ class SkyRegion(Region):
         wcs : `~astropy.wcs.WCS` instance, optional
             The world coordinate system transformation to use to convert
             between sky and pixel coordinates. Required if transforming
-            with boundary distortions (`include_boundary_distortions=True`).
+            with boundary distortions (if ``include_boundary_distortions`` is True).
             Ignored if boundary distortions not included.
 
         include_boundary_distortions : bool, optional
@@ -593,8 +594,8 @@ class SkyRegion(Region):
         -------
         spherical_sky_region : `~regions.SphericalSkyRegion`
             A spherical sky region, with an equivalent shape (if
-            include_boundary_distortions=False), or a discretized polygon of
-            the boundary (if include_boundary_distortions=True).
+            ``include_boundary_distortions`` is False), or a discretized polygon of
+            the boundary (if ``include_boundary_distortions`` is True).
         """
         raise NotImplementedError
 
@@ -760,7 +761,7 @@ class SphericalSkyRegion(Region):
         Returns
         -------
         sph_sky_region : `~regions.SphericalSkyRegion`
-            A new spherical sky region represented in the `frame` frame.
+            A new spherical sky region represented in the ``frame`` frame.
         """
         raise NotImplementedError
 
@@ -794,7 +795,7 @@ class SphericalSkyRegion(Region):
         wcs : `~astropy.wcs.WCS` instance, optional
             The world coordinate system transformation to use to convert
             between sky and pixel coordinates. Required if transforming
-            with boundary distortions (`include_boundary_distortions=True`).
+            with boundary distortions (if ``include_boundary_distortions`` is True).
             Ignored if boundary distortions not included.
 
         include_boundary_distortions : bool, optional
@@ -810,8 +811,8 @@ class SphericalSkyRegion(Region):
         -------
         sky_region : `~regions.SkyRegion`
             A planar sky region, with an equivalent shape (if
-            include_boundary_distortions=False), or a discretized polygon of
-            the boundary (if include_boundary_distortions=True).
+            ``include_boundary_distortions`` is False), or a discretized polygon of
+            the boundary (if ``include_boundary_distortions`` is True).
         """
         raise NotImplementedError
 
@@ -827,7 +828,7 @@ class SphericalSkyRegion(Region):
         wcs : `~astropy.wcs.WCS` instance, optional
             The world coordinate system transformation to use to convert
             between sky and pixel coordinates. Required if transforming
-            with boundary distortions (`include_boundary_distortions=True`).
+            with boundary distortions (if ``include_boundary_distortions`` is True).
             Ignored if boundary distortions not included.
 
         include_boundary_distortions : bool, optional
@@ -843,8 +844,8 @@ class SphericalSkyRegion(Region):
         -------
         pixel_region : `~regions.PixelRegion`
             A pixel region, with an equivalent shape (if
-            include_boundary_distortions=False), or a discretized polygon of
-            the boundary (if include_boundary_distortions=True).
+            ``include_boundary_distortions`` is False), or a discretized polygon of
+            the boundary (if ``include_boundary_distortions`` is True).
         """
         raise NotImplementedError
 
@@ -852,7 +853,8 @@ class SphericalSkyRegion(Region):
 class ComplexSphericalSkyRegion(SphericalSkyRegion):
     """
     Base class for complex cases, where the definitional parameters do
-    not transform (including RangeSphericalSkyRegion).
+    not / cannot transform between coordinate frames (including
+    RangeSphericalSkyRegion).
     """
 
     # Because the parameters don't transform,
