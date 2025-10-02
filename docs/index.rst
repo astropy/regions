@@ -65,8 +65,8 @@ I/O & Reference
    api
 
 
-Example
-=======
+Examples
+========
 
 The following example shows how to read a DS9 region file and plot the
 regions on an image using Matplotlib.
