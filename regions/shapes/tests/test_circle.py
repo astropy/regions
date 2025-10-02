@@ -18,6 +18,7 @@ from regions.shapes.tests.test_common import (BaseTestPixelRegion,
 from regions.tests.helpers import make_simple_wcs
 
 
+
 @pytest.fixture(scope='session', name='wcs')
 def wcs_fixture():
     filename = get_pkg_data_filename('data/example_header.fits')
@@ -140,3 +141,29 @@ class TestCircleSkyRegion(BaseTestSkyRegion):
     def test_zero_size(self):
         with pytest.raises(ValueError):
             CircleSkyRegion(SkyCoord(3 * u.deg, 4 * u.deg), 0. * u.arcsec)
+
+
+class TestCircleSectorPixelRegion(BaseTestPixelRegion):
+    meta = RegionMeta({'text': 'test'})
+    visual = RegionVisual({'color': 'blue'})
+    reg = CircleSectorPixelRegion(center=PixCoord(3, 4), radius=2, angle_start=30 * u.deg,
+                                  angle_stop=120 * u.deg, meta=meta, visual=visual)
+    sample_box = [0, 6, 1, 7]
+    inside = [(3, 5)]
+    outside = [(2, 4)]
+    expected_area = np.pi
+    expected_repr = ('<CircleSectorPixelRegion(center=PixCoord(x=3, y=4), radius=2, '
+                     'angle_start=30.0 deg, angle_stop=120.0 deg)>')
+    expected_str = ('Region: CircleSectorPixelRegion\n'
+                    'center: PixCoord(x=3, y=4)\n'
+                    'radius: 2\n'
+                    'angle_start: 30.0 deg\n'
+                    'angle_stop: 120.0 deg')
+
+    @pytest.mark.skipif('not HAS_MATPLOTLIB')
+    def test_as_artist(self):
+        patch = self.reg.as_artist()
+        assert_allclose(patch.center, (3, 4))
+        assert_allclose(patch.r, 2)
+        assert_allclose(patch.theta1, 30)
+        assert_allclose(patch.theta2, 120)
