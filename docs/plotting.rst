@@ -1,6 +1,9 @@
 Plotting Regions with Matplotlib
 ================================
 
+Plotting Pixel Regions
+----------------------
+
 Some `~regions.PixelRegion` objects have an ``as_artist()``
 method that returns an equivalent `matplotlib.patches` object.
 For example :meth:`regions.CirclePixelRegion.as_artist` returns a
@@ -78,3 +81,44 @@ to convert it to a pixel region (using a WCS object):
     >>> sky_region = CircleSkyRegion(sky_center, sky_radius)
     >>> pixel_region = sky_region.to_pixel(wcs)
     >>> pixel_region.plot()
+
+
+Plotting Spherical Sky Regions
+------------------------------
+
+Similarlly, `~regions.SphericalSkyRegion` objects do not have an
+``as_artist()`` or ``plot()`` method. To plot a `~regions.SphericalSkyRegion`
+object, you will need to convert it to a pixel region (using a WCS object).
+Boundary distortions effects can also be included in this conversion (by
+setting the ``include_boundary_distortions`` keyword), to capture
+the effects of projecting from spherical to a planar geometry.
+(See the second example in :ref:`index_examples`.)
+
+It is also possible to use the coordinates of a discretized
+`~regions.SphericalSkyRegion` to show the region's boundary in a figure.
+
+
+.. plot::
+   :include-source:
+
+    from astropy.coordinates import Angle, SkyCoord
+    import astropy.units as u
+    from regions import CircleSphericalSkyRegion
+    import matplotlib.pyplot as plt
+
+    sph_sky_center = SkyCoord(42, 43, unit='deg', frame='galactic')
+    sph_sky_radius = Angle(25, 'deg')
+    sph_sky_region = CircleSphericalSkyRegion(sph_sky_center, sph_sky_radius)
+    poly_sph_sky = sph_sky_region.discretize_boundary(n_points=1000)
+
+    fig, ax = plt.subplots(figsize=(8,4),
+                           subplot_kw=dict(projection="aitoff"))
+    ax.set_xlabel(r"Galactic $\ell$", fontsize=14, labelpad=8)
+    ax.set_ylabel(r"Galactic $b$", fontsize=14)
+    ax.grid(True)
+
+    ax.plot(
+        Angle(poly_sph_sky.vertices.l).wrap_at(180 * u.deg).radian,
+        Angle(poly_sph_sky.vertices.b).radian,
+        lw=3, color="tab:red",
+    )
