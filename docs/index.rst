@@ -32,15 +32,34 @@ Getting Started
 User Documentation
 ==================
 
+Defining Regions
+----------------
+
 .. toctree::
    :maxdepth: 1
 
    shapes
    metadata
+
+Using Regions
+-------------
+
+.. toctree::
+   :maxdepth: 1
+
    contains
    compound
    masks
+   spherical_frame_transform
+   spherical_bounding_regions
    plotting
+
+I/O & Reference
+---------------------
+
+.. toctree::
+   :maxdepth: 1
+
    region_io
    shapely
    api
