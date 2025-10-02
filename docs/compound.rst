@@ -2,8 +2,8 @@ Combining Regions
 =================
 
 There are a few ways to combine any two `~regions.Region` objects
-into a compound region, i.e., a `~regions.CompoundPixelRegion` or
-`~regions.CompoundSkyRegion` object.
+into a compound region, i.e., a `~regions.CompoundPixelRegion`,
+`~regions.CompoundSkyRegion`, or `~regions.CompoundSphericalSkyRegion` object.
 
 Let's start by defining two sky regions::
 
@@ -120,6 +120,7 @@ operator or the :meth:`~regions.Region.symmetric_difference` method::
 Example Illustrating Compound Regions
 -------------------------------------
 
+
 .. plot::
     :include-source: false
 
@@ -127,7 +128,9 @@ Example Illustrating Compound Regions
     import numpy as np
     from astropy.coordinates import Angle, SkyCoord
 
-    from regions import CircleSkyRegion, make_example_dataset
+    from regions import (CircleSkyRegion,
+                         CircleSphericalSkyRegion,
+                         make_example_dataset)
 
     # load example dataset to get skymap
     config = dict(crval=(0, 0),
@@ -141,6 +144,7 @@ Example Illustrating Compound Regions
     # remove sources
     dataset.image.data = np.zeros_like(dataset.image.data)
 
+    #----------------------------------------
     # define 2 sky circles
     circle1 = CircleSkyRegion(
         center=SkyCoord(20, 0, unit='deg', frame='galactic'),
@@ -156,6 +160,7 @@ Example Illustrating Compound Regions
     coords = np.array(np.meshgrid(lon, lat)).T.reshape(-1, 2)
     skycoords = SkyCoord(coords, unit='deg', frame='galactic')
 
+    #----------------------------------------
     # get events in AND and XOR
     compound_and = circle1 & circle2
     compound_xor = circle1 ^ circle2
@@ -165,10 +170,36 @@ Example Illustrating Compound Regions
     mask_xor = compound_xor.contains(skycoords, wcs)
     skycoords_xor = skycoords[mask_xor]
 
+    #----------------------------------------
+    # Spherical sky circles
+    sph_circle1 = circle1.to_spherical_sky()
+    sph_circle2 = circle2.to_spherical_sky()
+
+
+    #----------------------------------------
+    # get events in AND and XOR
+    # spherical regions
+    sph_compound_and = sph_circle1 & sph_circle2
+    sph_compound_xor = sph_circle1 ^ sph_circle2
+
+    sph_mask_and = sph_compound_and.contains(skycoords)
+    sph_skycoords_and = skycoords[sph_mask_and]
+    sph_mask_xor = sph_compound_xor.contains(skycoords)
+    sph_skycoords_xor = skycoords[sph_mask_xor]
+
     # plot
     fig = plt.figure()
-    ax = fig.add_axes([0.15, 0.1, 0.8, 0.8], projection=wcs, aspect='equal')
+    fig.set_size_inches(7,7)
 
+    axes = []
+    # axes.append(fig.add_axes([0.05, 0.1, 0.45, 0.8], projection=wcs, aspect='equal'))
+    # axes.append(fig.add_axes([0.525, 0.1, 0.45, 0.8], projection=wcs, aspect='equal'))
+
+    axes.append(fig.add_axes([0.15, 0.525, 0.8, 0.45], projection=wcs, aspect='equal'))
+    axes.append(fig.add_axes([0.15, 0.05, 0.8, 0.45], projection=wcs, aspect='equal'))
+
+    # planar
+    ax = axes[0]
     ax.scatter(skycoords.l.value, skycoords.b.value, label='all',
             transform=ax.get_transform('galactic'))
     ax.scatter(skycoords_xor.l.value, skycoords_xor.b.value, color='orange',
@@ -185,3 +216,28 @@ Example Illustrating Compound Regions
 
     ax.set_xlim(-0.5, dataset.config['shape'][1] - 0.5)
     ax.set_ylim(-0.5, dataset.config['shape'][0] - 0.5)
+    ax.set_title("Planar SkyRegions")
+
+    # spherical
+    ax = axes[1]
+
+    ax.scatter(skycoords.l.value, skycoords.b.value, label='all',
+            transform=ax.get_transform('galactic'))
+    ax.scatter(sph_skycoords_xor.l.value, sph_skycoords_xor.b.value, color='orange',
+            label='xor', transform=ax.get_transform('galactic'))
+    ax.scatter(sph_skycoords_and.l.value, sph_skycoords_and.b.value, color='magenta',
+            label='and', transform=ax.get_transform('galactic'))
+
+    boundary_kwargs = dict(
+        include_boundary_distortions=True, discretize_kwargs={"n_points":1000}
+    )
+    sph_circle1.to_pixel(wcs=wcs,**boundary_kwargs).plot(ax=ax, edgecolor='green', facecolor='none',
+                                alpha=0.8, lw=3)
+    sph_circle2.to_pixel(wcs=wcs,**boundary_kwargs).plot(ax=ax, edgecolor='red', facecolor='none',
+                                alpha=0.8, lw=3)
+
+    ax.legend(loc='lower right')
+
+    ax.set_xlim(-0.5, dataset.config['shape'][1] - 0.5)
+    ax.set_ylim(-0.5, dataset.config['shape'][0] - 0.5)
+    ax.set_title("SphericalSkyRegions")
