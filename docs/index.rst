@@ -65,6 +65,8 @@ I/O & Reference
    api
 
 
+.. _index_examples:
+
 Examples
 ========
 
@@ -123,8 +125,8 @@ and a longitude/latitude "range") on a full sky image (seen in the
     ax.coords.grid(color='white')
     ax.coords['glon'].set_ticklabel(color='white', path_effects=path_effects)
     ax.set_axisbelow(True)
-    ax.set_xlabel("Galactic $\ell$", fontsize=14, labelpad=8)
-    ax.set_ylabel("Galactic $b$", fontsize=14)
+    ax.set_xlabel(r"Galactic $\ell$", fontsize=14, labelpad=8)
+    ax.set_ylabel(r"Galactic $b$", fontsize=14)
     im = ax.imshow(image_data, vmin=0., vmax=300., cmap='gray')
 
     # Clip the image to the frame
