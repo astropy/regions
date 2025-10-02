@@ -10,14 +10,22 @@ Introduction
 
 The Regions package provides classes to represent:
 
-* Regions defined using pixel coordinates (e.g.,
+* Regions defined using pixel coordinates (a "region-on-image"; e.g.,
   `~regions.CirclePixelRegion`)
 * Regions defined using celestial coordinates, but still in an Euclidean
-  geometry (e.g., `~regions.CircleSkyRegion`)
+  geometry (i.e., a planar projection, as a "region-on-image";
+  e.g., `~regions.CircleSkyRegion`)
+* Regions defined using celestial coordinates, and with a spherical
+  geometry (a "region-on-celestial-sphere"; e.g., `~regions.CircleSphericalSkyRegion`)
 
-To transform between sky and pixel regions, a `world coordinate system
+To transform between (planar) sky and pixel regions, a `world coordinate system
 <https://docs.astropy.org/en/stable/wcs/wcsapi.html>`_ object (e.g.,
-`astropy.wcs.WCS`) is needed.
+`astropy.wcs.WCS`) is needed. To transform between spherical and planar (sky or pixel)
+regions, in addition to a `wcs
+<https://docs.astropy.org/en/stable/wcs/wcsapi.html>`_, it is also
+necessary to specify whether or not boundary distortions should be included
+(capturing the projection effects inherent in projection-to-spherical
+transformations, or the inverse).
 
 Regions also provides a unified interface for reading, writing,
 parsing, and serializing regions data in different formats, including
@@ -187,10 +195,10 @@ Sky Regions
 
 Sky regions are regions that are defined using celestial coordinates.
 Please note they are **not** defined as regions on the celestial sphere,
-but rather are meant to represent shapes on an image. They simply use
-sky coordinates instead of pixel coordinates to define their position.
-The remaining shape parameters are converted to pixels using the pixel
-scale of the image.
+but rather are meant to represent shapes on an image ("region-on-image").
+They simply use sky coordinates instead of pixel coordinates to define
+their position. The remaining shape parameters are converted to pixels
+using the pixel scale of the image.
 
 Let's create a sky region:
 
@@ -219,6 +227,70 @@ You can print the region to get some information about its properties:
 
     >>> print(region)
     Region: CircleSkyRegion
+    center: <SkyCoord (ICRS): (ra, dec) in deg
+        (42., 43.)>
+    radius: 3.0 deg
+
+You can access its properties via attributes:
+
+.. code-block:: python
+
+   >>> region.center
+    <SkyCoord (ICRS): (ra, dec) in deg
+        (42., 43.)>
+   >>> region.radius
+   <Quantity 3. deg>
+
+See the :ref:`shapes` documentation for the complete list of pixel-based
+regions and to learn more about :class:`~regions.Region` objects and
+their capabilities.
+
+
+Spherical Sky Regions
+---------------------
+
+Spherical sky regions are defined using celescial coordinates,
+and **are** defined as regions on the celestial sphere
+("regions-on-celestial-sphere", in contrast to the planar Sky Regions).
+In order to transform between spherical and planar ("region-on-image") regions,
+the planar projection (encoded in a `world coordinate system
+<https://docs.astropy.org/en/stable/wcs/wcsapi.html>`_ object; e.g.,
+`astropy.wcs.WCS`) must be specified, along with a specification of
+whether or not boundary distortions should be included.
+These distortions (implemented through discrete boundary sampling)
+capture the impact of the spherical-to-planar (or vice versa) projection.
+However, it is possible to ignore these distortions (e.g.,
+transforming a spherical circle to a planar circle).
+
+Spherical sky regions are created using celestial coordinates (as
+`~astropy.coordinates.SkyCoord`) and angular distances,
+for instance specified as
+
+.. code-block:: python
+
+    >>> from astropy.coordinates import Angle, SkyCoord
+    >>> from regions import CircleSphericalSkyRegion
+    >>> center = SkyCoord(42, 43, unit='deg')
+    >>> radius = Angle(3, 'deg')
+    >>> region = CircleSphericalSkyRegion(center, radius)
+
+Alternatively, one can define the radius using a
+`~astropy.units.Quantity` object with angular units:
+
+.. code-block:: python
+
+    >>> import astropy.units as u
+    >>> from regions import CircleSphericalSkyRegion
+    >>> center = SkyCoord(42, 43, unit='deg')
+    >>> radius = 3.0 * u.deg
+    >>> region = CircleSphericalSkyRegion(center, radius)
+
+You can print the region to get some information about its properties:
+
+.. code-block:: python
+
+    >>> print(region)
+    Region: CircleSphericalSkyRegion
     center: <SkyCoord (ICRS): (ra, dec) in deg
         (42., 43.)>
     radius: 3.0 deg
