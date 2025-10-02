@@ -849,6 +849,14 @@ class SphericalSkyRegion(Region):
         """
         raise NotImplementedError
 
+    def write(self, filename, format=None, overwrite=False, **kwargs):
+        # Note explicitly that this is not yet implemented.
+        raise NotImplementedError
+
+    def serialize(self, format=None, **kwargs):
+        # Note explicitly that this is not yet implemented.
+        raise NotImplementedError
+
 
 class ComplexSphericalSkyRegion(SphericalSkyRegion):
     """
