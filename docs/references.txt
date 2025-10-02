@@ -6,3 +6,4 @@
 .. _GitHub repository: https://github.com/astropy/regions
 .. _Region documentation: https://astropy-regions.readthedocs.io/en/latest/
 .. _coordinated package: https://www.astropy.org/affiliated/index.html#coordinated-packages
+.. _visualization demo here: https://docs.astropy.org/en/stable/visualization/wcsaxes/custom_frames.html
