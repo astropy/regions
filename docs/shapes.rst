@@ -198,6 +198,24 @@ Polygon
     >>> region2_pix = RegularPolygonPixelRegion(center, 6, 15)
 
 
+Range
+*****
+
+`~regions.RangeSphericalSkyRegion` (Range has no direct analog in
+planar geometry. Instead, this shape can be transformed by discretizing
+to a polygon and transforming the polygon.)
+
+.. code-block:: python
+
+    >>> from astropy.coordinates import SkyCoord
+    >>> from astropy import units as u
+    >>> from regions import RangeSphericalSkyRegion
+
+    >>> sph_range = RangeSphericalSkyRegion(frame="galactic",
+                                            longitude_range=[-45,45]*u.deg,
+                                            latitude_range=[0,45]*u.deg)
+
+
 Point
 *****
 

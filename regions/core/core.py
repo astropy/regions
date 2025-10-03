@@ -897,7 +897,9 @@ class ComplexSphericalSkyRegion(SphericalSkyRegion):
                     # place quotes around text value
                     keyval = f'{param}={getattr(self, param)!r}'
                 elif param == 'frame':
-                    keyval = f'{param}={repr(getattr(self, param))}'
+
+                    attr = getattr(self, param)
+                    keyval = f'{param}={getattr(attr, "name", repr(attr))}'
                 else:
                     keyval = f'{param}={getattr(self, param)}'
                 cls_info.append(keyval)
@@ -933,8 +935,12 @@ class ComplexSphericalSkyRegion(SphericalSkyRegion):
 
         if _do_params_info:
             for param in self._params:
-                if param in ['text', 'frame']:
+                if param in ['text']:
                     keyval = (param, repr(getattr(self, param)))
+
+                elif param == 'frame':
+                    attr = getattr(self, param)
+                    keyval = (param, getattr(attr, 'name', repr(attr)))
                 else:
                     keyval = (param, getattr(self, param))
                 cls_info.append(keyval)
@@ -943,7 +949,8 @@ class ComplexSphericalSkyRegion(SphericalSkyRegion):
             # First check if "frame" in self._params:
             if (self._params is not None) and (self._params[0] == 'frame'):
                 param = 'frame'
-                keyval = (param, repr(getattr(self, param)))
+                attr = getattr(self, param)
+                keyval = (param, getattr(attr, 'name', repr(attr)))
                 cls_info.append(keyval)
 
             # If "params" is None, eg for a transformed complex shape,
