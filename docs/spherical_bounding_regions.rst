@@ -1,5 +1,5 @@
 
 .. _spherical_bounding_regions:
 
-Bounding Regions for Spatial Searches
-=====================================
+Bounding Regions for On-Sky Spatial Searches
+============================================
