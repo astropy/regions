@@ -40,7 +40,7 @@ Circle
     >>> from astropy import units as u
     >>> from regions import PixCoord
     >>> from regions import (CircleSkyRegion, CirclePixelRegion,
-                             CircleSphericalSkyRegion)
+    ...                      CircleSphericalSkyRegion)
 
     >>> center_sky = SkyCoord(42, 43, unit='deg', frame='fk5')
     >>> region_sky = CircleSkyRegion(center=center_sky, radius=3 * u.deg)
@@ -58,8 +58,8 @@ and `~regions.CircleAnnulusSphericalSkyRegion`
     >>> from astropy import units as u
     >>> from regions import PixCoord
     >>> from regions import (CircleAnnulusSkyRegion,
-                             CircleAnnulusPixelRegion,
-                             CircleAnnulusSphericalSkyRegion)
+    ...                      CircleAnnulusPixelRegion,
+    ...                      CircleAnnulusSphericalSkyRegion)
 
     >>> center_sky = SkyCoord(42, 43, unit='deg', frame='fk5')
     >>> region_sky = CircleAnnulusSkyRegion(center=center_sky,
@@ -184,9 +184,9 @@ Polygon
 
     >>> from astropy.coordinates import SkyCoord
     >>> from regions import (PixCoord,
-                             PolygonSkyRegion,
-                             PolygonPixelRegion,
-                             PolygonSphericalSkyRegion)
+    ...                      PolygonSkyRegion,
+    ...                      PolygonPixelRegion,
+    ...                      PolygonSphericalSkyRegion)
     >>> from regions import RegularPolygonPixelRegion
 
     >>> vertices = SkyCoord([1, 2, 2], [1, 1, 2], unit='deg', frame='fk5')
@@ -212,8 +212,8 @@ to a polygon and transforming the polygon.)
     >>> from regions import RangeSphericalSkyRegion
 
     >>> sph_range = RangeSphericalSkyRegion(frame="galactic",
-                                            longitude_range=[-45,45]*u.deg,
-                                            latitude_range=[0,45]*u.deg)
+    ...                                     longitude_range=[-45,45]*u.deg,
+    ...                                     latitude_range=[0,45]*u.deg)
 
 
 Point
@@ -377,8 +377,8 @@ to the `~regions.SphericalSkyRegion.discretize_boundary()` method.
 .. code-block:: python
 
     >>> sky_reg = sph_sky_reg.to_sky(wcs=wcs,
-                                     include_boundary_distortions=True,
-                                     discretize_kwargs={"n_points": 10})
+    ...                              include_boundary_distortions=True,
+    ...                              discretize_kwargs={"n_points": 10})
     >>> print(sky_reg)  # doctest: +FLOAT_CMP
     Region: PolygonSkyRegion
     vertices: <SkyCoord (Galactic): (l, b) in deg
@@ -397,15 +397,15 @@ respectively).
 .. code-block:: python
 
     >>> pix_reg = sph_sky_reg.to_pixel(wcs=wcs,
-                                       include_boundary_distortions=False)
+    ...                                include_boundary_distortions=False)
     >>> print(pix_reg)  # doctest: +FLOAT_CMP
     Region: CirclePixelRegion
     center: PixCoord(x=55.352057112146014, y=40.095831389269705)
     radius: 0.010259141134880476
 
     >>> pix_reg2 = sph_sky_reg.to_pixel(wcs=wcs,
-                                        include_boundary_distortions=True,
-                                        discretize_kwargs={"n_points": 10})
+    ...                                 include_boundary_distortions=True,
+    ...                                 discretize_kwargs={"n_points": 10})
     >>> print(pix_reg2)  # doctest: +FLOAT_CMP
     Region: PolygonPixelRegion
     vertices: PixCoord(x=[55.35441629 55.36250693 55.366607   55.36514936
