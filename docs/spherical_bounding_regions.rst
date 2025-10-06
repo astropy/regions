@@ -44,12 +44,12 @@ and determine their bounding longitude/latitude spans and circle:
     >>> sph_circ = CircleSphericalSkyRegion(SkyCoord(100,-40,unit=u.deg,
     ...                                              frame="galactic"),
     ...                                     30*u.deg)
-    >>> print(sph_circ.bounding_lonlat)
+    >>> print(sph_circ.bounding_lonlat)  # doctest: +FLOAT_CMP
     (<Longitude [ 59.25424338, 140.74575662] deg>, <Latitude [-70., -10.] deg>)
     >>> sph_range = RangeSphericalSkyRegion(frame="galactic",
     ...                                     longitude_range=[-45,45]*u.deg,
     ...                                     latitude_range=[0,45]*u.deg)
-    >>> print(sph_range.bounding_circle)
+    >>> print(sph_range.bounding_circle)  # doctest: +FLOAT_CMP
     Region: CircleSphericalSkyRegion
     center: <SkyCoord (Galactic): (l, b) in deg
         (0., 16.32494994)>
@@ -67,12 +67,12 @@ bounds on the transformed Range region:
 .. code-block:: python
 
     >>> sph_circ_transf = sph_circ.transform_to("icrs")
-    >>> print(sph_circ_transf.bounding_lonlat)
+    >>> print(sph_circ_transf.bounding_lonlat)  # doctest: +FLOAT_CMP
     (<Longitude [322.34509896,  26.43985125] deg>, <Latitude [-10.44033547,  49.55966453] deg>)
     >>> sph_range_transf = sph_range.transform_to("icrs")
-    >>> print(sph_range_transf.bounding_lonlat)
+    >>> print(sph_range_transf.bounding_lonlat)  # doctest: +FLOAT_CMP
     (<Longitude [201.75437889, 288.42757587] deg>, <Latitude [-60.49575721,  27.00079109] deg>)
-    >>> print(sph_range_transf.bounding_circle)
+    >>> print(sph_range_transf.bounding_circle)  # doctest: +FLOAT_CMP
     Region: CircleSphericalSkyRegion
     center: <SkyCoord (ICRS): (ra, dec) in deg
         (251.64674219, -19.64298539)>
