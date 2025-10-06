@@ -81,7 +81,7 @@ Let's define a spherical sky region::
     >>> sph_sky_center = SkyCoord(42, 43, unit='deg')
     >>> sph_sky_radius = Angle(25, 'deg')
     >>> sph_sky_region = CircleSphericalSkyRegion(sph_sky_center,
-                                                  sph_sky_radius)
+    ...                                           sph_sky_radius)
     >>> print(sph_sky_region)
     Region: CircleSphericalSkyRegion
     center: <SkyCoord (ICRS): (ra, dec) in deg
