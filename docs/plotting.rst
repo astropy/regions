@@ -112,8 +112,7 @@ It is also possible to use the coordinates of a discretized
     sph_sky_radius = Angle(12, 'deg')
     sph_sky_region = CircleSphericalSkyRegion(sph_sky_center, sph_sky_radius)
 
-    fig, ax = plt.subplots(figsize=(8,4),
-                           subplot_kw=dict(projection=wcs))
+    fig, ax = plt.subplots(subplot_kw=dict(projection=wcs))
     ax.grid(True)
     ax.set_xlabel(r"Galactic $\ell$")
     ax.set_ylabel(r"Galactic $b$")
