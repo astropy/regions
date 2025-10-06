@@ -36,12 +36,12 @@ class TestRangeSphericalSkyRegion(BaseTestSphericalSkyRegion):
                                   meta=meta, visual=visual)
 
     expected_repr = ('<RangeSphericalSkyRegion(\n'
-                     "frame=<class 'astropy.coordinates.builtin_frames.icrs.ICRS'>,\n"
+                     'frame=icrs,\n'
                      'longitude_range=[ 0. 10.] deg,\n'
                      'latitude_range=[-4.  4.] deg\n'
                      ')>')
     expected_str = ('Region: RangeSphericalSkyRegion\n'
-                    "frame: <class 'astropy.coordinates.builtin_frames.icrs.ICRS'>\n"
+                    'frame: icrs\n'
                     'longitude_range: [ 0. 10.] deg\n'
                     'latitude_range: [-4.  4.] deg')
 
@@ -264,8 +264,7 @@ class TestRangeSphericalSkyRegion(BaseTestSphericalSkyRegion):
 
     def test_repr_str_frame_transformation(self):
         expected_repr_transf = ('<RangeSphericalSkyRegion(\n'
-                                "frame=<class 'astropy.coordinates.builtin_frames"
-                                ".galactic.Galactic'>,\n"
+                                'frame=galactic,\n'
                                 'longitude_bounds=<LuneSphericalSkyRegion('
                                 'center_gc1=<SkyCoord (Galactic): (l, b) in deg\n'
                                 '    (206.98913108, -11.42449097)>, '
@@ -277,8 +276,7 @@ class TestRangeSphericalSkyRegion(BaseTestSphericalSkyRegion):
                                 'inner_radius=86.0 deg, outer_radius=94.0 deg)>\n'
                                 ')>')
         expected_str_transf = ('Region: RangeSphericalSkyRegion\n'
-                               "frame: <class 'astropy.coordinates."
-                               "builtin_frames.galactic.Galactic'>\n"
+                               'frame: galactic\n'
                                'longitude_bounds: <LuneSphericalSkyRegion('
                                'center_gc1=<SkyCoord (Galactic): (l, b) in deg\n'
                                '    (206.98913108, -11.42449097)>, '
