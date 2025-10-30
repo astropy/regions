@@ -6,7 +6,6 @@ import numpy as np
 from regions.core.attributes import RegionType
 from regions.core.core import PixelRegion, SkyRegion
 from regions.core.mask import RegionMask
-from regions.core.metadata import RegionMeta, RegionVisual
 
 __all__ = ['CompoundPixelRegion', 'CompoundSkyRegion']
 
@@ -227,11 +226,11 @@ class CompoundSkyRegion(SkyRegion):
         if meta is None:
             self.meta = region1.meta
         else:
-            self.meta = RegionMeta()
+            self.meta = meta
         if visual is None:
             self.visual = region1.visual
         else:
-            self.visual = RegionVisual()
+            self.visual = visual
         self._operator = operator
 
     @property
