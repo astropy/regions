@@ -20,6 +20,9 @@ New Features
 Bug Fixes
 ---------
 
+- No longer overwrites input ``meta`` and ``visible`` values when
+  initializing a ``CompoundSkyRegion``. [#628]
+
 API Changes
 -----------
 

@@ -11,7 +11,8 @@ import pytest
 from astropy.coordinates import SkyCoord
 from numpy.testing import assert_allclose
 
-from regions.core import CompoundPixelRegion, PixCoord, RegionBoundingBox
+from regions.core import (CompoundPixelRegion, CompoundSkyRegion, PixCoord,
+                          RegionBoundingBox)
 from regions.shapes import CirclePixelRegion, CircleSkyRegion
 from regions.tests.helpers import make_simple_wcs
 
@@ -163,3 +164,8 @@ def test_compound_sky():
     diff = c1 ^ c2 ^ c3
     assert (diff.contains(coords, wcs) == [True, True, False, True]).all()
     assert 'Compound' in str(union)
+
+    # Test keeping the input meta
+    meta = {'test_meta': True}
+    compound = CompoundSkyRegion(c1, c2, operator.and_, meta=meta)
+    assert compound.meta['test_meta']
