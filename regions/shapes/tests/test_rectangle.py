@@ -146,11 +146,14 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
         from matplotlib.backend_bases import MouseEvent
         canvas = ax.figure.canvas
 
-        evt = MouseEvent('button_press_event', canvas, *ax.transData.transform((7.3, 4.4)), button=1)
+        evt = MouseEvent('button_press_event', canvas,
+                         *ax.transData.transform((7.3, 4.4)), button=1)
         canvas.callbacks.process(evt.name, evt)
-        evt = MouseEvent('motion_notify_event', canvas, *ax.transData.transform((9.3, 5.4)), button=1)
+        evt = MouseEvent('motion_notify_event', canvas,
+                         *ax.transData.transform((9.3, 5.4)), button=1)
         canvas.callbacks.process(evt.name, evt)
-        evt = MouseEvent('button_release_event', canvas, *ax.transData.transform((9.3, 5.4)), button=1)
+        evt = MouseEvent('button_release_event', canvas,
+                         *ax.transData.transform((9.3, 5.4)), button=1)
         canvas.callbacks.process(evt.name, evt)
         ax.figure.canvas.draw()
 
@@ -204,11 +207,14 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
         from matplotlib.backend_bases import MouseEvent
         canvas = ax.figure.canvas
 
-        evt = MouseEvent('button_press_event', canvas, *ax.transData.transform((3, 4)), button=1)
+        evt = MouseEvent('button_press_event', canvas,
+                         *ax.transData.transform((3, 4)), button=1)
         canvas.callbacks.process(evt.name, evt)
-        evt = MouseEvent('motion_notify_event', canvas, *ax.transData.transform((3.5, 4.5)), button=1)
+        evt = MouseEvent('motion_notify_event', canvas,
+                         *ax.transData.transform((3.5, 4.5)), button=1)
         canvas.callbacks.process(evt.name, evt)
-        evt = MouseEvent('button_release_event', canvas, *ax.transData.transform((3.5, 4.5)), button=1)
+        evt = MouseEvent('button_release_event', canvas,
+                         *ax.transData.transform((3.5, 4.5)), button=1)
         canvas.callbacks.process(evt.name, evt)
         ax.figure.canvas.draw()
 
@@ -217,11 +223,14 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
         assert_allclose(region.width, 4)
         assert_allclose(region.height, 3)
 
-        evt = MouseEvent('button_press_event', canvas, *ax.transData.transform((3.25, 4.25)), button=1)
+        evt = MouseEvent('button_press_event', canvas,
+                         *ax.transData.transform((3.25, 4.25)), button=1)
         canvas.callbacks.process(evt.name, evt)
-        evt = MouseEvent('motion_notify_event', canvas, *ax.transData.transform((4.25, 5.25)), button=1)
+        evt = MouseEvent('motion_notify_event', canvas,
+                         *ax.transData.transform((4.25, 5.25)), button=1)
         canvas.callbacks.process(evt.name, evt)
-        evt = MouseEvent('button_release_event', canvas, *ax.transData.transform((4.25, 5.25)), button=1)
+        evt = MouseEvent('button_release_event', canvas,
+                         *ax.transData.transform((4.25, 5.25)), button=1)
         canvas.callbacks.process(evt.name, evt)
         ax.figure.canvas.draw()
 
