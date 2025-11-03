@@ -114,7 +114,6 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
     def test_as_mpl_selector(self, sync):
 
         plt = pytest.importorskip('matplotlib.pyplot')
-        from matplotlib.testing.widgets import do_event
 
         rng = np.random.default_rng(0)
         data = rng.random((16, 16))
@@ -136,12 +135,20 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
 
         region = self.reg.copy(angle=0 * u.deg)
 
-        selector = region.as_mpl_selector(ax, callback=update_mask, sync=sync)
+        selector = region.as_mpl_selector(ax, callback=update_mask, sync=sync)  # noqa: F841
 
-        do_event(selector, 'press', xdata=7.3, ydata=4.4, button=1)
-        do_event(selector, 'onmove', xdata=9.3, ydata=5.4, button=1)
-        do_event(selector, 'release', xdata=9.3, ydata=5.4, button=1)
+        from matplotlib.backend_bases import MouseEvent
+        canvas = ax.figure.canvas
 
+        evt = MouseEvent('button_press_event', canvas,
+                         *ax.transData.transform((7.3, 4.4)), button=1)
+        canvas.callbacks.process(evt.name, evt)
+        evt = MouseEvent('motion_notify_event', canvas,
+                         *ax.transData.transform((9.3, 5.4)), button=1)
+        canvas.callbacks.process(evt.name, evt)
+        evt = MouseEvent('button_release_event', canvas,
+                         *ax.transData.transform((9.3, 5.4)), button=1)
+        canvas.callbacks.process(evt.name, evt)
         ax.figure.canvas.draw()
 
         if sync:
@@ -173,7 +180,6 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
         Test dragging of entire region from central handle and anywhere.
         """
         plt = pytest.importorskip('matplotlib.pyplot')
-        from matplotlib.testing.widgets import do_event
 
         rng = np.random.default_rng(0)
         data = rng.random((16, 16))
@@ -193,10 +199,19 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
         assert region._mpl_selector.drag_from_anywhere is anywhere
 
         # click_and_drag(selector, start=(3, 4), end=(3.5, 4.5))
-        do_event(selector, 'press', xdata=3, ydata=4, button=1)
-        do_event(selector, 'onmove', xdata=3.5, ydata=4.5, button=1)
-        do_event(selector, 'release', xdata=3.5, ydata=4.5, button=1)
 
+        from matplotlib.backend_bases import MouseEvent
+        canvas = ax.figure.canvas
+
+        evt = MouseEvent('button_press_event', canvas,
+                         *ax.transData.transform((3, 4)), button=1)
+        canvas.callbacks.process(evt.name, evt)
+        evt = MouseEvent('motion_notify_event', canvas,
+                         *ax.transData.transform((3.5, 4.5)), button=1)
+        canvas.callbacks.process(evt.name, evt)
+        evt = MouseEvent('button_release_event', canvas,
+                         *ax.transData.transform((3.5, 4.5)), button=1)
+        canvas.callbacks.process(evt.name, evt)
         ax.figure.canvas.draw()
 
         assert_allclose(region.center.x, 3.5)
@@ -204,10 +219,15 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
         assert_allclose(region.width, 4)
         assert_allclose(region.height, 3)
 
-        do_event(selector, 'press', xdata=3.25, ydata=4.25, button=1)
-        do_event(selector, 'onmove', xdata=4.25, ydata=5.25, button=1)
-        do_event(selector, 'release', xdata=4.25, ydata=5.25, button=1)
-
+        evt = MouseEvent('button_press_event', canvas,
+                         *ax.transData.transform((3.25, 4.25)), button=1)
+        canvas.callbacks.process(evt.name, evt)
+        evt = MouseEvent('motion_notify_event', canvas,
+                         *ax.transData.transform((4.25, 5.25)), button=1)
+        canvas.callbacks.process(evt.name, evt)
+        evt = MouseEvent('button_release_event', canvas,
+                         *ax.transData.transform((4.25, 5.25)), button=1)
+        canvas.callbacks.process(evt.name, evt)
         ax.figure.canvas.draw()
 
         # For drag_from_anywhere=False this will have created a new 1x1 rectangle.
