@@ -332,11 +332,11 @@ class CompoundSphericalSkyRegion(SphericalSkyRegion):
         if meta is None:
             self.meta = region1.meta
         else:
-            self.meta = RegionMeta()
+            self.meta = meta
         if visual is None:
             self.visual = region1.visual
         else:
-            self.visual = RegionVisual()
+            self.visual = visual
         self._operator = operator
 
     @property
