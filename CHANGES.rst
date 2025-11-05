@@ -1,3 +1,19 @@
+0.12 (unreleased)
+=================
+
+General
+-------
+
+New Features
+------------
+
+Bug Fixes
+---------
+
+API Changes
+-----------
+
+
 0.11 (2025-11-05)
 =================
 
@@ -19,6 +35,7 @@ Bug Fixes
 
 - No longer overwrites input ``meta`` and ``visible`` values when
   initializing a ``CompoundSkyRegion``. [#628]
+
 
 0.10 (2024-09-27)
 =================
