@@ -1,4 +1,4 @@
-0.11 (unreleased)
+0.11 (2025-11-05)
 =================
 
 General
@@ -14,18 +14,11 @@ General
 
 - The minimum required Shapely is now 2.0. [#601]
 
-New Features
-------------
-
 Bug Fixes
 ---------
 
 - No longer overwrites input ``meta`` and ``visible`` values when
   initializing a ``CompoundSkyRegion``. [#628]
-
-API Changes
------------
-
 
 0.10 (2024-09-27)
 =================
