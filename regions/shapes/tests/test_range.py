@@ -255,34 +255,53 @@ class TestRangeSphericalSkyRegion(BaseTestSphericalSkyRegion):
         assert reg.visual == self.visual
 
     def test_transformation(self, wcs):
-        polypix = self.reg.to_pixel(wcs)
-        assert isinstance(polypix, PolygonPixelRegion)
-        assert len(polypix.vertices) == 4
 
-        assert_allclose(polypix.vertices.x,
-                        [-4536.82156523, -5685.54622545,
-                         -5771.86292244, -4861.62586712])
-        assert_allclose(polypix.vertices.y,
-                        [-3091.16199865, -3236.05135267,
-                         -2837.97224466, -2724.76777962])
+        # Test error for no boundary distortions:
+        with pytest.raises(ValueError) as excinfo:
+            _ = self.reg.to_pixel(wcs)
+        estr = 'Invalid parameter: `include_boundary_distortions=False`!'
+        assert estr in str(excinfo.value)
 
-        polysky = self.reg.to_sky(wcs)
-        assert isinstance(polysky, PolygonSkyRegion)
-        assert_allclose(self.reg.vertices.ra.deg, [0, 10, 10, 0])
-        assert_allclose(self.reg.vertices.dec.deg, [-4, -4, 4, 4])
-        assert len(polysky.vertices) == 4
+        with pytest.raises(ValueError) as excinfo:
+            _ = self.reg.to_sky(wcs)
+        estr = 'Invalid parameter: `include_boundary_distortions=False`!'
+        assert estr in str(excinfo.value)
 
+        # Test boundary distortion transformations:
         polypix2 = self.reg.to_pixel(wcs,
                                      include_boundary_distortions=True,
-                                     discretize_kwargs={'n_points': 10})
+                                     discretize_kwargs={'n_points': 2})
         assert isinstance(polypix2, PolygonPixelRegion)
-        assert len(polypix2.vertices) == 40
+        assert len(polypix2.vertices) == 8
+
+        assert_allclose(polypix2.vertices.x,
+                        [-4861.625867, -4717.364168,
+                         -4536.821565, -5079.772466,
+                         -5685.546225, -5734.531503,
+                         -5771.862922, -5302.114084])
+        assert_allclose(polypix2.vertices.y,
+                        [-2724.76778, -2909.927597,
+                         -3091.161999, -3184.698562,
+                         -3236.051353, -3037.141783,
+                         -2837.972245, -2798.470494])
 
         polysky2 = self.reg.to_sky(wcs,
                                    include_boundary_distortions=True,
-                                   discretize_kwargs={'n_points': 10})
+                                   discretize_kwargs={'n_points': 2})
         assert isinstance(polysky2, PolygonSkyRegion)
-        assert len(polysky2.vertices) == 40
+        assert len(polysky2.vertices) == 8
+
+        # WCS is Galactic:
+        assert_allclose(polysky2.vertices.l.deg,
+                        [99.222517, 96.337283,
+                         92.726431, 103.585449,
+                         115.700925, 116.68063,
+                         117.427258, 108.032282])
+        assert_allclose(polysky2.vertices.b.deg,
+                        [-56.485356, -60.188552,
+                         -63.81324, -65.683971,
+                         -66.711027, -62.732836,
+                         -58.749445, -57.95941])
 
     def test_transformation_over_poles(self, wcs):
         # Transformation for over-poles case:
@@ -291,7 +310,9 @@ class TestRangeSphericalSkyRegion(BaseTestSphericalSkyRegion):
                                       frame='icrs')
 
         with pytest.raises(NotImplementedError):
-            _ = reg.to_pixel(wcs)
+            _ = reg.to_pixel(wcs,
+                             include_boundary_distortions=True,
+                             discretize_kwargs={'n_points': 10})
 
     def test_transformation_no_wcs(self):
         with pytest.raises(ValueError) as excinfo:

@@ -23,7 +23,7 @@ from regions.core.pixcoord import PixCoord
 from regions.shapes.annulus import CircleAnnulusSphericalSkyRegion
 from regions.shapes.circle import CircleSphericalSkyRegion
 from regions.shapes.lune import LuneSphericalSkyRegion
-from regions.shapes.polygon import (PolygonPixelRegion, PolygonSkyRegion,
+from regions.shapes.polygon import (PolygonPixelRegion,
                                     PolygonSphericalSkyRegion)
 from regions.shapes.whole_sky import WholeSphericalSkyRegion
 
@@ -836,6 +836,12 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
             include_boundary_distortions=False,
             discretize_kwargs=None
     ):
+        if not include_boundary_distortions:
+            raise ValueError(
+                'Invalid parameter: `include_boundary_distortions=False`!\n'
+                'Transforming range to planar sky region is only possible by '
+                'including boundary distortions.'
+            )
         if discretize_kwargs is None:
             discretize_kwargs = {}
 
@@ -852,18 +858,19 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
                 discretize_kwargs=discretize_kwargs,
             ).to_sky(wcs)
 
-        return PolygonSkyRegion(
-            self.vertices,
-            meta=self.meta,
-            visual=self.visual
-        )
-
     def to_pixel(
             self,
             wcs=None,
             include_boundary_distortions=False,
             discretize_kwargs=None,
     ):
+        if not include_boundary_distortions:
+            raise ValueError(
+                'Invalid parameter: `include_boundary_distortions=False`!\n'
+                'Transforming range to planar pixel region is only possible by '
+                'including boundary distortions.'
+            )
+
         if discretize_kwargs is None:
             discretize_kwargs = {}
         if include_boundary_distortions:
@@ -883,5 +890,3 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
                 PixCoord(*verts), meta=self.meta.copy(),
                 visual=self.visual.copy()
             )
-
-        return self.to_sky().to_pixel(wcs)

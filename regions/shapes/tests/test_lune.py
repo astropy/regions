@@ -47,11 +47,27 @@ class TestLuneSphericalSkyRegion(BaseTestSphericalSkyRegion):
         assert reg.visual == self.visual
 
     def test_transformation(self, wcs):
-        with pytest.raises(NotImplementedError):
+        # Test error for no boundary distortions:
+        with pytest.raises(ValueError) as excinfo:
+            _ = self.reg.to_pixel(wcs)
+        estr = 'Invalid parameter: `include_boundary_distortions=False`!'
+        assert estr in str(excinfo.value)
+
+        with pytest.raises(ValueError) as excinfo:
             _ = self.reg.to_sky(wcs)
+        estr = 'Invalid parameter: `include_boundary_distortions=False`!'
+        assert estr in str(excinfo.value)
+
+        # Test for not implemented with include_boundary_distortions=True
+        with pytest.raises(NotImplementedError):
+            _ = self.reg.to_sky(wcs,
+                                include_boundary_distortions=True,
+                                discretize_kwargs={'n_points': 2})
 
         with pytest.raises(NotImplementedError):
-            _ = self.reg.to_pixel(wcs)
+            _ = self.reg.to_pixel(wcs,
+                                  include_boundary_distortions=True,
+                                  discretize_kwargs={'n_points': 2})
 
     def test_frame_transformation(self):
         reg2 = self.reg.transform_to('galactic')
