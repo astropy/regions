@@ -249,7 +249,7 @@ their capabilities.
 Spherical Sky Regions
 ---------------------
 
-Spherical sky regions are defined using celescial coordinates,
+Spherical sky regions are defined using celestial coordinates,
 and **are** defined as regions on the celestial sphere
 ("regions-on-celestial-sphere", in contrast to the planar Sky Regions).
 In order to transform between spherical and planar ("region-on-image") regions,
