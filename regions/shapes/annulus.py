@@ -234,7 +234,7 @@ class CircleAnnulusPixelRegion(AnnulusPixelRegion):
                 raise ValueError(
                     "'wcs' must be set if 'include_boundary_distortions'=True"
                 )
-            # Requires cylindrical to spherical projection (using WCS) and discretization
+            # Requires planar to spherical projection (using WCS) and discretization
             # Will require implementing discretization in pixel space
             # to get correct handling of distortions.
             raise NotImplementedError
@@ -329,7 +329,7 @@ class CircleAnnulusSkyRegion(SkyRegion):
                 raise ValueError(
                     "'wcs' must be set if 'include_boundary_distortions'=True"
                 )
-            # Requires cylindrical to spherical projection (using WCS) and discretization
+            # Requires planar to spherical projection (using WCS) and discretization
             # Will require implementing discretization in pixel space
             # to get correct handling of distortions.
             raise NotImplementedError
@@ -436,7 +436,7 @@ class CircleAnnulusSphericalSkyRegion(AnnulusSphericalSkyRegion):
                 raise ValueError(
                     "'wcs' must be set if 'include_boundary_distortions'=True"
                 )
-            # Requires spherical to cylindrical projection (from WCS) and discretization
+            # Requires spherical to planar projection (from WCS) and discretization
             # Use to_pixel(), then apply "small angle approx" to get planar sky.
             return self.to_pixel(
                 include_boundary_distortions=include_boundary_distortions,
@@ -468,7 +468,7 @@ class CircleAnnulusSphericalSkyRegion(AnnulusSphericalSkyRegion):
                 raise ValueError(
                     "'wcs' must be set if 'include_boundary_distortions'=True"
                 )
-            # Requires spherical to cylindrical projection (from WCS) and discretization
+            # Requires spherical to planar projection (from WCS) and discretization
             polygonized = self.discretize_boundary(**discretize_kwargs)
 
             inner_vertices = wcs.world_to_pixel(polygonized.region1.vertices)
