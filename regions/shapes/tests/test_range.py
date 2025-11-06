@@ -216,10 +216,9 @@ class TestRangeSphericalSkyRegion(BaseTestSphericalSkyRegion):
         reg = RangeSphericalSkyRegion(longitude_range=[0, 10] * u.deg,
                                       latitude_range=[80, -80] * u.deg,
                                       frame='icrs')
-        try:
+
+        with pytest.raises(NotImplementedError):
             _ = reg.to_pixel(wcs)
-        except NotImplementedError:
-            pytest.xfail()
 
     def test_transformation_no_wcs(self):
         with pytest.raises(ValueError) as excinfo:
@@ -325,10 +324,9 @@ class TestRangeSphericalSkyRegion(BaseTestSphericalSkyRegion):
         reg = RangeSphericalSkyRegion(longitude_range=[0, 350] * u.deg,
                                       latitude_range=[80, -80] * u.deg,
                                       frame='icrs')
-        try:
+
+        with pytest.raises(NotImplementedError):
             _ = reg.bounding_circle
-        except NotImplementedError:
-            pytest.xfail()
 
     def test_bounding_lonlat(self):
         bounding_lonlat = self.reg.bounding_lonlat
@@ -382,10 +380,9 @@ class TestRangeSphericalSkyRegion(BaseTestSphericalSkyRegion):
         reg = RangeSphericalSkyRegion(longitude_range=[0, 350] * u.deg,
                                       latitude_range=[80, -80] * u.deg,
                                       frame='icrs')
-        try:
+
+        with pytest.raises(NotImplementedError):
             _ = reg.bounding_lonlat
-        except NotImplementedError:
-            pytest.xfail()
 
     def test_discretize_boundary(self):
         polyrange = self.reg.discretize_boundary(n_points=100)
@@ -410,7 +407,6 @@ class TestRangeSphericalSkyRegion(BaseTestSphericalSkyRegion):
         reg = RangeSphericalSkyRegion(longitude_range=[0, 350] * u.deg,
                                       latitude_range=[80, -80] * u.deg,
                                       frame='icrs')
-        try:
+
+        with pytest.raises(NotImplementedError):
             _ = reg.discretize_boundary()
-        except NotImplementedError:
-            pytest.xfail()

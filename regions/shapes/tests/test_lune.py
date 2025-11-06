@@ -47,15 +47,11 @@ class TestLuneSphericalSkyRegion(BaseTestSphericalSkyRegion):
         assert reg.visual == self.visual
 
     def test_transformation(self, wcs):
-        try:
-            self.reg.to_sky(wcs)
-        except NotImplementedError:
-            pytest.xfail()
+        with pytest.raises(NotImplementedError):
+            _ = self.reg.to_sky(wcs)
 
-        try:
-            self.reg.to_pixel(wcs)
-        except NotImplementedError:
-            pytest.xfail()
+        with pytest.raises(NotImplementedError):
+            _ = self.reg.to_pixel(wcs)
 
     def test_frame_transformation(self):
         reg2 = self.reg.transform_to('galactic')

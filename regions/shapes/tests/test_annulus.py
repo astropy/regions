@@ -11,8 +11,7 @@ from astropy.wcs import WCS
 from numpy.testing import assert_allclose
 
 from regions.core import PixCoord, RegionMeta, RegionVisual
-from regions.core.compound import (CompoundPixelRegion, CompoundSkyRegion,
-                                   CompoundSphericalSkyRegion)
+from regions.core.compound import CompoundPixelRegion, CompoundSkyRegion
 from regions.shapes.annulus import (CircleAnnulusPixelRegion,
                                     CircleAnnulusSkyRegion,
                                     CircleAnnulusSphericalSkyRegion,
@@ -90,12 +89,9 @@ class TestCircleAnnulusPixelRegion(BaseTestPixelRegion):
                                               include_boundary_distortions=False)
         assert isinstance(sphskyann, CircleAnnulusSphericalSkyRegion)
 
-        try:
-            sphskyann = self.reg.to_spherical_sky(wcs,
-                                                  include_boundary_distortions=True)
-            assert isinstance(sphskyann, CompoundSphericalSkyRegion)
-        except NotImplementedError:
-            pytest.xfail()
+        with pytest.raises(NotImplementedError):
+            _ = self.reg.to_spherical_sky(wcs,
+                                          include_boundary_distortions=True)
 
     def test_to_spherical_sky_no_wcs(self):
         with pytest.raises(ValueError) as excinfo:
@@ -157,12 +153,9 @@ class TestCircleAnnulusSkyRegion(BaseTestSkyRegion):
                                               include_boundary_distortions=False)
         assert isinstance(sphskyann, CircleAnnulusSphericalSkyRegion)
 
-        try:
-            sphskyann = self.reg.to_spherical_sky(wcs,
-                                                  include_boundary_distortions=True)
-            assert isinstance(sphskyann, CompoundSphericalSkyRegion)
-        except NotImplementedError:
-            pytest.xfail()
+        with pytest.raises(NotImplementedError):
+            _ = self.reg.to_spherical_sky(wcs,
+                                          include_boundary_distortions=True)
 
     def test_to_spherical_sky_no_wcs(self):
         with pytest.raises(ValueError) as excinfo:
