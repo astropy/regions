@@ -14,8 +14,7 @@ from regions._utils.optional_deps import HAS_MATPLOTLIB
 from regions.core import PixCoord, RegionMeta, RegionVisual
 from regions.shapes.circle import (CirclePixelRegion, CircleSkyRegion,
                                    CircleSphericalSkyRegion)
-from regions.shapes.polygon import (PolygonPixelRegion, PolygonSkyRegion,
-                                    PolygonSphericalSkyRegion)
+from regions.shapes.polygon import PolygonPixelRegion, PolygonSkyRegion
 from regions.shapes.tests.test_common import (BaseTestPixelRegion,
                                               BaseTestSkyRegion,
                                               BaseTestSphericalSkyRegion)
@@ -68,12 +67,9 @@ class TestCirclePixelRegion(BaseTestPixelRegion):
                                                  include_boundary_distortions=False)
         assert isinstance(sphskycircle, CircleSphericalSkyRegion)
 
-        try:
-            sphskycircle = self.reg.to_spherical_sky(wcs,
-                                                     include_boundary_distortions=True)
-            assert isinstance(sphskycircle, PolygonSphericalSkyRegion)
-        except NotImplementedError:
-            pytest.xfail()
+        with pytest.raises(NotImplementedError):
+            _ = self.reg.to_spherical_sky(wcs,
+                                          include_boundary_distortions=True)
 
     def test_to_spherical_sky_no_wcs(self):
         with pytest.raises(ValueError) as excinfo:
@@ -143,12 +139,9 @@ class TestCircleSkyRegion(BaseTestSkyRegion):
                                                  include_boundary_distortions=False)
         assert isinstance(sphskycircle, CircleSphericalSkyRegion)
 
-        try:
-            sphskycircle = self.reg.to_spherical_sky(wcs,
-                                                     include_boundary_distortions=True)
-            assert isinstance(sphskycircle, PolygonSphericalSkyRegion)
-        except NotImplementedError:
-            pytest.xfail()
+        with pytest.raises(NotImplementedError):
+            _ = self.reg.to_spherical_sky(wcs,
+                                          include_boundary_distortions=True)
 
     def test_to_spherical_sky_no_wcs(self):
         with pytest.raises(ValueError) as excinfo:
