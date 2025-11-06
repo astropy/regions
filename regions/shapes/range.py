@@ -182,8 +182,7 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
     # ALWAYS derive boundaries on the fly, IF all _params are not None
     # --- only a concern for RangeSphericalSkyRegion....
 
-    @property
-    def __longitude_bounds(self):
+    def _derive_longitude_bounds(self):
         # Internal, on-the-fly boundaries determination.
         # A concern if range values change after original _longitude_bounds
         # are computed, if these were "static" for all cases
@@ -220,8 +219,7 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
             center_gc1, center_gc2, self.meta, self.visual
         )
 
-    @property
-    def __latitude_bounds(self):
+    def _derive_latitute_bounds(self):
         # Internal, on-the-fly boundaries determination.
         # A concern if range values change after original _latitude_bounds
         # are computed, if these were "static" for all cases
@@ -380,7 +378,7 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
             return self._longitude_bounds
 
         # Otherwise derive on-the-fly
-        return self.__longitude_bounds
+        return self._derive_longitude_bounds()
 
     @property
     def latitude_bounds(self):
@@ -395,7 +393,7 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
             return self._latitude_bounds
 
         # Otherwise derive on-the-fly
-        return self.__latitude_bounds
+        return self._derive_latitute_bounds()
 
     @property
     def centroid(self):
