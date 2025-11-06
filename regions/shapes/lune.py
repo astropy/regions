@@ -189,17 +189,52 @@ class LuneSphericalSkyRegion(SphericalSkyRegion):
         return PolygonSphericalSkyRegion(bound_verts)
 
     def to_sky(
-        self,
-        wcs=None,
-        include_boundary_distortions=False,
-        discretize_kwargs=None
+            self,
+            wcs=None,
+            include_boundary_distortions=False,
+            discretize_kwargs=None
     ):
-        raise NotImplementedError('No analogous planar sky region.')
+        if not include_boundary_distortions:
+            raise ValueError(
+                'Invalid parameter: `include_boundary_distortions=False`!\n'
+                'Transforming lune to planar sky region is only possible by '
+                'including boundary distortions, as there is no analogous sky region.'
+            )
+        if discretize_kwargs is None:
+            discretize_kwargs = {}
+
+        if include_boundary_distortions:
+            if wcs is None:
+                raise ValueError(
+                    "'wcs' must be set if 'include_boundary_distortions'=True"
+                )
+            # Requires spherical to planar projection (from WCS) and discretization
+            # Use to_pixel(), then apply "small angle approx" to get planar sky.
+            return self.to_pixel(
+                include_boundary_distortions=include_boundary_distortions,
+                wcs=wcs,
+                discretize_kwargs=discretize_kwargs,
+            ).to_sky(wcs)
 
     def to_pixel(
-        self,
-        wcs=None,
-        include_boundary_distortions=False,
-        discretize_kwargs=None
+            self,
+            wcs=None,
+            include_boundary_distortions=False,
+            discretize_kwargs=None,
     ):
-        raise NotImplementedError('No analogous pixel region.')
+        if not include_boundary_distortions:
+            raise ValueError(
+                'Invalid parameter: `include_boundary_distortions=False`!\n'
+                'Transforming range to planar pixel region is only possible by '
+                'including boundary distortions, as there is no analogous pixel region.'
+            )
+
+        if discretize_kwargs is None:
+            discretize_kwargs = {}
+        if include_boundary_distortions:
+            if wcs is None:
+                raise ValueError(
+                    "'wcs' must be set if 'include_boundary_distortions'=True"
+                )
+            # Requires spherical to planar projection (from WCS) and discretization
+            raise NotImplementedError

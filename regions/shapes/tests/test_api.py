@@ -221,22 +221,40 @@ def test_sky_to_spherical_sky(region, include_dist):
                              INCLUDE_BOUNDARY_DISTORTIONS),
                          ids=ids_func)
 def test_spherical_sky_to_sky(region, include_dist):
-    # TODO: remove excepted failure for Lune once Lune handling is implemented
-    if isinstance(region,
-                  (LuneSphericalSkyRegion,
-                   WholeSphericalSkyRegion)):
+    # TODO: remove excepted failure for Lune+distortion once Lune handling is implemented
+    if isinstance(region, WholeSphericalSkyRegion):
         with pytest.raises(NotImplementedError):
-            sph_sky_region = region.to_sky(
+            _ = region.to_sky(
                 COMMON_WCS,
                 include_boundary_distortions=include_dist
             )
-            assert isinstance(sph_sky_region, SkyRegion)
+
+    elif isinstance(region, LuneSphericalSkyRegion) & include_dist:
+        # Include distortions
+        with pytest.raises(NotImplementedError):
+            _ = region.to_sky(
+                COMMON_WCS,
+                include_boundary_distortions=include_dist
+            )
+
+    elif (isinstance(region, (LuneSphericalSkyRegion, RangeSphericalSkyRegion))
+          & (not include_dist)):
+        # No distortions: not defined:
+        with pytest.raises(ValueError) as excinfo:
+            _ = region.to_sky(
+                COMMON_WCS,
+                include_boundary_distortions=include_dist
+            )
+
+        estr = 'Invalid parameter: `include_boundary_distortions=False`!'
+        assert estr in str(excinfo.value)
+
     else:
-        sph_sky_region = region.to_sky(
+        sky_region = region.to_sky(
             COMMON_WCS,
             include_boundary_distortions=include_dist
         )
-        assert isinstance(sph_sky_region, SkyRegion)
+        assert isinstance(sky_region, SkyRegion)
 
 
 @pytest.mark.parametrize(('region', 'include_dist'),
@@ -245,22 +263,39 @@ def test_spherical_sky_to_sky(region, include_dist):
                              INCLUDE_BOUNDARY_DISTORTIONS),
                          ids=ids_func)
 def test_spherical_sky_to_pix(region, include_dist):
-    # TODO: remove excepted failure for Lune once Lune handling is implemented
-    if isinstance(region,
-                  (LuneSphericalSkyRegion,
-                   WholeSphericalSkyRegion)):
+    # TODO: remove excepted failure for Lune+distortion once Lune handling is implemented
+    if isinstance(region, WholeSphericalSkyRegion):
         with pytest.raises(NotImplementedError):
-            sph_sky_region = region.to_pixel(
+            _ = region.to_pixel(
                 COMMON_WCS,
                 include_boundary_distortions=include_dist
             )
-            assert isinstance(sph_sky_region, PixelRegion)
+
+    elif isinstance(region, LuneSphericalSkyRegion) & include_dist:
+        # Include distortions
+        with pytest.raises(NotImplementedError):
+            _ = region.to_pixel(
+                COMMON_WCS,
+                include_boundary_distortions=include_dist
+            )
+
+    elif (isinstance(region, (LuneSphericalSkyRegion, RangeSphericalSkyRegion))
+          & (not include_dist)):
+        # No distortions: not defined:
+        with pytest.raises(ValueError) as excinfo:
+            _ = region.to_pixel(
+                COMMON_WCS,
+                include_boundary_distortions=include_dist
+            )
+        estr = 'Invalid parameter: `include_boundary_distortions=False`!'
+        assert estr in str(excinfo.value)
+
     else:
-        sph_sky_region = region.to_pixel(
+        pixel_region = region.to_pixel(
             COMMON_WCS,
             include_boundary_distortions=include_dist
         )
-        assert isinstance(sph_sky_region, PixelRegion)
+        assert isinstance(pixel_region, PixelRegion)
 
 
 @pytest.mark.parametrize('region', PIXEL_REGIONS, ids=ids_func)
