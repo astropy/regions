@@ -30,7 +30,7 @@ coordinate frame:
     ...                                              frame="galactic"),
     ...                                     30*u.deg)
     >>> sph_range = RangeSphericalSkyRegion(frame="galactic",
-    ...                                     longitude_range=[-45,45]*u.deg,
+    ...                                     longitude_range=[315,45]*u.deg,
     ...                                     latitude_range=[0,45]*u.deg)
     >>> print(sph_circ)  # doctest: +FLOAT_CMP
     Region: CircleSphericalSkyRegion
@@ -40,7 +40,7 @@ coordinate frame:
     >>> print(sph_range)  # doctest: +FLOAT_CMP
     Region: RangeSphericalSkyRegion
     frame: galactic
-    longitude_range: [-45.  45.] deg
+    longitude_range: [315.  45.] deg
     latitude_range: [ 0. 45.] deg
 
 
@@ -61,8 +61,8 @@ To convert these regions to the ICRS coordinate frame, the
     Region: RangeSphericalSkyRegion
     frame: icrs
     longitude_bounds: <LuneSphericalSkyRegion(center_gc1=<SkyCoord (ICRS): (ra, dec) in deg
-        (288.42757587, 10.72370325)>, center_gc2=<SkyCoord (ICRS): (ra, dec) in deg
-        (217.98010947, -60.49575721)>)>
+        (108.42757587, -10.72370325)>, center_gc2=<SkyCoord (ICRS): (ra, dec) in deg
+        (37.98010947, 60.49575721)>)>
     latitude_bounds: <CircleAnnulusSphericalSkyRegion(center=<SkyCoord (ICRS): (ra, dec) in deg
         (192.85947789, 27.12825241)>, inner_radius=45.0 deg, outer_radius=90.0 deg)>
 
@@ -104,7 +104,7 @@ reference frames (respectively).
                                                  frame="galactic"),
                                         30*u.deg)
     sph_range = RangeSphericalSkyRegion(frame="galactic",
-                                        longitude_range=[-45,45]*u.deg,
+                                        longitude_range=[315,45]*u.deg,
                                         latitude_range=[0,45]*u.deg)
     sph_circ_transf = sph_circ.transform_to("icrs")
     sph_range_transf = sph_range.transform_to("icrs")

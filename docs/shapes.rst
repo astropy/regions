@@ -212,7 +212,7 @@ to a polygon and transforming the polygon.)
     >>> from regions import RangeSphericalSkyRegion
 
     >>> sph_range = RangeSphericalSkyRegion(frame="galactic",
-    ...                                     longitude_range=[-45,45]*u.deg,
+    ...                                     longitude_range=[315,45]*u.deg,
     ...                                     latitude_range=[0,45]*u.deg)
 
 
