@@ -48,6 +48,7 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
         Longitude range in region. Spans from first to second entries
         (in increasing longitude value), so inverting the order will select
         the complement longitude range.
+        Longitude values must be within [0, 360] degrees (or equivalent).
 
     latitude_range : length 2 list-like of `~astropy.coordinates.Angle` or
         `~astropy.units.Quantity` or None
@@ -56,6 +57,7 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
         the complement latitude range.
         I.e., if latitude_range[0] > latitude_range[1], will wrap over the poles,
         and will instead exclude the central latitude range.
+        Longitude values must be within [-90, 90] degrees (or equivalent).
 
     meta : `~regions.RegionMeta` or `dict`, optional
         A dictionary that stores the meta attributes of the region.
@@ -87,17 +89,27 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
         visual=None,
         **kwargs
     ):
+        # Validate inputs:
+        if ((longitude_range is None) & (latitude_range is None)
+                & (kwargs.get('_longitude_bounds', None) is None)
+                & (kwargs.get('_latitude_bounds', None) is None)):
+            # Non-frame transformation instantiation is only intended to be used
+            # by setting longitude_range and latitude_range, so note those in the error message
+            raise ValueError('A range for at least one of longitude and latitude must be set')
 
         self.longitude_range = longitude_range
         self.latitude_range = latitude_range
+
+        # Validate lon/lat range inputs, to ensure ranges have expected definitions.
+        # Run this after setting the attribute, which performs initial validation using
+        # TwoValAngleorNone attribute class
+        self._validate_longitude_range(self.longitude_range)
+        self._validate_latitude_range(self.latitude_range)
 
         self._longitude_bounds = None
         self._latitude_bounds = None
         self._vertices = None
         self._is_original_frame = kwargs.pop('_is_original_frame', True)
-
-        # TODO:
-        # Validate lon/lat range inputs, to ensure lat range has expected definition.
 
         # Check if "_frame" is passed as a kwarg, from a copy:
         _frame = None
@@ -114,31 +126,26 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
 
         # --------------------
         if (
-            (longitude_range is None)
-            & (latitude_range is None)
+                ((longitude_range is None)
+                 & (latitude_range is None))
+                & ((kwargs.get('_longitude_bounds', None) is not None)
+                   | (kwargs.get('_latitude_bounds', None) is not None))
         ):
-            if (
-                (kwargs.get('_longitude_bounds', None) is not None)
-                | (kwargs.get('_latitude_bounds', None) is not None)
-            ):
-                # Create class by directly passing long/lat bounds
-                # -- for cases when creating transformed RangeSphericalSkyRegion instances
+            # Create class by directly passing long/lat bounds
+            # -- for cases when creating transformed RangeSphericalSkyRegion instances
 
-                # TODO: validation of direct bounds inputs
-                self._longitude_bounds = kwargs.pop('_longitude_bounds', None)
-                self._latitude_bounds = kwargs.pop('_latitude_bounds', None)
+            self._longitude_bounds = kwargs.pop('_longitude_bounds', None)
+            self._latitude_bounds = kwargs.pop('_latitude_bounds', None)
 
-                # Also directly input _vertices, as these are only computed in the
-                # original frame
-                self._vertices = kwargs.pop('_vertices', None)
+            # Also directly input _vertices, as these are only computed in the
+            # original frame
+            self._vertices = kwargs.pop('_vertices', None)
 
-                # Also set _params to to just ("frame") for this transformed instance.
-                self._params = ('frame',)
+            # Also set _params to to just ("frame") for this transformed instance.
+            self._params = ('frame',)
 
-            else:
-                raise ValueError(
-                    'A range for at least one of longitude and latitude must be set'
-                )
+            # Validate direct bounds, vertices inputs:
+            self._validate_inputs_lonlat_bounds_vertices()
 
         # Stash frame in private attribute to access when building on-the-fly
         # derived attributes & bounds:
@@ -179,6 +186,64 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
 
         return True
 
+    def _validate_longitude_range(self, longitude_range):
+        # Specifying longitude_range as an TwoValAngleorNone attribute already validates
+        # for input as either length-2 list-like with angular units, or None
+
+        # Here, only check that if not None,
+        # the values are within [0,360] deg or equivalent.
+        if longitude_range is not None:
+            for i in range(2):
+                if not ((longitude_range[i].to(u.deg).value >= 0)
+                        & (longitude_range[i].to(u.deg).value <= 360)):
+                    raise ValueError('Longitude values must be within [0, 360] degrees or '
+                                     'equivalent!')
+
+    def _validate_latitude_range(self, latitude_range):
+        # Specifying latitude_range as an TwoValAngleorNone attribute already validates
+        # for input as either length-2 list-like with angular units, or None
+
+        # Here, only check that if not None,
+        # the values are within [-90,90] deg or equivalent.
+        if latitude_range is not None:
+            for i in range(2):
+                if not ((latitude_range[i].to(u.deg).value >= -90)
+                        & (latitude_range[i].to(u.deg).value <= 90)):
+                    raise ValueError('Latitude values must be within [-90, 90] degrees or '
+                                     'equivalent!')
+
+    def _validate_inputs_lonlat_bounds_vertices(self):
+        # Validate direct bounds, vertices inputs:
+
+        # Lon bounds can be lune or None
+        if not (isinstance(self._longitude_bounds, LuneSphericalSkyRegion)
+                | (self._longitude_bounds is None)):
+            raise ValueError('Invalid direct longitude bounds input! Must be '
+                             'LuneSphericalSkyRegion or None.')
+
+        # Lat bounds can be circle, annulus, compound xor of whole sky and annulus, or None
+        if not (isinstance(self._latitude_bounds, (CircleAnnulusSphericalSkyRegion,
+                                                   CircleSphericalSkyRegion))
+                | (isinstance(self._latitude_bounds, CompoundSphericalSkyRegion)
+                & isinstance(getattr(self._latitude_bounds, 'region1', None),
+                             WholeSphericalSkyRegion)
+                & isinstance(getattr(self._latitude_bounds, 'region2', None),
+                             CircleAnnulusSphericalSkyRegion)
+                & (getattr(self._latitude_bounds, 'operator', None) == operator.xor))
+                | (self._latitude_bounds is None)):
+            raise ValueError('Invalid direct latitude bounds input! Must be one of: '
+                             'CircleSphericalSkyRegion, CircleAnnulusSphericalSkyRegion, '
+                             'CompoundSphericalSkyRegion (as WholeSphericalSkyRegion '
+                             '^ CircleAnnulusSphericalSkyRegion), or None.')
+
+        # Vertices can be Skycoord of specified length or None, depending on bounds:
+        if self._bound_nverts > 0:
+            assert (isinstance(self._vertices, SkyCoord)
+                    & (len(self._vertices) == self._bound_nverts))
+        else:
+            assert self._vertices is None
+
+    # -------------------------------------------------------------------------------
     # ALWAYS derive boundaries on the fly, IF all _params are not None
     # --- only a concern for RangeSphericalSkyRegion....
 
@@ -373,12 +438,18 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
 
         Defined as a spherical lune, or None if no longitude bound set.
         """
-        # If only boundaries are set: get bounds from internal attribute:
+        # If set, get bounds from internal attribute:
         if getattr(self, '_longitude_bounds', None) is not None:
             return self._longitude_bounds
 
-        # Otherwise derive on-the-fly
-        return self._derive_longitude_bounds()
+        # Otherwise, check whether range is set.
+        # If set, derive bounds on-the-fly:
+        elif self.longitude_range is not None:
+            return self._derive_longitude_bounds()
+
+        # If both are set to None, then the bounds are intended to be not set:
+        else:
+            return None
 
     @property
     def latitude_bounds(self):
@@ -388,12 +459,18 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
         Defined as a spherical circular annulus, a circle (if ending at
         a pole), or None if no latitude bound set.
         """
-        # If only boundaries are set: get bounds from internal attribute:
+        # If set, get bounds from internal attribute:
         if getattr(self, '_latitude_bounds', None) is not None:
             return self._latitude_bounds
 
-        # Otherwise derive on-the-fly
-        return self._derive_latitute_bounds()
+        # Otherwise, check whether range is set.
+        # If set, derive bounds on-the-fly:
+        elif self.latitude_range is not None:
+            return self._derive_latitute_bounds()
+
+        # If both are set to None, then the bounds are intended to be not set:
+        else:
+            return None
 
     @property
     def centroid(self):
