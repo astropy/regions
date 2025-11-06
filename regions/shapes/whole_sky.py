@@ -47,8 +47,6 @@ class WholeSphericalSkyRegion(SphericalSkyRegion):
         return None
 
     def transform_to(self, frame):
-        # TODO: handle offset origin transformations
-
         return self.__class__()
 
     def discretize_boundary(self, n_points=100):
