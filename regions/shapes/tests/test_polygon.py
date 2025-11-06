@@ -22,12 +22,6 @@ from regions.shapes.tests.test_common import (BaseTestPixelRegion,
 from regions.tests.helpers import assert_skycoord_allclose, make_simple_wcs
 
 
-def get_wcs():
-    config = dict(crpix=(18, 9), cdelt=(-10, 10), shape=(18, 36))
-    dataset = make_example_dataset(config=config)
-    return dataset.wcs
-
-
 @pytest.fixture(scope='session', name='wcs')
 def wcs_fixture():
     config = dict(crpix=(18, 9), cdelt=(-10, 10), shape=(18, 36))
