@@ -85,7 +85,7 @@ class TestCircleAnnulusPixelRegion(BaseTestPixelRegion):
         skyannulus = self.reg.to_sky(wcs=self.wcs)
         assert isinstance(skyannulus, CircleAnnulusSkyRegion)
 
-    def test_sph_transformation(self, wcs):
+    def test_to_spherical_sky(self, wcs):
         sphskyann = self.reg.to_spherical_sky(wcs,
                                               include_boundary_distortions=False)
         assert isinstance(sphskyann, CircleAnnulusSphericalSkyRegion)
@@ -97,7 +97,7 @@ class TestCircleAnnulusPixelRegion(BaseTestPixelRegion):
         except NotImplementedError:
             pytest.xfail()
 
-    def test_sph_transformation_no_wcs(self):
+    def test_to_spherical_sky_no_wcs(self):
         with pytest.raises(ValueError) as excinfo:
             _ = self.reg.to_spherical_sky(include_boundary_distortions=True)
         estr = "'wcs' must be set if 'include_boundary_distortions'=True"
@@ -152,7 +152,7 @@ class TestCircleAnnulusSkyRegion(BaseTestSkyRegion):
         pixannulus = self.reg.to_pixel(wcs=self.wcs)
         assert isinstance(pixannulus, CircleAnnulusPixelRegion)
 
-    def test_sph_transformation(self, wcs):
+    def test_to_spherical_sky(self, wcs):
         sphskyann = self.reg.to_spherical_sky(wcs,
                                               include_boundary_distortions=False)
         assert isinstance(sphskyann, CircleAnnulusSphericalSkyRegion)
@@ -164,7 +164,7 @@ class TestCircleAnnulusSkyRegion(BaseTestSkyRegion):
         except NotImplementedError:
             pytest.xfail()
 
-    def test_sph_transformation_no_wcs(self):
+    def test_to_spherical_sky_no_wcs(self):
         with pytest.raises(ValueError) as excinfo:
             _ = self.reg.to_spherical_sky(include_boundary_distortions=True)
         estr = "'wcs' must be set if 'include_boundary_distortions'=True"
