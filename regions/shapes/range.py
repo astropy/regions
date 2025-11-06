@@ -238,10 +238,11 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
 
         # Vertices can be Skycoord of specified length or None, depending on bounds:
         if self._bound_nverts > 0:
-            assert (isinstance(self._vertices, SkyCoord)
-                    & (len(self._vertices) == self._bound_nverts))
-        else:
-            assert self._vertices is None
+            if (isinstance(self._vertices, SkyCoord)
+                    & (len(self._vertices) != self._bound_nverts)):
+                raise ValueError('Invalid vertices direct input! Inconsistent with bounds.')
+        elif (self._vertices is not None) & (self._bound_nverts == 0):
+            raise ValueError('Invalid vertices direct input! Inconsistent with bounds.')
 
     # -------------------------------------------------------------------------------
     # ALWAYS derive boundaries on the fly, IF all _params are not None
