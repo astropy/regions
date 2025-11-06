@@ -63,7 +63,7 @@ class TestCirclePixelRegion(BaseTestPixelRegion):
         assert reg_new.meta['text'] != self.reg.meta['text']
         assert reg_new.visual['color'] != self.reg.visual['color']
 
-    def test_sph_transformation(self, wcs):
+    def test_to_spherical_sky(self, wcs):
         sphskycircle = self.reg.to_spherical_sky(wcs,
                                                  include_boundary_distortions=False)
         assert isinstance(sphskycircle, CircleSphericalSkyRegion)
@@ -75,7 +75,7 @@ class TestCirclePixelRegion(BaseTestPixelRegion):
         except NotImplementedError:
             pytest.xfail()
 
-    def test_sph_transformation_no_wcs(self):
+    def test_to_spherical_sky_no_wcs(self):
         with pytest.raises(ValueError) as excinfo:
             _ = self.reg.to_spherical_sky(include_boundary_distortions=True)
         estr = "'wcs' must be set if 'include_boundary_distortions'=True"
@@ -150,7 +150,7 @@ class TestCircleSkyRegion(BaseTestSkyRegion):
         except NotImplementedError:
             pytest.xfail()
 
-    def test_sph_transformation_no_wcs(self):
+    def test_to_spherical_sky_no_wcs(self):
         with pytest.raises(ValueError) as excinfo:
             _ = self.reg.to_spherical_sky(include_boundary_distortions=True)
         estr = "'wcs' must be set if 'include_boundary_distortions'=True"
