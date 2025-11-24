@@ -3,7 +3,6 @@
 The tests in this file simply check what functionality is currently
 implemented and doesn't check anything about correctness.
 """
-import itertools
 from collections import OrderedDict
 
 import astropy.units as u
@@ -89,9 +88,8 @@ def test_pix_to_sky(region):
         pytest.xfail()
 
 
-@pytest.mark.parametrize(('region', 'mode'),
-                         itertools.product(PIXEL_REGIONS, MASK_MODES),
-                         ids=ids_func)
+@pytest.mark.parametrize('region', PIXEL_REGIONS, ids=ids_func)
+@pytest.mark.parametrize('mode', MASK_MODES, ids=ids_func)
 def test_pix_to_mask(region, mode):
     try:
         mask = region.to_mask(mode=mode)
