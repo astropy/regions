@@ -3,8 +3,6 @@
 This file sets up detailed tests for computing masks with reference
 images.
 """
-import itertools
-
 import astropy.units as u
 import pytest
 
@@ -44,8 +42,8 @@ def label(value):
 
 
 @pytest.mark.array_compare(file_format='text', write_kwargs={'fmt': '%12.8e'})
-@pytest.mark.parametrize(('region', 'mode'),
-                         itertools.product(REGIONS, MODES), ids=label)
+@pytest.mark.parametrize('region', REGIONS, ids=label)
+@pytest.mark.parametrize('mode', MODES, ids=label)
 def test_to_mask(region, mode):
     try:
         mask = region.to_mask(**mode)
