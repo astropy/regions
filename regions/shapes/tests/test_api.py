@@ -3,7 +3,6 @@
 The tests in this file simply check what functionality is currently
 implemented and doesn't check anything about correctness.
 """
-import itertools
 from collections import OrderedDict
 
 import astropy.units as u
@@ -111,11 +110,8 @@ def test_pix_to_sky(region):
         pytest.xfail()
 
 
-@pytest.mark.parametrize(('region', 'include_dist'),
-                         itertools.product(
-                             PIXEL_REGIONS,
-                             INCLUDE_BOUNDARY_DISTORTIONS),
-                         ids=ids_func)
+@pytest.mark.parametrize('region', PIXEL_REGIONS, ids=ids_func)
+@pytest.mark.parametrize('include_dist', INCLUDE_BOUNDARY_DISTORTIONS, ids=ids_func)
 def test_pix_to_spherical_sky(region, include_dist):
     # TODO: remove expected failures when implemented
     # Expected failure:
@@ -149,9 +145,8 @@ def test_pix_to_spherical_sky(region, include_dist):
         assert isinstance(sph_sky_region, SphericalSkyRegion)
 
 
-@pytest.mark.parametrize(('region', 'mode'),
-                         itertools.product(PIXEL_REGIONS, MASK_MODES),
-                         ids=ids_func)
+@pytest.mark.parametrize('region', PIXEL_REGIONS, ids=ids_func)
+@pytest.mark.parametrize('mode', MASK_MODES, ids=ids_func)
 def test_pix_to_mask(region, mode):
     try:
         mask = region.to_mask(mode=mode)
@@ -177,11 +172,8 @@ def test_sky_to_pix(region):
     assert isinstance(pix_region, PixelRegion)
 
 
-@pytest.mark.parametrize(('region', 'include_dist'),
-                         itertools.product(
-                             SKY_REGIONS,
-                             INCLUDE_BOUNDARY_DISTORTIONS),
-                         ids=ids_func)
+@pytest.mark.parametrize('region', SKY_REGIONS, ids=ids_func)
+@pytest.mark.parametrize('include_dist', INCLUDE_BOUNDARY_DISTORTIONS, ids=ids_func)
 def test_sky_to_spherical_sky(region, include_dist):
     # TODO: remove expected failures when implemented
     # Expected failure:
@@ -215,11 +207,8 @@ def test_sky_to_spherical_sky(region, include_dist):
         assert isinstance(sph_sky_region, SphericalSkyRegion)
 
 
-@pytest.mark.parametrize(('region', 'include_dist'),
-                         itertools.product(
-                             SPHERICAL_SKY_REGIONS,
-                             INCLUDE_BOUNDARY_DISTORTIONS),
-                         ids=ids_func)
+@pytest.mark.parametrize('region', SPHERICAL_SKY_REGIONS, ids=ids_func)
+@pytest.mark.parametrize('include_dist', INCLUDE_BOUNDARY_DISTORTIONS, ids=ids_func)
 def test_spherical_sky_to_sky(region, include_dist):
     # TODO: remove excepted failure for Lune+distortion once Lune handling is implemented
     if isinstance(region, WholeSphericalSkyRegion):
@@ -257,11 +246,8 @@ def test_spherical_sky_to_sky(region, include_dist):
         assert isinstance(sky_region, SkyRegion)
 
 
-@pytest.mark.parametrize(('region', 'include_dist'),
-                         itertools.product(
-                             SPHERICAL_SKY_REGIONS,
-                             INCLUDE_BOUNDARY_DISTORTIONS),
-                         ids=ids_func)
+@pytest.mark.parametrize('region', SPHERICAL_SKY_REGIONS, ids=ids_func)
+@pytest.mark.parametrize('include_dist', INCLUDE_BOUNDARY_DISTORTIONS, ids=ids_func)
 def test_spherical_sky_to_pix(region, include_dist):
     # TODO: remove excepted failure for Lune+distortion once Lune handling is implemented
     if isinstance(region, WholeSphericalSkyRegion):
