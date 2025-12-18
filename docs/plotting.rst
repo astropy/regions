@@ -86,7 +86,7 @@ to convert it to a pixel region (using a WCS object):
 Plotting Spherical Sky Regions
 ------------------------------
 
-Similarlly, `~regions.SphericalSkyRegion` objects do not have an
+Similarly, `~regions.SphericalSkyRegion` objects do not have an
 ``as_artist()`` or ``plot()`` method. To plot a `~regions.SphericalSkyRegion`
 object, you will need to convert it to a pixel region (using a WCS object).
 Boundary distortions effects can also be included in this conversion (by
