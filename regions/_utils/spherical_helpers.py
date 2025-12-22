@@ -8,7 +8,7 @@ import numpy as np
 from astropy.coordinates import (Latitude, Longitude, SkyCoord,
                                  SphericalRepresentation,
                                  UnitSphericalRepresentation,
-                                 cartesian_to_spherical, concatenate)
+                                 cartesian_to_spherical)
 
 __all__ = []
 
@@ -398,7 +398,7 @@ def get_edge_raw_lonlat_bounds_circ_edges(vertices, centroid, gcs):
 
     for i, gc in enumerate(gcs):
         # PAs from gc center to vertices:
-        verts = concatenate([vertices[i - 1], vertices[i]])
+        verts = SkyCoord(np.concatenate([[vertices[i - 1]], [vertices[i]]]))
 
         pas_verts_wrap, wrap_ang = _validate_vertices_ordering(verts, gc, centroid)
 
@@ -487,16 +487,16 @@ def discretize_all_edge_boundaries(vertices, circs, centroid, n_points):
     all_edge_bound_verts = None
     for i, circ in enumerate(circs):
         # PAs from gc center to vertices:
-        verts = concatenate([vertices[i - 1], vertices[i]])
+        verts = SkyCoord(np.concatenate([[vertices[i - 1]], [vertices[i]]]))
 
         bound_verts = _discretize_edge_boundary(verts, circ, centroid, n_points)
 
         if all_edge_bound_verts is None:
             all_edge_bound_verts = bound_verts
         else:
-            all_edge_bound_verts = concatenate(
+            all_edge_bound_verts = SkyCoord(np.concatenate(
                 [all_edge_bound_verts.copy(), bound_verts]
-            )
+            ))
             # For some reason concatenate is adding distances,
             # so use remove those by running from
             # UnitSpherical->SphericalRepresentation...
