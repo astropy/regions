@@ -184,7 +184,7 @@ class LuneSphericalSkyRegion(SphericalSkyRegion):
 
     def discretize_boundary(self, n_points=100):
         bound_verts = discretize_all_edge_boundaries(
-            self.vertices, self._edge_circs, self.centroid, n_points
+            self.vertices, self._edge_circs, n_points
         )
         return PolygonSphericalSkyRegion(bound_verts)
 
