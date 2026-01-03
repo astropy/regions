@@ -825,7 +825,7 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
             return self.longitude_bounds.discretize_boundary(n_points=n_points)
         elif (bound_nverts == 4) | (bound_nverts == 3):
             bound_verts = discretize_all_edge_boundaries(
-                self.vertices, self._edge_circs, self.centroid, n_points
+                self.vertices, self._edge_circs, n_points
             )
             return PolygonSphericalSkyRegion(bound_verts)
         elif bound_nverts == 6:
