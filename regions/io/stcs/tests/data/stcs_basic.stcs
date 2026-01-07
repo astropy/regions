@@ -1,0 +1,21 @@
+# Region file format: STC-S astropy/regions
+# Examples created based on the IVOA STC-S standard specification:
+# https://www.ivoa.net/documents/Notes/STC-S/20091030/NOTE-STC-S-1.33-20091030.html
+# These examples demonstrate basic region shapes and coordinate systems
+# supported by the STC-S format, designed for comprehensive testing
+# of the astropy-regions STC-S I/O module.
+
+# Test basic circle
+Circle ICRS BARYCENTER 180.0 10.0 0.5
+
+# Test ellipse
+Ellipse ICRS BARYCENTER 150.0 -20.0 1.0 0.5 45.0
+
+# Test box/rectangle
+Box ICRS BARYCENTER 120.0 30.0 2.0 1.0 0.0
+
+# Test polygon
+Polygon ICRS BARYCENTER 45.0 45.0 50.0 45.0 50.0 50.0 45.0 50.0
+
+# Test position/point
+Position FK5 GEOCENTER 85.0 -15.0
