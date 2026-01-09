@@ -11,10 +11,15 @@
 Region Shapes
 =============
 
-Regions provides `~regions.Region` objects, defined in pixel or sky
-coordinates, representing shapes such as circles, ellipses, rectangles,
-polygons, lines, and points. There are also regions defining circular,
-elliptical, and rectangular annuli.
+Regions provides `~regions.Region` objects, representing
+projected planar "region-in-image" shapes (defined in pixel
+or sky coordinates), and also representing spherical
+"region-on-celestial-sphere" shapes (defined using sky coordinates).
+
+The provided `~regions.Region` objects represent shapes such as circles,
+ellipses, rectangles, polygons, lines, and points. There are also
+regions defining circular, elliptical, and rectangular annuli,
+and a longitude/latitude range (in spherical geometry).
 
 
 Defining Shapes
@@ -26,34 +31,43 @@ that's currently supported.
 Circle
 ******
 
-`~regions.CircleSkyRegion` and `~regions.CirclePixelRegion`
+`~regions.CircleSkyRegion`, `~regions.CirclePixelRegion`, and
+`~regions.CircleSphericalSkyRegion`
 
 .. code-block:: python
 
     >>> from astropy.coordinates import SkyCoord
     >>> from astropy import units as u
     >>> from regions import PixCoord
-    >>> from regions import CircleSkyRegion, CirclePixelRegion
+    >>> from regions import (CircleSkyRegion, CirclePixelRegion,
+    ...                      CircleSphericalSkyRegion)
 
     >>> center_sky = SkyCoord(42, 43, unit='deg', frame='fk5')
     >>> region_sky = CircleSkyRegion(center=center_sky, radius=3 * u.deg)
+    >>> region_sph_sky = CircleSphericalSkyRegion(center=center_sky, radius=3 * u.deg)
     >>> region_pix = CirclePixelRegion(center=PixCoord(x=42, y=43),
     ...                                radius=4.2)
 
 
-`~regions.CircleAnnulusSkyRegion` and `~regions.CircleAnnulusPixelRegion`
+`~regions.CircleAnnulusSkyRegion`, `~regions.CircleAnnulusPixelRegion`,
+and `~regions.CircleAnnulusSphericalSkyRegion`
 
 .. code-block:: python
 
     >>> from astropy.coordinates import SkyCoord
     >>> from astropy import units as u
     >>> from regions import PixCoord
-    >>> from regions import CircleAnnulusSkyRegion, CircleAnnulusPixelRegion
+    >>> from regions import (CircleAnnulusSkyRegion,
+    ...                      CircleAnnulusPixelRegion,
+    ...                      CircleAnnulusSphericalSkyRegion)
 
     >>> center_sky = SkyCoord(42, 43, unit='deg', frame='fk5')
     >>> region_sky = CircleAnnulusSkyRegion(center=center_sky,
     ...                                     inner_radius=3 * u.deg,
     ...                                     outer_radius=4 * u.deg)
+    >>> region_sph_sky = CircleAnnulusSphericalSkyRegion(center=center_sky,
+    ...                                                  inner_radius=3 * u.deg,
+    ...                                                  outer_radius=4 * u.deg)
     >>> region_pix = CircleAnnulusPixelRegion(center=PixCoord(x=42, y=43),
     ...                                       inner_radius=4.2,
     ...                                       outer_radius=5.2)
@@ -162,21 +176,44 @@ Polygon
 .. This is not available yet, for now see `spherical_geometry`_ for
 .. spherical polygons and `Shapely`_ for pixel polygons.
 
-`~regions.PolygonSkyRegion`, `~regions.PolygonPixelRegion`, and
+`~regions.PolygonSkyRegion`, `~regions.PolygonPixelRegion`,
+`~regions.PolygonSphericalSkyRegion`, and
 `~regions.RegularPolygonPixelRegion`
 
 .. code-block:: python
 
     >>> from astropy.coordinates import SkyCoord
-    >>> from regions import PixCoord, PolygonSkyRegion, PolygonPixelRegion
+    >>> from regions import (PixCoord,
+    ...                      PolygonSkyRegion,
+    ...                      PolygonPixelRegion,
+    ...                      PolygonSphericalSkyRegion)
     >>> from regions import RegularPolygonPixelRegion
 
     >>> vertices = SkyCoord([1, 2, 2], [1, 1, 2], unit='deg', frame='fk5')
     >>> region_sky = PolygonSkyRegion(vertices=vertices)
+    >>> region_sph_sky = PolygonSphericalSkyRegion(vertices=vertices)
     >>> vertices = PixCoord(x=[1, 2, 2], y=[1, 1, 2])
     >>> region_pix = PolygonPixelRegion(vertices=vertices)
     >>> center = PixCoord(25, 25)
     >>> region2_pix = RegularPolygonPixelRegion(center, 6, 15)
+
+
+Range
+*****
+
+`~regions.RangeSphericalSkyRegion` (Range has no direct analog in
+planar geometry. Instead, this shape can be transformed by discretizing
+to a polygon and transforming the polygon.)
+
+.. code-block:: python
+
+    >>> from astropy.coordinates import SkyCoord
+    >>> from astropy import units as u
+    >>> from regions import RangeSphericalSkyRegion
+
+    >>> sph_range = RangeSphericalSkyRegion(frame="galactic",
+    ...                                     longitude_range=[315,45]*u.deg,
+    ...                                     latitude_range=[0,45]*u.deg)
 
 
 Point
@@ -232,14 +269,32 @@ The text regions can be used to annotate a text string on an image.
 Region Transformations
 ----------------------
 
-For every region shape there are two classes, one representing a "sky
-region" and another representing a "pixel region" on a given image. A
-key feature of the regions package is that it is possible to convert
-back and forth between sky and image regions given a WCS object (e.g.,
-`astropy.wcs.WCS`).
+For nearly all region shapes there are three classes.
+First, for planar projections (e.g., "regions-on-image",
+with Euclidean geometry),
+there is one class representing a "sky region" and
+another representing a "pixel region" on a given image.
+There are also spherical region classes,
+representing a "celestial sphere region" (with spherical geometry).
 
-As an example, let's use the :class:`~regions.CircleSkyRegion`, a sky
-circle region:
+(The spherical class for some shapes is not currently implemented.
+Additionally, some spherical classes do not have projected/planar
+analogs, including `~regions.RangeSphericalSkyRegion`
+and `~regions.LuneSphericalSkyRegion`.)
+
+A key feature of the regions package is that it is possible to convert
+back and forth between sky and image regions given a WCS object (e.g.,
+`astropy.wcs.WCS`). For conversions to and from spherical sky regions,
+it is also necessary to specify how boundary distortions
+(from projection effects) should be treated.
+
+
+Planar sky and pixel region transformations
+*******************************************
+
+
+As an example, let's use the :class:`~regions.CircleSkyRegion`, a
+planar sky circle region:
 
 .. code-block:: python
 
@@ -274,6 +329,106 @@ to a :class:`~regions.SkyRegion`, call the
     center: <SkyCoord (Galactic): (l, b) in deg
         (172.17231545, -38.27972337)>
     radius: 18.55481729935556 arcsec
+
+
+Spherical to planar region transformations
+******************************************
+
+To demonstrate the transformation from spherical to planar regions,
+let's now use a `~regions.CircleSphericalSkyRegion`, a sky circle
+defined in spherical geometry:
+
+
+.. code-block:: python
+
+    >>> from regions import CircleSphericalSkyRegion
+
+    >>> center = SkyCoord(50, 10, unit='deg')
+    >>> radius = Angle(30, 'arcsec')
+    >>> sph_sky_reg = CircleSphericalSkyRegion(center, radius)
+
+
+To convert it to a planar sky circle region (i.e.,
+:class:`~regions.CircleSkyRegion`), call the
+:meth:`~regions.SphericalSkyRegion.to_sky` method.  If boundary distortions
+are ignored (i.e., a spherical circle is transformed to a planar circle),
+then a WCS object is not necessary:
+
+.. code-block:: python
+
+    >>> sky_reg = sph_sky_reg.to_sky(include_boundary_distortions=False)
+    >>> print(sky_reg)  # doctest: +FLOAT_CMP
+    Region: CircleSkyRegion
+    center: <SkyCoord (ICRS): (ra, dec) in deg
+        (50., 10.)>
+    radius: 30.0 arcsec
+
+To convert to a planar sky region that accounts for
+boundary distortions arising from projection effects,
+a WCS object must be passed (defining the projection).
+In this case, the spherical region boundary is discretized
+into a polygon before transforming, and a `~regions.PolygonSkyRegion`
+instance is returned.
+The number of points per side in the discretization (for a circle,
+the number of points around the circumference)
+can be specified through optional keywords that are passed
+to the `~regions.SphericalSkyRegion.discretize_boundary()` method.
+
+.. code-block:: python
+
+    >>> sky_reg = sph_sky_reg.to_sky(wcs=wcs,
+    ...                              include_boundary_distortions=True,
+    ...                              discretize_kwargs={"n_points": 10})
+    >>> print(sky_reg)  # doctest: +FLOAT_CMP
+    Region: PolygonSkyRegion
+    vertices: <SkyCoord (Galactic): (l, b) in deg
+        [(172.161888  , -38.27816116), (172.16270941, -38.28327092),
+        (172.16720048, -38.2870257 ), (172.1736458 , -38.28799101),
+        (172.17958283, -38.28579805), (172.18274335, -38.28128466),
+        (172.18192055, -38.27617504), (172.17742939, -38.27242082),
+        (172.1709854 , -38.27145571), (172.16504929, -38.27364824)]>
+
+
+Similarly, spherical sky regions can be converted to pixel regions
+by specifying a WCS object and whether to ignore or include boundary distortions
+(returning either a `~regions.CirclePixelRegion` or `~regions.PolygonPixelRegion`,
+respectively).
+
+.. code-block:: python
+
+    >>> pix_reg = sph_sky_reg.to_pixel(wcs=wcs,
+    ...                                include_boundary_distortions=False)
+    >>> print(pix_reg)  # doctest: +FLOAT_CMP
+    Region: CirclePixelRegion
+    center: PixCoord(x=55.352057112146014, y=40.095831389269705)
+    radius: 0.010259141134880476
+
+    >>> pix_reg2 = sph_sky_reg.to_pixel(wcs=wcs,
+    ...                                 include_boundary_distortions=True,
+    ...                                 discretize_kwargs={"n_points": 10})
+    >>> print(pix_reg2)  # doctest: +FLOAT_CMP
+    Region: PolygonPixelRegion
+    vertices: PixCoord(x=[55.35441629 55.36250693 55.366607   55.36514936
+    55.35869012 55.34969718 55.34160657 55.33750862 55.33896755 55.34542545],
+    y=[40.09920163 40.0934575  40.08862017 40.08653731 40.08800466 40.09246189
+    40.09820641 40.10304382 40.10512634 40.1036587 ])
+
+
+Planar regions can also be transformed to spherical regions, with the
+`~regions.SkyRegion.to_spherical_sky` and `~regions.PixelRegion.to_spherical_sky`
+methods.
+
+.. code-block:: python
+
+    >>> center = SkyCoord(50, 10, unit='deg')
+    >>> radius = Angle(30, 'arcsec')
+    >>> sky_reg = CircleSkyRegion(center, radius)
+    >>> sph_sky_reg = sky_reg.to_spherical_sky(include_boundary_distortions=False)
+    >>> print(sph_sky_reg)  # doctest: +FLOAT_CMP
+    Region: CircleSphericalSkyRegion
+    center: <SkyCoord (ICRS): (ra, dec) in deg
+        (50., 10.)>
+    radius: 30.0 arcsec
 
 
 .. _regions-as_mpl_selector:

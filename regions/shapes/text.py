@@ -74,6 +74,10 @@ class TextPixelRegion(PointPixelRegion):
         return TextSkyRegion(center, self.text, meta=self.meta.copy(),
                              visual=visual.copy())
 
+    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
+                         discretize_kwargs=None):
+        raise NotImplementedError
+
     def as_artist(self, origin=(0, 0), **kwargs):
         """
         Return a matplotlib Text object for this region
@@ -143,3 +147,7 @@ class TextSkyRegion(PointSkyRegion):
 
         return TextPixelRegion(center, self.text, meta=self.meta.copy(),
                                visual=visual.copy())
+
+    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
+                         discretize_kwargs=None):
+        raise NotImplementedError
