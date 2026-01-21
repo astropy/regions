@@ -5,18 +5,21 @@ from copy import copy
 import astropy.units as u
 import numpy as np
 import pytest
-from astropy.coordinates import SkyCoord
+from astropy.coordinates import Latitude, Longitude, SkyCoord
 from astropy.tests.helper import assert_quantity_allclose
 from numpy.testing import assert_allclose, assert_equal
 
 from regions._utils.examples import make_example_dataset
 from regions._utils.optional_deps import HAS_MATPLOTLIB
 from regions.core import PixCoord, RegionBoundingBox, RegionMeta, RegionVisual
+from regions.shapes.circle import CircleSphericalSkyRegion
 from regions.shapes.polygon import (PolygonPixelRegion, PolygonSkyRegion,
+                                    PolygonSphericalSkyRegion,
                                     RegularPolygonPixelRegion)
 from regions.shapes.tests.test_common import (BaseTestPixelRegion,
-                                              BaseTestSkyRegion)
-from regions.tests.helpers import make_simple_wcs
+                                              BaseTestSkyRegion,
+                                              BaseTestSphericalSkyRegion)
+from regions.tests.helpers import assert_skycoord_allclose, make_simple_wcs
 
 
 @pytest.fixture(scope='session', name='wcs')
@@ -69,6 +72,21 @@ class TestPolygonPixelRegion(BaseTestPixelRegion):
         reg_new.visual['color'] = 'green'
         assert reg_new.meta['text'] != self.reg.meta['text']
         assert reg_new.visual['color'] != self.reg.visual['color']
+
+    def test_to_spherical_sky(self, wcs):
+        polysphsky = self.reg.to_spherical_sky(wcs,
+                                               include_boundary_distortions=False)
+        assert isinstance(polysphsky, PolygonSphericalSkyRegion)
+
+        with pytest.raises(NotImplementedError):
+            _ = self.reg.to_spherical_sky(wcs,
+                                          include_boundary_distortions=True)
+
+    def test_to_spherical_sky_no_wcs(self):
+        with pytest.raises(ValueError) as excinfo:
+            _ = self.reg.to_spherical_sky(include_boundary_distortions=True)
+        estr = "'wcs' must be set if 'include_boundary_distortions'=True"
+        assert estr in str(excinfo.value)
 
     def test_bounding_box(self):
         bbox = self.reg.bounding_box
@@ -173,6 +191,20 @@ class TestPolygonSkyRegion(BaseTestSkyRegion):
         assert_quantity_allclose(poly.vertices.data.lat,
                                  self.reg.vertices.data.lat, atol=1e-3 * u.deg)
 
+        polysphsky = self.reg.to_spherical_sky(wcs,
+                                               include_boundary_distortions=False)
+        assert isinstance(polysphsky, PolygonSphericalSkyRegion)
+
+        with pytest.raises(NotImplementedError):
+            _ = self.reg.to_spherical_sky(wcs,
+                                          include_boundary_distortions=True)
+
+    def test_to_spherical_sky_no_wcs(self):
+        with pytest.raises(ValueError) as excinfo:
+            _ = self.reg.to_spherical_sky(include_boundary_distortions=True)
+        estr = "'wcs' must be set if 'include_boundary_distortions'=True"
+        assert estr in str(excinfo.value)
+
     def test_contains(self, wcs):
         position = SkyCoord([1, 3.25] * u.deg, [2, 3.75] * u.deg)
         # 1,2 is outside, 3.25,3.75 should be inside the triangle...
@@ -186,7 +218,7 @@ class TestPolygonSkyRegion(BaseTestSkyRegion):
         assert reg != self.reg
 
 
-class TestRegionPolygonPixelRegion(BaseTestPixelRegion):
+class TestRegularPolygonPixelRegion(BaseTestPixelRegion):
     meta = RegionMeta({'text': 'test'})
     visual = RegionVisual({'color': 'blue'})
     reg = RegularPolygonPixelRegion(PixCoord(50, 50), 8, 20, angle=25 * u.deg,
@@ -281,3 +313,118 @@ class TestRegionPolygonPixelRegion(BaseTestPixelRegion):
         assert polyreg.meta == self.meta
         assert polyreg.visual == self.visual
         assert polyreg.origin == PixCoord(0, 0)
+
+
+class TestPolygonSphericalSkyRegion(BaseTestSphericalSkyRegion):
+    inside = [(3.1 * u.deg, 3.5 * u.deg)]
+    outside = [(3 * u.deg, 0 * u.deg)]
+    meta = RegionMeta({'text': 'test'})
+    visual = RegionVisual({'color': 'blue'})
+    reg = PolygonSphericalSkyRegion(SkyCoord([3, 4, 3] * u.deg,
+                                             [3, 4, 4] * u.deg),
+                                    meta=meta, visual=visual)
+
+    expected_repr = ('<PolygonSphericalSkyRegion(vertices=<SkyCoord (ICRS): (ra, '
+                     'dec) in deg\n    [(3., 3.), (4., 4.), (3., 4.)]>)>')
+    expected_str = ('Region: PolygonSphericalSkyRegion\nvertices: <SkyCoord (ICRS):'
+                    ' (ra, dec) in deg\n    [(3., 3.), (4., 4.), (3., 4.)]>')
+
+    def test_copy(self):
+        reg = self.reg.copy()
+        assert_allclose(reg.vertices.ra.deg, [3, 4, 3])
+        assert_allclose(reg.vertices.dec.deg, [3, 4, 4])
+        assert reg.meta == self.meta
+        assert reg.visual == self.visual
+
+    def test_transformation(self, wcs):
+        polypix = self.reg.to_pixel(wcs)
+        assert isinstance(polypix, PolygonPixelRegion)
+        assert_allclose(polypix.vertices.x,
+                        [11.18799228, 10.97633218, 11.02403192])
+        assert_allclose(polypix.vertices.y,
+                        [1.99948607, 2.0390009, 2.07707564])
+
+        polysky = self.reg.to_sky(wcs)
+        assert isinstance(polysky, PolygonSkyRegion)
+        assert_allclose(polysky.vertices.ra.deg, [3, 4, 3])
+        assert_allclose(polysky.vertices.dec.deg, [3, 4, 4])
+
+        polysky2 = polysky.to_spherical_sky(wcs)
+
+        assert_quantity_allclose(self.reg.vertices.ra.deg,
+                                 polysky2.vertices.ra.deg)
+        assert_quantity_allclose(self.reg.vertices.dec.deg,
+                                 polysky2.vertices.dec.deg)
+
+        polysky3 = self.reg.to_sky(wcs,
+                                   include_boundary_distortions=True,
+                                   discretize_kwargs={'n_points': 10})
+        assert isinstance(polysky3, PolygonSkyRegion)
+        assert len(polysky3.vertices) == 30
+
+        polypix2 = self.reg.to_pixel(wcs,
+                                     include_boundary_distortions=True,
+                                     discretize_kwargs={'n_points': 10})
+        assert isinstance(polypix2, PolygonPixelRegion)
+        assert len(polypix2.vertices) == 30
+
+    def test_transformation_no_wcs(self):
+        with pytest.raises(ValueError) as excinfo:
+            _ = self.reg.to_sky(include_boundary_distortions=True)
+        estr = "'wcs' must be set if 'include_boundary_distortions'=True"
+        assert estr in str(excinfo.value)
+
+        with pytest.raises(ValueError) as excinfo:
+            _ = self.reg.to_pixel(include_boundary_distortions=True)
+        estr = "'wcs' must be set if 'include_boundary_distortions'=True"
+        assert estr in str(excinfo.value)
+
+    def test_frame_transformation(self):
+        reg = self.reg.transform_to('galactic')
+        assert_skycoord_allclose(reg.centroid_mindist,
+                                 self.reg.centroid_mindist.transform_to('galactic'))
+        assert_skycoord_allclose(reg.vertices,
+                                 self.reg.vertices.transform_to('galactic'))
+        assert isinstance(reg, PolygonSphericalSkyRegion)
+        assert reg.frame.name == 'galactic'
+        assert reg != self.reg
+
+    def test_eq(self):
+        reg = self.reg.copy()
+        assert reg == self.reg
+        reg.vertices = SkyCoord([3, 5, 3] * u.deg, [3, 4, 4] * u.deg)
+        assert reg != self.reg
+
+    def test_bounding_circle(self):
+        skycoord = SkyCoord(3.3333295725289807 * u.deg,
+                            3.6666666666666665 * u.deg,
+                            frame='icrs')
+        reg = CircleSphericalSkyRegion(skycoord,
+                                       0.7451014340169484 * u.deg)
+
+        bc = self.reg.bounding_circle
+        assert bc == reg
+
+    def test_bounding_lonlat(self):
+        bounding_lonlat = self.reg.bounding_lonlat
+
+        assert_quantity_allclose(bounding_lonlat[0],
+                                 Longitude([3 * u.deg,
+                                            4 * u.deg]))
+
+        # GC connecting top two vertices "bluges up" above
+        # the latitude value = 4 deg for those two points
+        assert_quantity_allclose(bounding_lonlat[1],
+                                 Latitude([3 * u.deg,
+                                           4.00015182 * u.deg]))
+
+    def test_centroid(self):
+        # Test default polygon has mindist centroid outside region,
+        # so falls back to average lon/lat centroid definition:
+        assert self.reg.centroid == self.reg.centroid_avg
+
+        # Test mindist centroid:
+        reg = PolygonSphericalSkyRegion(SkyCoord([3, 5, 3] * u.deg,
+                                                 [3, 4, 5] * u.deg))
+
+        assert reg.centroid == reg.centroid_mindist

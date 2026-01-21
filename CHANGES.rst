@@ -7,6 +7,27 @@ General
 New Features
 ------------
 
+- Regions now includes ``SphericalSkyRegion`` ("region-on-celestial-sphere"),
+  complementing the implicitly planar ``SkyRegion`` ("region-on-images").
+  ``SphericalSkyRegion`` does not require a WCS to determine whether points
+  are contained within the region or not (unlike ``SkyRegion``).
+  Additionally, ``SphericalSkyRegion`` classes include the method
+  ``transform_to`` to transform the regions between different
+  celestial coordinate reference frames.
+  It is also possible to transform between spherical and planar
+  (sky or pixel) regions (with ``to_sky``, ``to_pixel``, and ``to_spherical_sky``,
+  as appropriate), with the option to capture boundary distortions due to
+  projection effects between spherical and planar geometries
+  or to ignore them (e.g., assuming a circle stays a perfect circle).
+  Current spherical shapes supported include: ``CircleSphericalSkyRegion``,
+  ``CircleAnnulusSphericalSkyRegion``, ``RangeSphericalSkyRegion``
+  (i.e., bounded by ranges of longitude and/or latitude), and
+  ``LuneSphericalSkyRegion`` (a slice between two great circles,
+  such as between two lines of longitude).
+  Support for additional spherical shapes, and for all cases of
+  planar <-> spherical transformation (where well defined) may be added
+  at a future date. [#618]
+
 Bug Fixes
 ---------
 
