@@ -443,10 +443,16 @@ class PixelRegion(Region):
         if ax is None:
             ax = plt.gca()
 
-        artist = self.as_artist(origin=origin, **kwargs)
-        ax.add_artist(artist)
+        if hasattr(self, 'as_artists'):
+            artists = self.as_artists(origin=origin, **kwargs)
+            for artist in artists:
+                ax.add_artist(artist)
+            return artists
+        else:
+            artist = self.as_artist(origin=origin, **kwargs)
+            ax.add_artist(artist)
 
-        return artist
+            return artist
 
 
 class SkyRegion(Region):
