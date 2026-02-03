@@ -1,7 +1,10 @@
 Checking for Points Inside Regions
 ==================================
 
-Let's start by defining both a sky and pixel region::
+Points Inside Planar Regions
+----------------------------
+
+Let's start by defining both a planar sky and pixel region::
 
     >>> from astropy.coordinates import Angle, SkyCoord
     >>> from regions import CircleSkyRegion, PixCoord, CirclePixelRegion
@@ -59,4 +62,35 @@ Note that `regions.SkyRegion.contains` requires a WCS to be passed::
 
     >>> skycoord = SkyCoord([50, 50], [10, 60], unit='deg')
     >>> sky_region.contains(skycoord, wcs)
+    array([False, True])
+
+
+Points Inside Spherical Regions
+-------------------------------
+
+For `~regions.SphericalSkyRegion` objects, checking whether point(s) are
+contained inside that region requires no other input --- since these
+regions are defined with a the spherical geometry, and not a projected geometry
+(as captured through the projection encoded in a WCS) as in
+`~regions.SkyRegion`.
+
+Let's define a spherical sky region::
+
+    >>> from regions import CircleSphericalSkyRegion
+
+    >>> sph_sky_center = SkyCoord(42, 43, unit='deg')
+    >>> sph_sky_radius = Angle(25, 'deg')
+    >>> sph_sky_region = CircleSphericalSkyRegion(sph_sky_center,
+    ...                                           sph_sky_radius)
+    >>> print(sph_sky_region)
+    Region: CircleSphericalSkyRegion
+    center: <SkyCoord (ICRS): (ra, dec) in deg
+        (42., 43.)>
+    radius: 25.0 deg
+
+Use the `~regions.SphericalSkyRegion.contains()` method to determine which
+point(s) lie inside or outside the region::
+
+    >>> skycoord = SkyCoord([50, 50], [10, 60], unit='deg')
+    >>> sph_sky_region.contains(skycoord)
     array([False, True])

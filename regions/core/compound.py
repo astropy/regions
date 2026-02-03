@@ -1,13 +1,16 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 import operator as op
 
+import astropy.units as u
 import numpy as np
+from astropy.coordinates import Latitude, Longitude
 
+from regions._utils.spherical_helpers import bounding_lonlat_poles_processing
 from regions.core.attributes import RegionType
-from regions.core.core import PixelRegion, SkyRegion
+from regions.core.core import PixelRegion, SkyRegion, SphericalSkyRegion
 from regions.core.mask import RegionMask
 
-__all__ = ['CompoundPixelRegion', 'CompoundSkyRegion']
+__all__ = ['CompoundPixelRegion', 'CompoundSkyRegion', 'CompoundSphericalSkyRegion']
 
 
 class CompoundPixelRegion(PixelRegion):
@@ -93,6 +96,26 @@ class CompoundPixelRegion(PixelRegion):
         return CompoundSkyRegion(region1=skyreg1, operator=self.operator,
                                  region2=skyreg2, meta=self.meta.copy(),
                                  visual=self.visual.copy())
+
+    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
+                         discretize_kwargs=None):
+        sphreg1 = self.region1.to_spherical_sky(
+            wcs=wcs,
+            include_boundary_distortions=include_boundary_distortions,
+            discretize_kwargs=discretize_kwargs,
+        )
+        sphreg2 = self.region2.to_spherical_sky(
+            wcs=wcs,
+            include_boundary_distortions=include_boundary_distortions,
+            discretize_kwargs=discretize_kwargs,
+        )
+        return CompoundSphericalSkyRegion(
+            region1=sphreg1,
+            region2=sphreg2,
+            operator=self.operator,
+            meta=self.meta.copy(),
+            visual=self.visual.copy(),
+        )
 
     @staticmethod
     def _make_annulus_path(patch_inner, patch_outer):
@@ -252,5 +275,234 @@ class CompoundSkyRegion(SkyRegion):
                                    region2=pixreg2, meta=self.meta.copy(),
                                    visual=self.visual.copy())
 
+    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
+                         discretize_kwargs=None):
+        sphreg1 = self.region1.to_spherical_sky(
+            wcs=wcs,
+            include_boundary_distortions=include_boundary_distortions,
+            discretize_kwargs=discretize_kwargs,
+        )
+        sphreg2 = self.region2.to_spherical_sky(
+            wcs=wcs,
+            include_boundary_distortions=include_boundary_distortions,
+            discretize_kwargs=discretize_kwargs,
+        )
+        return CompoundSphericalSkyRegion(
+            region1=sphreg1,
+            region2=sphreg2,
+            operator=self.operator,
+            meta=self.meta.copy(),
+            visual=self.visual.copy(),
+        )
+
     def as_artist(self, ax, **kwargs):
         raise NotImplementedError
+
+
+class CompoundSphericalSkyRegion(SphericalSkyRegion):
+    """
+    A class that represents the logical combination of two regions in
+    spherical sky coordinates.
+
+    Parameters
+    ----------
+    region1 : `~regions.SphericalSkyRegion`
+       First spherical sky region.
+    region2 : `~regions.SphericalSkyRegion`
+        Second spherical sky region.
+    operator : callable
+        A callable binary operator.
+    meta : `~regions.RegionMeta`, optional
+        A dictionary that stores the meta attributes of this region.
+    visual : `~regions.RegionVisual`, optional
+        A dictionary that stores the visual meta attributes of this
+        region.
+    """
+
+    _params = ('region1', 'region2', 'operator')
+    region1 = RegionType('region1', SphericalSkyRegion)
+    region2 = RegionType('region2', SphericalSkyRegion)
+
+    def __init__(self, region1, region2, operator, meta=None, visual=None):
+        if not callable(operator):
+            raise TypeError('operator must be callable')
+
+        self.region1 = region1
+        self.region2 = region2
+        if meta is None:
+            self.meta = region1.meta
+        else:
+            self.meta = meta
+        if visual is None:
+            self.visual = region1.visual
+        else:
+            self.visual = visual
+        self._operator = operator
+
+    @property
+    def operator(self):
+        return self._operator
+
+    @property
+    def frame(self):
+        return self.region1.frame
+
+    @property
+    def bounding_circle(self):
+        from regions.shapes.circle import CircleSphericalSkyRegion
+
+        if self.operator in [op.or_]:
+            # Union:
+            # Compute connection between constituent two bounding circles,
+            # then total "span" on either side, then half and get center.
+
+            circ1 = self.region1.bounding_circle
+            circ2 = self.region2.bounding_circle
+
+            pa = circ1.center.position_angle(circ2.center)
+
+            e1 = circ1.center.directional_offset_by(180 * u.deg + pa, circ1.radius)
+            e2 = circ2.center.directional_offset_by(pa, circ2.radius)
+            sep = e1.separation(e2)
+
+            cnew = e1.directional_offset_by(pa, sep / 2)
+
+            return CircleSphericalSkyRegion(cnew, sep / 2)
+
+        # Disjoint set / XOR:
+        # Not clean
+        # Intersection:
+        # NOT anywhere near as clean. Much better to define for each subclass
+        # that has a compound region as their internal region logic.
+        # TODO:
+        # General solution requires finding intersections of boundaries,
+        # and then making a bounding circle. Doable with composed
+        # circle boundaries & polygon-specific logic from spherical-geometry
+        # Maybe better to not make bounding_circle and bounding_lonlat
+        # abstract classes of the base SphericalSkyRegion, and only
+        # add as properties to individual explicitly defined classes?
+        raise NotImplementedError
+
+    def _get_edge_raw_lonlat_bounds(self):
+        if self.operator in [op.or_]:
+            lons1, lats1 = self.region1.bounding_lonlat
+            lons2, lats2 = self.region2.bounding_lonlat
+            if (lons1 is None) | (lons2 is None):
+                return (None,
+                        Latitude([np.min([lats1[0].to(u.deg).value,
+                                          lats2[0].to(u.deg).value]) * u.deg,
+                                  np.max([lats1[1].to(u.deg).value,
+                                          lats2[1].to(u.deg).value]) * u.deg]).to(u.deg))
+            # Both lon ranges defined:
+            return (Longitude([np.min([lons1[0].to(u.deg).value,
+                                       lons2[0].to(u.deg).value]) * u.deg,
+                               np.max([lons1[1].to(u.deg).value,
+                                       lons2[1].to(u.deg).value]) * u.deg]).to(u.deg),
+                    Latitude([np.min([lats1[0].to(u.deg).value,
+                                      lats2[0].to(u.deg).value]) * u.deg,
+                              np.max([lats1[1].to(u.deg).value,
+                                      lats2[1].to(u.deg).value]) * u.deg]).to(u.deg))
+
+        # XOR, Intersection: not implemented
+        raise NotImplementedError
+
+    @property
+    def bounding_lonlat(self):
+        if self.operator in [op.or_]:
+            # Union:
+            # Find min max from constituent bounds
+
+            lons_arr, lats_arr = self._get_edge_raw_lonlat_bounds()
+
+            # Check if shape covers either pole & modify lats arr accordingly:
+            lons_arr, lats_arr = bounding_lonlat_poles_processing(
+                self, lons_arr, lats_arr
+            )
+
+            return lons_arr, lats_arr
+
+        # Disjoint set / XOR:
+        # Not clean
+        # Intersection:
+        # NOT anywhere near as clean. Much better to define for each subclass
+        # that has a compound region as their internal region logic.
+        # TODO:
+        # General solution requires finding intersections of boundaries,
+        # and then making a bounding lonlat. Doable with composed
+        # circle boundaries & polygon-specific logic from spherical-geometry
+        # Maybe better to not make bounding_circle and bounding_lonlat
+        # abstract classes of the base SphericalSkyRegion, and only
+        # add as properties to individual explicitly defined classes?
+        raise NotImplementedError
+
+    def contains(self, coord):
+        in_reg = self.operator(
+            self.region1.contains(coord), self.region2.contains(coord)
+        )
+        if self.meta.get('include', True):
+            return in_reg
+        else:
+            return np.logical_not(in_reg)
+
+    def transform_to(self, frame, merge_attributes=True):
+        # Transform the consitituent regions then recompose:
+        return self.__class__(
+            self.region1.transform_to(frame, merge_attributes=merge_attributes),
+            self.region2.transform_to(frame, merge_attributes=merge_attributes),
+            self.operator,
+            meta=self.meta,
+            visual=self.visual,
+        )
+
+    def discretize_boundary(self, n_points=100):
+        return CompoundSphericalSkyRegion(
+            self.region1.discretize_boundary(n_points=n_points),
+            self.region2.discretize_boundary(n_points=n_points),
+            operator=self.operator,
+            meta=self.meta.copy(),
+            visual=self.visual.copy()
+        )
+
+    def to_sky(
+        self, wcs=None, include_boundary_distortions=False,
+        discretize_kwargs=None,
+    ):
+        planarreg1 = self.region1.to_sky(
+            wcs=wcs,
+            include_boundary_distortions=include_boundary_distortions,
+            discretize_kwargs=discretize_kwargs,
+        )
+        planarreg2 = self.region2.to_sky(
+            wcs=wcs,
+            include_boundary_distortions=include_boundary_distortions,
+            discretize_kwargs=discretize_kwargs,
+        )
+        return CompoundSkyRegion(
+            region1=planarreg1,
+            region2=planarreg2,
+            operator=self.operator,
+            meta=self.meta.copy(),
+            visual=self.visual.copy(),
+        )
+
+    def to_pixel(
+        self, wcs=None, include_boundary_distortions=False,
+        discretize_kwargs=None,
+    ):
+        pixreg1 = self.region1.to_pixel(
+            wcs=wcs,
+            include_boundary_distortions=include_boundary_distortions,
+            discretize_kwargs=discretize_kwargs,
+        )
+        pixreg2 = self.region2.to_pixel(
+            wcs=wcs,
+            include_boundary_distortions=include_boundary_distortions,
+            discretize_kwargs=discretize_kwargs,
+        )
+        return CompoundPixelRegion(
+            region1=pixreg1,
+            region2=pixreg2,
+            operator=self.operator,
+            meta=self.meta.copy(),
+            visual=self.visual.copy(),
+        )

@@ -7,24 +7,31 @@ from collections import OrderedDict
 
 import astropy.units as u
 import pytest
-from astropy.coordinates import SkyCoord
+from astropy.coordinates import Angle, SkyCoord
 from astropy.wcs import WCS
 
-from regions.core.core import PixelRegion, Region, SkyRegion
+from regions.core.core import (PixelRegion, Region, SkyRegion,
+                               SphericalSkyRegion)
 from regions.core.mask import RegionMask
 from regions.core.metadata import RegionMeta, RegionVisual
 from regions.core.pixcoord import PixCoord
 from regions.shapes.annulus import (CircleAnnulusPixelRegion,
                                     CircleAnnulusSkyRegion,
+                                    CircleAnnulusSphericalSkyRegion,
                                     EllipseAnnulusPixelRegion,
                                     EllipseAnnulusSkyRegion,
                                     RectangleAnnulusPixelRegion,
                                     RectangleAnnulusSkyRegion)
-from regions.shapes.circle import CirclePixelRegion, CircleSkyRegion
+from regions.shapes.circle import (CirclePixelRegion, CircleSkyRegion,
+                                   CircleSphericalSkyRegion)
 from regions.shapes.ellipse import EllipsePixelRegion, EllipseSkyRegion
+from regions.shapes.lune import LuneSphericalSkyRegion
 from regions.shapes.point import PointPixelRegion, PointSkyRegion
-from regions.shapes.polygon import PolygonPixelRegion, PolygonSkyRegion
+from regions.shapes.polygon import (PolygonPixelRegion, PolygonSkyRegion,
+                                    PolygonSphericalSkyRegion)
+from regions.shapes.range import RangeSphericalSkyRegion
 from regions.shapes.rectangle import RectanglePixelRegion, RectangleSkyRegion
+from regions.shapes.whole_sky import WholeSphericalSkyRegion
 
 PIXEL_REGIONS = [
     CirclePixelRegion(PixCoord(3, 4), radius=5),
@@ -50,6 +57,21 @@ SKY_REGIONS = [
     RectangleAnnulusSkyRegion(SkyCoord(6 * u.deg, 5 * u.deg), 3 * u.deg,
                               5 * u.deg, 5 * u.deg, 7 * u.deg),
     PointSkyRegion(SkyCoord(6 * u.deg, 5 * u.deg))]
+
+SPHERICAL_SKY_REGIONS = [
+    CircleSphericalSkyRegion(SkyCoord(3 * u.deg, 4 * u.deg), radius=5 * u.deg),
+    CircleAnnulusSphericalSkyRegion(SkyCoord(3 * u.deg, 4 * u.deg), 5 * u.deg,
+                                    7 * u.deg),
+    LuneSphericalSkyRegion(SkyCoord(3 * u.deg, 4 * u.deg),
+                           SkyCoord(153 * u.deg, 4 * u.deg)),
+    PolygonSphericalSkyRegion(SkyCoord([1, 4, 3] * u.deg, [2, 4, 4] * u.deg)),
+    RangeSphericalSkyRegion(
+        longitude_range=[0, 10] * u.deg,
+        latitude_range=[40, 60] * u.deg,
+        frame='icrs'),
+    WholeSphericalSkyRegion()]
+
+INCLUDE_BOUNDARY_DISTORTIONS = [True, False]
 
 MASK_MODES = ['center', 'exact', 'subpixels']
 COMMON_WCS = WCS(naxis=2)
@@ -89,6 +111,41 @@ def test_pix_to_sky(region):
 
 
 @pytest.mark.parametrize('region', PIXEL_REGIONS, ids=ids_func)
+@pytest.mark.parametrize('include_dist', INCLUDE_BOUNDARY_DISTORTIONS, ids=ids_func)
+def test_pix_to_spherical_sky(region, include_dist):
+    # TODO: remove expected failures when implemented
+    # Expected failure:
+    #    No spherical Ellipse, EllipseAnnulus, Point, Rectangle, RectangleAnnulus
+    # Also expected failure:
+    #    Boundary distortions not yet implemented for
+    #    CirclePixelRegion, CircleAnnulusPixelRegion, PolygonPixelRegion
+    if (
+        isinstance(region,
+                   (EllipsePixelRegion,
+                    EllipseAnnulusPixelRegion,
+                    PointPixelRegion,
+                    RectanglePixelRegion,
+                    RectangleAnnulusPixelRegion))
+        | ((isinstance(region,
+                       (CirclePixelRegion,
+                        CircleAnnulusPixelRegion,
+                        PolygonPixelRegion))) & include_dist)
+    ):
+        with pytest.raises(NotImplementedError):
+            sph_sky_region = region.to_spherical_sky(
+                COMMON_WCS,
+                include_boundary_distortions=include_dist
+            )
+            assert isinstance(sph_sky_region, SphericalSkyRegion)
+    else:
+        sph_sky_region = region.to_spherical_sky(
+            COMMON_WCS,
+            include_boundary_distortions=include_dist
+        )
+        assert isinstance(sph_sky_region, SphericalSkyRegion)
+
+
+@pytest.mark.parametrize('region', PIXEL_REGIONS, ids=ids_func)
 @pytest.mark.parametrize('mode', MASK_MODES, ids=ids_func)
 def test_pix_to_mask(region, mode):
     try:
@@ -113,6 +170,118 @@ def test_sky_in_array(region):
 def test_sky_to_pix(region):
     pix_region = region.to_pixel(wcs=COMMON_WCS)
     assert isinstance(pix_region, PixelRegion)
+
+
+@pytest.mark.parametrize('region', SKY_REGIONS, ids=ids_func)
+@pytest.mark.parametrize('include_dist', INCLUDE_BOUNDARY_DISTORTIONS, ids=ids_func)
+def test_sky_to_spherical_sky(region, include_dist):
+    # TODO: remove expected failures when implemented
+    # Expected failure:
+    #    No spherical Ellipse, EllipseAnnulus, Point, Rectangle, RectangleAnnulus
+    # Also expected failure:
+    #    Boundary distortions not yet implemented for
+    #    CircleSkyRegion, CircleAnnulusSkyRegion, PolygonSkyRegion
+    if (
+        isinstance(region,
+                   (EllipseSkyRegion,
+                    EllipseAnnulusSkyRegion,
+                    PointSkyRegion,
+                    RectangleSkyRegion,
+                    RectangleAnnulusSkyRegion))
+        | ((isinstance(region,
+                       (CircleSkyRegion,
+                        CircleAnnulusSkyRegion,
+                        PolygonSkyRegion))) & include_dist)
+    ):
+        with pytest.raises(NotImplementedError):
+            sph_sky_region = region.to_spherical_sky(
+                COMMON_WCS,
+                include_boundary_distortions=include_dist
+            )
+            assert isinstance(sph_sky_region, SphericalSkyRegion)
+    else:
+        sph_sky_region = region.to_spherical_sky(
+            COMMON_WCS,
+            include_boundary_distortions=include_dist
+        )
+        assert isinstance(sph_sky_region, SphericalSkyRegion)
+
+
+@pytest.mark.parametrize('region', SPHERICAL_SKY_REGIONS, ids=ids_func)
+@pytest.mark.parametrize('include_dist', INCLUDE_BOUNDARY_DISTORTIONS, ids=ids_func)
+def test_spherical_sky_to_sky(region, include_dist):
+    # TODO: remove excepted failure for Lune+distortion once Lune handling is implemented
+    if isinstance(region, WholeSphericalSkyRegion):
+        with pytest.raises(NotImplementedError):
+            _ = region.to_sky(
+                COMMON_WCS,
+                include_boundary_distortions=include_dist
+            )
+
+    elif isinstance(region, LuneSphericalSkyRegion) & include_dist:
+        # Include distortions
+        with pytest.raises(NotImplementedError):
+            _ = region.to_sky(
+                COMMON_WCS,
+                include_boundary_distortions=include_dist
+            )
+
+    elif (isinstance(region, (LuneSphericalSkyRegion, RangeSphericalSkyRegion))
+          & (not include_dist)):
+        # No distortions: not defined:
+        with pytest.raises(ValueError) as excinfo:
+            _ = region.to_sky(
+                COMMON_WCS,
+                include_boundary_distortions=include_dist
+            )
+
+        estr = 'Invalid parameter: `include_boundary_distortions=False`!'
+        assert estr in str(excinfo.value)
+
+    else:
+        sky_region = region.to_sky(
+            COMMON_WCS,
+            include_boundary_distortions=include_dist
+        )
+        assert isinstance(sky_region, SkyRegion)
+
+
+@pytest.mark.parametrize('region', SPHERICAL_SKY_REGIONS, ids=ids_func)
+@pytest.mark.parametrize('include_dist', INCLUDE_BOUNDARY_DISTORTIONS, ids=ids_func)
+def test_spherical_sky_to_pix(region, include_dist):
+    # TODO: remove excepted failure for Lune+distortion once Lune handling is implemented
+    if isinstance(region, WholeSphericalSkyRegion):
+        with pytest.raises(NotImplementedError):
+            _ = region.to_pixel(
+                COMMON_WCS,
+                include_boundary_distortions=include_dist
+            )
+
+    elif isinstance(region, LuneSphericalSkyRegion) & include_dist:
+        # Include distortions
+        with pytest.raises(NotImplementedError):
+            _ = region.to_pixel(
+                COMMON_WCS,
+                include_boundary_distortions=include_dist
+            )
+
+    elif (isinstance(region, (LuneSphericalSkyRegion, RangeSphericalSkyRegion))
+          & (not include_dist)):
+        # No distortions: not defined:
+        with pytest.raises(ValueError) as excinfo:
+            _ = region.to_pixel(
+                COMMON_WCS,
+                include_boundary_distortions=include_dist
+            )
+        estr = 'Invalid parameter: `include_boundary_distortions=False`!'
+        assert estr in str(excinfo.value)
+
+    else:
+        pixel_region = region.to_pixel(
+            COMMON_WCS,
+            include_boundary_distortions=include_dist
+        )
+        assert isinstance(pixel_region, PixelRegion)
 
 
 @pytest.mark.parametrize('region', PIXEL_REGIONS, ids=ids_func)
@@ -176,6 +345,49 @@ def test_attribute_validation_sky_regions(region):
 
     for attr in invalid_values:
         if hasattr(region, attr):
+            for val in invalid_values.get(attr, None):
+                with pytest.raises(ValueError) as excinfo:
+                    setattr(region, attr, val)
+                assert f'{attr!r} must' in str(excinfo.value)
+
+
+@pytest.mark.parametrize('region', SPHERICAL_SKY_REGIONS, ids=ids_func)
+def test_attribute_validation_spherical_sky_regions(region):
+    invalid_values = dict(center=[PixCoord([1, 2], [2, 3]), 1,
+                                  SkyCoord([1 * u.deg], [2 * u.deg]),
+                                  (10, 10), (10 * u.deg, 10 * u.deg)],
+                          radius=[u.Quantity([1 * u.deg, 5 * u.deg]),
+                                  [1], SkyCoord(1 * u.deg, 2 * u.deg),
+                                  1, 3 * u.km, 0.0 * u.deg, -10. * u.deg],
+                          angle=[u.Quantity([1 * u.deg, 2 * u.deg]), 2,
+                                 SkyCoord(1 * u.deg, 2 * u.deg), 3. * u.km],
+                          vertices=[u.Quantity('1deg'), 2,
+                                    SkyCoord(1 * u.deg, 2 * u.deg),
+                                    SkyCoord([[1 * u.deg, 2 * u.deg]],
+                                             [[2 * u.deg, 3 * u.deg]]),
+                                    3 * u.km, (10, 10),
+                                    (10 * u.deg, 10 * u.deg)],
+                          longitude_range=[1, [1], [1, 2], [1 * u.deg],
+                                           [3 * u.km, 5 * u.km], u.Quantity([1 * u.deg]),
+                                           u.Quantity([3 * u.km, 5 * u.km]),
+                                           Angle([1 * u.deg])])
+
+    invalid_values['width'] = invalid_values['radius']
+    invalid_values['height'] = invalid_values['radius']
+    invalid_values['inner_height'] = invalid_values['radius']
+    invalid_values['inner_width'] = invalid_values['radius']
+    invalid_values['outer_height'] = invalid_values['radius']
+    invalid_values['outer_width'] = invalid_values['radius']
+    invalid_values['inner_radius'] = invalid_values['radius']
+    invalid_values['outer_radius'] = invalid_values['radius']
+    invalid_values['start'] = invalid_values['center']
+    invalid_values['end'] = invalid_values['radius']
+    invalid_values['latitude_range'] = invalid_values['longitude_range']
+
+    region_attrs = [attr for attr, _ in vars(region).items()]
+
+    for attr in invalid_values:
+        if hasattr(region, attr) & (attr in region_attrs):
             for val in invalid_values.get(attr, None):
                 with pytest.raises(ValueError) as excinfo:
                     setattr(region, attr, val)

@@ -121,6 +121,10 @@ class EllipsePixelRegion(PixelRegion):
                                 meta=self.meta.copy(),
                                 visual=self.visual.copy())
 
+    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
+                         discretize_kwargs=None):
+        raise NotImplementedError
+
     @property
     def bounding_box(self):
         """
@@ -376,3 +380,7 @@ class EllipseSkyRegion(SkyRegion):
         return EllipsePixelRegion(center, width, height, angle=angle,
                                   meta=self.meta.copy(),
                                   visual=self.visual.copy())
+
+    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
+                         discretize_kwargs=None):
+        raise NotImplementedError
