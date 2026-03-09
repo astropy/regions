@@ -194,8 +194,8 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
         # the values are within [0,360] deg or equivalent.
         if longitude_range is not None:
             for i in range(2):
-                if not ((longitude_range[i].to(u.deg).value >= 0)
-                        & (longitude_range[i].to(u.deg).value <= 360)):
+                if not ((longitude_range[i].to_value(u.deg) >= 0)
+                        & (longitude_range[i].to_value(u.deg) <= 360)):
                     raise ValueError('Longitude values must be within [0, 360] degrees or '
                                      'equivalent!')
 
@@ -207,8 +207,8 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
         # the values are within [-90,90] deg or equivalent.
         if latitude_range is not None:
             for i in range(2):
-                if not ((latitude_range[i].to(u.deg).value >= -90)
-                        & (latitude_range[i].to(u.deg).value <= 90)):
+                if not ((latitude_range[i].to_value(u.deg) >= -90)
+                        & (latitude_range[i].to_value(u.deg) <= 90)):
                     raise ValueError('Latitude values must be within [-90, 90] degrees or '
                                      'equivalent!')
 
@@ -621,7 +621,7 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
                 # Note this is never called for transformed instances,
                 # which have vertices info stashed in _vertices.
 
-                if np.abs(self.latitude_range[0].to(u.deg).value) == 90:
+                if np.abs(self.latitude_range[0].to_value(u.deg)) == 90:
                     verts_lon = [
                         self.longitude_range[0],
                         self.longitude_range[1],
@@ -633,7 +633,7 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
                         self.latitude_range[1],
                     ]
 
-                elif np.abs(self.latitude_range[1].to(u.deg).value) == 90:
+                elif np.abs(self.latitude_range[1].to_value(u.deg)) == 90:
                     verts_lon = [
                         self.longitude_range[0],
                         self.longitude_range[1],
