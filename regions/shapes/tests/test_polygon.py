@@ -133,6 +133,22 @@ class TestPolygonPixelRegion(BaseTestPixelRegion):
         reg.vertices = PixCoord([1, 3, 1], [1, 1, 6])
         assert reg != self.reg
 
+    def test_rotation(self):
+        """Test 'in-place' rotation of polygon instance, including full rotation"""
+        self.reg.rotation = 90 * u.deg
+        assert_allclose(self.reg.vertices.x, [8/3., 8/3., -1/3.], rtol=1e-9)
+        assert_allclose(self.reg.vertices.y, [4/3., 10/3., 4/3.], rtol=1e-9)
+        assert_allclose(self.reg.rotation, 0 * u.deg, rtol=1e-9)
+
+        self.reg.rotation = 90 * u.deg
+        assert_allclose(self.reg.vertices.x, [7/3., 1/3., 7/3.], rtol=1e-9)
+        assert_allclose(self.reg.vertices.y, [3, 3, 0], rtol=1e-9)
+
+        self.reg.rotation = 180 * u.deg
+        assert_allclose(self.reg.vertices.x, [1, 3, 1], rtol=1e-9)
+        assert_allclose(self.reg.vertices.y, [1, 1, 4], rtol=1e-9)
+        assert_allclose(self.reg.rotation, 0 * u.deg, rtol=1e-9)
+
 
 class TestPolygonSkyRegion(BaseTestSkyRegion):
     meta = RegionMeta({'text': 'test'})
