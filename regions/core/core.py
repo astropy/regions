@@ -834,7 +834,7 @@ class SphericalSkyRegion(Region):
         lons_arr : list of `~astropy.coordinates.Longitude`
             List of lower, upper boundary longitude values.
 
-        lons_arr : list of `~astropy.coordinates.Latitude`
+        lats_arr : list of `~astropy.coordinates.Latitude`
             List of lower, upper boundary latitude values.
         """
         raise NotImplementedError
