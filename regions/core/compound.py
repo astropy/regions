@@ -389,19 +389,19 @@ class CompoundSphericalSkyRegion(SphericalSkyRegion):
             lons2, lats2 = self.region2.bounding_lonlat
             if (lons1 is None) | (lons2 is None):
                 return (None,
-                        Latitude([np.min([lats1[0].to(u.deg).value,
-                                          lats2[0].to(u.deg).value]) * u.deg,
-                                  np.max([lats1[1].to(u.deg).value,
-                                          lats2[1].to(u.deg).value]) * u.deg]).to(u.deg))
+                        Latitude([np.min([lats1[0].to_value(u.deg),
+                                          lats2[0].to_value(u.deg)]) * u.deg,
+                                  np.max([lats1[1].to_value(u.deg),
+                                          lats2[1].to_value(u.deg)]) * u.deg]).to(u.deg))
             # Both lon ranges defined:
-            return (Longitude([np.min([lons1[0].to(u.deg).value,
-                                       lons2[0].to(u.deg).value]) * u.deg,
-                               np.max([lons1[1].to(u.deg).value,
-                                       lons2[1].to(u.deg).value]) * u.deg]).to(u.deg),
-                    Latitude([np.min([lats1[0].to(u.deg).value,
-                                      lats2[0].to(u.deg).value]) * u.deg,
-                              np.max([lats1[1].to(u.deg).value,
-                                      lats2[1].to(u.deg).value]) * u.deg]).to(u.deg))
+            return (Longitude([np.min([lons1[0].to_value(u.deg),
+                                       lons2[0].to_value(u.deg)]) * u.deg,
+                               np.max([lons1[1].to_value(u.deg),
+                                       lons2[1].to_value(u.deg)]) * u.deg]).to(u.deg),
+                    Latitude([np.min([lats1[0].to_value(u.deg),
+                                      lats2[0].to_value(u.deg)]) * u.deg,
+                              np.max([lats1[1].to_value(u.deg),
+                                      lats2[1].to_value(u.deg)]) * u.deg]).to(u.deg))
 
         # XOR, Intersection: not implemented
         raise NotImplementedError

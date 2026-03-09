@@ -187,7 +187,7 @@ def _get_circle_longitude_tangent_points(center, radius):
     lats = [0 * u.deg, 0 * u.deg]
 
     lats_ref = np.array(
-        [(crepr.lat - radius).to(u.deg).value, (crepr.lat + radius).to(u.deg).value]
+        [(crepr.lat - radius).to_value(u.deg), (crepr.lat + radius).to_value(u.deg)]
     )
     lons = []
 
@@ -203,7 +203,7 @@ def _get_circle_longitude_tangent_points(center, radius):
         # Do 1 then -1, because of lon increasing to east
         lon_gc = crepr.lon - sgn * (
             np.arccos(
-                np.sin(radius.to(u.radian).value) / np.cos(crepr.lat.to(u.radian).value)
+                np.sin(radius.to_value(u.radian)) / np.cos(crepr.lat.to_value(u.radian))
             )
             * u.radian
         ).to(u.deg)
