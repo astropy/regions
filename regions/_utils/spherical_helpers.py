@@ -390,9 +390,6 @@ def get_edge_raw_lonlat_bounds_circ_edges(vertices, centroid, gcs):
     # Consider lon/lat of vertices: may produce min/max bounds:
     vrepr = vertices.represent_as('spherical')
 
-    # lons_list = vrepr.lon
-    # lats_list = vrepr.lat
-
     # Special handling:
     # Exclude vertices from longitude bounds if any is on a pole
     lons_list = []
