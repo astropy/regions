@@ -77,7 +77,7 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
         'The range of longitude values, as a length-2 |Quantity| angle or list or as None'
     )
     latitude_range = TwoValAngleorNone(
-        'The range of longitude values, as a length-2 |Quantity| angle or list or as None'
+        'The range of latitude values, as a length-2 |Quantity| angle or list or as None'
     )
 
     def __init__(
