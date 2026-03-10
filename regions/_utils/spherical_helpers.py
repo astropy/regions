@@ -549,18 +549,13 @@ def discretize_all_edge_boundaries(vertices, circs, n_points):
         if all_edge_bound_verts is None:
             all_edge_bound_verts = bound_verts
         else:
-            all_edge_bound_verts = SkyCoord(np.concatenate(
-                [all_edge_bound_verts.copy(), bound_verts]
-            ))
-            # For some reason concatenate is adding distances,
-            # so use remove those by running from
-            # UnitSpherical->SphericalRepresentation...
+            # Specify representation type, as in some cases
+            # concatenate introduces distances/non unit spherical representation
             all_edge_bound_verts = SkyCoord(
-                SkyCoord(
-                    all_edge_bound_verts,
-                    representation_type=UnitSphericalRepresentation,
+                np.concatenate(
+                    [all_edge_bound_verts.copy(), bound_verts]
                 ),
-                representation_type=SphericalRepresentation,
+                representation_type=UnitSphericalRepresentation
             )
 
     return all_edge_bound_verts
