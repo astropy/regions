@@ -88,7 +88,7 @@ Let's define a spherical sky region::
         (42., 43.)>
     radius: 25.0 deg
 
-Use the `~regions.SphericalSkyRegion.contains()` method to determine which
+Use the `regions.SphericalSkyRegion.contains` method to determine which
 point(s) lie inside or outside the region::
 
     >>> skycoord = SkyCoord([50, 50], [10, 60], unit='deg')

@@ -284,7 +284,7 @@ and `~regions.LuneSphericalSkyRegion`.)
 
 A key feature of the regions package is that it is possible to convert
 back and forth between sky and image regions given a WCS object (e.g.,
-`astropy.wcs.WCS`). For conversions to and from spherical sky regions,
+`~astropy.wcs.WCS`). For conversions to and from spherical sky regions,
 it is also necessary to specify how boundary distortions
 (from projection effects) should be treated.
 
