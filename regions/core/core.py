@@ -855,8 +855,8 @@ class SphericalSkyRegion(Region):
     @abc.abstractmethod
     def transform_to(self, frame, merge_attributes=True):
         """
-        Transform the `SphericalSkyRegion` instance into another
-        instance with a different coordinate reference frame.
+        Transform the `~regions.SphericalSkyRegion` instance into
+        another instance with a different coordinate reference frame.
 
         The precise frame transformed to depends on ``merge_attributes``.
         If `False`, the destination frame is used exactly as passed in.
@@ -892,8 +892,9 @@ class SphericalSkyRegion(Region):
     @abc.abstractmethod
     def discretize_boundary(self, n_points=10):
         """
-        Discretize the boundary into a PolygonSphericalSkyRegion, as an
-        approximation where all sides follow great circles.
+        Discretize the boundary into a
+        `~regions.PolygonSphericalSkyRegion`, as an approximation where
+        all sides follow great circles.
 
         Parameters
         ----------
@@ -986,7 +987,7 @@ class ComplexSphericalSkyRegion(SphericalSkyRegion):
     """
     Base class for complex cases, where the definitional parameters do
     not / cannot transform between coordinate frames (including
-    RangeSphericalSkyRegion).
+    `~regions.RangeSphericalSkyRegion`).
     """
 
     # Because the parameters don't transform,

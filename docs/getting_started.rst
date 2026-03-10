@@ -20,7 +20,7 @@ The Regions package provides classes to represent:
 
 To transform between (planar) sky and pixel regions, a `world coordinate system
 <https://docs.astropy.org/en/stable/wcs/wcsapi.html>`_ object (e.g.,
-`astropy.wcs.WCS`) is needed. To transform between spherical and planar (sky or pixel)
+`~astropy.wcs.WCS`) is needed. To transform between spherical and planar (sky or pixel)
 regions, in addition to a `wcs
 <https://docs.astropy.org/en/stable/wcs/wcsapi.html>`_, it is also
 necessary to specify whether or not boundary distortions should be included
@@ -130,7 +130,7 @@ Pixel/Sky Coordinate Transformations
 
 To transform between pixel and sky coordinates, a `world coordinate system
 <https://docs.astropy.org/en/stable/wcs/wcsapi.html>`_ object (e.g.,
-`astropy.wcs.WCS`) is needed.
+`~astropy.wcs.WCS`) is needed.
 
 Let's start by creating a WCS object:
 
@@ -255,7 +255,7 @@ and **are** defined as regions on the celestial sphere
 In order to transform between spherical and planar ("region-on-image") regions,
 the planar projection (encoded in a `world coordinate system
 <https://docs.astropy.org/en/stable/wcs/wcsapi.html>`_ object; e.g.,
-`astropy.wcs.WCS`) must be specified, along with a specification of
+`~astropy.wcs.WCS`) must be specified, along with a specification of
 whether or not boundary distortions should be included.
 These distortions (implemented through discrete boundary sampling)
 capture the impact of the spherical-to-planar (or vice versa) projection.
