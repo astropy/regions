@@ -187,7 +187,7 @@ def _get_circle_longitude_tangent_points(center, radius):
     lats = [0 * u.deg, 0 * u.deg]
 
     lats_ref = np.array(
-        [(crepr.lat - radius).to(u.deg).value, (crepr.lat + radius).to(u.deg).value]
+        [(crepr.lat - radius).to_value(u.deg), (crepr.lat + radius).to_value(u.deg)]
     )
     lons = []
 
@@ -203,7 +203,7 @@ def _get_circle_longitude_tangent_points(center, radius):
         # Do 1 then -1, because of lon increasing to east
         lon_gc = crepr.lon - sgn * (
             np.arccos(
-                np.sin(radius.to(u.radian).value) / np.cos(crepr.lat.to(u.radian).value)
+                np.sin(radius.to_value(u.radian)) / np.cos(crepr.lat.to_value(u.radian))
             )
             * u.radian
         ).to(u.deg)
@@ -390,9 +390,6 @@ def get_edge_raw_lonlat_bounds_circ_edges(vertices, centroid, gcs):
     # Consider lon/lat of vertices: may produce min/max bounds:
     vrepr = vertices.represent_as('spherical')
 
-    # lons_list = vrepr.lon
-    # lats_list = vrepr.lat
-
     # Special handling:
     # Exclude vertices from longitude bounds if any is on a pole
     lons_list = []
@@ -463,7 +460,7 @@ def _discretize_edge_boundary(vertices, circ, n_points,
 
     # For every edge boundary: determine range of PAs spanned by lines
     # connecting circle center to the two vertices bounding that edge:
-    pas_verts = circ.center.position_angle(vertices).to(u.deg)
+    pas_verts = circ_center.position_angle(vertices).to(u.deg)
 
     pas_verts_wrap, wrap_ang = _validate_vertices_ordering(
         vertices, circ, gc_center=circ_center,
@@ -479,7 +476,7 @@ def _discretize_edge_boundary(vertices, circ, n_points,
 
     # Calculate directional offsets to get boundary discretization,
     # with vertices as SkyCoords
-    bound_verts = circ.center.directional_offset_by(theta, circ_radius)
+    bound_verts = circ_center.directional_offset_by(theta, circ_radius)
 
     return bound_verts
 
@@ -552,18 +549,13 @@ def discretize_all_edge_boundaries(vertices, circs, n_points):
         if all_edge_bound_verts is None:
             all_edge_bound_verts = bound_verts
         else:
-            all_edge_bound_verts = SkyCoord(np.concatenate(
-                [all_edge_bound_verts.copy(), bound_verts]
-            ))
-            # For some reason concatenate is adding distances,
-            # so use remove those by running from
-            # UnitSpherical->SphericalRepresentation...
+            # Specify representation type, as in some cases
+            # concatenate introduces distances/non unit spherical representation
             all_edge_bound_verts = SkyCoord(
-                SkyCoord(
-                    all_edge_bound_verts,
-                    representation_type=UnitSphericalRepresentation,
+                np.concatenate(
+                    [all_edge_bound_verts.copy(), bound_verts]
                 ),
-                representation_type=SphericalRepresentation,
+                representation_type=UnitSphericalRepresentation
             )
 
     return all_edge_bound_verts

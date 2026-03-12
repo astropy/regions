@@ -189,10 +189,10 @@ class LuneSphericalSkyRegion(SphericalSkyRegion):
         return PolygonSphericalSkyRegion(bound_verts)
 
     def to_sky(
-            self,
-            wcs=None,
-            include_boundary_distortions=False,
-            discretize_kwargs=None
+        self,
+        wcs=None,
+        include_boundary_distortions=False,
+        discretize_kwargs=None
     ):
         if not include_boundary_distortions:
             raise ValueError(
@@ -203,24 +203,23 @@ class LuneSphericalSkyRegion(SphericalSkyRegion):
         if discretize_kwargs is None:
             discretize_kwargs = {}
 
-        if include_boundary_distortions:
-            if wcs is None:
-                raise ValueError(
-                    "'wcs' must be set if 'include_boundary_distortions'=True"
-                )
-            # Requires spherical to planar projection (from WCS) and discretization
-            # Use to_pixel(), then apply "small angle approx" to get planar sky.
-            return self.to_pixel(
-                include_boundary_distortions=include_boundary_distortions,
-                wcs=wcs,
-                discretize_kwargs=discretize_kwargs,
-            ).to_sky(wcs)
+        if wcs is None:
+            raise ValueError(
+                "'wcs' must be set if `include_boundary_distortions=True`"
+            )
+        # Requires spherical to planar projection (from WCS) and discretization
+        # Use to_pixel(), then apply "small angle approx" to get planar sky.
+        return self.to_pixel(
+            include_boundary_distortions=include_boundary_distortions,
+            wcs=wcs,
+            discretize_kwargs=discretize_kwargs,
+        ).to_sky(wcs)
 
     def to_pixel(
-            self,
-            wcs=None,
-            include_boundary_distortions=False,
-            discretize_kwargs=None,
+        self,
+        wcs=None,
+        include_boundary_distortions=False,
+        discretize_kwargs=None,
     ):
         if not include_boundary_distortions:
             raise ValueError(
@@ -231,10 +230,10 @@ class LuneSphericalSkyRegion(SphericalSkyRegion):
 
         if discretize_kwargs is None:
             discretize_kwargs = {}
-        if include_boundary_distortions:
-            if wcs is None:
-                raise ValueError(
-                    "'wcs' must be set if 'include_boundary_distortions'=True"
-                )
-            # Requires spherical to planar projection (from WCS) and discretization
-            raise NotImplementedError
+
+        if wcs is None:
+            raise ValueError(
+                "'wcs' must be set if `include_boundary_distortions=True`"
+            )
+        # Requires spherical to planar projection (from WCS) and discretization
+        raise NotImplementedError

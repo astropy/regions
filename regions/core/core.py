@@ -233,6 +233,14 @@ class Region(abc.ABC):
         return RegionsRegistry.serialize([self], Region, format=format,
                                          **kwargs)
 
+    @staticmethod
+    def _validate_planar_spherical_transform(wcs, include_boundary_distortions):
+        # Validate whether inputs are valid for planar <-> spherical transformations
+        if include_boundary_distortions and (wcs is None):
+            raise ValueError(
+                "'wcs' must be set if `include_boundary_distortions=True`"
+            )
+
 
 class PixelRegion(Region):
     """
@@ -710,7 +718,7 @@ class SphericalSkyRegion(Region):
         lons_arr : list of `~astropy.coordinates.Longitude`
             List of lower, upper boundary longitude values.
 
-        lons_arr : list of `~astropy.coordinates.Latitude`
+        lats_arr : list of `~astropy.coordinates.Latitude`
             List of lower, upper boundary latitude values.
         """
         raise NotImplementedError
@@ -731,8 +739,8 @@ class SphericalSkyRegion(Region):
     @abc.abstractmethod
     def transform_to(self, frame, merge_attributes=True):
         """
-        Transform the `SphericalSkyRegion` instance into another
-        instance with a different coordinate reference frame.
+        Transform the `~regions.SphericalSkyRegion` instance into
+        another instance with a different coordinate reference frame.
 
         The precise frame transformed to depends on ``merge_attributes``.
         If `False`, the destination frame is used exactly as passed in.
@@ -768,8 +776,9 @@ class SphericalSkyRegion(Region):
     @abc.abstractmethod
     def discretize_boundary(self, n_points=10):
         """
-        Discretize the boundary into a PolygonSphericalSkyRegion, as an
-        approximation where all sides follow great circles.
+        Discretize the boundary into a
+        `~regions.PolygonSphericalSkyRegion`, as an approximation where
+        all sides follow great circles.
 
         Parameters
         ----------
@@ -862,7 +871,7 @@ class ComplexSphericalSkyRegion(SphericalSkyRegion):
     """
     Base class for complex cases, where the definitional parameters do
     not / cannot transform between coordinate frames (including
-    RangeSphericalSkyRegion).
+    `~regions.RangeSphericalSkyRegion`).
     """
 
     # Because the parameters don't transform,

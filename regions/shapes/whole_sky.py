@@ -46,7 +46,7 @@ class WholeSphericalSkyRegion(SphericalSkyRegion):
         # Not defined
         return None
 
-    def transform_to(self, frame):
+    def transform_to(self, frame, merge_attributes=True):
         return self.__class__()
 
     def discretize_boundary(self, n_points=100):

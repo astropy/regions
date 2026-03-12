@@ -77,7 +77,7 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
         'The range of longitude values, as a length-2 |Quantity| angle or list or as None'
     )
     latitude_range = TwoValAngleorNone(
-        'The range of longitude values, as a length-2 |Quantity| angle or list or as None'
+        'The range of latitude values, as a length-2 |Quantity| angle or list or as None'
     )
 
     def __init__(
@@ -194,8 +194,8 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
         # the values are within [0,360] deg or equivalent.
         if longitude_range is not None:
             for i in range(2):
-                if not ((longitude_range[i].to(u.deg).value >= 0)
-                        & (longitude_range[i].to(u.deg).value <= 360)):
+                if not ((longitude_range[i].to_value(u.deg) >= 0)
+                        & (longitude_range[i].to_value(u.deg) <= 360)):
                     raise ValueError('Longitude values must be within [0, 360] degrees or '
                                      'equivalent!')
 
@@ -207,8 +207,8 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
         # the values are within [-90,90] deg or equivalent.
         if latitude_range is not None:
             for i in range(2):
-                if not ((latitude_range[i].to(u.deg).value >= -90)
-                        & (latitude_range[i].to(u.deg).value <= 90)):
+                if not ((latitude_range[i].to_value(u.deg) >= -90)
+                        & (latitude_range[i].to_value(u.deg) <= 90)):
                     raise ValueError('Latitude values must be within [-90, 90] degrees or '
                                      'equivalent!')
 
@@ -285,7 +285,7 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
             center_gc1, center_gc2, self.meta, self.visual
         )
 
-    def _derive_latitute_bounds(self):
+    def _derive_latitude_bounds(self):
         # Internal, on-the-fly boundaries determination.
         # A concern if range values change after original _latitude_bounds
         # are computed, if these were "static" for all cases
@@ -467,7 +467,7 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
         # Otherwise, check whether range is set.
         # If set, derive bounds on-the-fly:
         elif self.latitude_range is not None:
-            return self._derive_latitute_bounds()
+            return self._derive_latitude_bounds()
 
         # If both are set to None, then the bounds are intended to be not set:
         else:
@@ -621,7 +621,7 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
                 # Note this is never called for transformed instances,
                 # which have vertices info stashed in _vertices.
 
-                if np.abs(self.latitude_range[0].to(u.deg).value) == 90:
+                if np.abs(self.latitude_range[0].to_value(u.deg)) == 90:
                     verts_lon = [
                         self.longitude_range[0],
                         self.longitude_range[1],
@@ -633,7 +633,7 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
                         self.latitude_range[1],
                     ]
 
-                elif np.abs(self.latitude_range[1].to(u.deg).value) == 90:
+                elif np.abs(self.latitude_range[1].to_value(u.deg)) == 90:
                     verts_lon = [
                         self.longitude_range[0],
                         self.longitude_range[1],
@@ -795,7 +795,7 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
                     frame, merge_attributes=merge_attributes
                 )
             else:
-                transformed[f"_{bound}"] = getattr(self, bound)
+                transformed[f"_{bound}"] = bound_orig
 
         # Also transform vertices:
         for field in ['_vertices']:
@@ -832,10 +832,10 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
             raise NotImplementedError
 
     def to_sky(
-            self,
-            wcs=None,
-            include_boundary_distortions=False,
-            discretize_kwargs=None
+        self,
+        wcs=None,
+        include_boundary_distortions=False,
+        discretize_kwargs=None
     ):
         if not include_boundary_distortions:
             raise ValueError(
@@ -843,27 +843,25 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
                 'Transforming range to planar sky region is only possible by '
                 'including boundary distortions.'
             )
+
+        self._validate_planar_spherical_transform(wcs, include_boundary_distortions)
+
         if discretize_kwargs is None:
             discretize_kwargs = {}
 
-        if include_boundary_distortions:
-            if wcs is None:
-                raise ValueError(
-                    "'wcs' must be set if 'include_boundary_distortions'=True"
-                )
-            # Requires spherical to planar projection (from WCS) and discretization
-            # Use to_pixel(), then apply "small angle approx" to get planar sky.
-            return self.to_pixel(
-                include_boundary_distortions=include_boundary_distortions,
-                wcs=wcs,
-                discretize_kwargs=discretize_kwargs,
-            ).to_sky(wcs)
+        # Requires spherical to planar projection (from WCS) and discretization
+        # Use to_pixel(), then apply "small angle approx" to get planar sky.
+        return self.to_pixel(
+            include_boundary_distortions=include_boundary_distortions,
+            wcs=wcs,
+            discretize_kwargs=discretize_kwargs,
+        ).to_sky(wcs)
 
     def to_pixel(
-            self,
-            wcs=None,
-            include_boundary_distortions=False,
-            discretize_kwargs=None,
+        self,
+        wcs=None,
+        include_boundary_distortions=False,
+        discretize_kwargs=None,
     ):
         if not include_boundary_distortions:
             raise ValueError(
@@ -872,22 +870,20 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
                 'including boundary distortions.'
             )
 
+        self._validate_planar_spherical_transform(wcs, include_boundary_distortions)
+
         if discretize_kwargs is None:
             discretize_kwargs = {}
-        if include_boundary_distortions:
-            if wcs is None:
-                raise ValueError(
-                    "'wcs' must be set if 'include_boundary_distortions'=True"
-                )
-            # Requires spherical to planar projection (from WCS) and discretization
-            disc_bound = self.discretize_boundary(**discretize_kwargs)
-            # Anticipating complex, wrapped over the poles case:
-            if isinstance(disc_bound, CompoundSphericalSkyRegion):
-                return disc_bound.to_pixel(wcs)
 
-            verts = wcs.world_to_pixel(disc_bound.vertices)
+        # Requires spherical to planar projection (from WCS) and discretization
+        disc_bound = self.discretize_boundary(**discretize_kwargs)
+        # Anticipating complex, wrapped over the poles case:
+        if isinstance(disc_bound, CompoundSphericalSkyRegion):
+            return disc_bound.to_pixel(wcs)
 
-            return PolygonPixelRegion(
-                PixCoord(*verts), meta=self.meta.copy(),
-                visual=self.visual.copy()
-            )
+        verts = wcs.world_to_pixel(disc_bound.vertices)
+
+        return PolygonPixelRegion(
+            PixCoord(*verts), meta=self.meta.copy(),
+            visual=self.visual.copy()
+        )
