@@ -205,7 +205,7 @@ class LuneSphericalSkyRegion(SphericalSkyRegion):
 
         if wcs is None:
             raise ValueError(
-                "'wcs' must be set if 'include_boundary_distortions'=True"
+                "'wcs' must be set if `include_boundary_distortions=True`"
             )
         # Requires spherical to planar projection (from WCS) and discretization
         # Use to_pixel(), then apply "small angle approx" to get planar sky.
@@ -233,7 +233,7 @@ class LuneSphericalSkyRegion(SphericalSkyRegion):
 
         if wcs is None:
             raise ValueError(
-                "'wcs' must be set if 'include_boundary_distortions'=True"
+                "'wcs' must be set if `include_boundary_distortions=True`"
             )
         # Requires spherical to planar projection (from WCS) and discretization
         raise NotImplementedError
