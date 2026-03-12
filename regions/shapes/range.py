@@ -832,10 +832,10 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
             raise NotImplementedError
 
     def to_sky(
-            self,
-            wcs=None,
-            include_boundary_distortions=False,
-            discretize_kwargs=None
+        self,
+        wcs=None,
+        include_boundary_distortions=False,
+        discretize_kwargs=None
     ):
         if not include_boundary_distortions:
             raise ValueError(
@@ -846,24 +846,23 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
         if discretize_kwargs is None:
             discretize_kwargs = {}
 
-        if include_boundary_distortions:
-            if wcs is None:
-                raise ValueError(
-                    "'wcs' must be set if 'include_boundary_distortions'=True"
-                )
-            # Requires spherical to planar projection (from WCS) and discretization
-            # Use to_pixel(), then apply "small angle approx" to get planar sky.
-            return self.to_pixel(
-                include_boundary_distortions=include_boundary_distortions,
-                wcs=wcs,
-                discretize_kwargs=discretize_kwargs,
-            ).to_sky(wcs)
+        if wcs is None:
+            raise ValueError(
+                "'wcs' must be set if 'include_boundary_distortions'=True"
+            )
+        # Requires spherical to planar projection (from WCS) and discretization
+        # Use to_pixel(), then apply "small angle approx" to get planar sky.
+        return self.to_pixel(
+            include_boundary_distortions=include_boundary_distortions,
+            wcs=wcs,
+            discretize_kwargs=discretize_kwargs,
+        ).to_sky(wcs)
 
     def to_pixel(
-            self,
-            wcs=None,
-            include_boundary_distortions=False,
-            discretize_kwargs=None,
+        self,
+        wcs=None,
+        include_boundary_distortions=False,
+        discretize_kwargs=None,
     ):
         if not include_boundary_distortions:
             raise ValueError(
@@ -874,20 +873,20 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
 
         if discretize_kwargs is None:
             discretize_kwargs = {}
-        if include_boundary_distortions:
-            if wcs is None:
-                raise ValueError(
-                    "'wcs' must be set if 'include_boundary_distortions'=True"
-                )
-            # Requires spherical to planar projection (from WCS) and discretization
-            disc_bound = self.discretize_boundary(**discretize_kwargs)
-            # Anticipating complex, wrapped over the poles case:
-            if isinstance(disc_bound, CompoundSphericalSkyRegion):
-                return disc_bound.to_pixel(wcs)
 
-            verts = wcs.world_to_pixel(disc_bound.vertices)
-
-            return PolygonPixelRegion(
-                PixCoord(*verts), meta=self.meta.copy(),
-                visual=self.visual.copy()
+        if wcs is None:
+            raise ValueError(
+                "'wcs' must be set if 'include_boundary_distortions'=True"
             )
+        # Requires spherical to planar projection (from WCS) and discretization
+        disc_bound = self.discretize_boundary(**discretize_kwargs)
+        # Anticipating complex, wrapped over the poles case:
+        if isinstance(disc_bound, CompoundSphericalSkyRegion):
+            return disc_bound.to_pixel(wcs)
+
+        verts = wcs.world_to_pixel(disc_bound.vertices)
+
+        return PolygonPixelRegion(
+            PixCoord(*verts), meta=self.meta.copy(),
+            visual=self.visual.copy()
+        )
