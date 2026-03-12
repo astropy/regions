@@ -233,6 +233,14 @@ class Region(abc.ABC):
         return RegionsRegistry.serialize([self], Region, format=format,
                                          **kwargs)
 
+    @staticmethod
+    def _validate_planar_spherical_transform(wcs, include_boundary_distortions):
+        # Validate whether inputs are valid for planar <-> spherical transformations
+        if include_boundary_distortions and (wcs is None):
+            raise ValueError(
+                "'wcs' must be set if `include_boundary_distortions=True`"
+            )
+
 
 class PixelRegion(Region):
     """
