@@ -102,7 +102,7 @@ class CirclePixelRegion(PixelRegion):
         if include_boundary_distortions:
             if wcs is None:
                 raise ValueError(
-                    "'wcs' must be set if 'include_boundary_distortions'=True"
+                    "'wcs' must be set if `include_boundary_distortions=True`"
                 )
             # Requires planar to spherical projection (using WCS) and discretization
             # Will require implementing discretization in pixel space
@@ -251,7 +251,7 @@ class CircleSkyRegion(SkyRegion):
         if include_boundary_distortions:
             if wcs is None:
                 raise ValueError(
-                    "'wcs' must be set if 'include_boundary_distortions'=True"
+                    "'wcs' must be set if `include_boundary_distortions=True`"
                 )
             # Requires planar to spherical projection (using WCS) and discretization
             # Will require implementing discretization in pixel space
@@ -355,7 +355,7 @@ class CircleSphericalSkyRegion(SphericalSkyRegion):
         if include_boundary_distortions:
             if wcs is None:
                 raise ValueError(
-                    "'wcs' must be set if 'include_boundary_distortions'=True"
+                    "'wcs' must be set if `include_boundary_distortions=True`"
                 )
             # Requires spherical to planar projection (from WCS) and discretization
             # Use to_pixel(), then apply "small angle approx" to get planar sky.
@@ -383,7 +383,7 @@ class CircleSphericalSkyRegion(SphericalSkyRegion):
 
             if wcs is None:
                 raise ValueError(
-                    "'wcs' must be set if 'include_boundary_distortions'=True"
+                    "'wcs' must be set if `include_boundary_distortions=True`"
                 )
             # Requires spherical to planar projection (from WCS) and discretization
             verts = wcs.world_to_pixel(
