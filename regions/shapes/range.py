@@ -843,13 +843,12 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
                 'Transforming range to planar sky region is only possible by '
                 'including boundary distortions.'
             )
+
+        self._validate_planar_spherical_transform(wcs, include_boundary_distortions)
+
         if discretize_kwargs is None:
             discretize_kwargs = {}
 
-        if wcs is None:
-            raise ValueError(
-                "'wcs' must be set if `include_boundary_distortions=True`"
-            )
         # Requires spherical to planar projection (from WCS) and discretization
         # Use to_pixel(), then apply "small angle approx" to get planar sky.
         return self.to_pixel(
@@ -871,13 +870,11 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
                 'including boundary distortions.'
             )
 
+        self._validate_planar_spherical_transform(wcs, include_boundary_distortions)
+
         if discretize_kwargs is None:
             discretize_kwargs = {}
 
-        if wcs is None:
-            raise ValueError(
-                "'wcs' must be set if `include_boundary_distortions=True`"
-            )
         # Requires spherical to planar projection (from WCS) and discretization
         disc_bound = self.discretize_boundary(**discretize_kwargs)
         # Anticipating complex, wrapped over the poles case:
