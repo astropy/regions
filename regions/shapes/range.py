@@ -795,7 +795,7 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
                     frame, merge_attributes=merge_attributes
                 )
             else:
-                transformed[f"_{bound}"] = getattr(self, bound)
+                transformed[f"_{bound}"] = bound_orig
 
         # Also transform vertices:
         for field in ['_vertices']:
