@@ -96,7 +96,7 @@ class TestCircleAnnulusPixelRegion(BaseTestPixelRegion):
     def test_to_spherical_sky_no_wcs(self):
         with pytest.raises(ValueError) as excinfo:
             _ = self.reg.to_spherical_sky(include_boundary_distortions=True)
-        estr = "'wcs' must be set if 'include_boundary_distortions'=True"
+        estr = "'wcs' must be set if `include_boundary_distortions=True`"
         assert estr in str(excinfo.value)
 
     def test_rotate(self):
@@ -160,7 +160,7 @@ class TestCircleAnnulusSkyRegion(BaseTestSkyRegion):
     def test_to_spherical_sky_no_wcs(self):
         with pytest.raises(ValueError) as excinfo:
             _ = self.reg.to_spherical_sky(include_boundary_distortions=True)
-        estr = "'wcs' must be set if 'include_boundary_distortions'=True"
+        estr = "'wcs' must be set if `include_boundary_distortions=True`"
         assert estr in str(excinfo.value)
 
     def test_eq(self):
@@ -229,12 +229,12 @@ class TestCircleAnnulusSphericalSkyRegion(BaseTestSphericalSkyRegion):
     def test_transformation_no_wcs(self):
         with pytest.raises(ValueError) as excinfo:
             _ = self.reg.to_sky(include_boundary_distortions=True)
-        estr = "'wcs' must be set if 'include_boundary_distortions'=True"
+        estr = "'wcs' must be set if `include_boundary_distortions=True`"
         assert estr in str(excinfo.value)
 
         with pytest.raises(ValueError) as excinfo:
             _ = self.reg.to_pixel(include_boundary_distortions=True)
-        estr = "'wcs' must be set if 'include_boundary_distortions'=True"
+        estr = "'wcs' must be set if `include_boundary_distortions=True`"
         assert estr in str(excinfo.value)
 
     def test_frame_transformation(self):

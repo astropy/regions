@@ -232,7 +232,7 @@ class CircleAnnulusPixelRegion(AnnulusPixelRegion):
         if include_boundary_distortions:
             if wcs is None:
                 raise ValueError(
-                    "'wcs' must be set if 'include_boundary_distortions'=True"
+                    "'wcs' must be set if `include_boundary_distortions=True`"
                 )
             # Requires planar to spherical projection (using WCS) and discretization
             # Will require implementing discretization in pixel space
@@ -327,7 +327,7 @@ class CircleAnnulusSkyRegion(SkyRegion):
         if include_boundary_distortions:
             if wcs is None:
                 raise ValueError(
-                    "'wcs' must be set if 'include_boundary_distortions'=True"
+                    "'wcs' must be set if `include_boundary_distortions=True`"
                 )
             # Requires planar to spherical projection (using WCS) and discretization
             # Will require implementing discretization in pixel space
@@ -434,7 +434,7 @@ class CircleAnnulusSphericalSkyRegion(AnnulusSphericalSkyRegion):
         if include_boundary_distortions:
             if wcs is None:
                 raise ValueError(
-                    "'wcs' must be set if 'include_boundary_distortions'=True"
+                    "'wcs' must be set if `include_boundary_distortions=True`"
                 )
             # Requires spherical to planar projection (from WCS) and discretization
             # Use to_pixel(), then apply "small angle approx" to get planar sky.
@@ -466,7 +466,7 @@ class CircleAnnulusSphericalSkyRegion(AnnulusSphericalSkyRegion):
 
             if wcs is None:
                 raise ValueError(
-                    "'wcs' must be set if 'include_boundary_distortions'=True"
+                    "'wcs' must be set if `include_boundary_distortions=True`"
                 )
             # Requires spherical to planar projection (from WCS) and discretization
             polygonized = self.discretize_boundary(**discretize_kwargs)
