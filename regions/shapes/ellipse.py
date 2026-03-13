@@ -11,7 +11,7 @@ import numpy as np
 from astropy.coordinates import Angle
 
 from regions._geometry import elliptical_overlap_grid
-from regions._utils.wcs_helpers import pixel_scale_angle_at_skycoord
+from regions._utils.wcs_helpers import pixel_to_sky_scales, sky_to_pixel_scales
 from regions.core.attributes import (PositiveScalar, PositiveScalarAngle,
                                      RegionMetaDescr, RegionVisualDescr,
                                      ScalarAngle, ScalarPixCoord,
@@ -109,14 +109,10 @@ class EllipsePixelRegion(PixelRegion):
             return np.logical_not(in_ell)
 
     def to_sky(self, wcs):
-        center = wcs.pixel_to_world(self.center.x, self.center.y)
-        _, pixscale, north_angle = pixel_scale_angle_at_skycoord(center, wcs)
-        height = Angle(self.height * u.pix * pixscale, 'arcsec')
-        width = Angle(self.width * u.pix * pixscale, 'arcsec')
-        # region sky angles are defined relative to the WCS longitude axis;
-        # photutils aperture sky angles are defined as the PA of the
-        # semimajor axis (i.e., relative to the WCS latitude axis)
-        angle = self.angle - (north_angle - 90 * u.deg)
+        center, scale_w, scale_h, angle = pixel_to_sky_scales(
+            self.center, wcs, self.angle.to(u.rad).value)
+        width = Angle(self.width * scale_w, 'arcsec')
+        height = Angle(self.height * scale_h, 'arcsec')
         return EllipseSkyRegion(center, width, height, angle=angle,
                                 meta=self.meta.copy(),
                                 visual=self.visual.copy())
@@ -365,14 +361,11 @@ class EllipseSkyRegion(SkyRegion):
         self.visual = visual or RegionVisual()
 
     def to_pixel(self, wcs):
-        center, pixscale, north_angle = pixel_scale_angle_at_skycoord(
-            self.center, wcs)
-        height = (self.height / pixscale).to(u.pixel).value
-        width = (self.width / pixscale).to(u.pixel).value
-        # region sky angles are defined relative to the WCS longitude axis;
-        # photutils aperture sky angles are defined as the PA of the
-        # semimajor axis (i.e., relative to the WCS latitude axis)
-        angle = self.angle + (north_angle - 90 * u.deg)
-        return EllipsePixelRegion(center, width, height, angle=angle,
+        center, scale_w, scale_h, angle = sky_to_pixel_scales(
+            self.center, wcs, self.angle.to(u.rad).value)
+        width = self.width.to(u.arcsec).value * scale_w
+        height = self.height.to(u.arcsec).value * scale_h
+        return EllipsePixelRegion(center, width, height,
+                                  angle=angle,
                                   meta=self.meta.copy(),
                                   visual=self.visual.copy())
