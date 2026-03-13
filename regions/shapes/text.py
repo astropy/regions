@@ -3,7 +3,9 @@
 This module defines text regions in both pixel and sky coordinates.
 """
 
-from regions._utils.wcs_helpers import pixel_scale_angle_at_skycoord
+import math
+
+from regions._utils.wcs_helpers import pixel_to_sky_scales, sky_to_pixel_scales
 from regions.core.attributes import (RegionMetaDescr, RegionVisualDescr,
                                      ScalarPixCoord, ScalarSkyCoord)
 from regions.shapes.point import PointPixelRegion, PointSkyRegion
@@ -60,16 +62,17 @@ class TextPixelRegion(PointPixelRegion):
         self.text = text
 
     def to_sky(self, wcs):
-        center = wcs.pixel_to_world(self.center.x, self.center.y)
+        rotation_rad = math.radians(self.visual.get('rotation', 0.0))
+        center, _, _, sky_angle = pixel_to_sky_scales(
+            self.center, wcs, rotation_rad)
 
-        # rotation value is relative to the coordinate system axes;
+        # Rotation value is relative to the coordinate system axes;
         # convert from counterclockwise angle from the positive x axis
-        # to angle relative to WCS longitude axis
+        # to angle relative to WCS longitude axis.
         visual = self.visual
         if 'rotation' in self.visual:
-            _, _, angle = pixel_scale_angle_at_skycoord(center, wcs)
             visual = visual.copy()
-            visual['rotation'] -= angle.to('deg').value - 90.
+            visual['rotation'] = sky_angle.to('deg').value
 
         return TextSkyRegion(center, self.text, meta=self.meta.copy(),
                              visual=visual.copy())
@@ -132,14 +135,16 @@ class TextSkyRegion(PointSkyRegion):
         self.text = text
 
     def to_pixel(self, wcs):
-        center, _, angle = pixel_scale_angle_at_skycoord(self.center, wcs)
+        rotation_rad = math.radians(self.visual.get('rotation', 0.0))
+        center, _, _, pixel_angle = sky_to_pixel_scales(
+            self.center, wcs, rotation_rad)
 
-        # rotation value is relative to the WCS longitude axis;
-        # convert to counterclockwise angle from the positive x axis
+        # Rotation value is relative to the WCS longitude axis;
+        # convert to counterclockwise angle from the positive x axis.
         visual = self.visual
         if 'rotation' in self.visual:
             visual = visual.copy()
-            visual['rotation'] += angle.to('deg').value - 90.
+            visual['rotation'] = pixel_angle.to('deg').value
 
         return TextPixelRegion(center, self.text, meta=self.meta.copy(),
                                visual=visual.copy())
