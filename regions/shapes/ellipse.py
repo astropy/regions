@@ -21,6 +21,7 @@ from regions.core.core import PixelRegion, SkyRegion
 from regions.core.mask import RegionMask
 from regions.core.metadata import RegionMeta, RegionVisual
 from regions.core.pixcoord import PixCoord
+from regions.shapes.polygon import PolygonPixelRegion
 
 __all__ = ['EllipsePixelRegion', 'EllipseSkyRegion']
 
@@ -320,6 +321,33 @@ class EllipsePixelRegion(PixelRegion):
         angle = self.angle + angle
         return self.copy(center=center, angle=angle)
 
+    def to_polygon(self, npoints=100):
+        """
+        Return a `~regions.PolygonPixelRegion` that approximates this
+        ellipse.
+
+        Parameters
+        ----------
+        npoints : int, optional
+            The number of polygon vertices. Default is 100.
+
+        Returns
+        -------
+        polygon : `~regions.PolygonPixelRegion`
+            A polygon region approximating the ellipse.
+        """
+        theta = np.linspace(0, 2 * np.pi, npoints, endpoint=False)
+        x = 0.5 * self.width * np.cos(theta)
+        y = 0.5 * self.height * np.sin(theta)
+        cos_angle = np.cos(self.angle)
+        sin_angle = np.sin(self.angle)
+        x_rot = x * cos_angle - y * sin_angle + self.center.x
+        y_rot = x * sin_angle + y * cos_angle + self.center.y
+        vertices = PixCoord(x=x_rot, y=y_rot)
+        return PolygonPixelRegion(vertices=vertices,
+                                  meta=self.meta.copy(),
+                                  visual=self.visual.copy())
+
 
 class EllipseSkyRegion(SkyRegion):
     """
@@ -376,3 +404,22 @@ class EllipseSkyRegion(SkyRegion):
         return EllipsePixelRegion(center, width, height, angle=angle,
                                   meta=self.meta.copy(),
                                   visual=self.visual.copy())
+
+    def to_polygon(self, wcs, npoints=100):
+        """
+        Return a `~regions.PolygonSkyRegion` that approximates this
+        ellipse.
+
+        Parameters
+        ----------
+        wcs : `~astropy.wcs.WCS`
+            The WCS to use for the sky-to-pixel-to-sky conversion.
+        npoints : int, optional
+            The number of polygon vertices. Default is 100.
+
+        Returns
+        -------
+        polygon : `~regions.PolygonSkyRegion`
+            A polygon region approximating the ellipse.
+        """
+        return self.to_pixel(wcs).to_polygon(npoints=npoints).to_sky(wcs)
