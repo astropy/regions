@@ -7,6 +7,10 @@ General
 New Features
 ------------
 
+- Added a ``to_polygon`` method to all region classes that returns a
+  ``PolygonPixelRegion`` or ``PolygonSkyRegion`` approximation of the
+  region. [#649]
+
 Bug Fixes
 ---------
 
