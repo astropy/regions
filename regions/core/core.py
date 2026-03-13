@@ -313,6 +313,20 @@ class PixelRegion(Region):
         -------
         sky_region : `~regions.SkyRegion`
             The sky region.
+
+        Notes
+        -----
+        The conversion between pixel and sky coordinates is an
+        approximation. The pixel region shape is mapped to a sky region
+        shape using the local pixel scale and angle at the region
+        center. Projection effects over the extent of the region are not
+        accounted for. The region shape type is always preserved (e.g.,
+        a `CirclePixelRegion` converts to a `CircleSkyRegion`).
+
+        For WCS with distortions (e.g., SIP), the local Jacobian matrix
+        of the WCS transformation is used to compute directional scale
+        factors and angle. For WCS without distortions, a local pixel
+        scale and angle are computed using offset-based methods.
         """
         raise NotImplementedError
 
@@ -527,5 +541,19 @@ class SkyRegion(Region):
         -------
         pixel_region : `~regions.PixelRegion`
             A pixel region.
+
+        Notes
+        -----
+        The conversion between sky and pixel coordinates is an
+        approximation. The sky region shape is mapped to a pixel region
+        shape using the local pixel scale and angle at the region
+        center. Projection effects over the extent of the region are not
+        accounted for. The region shape type is always preserved (e.g.,
+        a `CircleSkyRegion` converts to a `CirclePixelRegion`).
+
+        For WCS with distortions (e.g., SIP), the local Jacobian matrix
+        of the WCS transformation is used to compute directional scale
+        factors and angle. For WCS without distortions, a local pixel
+        scale and angle are computed using offset-based methods.
         """
         raise NotImplementedError
