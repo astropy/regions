@@ -4,6 +4,8 @@
 General
 -------
 
+- The minimum required NumPy is now 1.26.4. [#650]
+
 New Features
 ------------
 
