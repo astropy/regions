@@ -6,10 +6,9 @@ Checks for optional dependencies using lazy import from `PEP 562
 
 import importlib
 
-# This list is a duplicate of the dependencies in pyproject.toml "all".
-# Note that in some cases the package names are different from the
-# pip-install name (e.g.k scikit-image -> skimage).
-optional_deps = ['matplotlib', 'shapely']
+# This list is a duplicate of the dependencies in pyproject.toml "all"
+# and "test". gwcs is used only in tests.
+optional_deps = ['gwcs', 'matplotlib', 'shapely']
 deps = {key.upper(): key for key in optional_deps}
 __all__ = [f'HAS_{pkg}' for pkg in deps]
 
