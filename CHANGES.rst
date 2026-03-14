@@ -4,8 +4,19 @@
 General
 -------
 
+- The minimum required NumPy is now 1.26.4. [#650]
+
 New Features
 ------------
+
+- Improved pixel–sky coordinate conversions for non-distorted WCS
+  objects, providing more accurate local pixel scales and North angle
+  estimates. [#650]
+
+- Improved pixel–sky coordinate conversions for distorted WCS objects
+  (e.g., SIP) and non-astropy WCS implementations (e.g., GWCS), enabling
+  more accurate transformations for directed regions such as ellipses and
+  rectangles. [#650]
 
 Bug Fixes
 ---------

@@ -10,7 +10,8 @@ import numpy as np
 from astropy.coordinates import Angle
 
 from regions._geometry import circular_overlap_grid
-from regions._utils.wcs_helpers import pixel_scale_angle_at_skycoord
+from regions._utils.wcs_helpers import (pixel_to_sky_mean_scale,
+                                        sky_to_pixel_mean_scale)
 from regions.core.attributes import (PositiveScalar, PositiveScalarAngle,
                                      RegionMetaDescr, RegionVisualDescr,
                                      ScalarPixCoord, ScalarSkyCoord)
@@ -85,10 +86,8 @@ class CirclePixelRegion(PixelRegion):
             return np.logical_not(in_circle)
 
     def to_sky(self, wcs):
-        # TODO: write a pixel_to_skycoord_scale_angle
-        center = wcs.pixel_to_world(self.center.x, self.center.y)
-        _, pixscale, _ = pixel_scale_angle_at_skycoord(center, wcs)
-        radius = Angle(self.radius * u.pix * pixscale, 'arcsec')
+        center, mean_scale = pixel_to_sky_mean_scale(self.center, wcs)
+        radius = Angle(self.radius * mean_scale, 'arcsec')
         return CircleSkyRegion(center, radius, meta=self.meta.copy(),
                                visual=self.visual.copy())
 
@@ -211,7 +210,7 @@ class CircleSkyRegion(SkyRegion):
         self.visual = visual or RegionVisual()
 
     def to_pixel(self, wcs):
-        center, pixscale, _ = pixel_scale_angle_at_skycoord(self.center, wcs)
-        radius = (self.radius / pixscale).to(u.pix).value
+        center, mean_scale = sky_to_pixel_mean_scale(self.center, wcs)
+        radius = self.radius.to(u.arcsec).value * mean_scale
         return CirclePixelRegion(center, radius, meta=self.meta.copy(),
                                  visual=self.visual.copy())
