@@ -846,10 +846,10 @@ def wcs_pixel_scale_angle(skycoord, wcs):
     cdelt_y = sky0.separation(sky_y).arcsec
     scale = np.sqrt(cdelt_x * cdelt_y)
 
-    # Compute the angle by offsetting in latitude by exactly the
-    # local cdelt (geometric-mean pixel scale in degrees). This
-    # ensures the finite-difference derivative probes the same scale
-    # of the distortion field.
+    # Compute the angle by offsetting in latitude by exactly the local
+    # cdelt (geometric-mean pixel scale in degrees). This ensures
+    # the finite-difference derivative probes the same scale of the
+    # distortion field.
     cdelt_deg = scale / 3600  # arcsec -> deg
     skycoord_offset = skycoord.directional_offset_by(
         0.0, cdelt_deg * u.deg)
