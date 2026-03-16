@@ -11,9 +11,11 @@ import astropy.units as u
 from regions._utils.wcs_helpers import (pixel_ellipse_to_sky_svd,
                                         pixel_to_sky_mean_scale,
                                         pixel_to_sky_scales,
+                                        pixel_to_sky_svd_scales,
                                         sky_ellipse_to_pixel_svd,
                                         sky_to_pixel_mean_scale,
-                                        sky_to_pixel_scales)
+                                        sky_to_pixel_scales,
+                                        sky_to_pixel_svd_scales)
 from regions.core.attributes import (PositiveScalar, PositiveScalarAngle,
                                      RegionMetaDescr, RegionVisualDescr,
                                      ScalarAngle, ScalarPixCoord,
@@ -179,12 +181,12 @@ class CircleAnnulusPixelRegion(AnnulusPixelRegion):
             ``use_ellipse`` is `True`.
         """
         if use_ellipse:
-            center, scale_w, scale_h, angle = pixel_to_sky_scales(
-                self.center, wcs, 0.0)
-            inner_width = 2 * self.inner_radius * scale_w * u.arcsec
-            outer_width = 2 * self.outer_radius * scale_w * u.arcsec
-            inner_height = 2 * self.inner_radius * scale_h * u.arcsec
-            outer_height = 2 * self.outer_radius * scale_h * u.arcsec
+            center, scale_major, scale_minor, angle = pixel_to_sky_svd_scales(
+                self.center, wcs)
+            inner_width = 2 * self.inner_radius * scale_major * u.arcsec
+            outer_width = 2 * self.outer_radius * scale_major * u.arcsec
+            inner_height = 2 * self.inner_radius * scale_minor * u.arcsec
+            outer_height = 2 * self.outer_radius * scale_minor * u.arcsec
             return EllipseAnnulusSkyRegion(
                 center, inner_width, outer_width,
                 inner_height, outer_height, angle=angle,
@@ -286,14 +288,14 @@ class CircleAnnulusSkyRegion(SkyRegion):
             ``use_ellipse`` is `True`.
         """
         if use_ellipse:
-            center, scale_w, scale_h, angle = sky_to_pixel_scales(
-                self.center, wcs, 0.0)
+            center, scale_major, scale_minor, angle = sky_to_pixel_svd_scales(
+                self.center, wcs)
             inner_radius_arcsec = self.inner_radius.to(u.arcsec).value
             outer_radius_arcsec = self.outer_radius.to(u.arcsec).value
-            inner_width = 2 * inner_radius_arcsec * scale_w
-            outer_width = 2 * outer_radius_arcsec * scale_w
-            inner_height = 2 * inner_radius_arcsec * scale_h
-            outer_height = 2 * outer_radius_arcsec * scale_h
+            inner_width = 2 * inner_radius_arcsec * scale_major
+            outer_width = 2 * outer_radius_arcsec * scale_major
+            inner_height = 2 * inner_radius_arcsec * scale_minor
+            outer_height = 2 * outer_radius_arcsec * scale_minor
             return EllipseAnnulusPixelRegion(
                 center, inner_width, outer_width,
                 inner_height, outer_height, angle=angle,

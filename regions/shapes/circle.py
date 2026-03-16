@@ -11,9 +11,9 @@ from astropy.coordinates import Angle
 
 from regions._geometry import circular_overlap_grid
 from regions._utils.wcs_helpers import (pixel_to_sky_mean_scale,
-                                        pixel_to_sky_scales,
+                                        pixel_to_sky_svd_scales,
                                         sky_to_pixel_mean_scale,
-                                        sky_to_pixel_scales)
+                                        sky_to_pixel_svd_scales)
 from regions.core.attributes import (PositiveScalar, PositiveScalarAngle,
                                      RegionMetaDescr, RegionVisualDescr,
                                      ScalarPixCoord, ScalarSkyCoord)
@@ -115,10 +115,10 @@ class CirclePixelRegion(PixelRegion):
             is `True`.
         """
         if use_ellipse:
-            center, scale_w, scale_h, angle = pixel_to_sky_scales(
-                self.center, wcs, 0.0)
-            width = Angle(2 * self.radius * scale_w, 'arcsec')
-            height = Angle(2 * self.radius * scale_h, 'arcsec')
+            center, scale_major, scale_minor, angle = pixel_to_sky_svd_scales(
+                self.center, wcs)
+            width = Angle(2 * self.radius * scale_major, 'arcsec')
+            height = Angle(2 * self.radius * scale_minor, 'arcsec')
             return EllipseSkyRegion(center, width, height, angle=angle,
                                     meta=self.meta.copy(),
                                     visual=self.visual.copy())
@@ -295,11 +295,11 @@ class CircleSkyRegion(SkyRegion):
             is `True`.
         """
         if use_ellipse:
-            center, scale_w, scale_h, angle = sky_to_pixel_scales(
-                self.center, wcs, 0.0)
+            center, scale_major, scale_minor, angle = sky_to_pixel_svd_scales(
+                self.center, wcs)
             radius_arcsec = self.radius.to(u.arcsec).value
-            width = 2 * radius_arcsec * scale_w
-            height = 2 * radius_arcsec * scale_h
+            width = 2 * radius_arcsec * scale_major
+            height = 2 * radius_arcsec * scale_minor
             return EllipsePixelRegion(center, width, height,
                                       angle=angle,
                                       meta=self.meta.copy(),
