@@ -153,7 +153,43 @@ class CircleAnnulusPixelRegion(AnnulusPixelRegion):
         return self._component_class(self.center, self.outer_radius,
                                      self.meta, self.visual)
 
-    def to_sky(self, wcs):
+    def to_sky(self, wcs, *, use_ellipse=False):
+        """
+        Return a sky region from this pixel region.
+
+        Parameters
+        ----------
+        wcs : WCS object
+            A world coordinate system (WCS) transformation that
+            supports the `astropy shared interface for WCS
+            <https://docs.astropy.org/en/stable/wcs/wcsapi.html>`_
+            (e.g., `astropy.wcs.WCS`).
+
+        use_ellipse : bool, optional
+            If `True`, return an `~regions.EllipseAnnulusSkyRegion`
+            instead of a `~regions.CircleAnnulusSkyRegion`. An ellipse
+            annulus is generally a better approximation when the WCS has
+            distortions or different pixel scales along different axes.
+            Default is `False`.
+
+        Returns
+        -------
+        region : `~regions.CircleAnnulusSkyRegion` or `~regions.EllipseAnnulusSkyRegion`
+            The sky region. An ellipse annulus is returned if
+            ``use_ellipse`` is `True`.
+        """
+        if use_ellipse:
+            center, scale_w, scale_h, angle = pixel_to_sky_scales(
+                self.center, wcs, 0.0)
+            inner_width = 2 * self.inner_radius * scale_w * u.arcsec
+            outer_width = 2 * self.outer_radius * scale_w * u.arcsec
+            inner_height = 2 * self.inner_radius * scale_h * u.arcsec
+            outer_height = 2 * self.outer_radius * scale_h * u.arcsec
+            return EllipseAnnulusSkyRegion(
+                center, inner_width, outer_width,
+                inner_height, outer_height, angle=angle,
+                meta=self.meta.copy(), visual=self.visual.copy())
+
         center, mean_scale = pixel_to_sky_mean_scale(self.center, wcs)
         inner_radius = self.inner_radius * mean_scale * u.arcsec
         outer_radius = self.outer_radius * mean_scale * u.arcsec
@@ -224,7 +260,45 @@ class CircleAnnulusSkyRegion(SkyRegion):
         if inner_radius >= outer_radius:
             raise ValueError('outer_radius must be greater than inner_radius')
 
-    def to_pixel(self, wcs):
+    def to_pixel(self, wcs, *, use_ellipse=False):
+        """
+        Return a pixel region from this sky region.
+
+        Parameters
+        ----------
+        wcs : WCS object
+            A world coordinate system (WCS) transformation that
+            supports the `astropy shared interface for WCS
+            <https://docs.astropy.org/en/stable/wcs/wcsapi.html>`_
+            (e.g., `astropy.wcs.WCS`).
+
+        use_ellipse : bool, optional
+            If `True`, return an `~regions.EllipseAnnulusPixelRegion`
+            instead of a `~regions.CircleAnnulusPixelRegion`. An ellipse
+            annulus is generally a better approximation when the WCS has
+            distortions or different pixel scales along different axes.
+            Default is `False`.
+
+        Returns
+        -------
+        region : `~regions.CircleAnnulusPixelRegion` or `~regions.EllipseAnnulusPixelRegion`
+            The pixel region. An ellipse annulus is returned if
+            ``use_ellipse`` is `True`.
+        """
+        if use_ellipse:
+            center, scale_w, scale_h, angle = sky_to_pixel_scales(
+                self.center, wcs, 0.0)
+            inner_radius_arcsec = self.inner_radius.to(u.arcsec).value
+            outer_radius_arcsec = self.outer_radius.to(u.arcsec).value
+            inner_width = 2 * inner_radius_arcsec * scale_w
+            outer_width = 2 * outer_radius_arcsec * scale_w
+            inner_height = 2 * inner_radius_arcsec * scale_h
+            outer_height = 2 * outer_radius_arcsec * scale_h
+            return EllipseAnnulusPixelRegion(
+                center, inner_width, outer_width,
+                inner_height, outer_height, angle=angle,
+                meta=self.meta.copy(), visual=self.visual.copy())
+
         center, mean_scale = sky_to_pixel_mean_scale(self.center, wcs)
         inner_radius = self.inner_radius.to(u.arcsec).value * mean_scale
         outer_radius = self.outer_radius.to(u.arcsec).value * mean_scale
