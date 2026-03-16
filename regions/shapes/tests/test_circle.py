@@ -13,6 +13,7 @@ from numpy.testing import assert_allclose
 from regions._utils.optional_deps import HAS_MATPLOTLIB
 from regions.core import PixCoord, RegionMeta, RegionVisual
 from regions.shapes.circle import CirclePixelRegion, CircleSkyRegion
+from regions.shapes.ellipse import EllipsePixelRegion, EllipseSkyRegion
 from regions.shapes.tests.test_common import (BaseTestPixelRegion,
                                               BaseTestSkyRegion)
 from regions.tests.helpers import make_simple_wcs
@@ -140,3 +141,98 @@ class TestCircleSkyRegion(BaseTestSkyRegion):
     def test_zero_size(self):
         with pytest.raises(ValueError):
             CircleSkyRegion(SkyCoord(3 * u.deg, 4 * u.deg), 0. * u.arcsec)
+
+
+class TestCirclePixelRegionToSkyEllipse:
+    """
+    Tests for CirclePixelRegion.to_sky with use_ellipse=True.
+    """
+
+    def setup_method(self):
+        self.center = PixCoord(10, 10)
+        self.radius = 5.0
+        self.meta = RegionMeta({'text': 'test'})
+        self.visual = RegionVisual({'color': 'blue'})
+        self.reg = CirclePixelRegion(self.center, self.radius,
+                                     meta=self.meta, visual=self.visual)
+        self.wcs = make_simple_wcs(SkyCoord(2 * u.deg, 3 * u.deg),
+                                   0.1 * u.deg, 20)
+
+    def test_to_sky_use_ellipse(self):
+        result = self.reg.to_sky(self.wcs, use_ellipse=True)
+        assert isinstance(result, EllipseSkyRegion)
+        assert result.meta == self.meta
+        assert result.visual == self.visual
+
+    def test_to_sky_ellipse_roundtrip(self):
+        sky_ellipse = self.reg.to_sky(self.wcs, use_ellipse=True)
+        pix_ellipse = sky_ellipse.to_pixel(self.wcs)
+        # For a simple WCS without distortion, the roundtrip should
+        # recover the original diameter as width and height
+        assert_allclose(pix_ellipse.width, 2 * self.radius, rtol=1e-5)
+        assert_allclose(pix_ellipse.height, 2 * self.radius, rtol=1e-5)
+        assert_allclose(pix_ellipse.center.x, self.center.x, rtol=1e-5)
+        assert_allclose(pix_ellipse.center.y, self.center.y, rtol=1e-5)
+
+    def test_to_sky_ellipse_center_matches_circle(self):
+        sky_circle = self.reg.to_sky(self.wcs)
+        sky_ellipse = self.reg.to_sky(self.wcs, use_ellipse=True)
+        assert_quantity_allclose(sky_ellipse.center.ra,
+                                 sky_circle.center.ra)
+        assert_quantity_allclose(sky_ellipse.center.dec,
+                                 sky_circle.center.dec)
+
+    def test_to_sky_use_ellipse_meta_copies(self):
+        result = self.reg.to_sky(self.wcs, use_ellipse=True)
+        result.meta['text'] = 'new'
+        result.visual['color'] = 'green'
+        assert result.meta['text'] != self.reg.meta['text']
+        assert result.visual['color'] != self.reg.visual['color']
+
+
+class TestCircleSkyRegionToPixelEllipse:
+    """
+    Tests for CircleSkyRegion.to_pixel with use_ellipse=True.
+    """
+
+    def setup_method(self):
+        self.center = SkyCoord(3 * u.deg, 4 * u.deg)
+        self.radius = 20 * u.arcsec
+        self.meta = RegionMeta({'text': 'test'})
+        self.visual = RegionVisual({'color': 'blue'})
+        self.reg = CircleSkyRegion(self.center, self.radius,
+                                   meta=self.meta, visual=self.visual)
+        self.wcs = make_simple_wcs(SkyCoord(3 * u.deg, 4 * u.deg),
+                                   5 * u.arcsec, 20)
+
+    def test_to_pixel_use_ellipse(self):
+        result = self.reg.to_pixel(self.wcs, use_ellipse=True)
+        assert isinstance(result, EllipsePixelRegion)
+        assert result.meta == self.meta
+        assert result.visual == self.visual
+
+    def test_to_pixel_default_returns_circle(self):
+        result = self.reg.to_pixel(self.wcs)
+        assert isinstance(result, CirclePixelRegion)
+
+    def test_to_pixel_ellipse_roundtrip(self):
+        pix_ellipse = self.reg.to_pixel(self.wcs, use_ellipse=True)
+        sky_ellipse = pix_ellipse.to_sky(self.wcs)
+        # Roundtrip should recover the original diameter
+        assert_quantity_allclose(sky_ellipse.width,
+                                 2 * self.radius, rtol=1e-4)
+        assert_quantity_allclose(sky_ellipse.height,
+                                 2 * self.radius, rtol=1e-4)
+
+    def test_to_pixel_ellipse_center_matches_circle(self):
+        pix_circle = self.reg.to_pixel(self.wcs)
+        pix_ellipse = self.reg.to_pixel(self.wcs, use_ellipse=True)
+        assert_allclose(pix_ellipse.center.x, pix_circle.center.x)
+        assert_allclose(pix_ellipse.center.y, pix_circle.center.y)
+
+    def test_to_pixel_use_ellipse_meta_copies(self):
+        result = self.reg.to_pixel(self.wcs, use_ellipse=True)
+        result.meta['text'] = 'new'
+        result.visual['color'] = 'green'
+        assert result.meta['text'] != self.reg.meta['text']
+        assert result.visual['color'] != self.reg.visual['color']
