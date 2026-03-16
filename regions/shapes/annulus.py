@@ -158,6 +158,30 @@ class CircleAnnulusPixelRegion(AnnulusPixelRegion):
         return CircleAnnulusSkyRegion(center, inner_radius, outer_radius,
                                       self.meta.copy(), self.visual.copy())
 
+    def to_polygon(self, npoints=100):
+        """
+        Return a `~regions.CompoundPixelRegion` of two
+        `~regions.PolygonPixelRegion` objects that approximates this
+        annulus.
+
+        Parameters
+        ----------
+        npoints : int, optional
+            The number of polygon vertices for each circle. Default
+            is 100.
+
+        Returns
+        -------
+        polygon : `~regions.CompoundPixelRegion`
+            A compound region of two polygon regions approximating the
+            annulus.
+        """
+        inner_polygon = self._inner_region.to_polygon(npoints=npoints)
+        outer_polygon = self._outer_region.to_polygon(npoints=npoints)
+        return CompoundPixelRegion(inner_polygon, outer_polygon,
+                                   operator.xor, self.meta.copy(),
+                                   self.visual.copy())
+
 
 class CircleAnnulusSkyRegion(SkyRegion):
     """
@@ -205,6 +229,28 @@ class CircleAnnulusSkyRegion(SkyRegion):
         return CircleAnnulusPixelRegion(center, inner_radius, outer_radius,
                                         meta=self.meta.copy(),
                                         visual=self.visual.copy())
+
+    def to_polygon(self, wcs, npoints=100):
+        """
+        Return a `~regions.CompoundSkyRegion` of two
+        `~regions.PolygonSkyRegion` objects that approximates this
+        annulus.
+
+        Parameters
+        ----------
+        wcs : `~astropy.wcs.WCS`
+            The WCS to use for the sky-to-pixel-to-sky conversion.
+        npoints : int, optional
+            The number of polygon vertices for each circle. Default
+            is 100.
+
+        Returns
+        -------
+        polygon : `~regions.CompoundSkyRegion`
+            A compound region of two polygon regions approximating the
+            annulus.
+        """
+        return self.to_pixel(wcs).to_polygon(npoints=npoints).to_sky(wcs)
 
 
 class AsymmetricAnnulusPixelRegion(AnnulusPixelRegion):
@@ -449,6 +495,30 @@ class EllipseAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
                                        meta=self.meta.copy(),
                                        visual=self.visual.copy())
 
+    def to_polygon(self, npoints=100):
+        """
+        Return a `~regions.CompoundPixelRegion` of two
+        `~regions.PolygonPixelRegion` objects that approximates this
+        annulus.
+
+        Parameters
+        ----------
+        npoints : int, optional
+            The number of polygon vertices for each ellipse. Default
+            is 100.
+
+        Returns
+        -------
+        polygon : `~regions.CompoundPixelRegion`
+            A compound region of two polygon regions approximating the
+            annulus.
+        """
+        inner_polygon = self._inner_region.to_polygon(npoints=npoints)
+        outer_polygon = self._outer_region.to_polygon(npoints=npoints)
+        return CompoundPixelRegion(inner_polygon, outer_polygon,
+                                   operator.xor, self.meta.copy(),
+                                   self.visual.copy())
+
 
 class EllipseAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
     """
@@ -506,6 +576,28 @@ class EllipseAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
         return EllipseAnnulusPixelRegion(*self.to_pixel_args(wcs),
                                          meta=self.meta.copy(),
                                          visual=self.visual.copy())
+
+    def to_polygon(self, wcs, npoints=100):
+        """
+        Return a `~regions.CompoundSkyRegion` of two
+        `~regions.PolygonSkyRegion` objects that approximates this
+        annulus.
+
+        Parameters
+        ----------
+        wcs : `~astropy.wcs.WCS`
+            The WCS to use for the sky-to-pixel-to-sky conversion.
+        npoints : int, optional
+            The number of polygon vertices for each ellipse. Default
+            is 100.
+
+        Returns
+        -------
+        polygon : `~regions.CompoundSkyRegion`
+            A compound region of two polygon regions approximating the
+            annulus.
+        """
+        return self.to_pixel(wcs).to_polygon(npoints=npoints).to_sky(wcs)
 
 
 class RectangleAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
@@ -590,6 +682,24 @@ class RectangleAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
                                          meta=self.meta.copy(),
                                          visual=self.visual.copy())
 
+    def to_polygon(self):
+        """
+        Return a `~regions.CompoundPixelRegion` of two
+        `~regions.PolygonPixelRegion` objects equivalent to this
+        annulus.
+
+        Returns
+        -------
+        polygon : `~regions.CompoundPixelRegion`
+            A compound region of two polygon regions equivalent to the
+            annulus.
+        """
+        inner_polygon = self._inner_region.to_polygon()
+        outer_polygon = self._outer_region.to_polygon()
+        return CompoundPixelRegion(inner_polygon, outer_polygon,
+                                   operator.xor, self.meta.copy(),
+                                   self.visual.copy())
+
 
 class RectangleAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
     """
@@ -648,3 +758,22 @@ class RectangleAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
         return RectangleAnnulusPixelRegion(*self.to_pixel_args(wcs),
                                            meta=self.meta.copy(),
                                            visual=self.visual.copy())
+
+    def to_polygon(self, wcs):
+        """
+        Return a `~regions.CompoundSkyRegion` of two
+        `~regions.PolygonSkyRegion` objects equivalent to this
+        annulus.
+
+        Parameters
+        ----------
+        wcs : `~astropy.wcs.WCS`
+            The WCS to use for the sky-to-pixel-to-sky conversion.
+
+        Returns
+        -------
+        polygon : `~regions.CompoundSkyRegion`
+            A compound region of two polygon regions equivalent to the
+            annulus.
+        """
+        return self.to_pixel(wcs).to_polygon().to_sky(wcs)

@@ -313,7 +313,8 @@ class RectanglePixelRegion(PixelRegion):
         """
         x, y = self.corners.T
         vertices = PixCoord(x=x, y=y)
-        return PolygonPixelRegion(vertices=vertices, meta=self.meta.copy(),
+        return PolygonPixelRegion(vertices=vertices,
+                                  meta=self.meta.copy(),
                                   visual=self.visual.copy())
 
     def _lower_left_xy(self):
@@ -411,3 +412,20 @@ class RectangleSkyRegion(SkyRegion):
                                     angle=angle,
                                     meta=self.meta.copy(),
                                     visual=self.visual.copy())
+
+    def to_polygon(self, wcs):
+        """
+        Return a `~regions.PolygonSkyRegion` equivalent to this
+        rectangle.
+
+        Parameters
+        ----------
+        wcs : `~astropy.wcs.WCS`
+            The WCS to use for the sky-to-pixel-to-sky conversion.
+
+        Returns
+        -------
+        polygon : `~regions.PolygonSkyRegion`
+            A polygon region equivalent to the rectangle.
+        """
+        return self.to_pixel(wcs).to_polygon().to_sky(wcs)
