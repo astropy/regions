@@ -260,7 +260,7 @@ To convert it to a pixel circle region (i.e.,
     >>> print(pix_reg)  # doctest: +FLOAT_CMP
     Region: CirclePixelRegion
     center: PixCoord(x=55.35205711214607, y=40.0958313892697)
-    radius: 0.010259141135043101
+    radius: 0.005971508746074291
 
 Also to convert a :class:`~regions.PixelRegion`
 to a :class:`~regions.SkyRegion`, call the
@@ -273,7 +273,22 @@ to a :class:`~regions.SkyRegion`, call the
     Region: CircleSkyRegion
     center: <SkyCoord (Galactic): (l, b) in deg
         (172.17231545, -38.27972337)>
-    radius: 18.55481729935556 arcsec
+    radius: 29.999999999999996 arcsec
+
+The conversion automatically selects the best method based on the WCS.
+For WCS with distortions (e.g., SIP) or non-astropy WCS objects (e.g.,
+`GWCS <https://github.com/spacetelescope/gwcs>`_), the local Jacobian
+matrix of the WCS transformation is computed at the region center.
+This allows the scale factors along the width and height directions
+to differ, providing accurate conversions even for distorted WCS. For
+simple WCS without distortions, a faster offset-based method is used,
+which is exact in that case.
+
+Note that all conversion methods are approximations that use the local
+pixel scale at the region center. Projection effects over the extent
+of the region are not accounted for. The region shape type is always
+preserved through the conversion (e.g., a `~regions.CirclePixelRegion`
+converts to a `~regions.CircleSkyRegion` and vice versa).
 
 
 .. _regions-as_mpl_selector:
