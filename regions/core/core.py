@@ -3,7 +3,9 @@ import abc
 import copy
 import operator
 
+import astropy.units as u
 import numpy as np
+from astropy.coordinates import SkyCoord
 
 from regions.core.metadata import RegionMeta, RegionVisual
 from regions.core.pixcoord import PixCoord
@@ -37,32 +39,88 @@ class Region(abc.ABC):
 
         return self.__class__(**changes)
 
-    def __repr__(self):
-        prefix = f'{self.__class__.__name__}'
-        cls_info = []
+    @staticmethod
+    def _format_param_value(val, *, decimals=4, max_elements=5):
+        """
+        Format a region parameter value for use in repr/str output.
+
+        Floats (including pixel coordinates) are formatted to
+        ``decimals`` decimal places. `~astropy.units.Quantity`
+        values are also formatted to ``decimals`` decimal places.
+        `~regions.PixCoord` arrays and `~astropy.coordinates.SkyCoord`
+        arrays with more than ``max_elements`` elements are truncated to
+        the first ``max_elements``.
+
+        Parameters
+        ----------
+        val : object
+            The parameter value to format.
+        decimals : int, optional
+            The number of decimal places for floating-point values.
+        max_elements : int, optional
+            The maximum number of array elements to display before
+            truncating with ``...``.
+        """
+        fmt = f'.{decimals}f'
+        if isinstance(val, SkyCoord):
+            if not val.isscalar and len(val) > max_elements:
+                result = str(val[:max_elements]).rstrip('>') + ', ...]>'
+            else:
+                result = str(val)
+        elif isinstance(val, PixCoord):
+            if val.isscalar:
+                if isinstance(val.x, float):
+                    result = (f'PixCoord(x={val.x:{fmt}}, '
+                              f'y={val.y:{fmt}})')
+                else:
+                    result = f'PixCoord(x={val.x}, y={val.y})'
+            else:
+                n = len(val.x)
+                xs = val.x[:max_elements] if n > max_elements else val.x
+                ys = val.y[:max_elements] if n > max_elements else val.y
+                if np.issubdtype(val.x.dtype, np.floating):
+                    x_str = ' '.join(f'{x:{fmt}}' for x in xs)
+                    y_str = ' '.join(f'{y:{fmt}}' for y in ys)
+                else:
+                    x_str = ' '.join(str(x) for x in xs)
+                    y_str = ' '.join(str(y) for y in ys)
+                if n > max_elements:
+                    x_str += ' ...'
+                    y_str += ' ...'
+                result = f'PixCoord(x=[{x_str}], y=[{y_str}])'
+        elif isinstance(val, u.Quantity):
+            result = f'{val.value:{fmt}} {val.unit}'
+        elif isinstance(val, float) and not isinstance(val, bool):
+            result = f'{val:{fmt}}'
+        else:
+            result = str(val)
+        return result
+
+    def _cls_info(self):
+        """
+        Return a list of ``(param_name, formatted_value)`` tuples for
+        all region parameters, used by `__repr__` and `__str__`.
+        """
+        info = []
         if self._params is not None:
             for param in self._params:
+                val = getattr(self, param)
                 if param == 'text':
-                    # place quotes around text value
-                    keyval = f'{param}={getattr(self, param)!r}'
+                    # Place quotes around text value
+                    formatted = repr(val)
                 else:
-                    keyval = f'{param}={getattr(self, param)}'
-                cls_info.append(keyval)
-        cls_info = ', '.join(cls_info)
+                    formatted = self._format_param_value(val)
+                info.append((param, formatted))
+        return info
+
+    def __repr__(self):
+        prefix = self.__class__.__name__
+        cls_info = ', '.join(f'{k}={v}' for k, v in self._cls_info())
         return f'<{prefix}({cls_info})>'
 
     def __str__(self):
-        cls_info = [('Region', self.__class__.__name__)]
-        if self._params is not None:
-            for param in self._params:
-                if param == 'text':
-                    # place quotes around text value
-                    keyval = (param, repr(getattr(self, param)))
-                else:
-                    keyval = (param, getattr(self, param))
-                cls_info.append(keyval)
-
-        return '\n'.join([f'{key}: {val}' for key, val in cls_info])
+        cls_info = [('Region', self.__class__.__name__)] + self._cls_info()
+        return '\n'.join(f'{key}: {val}' for key, val in cls_info)
 
     def __eq__(self, other):
         """
