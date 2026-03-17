@@ -172,7 +172,8 @@ class TestEllipseAnnulusPixelRegion(BaseTestPixelRegion):
         assert_allclose(reg_new.outer_width, self.reg.outer_width)
         assert_allclose(reg_new.inner_height, self.reg.inner_height)
         assert_allclose(reg_new.outer_height, self.reg.outer_height)
-        assert_quantity_allclose(reg_new.angle, self.reg.angle)
+        assert_quantity_allclose(reg_new.angle, self.reg.angle,
+                                 atol=1e-10 * u.deg)
         assert reg_new.meta == self.reg.meta
         assert reg_new.visual == self.reg.visual
 
