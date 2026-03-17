@@ -15,12 +15,12 @@ New Features
 
 - Improved pixel–sky coordinate conversions for non-distorted WCS
   objects, providing more accurate local pixel scales and North angle
-  estimates. [#650]
+  estimates. [#650, #651]
 
 - Improved pixel–sky coordinate conversions for distorted WCS objects
   (e.g., SIP) and non-astropy WCS implementations (e.g., GWCS), enabling
   more accurate transformations for directed regions such as ellipses and
-  rectangles. [#650]
+  rectangles. [#650, #651]
 
 Bug Fixes
 ---------
