@@ -195,12 +195,12 @@ class TestRegionPolygonPixelRegion(BaseTestPixelRegion):
     outside = [(20, 20), (80, 90)]
     expected_area = 1131.37085
     expected_repr = ('<RegularPolygonPixelRegion(center=PixCoord(x=50, y=50), '
-                     'nvertices=8, radius=20, angle=25.0 deg)>')
+                     'nvertices=8, radius=20, angle=25.0000 deg)>')
 
     expected_str = ('Region: RegularPolygonPixelRegion\n'
                     'center: PixCoord(x=50, y=50)\n'
                     'nvertices: 8\n'
-                    'radius: 20\nangle: 25.0 deg')
+                    'radius: 20\nangle: 25.0000 deg')
 
     def test_copy(self):
         reg = self.reg.copy()

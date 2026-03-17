@@ -64,9 +64,9 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
     outside = [(5, 2.5)]
     expected_area = 12
     expected_repr = ('<RectanglePixelRegion(center=PixCoord(x=3, y=4), '
-                     'width=4, height=3, angle=5.0 deg)>')
+                     'width=4, height=3, angle=5.0000 deg)>')
     expected_str = ('Region: RectanglePixelRegion\ncenter: PixCoord(x=3, '
-                    'y=4)\nwidth: 4\nheight: 3\nangle: 5.0 deg')
+                    'y=4)\nwidth: 4\nheight: 3\nangle: 5.0000 deg')
 
     def test_copy(self):
         reg = self.reg.copy()
@@ -328,11 +328,11 @@ class TestRectangleSkyRegion(BaseTestSkyRegion):
                              angle=5 * u.deg, meta=meta, visual=visual)
 
     expected_repr = ('<RectangleSkyRegion(center=<SkyCoord (ICRS): (ra, dec) '
-                     'in deg\n    (3., 4.)>, width=4.0 deg, height=3.0 deg, '
-                     'angle=5.0 deg)>')
+                     'in deg\n    (3., 4.)>, width=4.0000 deg, height=3.0000 deg, '
+                     'angle=5.0000 deg)>')
     expected_str = ('Region: RectangleSkyRegion\ncenter: <SkyCoord '
                     '(ICRS): (ra, dec) in deg\n    (3., 4.)>\nwidth: '
-                    '4.0 deg\nheight: 3.0 deg\nangle: 5.0 deg')
+                    '4.0000 deg\nheight: 3.0000 deg\nangle: 5.0000 deg')
 
     def test_copy(self):
         reg = self.reg.copy()
