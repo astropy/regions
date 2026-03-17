@@ -8,8 +8,10 @@ import operator
 
 import astropy.units as u
 
-from regions._utils.wcs_helpers import (pixel_to_sky_mean_scale,
+from regions._utils.wcs_helpers import (pixel_ellipse_to_sky_svd,
+                                        pixel_to_sky_mean_scale,
                                         pixel_to_sky_scales,
+                                        sky_ellipse_to_pixel_svd,
                                         sky_to_pixel_mean_scale,
                                         sky_to_pixel_scales)
 from regions.core.attributes import (PositiveScalar, PositiveScalarAngle,
@@ -329,15 +331,14 @@ class AsymmetricAnnulusPixelRegion(AnnulusPixelRegion):
                                      self.meta, self.visual)
 
     def to_sky_args(self, wcs):
-        center, scale_w, scale_h, angle = pixel_to_sky_scales(
-            self.center, wcs, self.angle.to(u.rad).value)
-        inner_width = self.inner_width * scale_w * u.arcsec
-        outer_width = self.outer_width * scale_w * u.arcsec
-        inner_height = self.inner_height * scale_h * u.arcsec
-        outer_height = self.outer_height * scale_h * u.arcsec
-
-        return (center, inner_width, outer_width, inner_height,
-                outer_height, angle)
+        center, outer_width, outer_height, angle = pixel_ellipse_to_sky_svd(
+            self.center, wcs, self.outer_width, self.outer_height,
+            self.angle.to(u.rad).value)
+        _, inner_width, inner_height, _ = pixel_ellipse_to_sky_svd(
+            self.center, wcs, self.inner_width, self.inner_height,
+            self.angle.to(u.rad).value)
+        return (center, inner_width * u.arcsec, outer_width * u.arcsec,
+                inner_height * u.arcsec, outer_height * u.arcsec, angle)
 
 
 class AsymmetricAnnulusSkyRegion(SkyRegion):
@@ -403,14 +404,18 @@ class AsymmetricAnnulusSkyRegion(SkyRegion):
             raise ValueError('outer_height must be greater than inner_height')
 
     def to_pixel_args(self, wcs):
-        center, scale_w, scale_h, angle = sky_to_pixel_scales(
-            self.center, wcs, self.angle.to(u.rad).value)
-        inner_width = self.inner_width.to(u.arcsec).value * scale_w
-        outer_width = self.outer_width.to(u.arcsec).value * scale_w
-        inner_height = self.inner_height.to(u.arcsec).value * scale_h
-        outer_height = self.outer_height.to(u.arcsec).value * scale_h
-        return (center, inner_width, outer_width, inner_height,
-                outer_height, angle)
+        center, outer_width, outer_height, angle = sky_ellipse_to_pixel_svd(
+            self.center, wcs,
+            self.outer_width.to(u.arcsec).value,
+            self.outer_height.to(u.arcsec).value,
+            self.angle.to(u.rad).value)
+        _, inner_width, inner_height, _ = sky_ellipse_to_pixel_svd(
+            self.center, wcs,
+            self.inner_width.to(u.arcsec).value,
+            self.inner_height.to(u.arcsec).value,
+            self.angle.to(u.rad).value)
+        return (center, inner_width, outer_width, inner_height, outer_height,
+                angle)
 
 
 class EllipseAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
@@ -677,6 +682,16 @@ class RectangleAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
         super().__init__(center, inner_width, outer_width, inner_height,
                          outer_height, angle, meta, visual)
 
+    def to_sky_args(self, wcs):
+        center, scale_w, scale_h, angle = pixel_to_sky_scales(
+            self.center, wcs, self.angle.to(u.rad).value)
+        inner_width = self.inner_width * scale_w * u.arcsec
+        outer_width = self.outer_width * scale_w * u.arcsec
+        inner_height = self.inner_height * scale_h * u.arcsec
+        outer_height = self.outer_height * scale_h * u.arcsec
+        return (center, inner_width, outer_width, inner_height,
+                outer_height, angle)
+
     def to_sky(self, wcs):
         return RectangleAnnulusSkyRegion(*self.to_sky_args(wcs),
                                          meta=self.meta.copy(),
@@ -753,6 +768,16 @@ class RectangleAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
                  outer_height, angle=0 * u.deg, meta=None, visual=None):
         super().__init__(center, inner_width, outer_width, inner_height,
                          outer_height, angle, meta, visual)
+
+    def to_pixel_args(self, wcs):
+        center, scale_w, scale_h, angle = sky_to_pixel_scales(
+            self.center, wcs, self.angle.to(u.rad).value)
+        inner_width = self.inner_width.to(u.arcsec).value * scale_w
+        outer_width = self.outer_width.to(u.arcsec).value * scale_w
+        inner_height = self.inner_height.to(u.arcsec).value * scale_h
+        outer_height = self.outer_height.to(u.arcsec).value * scale_h
+        return (center, inner_width, outer_width, inner_height,
+                outer_height, angle)
 
     def to_pixel(self, wcs):
         return RectangleAnnulusPixelRegion(*self.to_pixel_args(wcs),

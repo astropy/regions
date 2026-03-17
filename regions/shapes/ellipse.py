@@ -11,7 +11,8 @@ import numpy as np
 from astropy.coordinates import Angle
 
 from regions._geometry import elliptical_overlap_grid
-from regions._utils.wcs_helpers import pixel_to_sky_scales, sky_to_pixel_scales
+from regions._utils.wcs_helpers import (pixel_ellipse_to_sky_svd,
+                                        sky_ellipse_to_pixel_svd)
 from regions.core.attributes import (PositiveScalar, PositiveScalarAngle,
                                      RegionMetaDescr, RegionVisualDescr,
                                      ScalarAngle, ScalarPixCoord,
@@ -110,10 +111,11 @@ class EllipsePixelRegion(PixelRegion):
             return np.logical_not(in_ell)
 
     def to_sky(self, wcs):
-        center, scale_w, scale_h, angle = pixel_to_sky_scales(
-            self.center, wcs, self.angle.to(u.rad).value)
-        width = Angle(self.width * scale_w, 'arcsec')
-        height = Angle(self.height * scale_h, 'arcsec')
+        center, sky_width, sky_height, angle = pixel_ellipse_to_sky_svd(
+            self.center, wcs, self.width, self.height,
+            self.angle.to(u.rad).value)
+        width = Angle(sky_width, 'arcsec')
+        height = Angle(sky_height, 'arcsec')
         return EllipseSkyRegion(center, width, height, angle=angle,
                                 meta=self.meta.copy(),
                                 visual=self.visual.copy())
@@ -389,11 +391,12 @@ class EllipseSkyRegion(SkyRegion):
         self.visual = visual or RegionVisual()
 
     def to_pixel(self, wcs):
-        center, scale_w, scale_h, angle = sky_to_pixel_scales(
-            self.center, wcs, self.angle.to(u.rad).value)
-        width = self.width.to(u.arcsec).value * scale_w
-        height = self.height.to(u.arcsec).value * scale_h
-        return EllipsePixelRegion(center, width, height,
+        center, pix_width, pix_height, angle = sky_ellipse_to_pixel_svd(
+            self.center, wcs,
+            self.width.to(u.arcsec).value,
+            self.height.to(u.arcsec).value,
+            self.angle.to(u.rad).value)
+        return EllipsePixelRegion(center, pix_width, pix_height,
                                   angle=angle,
                                   meta=self.meta.copy(),
                                   visual=self.visual.copy())
