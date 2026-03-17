@@ -368,20 +368,20 @@ def compute_local_wcs_jacobian(skycoord, wcs):
     sky_x = wcs.pixel_to_world(x0 + 1, y0)
     sky_y = wcs.pixel_to_world(x0, y0 + 1)
 
-    ra0 = sky0.ra.rad
-    dec0 = sky0.dec.rad
+    ra0 = sky0.spherical.lon.rad
+    dec0 = sky0.spherical.lat.rad
     cos_dec = np.cos(dec0)
 
     # Tangent-plane offsets (xi, eta) in arcsec for a +1 pixel step
     # in x. xi = dRA * cos(dec), eta = dDec, both converted to arcsec.
-    dra_x = sky_x.ra.rad - ra0
-    ddec_x = sky_x.dec.rad - dec0
+    dra_x = sky_x.spherical.lon.rad - ra0
+    ddec_x = sky_x.spherical.lat.rad - dec0
     dxi_x = dra_x * cos_dec * 3600.0 * np.degrees(1)
     deta_x = ddec_x * 3600.0 * np.degrees(1)
 
     # Same for a +1 pixel step in y
-    dra_y = sky_y.ra.rad - ra0
-    ddec_y = sky_y.dec.rad - dec0
+    dra_y = sky_y.spherical.lon.rad - ra0
+    ddec_y = sky_y.spherical.lat.rad - dec0
     dxi_y = dra_y * cos_dec * 3600.0 * np.degrees(1)
     deta_y = ddec_y * 3600.0 * np.degrees(1)
 
@@ -590,6 +590,211 @@ def pixel_to_sky_mean_scale(pixcoord, wcs):
         return center, pixscale
 
     return jacobian_pixel_to_sky_mean_scale(pixcoord, wcs)
+
+
+def pixel_ellipse_to_sky_svd(pixcoord, wcs, width, height, pixel_angle_rad):
+    """
+    Convert a pixel ellipse to a sky ellipse using SVD.
+
+    This builds the composite matrix ``M_sky = J^{-1} @ M_pix`` where
+    ``M_pix`` encodes the pixel ellipse semi-axes and rotation, and
+    ``J^{-1}`` is the local inverse Jacobian. The SVD of ``M_sky`` gives
+    the exact sky ellipse semi-axes and orientation.
+
+    This handles WCS shear correctly: the sky image of a pixel ellipse
+    is always an ellipse, and SVD extracts its true principal axes,
+    regardless of whether the Jacobian's mapped width and height
+    directions are orthogonal.
+
+    Parameters
+    ----------
+    pixcoord : `~regions.PixCoord`
+        The pixel coordinate of the ellipse center.
+
+    wcs : WCS object
+        A world coordinate system (WCS) transformation that
+        supports the `astropy shared interface for WCS
+        <https://docs.astropy.org/en/stable/wcs/wcsapi.html>`_ (e.g.,
+        `astropy.wcs.WCS`, `gwcs.wcs.WCS`).
+
+    width : float
+        The full width of the pixel ellipse (before rotation) in pixels.
+
+    height : float
+        The full height of the pixel ellipse (before rotation) in
+        pixels.
+
+    pixel_angle_rad : float
+        The pixel rotation angle in radians. This is the angle of the
+        ellipse's width axis measured counterclockwise from the positive
+        x-axis.
+
+    Returns
+    -------
+    center : `~astropy.coordinates.SkyCoord`
+        The sky center position.
+
+    sky_width : float
+        The full width of the sky ellipse in arcsec.
+
+    sky_height : float
+        The full height of the sky ellipse in arcsec.
+
+    sky_angle : `~astropy.coordinates.Angle`
+        The sky rotation angle of the width axis, measured
+        counterclockwise from the longitude (RA) axis, wrapped to [0,
+        360) degrees.
+    """
+    center = wcs.pixel_to_world(pixcoord.x, pixcoord.y)
+
+    jacobian = compute_local_wcs_jacobian(center, wcs)
+    jacobian_inv = np.linalg.inv(jacobian)
+    parity = np.sign(np.linalg.det(jacobian))
+
+    # Build M_pix: columns are pixel semi-axis vectors
+    cos_a = np.cos(pixel_angle_rad)
+    sin_a = np.sin(pixel_angle_rad)
+    half_w = 0.5 * width
+    half_h = 0.5 * height
+    m_pix = np.array([[half_w * cos_a, -half_h * sin_a],
+                      [half_w * sin_a, half_h * cos_a]])
+
+    # M_sky = J^{-1} @ M_pix: columns are sky semi-axis vectors
+    m_sky = jacobian_inv @ m_pix
+    u_mat, s_vals, _vt = np.linalg.svd(m_sky)
+
+    # SVD returns singular values in descending order, so s_vals[0]
+    # corresponds to the major axis. Determine whether the major axis
+    # corresponds to the width or height by checking alignment with the
+    # mapped width semi-axis (first column of m_sky).
+    width_col = m_sky[:, 0]
+    if (np.abs(np.dot(u_mat[:, 0], width_col))
+            >= np.abs(np.dot(u_mat[:, 1], width_col))):
+        # Major axis aligns with width
+        sky_width = 2 * s_vals[0]
+        sky_height = 2 * s_vals[1]
+        angle_col = u_mat[:, 0]
+    else:
+        # Major axis aligns with height; swap
+        sky_width = 2 * s_vals[1]
+        sky_height = 2 * s_vals[0]
+        angle_col = u_mat[:, 1]
+
+    # Fix SVD sign ambiguity: ensure the angle direction aligns
+    # with the mapped width semi-axis
+    if np.dot(angle_col, width_col) < 0:
+        angle_col = -angle_col
+
+    # Sky angle of the width axis in tangent-plane coordinates
+    sky_angle = Angle(
+        np.rad2deg(np.arctan2(angle_col[1],
+                              parity * angle_col[0])) * u.deg
+    ).wrap_at(360 * u.deg)
+
+    return center, sky_width, sky_height, sky_angle
+
+
+def sky_ellipse_to_pixel_svd(skycoord, wcs, width_arcsec, height_arcsec,
+                             sky_angle_rad):
+    """
+    Convert a sky ellipse to a pixel ellipse using SVD.
+
+    This builds the composite matrix ``M_pix = J @ M_sky`` where
+    ``M_sky`` encodes the sky ellipse semi-axes and rotation, and ``J``
+    is the local Jacobian. The SVD of ``M_pix`` gives the exact pixel
+    ellipse semi-axes and orientation.
+
+    This handles WCS shear correctly: the pixel image of a sky ellipse
+    is always an ellipse, and SVD extracts its true principal axes,
+    regardless of whether the Jacobian's mapped width and height
+    directions are orthogonal.
+
+    Parameters
+    ----------
+    skycoord : `~astropy.coordinates.SkyCoord`
+        The sky coordinate of the ellipse center.
+
+    wcs : WCS object
+        A world coordinate system (WCS) transformation that
+        supports the `astropy shared interface for WCS
+        <https://docs.astropy.org/en/stable/wcs/wcsapi.html>`_ (e.g.,
+        `astropy.wcs.WCS`, `gwcs.wcs.WCS`).
+
+    width_arcsec : float
+        The full width of the sky ellipse in arcsec.
+
+    height_arcsec : float
+        The full height of the sky ellipse in arcsec.
+
+    sky_angle_rad : float
+        The sky rotation angle in radians. This is the angle of the
+        ellipse's width axis measured counterclockwise from the
+        longitude (RA) axis.
+
+    Returns
+    -------
+    center : `~regions.PixCoord`
+        The pixel center position.
+
+    pixel_width : float
+        The full width of the pixel ellipse in pixels.
+
+    pixel_height : float
+        The full height of the pixel ellipse in pixels.
+
+    pixel_angle : `~astropy.coordinates.Angle`
+        The pixel rotation angle of the width axis, measured
+        counterclockwise from the positive x-axis, wrapped to [0, 360)
+        degrees.
+    """
+    x0, y0 = wcs.world_to_pixel(skycoord)
+    center = PixCoord(x=x0, y=y0)
+
+    jacobian = compute_local_wcs_jacobian(skycoord, wcs)
+    parity = np.sign(np.linalg.det(jacobian))
+
+    # Build M_sky: columns are sky semi-axis vectors in tangent-plane
+    # coordinates. Apply parity to the RA component to account for the
+    # reflected RA axis.
+    cos_a = np.cos(sky_angle_rad)
+    sin_a = np.sin(sky_angle_rad)
+    half_w = 0.5 * width_arcsec
+    half_h = 0.5 * height_arcsec
+    m_sky = np.array([[parity * half_w * cos_a, -parity * half_h * sin_a],
+                      [half_w * sin_a, half_h * cos_a]])
+
+    # M_pix = J @ M_sky: columns are pixel semi-axis vectors
+    m_pix = jacobian @ m_sky
+    u_mat, s_vals, _vt = np.linalg.svd(m_pix)
+
+    # SVD returns singular values in descending order, so s_vals[0]
+    # corresponds to the major axis. Determine whether the major axis
+    # corresponds to the width or height by checking alignment with the
+    # mapped width semi-axis (first column of m_pix).
+    width_col = m_pix[:, 0]
+    if (np.abs(np.dot(u_mat[:, 0], width_col))
+            >= np.abs(np.dot(u_mat[:, 1], width_col))):
+        # Major axis aligns with width
+        pixel_width = 2 * s_vals[0]
+        pixel_height = 2 * s_vals[1]
+        angle_col = u_mat[:, 0]
+    else:
+        # Major axis aligns with height; swap
+        pixel_width = 2 * s_vals[1]
+        pixel_height = 2 * s_vals[0]
+        angle_col = u_mat[:, 1]
+
+    # Fix SVD sign ambiguity: ensure the angle direction aligns
+    # with the mapped width semi-axis
+    if np.dot(angle_col, width_col) < 0:
+        angle_col = -angle_col
+
+    # Pixel angle of the width axis
+    pixel_angle = Angle(
+        np.rad2deg(np.arctan2(angle_col[1], angle_col[0])) * u.deg
+    ).wrap_at(360 * u.deg)
+
+    return center, pixel_width, pixel_height, pixel_angle
 
 
 def wcs_pixel_scale_angle(skycoord, wcs):
