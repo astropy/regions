@@ -26,6 +26,14 @@ New Features
   more accurate transformations for directed regions such as ellipses and
   rectangles. [#650, #651]
 
+- Added a ``use_ellipse`` keyword to the ``to_pixel`` and ``to_sky``
+  methods of circular and circular annulus region classes that allows
+  the user to specify whether to return an elliptical region instead of
+  a circular region when converting between pixel and sky coordinates.
+  This is useful for cases where the WCS is distorted or has different
+  pixel scales along different axes and the circular region would be
+  significantly distorted in pixel or sky coordinates. [#652]
+
 - Improved the string representations of all ``Regions`` and ``Region``
   objects. [#653]
 
