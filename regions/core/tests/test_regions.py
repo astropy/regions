@@ -106,7 +106,8 @@ def test_regions_get_formats():
 def test_regions_repr():
     reg = CirclePixelRegion(PixCoord(0, 0), radius=1)
     regions = Regions([reg])
-    regions_str = '[<CirclePixelRegion(center=PixCoord(x=0, y=0), radius=1)>]'
-    regions_repr = f'<Regions({regions_str})>'
+    reg_repr = '<CirclePixelRegion(center=PixCoord(x=0, y=0), radius=1)>'
+    regions_str = reg_repr
+    regions_repr = f'<Regions([\n  {reg_repr}\n])>'
     assert str(regions) == regions_str
     assert repr(regions) == regions_repr
