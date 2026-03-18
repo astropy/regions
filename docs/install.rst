@@ -9,13 +9,13 @@ Regions has the following strict requirements:
 
 * `Python <https://www.python.org/>`_ 3.11 or later
 
-* `NumPy <https://numpy.org/>`_ 1.25 or later
+* `NumPy <https://numpy.org/>`_ 2.0 or later
 
-* `Astropy`_ 6.0 or later
+* `Astropy`_ 6.1 or later
 
 Region also optionally depends on other packages for some features:
 
-* `Matplotlib <https://matplotlib.org/>`_ 3.8 or later
+* `Matplotlib <https://matplotlib.org/>`_ 3.9 or later
 
 
 Installing the latest released version

@@ -280,7 +280,7 @@ statistics:
 
     >>> import numpy as np
     >>> np.average(data, weights=mask)  # doctest: +FLOAT_CMP
-    9364.012674888021
+    np.float64(9364.012674888021)
 
 
 .. _interactive-masks:

@@ -4,7 +4,11 @@
 General
 -------
 
-- The minimum required NumPy is now 1.26.4. [#650]
+- The minimum required NumPy is now 2.0. [#654]
+
+- The minimum required Astropy is now 6.1. [#654]
+
+- The minimum required Matplotlib is now 3.9. [#654]
 
 New Features
 ------------
