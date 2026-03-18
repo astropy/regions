@@ -53,7 +53,7 @@ or `regions.PixelRegion.contains` methods::
 
     >>> pixcoords = PixCoord.from_sky(sky_center, wcs)
     >>> pixel_region.contains(pixcoords)
-    True
+    np.True_
 
 Note that `regions.SkyRegion.contains` requires a WCS to be passed::
 
