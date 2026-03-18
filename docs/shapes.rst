@@ -259,8 +259,8 @@ To convert it to a pixel circle region (i.e.,
     >>> pix_reg = sky_reg.to_pixel(wcs)
     >>> print(pix_reg)  # doctest: +FLOAT_CMP
     Region: CirclePixelRegion
-    center: PixCoord(x=55.35205711214607, y=40.0958313892697)
-    radius: 0.005971508746074291
+    center: PixCoord(x=55.3521, y=40.0958)
+    radius: 0.0060
 
 Also to convert a :class:`~regions.PixelRegion`
 to a :class:`~regions.SkyRegion`, call the
@@ -379,7 +379,7 @@ regions::
     >>> print(regs[0])
     Region: CirclePixelRegion
     center: PixCoord(x=1, y=2)
-    radius: 4.2
+    radius: 4.2000
     >>> [reg.area for reg in regs]
     [55.41769440932395, 55.41769440932395]
 
