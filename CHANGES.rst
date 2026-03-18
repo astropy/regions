@@ -22,6 +22,9 @@ New Features
   more accurate transformations for directed regions such as ellipses and
   rectangles. [#650, #651]
 
+- Improved the string representations of all ``Regions`` and ``Region``
+  objects. [#653]
+
 Bug Fixes
 ---------
 

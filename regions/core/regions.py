@@ -44,10 +44,13 @@ class Regions:
 
     def __repr__(self):
         cls_name = self.__class__.__name__
-        return f'<{cls_name}({repr(self.regions)})>'
+        if not self.regions:
+            return f'<{cls_name}([])>'
+        regions_str = ',\n  '.join(repr(r) for r in self.regions)
+        return f'<{cls_name}([\n  {regions_str}\n])>'
 
     def __str__(self):
-        return str(self.regions)
+        return '\n'.join(repr(r) for r in self.regions)
 
     def __len__(self):
         return len(self.regions)

@@ -166,7 +166,7 @@ You can print the region to get some information about its properties:
     >>> print(region)
     Region: CirclePixelRegion
     center: PixCoord(x=42, y=43)
-    radius: 4.2
+    radius: 4.2000
 
 You can access its properties via attributes:
 
@@ -221,7 +221,7 @@ You can print the region to get some information about its properties:
     Region: CircleSkyRegion
     center: <SkyCoord (ICRS): (ra, dec) in deg
         (42., 43.)>
-    radius: 3.0 deg
+    radius: 3.0000 deg
 
 You can access its properties via attributes:
 
