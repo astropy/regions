@@ -87,9 +87,9 @@ class TestCircleSkyRegion(BaseTestSkyRegion):
                           meta=meta, visual=visual)
 
     expected_repr = ('<CircleSkyRegion(center=<SkyCoord (ICRS): (ra, dec) in '
-                     'deg\n    (3., 4.)>, radius=2.0000 arcsec)>')
+                     'deg\n    (3., 4.)>, radius=2.0 arcsec)>')
     expected_str = ('Region: CircleSkyRegion\ncenter: <SkyCoord (ICRS): '
-                    '(ra, dec) in deg\n    (3., 4.)>\nradius: 2.0000 '
+                    '(ra, dec) in deg\n    (3., 4.)>\nradius: 2.0 '
                     'arcsec')
 
     def test_copy(self):

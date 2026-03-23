@@ -114,7 +114,7 @@ parsed for the ``fits`` format::
     >>> regions_str = '# Region file format: DS9\nimage\ncircle(147.10,254.17,3.1) # color=green\n'
     >>> regions = Regions.parse(regions_str, format='ds9')
     >>> print(regions)
-    <CirclePixelRegion(center=PixCoord(x=146.1000, y=253.1700), radius=3.1000)>
+    <CirclePixelRegion(center=PixCoord(x=146.1, y=253.17), radius=3.1)>
     >>> print(regions[0].visual)
     {'default_style': 'ds9', 'facecolor': 'green', 'edgecolor': 'green'}
 
@@ -149,7 +149,7 @@ As an example, let's create a :class:`~regions.CircleSkyRegion` object::
     >>> region = CircleSkyRegion(coord, radius=0.01 * u.deg)
     >>> region
     <CircleSkyRegion(center=<SkyCoord (FK5: equinox=J2000.000): (ra, dec) in deg
-        (202.469575, 47.19525833)>, radius=0.0100 deg)>
+        (202.469575, 47.19525833)>, radius=0.01 deg)>
 
 To serialize the region::
 

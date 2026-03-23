@@ -15,6 +15,41 @@ __all__ = ['Region', 'PixelRegion', 'SkyRegion']
 __doctest_skip__ = ['Region.serialize', 'Region.write']
 
 
+def _format_float(val, max_decimals=4, sci_threshold=1e5):
+    """
+    Format a float for repr/str output.
+
+    Trailing zeros are stripped (a single trailing zero after a decimal
+    point is always kept).  Scientific notation is used for values with
+    absolute value >= ``sci_threshold`` or <= 1e-5.
+
+    Parameters
+    ----------
+    val : float
+        The float value to format.
+    max_decimals : int, optional
+        The maximum number of decimal places.
+    sci_threshold : float, optional
+        The threshold above which scientific notation is used.
+    """
+    val = float(val)
+
+    if (np.isfinite(val)
+            and (abs(val) >= sci_threshold or (0 < abs(val) <= 1e-5))):
+        s = f'{val:.{max_decimals}e}'
+        mantissa, exponent = s.split('e')
+        mantissa = mantissa.rstrip('0')
+        if mantissa.endswith('.'):
+            mantissa += '0'
+        result = f'{mantissa}e{exponent}'
+    else:
+        result = f'{val:.{max_decimals}f}'
+        result = result.rstrip('0')
+        if result.endswith('.'):
+            result += '0'
+    return result
+
+
 class Region(abc.ABC):
     """
     Base class for all regions.
@@ -40,28 +75,28 @@ class Region(abc.ABC):
         return self.__class__(**changes)
 
     @staticmethod
-    def _format_param_value(val, *, decimals=4, max_elements=5):
+    def _format_param_value(val, *, max_decimals=4, max_elements=5):
         """
         Format a region parameter value for use in repr/str output.
 
-        Floats (including pixel coordinates) are formatted to
-        ``decimals`` decimal places. `~astropy.units.Quantity`
-        values are also formatted to ``decimals`` decimal places.
-        `~regions.PixCoord` arrays and `~astropy.coordinates.SkyCoord`
-        arrays with more than ``max_elements`` elements are truncated to
-        the first ``max_elements``.
+        Floats (including pixel coordinates) are formatted using
+        `_format_float` with at most ``max_decimals`` decimal
+        places and trailing zeros stripped. `~regions.PixCoord`
+        arrays and `~astropy.coordinates.SkyCoord` arrays with more
+        than ``max_elements`` elements are truncated to the first
+        ``max_elements``.
 
         Parameters
         ----------
         val : object
             The parameter value to format.
-        decimals : int, optional
-            The number of decimal places for floating-point values.
+        max_decimals : int, optional
+            The maximum number of decimal places for floating-point
+            values.
         max_elements : int, optional
             The maximum number of array elements to display before
             truncating with ``...``.
         """
-        fmt = f'.{decimals}f'
         if isinstance(val, SkyCoord):
             if not val.isscalar and len(val) > max_elements:
                 result = str(val[:max_elements]).rstrip('>') + ', ...]>'
@@ -70,8 +105,9 @@ class Region(abc.ABC):
         elif isinstance(val, PixCoord):
             if val.isscalar:
                 if isinstance(val.x, float):
-                    result = (f'PixCoord(x={val.x:{fmt}}, '
-                              f'y={val.y:{fmt}})')
+                    x_fmt = _format_float(val.x, max_decimals)
+                    y_fmt = _format_float(val.y, max_decimals)
+                    result = f'PixCoord(x={x_fmt}, y={y_fmt})'
                 else:
                     result = f'PixCoord(x={val.x}, y={val.y})'
             else:
@@ -79,8 +115,10 @@ class Region(abc.ABC):
                 xs = val.x[:max_elements] if n > max_elements else val.x
                 ys = val.y[:max_elements] if n > max_elements else val.y
                 if np.issubdtype(val.x.dtype, np.floating):
-                    x_str = ' '.join(f'{x:{fmt}}' for x in xs)
-                    y_str = ' '.join(f'{y:{fmt}}' for y in ys)
+                    x_str = ' '.join(
+                        _format_float(x, max_decimals) for x in xs)
+                    y_str = ' '.join(
+                        _format_float(y, max_decimals) for y in ys)
                 else:
                     x_str = ' '.join(str(x) for x in xs)
                     y_str = ' '.join(str(y) for y in ys)
@@ -89,9 +127,9 @@ class Region(abc.ABC):
                     y_str += ' ...'
                 result = f'PixCoord(x=[{x_str}], y=[{y_str}])'
         elif isinstance(val, u.Quantity):
-            result = f'{val.value:{fmt}} {val.unit}'
+            result = f'{_format_float(val.value, max_decimals)} {val.unit}'
         elif isinstance(val, float) and not isinstance(val, bool):
-            result = f'{val:{fmt}}'
+            result = _format_float(val, max_decimals)
         else:
             result = str(val)
         return result
