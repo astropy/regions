@@ -860,4 +860,4 @@ def wcs_pixel_scale_angle(skycoord, wcs):
     angle_rad = np.arctan2(dy, dx)
     angle = Angle(np.rad2deg(angle_rad) * u.deg).wrap_at(360 * u.deg)
 
-    return pixcoord, scale, angle,
+    return pixcoord, scale, angle
