@@ -110,7 +110,7 @@ def make_gwcs():
     scale = models.Scale(cdelt_deg) & models.Scale(cdelt_deg)
     rotation = models.AffineTransformation2D(
         matrix=np.array([[-1, 0], [0, 1]]),
-        translation=[0, 0]
+        translation=[0, 0],
     )
     tan = models.Pix2Sky_TAN()
     celestial_rotation = models.RotateNative2Celestial(100.0, 30.0, 180.0)

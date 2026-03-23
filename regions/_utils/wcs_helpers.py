@@ -447,7 +447,7 @@ def sky_to_pixel_scales(skycoord, wcs, sky_angle_rad):
         # axis; photutils aperture sky angles are defined as the PA of
         # the semimajor axis (i.e., relative to the WCS latitude axis).
         pixel_angle = Angle(np.rad2deg(sky_angle_rad) * u.deg
-                            + (north_angle - 90 * u.deg)
+                            + (north_angle - 90 * u.deg),
                             ).wrap_at(360 * u.deg)
         return center, scale, scale, pixel_angle
 
@@ -506,7 +506,7 @@ def pixel_to_sky_scales(pixcoord, wcs, pixel_angle_rad):
         # axis; photutils aperture sky angles are defined as the PA of
         # the semimajor axis (i.e., relative to the WCS latitude axis).
         sky_angle = Angle(np.rad2deg(pixel_angle_rad) * u.deg
-                          - (north_angle - 90 * u.deg)
+                          - (north_angle - 90 * u.deg),
                           ).wrap_at(360 * u.deg)
         return center, pixscale, pixscale, sky_angle
 
@@ -688,7 +688,7 @@ def pixel_ellipse_to_sky_svd(pixcoord, wcs, width, height, pixel_angle_rad):
     # Sky angle of the width axis in tangent-plane coordinates
     sky_angle = Angle(
         np.rad2deg(np.arctan2(angle_col[1],
-                              parity * angle_col[0])) * u.deg
+                              parity * angle_col[0])) * u.deg,
     ).wrap_at(360 * u.deg)
 
     return center, sky_width, sky_height, sky_angle
@@ -791,7 +791,7 @@ def sky_ellipse_to_pixel_svd(skycoord, wcs, width_arcsec, height_arcsec,
 
     # Pixel angle of the width axis
     pixel_angle = Angle(
-        np.rad2deg(np.arctan2(angle_col[1], angle_col[0])) * u.deg
+        np.rad2deg(np.arctan2(angle_col[1], angle_col[0])) * u.deg,
     ).wrap_at(360 * u.deg)
 
     return center, pixel_width, pixel_height, pixel_angle

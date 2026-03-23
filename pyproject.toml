@@ -230,7 +230,7 @@ exclude = [
 
 [tool.ruff.lint]
 select = [
-    'B', 'D', 'E', 'F', 'FLY', 'I', 'INT', 'N', 'NPY', 'PERF', 'PL', 'Q',
+    'B', 'COM', 'D', 'E', 'F', 'FLY', 'I', 'INT', 'N', 'NPY', 'PERF', 'PL', 'Q',
     'RSE', 'SIM', 'UP', 'W'
 ]
 ignore = [
