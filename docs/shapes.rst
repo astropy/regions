@@ -379,7 +379,7 @@ regions::
     >>> print(regs[0])
     Region: CirclePixelRegion
     center: PixCoord(x=1, y=2)
-    radius: 4.2000
+    radius: 4.2
     >>> [reg.area for reg in regs]
     [55.41769440932395, 55.41769440932395]
 

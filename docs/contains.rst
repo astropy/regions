@@ -13,7 +13,7 @@ Let's start by defining both a sky and pixel region::
     Region: CircleSkyRegion
     center: <SkyCoord (ICRS): (ra, dec) in deg
         (42., 43.)>
-    radius: 25.0000 deg
+    radius: 25.0 deg
 
     >>> pixel_center = PixCoord(x=42, y=43)
     >>> pixel_radius = 42

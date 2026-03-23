@@ -30,11 +30,11 @@ or the :meth:`~regions.Region.intersection` method::
     region1: Region: CircleSkyRegion
     center: <SkyCoord (Galactic): (l, b) in deg
         (1., 2.)>
-    radius: 5.0000 deg
+    radius: 5.0 deg
     region2: Region: CircleSkyRegion
     center: <SkyCoord (Galactic): (l, b) in deg
         (356., 3.)>
-    radius: 3.0000 deg
+    radius: 3.0 deg
     operator: <built-in function and_>
 
     >>> comp_region = circle1.intersection(circle2)
@@ -43,11 +43,11 @@ or the :meth:`~regions.Region.intersection` method::
     region1: Region: CircleSkyRegion
     center: <SkyCoord (Galactic): (l, b) in deg
         (1., 2.)>
-    radius: 5.0000 deg
+    radius: 5.0 deg
     region2: Region: CircleSkyRegion
     center: <SkyCoord (Galactic): (l, b) in deg
         (356., 3.)>
-    radius: 3.0000 deg
+    radius: 3.0 deg
     operator: <built-in function and_>
 
 
@@ -63,11 +63,11 @@ To create a union compound region, use either the ``|`` operator or the
     region1: Region: CircleSkyRegion
     center: <SkyCoord (Galactic): (l, b) in deg
         (1., 2.)>
-    radius: 5.0000 deg
+    radius: 5.0 deg
     region2: Region: CircleSkyRegion
     center: <SkyCoord (Galactic): (l, b) in deg
         (356., 3.)>
-    radius: 3.0000 deg
+    radius: 3.0 deg
     operator: <built-in function or_>
 
     >>> comp_region = circle1.union(circle2)
@@ -76,11 +76,11 @@ To create a union compound region, use either the ``|`` operator or the
     region1: Region: CircleSkyRegion
     center: <SkyCoord (Galactic): (l, b) in deg
         (1., 2.)>
-    radius: 5.0000 deg
+    radius: 5.0 deg
     region2: Region: CircleSkyRegion
     center: <SkyCoord (Galactic): (l, b) in deg
         (356., 3.)>
-    radius: 3.0000 deg
+    radius: 3.0 deg
     operator: <built-in function or_>
 
 
@@ -96,11 +96,11 @@ operator or the :meth:`~regions.Region.symmetric_difference` method::
     region1: Region: CircleSkyRegion
     center: <SkyCoord (Galactic): (l, b) in deg
         (1., 2.)>
-    radius: 5.0000 deg
+    radius: 5.0 deg
     region2: Region: CircleSkyRegion
     center: <SkyCoord (Galactic): (l, b) in deg
         (356., 3.)>
-    radius: 3.0000 deg
+    radius: 3.0 deg
     operator: <built-in function xor>
 
     >>> comp_region = circle1.symmetric_difference(circle2)
@@ -109,11 +109,11 @@ operator or the :meth:`~regions.Region.symmetric_difference` method::
     region1: Region: CircleSkyRegion
     center: <SkyCoord (Galactic): (l, b) in deg
         (1., 2.)>
-    radius: 5.0000 deg
+    radius: 5.0 deg
     region2: Region: CircleSkyRegion
     center: <SkyCoord (Galactic): (l, b) in deg
         (356., 3.)>
-    radius: 3.0000 deg
+    radius: 3.0 deg
     operator: <built-in function xor>
 
 

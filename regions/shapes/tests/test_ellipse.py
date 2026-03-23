@@ -35,9 +35,9 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
     outside = [(5, 4)]
     expected_area = 3 * np.pi
     expected_repr = ('<EllipsePixelRegion(center=PixCoord(x=3, y=4), '
-                     'width=4, height=3, angle=5.0000 deg)>')
+                     'width=4, height=3, angle=5.0 deg)>')
     expected_str = ('Region: EllipsePixelRegion\ncenter: PixCoord(x=3, y=4)\n'
-                    'width: 4\nheight: 3\nangle: 5.0000 deg')
+                    'width: 4\nheight: 3\nangle: 5.0 deg')
 
     def test_copy(self):
         reg = self.reg.copy()
@@ -293,11 +293,11 @@ class TestEllipseSkyRegion(BaseTestSkyRegion):
                            visual=visual)
 
     expected_repr = ('<EllipseSkyRegion(center=<SkyCoord (ICRS): (ra, dec) '
-                     'in deg\n    (3., 4.)>, width=4.0000 deg, height=3.0000 deg,'
-                     ' angle=5.0000 deg)>')
+                     'in deg\n    (3., 4.)>, width=4.0 deg, height=3.0 deg,'
+                     ' angle=5.0 deg)>')
     expected_str = ('Region: EllipseSkyRegion\ncenter: <SkyCoord (ICRS): '
-                    '(ra, dec) in deg\n    (3., 4.)>\nwidth: 4.0000 deg\n'
-                    'height: 3.0000 deg\nangle: 5.0000 deg')
+                    '(ra, dec) in deg\n    (3., 4.)>\nwidth: 4.0 deg\n'
+                    'height: 3.0 deg\nangle: 5.0 deg')
 
     def test_copy(self):
         reg = self.reg.copy()
