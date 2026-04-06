@@ -57,7 +57,7 @@ class WholeSphericalSkyRegion(SphericalSkyRegion):
         self,
         wcs=None,
         include_boundary_distortions=False,
-        discretize_kwargs=None
+        discretize_kwargs=None,
     ):
         # Not defined
         raise NotImplementedError('Not defined.')
@@ -66,7 +66,7 @@ class WholeSphericalSkyRegion(SphericalSkyRegion):
         self,
         wcs=None,
         include_boundary_distortions=False,
-        discretize_kwargs=None
+        discretize_kwargs=None,
     ):
         # Not defined
         raise NotImplementedError('Not defined.')

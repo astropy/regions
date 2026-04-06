@@ -74,10 +74,10 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
     _params = ('frame', 'longitude_range', 'latitude_range')
     _boundaries = ('longitude_bounds', 'latitude_bounds')
     longitude_range = TwoValAngleorNone(
-        'The range of longitude values, as a length-2 |Quantity| angle or list or as None'
+        'The range of longitude values, as a length-2 |Quantity| angle or list or as None',
     )
     latitude_range = TwoValAngleorNone(
-        'The range of latitude values, as a length-2 |Quantity| angle or list or as None'
+        'The range of latitude values, as a length-2 |Quantity| angle or list or as None',
     )
 
     def __init__(
@@ -87,7 +87,7 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
         latitude_range=None,
         meta=None,
         visual=None,
-        **kwargs
+        **kwargs,
     ):
         # Validate inputs:
         if ((longitude_range is None) & (latitude_range is None)
@@ -282,7 +282,7 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
         center_gc2 = SkyCoord(c_gc2_sph.lon, 0 * u.deg, frame=self.frame)
 
         return LuneSphericalSkyRegion(
-            center_gc1, center_gc2, self.meta, self.visual
+            center_gc1, center_gc2, self.meta, self.visual,
         )
 
     def _derive_latitude_bounds(self):
@@ -324,12 +324,12 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
                 # simple circle centered at S pole:
                 lat_bounds = CircleSphericalSkyRegion(
                     c_pole_s, lat_arr[0] + 90.0 * u.deg,
-                    self.meta, self.visual
+                    self.meta, self.visual,
                 )
             else:
                 # Simple circle case:
                 lat_bounds = CircleSphericalSkyRegion(
-                    c_pole, outer_rad, self.meta, self.visual
+                    c_pole, outer_rad, self.meta, self.visual,
                 )
             return lat_bounds
         elif lat_arr[0] == Angle(-90 * u.deg):
@@ -338,13 +338,13 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
                 # equivalent to [X*u.deg, 90*u.deg], and is a simple circle
                 # Radius from input X*u.deg constraint is in inner_rad after swap
                 lat_bounds = CircleSphericalSkyRegion(
-                    c_pole, inner_rad, self.meta, self.visual
+                    c_pole, inner_rad, self.meta, self.visual,
                 )
             else:
                 # Simple circle centered at S pole:
                 lat_bounds = CircleSphericalSkyRegion(
                     c_pole_s, lat_arr[1] + 90.0 * u.deg,
-                    self.meta, self.visual
+                    self.meta, self.visual,
                 )
             return lat_bounds
 
@@ -355,14 +355,14 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
                 WholeSphericalSkyRegion(),
                 CircleAnnulusSphericalSkyRegion(
                     c_pole, inner_rad, outer_rad,
-                    self.meta, self.visual
+                    self.meta, self.visual,
                 ),
-                operator.xor, self.meta, self.visual
+                operator.xor, self.meta, self.visual,
             )
 
         # Not wrapping poles:
         return CircleAnnulusSphericalSkyRegion(
-            c_pole, inner_rad, outer_rad, self.meta, self.visual
+            c_pole, inner_rad, outer_rad, self.meta, self.visual,
         )
 
     @property
@@ -429,7 +429,7 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
 
         return CompoundSphericalSkyRegion(
             self.longitude_bounds, self.latitude_bounds,
-            operator.and_, self.meta, self.visual
+            operator.and_, self.meta, self.visual,
         )
 
     @property
@@ -603,7 +603,7 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
                     self.longitude_range[0],
                     self.longitude_range[1],
                     self.longitude_range[1],
-                    self.longitude_range[0]
+                    self.longitude_range[0],
                 ]
                 verts_lat = [
                     self.latitude_range[0],
@@ -625,7 +625,7 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
                     verts_lon = [
                         self.longitude_range[0],
                         self.longitude_range[1],
-                        self.longitude_range[0]
+                        self.longitude_range[0],
                     ]
                     verts_lat = [
                         self.latitude_range[0],
@@ -637,7 +637,7 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
                     verts_lon = [
                         self.longitude_range[0],
                         self.longitude_range[1],
-                        self.longitude_range[0]
+                        self.longitude_range[0],
                     ]
                     verts_lat = [
                         self.latitude_range[0],
@@ -792,7 +792,7 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
             bound_orig = getattr(self, bound)
             if bound_orig is not None:
                 transformed[f"_{bound}"] = bound_orig.transform_to(
-                    frame, merge_attributes=merge_attributes
+                    frame, merge_attributes=merge_attributes,
                 )
             else:
                 transformed[f"_{bound}"] = bound_orig
@@ -806,7 +806,7 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
                 verts = self.vertices
             if verts is not None:
                 transformed[field] = verts.transform_to(
-                    frame, merge_attributes=merge_attributes
+                    frame, merge_attributes=merge_attributes,
                 )
             else:
                 transformed[field] = None
@@ -825,7 +825,7 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
             return self.longitude_bounds.discretize_boundary(n_points=n_points)
         elif (bound_nverts == 4) | (bound_nverts == 3):
             bound_verts = discretize_all_edge_boundaries(
-                self.vertices, self._edge_circs, n_points
+                self.vertices, self._edge_circs, n_points,
             )
             return PolygonSphericalSkyRegion(bound_verts)
         elif bound_nverts == 6:
@@ -835,13 +835,13 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
         self,
         wcs=None,
         include_boundary_distortions=False,
-        discretize_kwargs=None
+        discretize_kwargs=None,
     ):
         if not include_boundary_distortions:
             raise ValueError(
                 'Invalid parameter: `include_boundary_distortions=False`!\n'
                 'Transforming range to planar sky region is only possible by '
-                'including boundary distortions.'
+                'including boundary distortions.',
             )
 
         self._validate_planar_spherical_transform(wcs, include_boundary_distortions)
@@ -867,7 +867,7 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
             raise ValueError(
                 'Invalid parameter: `include_boundary_distortions=False`!\n'
                 'Transforming range to planar pixel region is only possible by '
-                'including boundary distortions.'
+                'including boundary distortions.',
             )
 
         self._validate_planar_spherical_transform(wcs, include_boundary_distortions)
@@ -885,5 +885,5 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
 
         return PolygonPixelRegion(
             PixCoord(*verts), meta=self.meta.copy(),
-            visual=self.visual.copy()
+            visual=self.visual.copy(),
         )

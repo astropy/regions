@@ -134,13 +134,13 @@ def test_pix_to_spherical_sky(region, include_dist):
         with pytest.raises(NotImplementedError):
             sph_sky_region = region.to_spherical_sky(
                 COMMON_WCS,
-                include_boundary_distortions=include_dist
+                include_boundary_distortions=include_dist,
             )
             assert isinstance(sph_sky_region, SphericalSkyRegion)
     else:
         sph_sky_region = region.to_spherical_sky(
             COMMON_WCS,
-            include_boundary_distortions=include_dist
+            include_boundary_distortions=include_dist,
         )
         assert isinstance(sph_sky_region, SphericalSkyRegion)
 
@@ -196,13 +196,13 @@ def test_sky_to_spherical_sky(region, include_dist):
         with pytest.raises(NotImplementedError):
             sph_sky_region = region.to_spherical_sky(
                 COMMON_WCS,
-                include_boundary_distortions=include_dist
+                include_boundary_distortions=include_dist,
             )
             assert isinstance(sph_sky_region, SphericalSkyRegion)
     else:
         sph_sky_region = region.to_spherical_sky(
             COMMON_WCS,
-            include_boundary_distortions=include_dist
+            include_boundary_distortions=include_dist,
         )
         assert isinstance(sph_sky_region, SphericalSkyRegion)
 
@@ -215,7 +215,7 @@ def test_spherical_sky_to_sky(region, include_dist):
         with pytest.raises(NotImplementedError):
             _ = region.to_sky(
                 COMMON_WCS,
-                include_boundary_distortions=include_dist
+                include_boundary_distortions=include_dist,
             )
 
     elif isinstance(region, LuneSphericalSkyRegion) & include_dist:
@@ -223,7 +223,7 @@ def test_spherical_sky_to_sky(region, include_dist):
         with pytest.raises(NotImplementedError):
             _ = region.to_sky(
                 COMMON_WCS,
-                include_boundary_distortions=include_dist
+                include_boundary_distortions=include_dist,
             )
 
     elif (isinstance(region, (LuneSphericalSkyRegion, RangeSphericalSkyRegion))
@@ -232,7 +232,7 @@ def test_spherical_sky_to_sky(region, include_dist):
         with pytest.raises(ValueError) as excinfo:
             _ = region.to_sky(
                 COMMON_WCS,
-                include_boundary_distortions=include_dist
+                include_boundary_distortions=include_dist,
             )
 
         estr = 'Invalid parameter: `include_boundary_distortions=False`!'
@@ -241,7 +241,7 @@ def test_spherical_sky_to_sky(region, include_dist):
     else:
         sky_region = region.to_sky(
             COMMON_WCS,
-            include_boundary_distortions=include_dist
+            include_boundary_distortions=include_dist,
         )
         assert isinstance(sky_region, SkyRegion)
 
@@ -254,7 +254,7 @@ def test_spherical_sky_to_pix(region, include_dist):
         with pytest.raises(NotImplementedError):
             _ = region.to_pixel(
                 COMMON_WCS,
-                include_boundary_distortions=include_dist
+                include_boundary_distortions=include_dist,
             )
 
     elif isinstance(region, LuneSphericalSkyRegion) & include_dist:
@@ -262,7 +262,7 @@ def test_spherical_sky_to_pix(region, include_dist):
         with pytest.raises(NotImplementedError):
             _ = region.to_pixel(
                 COMMON_WCS,
-                include_boundary_distortions=include_dist
+                include_boundary_distortions=include_dist,
             )
 
     elif (isinstance(region, (LuneSphericalSkyRegion, RangeSphericalSkyRegion))
@@ -271,7 +271,7 @@ def test_spherical_sky_to_pix(region, include_dist):
         with pytest.raises(ValueError) as excinfo:
             _ = region.to_pixel(
                 COMMON_WCS,
-                include_boundary_distortions=include_dist
+                include_boundary_distortions=include_dist,
             )
         estr = 'Invalid parameter: `include_boundary_distortions=False`!'
         assert estr in str(excinfo.value)
@@ -279,7 +279,7 @@ def test_spherical_sky_to_pix(region, include_dist):
     else:
         pixel_region = region.to_pixel(
             COMMON_WCS,
-            include_boundary_distortions=include_dist
+            include_boundary_distortions=include_dist,
         )
         assert isinstance(pixel_region, PixelRegion)
 

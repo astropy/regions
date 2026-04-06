@@ -61,14 +61,14 @@ class LuneSphericalSkyRegion(SphericalSkyRegion):
     def _circle_1(self):
         return CircleSphericalSkyRegion(
             self.center_gc1, 90 * u.deg,
-            self.meta, self.visual
+            self.meta, self.visual,
         )
 
     @property
     def _circle_2(self):
         return CircleSphericalSkyRegion(
             self.center_gc2, 90 * u.deg,
-            self.meta, self.visual
+            self.meta, self.visual,
         )
 
     @property
@@ -118,7 +118,7 @@ class LuneSphericalSkyRegion(SphericalSkyRegion):
                 c_gc1_sph.lat,
                 c_p_sph.lat,
             ],
-            frame=self.frame
+            frame=self.frame,
         )
 
         return cross_product_sum_skycoord2skycoord(verts)
@@ -147,7 +147,7 @@ class LuneSphericalSkyRegion(SphericalSkyRegion):
                 c_p_sph.lat,
                 c_p_a_sph.lat,
             ],
-            frame=self.frame
+            frame=self.frame,
         )
 
         return verts
@@ -159,7 +159,7 @@ class LuneSphericalSkyRegion(SphericalSkyRegion):
     @property
     def bounding_lonlat(self):
         lons_arr, lats_arr = get_edge_raw_lonlat_bounds_circ_edges(
-            self.vertices, self.centroid, self._edge_circs
+            self.vertices, self.centroid, self._edge_circs,
         )
 
         lons_arr, lats_arr = self._validate_lonlat_bounds(lons_arr, lats_arr)
@@ -179,12 +179,12 @@ class LuneSphericalSkyRegion(SphericalSkyRegion):
             center_gc1_transf,
             center_gc2_transf,
             self.meta.copy(),
-            self.visual.copy()
+            self.visual.copy(),
         )
 
     def discretize_boundary(self, n_points=100):
         bound_verts = discretize_all_edge_boundaries(
-            self.vertices, self._edge_circs, n_points
+            self.vertices, self._edge_circs, n_points,
         )
         return PolygonSphericalSkyRegion(bound_verts)
 
@@ -192,20 +192,20 @@ class LuneSphericalSkyRegion(SphericalSkyRegion):
         self,
         wcs=None,
         include_boundary_distortions=False,
-        discretize_kwargs=None
+        discretize_kwargs=None,
     ):
         if not include_boundary_distortions:
             raise ValueError(
                 'Invalid parameter: `include_boundary_distortions=False`!\n'
                 'Transforming lune to planar sky region is only possible by '
-                'including boundary distortions, as there is no analogous sky region.'
+                'including boundary distortions, as there is no analogous sky region.',
             )
         if discretize_kwargs is None:
             discretize_kwargs = {}
 
         if wcs is None:
             raise ValueError(
-                "'wcs' must be set if `include_boundary_distortions=True`"
+                "'wcs' must be set if `include_boundary_distortions=True`",
             )
         # Requires spherical to planar projection (from WCS) and discretization
         # Use to_pixel(), then apply "small angle approx" to get planar sky.
@@ -225,7 +225,7 @@ class LuneSphericalSkyRegion(SphericalSkyRegion):
             raise ValueError(
                 'Invalid parameter: `include_boundary_distortions=False`!\n'
                 'Transforming range to planar pixel region is only possible by '
-                'including boundary distortions, as there is no analogous pixel region.'
+                'including boundary distortions, as there is no analogous pixel region.',
             )
 
         if discretize_kwargs is None:
@@ -233,7 +233,7 @@ class LuneSphericalSkyRegion(SphericalSkyRegion):
 
         if wcs is None:
             raise ValueError(
-                "'wcs' must be set if `include_boundary_distortions=True`"
+                "'wcs' must be set if `include_boundary_distortions=True`",
             )
         # Requires spherical to planar projection (from WCS) and discretization
         raise NotImplementedError
