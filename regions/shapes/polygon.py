@@ -454,11 +454,8 @@ class PolygonSphericalSkyRegion(SphericalSkyRegion):
     """
     A spherical polygon defined using vertices in sky coordinates.
 
-    Internal "contains" logic could be changed to
-    leverage spherical-geometry package functionality.
-
-    This region is very much akin to the `~regions.PolygonPixelRegion`
-    class (and borrows internal attributes following the same structure).
+    Currently, this class only supports convex spherical polygons.
+    (Note that non-convex polygons will have incorrect "contains" logic.)
 
     Parameters
     ----------

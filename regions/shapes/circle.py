@@ -314,9 +314,6 @@ class CircleSphericalSkyRegion(SphericalSkyRegion):
     Class for a circular sky region, where the circle is interpreted
     within a spherical geometry reference frame.
 
-    This region is very much akin to the `~regions.CircleSkyRegion`
-    class (and borrows internal attributes following the same structure).
-
     Parameters
     ----------
     center : `~astropy.coordinates.SkyCoord`

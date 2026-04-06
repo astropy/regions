@@ -42,8 +42,9 @@ New Features
   projection effects between spherical and planar geometries
   or to ignore them (e.g., assuming a circle stays a perfect circle).
   Current spherical shapes supported include: ``CircleSphericalSkyRegion``,
-  ``CircleAnnulusSphericalSkyRegion``, ``RangeSphericalSkyRegion``
-  (i.e., bounded by ranges of longitude and/or latitude), and
+  ``CircleAnnulusSphericalSkyRegion``,
+  ``PolygonSphericalSkyRegion`` (currently only supports convex polygons),
+  ``RangeSphericalSkyRegion``  (i.e., bounded by ranges of longitude and/or latitude), and
   ``LuneSphericalSkyRegion`` (a slice between two great circles,
   such as between two lines of longitude).
   Support for additional spherical shapes, and for all cases of

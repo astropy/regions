@@ -175,10 +175,13 @@ Polygon
 .. methods, e.g. how to obtain a polygon approximation for any shape.
 .. This is not available yet, for now see `spherical_geometry`_ for
 .. spherical polygons and `Shapely`_ for pixel polygons.
+.. TODO: after spherical polygons are generalized, remove note
+.. about spherical polygon only supporting convex polygons.
 
 `~regions.PolygonSkyRegion`, `~regions.PolygonPixelRegion`,
 `~regions.PolygonSphericalSkyRegion`, and
-`~regions.RegularPolygonPixelRegion`
+`~regions.RegularPolygonPixelRegion`. (Note that currently
+`~regions.PolygonSphericalSkyRegion` only supports convex polygons.)
 
 .. code-block:: python
 
