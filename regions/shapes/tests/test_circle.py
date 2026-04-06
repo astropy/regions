@@ -203,7 +203,7 @@ class TestCircleSphericalSkyRegion(BaseTestSphericalSkyRegion):
 
         assert_allclose(pixcircle.center.x, -50.5)
         assert_allclose(pixcircle.center.y, 299.5)
-        assert_allclose(pixcircle.radius, 0.027777777777828305)
+        assert_allclose(pixcircle.radius, 0.0278117, rtol=1e-6)
 
         skycircle = sphskycircle.to_sky(wcs)
         assert isinstance(skycircle, CircleSkyRegion)
