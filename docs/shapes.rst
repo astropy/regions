@@ -402,9 +402,7 @@ to the `~regions.SphericalSkyRegion.discretize_boundary()` method.
     vertices: <SkyCoord (Galactic): (l, b) in deg
         [(172.161888  , -38.27816116), (172.16270941, -38.28327092),
         (172.16720048, -38.2870257 ), (172.1736458 , -38.28799101),
-        (172.17958283, -38.28579805), (172.18274335, -38.28128466),
-        (172.18192055, -38.27617504), (172.17742939, -38.27242082),
-        (172.1709854 , -38.27145571), (172.16504929, -38.27364824)]>
+        (172.17958283, -38.28579805)], ...]>
 
 
 Similarly, spherical sky regions can be converted to pixel regions
@@ -418,18 +416,16 @@ respectively).
     ...                                include_boundary_distortions=False)
     >>> print(pix_reg)  # doctest: +FLOAT_CMP
     Region: CirclePixelRegion
-    center: PixCoord(x=55.352057112146014, y=40.095831389269705)
-    radius: 0.010259141134880476
+    center: PixCoord(x=55.3521, y=40.0958)
+    radius: 0.006
 
     >>> pix_reg2 = sph_sky_reg.to_pixel(wcs=wcs,
     ...                                 include_boundary_distortions=True,
     ...                                 discretize_kwargs={"n_points": 10})
     >>> print(pix_reg2)  # doctest: +FLOAT_CMP
     Region: PolygonPixelRegion
-    vertices: PixCoord(x=[55.35441629 55.36250693 55.366607   55.36514936
-    55.35869012 55.34969718 55.34160657 55.33750862 55.33896755 55.34542545],
-    y=[40.09920163 40.0934575  40.08862017 40.08653731 40.08800466 40.09246189
-    40.09820641 40.10304382 40.10512634 40.1036587 ])
+    vertices: PixCoord(x=[55.3544 55.3625 55.3666 55.3651 55.3587 ...],
+    y=[40.0992 40.0935 40.0886 40.0865 40.088 ...])
 
 
 Planar regions can also be transformed to spherical regions, with the
