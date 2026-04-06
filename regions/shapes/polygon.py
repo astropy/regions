@@ -446,7 +446,7 @@ class PolygonSkyRegion(SkyRegion):
         return PolygonSphericalSkyRegion(
             self.vertices,
             self.meta.copy(),
-            self.visual.copy()
+            self.visual.copy(),
         )
 
 
@@ -566,7 +566,7 @@ class PolygonSphericalSkyRegion(SphericalSkyRegion):
     @property
     def bounding_lonlat(self):
         lons_arr, lats_arr = get_edge_raw_lonlat_bounds_circ_edges(
-            self.vertices, self.centroid, self._edge_circs
+            self.vertices, self.centroid, self._edge_circs,
         )
 
         lons_arr, lats_arr = self._validate_lonlat_bounds(lons_arr, lats_arr)
@@ -585,12 +585,12 @@ class PolygonSphericalSkyRegion(SphericalSkyRegion):
         return PolygonSphericalSkyRegion(
             verts_transf,
             self.meta.copy(),
-            self.visual.copy()
+            self.visual.copy(),
         )
 
     def discretize_boundary(self, n_points=10):
         bound_verts = discretize_all_edge_boundaries(
-            self.vertices, self._edge_circs, n_points
+            self.vertices, self._edge_circs, n_points,
         )
         return PolygonSphericalSkyRegion(bound_verts)
 
@@ -598,7 +598,7 @@ class PolygonSphericalSkyRegion(SphericalSkyRegion):
             self,
             wcs=None,
             include_boundary_distortions=False,
-            discretize_kwargs=None
+            discretize_kwargs=None,
     ):
         self._validate_planar_spherical_transform(wcs, include_boundary_distortions)
 
@@ -617,7 +617,7 @@ class PolygonSphericalSkyRegion(SphericalSkyRegion):
         return PolygonSkyRegion(
             self.vertices,
             meta=self.meta,
-            visual=self.visual
+            visual=self.visual,
         )
 
     def to_pixel(
@@ -633,12 +633,12 @@ class PolygonSphericalSkyRegion(SphericalSkyRegion):
         if include_boundary_distortions:
             # Requires spherical to planar projection (from WCS) and discretization
             verts = wcs.world_to_pixel(
-                self.discretize_boundary(**discretize_kwargs).vertices
+                self.discretize_boundary(**discretize_kwargs).vertices,
             )
 
             return PolygonPixelRegion(
                 PixCoord(*verts), meta=self.meta.copy(),
-                visual=self.visual.copy()
+                visual=self.visual.copy(),
             )
 
         return self.to_sky().to_pixel(wcs)

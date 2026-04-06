@@ -115,7 +115,7 @@ class AnnulusSphericalSkyRegion(SphericalSkyRegion, abc.ABC):
         # Check if shape covers either pole & modify lats arr accordingly,
         # accounting for annular geometry:
         lons_arr, lats_arr = self._validate_lonlat_bounds(
-            lons_arr, lats_arr, inner_region=self._inner_region
+            lons_arr, lats_arr, inner_region=self._inner_region,
         )
 
         return lons_arr, lats_arr
@@ -340,7 +340,7 @@ class CircleAnnulusSkyRegion(SkyRegion):
 
         return CircleAnnulusSphericalSkyRegion(
             self.center, self.inner_radius, self.outer_radius,
-            self.meta.copy(), self.visual.copy()
+            self.meta.copy(), self.visual.copy(),
         )
 
 
@@ -406,7 +406,7 @@ class CircleAnnulusSphericalSkyRegion(AnnulusSphericalSkyRegion):
             self.inner_radius.copy(),
             self.outer_radius.copy(),
             self.meta.copy(),
-            self.visual.copy()
+            self.visual.copy(),
         )
 
     def discretize_boundary(self, n_points=100):
@@ -415,14 +415,14 @@ class CircleAnnulusSphericalSkyRegion(AnnulusSphericalSkyRegion):
             self._outer_region.discretize_boundary(n_points=n_points),
             operator=operator.xor,
             meta=self.meta.copy(),
-            visual=self.visual.copy()
+            visual=self.visual.copy(),
         )
 
     def to_sky(
             self,
             wcs=None,
             include_boundary_distortions=False,
-            discretize_kwargs=None
+            discretize_kwargs=None,
     ):
         self._validate_planar_spherical_transform(wcs, include_boundary_distortions)
 
@@ -443,7 +443,7 @@ class CircleAnnulusSphericalSkyRegion(AnnulusSphericalSkyRegion):
             self.inner_radius.copy(),
             self.outer_radius.copy(),
             meta=self.meta.copy(),
-            visual=self.visual.copy()
+            visual=self.visual.copy(),
         )
 
     def to_pixel(
@@ -471,7 +471,7 @@ class CircleAnnulusSphericalSkyRegion(AnnulusSphericalSkyRegion):
                 PolygonPixelRegion(PixCoord(*outer_vertices)),
                 operator=operator.xor,
                 meta=self.meta.copy(),
-                visual=self.visual.copy()
+                visual=self.visual.copy(),
             )
 
         return self.to_sky().to_pixel(wcs)

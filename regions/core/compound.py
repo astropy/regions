@@ -410,7 +410,7 @@ class CompoundSphericalSkyRegion(SphericalSkyRegion):
 
             # Check if shape covers either pole & modify lats arr accordingly:
             lons_arr, lats_arr = bounding_lonlat_poles_processing(
-                self, lons_arr, lats_arr
+                self, lons_arr, lats_arr,
             )
 
             return lons_arr, lats_arr
@@ -431,7 +431,7 @@ class CompoundSphericalSkyRegion(SphericalSkyRegion):
 
     def contains(self, coord):
         in_reg = self.operator(
-            self.region1.contains(coord), self.region2.contains(coord)
+            self.region1.contains(coord), self.region2.contains(coord),
         )
         if self.meta.get('include', True):
             return in_reg
@@ -454,7 +454,7 @@ class CompoundSphericalSkyRegion(SphericalSkyRegion):
             self.region2.discretize_boundary(n_points=n_points),
             operator=self.operator,
             meta=self.meta.copy(),
-            visual=self.visual.copy()
+            visual=self.visual.copy(),
         )
 
     def to_sky(

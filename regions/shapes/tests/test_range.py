@@ -108,7 +108,7 @@ class TestRangeSphericalSkyRegion(BaseTestSphericalSkyRegion):
 
     def test_invalid_lon_bounds_input(self):
         invalid_bounds = CircleSphericalSkyRegion(SkyCoord(5 * u.deg, 0 * u.deg),
-                                                  0.2 * u.deg),
+                                                  0.2 * u.deg)
         with pytest.raises(ValueError) as excinfo:
             _ = RangeSphericalSkyRegion(_longitude_bounds=invalid_bounds,
                                         frame='icrs')

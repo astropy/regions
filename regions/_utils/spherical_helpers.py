@@ -187,7 +187,7 @@ def _get_circle_longitude_tangent_points(center, radius):
     lats = [0 * u.deg, 0 * u.deg]
 
     lats_ref = np.array(
-        [(crepr.lat - radius).to_value(u.deg), (crepr.lat + radius).to_value(u.deg)]
+        [(crepr.lat - radius).to_value(u.deg), (crepr.lat + radius).to_value(u.deg)],
     )
     lons = []
 
@@ -196,14 +196,14 @@ def _get_circle_longitude_tangent_points(center, radius):
 
     if np.any(np.abs(lats_ref) == 90):
         return SkyCoord(
-            [crepr.lon - 90 * u.deg, crepr.lon + 90 * u.deg], lats, frame=center.frame
+            [crepr.lon - 90 * u.deg, crepr.lon + 90 * u.deg], lats, frame=center.frame,
         )
 
     for sgn in [-1, 1]:
         # Do 1 then -1, because of lon increasing to east
         lon_gc = crepr.lon - sgn * (
             np.arccos(
-                np.sin(radius.to_value(u.radian)) / np.cos(crepr.lat.to_value(u.radian))
+                np.sin(radius.to_value(u.radian)) / np.cos(crepr.lat.to_value(u.radian)),
             )
             * u.radian
         ).to(u.deg)
@@ -342,7 +342,7 @@ def _validate_vertices_ordering(verts, gc, gc_center=None):
     if not is_valid_arc_length:
         wrap_ang_opp = pas_verts[-1]
         pas_verts_wrap_opp, is_valid_arc_length_opp = _check_edge_lt_pi(
-            pas_verts[::-1], wrap_ang_opp
+            pas_verts[::-1], wrap_ang_opp,
         )
         if is_valid_arc_length_opp:
             return pas_verts_wrap_opp, wrap_ang_opp
@@ -423,7 +423,7 @@ def get_edge_raw_lonlat_bounds_circ_edges(vertices, centroid, gcs):
 
         lats_list = _add_tan_pts_if_in_pa_range(
             lats_list, tan_lat_pts, gc, wrap_ang, pas_verts_wrap,
-            coord='lat'
+            coord='lat',
         )
 
         # --------------------------------------------------------
@@ -434,7 +434,7 @@ def get_edge_raw_lonlat_bounds_circ_edges(vertices, centroid, gcs):
         if tan_lon_pts is not None:
             lons_list = _add_tan_pts_if_in_pa_range(
                 lons_list, tan_lon_pts, gc, wrap_ang, pas_verts_wrap,
-                coord='lon'
+                coord='lon',
             )
 
     lons_arr = [lons_list.min(), lons_list.max()]
@@ -553,9 +553,9 @@ def discretize_all_edge_boundaries(vertices, circs, n_points):
             # concatenate introduces distances/non unit spherical representation
             all_edge_bound_verts = SkyCoord(
                 np.concatenate(
-                    [all_edge_bound_verts.copy(), bound_verts]
+                    [all_edge_bound_verts.copy(), bound_verts],
                 ),
-                representation_type=UnitSphericalRepresentation
+                representation_type=UnitSphericalRepresentation,
             )
 
     return all_edge_bound_verts

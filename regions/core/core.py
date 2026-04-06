@@ -334,7 +334,7 @@ class Region(abc.ABC):
         # Validate whether inputs are valid for planar <-> spherical transformations
         if include_boundary_distortions and (wcs is None):
             raise ValueError(
-                "'wcs' must be set if `include_boundary_distortions=True`"
+                "'wcs' must be set if `include_boundary_distortions=True`",
             )
 
 
@@ -751,7 +751,7 @@ class SphericalSkyRegion(Region):
         from .compound import CompoundSphericalSkyRegion
 
         return CompoundSphericalSkyRegion(
-            region1=self, region2=other, operator=operator.and_
+            region1=self, region2=other, operator=operator.and_,
         )
 
     def symmetric_difference(self, other):
@@ -767,7 +767,7 @@ class SphericalSkyRegion(Region):
         from .compound import CompoundSphericalSkyRegion
 
         return CompoundSphericalSkyRegion(
-            region1=self, region2=other, operator=operator.xor
+            region1=self, region2=other, operator=operator.xor,
         )
 
     def union(self, other):
@@ -783,7 +783,7 @@ class SphericalSkyRegion(Region):
         from .compound import CompoundSphericalSkyRegion
 
         return CompoundSphericalSkyRegion(
-            region1=self, region2=other, operator=operator.or_
+            region1=self, region2=other, operator=operator.or_,
         )
 
     @staticmethod
@@ -807,7 +807,7 @@ class SphericalSkyRegion(Region):
         else:
             raise AttributeError(
                 "Either 'center' or 'vertices' must be an attribute/property "
-                'of the SphericalSkyRegion.'
+                'of the SphericalSkyRegion.',
             )
 
     @property
@@ -826,7 +826,7 @@ class SphericalSkyRegion(Region):
     def _validate_lonlat_bounds(self, lons_arr, lats_arr, inner_region=None):
         # Check if shape covers either pole & modify lats arr accordingly:
         lons_arr, lats_arr = bounding_lonlat_poles_processing(
-            self, lons_arr, lats_arr, inner_region=inner_region
+            self, lons_arr, lats_arr, inner_region=inner_region,
         )
         return lons_arr, lats_arr
 
@@ -918,7 +918,7 @@ class SphericalSkyRegion(Region):
 
     @abc.abstractmethod
     def to_sky(
-        self, wcs=None, include_boundary_distortions=False, discretize_kwargs=None
+        self, wcs=None, include_boundary_distortions=False, discretize_kwargs=None,
     ):
         """
         Convert to a planar `~regions.SkyRegion` instance.
@@ -951,7 +951,7 @@ class SphericalSkyRegion(Region):
 
     @abc.abstractmethod
     def to_pixel(
-        self, wcs=None, include_boundary_distortions=False, discretize_kwargs=None
+        self, wcs=None, include_boundary_distortions=False, discretize_kwargs=None,
     ):
         """
         Convert to a planar `~regions.PixelRegion` instance.
