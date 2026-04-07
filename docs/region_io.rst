@@ -181,3 +181,10 @@ Region File Format Limitations
 
     ds9_io
     fits_io
+
+
+Spherical Regions Limitations
+=============================
+
+Reading/writing and serializing `~regions.SphericalSkyRegion` objects
+is not currently implemented.
