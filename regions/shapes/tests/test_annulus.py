@@ -125,6 +125,94 @@ class TestCircleAnnulusSkyRegion(BaseTestSkyRegion):
         assert reg != self.reg
 
 
+class TestCircleAnnulusPixelRegionToSkyEllipse:
+    """
+    Tests for CircleAnnulusPixelRegion.to_sky with use_ellipse=True.
+    """
+
+    def setup_method(self):
+        self.center = PixCoord(10, 10)
+        self.inner_radius = 3.0
+        self.outer_radius = 5.0
+        self.meta = RegionMeta({'text': 'test'})
+        self.visual = RegionVisual({'color': 'blue'})
+        self.reg = CircleAnnulusPixelRegion(
+            self.center, self.inner_radius, self.outer_radius,
+            meta=self.meta, visual=self.visual)
+        self.wcs = make_simple_wcs(SkyCoord(2 * u.deg, 3 * u.deg),
+                                   0.1 * u.deg, 20)
+
+    def test_to_sky_use_ellipse(self):
+        result = self.reg.to_sky(self.wcs, use_ellipse=True)
+        assert isinstance(result, EllipseAnnulusSkyRegion)
+        assert result.meta == self.meta
+        assert result.visual == self.visual
+
+    def test_to_sky_ellipse_roundtrip(self):
+        sky_ellipse = self.reg.to_sky(self.wcs, use_ellipse=True)
+        pix_ellipse = sky_ellipse.to_pixel(self.wcs)
+        assert_allclose(pix_ellipse.center.x, self.center.x, rtol=1e-5)
+        assert_allclose(pix_ellipse.center.y, self.center.y, rtol=1e-5)
+        assert_allclose(pix_ellipse.inner_width,
+                        2 * self.inner_radius, rtol=1e-4)
+        assert_allclose(pix_ellipse.outer_width,
+                        2 * self.outer_radius, rtol=1e-4)
+        assert_allclose(pix_ellipse.inner_height,
+                        2 * self.inner_radius, rtol=1e-4)
+        assert_allclose(pix_ellipse.outer_height,
+                        2 * self.outer_radius, rtol=1e-4)
+
+    def test_to_sky_use_ellipse_meta_copies(self):
+        result = self.reg.to_sky(self.wcs, use_ellipse=True)
+        result.meta['text'] = 'new'
+        result.visual['color'] = 'green'
+        assert result.meta['text'] != self.reg.meta['text']
+        assert result.visual['color'] != self.reg.visual['color']
+
+
+class TestCircleAnnulusSkyRegionToPixelEllipse:
+    """
+    Tests for CircleAnnulusSkyRegion.to_pixel with use_ellipse=True.
+    """
+
+    def setup_method(self):
+        self.center = SkyCoord(3 * u.deg, 4 * u.deg)
+        self.inner_radius = 20 * u.arcsec
+        self.outer_radius = 30 * u.arcsec
+        self.meta = RegionMeta({'text': 'test'})
+        self.visual = RegionVisual({'color': 'blue'})
+        self.reg = CircleAnnulusSkyRegion(
+            self.center, self.inner_radius, self.outer_radius,
+            meta=self.meta, visual=self.visual)
+        self.wcs = make_simple_wcs(SkyCoord(3 * u.deg, 4 * u.deg),
+                                   5 * u.arcsec, 20)
+
+    def test_to_pixel_use_ellipse(self):
+        result = self.reg.to_pixel(self.wcs, use_ellipse=True)
+        assert isinstance(result, EllipseAnnulusPixelRegion)
+        assert result.meta == self.meta
+        assert result.visual == self.visual
+
+    def test_to_pixel_ellipse_roundtrip(self):
+        pix_ellipse = self.reg.to_pixel(self.wcs, use_ellipse=True)
+        sky_ellipse = pix_ellipse.to_sky(self.wcs)
+        assert_quantity_allclose(sky_ellipse.inner_width,
+                                 2 * self.inner_radius, rtol=1e-4)
+        assert_quantity_allclose(sky_ellipse.outer_width,
+                                 2 * self.outer_radius, rtol=1e-4)
+        assert_quantity_allclose(sky_ellipse.inner_height,
+                                 2 * self.inner_radius, rtol=1e-4)
+        assert_quantity_allclose(sky_ellipse.outer_height,
+                                 2 * self.outer_radius, rtol=1e-4)
+
+    def test_to_pixel_use_ellipse_meta_copies(self):
+        result = self.reg.to_pixel(self.wcs, use_ellipse=True)
+        result.meta['text'] = 'new'
+        result.visual['color'] = 'green'
+        assert result.meta['text'] != self.reg.meta['text']
+        assert result.visual['color'] != self.reg.visual['color']
+
+
 class TestEllipseAnnulusPixelRegion(BaseTestPixelRegion):
     meta = RegionMeta({'text': 'test'})
     visual = RegionVisual({'color': 'blue'})

@@ -11,7 +11,9 @@ from astropy.coordinates import Angle
 
 from regions._geometry import circular_overlap_grid
 from regions._utils.wcs_helpers import (pixel_to_sky_mean_scale,
-                                        sky_to_pixel_mean_scale)
+                                        pixel_to_sky_svd_scales,
+                                        sky_to_pixel_mean_scale,
+                                        sky_to_pixel_svd_scales)
 from regions.core.attributes import (PositiveScalar, PositiveScalarAngle,
                                      RegionMetaDescr, RegionVisualDescr,
                                      ScalarPixCoord, ScalarSkyCoord)
@@ -20,6 +22,7 @@ from regions.core.core import PixelRegion, SkyRegion
 from regions.core.mask import RegionMask
 from regions.core.metadata import RegionMeta, RegionVisual
 from regions.core.pixcoord import PixCoord
+from regions.shapes.ellipse import EllipsePixelRegion, EllipseSkyRegion
 from regions.shapes.polygon import PolygonPixelRegion
 
 __all__ = ['CirclePixelRegion', 'CircleSkyRegion']
@@ -86,7 +89,40 @@ class CirclePixelRegion(PixelRegion):
         else:
             return np.logical_not(in_circle)
 
-    def to_sky(self, wcs):
+    def to_sky(self, wcs, *, use_ellipse=False):
+        """
+        Return a sky region from this pixel region.
+
+        Parameters
+        ----------
+        wcs : WCS object
+            A world coordinate system (WCS) transformation that
+            supports the `astropy shared interface for WCS
+            <https://docs.astropy.org/en/stable/wcs/wcsapi.html>`_
+            (e.g., `astropy.wcs.WCS`).
+
+        use_ellipse : bool, optional
+            If `True`, return an `~regions.EllipseSkyRegion` instead
+            of a `~regions.CircleSkyRegion`. An ellipse is generally
+            a better approximation when the WCS has distortions or
+            different pixel scales along different axes. Default is
+            `False`.
+
+        Returns
+        -------
+        region : `~regions.CircleSkyRegion` or `~regions.EllipseSkyRegion`
+            The sky region. An ellipse is returned if ``use_ellipse``
+            is `True`.
+        """
+        if use_ellipse:
+            center, scale_major, scale_minor, angle = pixel_to_sky_svd_scales(
+                self.center, wcs)
+            width = Angle(2 * self.radius * scale_major, 'arcsec')
+            height = Angle(2 * self.radius * scale_minor, 'arcsec')
+            return EllipseSkyRegion(center, width, height, angle=angle,
+                                    meta=self.meta.copy(),
+                                    visual=self.visual.copy())
+
         center, mean_scale = pixel_to_sky_mean_scale(self.center, wcs)
         radius = Angle(self.radius * mean_scale, 'arcsec')
         return CircleSkyRegion(center, radius, meta=self.meta.copy(),
@@ -233,7 +269,42 @@ class CircleSkyRegion(SkyRegion):
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
 
-    def to_pixel(self, wcs):
+    def to_pixel(self, wcs, *, use_ellipse=False):
+        """
+        Return a pixel region from this sky region.
+
+        Parameters
+        ----------
+        wcs : WCS object
+            A world coordinate system (WCS) transformation that
+            supports the `astropy shared interface for WCS
+            <https://docs.astropy.org/en/stable/wcs/wcsapi.html>`_
+            (e.g., `astropy.wcs.WCS`).
+
+        use_ellipse : bool, optional
+            If `True`, return an `~regions.EllipsePixelRegion` instead
+            of a `~regions.CirclePixelRegion`. An ellipse is generally
+            a better approximation when the WCS has distortions or
+            different pixel scales along different axes. Default is
+            `False`.
+
+        Returns
+        -------
+        region : `~regions.CirclePixelRegion` or `~regions.EllipsePixelRegion`
+            The pixel region. An ellipse is returned if ``use_ellipse``
+            is `True`.
+        """
+        if use_ellipse:
+            center, scale_major, scale_minor, angle = sky_to_pixel_svd_scales(
+                self.center, wcs)
+            radius_arcsec = self.radius.to(u.arcsec).value
+            width = 2 * radius_arcsec * scale_major
+            height = 2 * radius_arcsec * scale_minor
+            return EllipsePixelRegion(center, width, height,
+                                      angle=angle,
+                                      meta=self.meta.copy(),
+                                      visual=self.visual.copy())
+
         center, mean_scale = sky_to_pixel_mean_scale(self.center, wcs)
         radius = self.radius.to(u.arcsec).value * mean_scale
         return CirclePixelRegion(center, radius, meta=self.meta.copy(),

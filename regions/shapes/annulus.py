@@ -11,9 +11,11 @@ import astropy.units as u
 from regions._utils.wcs_helpers import (pixel_ellipse_to_sky_svd,
                                         pixel_to_sky_mean_scale,
                                         pixel_to_sky_scales,
+                                        pixel_to_sky_svd_scales,
                                         sky_ellipse_to_pixel_svd,
                                         sky_to_pixel_mean_scale,
-                                        sky_to_pixel_scales)
+                                        sky_to_pixel_scales,
+                                        sky_to_pixel_svd_scales)
 from regions.core.attributes import (PositiveScalar, PositiveScalarAngle,
                                      RegionMetaDescr, RegionVisualDescr,
                                      ScalarAngle, ScalarPixCoord,
@@ -153,7 +155,43 @@ class CircleAnnulusPixelRegion(AnnulusPixelRegion):
         return self._component_class(self.center, self.outer_radius,
                                      self.meta, self.visual)
 
-    def to_sky(self, wcs):
+    def to_sky(self, wcs, *, use_ellipse=False):
+        """
+        Return a sky region from this pixel region.
+
+        Parameters
+        ----------
+        wcs : WCS object
+            A world coordinate system (WCS) transformation that
+            supports the `astropy shared interface for WCS
+            <https://docs.astropy.org/en/stable/wcs/wcsapi.html>`_
+            (e.g., `astropy.wcs.WCS`).
+
+        use_ellipse : bool, optional
+            If `True`, return an `~regions.EllipseAnnulusSkyRegion`
+            instead of a `~regions.CircleAnnulusSkyRegion`. An ellipse
+            annulus is generally a better approximation when the WCS has
+            distortions or different pixel scales along different axes.
+            Default is `False`.
+
+        Returns
+        -------
+        region : `~regions.CircleAnnulusSkyRegion` or `~regions.EllipseAnnulusSkyRegion`
+            The sky region. An ellipse annulus is returned if
+            ``use_ellipse`` is `True`.
+        """
+        if use_ellipse:
+            center, scale_major, scale_minor, angle = pixel_to_sky_svd_scales(
+                self.center, wcs)
+            inner_width = 2 * self.inner_radius * scale_major * u.arcsec
+            outer_width = 2 * self.outer_radius * scale_major * u.arcsec
+            inner_height = 2 * self.inner_radius * scale_minor * u.arcsec
+            outer_height = 2 * self.outer_radius * scale_minor * u.arcsec
+            return EllipseAnnulusSkyRegion(
+                center, inner_width, outer_width,
+                inner_height, outer_height, angle=angle,
+                meta=self.meta.copy(), visual=self.visual.copy())
+
         center, mean_scale = pixel_to_sky_mean_scale(self.center, wcs)
         inner_radius = self.inner_radius * mean_scale * u.arcsec
         outer_radius = self.outer_radius * mean_scale * u.arcsec
@@ -224,7 +262,45 @@ class CircleAnnulusSkyRegion(SkyRegion):
         if inner_radius >= outer_radius:
             raise ValueError('outer_radius must be greater than inner_radius')
 
-    def to_pixel(self, wcs):
+    def to_pixel(self, wcs, *, use_ellipse=False):
+        """
+        Return a pixel region from this sky region.
+
+        Parameters
+        ----------
+        wcs : WCS object
+            A world coordinate system (WCS) transformation that
+            supports the `astropy shared interface for WCS
+            <https://docs.astropy.org/en/stable/wcs/wcsapi.html>`_
+            (e.g., `astropy.wcs.WCS`).
+
+        use_ellipse : bool, optional
+            If `True`, return an `~regions.EllipseAnnulusPixelRegion`
+            instead of a `~regions.CircleAnnulusPixelRegion`. An ellipse
+            annulus is generally a better approximation when the WCS has
+            distortions or different pixel scales along different axes.
+            Default is `False`.
+
+        Returns
+        -------
+        region : `~regions.CircleAnnulusPixelRegion` or `~regions.EllipseAnnulusPixelRegion`
+            The pixel region. An ellipse annulus is returned if
+            ``use_ellipse`` is `True`.
+        """
+        if use_ellipse:
+            center, scale_major, scale_minor, angle = sky_to_pixel_svd_scales(
+                self.center, wcs)
+            inner_radius_arcsec = self.inner_radius.to(u.arcsec).value
+            outer_radius_arcsec = self.outer_radius.to(u.arcsec).value
+            inner_width = 2 * inner_radius_arcsec * scale_major
+            outer_width = 2 * outer_radius_arcsec * scale_major
+            inner_height = 2 * inner_radius_arcsec * scale_minor
+            outer_height = 2 * outer_radius_arcsec * scale_minor
+            return EllipseAnnulusPixelRegion(
+                center, inner_width, outer_width,
+                inner_height, outer_height, angle=angle,
+                meta=self.meta.copy(), visual=self.visual.copy())
+
         center, mean_scale = sky_to_pixel_mean_scale(self.center, wcs)
         inner_radius = self.inner_radius.to(u.arcsec).value * mean_scale
         outer_radius = self.outer_radius.to(u.arcsec).value * mean_scale
