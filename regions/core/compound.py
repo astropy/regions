@@ -122,6 +122,23 @@ class CompoundPixelRegion(PixelRegion):
 
         return mpath.Path(verts, codes)
 
+
+    def as_artists(self, origin=(0, 0), **kwargs):
+        """
+        Return a list of patches for the composite region.
+        """
+        # recursively retrieve all artist patches
+        if hasattr(self.region1, 'as_artists'):
+            r1p = self.region1.as_artists(origin=origin, **kwargs)
+        else:
+            r1p = [self.region1.as_artist(origin=origin, **kwargs)]
+        if hasattr(self.region2, 'as_artists'):
+            r2p = self.region2.as_artists(origin=origin, **kwargs)
+        else:
+            r2p = [self.region2.as_artist(origin=origin, **kwargs)]
+        return r1p + r2p
+
+
     def as_artist(self, origin=(0, 0), **kwargs):
         """
         Return a matplotlib patch object for this region
@@ -142,8 +159,10 @@ class CompoundPixelRegion(PixelRegion):
         patch : `~matplotlib.patches.PathPatch`
             A matplotlib patch object.
         """
-        if (self.region1.center == self.region2.center
-                and self.operator is op.xor):
+        if (hasattr(self.region1, 'center') and 
+            hasattr(self.region2, 'center') and
+            self.region1.center == self.region2.center and
+            self.operator is op.xor):
 
             import matplotlib.patches as mpatches
 
