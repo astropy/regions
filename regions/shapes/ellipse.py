@@ -319,14 +319,14 @@ class EllipsePixelRegion(PixelRegion):
         angle = self.angle + angle
         return self.copy(center=center, angle=angle)
 
-    def to_polygon(self, npoints=100):
+    def to_polygon(self, n_points=100):
         """
         Return a `~regions.PolygonPixelRegion` that approximates this
         ellipse.
 
         Parameters
         ----------
-        npoints : int, optional
+        n_points : int, optional
             The number of polygon vertices. Default is 100.
 
         Returns
@@ -334,7 +334,7 @@ class EllipsePixelRegion(PixelRegion):
         polygon : `~regions.PolygonPixelRegion`
             A polygon region approximating the ellipse.
         """
-        theta = np.linspace(0, 2 * np.pi, npoints, endpoint=False)
+        theta = np.linspace(0, 2 * np.pi, n_points, endpoint=False)
         x = 0.5 * self.width * np.cos(theta)
         y = 0.5 * self.height * np.sin(theta)
         cos_angle = np.cos(self.angle)
@@ -401,7 +401,7 @@ class EllipseSkyRegion(SkyRegion):
                                   meta=self.meta.copy(),
                                   visual=self.visual.copy())
 
-    def to_polygon(self, wcs, npoints=100):
+    def to_polygon(self, wcs, n_points=100):
         """
         Return a `~regions.PolygonSkyRegion` that approximates this
         ellipse.
@@ -410,7 +410,7 @@ class EllipseSkyRegion(SkyRegion):
         ----------
         wcs : `~astropy.wcs.WCS`
             The WCS to use for the sky-to-pixel-to-sky conversion.
-        npoints : int, optional
+        n_points : int, optional
             The number of polygon vertices. Default is 100.
 
         Returns
@@ -418,4 +418,4 @@ class EllipseSkyRegion(SkyRegion):
         polygon : `~regions.PolygonSkyRegion`
             A polygon region approximating the ellipse.
         """
-        return self.to_pixel(wcs).to_polygon(npoints=npoints).to_sky(wcs)
+        return self.to_pixel(wcs).to_polygon(n_points=n_points).to_sky(wcs)

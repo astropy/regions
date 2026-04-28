@@ -180,14 +180,14 @@ class CirclePixelRegion(PixelRegion):
         center = self.center.rotate(center, angle)
         return self.copy(center=center)
 
-    def to_polygon(self, npoints=100):
+    def to_polygon(self, n_points=100):
         """
         Return a `~regions.PolygonPixelRegion` that approximates this
         circle.
 
         Parameters
         ----------
-        npoints : int, optional
+        n_points : int, optional
             The number of polygon vertices. Default is 100.
 
         Returns
@@ -195,7 +195,7 @@ class CirclePixelRegion(PixelRegion):
         polygon : `~regions.PolygonPixelRegion`
             A polygon region approximating the circle.
         """
-        theta = np.linspace(0, 2 * np.pi, npoints, endpoint=False)
+        theta = np.linspace(0, 2 * np.pi, n_points, endpoint=False)
         x = self.radius * np.cos(theta) + self.center.x
         y = self.radius * np.sin(theta) + self.center.y
         vertices = PixCoord(x=x, y=y)
@@ -239,7 +239,7 @@ class CircleSkyRegion(SkyRegion):
         return CirclePixelRegion(center, radius, meta=self.meta.copy(),
                                  visual=self.visual.copy())
 
-    def to_polygon(self, wcs, npoints=100):
+    def to_polygon(self, wcs, n_points=100):
         """
         Return a `~regions.PolygonSkyRegion` that approximates this
         circle.
@@ -248,7 +248,7 @@ class CircleSkyRegion(SkyRegion):
         ----------
         wcs : `~astropy.wcs.WCS`
             The WCS to use for the sky-to-pixel-to-sky conversion.
-        npoints : int, optional
+        n_points : int, optional
             The number of polygon vertices. Default is 100.
 
         Returns
@@ -256,4 +256,4 @@ class CircleSkyRegion(SkyRegion):
         polygon : `~regions.PolygonSkyRegion`
             A polygon region approximating the circle.
         """
-        return self.to_pixel(wcs).to_polygon(npoints=npoints).to_sky(wcs)
+        return self.to_pixel(wcs).to_polygon(n_points=n_points).to_sky(wcs)
