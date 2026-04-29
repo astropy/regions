@@ -112,7 +112,7 @@ class EllipsePixelRegion(PixelRegion):
 
     def to_sky(self, wcs):
         center, sky_width, sky_height, angle = pixel_ellipse_to_sky_svd(
-            self.center, wcs, self.width, self.height,
+            (self.center.x, self.center.y), wcs, self.width, self.height,
             self.angle.to(u.rad).value)
         width = Angle(sky_width, 'arcsec')
         height = Angle(sky_height, 'arcsec')
@@ -393,6 +393,17 @@ class EllipseSkyRegion(SkyRegion):
         self.angle = angle
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
+
+    def to_pixel(self, wcs):
+        center, pix_width, pix_height, angle = sky_ellipse_to_pixel_svd(
+            self.center, wcs,
+            self.width.to(u.arcsec).value,
+            self.height.to(u.arcsec).value,
+            self.angle.to(u.rad).value)
+        return EllipsePixelRegion(PixCoord(*center), pix_width, pix_height,
+                                  angle=angle,
+                                  meta=self.meta.copy(),
+                                  visual=self.visual.copy())
 
     def to_polygon(self, wcs, n_points=100):
         """

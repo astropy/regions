@@ -109,7 +109,8 @@ class RectanglePixelRegion(PixelRegion):
 
     def to_sky(self, wcs):
         center, scale_w, scale_h, angle = pixel_to_sky_scales(
-            self.center, wcs, self.angle.to(u.rad).value)
+            (self.center.x, self.center.y), wcs,
+            self.angle.to(u.rad).value)
         width = Angle(self.width * scale_w, 'arcsec')
         height = Angle(self.height * scale_h, 'arcsec')
         return RectangleSkyRegion(center, width, height, angle=angle,
@@ -406,6 +407,16 @@ class RectangleSkyRegion(SkyRegion):
         self.angle = angle
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
+
+    def to_pixel(self, wcs):
+        center, scale_w, scale_h, angle = sky_to_pixel_scales(
+            self.center, wcs, self.angle.to(u.rad).value)
+        width = self.width.to(u.arcsec).value * scale_w
+        height = self.height.to(u.arcsec).value * scale_h
+        return RectanglePixelRegion(PixCoord(*center), width, height,
+                                    angle=angle,
+                                    meta=self.meta.copy(),
+                                    visual=self.visual.copy())
 
     def to_polygon(self, wcs):
         """

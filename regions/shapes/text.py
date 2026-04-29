@@ -8,6 +8,7 @@ import math
 from regions._utils.wcs_helpers import pixel_to_sky_scales, sky_to_pixel_scales
 from regions.core.attributes import (RegionMetaDescr, RegionVisualDescr,
                                      ScalarPixCoord, ScalarSkyCoord)
+from regions.core.pixcoord import PixCoord
 from regions.shapes.point import PointPixelRegion, PointSkyRegion
 
 __all__ = ['TextSkyRegion', 'TextPixelRegion']
@@ -64,7 +65,7 @@ class TextPixelRegion(PointPixelRegion):
     def to_sky(self, wcs):
         rotation_rad = math.radians(self.visual.get('rotation', 0.0))
         center, _, _, sky_angle = pixel_to_sky_scales(
-            self.center, wcs, rotation_rad)
+            (self.center.x, self.center.y), wcs, rotation_rad)
 
         # Rotation value is relative to the coordinate system axes;
         # convert from counterclockwise angle from the positive x axis
@@ -150,7 +151,8 @@ class TextSkyRegion(PointSkyRegion):
             visual = visual.copy()
             visual['rotation'] = pixel_angle.to('deg').value
 
-        return TextPixelRegion(center, self.text, meta=self.meta.copy(),
+        return TextPixelRegion(PixCoord(*center), self.text,
+                               meta=self.meta.copy(),
                                visual=visual.copy())
 
     def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
