@@ -209,6 +209,96 @@ class TestRoundtripPixelSkyPixel:
             assert_quantity_allclose(pix_rt.angle, pix_reg.angle)
 
 
+class TestAngleConvention:
+    """
+    Verify the regions rotation-angle convention is preserved through
+    sky <-> pixel conversions.
+
+    The regions convention measures the rotation angle of the region's
+    width axis from the longitude (RA) axis (sky regions) or the
+    positive ``x`` axis (pixel regions), counterclockwise. Internally
+    the WCS helpers use the photutils convention (position angle from
+    North); the regions shape methods must apply the appropriate 90 deg
+    offset to bridge the two conventions.
+
+    For an axis-aligned, isotropic ``simple_wcs`` (RA increasing to the
+    left, equal pixel scales), the regions sky angle and pixel angle
+    must be numerically equal after conversion.
+    """
+
+    @staticmethod
+    def _assert_angles_close(actual, desired, atol=1e-3 * u.deg):
+        """
+        Compare two angles modulo 360 deg.
+        """
+        diff_deg = ((actual - desired).to(u.deg).value + 180) % 360 - 180
+        assert abs(diff_deg) <= atol.to(u.deg).value, (
+            f'angles differ (mod 360 deg): {actual} vs {desired}')
+
+    @pytest.mark.parametrize(
+        'sky_cls, sky_kw, pix_cls, pix_kw, size_attrs, has_angle',
+        DIRECTED_REGIONS)
+    @pytest.mark.parametrize('angle_deg', [0, 30, 60, 135, 200, 315])
+    def test_sky_to_pixel_angle_matches(self, simple_wcs, sky_cls, sky_kw,
+                                        pix_cls, pix_kw, size_attrs,
+                                        has_angle, angle_deg):
+        """
+        For an axis-aligned WCS, ``sky_to_pixel`` must produce a pixel
+        region with the same numerical rotation angle as the sky region.
+        """
+        sky_kw = dict(sky_kw)
+        sky_kw['angle'] = angle_deg * u.deg
+        sky_reg = sky_cls(**sky_kw)
+        pix_reg = sky_reg.to_pixel(simple_wcs)
+        self._assert_angles_close(pix_reg.angle, angle_deg * u.deg)
+
+    @pytest.mark.parametrize(
+        'sky_cls, sky_kw, pix_cls, pix_kw, size_attrs, has_angle',
+        DIRECTED_REGIONS)
+    @pytest.mark.parametrize('angle_deg', [0, 30, 60, 135, 200, 315])
+    def test_pixel_to_sky_angle_matches(self, simple_wcs, sky_cls, sky_kw,
+                                        pix_cls, pix_kw, size_attrs,
+                                        has_angle, angle_deg):
+        """
+        For an axis-aligned WCS, ``pixel_to_sky`` must produce a sky
+        region with the same numerical rotation angle as the pixel
+        region.
+        """
+        pix_kw = dict(pix_kw)
+        pix_kw['angle'] = angle_deg * u.deg
+        pix_reg = pix_cls(**pix_kw)
+        sky_reg = pix_reg.to_sky(simple_wcs)
+        self._assert_angles_close(sky_reg.angle, angle_deg * u.deg)
+
+    def test_text_region_rotation_sky_to_pixel(self, simple_wcs):
+        """
+        ``TextSkyRegion.to_pixel`` must preserve the visual rotation
+        angle (in degrees) for an axis-aligned WCS.
+        """
+        from regions.core.metadata import RegionVisual
+        from regions.shapes.text import TextSkyRegion
+
+        sky_reg = TextSkyRegion(CENTER, 'foo',
+                                visual=RegionVisual(rotation=30.0))
+        pix_reg = sky_reg.to_pixel(simple_wcs)
+        self._assert_angles_close(pix_reg.visual['rotation'] * u.deg,
+                                  30.0 * u.deg)
+
+    def test_text_region_rotation_pixel_to_sky(self, simple_wcs):
+        """
+        ``TextPixelRegion.to_sky`` must preserve the visual rotation
+        angle (in degrees) for an axis-aligned WCS.
+        """
+        from regions.core.metadata import RegionVisual
+        from regions.shapes.text import TextPixelRegion
+
+        pix_reg = TextPixelRegion(PixCoord(9.5, 9.5), 'foo',
+                                  visual=RegionVisual(rotation=30.0))
+        sky_reg = pix_reg.to_sky(simple_wcs)
+        self._assert_angles_close(sky_reg.visual['rotation'] * u.deg,
+                                  30.0 * u.deg)
+
+
 # Build GWCS test region params with smaller sky sizes (0.05 deg/pix)
 GWCS_SKY_REGIONS = [
     pytest.param(
