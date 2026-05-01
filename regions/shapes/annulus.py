@@ -4,6 +4,7 @@ This module defines annulus regions in both pixel and sky coordinates.
 """
 
 import abc
+import math
 import operator
 
 import astropy.units as u
@@ -578,12 +579,16 @@ class AsymmetricAnnulusPixelRegion(AnnulusPixelRegion):
                                      self.meta, self.visual)
 
     def to_sky_args(self, wcs):
+        # The photutils helpers measure the sky rotation as a position
+        # angle (PA) from North; regions measures it from the RA axis.
+        # Convert between them with a 90 deg offset.
         center, outer_width, outer_height, angle = pixel_ellipse_to_sky_svd(
             (self.center.x, self.center.y), wcs, self.outer_width,
             self.outer_height, self.angle.to(u.rad).value)
         _, inner_width, inner_height, _ = pixel_ellipse_to_sky_svd(
             (self.center.x, self.center.y), wcs, self.inner_width,
             self.inner_height, self.angle.to(u.rad).value)
+        angle = (angle + 90 * u.deg).wrap_at(360 * u.deg)
         return (center, inner_width * u.arcsec, outer_width * u.arcsec,
                 inner_height * u.arcsec, outer_height * u.arcsec, angle)
 
@@ -651,16 +656,19 @@ class AsymmetricAnnulusSkyRegion(SkyRegion):
             raise ValueError('outer_height must be greater than inner_height')
 
     def to_pixel_args(self, wcs):
+        # Convert regions sky angle (from RA axis) to photutils PA
+        # (from North) by subtracting 90 deg.
+        sky_angle_rad = self.angle.to(u.rad).value - math.pi / 2
         center, outer_width, outer_height, angle = sky_ellipse_to_pixel_svd(
             self.center, wcs,
             self.outer_width.to(u.arcsec).value,
             self.outer_height.to(u.arcsec).value,
-            self.angle.to(u.rad).value)
+            sky_angle_rad)
         _, inner_width, inner_height, _ = sky_ellipse_to_pixel_svd(
             self.center, wcs,
             self.inner_width.to(u.arcsec).value,
             self.inner_height.to(u.arcsec).value,
-            self.angle.to(u.rad).value)
+            sky_angle_rad)
         return (PixCoord(*center), inner_width, outer_width, inner_height,
                 outer_height, angle)
 
@@ -938,6 +946,9 @@ class RectangleAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
                          outer_height, angle, meta, visual)
 
     def to_sky_args(self, wcs):
+        # The photutils helpers measure the sky rotation as a position
+        # angle (PA) from North; regions measures it from the RA axis.
+        # Convert between them with a 90 deg offset.
         center, scale_w, scale_h, angle = pixel_to_sky_scales(
             (self.center.x, self.center.y), wcs,
             self.angle.to(u.rad).value)
@@ -945,6 +956,7 @@ class RectangleAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
         outer_width = self.outer_width * scale_w * u.arcsec
         inner_height = self.inner_height * scale_h * u.arcsec
         outer_height = self.outer_height * scale_h * u.arcsec
+        angle = (angle + 90 * u.deg).wrap_at(360 * u.deg)
         return (center, inner_width, outer_width, inner_height,
                 outer_height, angle)
 
@@ -1030,8 +1042,11 @@ class RectangleAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
                          outer_height, angle, meta, visual)
 
     def to_pixel_args(self, wcs):
+        # Convert regions sky angle (from RA axis) to photutils PA
+        # (from North) by subtracting 90 deg.
         center, scale_w, scale_h, angle = sky_to_pixel_scales(
-            self.center, wcs, self.angle.to(u.rad).value)
+            self.center, wcs,
+            self.angle.to(u.rad).value - math.pi / 2)
         inner_width = self.inner_width.to(u.arcsec).value * scale_w
         outer_width = self.outer_width.to(u.arcsec).value * scale_w
         inner_height = self.inner_height.to(u.arcsec).value * scale_h

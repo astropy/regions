@@ -108,9 +108,13 @@ class RectanglePixelRegion(PixelRegion):
             return np.logical_not(in_rect)
 
     def to_sky(self, wcs):
+        # The photutils helpers measure the sky rotation as a position
+        # angle (PA) from North; regions measures it from the RA axis.
+        # Convert between them with a 90 deg offset.
         center, scale_w, scale_h, angle = pixel_to_sky_scales(
             (self.center.x, self.center.y), wcs,
             self.angle.to(u.rad).value)
+        angle = (angle + 90 * u.deg).wrap_at(360 * u.deg)
         width = Angle(self.width * scale_w, 'arcsec')
         height = Angle(self.height * scale_h, 'arcsec')
         return RectangleSkyRegion(center, width, height, angle=angle,
@@ -409,8 +413,11 @@ class RectangleSkyRegion(SkyRegion):
         self.visual = visual or RegionVisual()
 
     def to_pixel(self, wcs):
+        # Convert regions sky angle (from RA axis) to photutils PA
+        # (from North) by subtracting 90 deg.
         center, scale_w, scale_h, angle = sky_to_pixel_scales(
-            self.center, wcs, self.angle.to(u.rad).value)
+            self.center, wcs,
+            self.angle.to(u.rad).value - np.pi / 2)
         width = self.width.to(u.arcsec).value * scale_w
         height = self.height.to(u.arcsec).value * scale_h
         return RectanglePixelRegion(PixCoord(*center), width, height,

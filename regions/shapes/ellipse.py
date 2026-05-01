@@ -111,9 +111,13 @@ class EllipsePixelRegion(PixelRegion):
             return np.logical_not(in_ell)
 
     def to_sky(self, wcs):
+        # The photutils helpers measure the sky rotation as a position
+        # angle (PA) from North; regions measures it from the RA axis.
+        # Convert between them with a 90 deg offset.
         center, sky_width, sky_height, angle = pixel_ellipse_to_sky_svd(
             (self.center.x, self.center.y), wcs, self.width, self.height,
             self.angle.to(u.rad).value)
+        angle = (angle + 90 * u.deg).wrap_at(360 * u.deg)
         width = Angle(sky_width, 'arcsec')
         height = Angle(sky_height, 'arcsec')
         return EllipseSkyRegion(center, width, height, angle=angle,
@@ -395,11 +399,13 @@ class EllipseSkyRegion(SkyRegion):
         self.visual = visual or RegionVisual()
 
     def to_pixel(self, wcs):
+        # Convert regions sky angle (from RA axis) to photutils PA
+        # (from North) by subtracting 90 deg.
         center, pix_width, pix_height, angle = sky_ellipse_to_pixel_svd(
             self.center, wcs,
             self.width.to(u.arcsec).value,
             self.height.to(u.arcsec).value,
-            self.angle.to(u.rad).value)
+            self.angle.to(u.rad).value - math.pi / 2)
         return EllipsePixelRegion(PixCoord(*center), pix_width, pix_height,
                                   angle=angle,
                                   meta=self.meta.copy(),
