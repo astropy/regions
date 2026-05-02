@@ -15,3 +15,7 @@ from .fits.connect import *  # noqa: F401, F403
 from .fits.core import *  # noqa: F401, F403
 from .fits.read import *  # noqa: F401, F403
 from .fits.write import *  # noqa: F401, F403
+from .stcs.connect import *  # noqa: F401, F403
+from .stcs.core import *  # noqa: F401, F403
+from .stcs.read import *  # noqa: F401, F403
+from .stcs.write import *  # noqa: F401, F403
