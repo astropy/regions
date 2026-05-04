@@ -51,6 +51,10 @@ class TestWholeSphericalSkyRegion(BaseTestSphericalSkyRegion):
         reg2 = self.reg.transform_to('galactic')
         assert isinstance(reg2, WholeSphericalSkyRegion)
 
+    def test_discretize_boundary(self):
+        with pytest.raises(NotImplementedError):
+            _ = self.reg.discretize_boundary(n_points=100)
+
     def test_eq(self):
         reg = self.reg.copy()
         assert reg == self.reg
