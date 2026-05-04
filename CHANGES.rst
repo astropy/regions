@@ -39,7 +39,7 @@ New Features
   It is also possible to transform between spherical and planar
   (sky or pixel) regions (with ``to_sky``, ``to_pixel``, and ``to_spherical_sky``,
   as appropriate), with the option to capture boundary distortions due to
-  projection effects between spherical and planar geometries
+  WCS projection effects between spherical and planar geometries
   or to ignore them (e.g., assuming a circle stays a perfect circle).
   Current spherical shapes supported include: ``CircleSphericalSkyRegion``,
   ``CircleAnnulusSphericalSkyRegion``,

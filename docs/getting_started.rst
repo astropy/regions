@@ -24,7 +24,7 @@ To transform between (planar) sky and pixel regions, a `world coordinate system
 regions, in addition to a `wcs
 <https://docs.astropy.org/en/stable/wcs/wcsapi.html>`_, it is also
 necessary to specify whether or not boundary distortions should be included
-(capturing the projection effects inherent in projection-to-spherical
+(capturing the WCS projection effects inherent in planar-to-spherical
 transformations, or the inverse).
 
 Regions also provides a unified interface for reading, writing,
@@ -258,9 +258,9 @@ the planar projection (encoded in a `world coordinate system
 `~astropy.wcs.WCS`) must be specified, along with a specification of
 whether or not boundary distortions should be included.
 These distortions (implemented through discrete boundary sampling)
-capture the impact of the spherical-to-planar (or vice versa) projection.
-However, it is possible to ignore these distortions (e.g.,
-transforming a spherical circle to a planar circle).
+capture the impact of the spherical-to-planar (or vice versa) projection
+described by the WCS. However, it is possible to ignore these
+distortions (e.g., transforming a spherical circle to a planar circle).
 
 Spherical sky regions are created using celestial coordinates (as
 `~astropy.coordinates.SkyCoord`) and angular distances,

@@ -89,9 +89,9 @@ Plotting Spherical Sky Regions
 Similarly, `~regions.SphericalSkyRegion` objects do not have an
 ``as_artist()`` or ``plot()`` method. To plot a `~regions.SphericalSkyRegion`
 object, you will need to convert it to a pixel region (using a WCS object).
-Boundary distortions effects can also be included in this conversion (by
+Boundary distortions can also be included in this conversion (by
 setting the ``include_boundary_distortions`` keyword), to capture
-the effects of projecting from spherical to a planar geometry.
+the effects of the WCS projection from spherical to a planar geometry.
 (See the second example in :ref:`index_examples`.)
 
 It is also possible to use the coordinates of a discretized
