@@ -418,6 +418,26 @@ class CircleAnnulusSphericalSkyRegion(AnnulusSphericalSkyRegion):
             visual=self.visual.copy(),
         )
 
+    def to_polygon(self, n_points=100):
+        """
+        Return a `~regions.CompoundSphericalSkyRegion` of two
+        `~regions.PolygonSphericalSkyRegion` objects that approximates this
+        annulus.
+
+        Parameters
+        ----------
+        n_points : int, optional
+            The number of polygon vertices for each circle. Default
+            is 100.
+
+        Returns
+        -------
+        polygon : `~regions.CompoundSphericalSkyRegion`
+            A compound region of two polygon regions approximating the
+            annulus.
+        """
+        return self.discretize_boundary(n_points=n_points)
+
     def to_sky(
             self,
             wcs=None,

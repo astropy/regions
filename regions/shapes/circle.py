@@ -382,6 +382,23 @@ class CircleSphericalSkyRegion(SphericalSkyRegion):
         return PolygonSphericalSkyRegion(bound_verts, meta=self.meta.copy(),
                                          visual=self.visual.copy())
 
+    def to_polygon(self, n_points=100):
+        """
+        Return a `~regions.PolygonSphericalSkyRegion` that approximates this
+        circle.
+
+        Parameters
+        ----------
+        n_points : int, optional
+            The number of polygon vertices. Default is 100.
+
+        Returns
+        -------
+        polygon : `~regions.PolygonSphericalSkyRegion`
+            A polygon region approximating the circle.
+        """
+        return self.discretize_boundary(n_points=n_points)
+
     def to_sky(
         self, wcs=None, include_boundary_distortions=False, discretize_kwargs=None,
     ):

@@ -5,17 +5,23 @@ from astropy.coordinates import SkyCoord
 from numpy.testing import assert_allclose
 
 from regions.core import PixCoord, RegionMeta, RegionVisual
-from regions.core.compound import CompoundPixelRegion, CompoundSkyRegion
+from regions.core.compound import (CompoundPixelRegion, CompoundSkyRegion,
+                                   CompoundSphericalSkyRegion)
 from regions.shapes.annulus import (CircleAnnulusPixelRegion,
                                     CircleAnnulusSkyRegion,
+                                    CircleAnnulusSphericalSkyRegion,
                                     EllipseAnnulusPixelRegion,
                                     EllipseAnnulusSkyRegion,
                                     RectangleAnnulusPixelRegion,
                                     RectangleAnnulusSkyRegion)
-from regions.shapes.circle import CirclePixelRegion, CircleSkyRegion
+from regions.shapes.circle import (CirclePixelRegion, CircleSkyRegion,
+                                   CircleSphericalSkyRegion)
 from regions.shapes.ellipse import EllipsePixelRegion, EllipseSkyRegion
+from regions.shapes.lune import LuneSphericalSkyRegion
 from regions.shapes.polygon import (PolygonPixelRegion, PolygonSkyRegion,
+                                    PolygonSphericalSkyRegion,
                                     RegularPolygonPixelRegion)
+from regions.shapes.range import RangeSphericalSkyRegion
 from regions.shapes.rectangle import RectanglePixelRegion, RectangleSkyRegion
 from regions.tests.helpers import make_simple_wcs
 
@@ -82,6 +88,38 @@ class TestCircleSkyRegionToPolygon:
     def test_to_polygon_n_points(self):
         poly = self.reg.to_polygon(self.wcs, n_points=50)
         assert len(poly.vertices.ra) == 50
+
+
+class TestCircleSphericalSkyRegionToPolygon:
+    meta = RegionMeta({'text': 'test'})
+    visual = RegionVisual({'color': 'blue'})
+
+    reg = CircleSphericalSkyRegion(SkyCoord(3 * u.deg, 4 * u.deg), 2 * u.arcsec,
+                                   meta=meta, visual=visual)
+
+    def test_to_polygon_type(self):
+        poly = self.reg.to_polygon()
+        assert isinstance(poly, PolygonSphericalSkyRegion)
+
+    def test_to_polygon_nvertices(self):
+        poly = self.reg.to_polygon()
+        assert len(poly.vertices.ra) == 100
+
+    def test_to_polygon_n_points(self):
+        poly = self.reg.to_polygon(n_points=50)
+        assert len(poly.vertices.ra) == 50
+
+    def test_to_polygon_meta(self):
+        poly = self.reg.to_polygon()
+        assert poly.meta == self.meta
+        assert poly.visual == self.visual
+
+    def test_to_polygon_contains(self):
+        poly = self.reg.to_polygon()
+        # Center should be inside
+        assert poly.contains(SkyCoord(3 * u.deg, 4 * u.deg))
+        # Point far away should be outside
+        assert not poly.contains(SkyCoord(180 * u.deg, 0 * u.deg))
 
 
 class TestEllipsePixelRegionToPolygon:
@@ -157,6 +195,50 @@ class TestEllipseSkyRegionToPolygon:
     def test_to_polygon_n_points(self):
         poly = self.reg.to_polygon(self.wcs, n_points=50)
         assert len(poly.vertices.ra) == 50
+
+
+class TestLuneSphericalSkyRegionToPolygon:
+    meta = RegionMeta({'text': 'test'})
+    visual = RegionVisual({'color': 'blue'})
+
+    reg = LuneSphericalSkyRegion(SkyCoord(3 * u.deg, 0 * u.deg),
+                                 SkyCoord(178 * u.deg, 0 * u.deg),
+                                 meta=meta, visual=visual)
+
+    # Verify changing order of GC center does not change the contains results:
+    reg_inv = LuneSphericalSkyRegion(SkyCoord(178 * u.deg, 0 * u.deg),
+                                     SkyCoord(3 * u.deg, 0 * u.deg),
+                                     meta=meta, visual=visual)
+
+    def test_to_polygon_type(self):
+        poly = self.reg.to_polygon()
+        assert isinstance(poly, PolygonSphericalSkyRegion)
+
+    def test_to_polygon_nvertices(self):
+        poly = self.reg.to_polygon()
+        assert len(poly.vertices.ra) == 100
+
+    def test_to_polygon_n_points(self):
+        poly = self.reg.to_polygon(n_points=50)
+        assert len(poly.vertices.ra) == 50
+
+    def test_to_polygon_meta(self):
+        poly = self.reg.to_polygon()
+        assert poly.meta == self.meta
+        assert poly.visual == self.visual
+
+    def test_to_polygon_contains(self):
+        poly = self.reg.to_polygon()
+        # Inside point
+        assert poly.contains(SkyCoord(90 * u.deg, 0 * u.deg))
+        # Point far away should be outside
+        assert not poly.contains(SkyCoord(75 * u.deg, 0 * u.deg))
+
+        polylune_inv = self.reg_inv.discretize_boundary(n_points=100)
+        # Inside point
+        assert polylune_inv.contains(SkyCoord(90 * u.deg, 0 * u.deg))
+        # Point far away should be outside
+        assert not polylune_inv.contains(SkyCoord(75 * u.deg, 0 * u.deg))
 
 
 class TestRectanglePixelRegionToPolygon:
@@ -242,6 +324,40 @@ class TestRegularPolygonPixelRegionToPolygon:
         assert poly.origin == PixCoord(0, 0)
 
 
+class TestRangeSphericalSkyRegionToPolygon:
+    meta = RegionMeta({'text': 'test'})
+    visual = RegionVisual({'color': 'blue'})
+
+    reg = RangeSphericalSkyRegion(longitude_range=[0, 10] * u.deg,
+                                  latitude_range=[-4, 4] * u.deg,
+                                  frame='icrs',
+                                  meta=meta, visual=visual)
+
+    def test_to_polygon_type(self):
+        poly = self.reg.to_polygon()
+        assert isinstance(poly, PolygonSphericalSkyRegion)
+
+    def test_to_polygon_nvertices(self):
+        poly = self.reg.to_polygon()
+        assert len(poly.vertices.ra) == 100
+
+    def test_to_polygon_n_points(self):
+        poly = self.reg.to_polygon(n_points=50)
+        assert len(poly.vertices.ra) == 50
+
+    def test_to_polygon_meta(self):
+        poly = self.reg.to_polygon()
+        assert poly.meta == self.meta
+        assert poly.visual == self.visual
+
+    def test_to_polygon_contains(self):
+        poly = self.reg.to_polygon()
+        # Center should be inside
+        assert poly.contains(SkyCoord(5 * u.deg, 0 * u.deg))
+        # Point far away should be outside
+        assert not poly.contains(SkyCoord(75 * u.deg, 10 * u.deg))
+
+
 class TestCircleAnnulusPixelRegionToPolygon:
     meta = RegionMeta({'text': 'test'})
     visual = RegionVisual({'color': 'blue'})
@@ -294,6 +410,44 @@ class TestCircleAnnulusSkyRegionToPolygon:
     def test_to_polygon_n_points(self):
         poly = self.reg.to_polygon(self.wcs, n_points=50)
         assert isinstance(poly, CompoundSkyRegion)
+
+
+class TestCircleAnnulusSphericalSkyRegionToPolygon:
+    meta = RegionMeta({'text': 'test'})
+    visual = RegionVisual({'color': 'blue'})
+    reg = CircleAnnulusSphericalSkyRegion(SkyCoord(3 * u.deg, 4 * u.deg),
+                                          20 * u.arcsec, 30 * u.arcsec, meta=meta,
+                                          visual=visual)
+
+    def test_to_polygon_type(self):
+        poly = self.reg.to_polygon()
+        assert isinstance(poly, CompoundSphericalSkyRegion)
+        assert isinstance(poly.region1, PolygonSphericalSkyRegion)
+        assert isinstance(poly.region2, PolygonSphericalSkyRegion)
+
+    def test_to_polygon_nvertices(self):
+        poly = self.reg.to_polygon()
+        assert len(poly.region1.vertices.ra) == 100
+        assert len(poly.region2.vertices.ra) == 100
+
+    def test_to_polygon_n_points(self):
+        poly = self.reg.to_polygon(n_points=50)
+        assert len(poly.region1.vertices.ra) == 50
+        assert len(poly.region2.vertices.ra) == 50
+
+    def test_to_polygon_meta(self):
+        poly = self.reg.to_polygon()
+        assert poly.meta == self.meta
+        assert poly.visual == self.visual
+
+    def test_to_polygon_contains(self):
+        poly = self.reg.to_polygon()
+        # Center should be outside (it's an annulus)
+        assert not poly.contains(SkyCoord(3 * u.deg, 4 * u.deg))
+        # Point at radius 25*u.arcsec should be inside
+        assert poly.contains(SkyCoord(3 * u.deg + 25 * u.arcsec, 4 * u.deg))
+        # Point far away should be outside
+        assert not poly.contains(SkyCoord(180 * u.deg, 4 * u.deg))
 
 
 class TestEllipseAnnulusPixelRegionToPolygon:

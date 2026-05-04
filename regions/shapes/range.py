@@ -832,6 +832,23 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
         elif bound_nverts == 6:
             raise NotImplementedError
 
+    def to_polygon(self, n_points=100):
+        """
+        Return a `~regions.PolygonSphericalSkyRegion` that approximates this
+        longitude/latitude range.
+
+        Parameters
+        ----------
+        n_points : int, optional
+            The number of polygon vertices. Default is 100.
+
+        Returns
+        -------
+        polygon : `~regions.PolygonSphericalSkyRegion`
+            A polygon region approximating the range.
+        """
+        return self.discretize_boundary(n_points=n_points)
+
     def to_sky(
         self,
         wcs=None,

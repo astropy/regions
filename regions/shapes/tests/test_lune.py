@@ -32,7 +32,7 @@ class TestLuneSphericalSkyRegion(BaseTestSphericalSkyRegion):
                                  SkyCoord(178 * u.deg, 0 * u.deg),
                                  meta=meta, visual=visual)
 
-    # Verify changing order of GC center does not change the results:
+    # Verify changing order of GC center does not change the contains results:
     reg_inv = LuneSphericalSkyRegion(SkyCoord(178 * u.deg, 0 * u.deg),
                                      SkyCoord(3 * u.deg, 0 * u.deg),
                                      meta=meta, visual=visual)
