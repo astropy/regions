@@ -816,7 +816,7 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
 
         return self.__class__(**transformed)
 
-    def discretize_boundary(self, n_points=10):
+    def discretize_boundary(self, n_points=100):
         bound_nverts = self._bound_nverts
 
         if bound_nverts == 0:

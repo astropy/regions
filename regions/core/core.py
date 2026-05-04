@@ -898,7 +898,7 @@ class SphericalSkyRegion(Region):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def discretize_boundary(self, n_points=10):
+    def discretize_boundary(self, n_points=100):
         """
         Discretize the boundary into a
         `~regions.PolygonSphericalSkyRegion`, as an approximation where
@@ -907,7 +907,7 @@ class SphericalSkyRegion(Region):
         Parameters
         ----------
         n_points : int, optional
-            Number of points along the region's boundary.
+            Number of points along the region's boundary. Default is 100.
 
         Returns
         -------

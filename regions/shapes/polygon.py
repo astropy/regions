@@ -588,7 +588,7 @@ class PolygonSphericalSkyRegion(SphericalSkyRegion):
             self.visual.copy(),
         )
 
-    def discretize_boundary(self, n_points=10):
+    def discretize_boundary(self, n_points=100):
         bound_verts = discretize_all_edge_boundaries(
             self.vertices, self._edge_circs, n_points,
         )
