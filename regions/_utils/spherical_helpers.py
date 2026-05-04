@@ -529,7 +529,7 @@ def discretize_all_edge_boundaries(vertices, circs, n_points):
         The circle boundaries as CircleSphericalSkyRegion instances.
 
     n_points : int
-        The number of points for discretization along each edge.
+        The number of points for discretization along the boundary.
 
     Returns
     -------
@@ -539,12 +539,28 @@ def discretize_all_edge_boundaries(vertices, circs, n_points):
     # Iterate over full set of vertices & boundary circles for
     # a region (polygon or range)
 
+    # Verify n_points >= the number of vertices:
+    if n_points < len(vertices):
+        raise ValueError(
+            f"n_points must be greater than {len(vertices)} "
+            'to discretize/polygonize this region!',
+        )
+
+    # Return if n_points = len(vertices)
+    if n_points == len(vertices):
+        return vertices
+
+    # Determine the number of vertices per edge:
+    npt_edge, remainder = np.divmod(n_points, len(vertices))
+
     all_edge_bound_verts = None
     for i, circ in enumerate(circs):
+        npt = npt_edge + 1 if i < remainder else npt_edge
+
         # PAs from gc center to vertices:
         verts = SkyCoord(np.concatenate([[vertices[i - 1]], [vertices[i]]]))
 
-        bound_verts = _discretize_edge_boundary(verts, circ, n_points)
+        bound_verts = _discretize_edge_boundary(verts, circ, npt)
 
         if all_edge_bound_verts is None:
             all_edge_bound_verts = bound_verts

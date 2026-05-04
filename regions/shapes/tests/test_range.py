@@ -270,7 +270,7 @@ class TestRangeSphericalSkyRegion(BaseTestSphericalSkyRegion):
         # Test boundary distortion transformations:
         polypix2 = self.reg.to_pixel(wcs,
                                      include_boundary_distortions=True,
-                                     discretize_kwargs={'n_points': 2})
+                                     discretize_kwargs={'n_points': 8})
         assert isinstance(polypix2, PolygonPixelRegion)
         assert len(polypix2.vertices) == 8
 
@@ -287,7 +287,7 @@ class TestRangeSphericalSkyRegion(BaseTestSphericalSkyRegion):
 
         polysky2 = self.reg.to_sky(wcs,
                                    include_boundary_distortions=True,
-                                   discretize_kwargs={'n_points': 2})
+                                   discretize_kwargs={'n_points': 8})
         assert isinstance(polysky2, PolygonSkyRegion)
         assert len(polysky2.vertices) == 8
 
@@ -481,14 +481,14 @@ class TestRangeSphericalSkyRegion(BaseTestSphericalSkyRegion):
     def test_discretize_boundary(self):
         polyrange = self.reg.discretize_boundary(n_points=100)
         assert isinstance(polyrange, PolygonSphericalSkyRegion)
-        assert len(polyrange.vertices) == 400
+        assert len(polyrange.vertices) == 100
 
         # Longitude only
         reg2 = RangeSphericalSkyRegion(longitude_range=[0, 10] * u.deg,
                                        frame='icrs')
         polyrange2 = reg2.discretize_boundary(n_points=100)
         assert polyrange2 == reg2.longitude_bounds.discretize_boundary(n_points=100)
-        assert len(polyrange2.vertices) == 200
+        assert len(polyrange2.vertices) == 100
 
         # Latitude only
         reg3 = RangeSphericalSkyRegion(latitude_range=[-4, 4] * u.deg,
@@ -497,6 +497,11 @@ class TestRangeSphericalSkyRegion(BaseTestSphericalSkyRegion):
         assert polyrange3 == reg3.latitude_bounds.discretize_boundary(n_points=100)
         assert len(polyrange3.region1.vertices) == 100
         assert len(polyrange3.region2.vertices) == 100
+
+        with pytest.raises(ValueError) as excinfo:
+            _ = self.reg.discretize_boundary(n_points=3)
+        estr = 'n_points must be greater than'
+        assert estr in str(excinfo.value)
 
     def test_discretize_over_poles(self):
         # Wrap over poles:

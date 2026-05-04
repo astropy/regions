@@ -131,8 +131,13 @@ class TestLuneSphericalSkyRegion(BaseTestSphericalSkyRegion):
     def test_discretize_boundary(self):
         polylune = self.reg.discretize_boundary(n_points=100)
         assert isinstance(polylune, PolygonSphericalSkyRegion)
-        assert len(polylune.vertices) == 200
+        assert len(polylune.vertices) == 100
 
         assert polylune.contains(self.reg.centroid)
         polylune_inv = self.reg_inv.discretize_boundary(n_points=100)
         assert polylune_inv.contains(self.reg.centroid)
+
+        with pytest.raises(ValueError) as excinfo:
+            _ = self.reg.discretize_boundary(n_points=1)
+        estr = 'n_points must be greater than'
+        assert estr in str(excinfo.value)
