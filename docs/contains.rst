@@ -70,7 +70,7 @@ Points Inside Spherical Regions
 
 For `~regions.SphericalSkyRegion` objects, checking whether point(s) are
 contained inside that region requires no other input --- since these
-regions are defined with a the spherical geometry, and not a projected geometry
+regions are defined with a spherical geometry, and not a projected geometry
 (as captured through the projection encoded in a WCS) as in
 `~regions.SkyRegion`.
 

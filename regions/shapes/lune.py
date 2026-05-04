@@ -25,7 +25,7 @@ __all__ = ['LuneSphericalSkyRegion']
 
 class LuneSphericalSkyRegion(SphericalSkyRegion):
     """
-    Class for a spherical "lune", the intersection between to great
+    Class for a spherical "lune", the intersection between two great
     circles in spherical geometry.
 
     Composed of two CircleSphericalSkyRegions.
@@ -224,7 +224,7 @@ class LuneSphericalSkyRegion(SphericalSkyRegion):
         if not include_boundary_distortions:
             raise ValueError(
                 'Invalid parameter: `include_boundary_distortions=False`!\n'
-                'Transforming range to planar pixel region is only possible by '
+                'Transforming lune to planar pixel region is only possible by '
                 'including boundary distortions, as there is no analogous pixel region.',
             )
 

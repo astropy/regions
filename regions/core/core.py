@@ -453,7 +453,7 @@ class PixelRegion(Region):
             Ignored if boundary distortions not included.
 
         include_boundary_distortions : bool, optional
-            If True, accounts for boundary boundary distortions in spherical to planar
+            If True, accounts for boundary distortions in spherical to planar
             conversions, by discretizing the boundary and converting the boundary polygon.
             Default is False, which converts to an equivalent idealized shape.
 
@@ -714,7 +714,7 @@ class SkyRegion(Region):
             Ignored if boundary distortions not included.
 
         include_boundary_distortions : bool, optional
-            If True, accounts for boundary boundary distortions in spherical to planar
+            If True, accounts for boundary distortions in spherical to planar
             conversions, by discretizing the boundary and converting the boundary polygon.
             Default is False, which converts to an equivalent idealized shape.
 
@@ -932,7 +932,7 @@ class SphericalSkyRegion(Region):
             Ignored if boundary distortions not included.
 
         include_boundary_distortions : bool, optional
-            If True, accounts for boundary boundary distortions in spherical to planar
+            If True, accounts for boundary distortions in spherical to planar
             conversions, by discretizing the boundary and converting the boundary polygon.
             Default is False, which converts to an equivalent idealized shape.
 
@@ -965,7 +965,7 @@ class SphericalSkyRegion(Region):
             Ignored if boundary distortions not included.
 
         include_boundary_distortions : bool, optional
-            If True, accounts for boundary boundary distortions in spherical to planar
+            If True, accounts for boundary distortions in spherical to planar
             conversions, by discretizing the boundary and converting the boundary polygon.
             Default is False, which converts to an equivalent idealized shape.
 
