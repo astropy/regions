@@ -592,7 +592,8 @@ class PolygonSphericalSkyRegion(SphericalSkyRegion):
         bound_verts = discretize_all_edge_boundaries(
             self.vertices, self._edge_circs, n_points,
         )
-        return PolygonSphericalSkyRegion(bound_verts)
+        return PolygonSphericalSkyRegion(bound_verts, meta=self.meta.copy(),
+                                         visual=self.visual.copy())
 
     def to_sky(
             self,

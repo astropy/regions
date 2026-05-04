@@ -379,7 +379,8 @@ class CircleSphericalSkyRegion(SphericalSkyRegion):
         theta = np.linspace(0, 1, num=n_points, endpoint=False) * 360 * u.deg
         # Need to invert order because of CW convention:
         bound_verts = self.center.directional_offset_by(theta[::-1], self.radius)
-        return PolygonSphericalSkyRegion(bound_verts)
+        return PolygonSphericalSkyRegion(bound_verts, meta=self.meta.copy(),
+                                         visual=self.visual.copy())
 
     def to_sky(
         self, wcs=None, include_boundary_distortions=False, discretize_kwargs=None,
