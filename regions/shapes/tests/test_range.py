@@ -483,12 +483,14 @@ class TestRangeSphericalSkyRegion(BaseTestSphericalSkyRegion):
         assert isinstance(polyrange, PolygonSphericalSkyRegion)
         assert len(polyrange.vertices) == 400
 
+        # Longitude only
         reg2 = RangeSphericalSkyRegion(longitude_range=[0, 10] * u.deg,
                                        frame='icrs')
         polyrange2 = reg2.discretize_boundary(n_points=100)
         assert polyrange2 == reg2.longitude_bounds.discretize_boundary(n_points=100)
         assert len(polyrange2.vertices) == 200
 
+        # Latitude only
         reg3 = RangeSphericalSkyRegion(latitude_range=[-4, 4] * u.deg,
                                        frame='icrs')
         polyrange3 = reg3.discretize_boundary(n_points=100)

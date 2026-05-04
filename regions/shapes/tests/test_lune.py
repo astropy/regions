@@ -32,6 +32,11 @@ class TestLuneSphericalSkyRegion(BaseTestSphericalSkyRegion):
                                  SkyCoord(178 * u.deg, 0 * u.deg),
                                  meta=meta, visual=visual)
 
+    # Verify changing order of GC center does not change the results:
+    reg_inv = LuneSphericalSkyRegion(SkyCoord(178 * u.deg, 0 * u.deg),
+                                     SkyCoord(3 * u.deg, 0 * u.deg),
+                                     meta=meta, visual=visual)
+
     expected_repr = ('<LuneSphericalSkyRegion(center_gc1=<SkyCoord (ICRS): (ra, dec) in '
                      'deg\n    (3., 0.)>, center_gc2=<SkyCoord (ICRS): (ra, dec) in deg\n'
                      '    (178., 0.)>)>')
@@ -96,6 +101,12 @@ class TestLuneSphericalSkyRegion(BaseTestSphericalSkyRegion):
 
     def test_bounding_lonlat(self):
         bounding_lonlat = self.reg.bounding_lonlat
+        bounding_lonlat_inv = self.reg_inv.bounding_lonlat
+
+        assert_quantity_allclose(bounding_lonlat[0],
+                                 bounding_lonlat_inv[0])
+        assert_quantity_allclose(bounding_lonlat[1],
+                                 bounding_lonlat_inv[1])
 
         assert_quantity_allclose(bounding_lonlat[0],
                                  Longitude([88. * u.deg,
