@@ -132,3 +132,7 @@ class TestLuneSphericalSkyRegion(BaseTestSphericalSkyRegion):
         polylune = self.reg.discretize_boundary(n_points=100)
         assert isinstance(polylune, PolygonSphericalSkyRegion)
         assert len(polylune.vertices) == 200
+
+        assert polylune.contains(self.reg.centroid)
+        polylune_inv = self.reg_inv.discretize_boundary(n_points=100)
+        assert polylune_inv.contains(self.reg.centroid)

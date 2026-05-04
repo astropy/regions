@@ -185,8 +185,10 @@ class LuneSphericalSkyRegion(SphericalSkyRegion):
     def discretize_boundary(self, n_points=100):
         bound_verts = discretize_all_edge_boundaries(
             self.vertices, self._edge_circs, n_points,
-        )
-        return PolygonSphericalSkyRegion(bound_verts)
+        )[::-1]  # inverted for lune
+        # TODO: properly check for CW order even for a nverts=2 spherical polygon (lune).
+        return PolygonSphericalSkyRegion(bound_verts, meta=self.meta.copy(),
+                                         visual=self.visual.copy())
 
     def to_sky(
         self,
