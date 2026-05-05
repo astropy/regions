@@ -120,7 +120,7 @@ It is also possible to use the coordinates of a discretized
     sph_sky_region.to_pixel(
        wcs=wcs,
        include_boundary_distortions=True,
-       discretize_kwargs={"n_points":1000}
+       n_points=1000
     ).plot(ax=ax, color='tab:red', lw=3)
 
     sph_sky_center2 = SkyCoord(42, 43, unit='deg', frame='galactic')

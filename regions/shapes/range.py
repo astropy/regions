@@ -853,7 +853,7 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
         self,
         wcs=None,
         include_boundary_distortions=False,
-        discretize_kwargs=None,
+        n_points=None,
     ):
         if not include_boundary_distortions:
             raise ValueError(
@@ -864,22 +864,19 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
 
         self._validate_planar_spherical_transform(wcs, include_boundary_distortions)
 
-        if discretize_kwargs is None:
-            discretize_kwargs = {}
-
         # Requires spherical to planar projection (from WCS) and discretization
         # Use to_pixel(), then apply "small angle approx" to get planar sky.
         return self.to_pixel(
             include_boundary_distortions=include_boundary_distortions,
             wcs=wcs,
-            discretize_kwargs=discretize_kwargs,
+            n_points=n_points,
         ).to_sky(wcs)
 
     def to_pixel(
         self,
         wcs=None,
         include_boundary_distortions=False,
-        discretize_kwargs=None,
+        n_points=None,
     ):
         if not include_boundary_distortions:
             raise ValueError(
@@ -890,11 +887,10 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
 
         self._validate_planar_spherical_transform(wcs, include_boundary_distortions)
 
-        if discretize_kwargs is None:
-            discretize_kwargs = {}
+        disc_kwargs = {} if n_points is None else {'n_points': n_points}
 
         # Requires spherical to planar projection (from WCS) and discretization
-        disc_bound = self.discretize_boundary(**discretize_kwargs)
+        disc_bound = self.discretize_boundary(**disc_kwargs)
         # Anticipating complex, wrapped over the poles case:
         if isinstance(disc_bound, CompoundSphericalSkyRegion):
             return disc_bound.to_pixel(wcs)

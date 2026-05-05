@@ -138,7 +138,7 @@ and a longitude/latitude "range") on a full sky image (seen in the
     circ.to_pixel(
        wcs=wcs,
        include_boundary_distortions=True,
-       discretize_kwargs={"n_points":1000}
+       n_points=1000
     ).plot(ax=ax, edgecolor='red',
            facecolor='none', lw=2)
 
@@ -150,6 +150,6 @@ and a longitude/latitude "range") on a full sky image (seen in the
     range.to_pixel(
        wcs=wcs,
        include_boundary_distortions=True,
-       discretize_kwargs={"n_points":250}
+       n_points=250
     ).plot(ax=ax, edgecolor='blue',
            facecolor='none', lw=2)

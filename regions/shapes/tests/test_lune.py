@@ -67,12 +67,12 @@ class TestLuneSphericalSkyRegion(BaseTestSphericalSkyRegion):
         with pytest.raises(NotImplementedError):
             _ = self.reg.to_sky(wcs,
                                 include_boundary_distortions=True,
-                                discretize_kwargs={'n_points': 2})
+                                n_points=4)
 
         with pytest.raises(NotImplementedError):
             _ = self.reg.to_pixel(wcs,
                                   include_boundary_distortions=True,
-                                  discretize_kwargs={'n_points': 2})
+                                  n_points=4)
 
     def test_frame_transformation(self):
         reg2 = self.reg.transform_to('galactic')

@@ -270,7 +270,7 @@ class TestRangeSphericalSkyRegion(BaseTestSphericalSkyRegion):
         # Test boundary distortion transformations:
         polypix2 = self.reg.to_pixel(wcs,
                                      include_boundary_distortions=True,
-                                     discretize_kwargs={'n_points': 8})
+                                     n_points=8)
         assert isinstance(polypix2, PolygonPixelRegion)
         assert len(polypix2.vertices) == 8
 
@@ -287,7 +287,7 @@ class TestRangeSphericalSkyRegion(BaseTestSphericalSkyRegion):
 
         polysky2 = self.reg.to_sky(wcs,
                                    include_boundary_distortions=True,
-                                   discretize_kwargs={'n_points': 8})
+                                   n_points=8)
         assert isinstance(polysky2, PolygonSkyRegion)
         assert len(polysky2.vertices) == 8
 
@@ -312,7 +312,7 @@ class TestRangeSphericalSkyRegion(BaseTestSphericalSkyRegion):
         with pytest.raises(NotImplementedError):
             _ = reg.to_pixel(wcs,
                              include_boundary_distortions=True,
-                             discretize_kwargs={'n_points': 10})
+                             n_points=10)
 
     def test_transformation_no_wcs(self):
         with pytest.raises(ValueError) as excinfo:

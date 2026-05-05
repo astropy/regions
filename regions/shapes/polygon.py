@@ -120,11 +120,8 @@ class PolygonPixelRegion(PixelRegion):
                                 visual=self.visual.copy())
 
     def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
-                         discretize_kwargs=None):
+                         n_points=None):
         self._validate_planar_spherical_transform(wcs, include_boundary_distortions)
-
-        if discretize_kwargs is None:
-            discretize_kwargs = {}
 
         if include_boundary_distortions:
             # Requires planar to spherical projection (using WCS) and discretization
@@ -136,7 +133,7 @@ class PolygonPixelRegion(PixelRegion):
             # # Leverage polygon class to_spherical_sky() functionality without
             # # distortions, as the distortions were already computed in creating
             # # that polygon approximation
-            # return self.to_pixel(wcs).discretize_boundary(**discretize_kwargs).to_spherical_sky(
+            # return self.to_pixel(wcs).discretize_boundary(n_points=n_points).to_spherical_sky(
             #     wcs=wcs, include_boundary_distortions=False
             # )
 
@@ -419,11 +416,8 @@ class PolygonSkyRegion(SkyRegion):
                                   visual=self.visual.copy())
 
     def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
-                         discretize_kwargs=None):
+                         n_points=None):
         self._validate_planar_spherical_transform(wcs, include_boundary_distortions)
-
-        if discretize_kwargs is None:
-            discretize_kwargs = {}
 
         if include_boundary_distortions:
             # Requires planar to spherical projection (using WCS) and discretization
@@ -435,7 +429,7 @@ class PolygonSkyRegion(SkyRegion):
             # # Leverage polygon class to_spherical_sky() functionality without
             # # distortions, as the distortions were already computed in creating
             # # that polygon approximation
-            # return self.to_pixel(wcs).discretize_boundary(**discretize_kwargs).to_spherical_sky(
+            # return self.to_pixel(wcs).discretize_boundary(n_points=n_points).to_spherical_sky(
             #     wcs=wcs, include_boundary_distortions=False
             # )
 
@@ -599,12 +593,9 @@ class PolygonSphericalSkyRegion(SphericalSkyRegion):
             self,
             wcs=None,
             include_boundary_distortions=False,
-            discretize_kwargs=None,
+            n_points=None,
     ):
         self._validate_planar_spherical_transform(wcs, include_boundary_distortions)
-
-        if discretize_kwargs is None:
-            discretize_kwargs = {}
 
         if include_boundary_distortions:
             # Requires spherical to planar projection (from WCS) and discretization
@@ -612,7 +603,7 @@ class PolygonSphericalSkyRegion(SphericalSkyRegion):
             return self.to_pixel(
                 include_boundary_distortions=include_boundary_distortions,
                 wcs=wcs,
-                discretize_kwargs=discretize_kwargs,
+                n_points=n_points,
             ).to_sky(wcs)
 
         return PolygonSkyRegion(
@@ -625,16 +616,16 @@ class PolygonSphericalSkyRegion(SphericalSkyRegion):
             self,
             wcs=None,
             include_boundary_distortions=False,
-            discretize_kwargs=None,
+            n_points=None,
     ):
         self._validate_planar_spherical_transform(wcs, include_boundary_distortions)
 
-        if discretize_kwargs is None:
-            discretize_kwargs = {}
         if include_boundary_distortions:
             # Requires spherical to planar projection (from WCS) and discretization
+            disc_kwargs = {} if n_points is None else {'n_points': n_points}
+
             verts = wcs.world_to_pixel(
-                self.discretize_boundary(**discretize_kwargs).vertices,
+                self.discretize_boundary(**disc_kwargs).vertices,
             )
 
             return PolygonPixelRegion(

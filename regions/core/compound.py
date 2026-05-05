@@ -98,16 +98,16 @@ class CompoundPixelRegion(PixelRegion):
                                  visual=self.visual.copy())
 
     def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
-                         discretize_kwargs=None):
+                         n_points=None):
         sphreg1 = self.region1.to_spherical_sky(
             wcs=wcs,
             include_boundary_distortions=include_boundary_distortions,
-            discretize_kwargs=discretize_kwargs,
+            n_points=n_points,
         )
         sphreg2 = self.region2.to_spherical_sky(
             wcs=wcs,
             include_boundary_distortions=include_boundary_distortions,
-            discretize_kwargs=discretize_kwargs,
+            n_points=n_points,
         )
         return CompoundSphericalSkyRegion(
             region1=sphreg1,
@@ -276,16 +276,16 @@ class CompoundSkyRegion(SkyRegion):
                                    visual=self.visual.copy())
 
     def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
-                         discretize_kwargs=None):
+                         n_points=None):
         sphreg1 = self.region1.to_spherical_sky(
             wcs=wcs,
             include_boundary_distortions=include_boundary_distortions,
-            discretize_kwargs=discretize_kwargs,
+            n_points=n_points,
         )
         sphreg2 = self.region2.to_spherical_sky(
             wcs=wcs,
             include_boundary_distortions=include_boundary_distortions,
-            discretize_kwargs=discretize_kwargs,
+            n_points=n_points,
         )
         return CompoundSphericalSkyRegion(
             region1=sphreg1,
@@ -459,17 +459,17 @@ class CompoundSphericalSkyRegion(SphericalSkyRegion):
 
     def to_sky(
         self, wcs=None, include_boundary_distortions=False,
-        discretize_kwargs=None,
+        n_points=None,
     ):
         planarreg1 = self.region1.to_sky(
             wcs=wcs,
             include_boundary_distortions=include_boundary_distortions,
-            discretize_kwargs=discretize_kwargs,
+            n_points=n_points,
         )
         planarreg2 = self.region2.to_sky(
             wcs=wcs,
             include_boundary_distortions=include_boundary_distortions,
-            discretize_kwargs=discretize_kwargs,
+            n_points=n_points,
         )
         return CompoundSkyRegion(
             region1=planarreg1,
@@ -481,17 +481,17 @@ class CompoundSphericalSkyRegion(SphericalSkyRegion):
 
     def to_pixel(
         self, wcs=None, include_boundary_distortions=False,
-        discretize_kwargs=None,
+        n_points=None,
     ):
         pixreg1 = self.region1.to_pixel(
             wcs=wcs,
             include_boundary_distortions=include_boundary_distortions,
-            discretize_kwargs=discretize_kwargs,
+            n_points=n_points,
         )
         pixreg2 = self.region2.to_pixel(
             wcs=wcs,
             include_boundary_distortions=include_boundary_distortions,
-            discretize_kwargs=discretize_kwargs,
+            n_points=n_points,
         )
         return CompoundPixelRegion(
             region1=pixreg1,

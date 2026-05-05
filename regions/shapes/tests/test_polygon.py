@@ -358,13 +358,13 @@ class TestPolygonSphericalSkyRegion(BaseTestSphericalSkyRegion):
 
         polysky3 = self.reg.to_sky(wcs,
                                    include_boundary_distortions=True,
-                                   discretize_kwargs={'n_points': 10})
+                                   n_points=10)
         assert isinstance(polysky3, PolygonSkyRegion)
         assert len(polysky3.vertices) == 10
 
         polypix2 = self.reg.to_pixel(wcs,
                                      include_boundary_distortions=True,
-                                     discretize_kwargs={'n_points': 10})
+                                     n_points=10)
         assert isinstance(polypix2, PolygonPixelRegion)
         assert len(polypix2.vertices) == 10
 

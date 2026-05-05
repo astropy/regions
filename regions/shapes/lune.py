@@ -211,7 +211,7 @@ class LuneSphericalSkyRegion(SphericalSkyRegion):
         self,
         wcs=None,
         include_boundary_distortions=False,
-        discretize_kwargs=None,
+        n_points=None,
     ):
         if not include_boundary_distortions:
             raise ValueError(
@@ -219,8 +219,6 @@ class LuneSphericalSkyRegion(SphericalSkyRegion):
                 'Transforming lune to planar sky region is only possible by '
                 'including boundary distortions, as there is no analogous sky region.',
             )
-        if discretize_kwargs is None:
-            discretize_kwargs = {}
 
         if wcs is None:
             raise ValueError(
@@ -231,14 +229,14 @@ class LuneSphericalSkyRegion(SphericalSkyRegion):
         return self.to_pixel(
             include_boundary_distortions=include_boundary_distortions,
             wcs=wcs,
-            discretize_kwargs=discretize_kwargs,
+            n_points=n_points,
         ).to_sky(wcs)
 
     def to_pixel(
         self,
         wcs=None,
         include_boundary_distortions=False,
-        discretize_kwargs=None,
+        n_points=None,
     ):
         if not include_boundary_distortions:
             raise ValueError(
@@ -246,9 +244,6 @@ class LuneSphericalSkyRegion(SphericalSkyRegion):
                 'Transforming lune to planar pixel region is only possible by '
                 'including boundary distortions, as there is no analogous pixel region.',
             )
-
-        if discretize_kwargs is None:
-            discretize_kwargs = {}
 
         if wcs is None:
             raise ValueError(

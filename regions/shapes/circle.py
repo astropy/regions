@@ -95,11 +95,8 @@ class CirclePixelRegion(PixelRegion):
                                visual=self.visual.copy())
 
     def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
-                         discretize_kwargs=None):
+                         n_points=None):
         self._validate_planar_spherical_transform(wcs, include_boundary_distortions)
-
-        if discretize_kwargs is None:
-            discretize_kwargs = {}
 
         if include_boundary_distortions:
             # Requires planar to spherical projection (using WCS) and discretization
@@ -111,7 +108,7 @@ class CirclePixelRegion(PixelRegion):
             # # Leverage polygon class to_spherical_sky() functionality without
             # # distortions, as the distortions were already computed in creating
             # # that polygon approximation
-            # return self.discretize_boundary(**discretize_kwargs).to_spherical_sky(
+            # return self.discretize_boundary(n_points).to_spherical_sky(
             #     wcs=wcs, include_boundary_distortions=False
             # )
 
@@ -284,11 +281,8 @@ class CircleSkyRegion(SkyRegion):
                                  visual=self.visual.copy())
 
     def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
-                         discretize_kwargs=None):
+                         n_points=None):
         self._validate_planar_spherical_transform(wcs, include_boundary_distortions)
-
-        if discretize_kwargs is None:
-            discretize_kwargs = {}
 
         if include_boundary_distortions:
             # Requires planar to spherical projection (using WCS) and discretization
@@ -300,7 +294,7 @@ class CircleSkyRegion(SkyRegion):
             # # Leverage polygon class to_spherical_sky() functionality without
             # # distortions, as the distortions were already computed in creating
             # # that polygon approximation
-            # return self.to_pixel(wcs).discretize_boundary(**discretize_kwargs).to_spherical_sky(
+            # return self.to_pixel(wcs).discretize_boundary(**n_points).to_spherical_sky(
             #     wcs=wcs, include_boundary_distortions=False
             # )
 
@@ -400,12 +394,9 @@ class CircleSphericalSkyRegion(SphericalSkyRegion):
         return self.discretize_boundary(n_points=n_points)
 
     def to_sky(
-        self, wcs=None, include_boundary_distortions=False, discretize_kwargs=None,
+        self, wcs=None, include_boundary_distortions=False, n_points=None,
     ):
         self._validate_planar_spherical_transform(wcs, include_boundary_distortions)
-
-        if discretize_kwargs is None:
-            discretize_kwargs = {}
 
         if include_boundary_distortions:
             # Requires spherical to planar projection (from WCS) and discretization
@@ -413,7 +404,7 @@ class CircleSphericalSkyRegion(SphericalSkyRegion):
             return self.to_pixel(
                 include_boundary_distortions=include_boundary_distortions,
                 wcs=wcs,
-                discretize_kwargs=discretize_kwargs,
+                n_points=n_points,
             ).to_sky(wcs)
 
         return CircleSkyRegion(
@@ -424,19 +415,18 @@ class CircleSphericalSkyRegion(SphericalSkyRegion):
         self,
         wcs=None,
         include_boundary_distortions=False,
-        discretize_kwargs=None,
+        n_points=None,
     ):
         self._validate_planar_spherical_transform(wcs, include_boundary_distortions)
-
-        if discretize_kwargs is None:
-            discretize_kwargs = {}
 
         if include_boundary_distortions:
             from .polygon import PolygonPixelRegion
 
+            disc_kwargs = {} if n_points is None else {'n_points': n_points}
+
             # Requires spherical to planar projection (from WCS) and discretization
             verts = wcs.world_to_pixel(
-                self.discretize_boundary(**discretize_kwargs).vertices,
+                self.discretize_boundary(**disc_kwargs).vertices,
             )
             return PolygonPixelRegion(
                 PixCoord(*verts), meta=self.meta.copy(), visual=self.visual.copy(),

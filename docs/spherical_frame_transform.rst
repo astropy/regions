@@ -133,13 +133,13 @@ reference frames (respectively).
     patch = sph_circ.to_pixel(
        wcs=wcs,
        include_boundary_distortions=True,
-       discretize_kwargs={"n_points":1000}
+       n_points=1000
     ).plot(ax=ax, color='tab:blue', lw=3)
 
     sph_range.to_pixel(
        wcs=wcs,
        include_boundary_distortions=True,
-       discretize_kwargs={"n_points":250}
+       n_points=250
     ).plot(ax=ax, color='tab:red', lw=3)
 
     patch.set_clip_path(ax.coords.frame.patch)
@@ -159,13 +159,13 @@ reference frames (respectively).
     patch = sph_circ_transf.to_pixel(
        wcs=wcs_icrs,
        include_boundary_distortions=True,
-       discretize_kwargs={"n_points":1000}
+       n_points=1000
     ).plot(ax=ax, color='tab:blue', lw=3)
 
     sph_range_transf.to_pixel(
        wcs=wcs_icrs,
        include_boundary_distortions=True,
-       discretize_kwargs={"n_points":250}
+       n_points=250
     ).plot(ax=ax, color='tab:red', lw=3)
 
     patch.set_clip_path(ax.coords.frame.patch)

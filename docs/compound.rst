@@ -258,7 +258,7 @@ and spherical sky regions, with the same circle centers and radii.
             label='and', transform=ax.get_transform('galactic'))
 
     boundary_kwargs = dict(
-        include_boundary_distortions=True, discretize_kwargs={"n_points":1000}
+        include_boundary_distortions=True, n_points=1000
     )
     sph_circle1.to_pixel(wcs=wcs,**boundary_kwargs).plot(ax=ax, edgecolor='green', facecolor='none',
                                 alpha=0.8, lw=3)
