@@ -238,7 +238,7 @@ class CircleAnnulusPixelRegion(AnnulusPixelRegion):
             # # Leverage polygon class to_spherical_sky() functionality without
             # # distortions, as the distortions were already computed in creating
             # # that polygon approximation
-            # return self.discretize_boundary(n_points).to_spherical_sky(
+            # return self.discretize_boundary(n_points=n_points).to_spherical_sky(
             #     wcs=wcs, include_boundary_distortions=False
             # )
 
@@ -328,7 +328,7 @@ class CircleAnnulusSkyRegion(SkyRegion):
             # # Leverage polygon class to_spherical_sky() functionality without
             # # distortions, as the distortions were already computed in creating
             # # that polygon approximation
-            # return self.to_pixel(wcs).discretize_boundary(n_points).to_spherical_sky(
+            # return self.to_pixel(wcs).discretize_boundary(n_points=npoints).to_spherical_sky(
             #     wcs=wcs, include_boundary_distortions=False
             # )
 

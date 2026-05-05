@@ -17,8 +17,10 @@ from regions.core.attributes import (RegionMetaDescr, RegionVisualDescr,
 from regions.core.compound import CompoundSphericalSkyRegion
 from regions.core.core import SphericalSkyRegion
 from regions.core.metadata import RegionMeta, RegionVisual
+from regions.core.pixcoord import PixCoord
 from regions.shapes.circle import CircleSphericalSkyRegion
-from regions.shapes.polygon import PolygonSphericalSkyRegion
+from regions.shapes.polygon import (PolygonPixelRegion,
+                                    PolygonSphericalSkyRegion)
 
 __all__ = ['LuneSphericalSkyRegion']
 
@@ -220,10 +222,8 @@ class LuneSphericalSkyRegion(SphericalSkyRegion):
                 'including boundary distortions, as there is no analogous sky region.',
             )
 
-        if wcs is None:
-            raise ValueError(
-                "'wcs' must be set if `include_boundary_distortions=True`",
-            )
+        self._validate_planar_spherical_transform(wcs, include_boundary_distortions)
+
         # Requires spherical to planar projection (from WCS) and discretization
         # Use to_pixel(), then apply "small angle approx" to get planar sky.
         return self.to_pixel(
@@ -245,9 +245,16 @@ class LuneSphericalSkyRegion(SphericalSkyRegion):
                 'including boundary distortions, as there is no analogous pixel region.',
             )
 
-        if wcs is None:
-            raise ValueError(
-                "'wcs' must be set if `include_boundary_distortions=True`",
-            )
+        self._validate_planar_spherical_transform(wcs, include_boundary_distortions)
+
+        disc_kwargs = {} if n_points is None else {'n_points': n_points}
+
         # Requires spherical to planar projection (from WCS) and discretization
-        raise NotImplementedError
+        disc_bound = self.discretize_boundary(**disc_kwargs)
+
+        verts = wcs.world_to_pixel(disc_bound.vertices)
+
+        return PolygonPixelRegion(
+            PixCoord(*verts), meta=self.meta.copy(),
+            visual=self.visual.copy(),
+        )

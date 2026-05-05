@@ -12,7 +12,8 @@ from numpy.testing import assert_allclose
 from regions.core import RegionMeta, RegionVisual
 from regions.shapes.circle import CircleSphericalSkyRegion
 from regions.shapes.lune import LuneSphericalSkyRegion
-from regions.shapes.polygon import PolygonSphericalSkyRegion
+from regions.shapes.polygon import (PolygonPixelRegion, PolygonSkyRegion,
+                                    PolygonSphericalSkyRegion)
 from regions.shapes.tests.test_common import BaseTestSphericalSkyRegion
 
 
@@ -63,16 +64,26 @@ class TestLuneSphericalSkyRegion(BaseTestSphericalSkyRegion):
         estr = 'Invalid parameter: `include_boundary_distortions=False`!'
         assert estr in str(excinfo.value)
 
-        # Test for not implemented with include_boundary_distortions=True
-        with pytest.raises(NotImplementedError):
-            _ = self.reg.to_sky(wcs,
-                                include_boundary_distortions=True,
-                                n_points=4)
+        # Test for transformations with `include_boundary_distortions=True`
+        polypix = self.reg.to_pixel(wcs,
+                                    include_boundary_distortions=True,
+                                    n_points=4)
+        assert isinstance(polypix, PolygonPixelRegion)
+        assert len(polypix.vertices) == 4
+        assert_allclose(polypix.vertices.x,
+                        [7797.817216, 2952.903737, 7679.463723, -6047.096263])
+        assert_allclose(polypix.vertices.y,
+                        [-560.164308, -1256.912621, -338.786552, 1455.912621])
 
-        with pytest.raises(NotImplementedError):
-            _ = self.reg.to_pixel(wcs,
+        polysky = self.reg.to_sky(wcs,
                                   include_boundary_distortions=True,
                                   n_points=4)
+        assert isinstance(polysky, PolygonSkyRegion)
+        assert len(polysky.vertices) == 4
+        assert_allclose(polysky.vertices.l.deg,
+                        [206.033656, 302.931925, 208.400726, 122.931925])
+        assert_allclose(polysky.vertices.b.deg,
+                        [-13.193286, -27.128252, -8.765731, 27.128252])
 
     def test_frame_transformation(self):
         reg2 = self.reg.transform_to('galactic')
