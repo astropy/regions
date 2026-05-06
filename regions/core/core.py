@@ -977,9 +977,7 @@ class SphericalSkyRegion(Region):
         ----------
         wcs : `~astropy.wcs.WCS` instance, optional
             The world coordinate system transformation to use to convert
-            between sky and pixel coordinates. Required if transforming
-            with boundary distortions (if ``include_boundary_distortions`` is True).
-            Ignored if boundary distortions not included.
+            between sky and pixel coordinates.
 
         include_boundary_distortions : bool, optional
             If True, accounts for boundary distortions in spherical to planar
