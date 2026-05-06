@@ -314,7 +314,7 @@ distortions (e.g., transforming a spherical circle to a planar circle).
 
 The example below demonstrates the difference between a spherical and
 a planar circle with the same center and radius. Boundary distortions
-are included when projection the spherical circle onto the plot.
+are included when projecting the spherical circle onto the plot.
 In this full-sky Aitoff projection, the distortions result in
 points inside the spherical circle falling outside of the planar circle
 and vice versa.
