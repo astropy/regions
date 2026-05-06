@@ -459,7 +459,7 @@ class PixelRegion(Region):
 
         n_points : int, optional
             The number of polygon vertices for boundary discretization.
-            This keyword will have effect unless ``include_boundary_distortions=True``.
+            This keyword will have no effect unless ``include_boundary_distortions=True``.
             Default is 100.
 
         Returns
@@ -721,7 +721,7 @@ class SkyRegion(Region):
 
         n_points : int, optional
             The number of polygon vertices for boundary discretization.
-            This keyword will have effect unless ``include_boundary_distortions=True``.
+            This keyword will have no effect unless ``include_boundary_distortions=True``.
             Default is 100.
 
         Returns
