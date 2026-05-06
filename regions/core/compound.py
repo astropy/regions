@@ -327,6 +327,8 @@ class CompoundSphericalSkyRegion(SphericalSkyRegion):
         if not callable(operator):
             raise TypeError('operator must be callable')
 
+        self._validate_regions(region1, region2)
+
         self.region1 = region1
         self.region2 = region2
         if meta is None:
@@ -338,6 +340,20 @@ class CompoundSphericalSkyRegion(SphericalSkyRegion):
         else:
             self.visual = visual
         self._operator = operator
+
+    @staticmethod
+    def _validate_regions(region1, region2):
+        # Ensure both regions are in the same frame:
+        from regions.shapes.whole_sky import WholeSphericalSkyRegion
+
+        # If one region is WholeSphericalSkyRegion, skip check:
+        if (not (isinstance(region1, WholeSphericalSkyRegion)
+                 | isinstance(region2, WholeSphericalSkyRegion))
+           and not region1.frame.is_equivalent_frame(region2.frame)):
+            raise ValueError(
+                'To create a compound region, "region1" & "region2"'
+                ' must be in the same coordinate frame!',
+            )
 
     @property
     def operator(self):
