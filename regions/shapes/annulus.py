@@ -390,7 +390,7 @@ class CircleAnnulusSphericalSkyRegion(AnnulusSphericalSkyRegion):
                                      self.meta, self.visual)
 
     def transform_to(self, frame, merge_attributes=True):
-        frame = self._validate_frame(frame)
+        frame = self._validate_frame_transformation(frame)
 
         # Only center transforms, radii preserved
         center_transf = self.center.transform_to(frame, merge_attributes=merge_attributes)

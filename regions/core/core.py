@@ -794,7 +794,11 @@ class SphericalSkyRegion(Region):
         frame = get_astropy_frame_class(frame)
         return frame
 
-    def _validate_frame(self, frame):
+    def _validate_frame_transformation(self, frame):
+        # Validate the transformation from a spherical region's
+        # current frame to a target frame
+
+        # Standardize target frame input:
         frame = self._standardize_frame(frame)
 
         # Check if current frame is transformable to new frame:

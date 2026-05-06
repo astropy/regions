@@ -773,7 +773,7 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
         return self._compound_region.contains(coord)
 
     def transform_to(self, frame, merge_attributes=True):
-        frame = self._validate_frame(frame)
+        frame = self._validate_frame_transformation(frame)
 
         transformed = {}
 
