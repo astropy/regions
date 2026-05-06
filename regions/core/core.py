@@ -5,7 +5,7 @@ import operator
 
 import astropy.units as u
 import numpy as np
-from astropy.coordinates import SkyCoord
+from astropy.coordinates import BaseCoordinateFrame, SkyCoord
 from astropy.coordinates.sky_coordinate_parsers import _get_frame_class
 
 from regions._utils.spherical_helpers import bounding_lonlat_poles_processing
@@ -789,12 +789,26 @@ class SphericalSkyRegion(Region):
         )
 
     @staticmethod
-    def _validate_frame(frame):
-        # TODO: handle offset origin transformations
+    def _standardize_frame(frame):
+        # Standardize frame format: get as an astropy coordinate frame class
+        frame = _get_frame_class(frame)
+        return frame
 
-        frame = (
-            _get_frame_class(frame) if isinstance(frame, str) else frame
-        )
+    def _validate_frame(self, frame):
+        frame = self._standardize_frame(frame)
+
+        # Check if current frame is transformable to new frame:
+        if (isinstance(self.frame, type)
+           and issubclass(self.frame, BaseCoordinateFrame)):
+            # Need to make an instance to check if transformable:
+            self_frame = self.frame()
+        else:
+            self_frame = self.frame
+
+        if not self_frame.is_transformable_to(frame):
+            raise ValueError(f"Cannot transform from {self.frame} to {frame}!")
+
+        # TODO: check for offset origin transformations
         return frame
 
     @property

@@ -121,8 +121,8 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
         if frame is None:
             frame = _frame
 
-        # Validate frame and get into standard format:
-        frame = self._validate_frame(frame)
+        # Get frame into standard format instance:
+        frame = self._standardize_frame(frame)
 
         # --------------------
         if (
