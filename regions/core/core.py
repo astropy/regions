@@ -6,9 +6,9 @@ import operator
 import astropy.units as u
 import numpy as np
 from astropy.coordinates import BaseCoordinateFrame, SkyCoord
-from astropy.coordinates.sky_coordinate_parsers import _get_frame_class
 
-from regions._utils.spherical_helpers import bounding_lonlat_poles_processing
+from regions._utils.spherical_helpers import (bounding_lonlat_poles_processing,
+                                              get_astropy_frame_class)
 from regions.core.metadata import RegionMeta, RegionVisual
 from regions.core.pixcoord import PixCoord
 from regions.core.registry import RegionsRegistry
@@ -791,7 +791,7 @@ class SphericalSkyRegion(Region):
     @staticmethod
     def _standardize_frame(frame):
         # Standardize frame format: get as an astropy coordinate frame class
-        frame = _get_frame_class(frame)
+        frame = get_astropy_frame_class(frame)
         return frame
 
     def _validate_frame(self, frame):

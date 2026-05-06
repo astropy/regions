@@ -5,12 +5,52 @@ This module provides spherical sky region calculation helper tools.
 
 import astropy.units as u
 import numpy as np
-from astropy.coordinates import (Latitude, Longitude, SkyCoord,
-                                 SphericalRepresentation,
+from astropy.coordinates import (BaseCoordinateFrame, Latitude, Longitude,
+                                 SkyCoord, SphericalRepresentation,
                                  UnitSphericalRepresentation,
-                                 cartesian_to_spherical)
+                                 cartesian_to_spherical, frame_transform_graph)
 
 __all__ = []
+
+
+def get_astropy_frame_class(frame):
+    """
+    Get a frame class from the input `frame`, which could be a frame name
+    string, or frame class.
+
+    Direct port of `_get_frame_class()` from
+    https://github.com/astropy/astropy/blob/v7.2.0/astropy/coordinates/sky_coordinate_parsers.py
+    to avoid importing private methods.
+
+    Parameters
+    ----------
+    frame : str or `~astropy.coordinates.BaseCoordinateFrame` instance
+        The frame as a string or astropy frame class.
+
+    Returns
+    -------
+    frame_cls : A (sub)class of `~astropy.coordinates.BaseCoordinateFrame`
+        The frame as an astropy frame class.
+    """
+    if isinstance(frame, str):
+        frame_names = frame_transform_graph.get_names()
+        if frame not in frame_names:
+            raise ValueError(
+                f'Coordinate frame name "{frame}" is not a known '
+                f"coordinate frame ({sorted(frame_names)})",
+            )
+        frame_cls = frame_transform_graph.lookup_name(frame)
+
+    elif isinstance(frame, type) and issubclass(frame, BaseCoordinateFrame):
+        frame_cls = frame
+
+    else:
+        raise ValueError(
+            'Coordinate frame must be a frame name or frame class, not a'
+            f" '{frame.__class__.__name__}'",
+        )
+
+    return frame_cls
 
 
 def cross_product_skycoord2skycoord(c1, c2):
