@@ -40,7 +40,7 @@ def make_simple_wcs(skycoord, resolution, size, *, rotation_deg=0):
         A WCS object with the specified parameters.
     """
     crpix = (size + 1) / 2
-    cdelt = resolution.to(u.deg).value
+    cdelt = resolution.to_value(u.deg)
     skycoord_icrs = skycoord.transform_to('icrs')
     ra = skycoord_icrs.ra.degree
     dec = skycoord_icrs.dec.degree
