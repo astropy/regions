@@ -63,8 +63,7 @@ class WholeSphericalSkyRegion(SphericalSkyRegion):
         raise ValueError('Not defined.')
 
     def to_pixel(
-        self,
-        wcs=None,
+        self, wcs,
         include_boundary_distortions=False,
         n_points=None,
     ):

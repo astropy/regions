@@ -374,11 +374,6 @@ class TestPolygonSphericalSkyRegion(BaseTestSphericalSkyRegion):
         estr = "'wcs' must be set if `include_boundary_distortions=True`"
         assert estr in str(excinfo.value)
 
-        with pytest.raises(ValueError) as excinfo:
-            _ = self.reg.to_pixel(include_boundary_distortions=True)
-        estr = "'wcs' must be set if `include_boundary_distortions=True`"
-        assert estr in str(excinfo.value)
-
     def test_frame_transformation(self):
         reg = self.reg.transform_to('galactic')
         assert_skycoord_allclose(reg.centroid_mindist,

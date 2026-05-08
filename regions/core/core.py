@@ -941,11 +941,11 @@ class SphericalSkyRegion(Region):
         self, wcs=None, include_boundary_distortions=False, n_points=None,
     ):
         """
-        Convert to a planar `~regions.SkyRegion` instance.
+        Convert to a planar `~regions.SkyRegion`.
 
         Parameters
         ----------
-        wcs : `~astropy.wcs.WCS` instance, optional
+        wcs : `~astropy.wcs.WCS`, optional
             The world coordinate system transformation to use to convert
             between sky and pixel coordinates. Required if transforming
             with boundary distortions (if ``include_boundary_distortions`` is True).
@@ -972,14 +972,14 @@ class SphericalSkyRegion(Region):
 
     @abc.abstractmethod
     def to_pixel(
-        self, wcs=None, include_boundary_distortions=False, n_points=None,
+        self, wcs, include_boundary_distortions=False, n_points=None,
     ):
         """
-        Convert to a planar `~regions.PixelRegion` instance.
+        Convert to a planar `~regions.PixelRegion`.
 
         Parameters
         ----------
-        wcs : `~astropy.wcs.WCS` instance, optional
+        wcs : `~astropy.wcs.WCS`
             The world coordinate system transformation to use to convert
             between sky and pixel coordinates.
 

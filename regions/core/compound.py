@@ -496,16 +496,16 @@ class CompoundSphericalSkyRegion(SphericalSkyRegion):
         )
 
     def to_pixel(
-        self, wcs=None, include_boundary_distortions=False,
+        self, wcs, include_boundary_distortions=False,
         n_points=None,
     ):
         pixreg1 = self.region1.to_pixel(
-            wcs=wcs,
+            wcs,
             include_boundary_distortions=include_boundary_distortions,
             n_points=n_points,
         )
         pixreg2 = self.region2.to_pixel(
-            wcs=wcs,
+            wcs,
             include_boundary_distortions=include_boundary_distortions,
             n_points=n_points,
         )

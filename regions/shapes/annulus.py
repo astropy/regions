@@ -433,10 +433,10 @@ class CircleAnnulusSphericalSkyRegion(AnnulusSphericalSkyRegion):
         return self.discretize_boundary(n_points=n_points)
 
     def to_sky(
-            self,
-            wcs=None,
-            include_boundary_distortions=False,
-            n_points=None,
+        self,
+        wcs=None,
+        include_boundary_distortions=False,
+        n_points=None,
     ):
         self._validate_planar_spherical_transform(wcs, include_boundary_distortions)
 
@@ -458,10 +458,9 @@ class CircleAnnulusSphericalSkyRegion(AnnulusSphericalSkyRegion):
         )
 
     def to_pixel(
-            self,
-            wcs=None,
-            include_boundary_distortions=False,
-            n_points=None,
+        self, wcs,
+        include_boundary_distortions=False,
+        n_points=None,
     ):
         self._validate_planar_spherical_transform(wcs, include_boundary_distortions)
 

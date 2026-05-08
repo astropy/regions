@@ -214,7 +214,7 @@ class TestCircleAnnulusSphericalSkyRegion(BaseTestSphericalSkyRegion):
         assert not self.reg.contains(test_coord)
 
     def test_transformation(self):
-        pixannulus = self.reg.to_pixel(wcs=self.wcs)
+        pixannulus = self.reg.to_pixel(self.wcs)
         assert isinstance(pixannulus, CircleAnnulusPixelRegion)
 
         skyannulus = self.reg.to_sky(wcs=self.wcs)
@@ -229,11 +229,6 @@ class TestCircleAnnulusSphericalSkyRegion(BaseTestSphericalSkyRegion):
     def test_transformation_no_wcs(self):
         with pytest.raises(ValueError) as excinfo:
             _ = self.reg.to_sky(include_boundary_distortions=True)
-        estr = "'wcs' must be set if `include_boundary_distortions=True`"
-        assert estr in str(excinfo.value)
-
-        with pytest.raises(ValueError) as excinfo:
-            _ = self.reg.to_pixel(include_boundary_distortions=True)
         estr = "'wcs' must be set if `include_boundary_distortions=True`"
         assert estr in str(excinfo.value)
 
