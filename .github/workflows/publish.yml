@@ -12,7 +12,7 @@ on:
       - labeled
   push:
     branches:
-      - '*'
+      - 'main'
     tags:
       - '*'
       - '!*dev*'
@@ -51,6 +51,8 @@ jobs:
       targets: |
         # Linux wheels
         - cp3*-manylinux_x86_64
+        - target: cp3*-manylinux_aarch64
+          runs-on: ubuntu-24.04-arm
 
         # MacOS X wheels
         - cp3*-macosx_x86_64
@@ -58,6 +60,7 @@ jobs:
 
         # Windows wheels
         - cp3*-win_amd64
+        - cp3*-win_arm64
 
       # Developer wheels
       upload_to_anaconda: >-
