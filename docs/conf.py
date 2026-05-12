@@ -20,8 +20,8 @@ from importlib import metadata
 from pathlib import Path
 
 try:
-    from sphinx_astropy.conf.v1 import *  # noqa: F403
-    from sphinx_astropy.conf.v1 import rst_epilog
+    from sphinx_astropy.conf.v3 import *  # noqa: F403
+    from sphinx_astropy.conf.v3 import rst_epilog
 except ImportError:
     print('ERROR: the documentation requires the sphinx-astropy package to '
           'be installed')
@@ -90,13 +90,6 @@ dev = 'dev' in release
 # to the name of a builtin theme or the name of a custom theme in
 # html_theme_path.
 # html_theme = None
-
-# Customized theme options
-html_theme_options = {
-    'logotext1': 'regions',  # white,  semi-bold
-    'logotext2': '',  # orange, light
-    'logotext3': ':docs',   # white,  light
-}
 
 # Custom sidebar templates, maps document names to template names.
 # html_sidebars = {}
