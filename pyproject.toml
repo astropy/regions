@@ -48,7 +48,7 @@ test = [
 docs = [
     'regions[all]',
     'sphinx >= 8.2',  # keep in sync with docs/conf.py
-    'sphinx-astropy>=1.9',
+    'sphinx-astropy[confv3]>=1.11',
 ]
 dev = [
     'pre-commit >= 4.0',
