@@ -2,7 +2,7 @@ name: Weekly Cron Tests
 
 on:
   schedule:
-    # run every Monday at 5am UTC
+    # Run every Monday at 5am UTC
     - cron: '0 5 * * 1'
   pull_request:
     # We also want this workflow triggered if the 'Weekly CI' label is added
@@ -19,16 +19,23 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 env:
   TOXARGS: '-v'
   IS_CRON: 'true'
 
-permissions:
-  contents: read
-
 jobs:
   tests:
-    if: (github.repository == 'astropy/regions' && (github.event_name == 'schedule' || github.event_name == 'push' || github.event_name == 'workflow_dispatch' || contains(github.event.pull_request.labels.*.name, 'Weekly CI')))
+    if: |
+      github.repository == 'astropy/regions' &&
+      (
+        github.event_name == 'push' ||
+        github.event_name == 'schedule' ||
+        github.event_name == 'workflow_dispatch' ||
+        contains(github.event.pull_request.labels.*.name, 'Weekly CI')
+      )
     name: ${{ matrix.os }}, ${{ matrix.tox_env }}
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.allow_failure }}
@@ -37,8 +44,8 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            python: '3.13'
-            tox_env: 'py312-test-alldeps-devinfra'
+            python: '3.14'
+            tox_env: 'py314-test-alldeps-devinfra'
             allow_failure: false
 
     steps:
@@ -70,7 +77,14 @@ jobs:
 
     runs-on: ubuntu-latest
     name: More architectures
-    if: (github.repository == 'astropy/regions' && (github.event_name == 'schedule' || github.event_name == 'push' || github.event_name == 'workflow_dispatch' || contains(github.event.pull_request.labels.*.name, 'Arch CI')))
+    if: |
+      github.repository == 'astropy/regions' &&
+      (
+        github.event_name == 'push' ||
+        github.event_name == 'schedule' ||
+        github.event_name == 'workflow_dispatch' ||
+        contains(github.event.pull_request.labels.*.name, 'Arch CI')
+      )
     env:
       ARCH_ON_CI: ${{ matrix.arch }}
 
@@ -122,7 +136,7 @@ jobs:
             echo "LONG_BIT="$(getconf LONG_BIT)
             python3 -m venv --system-site-packages tests
             source tests/bin/activate
-            # update older versions
+            # Update older versions
             pip install -U cython setuptools packaging
             pip install -U --no-build-isolation pyerfa
             ASTROPY_USE_SYSTEM_ALL=1 pip3 install -v --no-build-isolation -e .[test]
