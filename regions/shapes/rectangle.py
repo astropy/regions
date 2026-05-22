@@ -51,9 +51,9 @@ class RectanglePixelRegion(PixelRegion):
     .. plot::
         :include-source:
 
+        import matplotlib.pyplot as plt
         from astropy.coordinates import Angle
         from regions import PixCoord, RectanglePixelRegion
-        import matplotlib.pyplot as plt
 
         fig, ax = plt.subplots(1, 1)
 

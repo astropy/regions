@@ -147,8 +147,8 @@ class CircleAnnulusPixelRegion(AnnulusPixelRegion):
     .. plot::
         :include-source:
 
-        from regions import PixCoord, CircleAnnulusPixelRegion
         import matplotlib.pyplot as plt
+        from regions import CircleAnnulusPixelRegion, PixCoord
 
         fig, ax = plt.subplots(1, 1)
 
@@ -683,9 +683,9 @@ class EllipseAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
     .. plot::
         :include-source:
 
-        from astropy.coordinates import Angle
-        from regions import PixCoord, EllipseAnnulusPixelRegion
         import matplotlib.pyplot as plt
+        from astropy.coordinates import Angle
+        from regions import EllipseAnnulusPixelRegion, PixCoord
 
         fig, ax = plt.subplots(1, 1)
 
@@ -878,9 +878,9 @@ class RectangleAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
     .. plot::
         :include-source:
 
+        import matplotlib.pyplot as plt
         from astropy.coordinates import Angle
         from regions import PixCoord, RectangleAnnulusPixelRegion
-        import matplotlib.pyplot as plt
 
         fig, ax = plt.subplots(1, 1)
 

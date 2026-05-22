@@ -48,8 +48,8 @@ class CirclePixelRegion(PixelRegion):
     .. plot::
         :include-source:
 
-        from regions import PixCoord, CirclePixelRegion
         import matplotlib.pyplot as plt
+        from regions import CirclePixelRegion, PixCoord
 
         fig, ax = plt.subplots(1, 1)
 

@@ -54,9 +54,9 @@ class EllipsePixelRegion(PixelRegion):
     .. plot::
         :include-source:
 
-        from astropy.coordinates import Angle
-        from regions import PixCoord, EllipsePixelRegion
         import matplotlib.pyplot as plt
+        from astropy.coordinates import Angle
+        from regions import EllipsePixelRegion, PixCoord
 
         fig, ax = plt.subplots(1, 1)
 

@@ -78,15 +78,13 @@ regions on an image using Matplotlib.
     from astropy.io import fits
     from astropy.utils.data import get_pkg_data_filename
     from matplotlib import pyplot as plt
-
     from regions import Regions
 
     image_file = get_pkg_data_filename('tutorials/FITS-images/HorseHead.fits')
     image_data = fits.getdata(image_file, ext=0, memmap=False)
 
     fig, ax = plt.subplots(figsize=(8, 8))
-    ax.imshow(image_data, cmap='gray')
-    #ax.set_ylim([-0.5, 892.5])
+    ax.imshow(image_data, cmap='gray', origin='lower')
 
     region_file = get_pkg_data_filename('data/plot_image.reg',
                                         package='regions.io.ds9.tests')
@@ -94,21 +92,20 @@ regions on an image using Matplotlib.
     for i, region in enumerate(regions):
         region.plot(ax=ax)
 
-The next example demonstrates how to plot spherical regions (e.g., a circle
-and a longitude/latitude "range") on a full sky image (seen in the
-`visualization demo here`_) using Matplotlib.
+The next example demonstrates how to plot spherical regions (e.g., a
+circle and a longitude/latitude "range") on a full sky image (seen in
+the `visualization demo here`_) using Matplotlib.
 
 .. plot::
 
-    from astropy.wcs import WCS
+    import astropy.units as u
+    import matplotlib.pyplot as plt
+    from astropy.coordinates import SkyCoord
     from astropy.io import fits
     from astropy.utils.data import get_pkg_data_filename
-    import astropy.units as u
-    from astropy.coordinates import SkyCoord
     from astropy.visualization.wcsaxes.frame import EllipticalFrame
+    from astropy.wcs import WCS
     from matplotlib import patheffects
-    from matplotlib import pyplot as plt
-
     from regions import CircleSphericalSkyRegion, RangeSphericalSkyRegion
 
     image_file = get_pkg_data_filename('allsky/allsky_rosat.fits')
@@ -116,40 +113,40 @@ and a longitude/latitude "range") on a full sky image (seen in the
     image_hdr = fits.getheader(image_file)
     wcs = WCS(image_hdr)
 
+    fig = plt.figure(figsize=(8, 8))
+    ax = fig.add_subplot(projection=wcs, frame_class=EllipticalFrame)
 
-    fig, ax = plt.subplots(figsize=(8,8),
-                           subplot_kw=dict(projection=wcs,
-                                           frame_class=EllipticalFrame))
-
-    path_effects=[patheffects.withStroke(linewidth=3, foreground='black')]
+    path_effects = [patheffects.withStroke(linewidth=3, foreground='black')]
     ax.coords.grid(color='white')
     ax.coords['glon'].set_ticklabel(color='white', path_effects=path_effects)
     ax.set_axisbelow(True)
-    ax.set_xlabel(r"Galactic $\ell$", labelpad=10)
-    ax.set_ylabel(r"Galactic $b$")
-    im = ax.imshow(image_data, vmin=0., vmax=300., cmap='gray')
+    ax.set_xlabel(r'Galactic $\ell$', labelpad=10)
+    ax.set_ylabel(r'Galactic $b$')
+    im = ax.imshow(image_data, vmin=0., vmax=300., cmap='gray',
+                   origin='lower')
 
     # Clip the image to the frame
     im.set_clip_path(ax.coords.frame.patch)
 
     # Image is in galactic coordinates
-    circ = CircleSphericalSkyRegion(SkyCoord(80,45,unit=u.deg,frame="galactic"),
-                                    25*u.deg)
+    circ = CircleSphericalSkyRegion(
+        SkyCoord(80, 45, unit=u.deg, frame='galactic'),
+        25 * u.deg)
     circ.to_pixel(
-       wcs=wcs,
-       include_boundary_distortions=True,
-       n_points=1000
+        wcs=wcs,
+        include_boundary_distortions=True,
+        n_points=1000,
     ).plot(ax=ax, edgecolor='red',
            facecolor='none', lw=2)
 
-    range = RangeSphericalSkyRegion(
-        frame="galactic",
-        longitude_range=[210,330]*u.deg,
-        latitude_range=[-55,-15]*u.deg,
+    lon_lat_range = RangeSphericalSkyRegion(
+        frame='galactic',
+        longitude_range=[210, 330] * u.deg,
+        latitude_range=[-55, -15] * u.deg,
     )
-    range.to_pixel(
-       wcs=wcs,
-       include_boundary_distortions=True,
-       n_points=250
+    lon_lat_range.to_pixel(
+        wcs=wcs,
+        include_boundary_distortions=True,
+        n_points=250,
     ).plot(ax=ax, edgecolor='blue',
            facecolor='none', lw=2)

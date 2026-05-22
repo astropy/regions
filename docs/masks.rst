@@ -56,7 +56,7 @@ The other mask modes that are available are:
 Here are what the region masks produced by different modes look like:
 
 .. plot::
-   :include-source:
+    :include-source:
 
     import matplotlib.pyplot as plt
     from regions.core import PixCoord
@@ -65,31 +65,23 @@ Here are what the region masks produced by different modes look like:
     center = PixCoord(26.6, 27.2)
     reg = CirclePixelRegion(center, 5.2)
 
-    plt.figure(figsize=(6, 6))
+    fig, axes = plt.subplots(nrows=2, ncols=2, figsize=(6, 6))
 
     mask1 = reg.to_mask(mode='center')
-    plt.subplot(2, 2, 1)
-    plt.title("mode='center'", size=9)
-    plt.imshow(mask1.data, cmap=plt.cm.viridis,
-               interpolation='nearest', origin='lower')
+    axes[0, 0].set_title("mode='center'", size=9)
+    axes[0, 0].imshow(mask1.data, origin='lower')
 
     mask2 = reg.to_mask(mode='exact')
-    plt.subplot(2, 2, 2)
-    plt.title("mode='exact'", size=9)
-    plt.imshow(mask2.data, cmap=plt.cm.viridis,
-               interpolation='nearest', origin='lower')
+    axes[0, 1].set_title("mode='exact'", size=9)
+    axes[0, 1].imshow(mask2.data, origin='lower')
 
     mask3 = reg.to_mask(mode='subpixels', subpixels=3)
-    plt.subplot(2, 2, 3)
-    plt.title("mode='subpixels', subpixels=3", size=9)
-    plt.imshow(mask3.data, cmap=plt.cm.viridis,
-               interpolation='nearest', origin='lower')
+    axes[1, 0].set_title("mode='subpixels', subpixels=3", size=9)
+    axes[1, 0].imshow(mask3.data, origin='lower')
 
     mask4 = reg.to_mask(mode='subpixels', subpixels=20)
-    plt.subplot(2, 2, 4)
-    plt.title("mode='subpixels', subpixels=20", size=9)
-    plt.imshow(mask4.data, cmap=plt.cm.viridis,
-               interpolation='nearest', origin='lower')
+    axes[1, 1].set_title("mode='subpixels', subpixels=20", size=9)
+    axes[1, 1].imshow(mask4.data, origin='lower')
 
 As we've seen above, the :class:`~regions.RegionMask` object has a
 ``data`` attribute that contains a Numpy array with the mask values.
@@ -114,7 +106,7 @@ effects. For this example, let's place the mask in an image with shape
 (50, 50):
 
 .. plot::
-   :include-source:
+    :include-source:
 
     import matplotlib.pyplot as plt
     from regions.core import PixCoord
@@ -124,10 +116,9 @@ effects. For this example, let's place the mask in an image with shape
     reg = CirclePixelRegion(center, 5.2)
 
     mask = reg.to_mask(mode='exact')
-    plt.figure(figsize=(4, 4))
     shape = (50, 50)
-    plt.imshow(mask.to_image(shape), cmap=plt.cm.viridis,
-               interpolation='nearest', origin='lower')
+    fig, ax = plt.subplots(figsize=(4, 4))
+    ax.imshow(mask.to_image(shape), origin='lower')
 
 
 Making image cutouts and multiplying the region mask
@@ -185,30 +176,24 @@ the aperture:
 .. doctest-skip::
 
     >>> import matplotlib.pyplot as plt
-    >>> plt.subplot(1, 3, 1)
-    >>> plt.title("Mask", size=9)
-    >>> plt.imshow(mask.data, cmap=plt.cm.viridis,
-    ...            interpolation='nearest', origin='lower',
-    ...            extent=mask.bbox.extent)
-    >>> plt.subplot(1, 3, 2)
-    >>> plt.title("Data cutout", size=9)
-    >>> plt.imshow(data, cmap=plt.cm.viridis,
-    ...            interpolation='nearest', origin='lower',
-    ...            extent=mask.bbox.extent)
-    >>> plt.subplot(1, 3, 3)
-    >>> plt.title("Data cutout multiplied by mask", size=9)
-    >>> plt.imshow(weighted_data, cmap=plt.cm.viridis,
-    ...            interpolation='nearest', origin='lower',
-    ...            extent=mask.bbox.extent)
+    >>> fig, axes = plt.subplots(nrows=1, ncols=3)
+    >>> axes[0].set_title('Mask', size=9)
+    >>> axes[0].imshow(mask.data, origin='lower',
+    ...                extent=mask.bbox.extent)
+    >>> axes[1].set_title('Data cutout', size=9)
+    >>> axes[1].imshow(data, origin='lower',
+    ...                extent=mask.bbox.extent)
+    >>> axes[2].set_title('Data cutout multiplied by mask', size=9)
+    >>> axes[2].imshow(weighted_data, origin='lower',
+    ...                extent=mask.bbox.extent)
 
 
 .. plot::
-   :context: reset
-   :align: center
+    :include-source:
 
+    import matplotlib.pyplot as plt
     from astropy.io import fits
     from astropy.utils.data import get_pkg_data_filename
-    import matplotlib.pyplot as plt
     from regions.core import PixCoord
     from regions.shapes.circle import CirclePixelRegion
 
@@ -220,34 +205,28 @@ the aperture:
     mask = aperture.to_mask(mode='exact')
     data = mask.cutout(hdu.data)
     weighted_data = mask.multiply(hdu.data)
-    plt.subplot(1, 3, 1)
-    plt.title("Mask", size=9)
-    plt.imshow(mask.data, cmap=plt.cm.viridis,
-               interpolation='nearest', origin='lower',
-               extent=mask.bbox.extent)
-    plt.subplot(1, 3, 2)
-    plt.title("Data cutout", size=9)
-    plt.imshow(data, cmap=plt.cm.viridis,
-               interpolation='nearest', origin='lower',
-               extent=mask.bbox.extent)
-    plt.subplot(1, 3, 3)
-    plt.title("Data cutout multiplied by mask", size=9)
-    plt.imshow(weighted_data, cmap=plt.cm.viridis,
-               interpolation='nearest', origin='lower',
-               extent=mask.bbox.extent)
+
+    fig, axes = plt.subplots(nrows=1, ncols=3)
+    axes[0].set_title('Mask', size=9)
+    axes[0].imshow(mask.data, origin='lower',
+                   extent=mask.bbox.extent)
+    axes[1].set_title('Data cutout', size=9)
+    axes[1].imshow(data, origin='lower',
+                   extent=mask.bbox.extent)
+    axes[2].set_title('Data cutout multiplied by mask', size=9)
+    axes[2].imshow(weighted_data, origin='lower',
+                   extent=mask.bbox.extent)
     hdulist.close()
 
 We can also use the `~regions.RegionMask` ``bbox`` attribute to look
 at the extent of the mask in the image:
 
 .. plot::
-   :context:
-   :include-source:
-   :align: center
+    :include-source:
 
+    import matplotlib.pyplot as plt
     from astropy.io import fits
     from astropy.utils.data import get_pkg_data_filename
-    import matplotlib.pyplot as plt
     from regions.core import PixCoord
     from regions.shapes.circle import CirclePixelRegion
 
@@ -258,9 +237,8 @@ at the extent of the mask in the image:
     aperture = CirclePixelRegion(center, 4.)
     mask = aperture.to_mask(mode='exact')
 
-    ax = plt.subplot(1, 1, 1)
-    ax.imshow(hdu.data, cmap=plt.cm.viridis,
-              interpolation='nearest', origin='lower')
+    fig, ax = plt.subplots()
+    ax.imshow(hdu.data, origin='lower')
     ax.add_artist(mask.bbox.as_artist(facecolor='none', edgecolor='white'))
     ax.add_artist(aperture.as_artist(facecolor='none', edgecolor='orange'))
     ax.set_xlim(120, 180)
@@ -303,19 +281,21 @@ We will use this mask as an aperture as well to calculate integrated
 and averaged flux, which is updated live in the text field of the plot as well.
 
 .. plot::
-   :context:
-   :include-source:
-   :align: center
+    :include-source:
 
+    import matplotlib.pyplot as plt
+    import numpy as np
     from astropy import units as u
-    from regions import PixCoord, EllipsePixelRegion
+    from astropy.io import fits
+    from astropy.utils.data import get_pkg_data_filename
+    from regions import EllipsePixelRegion, PixCoord
 
+    filename = get_pkg_data_filename('photometry/M6707HH.fits')
     hdulist = fits.open(filename)
     hdu = hdulist[0]
 
-    plt.clf()
-    ax = plt.subplot(1, 1, 1)
-    im = ax.imshow(hdu.data, cmap=plt.cm.viridis, interpolation='nearest', origin='lower')
+    fig, ax = plt.subplots()
+    im = ax.imshow(hdu.data, origin='lower')
     text = ax.text(122, 1002, '', size='small', color='yellow')
     ax.set_xlim(120, 180)
     ax.set_ylim(1000, 1059)
@@ -327,8 +307,10 @@ and averaged flux, which is updated live in the text field of the plot as well.
         mean = np.average(hdu.data, weights=mask.to_image(hdu.data.shape))
         text.set_text(f'Total: {total:g}\nMean: {mean:g}')
 
-    ellipse = EllipsePixelRegion(center=PixCoord(x=126, y=1031), width=8, height=4,
-                                 angle=-0*u.deg, visual={'color': 'yellow'})
+    ellipse = EllipsePixelRegion(center=PixCoord(x=126, y=1031),
+                                 width=8, height=4,
+                                 angle=-0 * u.deg,
+                                 visual={'color': 'yellow'})
     selector = ellipse.as_mpl_selector(ax, callback=update_sel)
 
     hdulist.close()

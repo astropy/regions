@@ -36,8 +36,8 @@ class LinePixelRegion(PixelRegion):
     .. plot::
         :include-source:
 
-        from regions import PixCoord, LinePixelRegion
         import matplotlib.pyplot as plt
+        from regions import LinePixelRegion, PixCoord
 
         fig, ax = plt.subplots(1, 1)
 
