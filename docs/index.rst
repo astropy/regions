@@ -81,10 +81,11 @@ regions on an image using Matplotlib.
     from regions import Regions
 
     image_file = get_pkg_data_filename('tutorials/FITS-images/HorseHead.fits')
-    image_data = fits.getdata(image_file, ext=0, memmap=False)
+    data = fits.getdata(image_file, ext=0, memmap=False)
+    data = np.rot90(data, k=-1)
 
     fig, ax = plt.subplots(figsize=(8, 8))
-    ax.imshow(image_data, cmap='gray', origin='lower')
+    ax.imshow(data, cmap='gray', origin='lower')
 
     region_file = get_pkg_data_filename('data/plot_image.reg',
                                         package='regions.io.ds9.tests')
