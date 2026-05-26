@@ -239,8 +239,8 @@ at the extent of the mask in the image:
 
     fig, ax = plt.subplots()
     ax.imshow(hdu.data, origin='lower')
-    ax.add_artist(mask.bbox.as_artist(facecolor='none', edgecolor='white'))
-    ax.add_artist(aperture.as_artist(facecolor='none', edgecolor='orange'))
+    mask.bbox.plot(ax=ax, color='white')
+    aperture.plot(ax=ax, color='orange')
     ax.set_xlim(120, 180)
     ax.set_ylim(1000, 1059)
     hdulist.close()
