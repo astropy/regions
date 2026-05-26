@@ -8,11 +8,11 @@ Region Shapes
 The following DS9 regions shapes do not have corresponding
 `~regions.Region` classes and therefore are not supported:
 
-  * panda, epanda, and bpanda
-  * vector
-  * ruler
-  * compass
-  * projection
+* panda, epanda, and bpanda
+* vector
+* ruler
+* compass
+* projection
 
 Coordinate Frames
 -----------------
@@ -21,13 +21,13 @@ Coordinate Frames
   to any particular image or WCS transformation. Therefore, the following
   DS9 coordinate frames are not supported:
 
-    * physical
-    * detector
-    * linear
-    * amplifier
-    * tile
-    * wcs and wcs0
-    * wcs[a-z]
+  * physical
+  * detector
+  * linear
+  * amplifier
+  * tile
+  * wcs and wcs0
+  * wcs[a-z]
 
   If you have a DS9 region file that uses one of these coordinate
   frames, you can load it into DS9 with its corresponding image/WCS and

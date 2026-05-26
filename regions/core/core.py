@@ -501,25 +501,25 @@ class PixelRegion(Region):
             types. Note that the more precise methods are generally
             slower. The following methods are available:
 
-                * ``'center'``:
-                  A pixel is considered to be entirely in or out of the
-                  region depending on whether its center is in or out of
-                  the region. The returned mask will contain values only
-                  of 0 (out) and 1 (in).
+            * ``'center'``:
+              A pixel is considered to be entirely in or out of the
+              region depending on whether its center is in or out of the
+              region. The returned mask will contain values only of 0
+              (out) and 1 (in).
 
-                * ``'exact'`` (default):
-                  The exact fractional overlap of the region and each
-                  pixel is calculated. The returned mask will contain
-                  values between 0 and 1.
+            * ``'exact'`` (default):
+              The exact fractional overlap of the region and each pixel
+              is calculated. The returned mask will contain values
+              between 0 and 1.
 
-                * ``'subpixel'``:
-                  A pixel is divided into subpixels (see the
-                  ``subpixels`` keyword), each of which are considered
-                  to be entirely in or out of the region depending
-                  on whether its center is in or out of the region.
-                  If ``subpixels=1``, this method is equivalent to
-                  ``'center'``. The returned mask will contain values
-                  between 0 and 1.
+            * ``'subpixel'``:
+              A pixel is divided into subpixels (see the
+              ``subpixels`` keyword), each of which are considered
+              to be entirely in or out of the region depending
+              on whether its center is in or out of the region.
+              If ``subpixels=1``, this method is equivalent to
+              ``'center'``. The returned mask will contain values
+              between 0 and 1.
 
         subpixels : int, optional
             For the ``'subpixel'`` mode, resample pixels by this factor

@@ -28,10 +28,10 @@ Region Shapes
 * The following `~regions.PixelRegion` classes do not have corresponding
   FITS shapes and therefore are not supported (a warning will be raised):
 
-    * `~regions.RectangleAnnulusPixelRegion`
-    * `~regions.LinePixelRegion`
-    * `~regions.TextPixelRegion`
-    * `~regions.CompoundPixelRegion`
+  * `~regions.RectangleAnnulusPixelRegion`
+  * `~regions.LinePixelRegion`
+  * `~regions.TextPixelRegion`
+  * `~regions.CompoundPixelRegion`
 
 * FITS regions are always parsed and serialized into separate regions.
   Shapes that have the ``COMPONENT`` column will have that value
