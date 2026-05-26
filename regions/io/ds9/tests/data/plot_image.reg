@@ -1,14 +1,19 @@
-# Region file format: DS9 astropy/regions
+# Region file format: DS9 version 4.1
+global color=green dashlist=8 3 width=1 font="helvetica 10 normal roman" select=1 highlite=1 dash=0 fixed=0 edit=1 move=1 delete=1 include=1 source=1
 image
-circle(501.000000,601.000000,50.000000) # color=red
-line(401.000000,201.000000,501.000000,101.000000) # color=blue
-point(101.000000,801.000000) # point=cross color=orange
-point(101.000000,101.000000) # point=x color=brown
-point(101.000000,301.000000) # point=boxcircle color=yellow
-point(101.000000,401.000000) # point=x color=violet
-point(101.000000,201.000000) # color=red
-ellipse(301.000000,751.000000,45.000000,30.000000,75.000000) # color=blue
-text(151.000000,551.000000) # text={Text} textangle=45 color=orange font="helvetica 12 normal roman"
-annulus(651.000000,301.000000,60.000000,90.000000) # color=brown
-polygon(451.000000,751.000000,451.000000,701.000000,551.000000,651.000000,601.000000,751.000000) # color=yellow
-box(401.000000,401.000000,100.000000,80.000000,0.000000) # color=violet
+point(101,101) # point=circle color=red
+point(101,201) # point=box
+point(101,301) # point=diamond color=#bad8ff
+point(101,401) # point=cross color=cyan
+point(201,101) # point=x color=yellow
+point(201,201) # point=arrow color=magenta
+point(201,301) # point=boxcircle color=orange
+# text(201,401) textangle=45 color=pink font="helvetica 12 normal roman" text={Text}
+circle(501,701,75) # color=red
+annulus(701,701,60,90) # color=violet
+ellipse(501,501,75,40,70) # color=#4c90ff
+ellipse(701,501,30,60,40,80,70) # color=cyan
+box(501,301,150,80,20) # color=orange
+box(701,301,50,75,100,150,20) # color=magenta
+polygon(601,164,668,41,370,61,500,161) # color=yellow
+line(807.67432,202.77662,720.05219,55.496868) # line=0 0 color=#00ff7f

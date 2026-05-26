@@ -2,4 +2,4 @@ Reference/API
 =============
 
 .. automodapi:: regions
-   :no-inheritance-diagram:
+    :no-inheritance-diagram:

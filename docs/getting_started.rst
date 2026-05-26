@@ -13,19 +13,21 @@ The Regions package provides classes to represent:
 * Regions defined using pixel coordinates (a "region-on-image"; e.g.,
   `~regions.CirclePixelRegion`)
 * Regions defined using celestial coordinates, but still in an Euclidean
-  geometry (i.e., a planar projection, as a "region-on-image";
-  e.g., `~regions.CircleSkyRegion`)
-* Regions defined using celestial coordinates, and with a spherical
-  geometry (a "region-on-celestial-sphere"; e.g., `~regions.CircleSphericalSkyRegion`)
+  geometry (i.e., a planar projection, as a "region-on-image"; e.g.,
+  `~regions.CircleSkyRegion`)
 
-To transform between (planar) sky and pixel regions, a `world coordinate system
-<https://docs.astropy.org/en/stable/wcs/wcsapi.html>`_ object (e.g.,
-`~astropy.wcs.WCS`) is needed. To transform between spherical and planar (sky or pixel)
-regions, in addition to a `wcs
+* Regions defined using celestial coordinates, and with a
+  spherical geometry (a "region-on-celestial-sphere"; e.g.,
+  `~regions.CircleSphericalSkyRegion`)
+
+To transform between (planar) sky and pixel regions, a `world coordinate
+system <https://docs.astropy.org/en/stable/wcs/wcsapi.html>`_
+object (e.g., `~astropy.wcs.WCS`) is needed. To transform between
+spherical and planar (sky or pixel) regions, in addition to a `wcs
 <https://docs.astropy.org/en/stable/wcs/wcsapi.html>`_, it is also
-necessary to specify whether or not boundary distortions should be included
-(capturing the WCS projection effects inherent in planar-to-spherical
-transformations, or the inverse).
+necessary to specify whether or not boundary distortions should
+be included (capturing the WCS projection effects inherent in
+planar-to-spherical transformations, or the inverse).
 
 Regions also provides a unified interface for reading, writing,
 parsing, and serializing regions data in different formats, including
@@ -46,9 +48,7 @@ Pixel Coordinates
 
 :class:`~regions.PixCoord` objects are used to represent pixel
 coordinates. Pixel coordinates are defined with a scalar or an array of
-``x`` and ``y`` Cartesian coordinates:
-
-.. code-block:: python
+``x`` and ``y`` Cartesian coordinates::
 
     >>> from regions import PixCoord
     >>> pixcoord = PixCoord(x=42, y=43)
@@ -64,9 +64,7 @@ coordinates. Pixel coordinates are defined with a scalar or an array of
 `~regions.PixCoord` objects can also represent arrays of pixel
 coordinates. These work in the same way as single-value coordinates, but
 they store multiple coordinates in a single object. Let's create a 1D
-array of pixel coordinates:
-
-.. code-block:: python
+array of pixel coordinates::
 
     >>> pixcoord = PixCoord(x=[0, 1], y=[2, 3])
     >>> pixcoord
@@ -78,9 +76,7 @@ array of pixel coordinates:
     >>> pixcoord.xy
     (array([0, 1]), array([2, 3]))
 
-Let's now create a 2D array of pixel coordinates:
-
-.. code-block:: python
+Let's now create a 2D array of pixel coordinates::
 
     >>> pixcoord = PixCoord(x=[[1, 2, 3], [4, 5, 6]],
     ...                     y=[[11, 12, 13], [14, 15, 16]])
@@ -99,9 +95,7 @@ class that provides a flexible interface for celestial coordinate
 representation, manipulation, and transformation between systems. See
 the extensive :ref:`astropy-coordinates` documentation for more details.
 
-Let's create a single sky coordinate:
-
-.. code-block:: python
+Let's create a single sky coordinate::
 
     >>> from astropy.coordinates import SkyCoord
     >>> skycoord = SkyCoord(42, 43, unit='deg', frame='galactic')
@@ -111,9 +105,7 @@ Let's create a single sky coordinate:
 
 Sky coordinates also support array coordinates. These work in the same
 way as single-value coordinates, but they store multiple coordinates in
-a single object:
-
-.. code-block:: python
+a single object::
 
     >>> skycoord = SkyCoord(ra=[10, 11, 12], dec=[41, 42, 43], unit='deg')
     >>> skycoord
@@ -128,21 +120,17 @@ objects with angular units can be used.
 Pixel/Sky Coordinate Transformations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To transform between pixel and sky coordinates, a `world coordinate system
-<https://docs.astropy.org/en/stable/wcs/wcsapi.html>`_ object (e.g.,
-`~astropy.wcs.WCS`) is needed.
+To transform between pixel and sky coordinates, a `world coordinate
+system <https://docs.astropy.org/en/stable/wcs/wcsapi.html>`_ object
+(e.g., `~astropy.wcs.WCS`) is needed.
 
-Let's start by creating a WCS object:
-
-.. code-block:: python
+Let's start by creating a WCS object::
 
     >>> from regions import make_example_dataset
     >>> dataset = make_example_dataset(data='simulated')
     >>> wcs = dataset.wcs
 
-Now let's use this WCS to convert between sky and pixel coordinates:
-
-.. code-block:: python
+Now let's use this WCS to convert between sky and pixel coordinates::
 
     >>> skycoord = SkyCoord(42, 43, unit='deg', frame='galactic')
     >>> pixcoord = PixCoord.from_sky(skycoord=skycoord, wcs=wcs)
@@ -158,27 +146,21 @@ Pixel Regions
 
 Pixel regions are regions that are defined using pixel coordinates and
 sizes in pixels. The regions package provides a set of "pixel-based"
-regions classes, for example, `~regions.CirclePixelRegion`:
-
-.. code-block:: python
+regions classes, for example, `~regions.CirclePixelRegion`::
 
     >>> from regions import PixCoord, CirclePixelRegion
     >>> center = PixCoord(x=42, y=43)
     >>> radius = 4.2
     >>> region = CirclePixelRegion(center, radius)
 
-You can print the region to get some information about its properties:
-
-.. code-block:: python
+You can print the region to get some information about its properties::
 
     >>> print(region)
     Region: CirclePixelRegion
     center: PixCoord(x=42, y=43)
     radius: 4.2
 
-You can access its properties via attributes:
-
-.. code-block:: python
+You can access its properties via attributes::
 
    >>> region.center
    PixCoord(x=42, y=43)
@@ -194,15 +176,13 @@ Sky Regions
 -----------
 
 Sky regions are regions that are defined using celestial coordinates.
-Please note they are **not** defined as regions on the celestial sphere,
-but rather are meant to represent shapes on an image ("region-on-image").
-They simply use sky coordinates instead of pixel coordinates to define
-their position. The remaining shape parameters are converted to pixels
-using the pixel scale of the image.
+Please note they are **not** defined as regions on the celestial
+sphere, but rather are meant to represent shapes on an image
+("region-on-image"). They simply use sky coordinates instead of pixel
+coordinates to define their position. The remaining shape parameters are
+converted to pixels using the pixel scale of the image.
 
-Let's create a sky region:
-
-.. code-block:: python
+Let's create a sky region::
 
     >>> from astropy.coordinates import Angle, SkyCoord
     >>> from regions import CircleSkyRegion
@@ -211,9 +191,7 @@ Let's create a sky region:
     >>> region = CircleSkyRegion(center, radius)
 
 Alternatively, one can define the radius using a
-`~astropy.units.Quantity` object with angular units:
-
-.. code-block:: python
+`~astropy.units.Quantity` object with angular units::
 
     >>> import astropy.units as u
     >>> from regions import CircleSkyRegion
@@ -221,9 +199,7 @@ Alternatively, one can define the radius using a
     >>> radius = 3.0 * u.deg
     >>> region = CircleSkyRegion(center, radius)
 
-You can print the region to get some information about its properties:
-
-.. code-block:: python
+You can print the region to get some information about its properties::
 
     >>> print(region)
     Region: CircleSkyRegion
@@ -231,9 +207,7 @@ You can print the region to get some information about its properties:
         (42., 43.)>
     radius: 3.0 deg
 
-You can access its properties via attributes:
-
-.. code-block:: python
+You can access its properties via attributes::
 
    >>> region.center
     <SkyCoord (ICRS): (ra, dec) in deg
@@ -254,10 +228,8 @@ and **are** defined as regions on the celestial sphere
 ("regions-on-celestial-sphere", in contrast to the planar Sky Regions).
 
 Spherical sky regions are created using celestial coordinates (as
-`~astropy.coordinates.SkyCoord`) and angular distances,
-for instance specified as
-
-.. code-block:: python
+`~astropy.coordinates.SkyCoord`) and angular distances, for instance
+specified as::
 
     >>> from astropy.coordinates import Angle, SkyCoord
     >>> from regions import CircleSphericalSkyRegion
@@ -266,9 +238,7 @@ for instance specified as
     >>> region = CircleSphericalSkyRegion(center, radius)
 
 Alternatively, one can define the radius using a
-`~astropy.units.Quantity` object with angular units:
-
-.. code-block:: python
+`~astropy.units.Quantity` object with angular units::
 
     >>> import astropy.units as u
     >>> from regions import CircleSphericalSkyRegion
@@ -276,9 +246,7 @@ Alternatively, one can define the radius using a
     >>> radius = 3.0 * u.deg
     >>> region = CircleSphericalSkyRegion(center, radius)
 
-You can print the region to get some information about its properties:
-
-.. code-block:: python
+You can print the region to get some information about its properties::
 
     >>> print(region)
     Region: CircleSphericalSkyRegion
@@ -286,9 +254,7 @@ You can print the region to get some information about its properties:
         (42., 43.)>
     radius: 3.0 deg
 
-You can access its properties via attributes:
-
-.. code-block:: python
+You can access its properties via attributes::
 
    >>> region.center
     <SkyCoord (ICRS): (ra, dec) in deg
@@ -302,22 +268,22 @@ their capabilities.
 
 Spherical to planar region transformations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-In order to transform between spherical and planar ("region-on-image") regions,
-the planar projection (encoded in a `world coordinate system
+
+In order to transform between spherical and planar ("region-on-image")
+regions, the planar projection (encoded in a `world coordinate system
 <https://docs.astropy.org/en/stable/wcs/wcsapi.html>`_ object; e.g.,
-`~astropy.wcs.WCS`) must be specified, along with a specification of
-whether or not boundary distortions should be included.
-These distortions (implemented through discrete boundary sampling)
-capture the impact of the spherical-to-planar (or vice versa) projection
-described by the WCS. However, it is possible to ignore these
-distortions (e.g., transforming a spherical circle to a planar circle).
+`~astropy.wcs.WCS`) must be specified, along with a specification
+of whether or not boundary distortions should be included. These
+distortions (implemented through discrete boundary sampling) capture the
+impact of the spherical-to-planar (or vice versa) projection described
+by the WCS. However, it is possible to ignore these distortions (e.g.,
+transforming a spherical circle to a planar circle).
 
 The example below demonstrates the difference between a spherical and
 a planar circle with the same center and radius. Boundary distortions
-are included when projecting the spherical circle onto the plot.
-In this full-sky Aitoff projection, the distortions result in
-points inside the spherical circle falling outside of the planar circle
-and vice versa.
+are included when projecting the spherical circle onto the plot. In this
+full-sky Aitoff projection, the distortions result in points inside the
+spherical circle falling outside of the planar circle and vice versa.
 
 .. plot::
     :include-source: false
@@ -325,33 +291,31 @@ and vice versa.
     import matplotlib.pyplot as plt
     import numpy as np
     from astropy.coordinates import Angle, SkyCoord
-
     from regions import (CircleSkyRegion, CircleSphericalSkyRegion,
-                        make_example_dataset, PixCoord)
+                         PixCoord, make_example_dataset)
 
-    # load example dataset to get skymap
-    config = dict(crval=(0, 0),
-                crpix=(180, 90),
-                cdelt=(-1, 1),
-                shape=(180, 360))
+    # Load example dataset to get skymap
+    config = {
+              'crval': (0, 0),
+              'crpix': (180, 90),
+              'cdelt': (-1, 1),
+              'shape': (180, 360),
+              }
 
     dataset = make_example_dataset(data='simulated', config=config)
     wcs = dataset.wcs
 
-    # remove sources
+    # Remove sources
     dataset.image.data = np.zeros_like(dataset.image.data)
 
-    #----------------------------------------
-    # define skycoords, pixcoords grids
+    # Define skycoords, pixcoords grids
     lon = np.arange(-180, 181, 10)
     lat = np.arange(-90, 91, 10)
     coords = np.array(np.meshgrid(lon, lat)).T.reshape(-1, 2)
     skycoords = SkyCoord(coords, unit='deg', frame='galactic')
     pixcoords = PixCoord.from_sky(skycoords, wcs)
 
-
-    #----------------------------------------
-    # define spherical & planar sky circles
+    # Define spherical & planar sky circles
     sph_circle = CircleSphericalSkyRegion(
         center=SkyCoord(50, 45, unit='deg', frame='galactic'),
         radius=Angle('30 deg'))
@@ -361,17 +325,13 @@ and vice versa.
     # Note: circle is equivalent to transforming from sph_circle
     # with sph_circle.to_sky(wcs, include_boundary_distortions=False)
 
-
-    #----------------------------------------
-    # define transformed-to pixel regions
+    # Define transformed-to pixel regions
     pix_circ_distort = sph_circle.to_pixel(wcs=wcs,
-                        include_boundary_distortions=True,
-                        n_points=1000)
+                                           include_boundary_distortions=True,
+                                           n_points=1000)
     pix_circ_nodistort = circle.to_pixel(wcs=wcs)
 
-
-    #----------------------------------------
-    # get contained points:
+    # Get contained points
     distort_mask = sph_circle.contains(skycoords)
     nodistort_mask = pix_circ_nodistort.contains(pixcoords)
 
@@ -379,9 +339,9 @@ and vice versa.
     distort_only_skycoords = skycoords[distort_mask & ~nodistort_mask]
     nodistort_only_skycoords = skycoords[~distort_mask & nodistort_mask]
 
-    # plot
+    # Plot
     fig = plt.figure()
-    fig.set_size_inches(7,3.5)
+    fig.set_size_inches(7, 3.5)
     ax = fig.add_axes([0.15, 0.1, 0.8, 0.8], projection=wcs, aspect='equal')
 
     ax.scatter(skycoords.l.value, skycoords.b.value, label='All',
@@ -389,14 +349,15 @@ and vice versa.
     ax.scatter(distort_only_skycoords.l.value, distort_only_skycoords.b.value,
                color='magenta', label='Only within spherical circle',
                transform=ax.get_transform('galactic'))
-    ax.scatter(nodistort_only_skycoords.l.value, nodistort_only_skycoords.b.value,
+    ax.scatter(nodistort_only_skycoords.l.value,
+               nodistort_only_skycoords.b.value,
                color='lime', label='Only within planar circle',
                transform=ax.get_transform('galactic'))
     ax.scatter(both_skycoords.l.value, both_skycoords.b.value, color='orange',
                label='Within both', transform=ax.get_transform('galactic'))
 
     pix_circ_distort.plot(ax=ax, edgecolor='red', facecolor='none',
-                        alpha=0.8, lw=3)
+                          alpha=0.8, lw=3)
 
     pix_circ_nodistort.plot(ax=ax, edgecolor='green', facecolor='none',
                             alpha=0.8, lw=3)
@@ -405,4 +366,5 @@ and vice versa.
 
     ax.set_xlim(-0.5, dataset.config['shape'][1] - 0.5)
     ax.set_ylim(-0.5, dataset.config['shape'][0] - 0.5)
-    ax.set_title("Spherical vs. Planar circle: Center=(50deg,45deg), radius=30deg")
+    ax.set_title('Spherical vs. Planar circle: '
+                 'Center=(50°, 45°), radius=30°')

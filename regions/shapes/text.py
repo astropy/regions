@@ -34,14 +34,14 @@ class TextPixelRegion(PointPixelRegion):
     .. plot::
         :include-source:
 
-        from regions import PixCoord, TextPixelRegion, RegionVisual
         import matplotlib.pyplot as plt
+        from regions import PixCoord, RegionVisual, TextPixelRegion
 
-        fig, ax = plt.subplots(1, 1)
+        fig, ax = plt.subplots()
 
         center = PixCoord(x=15, y=10)
         visual = RegionVisual({'textangle': 30})
-        reg = TextPixelRegion(center=center, text="Hello World!",
+        reg = TextPixelRegion(center=center, text='Hello World!',
                               visual=visual)
         reg.plot(ax=ax)
 

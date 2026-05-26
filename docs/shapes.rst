@@ -457,8 +457,7 @@ create an interactive editable matplotlib widget that will be
 connected to its parent region.
 
 .. plot::
-   :context:
-   :include-source:
+    :include-source:
 
     import matplotlib.pyplot as plt
     import numpy as np
@@ -466,8 +465,8 @@ connected to its parent region.
 
     x, y = np.mgrid[-15:16, -10:21]
     z = np.exp(-(x / 4)**2 - (y / 6)**2)
-    ax = plt.subplot()
-    img = ax.imshow(z)
+    fig, ax = plt.subplots()
+    img = ax.imshow(z, origin='lower')
 
     rectangle = RectanglePixelRegion(center=PixCoord(x=12, y=15), width=14, height=10)
     selector = rectangle.as_mpl_selector(ax)

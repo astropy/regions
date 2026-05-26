@@ -5,23 +5,21 @@
 Coordinate Frame Transformation of Spherical Regions
 ====================================================
 
-The `~astropy.coordinates.SkyCoord` class provides functionality for
-representing celestial coordinates and for transforming between
-different coordinate frames (see the :ref:`astropy-coordinates` documentation
-for full details).
+The `~astropy.coordinates.SkyCoord` class provides functionality
+for representing celestial coordinates and for transforming between
+different coordinate frames (see the :ref:`astropy-coordinates`
+documentation for full details).
 
-Since the `~regions.SphericalSkyRegion` class represents geometric shapes on the
-celestial sphere, these idealized shapes can also be represented in, and
-transformed between, any spherical coordinate reference frame.
-Transforming spherical regions can be useful in cases where a region of
-interest is defined in one coordinate frame, but a query
-searching for targets in this region needs to be specified
-in second coordinate frame.
+Since the `~regions.SphericalSkyRegion` class represents geometric
+shapes on the celestial sphere, these idealized shapes can also be
+represented in, and transformed between, any spherical coordinate
+reference frame. Transforming spherical regions can be useful in cases
+where a region of interest is defined in one coordinate frame, but a
+query searching for targets in this region needs to be specified in
+second coordinate frame.
 
 As an example, let's start by defining two sky regions in the Galactic
-coordinate frame:
-
-.. code-block:: python
+coordinate frame::
 
     >>> from astropy.coordinates import SkyCoord
     >>> from astropy import units as u
@@ -44,11 +42,8 @@ coordinate frame:
     latitude_range: [ 0. 45.] deg
 
 
-
 To convert these regions to the ICRS coordinate frame, the
-`~regions.SphericalSkyRegion.transform_to()` method is used.
-
-.. code-block:: python
+`~regions.SphericalSkyRegion.transform_to()` method is used::
 
     >>> sph_circ_transf = sph_circ.transform_to("icrs")
     >>> sph_range_transf = sph_range.transform_to("icrs")
@@ -67,51 +62,50 @@ To convert these regions to the ICRS coordinate frame, the
         (192.85947789, 27.12825241)>, inner_radius=45.0 deg, outer_radius=90.0 deg)>
 
 
-Note that the Range region boundaries cannot be simply described
-by longitude/latitude boundaries in a transformed frame, so
-the underlying circular annulus and lune boundaries (capturing
-the original frame latitude and longitude bounds, respectively)
-are used to describe this Range regions after a transformation.
+Note that the Range region boundaries cannot be simply described by
+longitude/latitude boundaries in a transformed frame, so the underlying
+circular annulus and lune boundaries (capturing the original frame
+latitude and longitude bounds, respectively) are used to describe this
+Range regions after a transformation.
 
-These original and transformed regions are shown below on
-full-sky projections for the Galactic and ICRS coordinate
-reference frames (respectively).
+These original and transformed regions are shown below on full-sky
+projections for the Galactic and ICRS coordinate reference frames
+(respectively).
 
 .. plot::
-   :include-source: false
+    :include-source: false
 
-    from astropy.coordinates import SkyCoord, Angle
-    from astropy.visualization.wcsaxes.frame import EllipticalFrame
-    from astropy import units as u
+    import warnings
 
     import matplotlib.pyplot as plt
+    from astropy import units as u
+    from astropy.coordinates import SkyCoord
+    from astropy.utils.exceptions import AstropyDeprecationWarning
+    from astropy.visualization.wcsaxes.frame import EllipticalFrame
 
     from regions import (CircleSphericalSkyRegion,
                          RangeSphericalSkyRegion,
                          make_example_dataset)
 
-
     dataset = make_example_dataset(data='simulated')
     wcs = dataset.wcs
 
-    dataset_icrs = make_example_dataset(data='simulated', config={'ctype':
-                                                             ('RA---AIT',
-                                                              'DEC--AIT')})
+    config = {'ctype': ('RA---AIT', 'DEC--AIT')}
+    dataset_icrs = make_example_dataset(data='simulated', config=config)
     wcs_icrs = dataset_icrs.wcs
 
-    sph_circ = CircleSphericalSkyRegion(SkyCoord(100,-30,
-                                                 unit=u.deg,
-                                                 frame="galactic"),
-                                        30*u.deg)
-    sph_range = RangeSphericalSkyRegion(frame="galactic",
-                                        longitude_range=[315,45]*u.deg,
-                                        latitude_range=[0,45]*u.deg)
-    sph_circ_transf = sph_circ.transform_to("icrs")
-    sph_range_transf = sph_range.transform_to("icrs")
-
+    sph_circ = CircleSphericalSkyRegion(
+        SkyCoord(100, -30, unit=u.deg, frame='galactic'),
+        30 * u.deg)
+    sph_range = RangeSphericalSkyRegion(
+        frame='galactic',
+        longitude_range=[315, 45] * u.deg,
+        latitude_range=[0, 45] * u.deg)
+    sph_circ_transf = sph_circ.transform_to('icrs')
+    sph_range_transf = sph_range.transform_to('icrs')
 
     fig = plt.figure()
-    fig.set_size_inches(7,7)
+    fig.set_size_inches(7, 7)
 
     axes = []
     axes.append(fig.add_axes([0.15, 0.575, 0.8, 0.425],
@@ -123,53 +117,60 @@ reference frames (respectively).
 
     ax = axes[0]
     ax.coords.grid(color='black')
-    ax.set_xlabel(r"Galactic $\ell$", labelpad=10)
-    ax.set_ylabel(r"Galactic $b$")
-    ax.set_title("Galactic coordinates", pad=5)
+    ax.set_xlabel(r'Galactic $\ell$', labelpad=10)
+    ax.set_ylabel(r'Galactic $b$')
+    ax.set_title('Galactic coordinates', pad=5)
 
-    overlay = ax.get_coords_overlay('icrs')
+    # ax.get_coords_overlay currently triggers a spurious
+    # AstropyDeprecationWarning about default tick positions ('t', 'r')
+    # not being valid for EllipticalFrame (which uses 'c', 'h', 'v').
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore', AstropyDeprecationWarning)
+        overlay = ax.get_coords_overlay('icrs')
     overlay.grid(color='gray', ls='dotted')
 
     patch = sph_circ.to_pixel(
-       wcs=wcs,
-       include_boundary_distortions=True,
-       n_points=1000
+        wcs=wcs,
+        include_boundary_distortions=True,
+        n_points=1000,
     ).plot(ax=ax, color='tab:blue', lw=3)
 
     sph_range.to_pixel(
-       wcs=wcs,
-       include_boundary_distortions=True,
-       n_points=250
+        wcs=wcs,
+        include_boundary_distortions=True,
+        n_points=250,
     ).plot(ax=ax, color='tab:red', lw=3)
 
     patch.set_clip_path(ax.coords.frame.patch)
 
-    ax.set_xlim(20,340)
-    ax.set_ylim(10,170)
+    ax.set_xlim(20, 340)
+    ax.set_ylim(10, 170)
 
     ax = axes[1]
     ax.coords.grid(color='gray', ls='dotted')
-    ax.set_xlabel("RA", labelpad=10)
-    ax.set_ylabel("Dec")
-    ax.set_title("ICRS coordinates", pad=5)
+    ax.set_xlabel('RA', labelpad=10)
+    ax.set_ylabel('Dec')
+    ax.set_title('ICRS coordinates', pad=5)
 
-    overlay = ax.get_coords_overlay('galactic')
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore', AstropyDeprecationWarning)
+        overlay = ax.get_coords_overlay('galactic')
     overlay.grid(color='black', ls='solid')
 
     patch = sph_circ_transf.to_pixel(
-       wcs=wcs_icrs,
-       include_boundary_distortions=True,
-       n_points=1000
+        wcs=wcs_icrs,
+        include_boundary_distortions=True,
+        n_points=1000,
     ).plot(ax=ax, color='tab:blue', lw=3)
 
     sph_range_transf.to_pixel(
-       wcs=wcs_icrs,
-       include_boundary_distortions=True,
-       n_points=250
+        wcs=wcs_icrs,
+        include_boundary_distortions=True,
+        n_points=250,
     ).plot(ax=ax, color='tab:red', lw=3)
 
     patch.set_clip_path(ax.coords.frame.patch)
 
-    ax.set_xlim(20,340)
-    ax.set_ylim(10,170)
+    ax.set_xlim(20, 340)
+    ax.set_ylim(10, 170)
     ax.coords[0].set_format_unit(u.deg)
