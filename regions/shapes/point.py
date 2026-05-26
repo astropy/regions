@@ -37,7 +37,7 @@ class PointPixelRegion(PixelRegion):
         import matplotlib.pyplot as plt
         from regions import PixCoord, PointPixelRegion, RegionVisual
 
-        fig, ax = plt.subplots(1, 1)
+        fig, ax = plt.subplots()
 
         regs = []
         regs.append(PointPixelRegion(PixCoord(2, 2),

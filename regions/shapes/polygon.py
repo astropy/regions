@@ -55,7 +55,7 @@ class PolygonPixelRegion(PixelRegion):
         import matplotlib.pyplot as plt
         from regions import PixCoord, PolygonPixelRegion
 
-        fig, ax = plt.subplots(1, 1)
+        fig, ax = plt.subplots()
 
         x, y = [45, 45, 55, 60], [75, 70, 65, 75]
         vertices = PixCoord(x=x, y=y)
@@ -289,7 +289,7 @@ class RegularPolygonPixelRegion(PolygonPixelRegion):
         import matplotlib.pyplot as plt
         from regions import PixCoord, RegularPolygonPixelRegion
 
-        fig, ax = plt.subplots(1, 1)
+        fig, ax = plt.subplots()
         center = PixCoord(x=50, y=50)
         reg1 = RegularPolygonPixelRegion(center, 6, 15)
         reg1.plot(edgecolor='red', lw=2)

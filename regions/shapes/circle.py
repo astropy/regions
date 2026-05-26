@@ -51,7 +51,7 @@ class CirclePixelRegion(PixelRegion):
         import matplotlib.pyplot as plt
         from regions import CirclePixelRegion, PixCoord
 
-        fig, ax = plt.subplots(1, 1)
+        fig, ax = plt.subplots()
 
         reg = CirclePixelRegion(PixCoord(x=8, y=7), radius=3.5)
         patch = reg.plot(ax=ax, facecolor='none', edgecolor='red', lw=2,
