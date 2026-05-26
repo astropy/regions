@@ -115,17 +115,16 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
         reg.angle = 35 * u.deg
         assert reg != self.reg
 
-    # temporarily disable sync=True test due to random failures
-    # @pytest.mark.parametrize('sync', (False, True))
-    @pytest.mark.parametrize('sync', (False,))
+    @pytest.mark.skipif(not HAS_MATPLOTLIB, reason='matplotlib is required')
+    @pytest.mark.parametrize('sync', (False, True))
     def test_as_mpl_selector(self, sync):
-        plt = pytest.importorskip('matplotlib.pyplot')
+        import matplotlib.pyplot as plt
 
         rng = np.random.default_rng(0)
         data = rng.random((16, 16))
         mask = np.zeros_like(data)
 
-        ax = plt.subplot(1, 1, 1)
+        fig, ax = plt.subplots()
         ax.imshow(data)
 
         def update_mask(reg):
@@ -178,18 +177,21 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
         with pytest.raises(AttributeError, match=('Cannot attach more than one selector to a reg')):
             region.as_mpl_selector(ax)
 
+        plt.close()
+
+    @pytest.mark.skipif(not HAS_MATPLOTLIB, reason='matplotlib is required')
     @pytest.mark.parametrize('anywhere', (False, True))
     def test_mpl_selector_drag(self, anywhere):
         """
         Test dragging of entire region from central handle and anywhere.
         """
-        plt = pytest.importorskip('matplotlib.pyplot')
+        import matplotlib.pyplot as plt
 
         rng = np.random.default_rng(0)
         data = rng.random((16, 16))
         mask = np.zeros_like(data)
 
-        ax = plt.subplot(1, 1, 1)
+        fig, ax = plt.subplots()
         ax.imshow(data)
 
         def update_mask(reg):
@@ -246,6 +248,9 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
 
         assert_equal(mask, region.to_mask(mode='subpixels', subpixels=10).to_image(data.shape))
 
+        plt.close()
+
+    @pytest.mark.skipif(not HAS_MATPLOTLIB, reason='matplotlib is required')
     @pytest.mark.parametrize('userargs',
                              ({'useblit': True},
                               {'grab_range': 20, 'minspanx': 5, 'minspany': 4},
@@ -255,13 +260,13 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
         """
         Test that additional kwargs are passed to selector.
         """
-        plt = pytest.importorskip('matplotlib.pyplot')
+        import matplotlib.pyplot as plt
 
         rng = np.random.default_rng(0)
         data = rng.random((16, 16))
         mask = np.zeros_like(data)
 
-        ax = plt.subplot(1, 1, 1)
+        fig, ax = plt.subplots()
         ax.imshow(data)
 
         def update_mask(reg):
@@ -286,6 +291,8 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
                 for key, val in userargs.items():
                     assert getattr(region._mpl_selector, key) == val
                     assert getattr(selector, key) == val
+
+        plt.close()
 
 
 def test_rectangular_pixel_region_bbox():
