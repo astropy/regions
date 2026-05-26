@@ -115,10 +115,8 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
         reg.angle = 35 * u.deg
         assert reg != self.reg
 
-    # temporarily disable sync=True test due to random failures
     @pytest.mark.skipif(not HAS_MATPLOTLIB, reason='matplotlib is required')
-    # @pytest.mark.parametrize('sync', (False, True))
-    @pytest.mark.parametrize('sync', (False,))
+    @pytest.mark.parametrize('sync', (False, True))
     def test_as_mpl_selector(self, sync):
         import matplotlib.pyplot as plt
 
@@ -251,7 +249,6 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
         assert_equal(mask, region.to_mask(mode='subpixels', subpixels=10).to_image(data.shape))
 
         plt.close()
-
 
     @pytest.mark.skipif(not HAS_MATPLOTLIB, reason='matplotlib is required')
     @pytest.mark.parametrize('userargs',

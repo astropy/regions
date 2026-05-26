@@ -108,10 +108,8 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
             EllipsePixelRegion(PixCoord(50, 50), width=10, height=0,
                                angle=0. * u.deg)
 
-    # temporarily disable sync=True test due to random failures
     @pytest.mark.skipif(not HAS_MATPLOTLIB, reason='matplotlib is required')
-    # @pytest.mark.parametrize('sync', (False, True))
-    @pytest.mark.parametrize('sync', (False,))
+    @pytest.mark.parametrize('sync', (False, True))
     def test_as_mpl_selector(self, sync):
         import matplotlib.pyplot as plt
 
