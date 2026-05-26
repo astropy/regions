@@ -63,7 +63,7 @@ def test_region_visual_mpl_kwargs():
     expected = {'edgecolor': 'blue', 'fill': False}
     assert kwargs == expected
 
-    kwargs = meta.define_mpl_kwargs('Line2D')
+    kwargs = meta.define_mpl_kwargs('point')
     expected = {'markeredgecolor': 'blue', 'fillstyle': 'none',
                 'marker': 'o'}
     assert kwargs == expected

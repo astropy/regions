@@ -57,6 +57,10 @@ Bug Fixes
 API Changes
 -----------
 
+- The ``LinePixelRegion`` ``as_artist`` method now returns a
+  ``matplotlib.lines.Line2D`` object instead of a
+  ``matplotlib.patches.Arrow`` object. [#668]
+
 
 0.11 (2025-11-05)
 =================

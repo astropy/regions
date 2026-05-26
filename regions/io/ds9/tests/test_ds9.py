@@ -7,10 +7,12 @@ import os
 import warnings
 
 import astropy.units as u
+import numpy as np
 import pytest
 from astropy.coordinates import Angle, SkyCoord
+from astropy.io import fits
 from astropy.tests.helper import assert_quantity_allclose
-from astropy.utils.data import get_pkg_data_filenames
+from astropy.utils.data import get_pkg_data_filename, get_pkg_data_filenames
 from astropy.utils.exceptions import AstropyUserWarning
 from numpy.testing import assert_allclose, assert_equal
 
@@ -20,6 +22,26 @@ from regions.shapes import (CirclePixelRegion, CircleSkyRegion,
                             PointPixelRegion, RegularPolygonPixelRegion,
                             TextPixelRegion)
 from regions.tests.helpers import assert_region_allclose
+
+
+@pytest.mark.remote_data
+@pytest.mark.skipif(not HAS_MATPLOTLIB, reason='matplotlib is required')
+def test_example_plot():
+    import matplotlib.pyplot as plt
+
+    image_file = get_pkg_data_filename('tutorials/FITS-images/HorseHead.fits')
+    data = fits.getdata(image_file, ext=0, memmap=False)
+    data = np.rot90(data, k=-1)
+
+    _, ax = plt.subplots(figsize=(8, 8))
+    ax.imshow(data, cmap='gray', origin='lower')
+
+    region_file = get_pkg_data_filename('data/plot_image.reg',
+                                        package='regions.io.ds9.tests')
+    regions = Regions.read(region_file, format='ds9')
+    for _i, region in enumerate(regions):
+        region.plot(ax=ax)
+    plt.close()
 
 
 def test_roundtrip(tmpdir):

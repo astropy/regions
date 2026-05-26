@@ -60,7 +60,7 @@ class PointPixelRegion(PixelRegion):
     """
 
     _params = ('center',)
-    _mpl_artist = 'Line2D'
+    _mpl_artist = 'point'  # custom Line2D with marker only
     center = ScalarPixCoord('The point pixel position as a |PixCoord|.')
     meta = RegionMetaDescr('The meta attributes as a |RegionMeta|')
     visual = RegionVisualDescr('The visual attributes as a |RegionVisual|.')
@@ -123,6 +123,8 @@ class PointPixelRegion(PixelRegion):
         artist : `~matplotlib.lines.Line2D`
             A matplotlib Line2D object.
         """
+        # matplotlib does not have a "point" artist, so we use a Line2D
+        # with marker only
         from matplotlib.lines import Line2D
 
         mpl_kwargs = self.visual.define_mpl_kwargs(self._mpl_artist)

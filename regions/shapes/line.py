@@ -41,8 +41,8 @@ class LinePixelRegion(PixelRegion):
 
         fig, ax = plt.subplots()
 
-        start = PixCoord(x=15, y=10)
-        end = PixCoord(x=20, y=25)
+        start = PixCoord(x=5, y=8)
+        end = PixCoord(x=25, y=25)
         reg = LinePixelRegion(start=start, end=end)
         patch = reg.plot(ax=ax, color='red', lw=2, label='Line')
 
@@ -53,7 +53,7 @@ class LinePixelRegion(PixelRegion):
     """
 
     _params = ('start', 'end')
-    _mpl_artist = 'Patch'
+    _mpl_artist = 'Line2D'
     start = ScalarPixCoord('The start pixel position as a |PixCoord|.')
     end = ScalarPixCoord('The end pixel position as a |PixCoord|.')
     meta = RegionMetaDescr('The meta attributes as a |RegionMeta|')
@@ -122,21 +122,13 @@ class LinePixelRegion(PixelRegion):
         artist : `~matplotlib.patches.Arrow`
             A matplotlib line patch.
         """
-        # Note: Long term we want to support DS9 lines with arrow heads.
-        # We may want to use Line2D instead of arrow for lines because the
-        # width of the arrow is non-scalable in patches.
-        from matplotlib.patches import Arrow
-
-        x = self.start.x - origin[0]
-        y = self.start.y - origin[1]
-        dx = self.end.x - self.start.x
-        dy = self.end.y - self.start.y
-        kwargs.setdefault('width', 0.1)
+        from matplotlib.lines import Line2D
 
         mpl_kwargs = self.visual.define_mpl_kwargs(self._mpl_artist)
         mpl_kwargs.update(kwargs)
 
-        return Arrow(x, y, dx, dy, **mpl_kwargs)
+        return Line2D([self.start.x, self.end.x], [self.start.y, self.end.y],
+                      **mpl_kwargs)
 
     def rotate(self, center, angle):
         """
