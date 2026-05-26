@@ -140,7 +140,7 @@ class RegionVisual(Meta):
             # matplotlib defaults
             if artist == 'Patch':
                 kwargs['fill'] = False
-            elif artist == 'Line2D':
+            elif artist == 'point':  # Line2D with marker only
                 kwargs['fillstyle'] = 'none'
                 kwargs['marker'] = 'o'
             return kwargs
@@ -151,7 +151,7 @@ class RegionVisual(Meta):
             if artist == 'Text':
                 kwargs['ha'] = 'center'  # text horizontal alignment
                 kwargs['va'] = 'center'  # text vertical alignment
-            elif artist == 'Line2D':
+            elif artist == 'point':  # Line2D with marker only
                 from regions.io.ds9.core import ds9_valid_symbols
 
                 kwargs['marker'] = ds9_valid_symbols['boxcircle']
@@ -162,9 +162,6 @@ class RegionVisual(Meta):
                 kwargs['edgecolor'] = kwargs.pop('color')
                 kwargs['fill'] = False
 
-            else:
-                raise ValueError('invalid visual["default"] value')
-
         return kwargs
 
     def _to_mpl_kwargs(self, artist):
@@ -174,8 +171,9 @@ class RegionVisual(Meta):
 
         Parameters
         ----------
-        artist : {'Text', 'Line2D', 'Patch'}
-            The matplotlib artist type.
+        artist : {'Text', 'Line2D', 'Patch', 'point'}
+            The matplotlib artist type. 'point' is a special case for
+            Line2D with a marker only.
 
         Returns
         -------
@@ -190,14 +188,17 @@ class RegionVisual(Meta):
                       'textangle': 'rotation'}
 
         elif artist == 'Line2D':
-            keymap = {'symsize': 'markersize',
-                      'color': 'markeredgecolor',
-                      'linewidth': 'markeredgewidth',
-                      'fill': 'fillstyle'}
+            keymap = {}
 
         elif artist == 'Patch':
             keymap = {'color': 'edgecolor',
                       'fill': 'fill'}
+
+        elif artist == 'point':
+            keymap = {'symsize': 'markersize',
+                      'color': 'markeredgecolor',
+                      'linewidth': 'markeredgewidth',
+                      'fill': 'fillstyle'}
 
         else:
             raise ValueError('invalid artist type')
@@ -226,7 +227,7 @@ class RegionVisual(Meta):
 
         Parameters
         ----------
-        artist : {'Text', 'Line2D', 'Patch'}
+        artist : {'Text', 'Line2D', 'Patch', 'point'}
             The matplotlib artist type.
 
         Returns
@@ -234,7 +235,7 @@ class RegionVisual(Meta):
         result : dict
             A dictionary of matplotlib keyword arguments.
         """
-        if artist not in ('Patch', 'Line2D', 'Text'):
+        if artist not in ('Patch', 'Line2D', 'Text', 'point'):
             raise ValueError(f'artist "{artist}" is not supported')
 
         kwargs = self._define_default_mpl_kwargs(artist)

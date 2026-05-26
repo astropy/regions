@@ -64,8 +64,8 @@ class TestLinePixelRegion(BaseTestPixelRegion):
 
     @pytest.mark.skipif(not HAS_MATPLOTLIB, reason='matplotlib is required')
     def test_as_artist(self):
-        patch = self.reg.as_artist()
-        assert 'Arrow' in str(patch)
+        line2d = self.reg.as_artist()
+        assert 'Line2D' in str(line2d)
 
     def test_rotate(self):
         reg = self.reg.rotate(PixCoord(2, 3), 90 * u.deg)
