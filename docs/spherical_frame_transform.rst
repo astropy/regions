@@ -80,7 +80,6 @@ projections for the Galactic and ICRS coordinate reference frames
     import matplotlib.pyplot as plt
     from astropy import units as u
     from astropy.coordinates import SkyCoord
-    from astropy.utils.exceptions import AstropyDeprecationWarning
     from astropy.visualization.wcsaxes.frame import EllipticalFrame
 
     from regions import (CircleSphericalSkyRegion,
@@ -121,12 +120,7 @@ projections for the Galactic and ICRS coordinate reference frames
     ax.set_ylabel(r'Galactic $b$')
     ax.set_title('Galactic coordinates', pad=5)
 
-    # ax.get_coords_overlay currently triggers a spurious
-    # AstropyDeprecationWarning about default tick positions ('t', 'r')
-    # not being valid for EllipticalFrame (which uses 'c', 'h', 'v').
-    with warnings.catch_warnings():
-        warnings.simplefilter('ignore', AstropyDeprecationWarning)
-        overlay = ax.get_coords_overlay('icrs')
+    overlay = ax.get_coords_overlay('icrs')
     overlay.grid(color='gray', ls='dotted')
 
     patch = sph_circ.to_pixel(
@@ -152,9 +146,7 @@ projections for the Galactic and ICRS coordinate reference frames
     ax.set_ylabel('Dec')
     ax.set_title('ICRS coordinates', pad=5)
 
-    with warnings.catch_warnings():
-        warnings.simplefilter('ignore', AstropyDeprecationWarning)
-        overlay = ax.get_coords_overlay('galactic')
+    overlay = ax.get_coords_overlay('galactic')
     overlay.grid(color='black', ls='solid')
 
     patch = sph_circ_transf.to_pixel(
