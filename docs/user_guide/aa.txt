@@ -1,0 +1,12 @@
+[0m[38;5;152maa.txt[0m
+[38;5;152mcompound.rst[0m
+[38;5;152mcontains.rst[0m
+[38;5;152mds9_io.rst[0m
+[38;5;152mfits_io.rst[0m
+[38;5;152mindex.rst[0m
+[38;5;152mmasks.rst[0m
+[38;5;152mmetadata.rst[0m
+[38;5;152mplotting.rst[0m
+[38;5;152mregion_io.rst[0m
+[38;5;152mshapely.rst[0m
+[38;5;152mshapes.rst[0m
