@@ -1,6 +1,9 @@
 Plotting Regions with Matplotlib
 ================================
 
+Plotting Pixel Regions
+----------------------
+
 Some `~regions.PixelRegion` objects have an ``as_artist()``
 method that returns an equivalent `matplotlib.patches` object.
 For example :meth:`regions.CirclePixelRegion.as_artist` returns a
@@ -10,19 +13,19 @@ To draw a matplotlib patch object, add it to an `matplotlib.axes.Axes`
 object.
 
 .. plot::
-   :include-source:
+    :include-source:
 
-    from regions import PixCoord, CirclePixelRegion
     import matplotlib.pyplot as plt
+    from regions import CirclePixelRegion, PixCoord
 
     region = CirclePixelRegion(PixCoord(x=0.3, y=0.42), radius=0.5)
     artist = region.as_artist()
 
-    axes = plt.gca()
-    axes.set_aspect('equal')
-    axes.add_artist(artist)
-    axes.set_xlim([-0.5, 1])
-    axes.set_ylim([-0.5, 1])
+    fig, ax = plt.subplots()
+    ax.set_aspect('equal')
+    ax.add_artist(artist)
+    ax.set_xlim([-0.5, 1])
+    ax.set_ylim([-0.5, 1])
 
 The default keyword arguments for the matplotlib artist depend on the
 value of the ``default_style`` keyword in the `~regions.RegionVisual`
@@ -47,15 +50,15 @@ for point regions. For example:
 .. plot::
     :include-source:
 
-    import numpy as np
     import matplotlib.pyplot as plt
-    from regions import PixCoord, CirclePixelRegion
+    import numpy as np
+    from regions import CirclePixelRegion, PixCoord
 
     fig, ax = plt.subplots()
     region = CirclePixelRegion(center=PixCoord(x=7, y=5), radius=3)
 
     data = np.arange(10 * 15).reshape((10, 15))
-    ax.imshow(data, cmap='gray', interpolation='nearest', origin='lower')
+    ax.imshow(data, cmap='gray', origin='lower')
     region.plot(ax=ax, color='red', lw=2.0)
 
 The documentation for `~regions.RectanglePixelRegion` and
@@ -78,3 +81,56 @@ to convert it to a pixel region (using a WCS object):
     >>> sky_region = CircleSkyRegion(sky_center, sky_radius)
     >>> pixel_region = sky_region.to_pixel(wcs)
     >>> pixel_region.plot()
+
+
+Plotting Spherical Sky Regions
+------------------------------
+
+Similarly, `~regions.SphericalSkyRegion` objects do not
+have an ``as_artist()`` or ``plot()`` method. To plot a
+`~regions.SphericalSkyRegion` object, you will need to convert
+it to a pixel region (using a WCS object). Boundary distortions
+can also be included in this conversion (by setting the
+``include_boundary_distortions`` keyword), to capture the effects of
+the WCS projection from spherical to a planar geometry. (See the second
+example in :ref:`index_examples`.)
+
+It is also possible to use the coordinates of a discretized
+`~regions.SphericalSkyRegion` to show the region's boundary in a figure.
+
+.. plot::
+    :include-source:
+
+    import matplotlib.pyplot as plt
+    from astropy.coordinates import Angle, SkyCoord
+    from regions import CircleSphericalSkyRegion, make_example_dataset
+
+    dataset = make_example_dataset(data='simulated')
+    wcs = dataset.wcs
+
+    sph_sky_center = SkyCoord(42, 30, unit='deg', frame='galactic')
+    sph_sky_radius = Angle(12, 'deg')
+    sph_sky_region = CircleSphericalSkyRegion(sph_sky_center, sph_sky_radius)
+
+    fig = plt.figure()
+    ax = fig.add_subplot(projection=wcs)
+    ax.grid(True)
+    ax.set_xlabel(r'Galactic $\ell$')
+    ax.set_ylabel(r'Galactic $b$')
+
+    sph_sky_region.to_pixel(
+        wcs=wcs,
+        include_boundary_distortions=True,
+        n_points=1000,
+    ).plot(ax=ax, color='tab:red', lw=3)
+
+    sph_sky_center2 = SkyCoord(42, 43, unit='deg', frame='galactic')
+    sph_sky_radius2 = Angle(25, 'deg')
+    sph_sky_region2 = CircleSphericalSkyRegion(sph_sky_center2, sph_sky_radius2)
+    poly_sph_sky2 = sph_sky_region2.discretize_boundary(n_points=1000)
+    ax.plot(
+        poly_sph_sky2.vertices.l,
+        poly_sph_sky2.vertices.b,
+        lw=2, color='tab:blue',
+        transform=ax.get_transform('galactic'),
+    )

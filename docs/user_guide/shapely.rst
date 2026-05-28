@@ -23,7 +23,7 @@ intersection and union.
     :include-source:
 
     import matplotlib.pyplot as plt
-    from regions import PixCoord, CirclePixelRegion
+    from regions import CirclePixelRegion, PixCoord
     from shapely.geometry import Point
 
     # Make an example region
@@ -38,6 +38,6 @@ intersection and union.
 
     # Plot the result
     x, y = circle.exterior.xy
-    ax = plt.subplot(1, 1, 1)
+    fig, ax = plt.subplots()
     ax.set_aspect('equal')
     ax.plot(x, y, 'g-')

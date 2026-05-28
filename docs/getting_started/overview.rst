@@ -2,8 +2,8 @@
 
 .. _getting_started:
 
-Getting Started
-===============
+Overview
+========
 
 Introduction
 ------------
@@ -22,8 +22,8 @@ The Regions package provides classes to represent:
 
 To transform between (planar) sky and pixel regions, a `world coordinate
 system <https://docs.astropy.org/en/stable/wcs/wcsapi.html>`_
-object (e.g., `~astropy.wcs.WCS`) is needed. To transform between
-spherical and planar (sky or pixel) regions, in addition to a `wcs
+object (e.g., FITS `~astropy.wcs.WCS`) is needed. To transform between
+spherical and planar (sky or pixel) regions, in addition to a `WCS
 <https://docs.astropy.org/en/stable/wcs/wcsapi.html>`_, it is also
 necessary to specify whether or not boundary distortions should
 be included (capturing the WCS projection effects inherent in
@@ -36,6 +36,17 @@ the `DS9 Region Format <http://ds9.si.edu/doc/ref/region.html>`_,
 <https://casadocs.readthedocs.io/en/stable/notebooks/image_analysis.html
 #Region-File-Format>`_, and `FITS Region Binary Table
 <https://fits.gsfc.nasa.gov/registry/region.html>`_ format.
+
+The code and issue tracker are available at the following links:
+
+* Code: https://github.com/astropy/regions
+* Issue Tracker: https://github.com/astropy/regions/issues
+
+Like much astronomy software, Regions is an evolving package. The
+developers try to maintain backwards compatibility, but at times the
+API may change if there is a benefit to doing so. If there are specific
+areas you think API stability is important, please let us know as part
+of the development process.
 
 
 .. _getting_started-coord:

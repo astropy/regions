@@ -8,5 +8,6 @@ Getting Started
     :maxdepth: 1
 
     install
-    getting_started
+    overview
+    examples
     citation

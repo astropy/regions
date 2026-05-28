@@ -16,6 +16,8 @@ are listed below.
    contains
    compound
    masks
+   spherical_frame_transform
+   spherical_bounding_regions
    plotting
    region_io
    shapely
