@@ -9,3 +9,4 @@ modules, and objects included in Regions. It assumes that you have an
 understanding of the key concepts presented in the :ref:`user_guide`.
 
 .. automodapi:: regions
+   :no-heading:

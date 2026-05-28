@@ -10,7 +10,7 @@ following acknowledgment:
 .. code-block:: text
 
     This research made use of Regions, an Astropy package for region
-    handling (Bradley et al. 202X).
+    handling (Bradley et al. <YEAR>).
 
 where (Bradley et al. <YEAR>) is a citation to the `Zenodo record
 <https://doi.org/10.5281/zenodo.5826358>`_ of the Regions version
