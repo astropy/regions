@@ -1,4 +1,3 @@
-
 FITS Region File Format Limitations
 ===================================
 

@@ -1,7 +1,3 @@
-.. include:: references.txt
-
-.. _getting_started:
-
 Overview
 ========
 

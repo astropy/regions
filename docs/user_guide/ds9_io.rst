@@ -1,4 +1,3 @@
-
 DS9 Region File Format Limitations
 ==================================
 

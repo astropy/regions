@@ -93,7 +93,7 @@ it to a pixel region (using a WCS object). Boundary distortions
 can also be included in this conversion (by setting the
 ``include_boundary_distortions`` keyword), to capture the effects of
 the WCS projection from spherical to a planar geometry. (See the second
-example in :ref:`index_examples`.)
+example in :ref:`examples`.)
 
 It is also possible to use the coordinates of a discretized
 `~regions.SphericalSkyRegion` to show the region's boundary in a figure.
