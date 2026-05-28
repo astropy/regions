@@ -142,8 +142,8 @@ html_context = {
     'READTHEDOCS': os.environ.get('READTHEDOCS', '') == 'True',
 }
 
-# fix size of inheritance diagrams
-# inheritance_graph_attrs = {'size': '""'}
+# Fix size of inheritance diagrams
+inheritance_graph_attrs = {'size': '""'}
 
 # -- Options for LaTeX output -------------------------------------------------
 # Grouping the document tree into LaTeX files. List of tuples (source
