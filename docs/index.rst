@@ -75,6 +75,7 @@ regions on an image using Matplotlib.
 
 .. plot::
 
+    import numpy as np
     from astropy.io import fits
     from astropy.utils.data import get_pkg_data_filename
     from matplotlib import pyplot as plt
