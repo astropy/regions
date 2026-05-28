@@ -82,7 +82,7 @@ repository is called ``upstream``.
    Then click "Publish release". This step will trigger an automatic
    update of the package on Zenodo (see below).
 
-#. Check that `Zenodo <https://doi.org/10.5281/zenodo.596036>`_
+#. Check that `Zenodo <https://doi.org/10.5281/zenodo.5826358>`_
    is updated with the released version. Zenodo is already configured to
    automatically update with a new published GitHub Release (see above).
 

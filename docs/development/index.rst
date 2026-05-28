@@ -4,15 +4,6 @@
 Development
 ***********
 
-License
--------
-
-.. toctree::
-    :maxdepth: 1
-
-    license.rst
-
-
 For Contributors
 ----------------
 .. toctree::
@@ -28,4 +19,12 @@ For Maintainers
     :maxdepth: 1
 
     releasing.rst
+
+
+License
+-------
+
+.. toctree::
+    :maxdepth: 1
+
     license.rst
