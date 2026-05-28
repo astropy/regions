@@ -1,0 +1,195 @@
+/* =========================================================================
+   CSS Variables
+   ========================================================================= */
+
+:root {
+  --pst-font-size-h1: 2rem;
+  --pst-font-size-h2: 1.6rem;
+  --pst-font-size-h3: 1.35rem;
+  --pst-font-size-h4: 1.15rem;
+  --pst-font-size-h5: 1rem;
+  --pst-font-size-h6: 0.9rem;
+
+  --sst-accent-color-bright: #ff9a6c;
+  --sst-accent-color-muted: #ff9a6c;
+}
+
+html[data-theme='light'] {
+  --pst-color-surface: #f3f4f5;
+  --pst-color-border: #d1d5da;
+  --pst-color-warning-bg: #f5e4d4;
+
+  /* Steel blue link/card colors */
+  --pst-color-link: #2e6da4;
+  --pst-color-link-hover: #1f5080;
+  --pst-color-primary: #2e6da4;
+  --pst-color-primary-highlight: #1f5080;
+  --sd-color-primary-highlight: #1f5080;
+
+  /* Orange secondary accent */
+  --pst-color-secondary: #d07530;
+  --pst-color-secondary-highlight: #b85f1f;
+  --pst-color-secondary-text: #ffffff;
+  --pst-color-secondary-highlight-text: #ffffff;
+
+  --pst-color-inline-code: #912583;
+  --pst-color-inline-code-links: #2e6da4;
+  --pst-color-link-higher-contrast: #2e6da4;
+
+  --pst-color-target: #f3cf95;
+
+  --sst-footer-background-color: #f6f6f6;
+}
+
+html[data-theme='dark'] {
+  /* Steel blue link/card colors */
+  --pst-color-link: #5b9fd6;
+  --pst-color-link-hover: #4a85bc;
+  --pst-color-primary: #5b9fd6;
+  --pst-color-primary-highlight: #4a85bc;
+  --sd-color-primary-highlight: #4a85bc;
+
+  /* Orange secondary accent */
+  --pst-color-secondary: #e08a42;
+  --pst-color-secondary-highlight: #d07530;
+  --pst-color-secondary--text: #14181e;
+  --pst-color-secondary-highlight-text: #14181e;
+
+  --pst-color-inline-code: #f3c7ee;
+  --pst-color-inline-code-links: #5b9fd6;
+  --pst-color-link-higher-contrast: #5b9fd6;
+
+  --pst-color-target: #5a3c19;
+
+  --sst-footer-background-color: #282828;
+}
+
+/* =========================================================================
+   Header / Navigation
+   ========================================================================= */
+
+.bd-header a.navbar-brand {
+  color: #ff6b26 !important;
+}
+
+.bd-header ul.navbar-nav > li.nav-item > .nav-link:hover {
+  color: var(--sst-accent-color-bright) !important;
+}
+
+.bd-header ul.navbar-nav > li.nav-item > .nav-link:hover:before {
+  border-bottom-color: var(--sst-accent-color-bright) !important;
+}
+
+/* Theme toggle and GitHub icon hover color */
+html .pst-navbar-icon:hover {
+  color: #ff9a6c !important;
+}
+
+/* Selected theme in the light/dark mode dropdown */
+html[data-theme='light'] .theme-switch-button + .dropdown-menu {
+  --bs-dropdown-link-active-color: #5b9fd6;
+}
+
+/* Vertical sidebar/content separator */
+html[data-theme='light'] .bd-sidebar-primary {
+  border-right-width: thin;
+  border-right-color: #c4c4c4;
+}
+
+html[data-theme='dark'] .bd-sidebar-primary {
+  border-right-width: thin;
+  border-right-color: #666666;
+}
+
+/* =========================================================================
+   Layout
+   ========================================================================= */
+
+.bd-article {
+  padding-top: 0.75rem;
+}
+
+.section {
+  margin-bottom: 1.6rem;
+}
+
+p {
+  margin-bottom: 0.7rem;
+}
+
+div.sidebar-primary-item > a.logo {
+  display: flex;
+  flex-direction: column;
+}
+
+/* =========================================================================
+   Footer
+   ========================================================================= */
+
+html[data-theme='light'] .bd-footer {
+  border-top: 1px solid #c4c4c4;
+}
+
+html[data-theme='dark'] .bd-footer {
+  border-top: 1px solid #666666;
+}
+
+/* =========================================================================
+   Headings
+   ========================================================================= */
+
+.bd-content h1 {
+  margin-top: 0;
+}
+
+.bd-content h2 {
+  border-bottom: 1px solid var(--pst-color-border);
+  padding-bottom: 0.3rem;
+}
+
+/* =========================================================================
+   Admonitions (dark mode)
+   ========================================================================= */
+
+/* Muted slate blue for general admonitions (note, important, etc.) */
+html[data-theme='dark'] .admonition {
+  border-color: #2e6da4;
+}
+html[data-theme='dark'] .admonition > .admonition-title {
+  background-color: #1c4378;
+}
+html[data-theme='dark'] .admonition > .admonition-title:after {
+  color: #5b9fd6;
+}
+
+/* Orange theming for warning admonitions */
+html[data-theme='dark'] .admonition.warning {
+  border-color: #c07030;
+}
+html[data-theme='dark'] .admonition.warning > .admonition-title {
+  background-color: #6d4225;
+}
+html[data-theme='dark'] .admonition.warning > .admonition-title:after {
+  color: #e08a42;
+}
+
+/* =========================================================================
+   Typography / Code
+   ========================================================================= */
+
+.field-list ul {
+  padding-left: 2em;
+}
+
+code.literal {
+  background-color: var(--pst-color-surface);
+  border: 1px solid var(--pst-color-border);
+  border-radius: 0.25rem;
+  padding: 0.1rem 0.25rem;
+}
+
+/* Prevent unnecessary vertical scrollbars for MathJax equations */
+mjx-container {
+  overflow: visible !important;
+  padding-bottom: 0 !important;
+}
