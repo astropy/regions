@@ -83,7 +83,7 @@ redirects = {
 
 # This is added to the end of RST files - a good place to put
 # substitutions to be used globally.
-with open('common_links.txt') as fh:
+with open('substitutions.txt') as fh:
     rst_epilog += fh.read()
 
 # -- Project information ------------------------------------------------------
