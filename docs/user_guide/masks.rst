@@ -1,4 +1,3 @@
-
 .. _overlap-masks:
 
 Computing Overlap Masks

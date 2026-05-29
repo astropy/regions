@@ -1,4 +1,3 @@
-.. include:: references.txt
 
 .. testsetup::
     >>> from regions import make_example_dataset

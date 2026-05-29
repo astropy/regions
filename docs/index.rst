@@ -1,153 +1,69 @@
-.. include:: references.txt
 
-###############
+:tocdepth: 3
+
+.. |br| raw:: html
+
+    <div style="min-height:0.1em;"></div>
+
+***************
 Astropy Regions
-###############
+***************
 
-**regions** is an in-development `coordinated package`_ of `Astropy`_
-for region handling.
+| **Version**: |release|
+| **Date**: |today|
+| **Useful links**: :doc:`getting_started/install` | :doc:`release_notes/index`
 
-To get an overview of available features, see :ref:`getting_started`.
-
-The eventual goal is to merge this package into the Astropy core
-package.
-
-* Code : `GitHub repository`_
-* Contributors : https://github.com/astropy/regions/graphs/contributors
+**regions** is an in-development `coordinated package
+<https://www.astropy.org/affiliated/index.html#coordinated-packages>`_
+of `Astropy`_ for region handling. This package may eventually be merged
+into the Astropy core package.
 
 
-Getting Started
-===============
+.. admonition:: Important
+
+    If you use Regions for a project that leads to a publication,
+    whether directly or as a dependency of another package, please
+    include an :ref:`acknowledgment and/or citation <citation>`.
+
+|br|
+
 
 .. toctree::
-   :maxdepth: 1
+    :maxdepth: 1
+    :hidden:
 
-   install
-   getting_started
-   contributing
-   license
-   changelog
-
-
-User Documentation
-==================
-
-Defining Regions
-----------------
-
-.. toctree::
-   :maxdepth: 1
-
-   shapes
-   metadata
-
-Using Regions
--------------
-
-.. toctree::
-   :maxdepth: 1
-
-   contains
-   compound
-   masks
-   spherical_frame_transform
-   spherical_bounding_regions
-   plotting
-
-I/O & Reference
----------------------
-
-.. toctree::
-   :maxdepth: 1
-
-   region_io
-   shapely
-   api
+    getting_started/index
+    user_guide/index
+    reference/index
+    development/index
+    Release Notes <release_notes/index>
 
 
-.. _index_examples:
+.. grid:: 3
+    :gutter: 2 3 4 4
 
-Examples
-========
+    .. grid-item-card:: Getting Started
+        :link: getting_started/index
+        :link-type: doc
+        :text-align: center
 
-The following example shows how to read a DS9 region file and plot the
-regions on an image using Matplotlib.
+        New to Regions? Check out the getting started guides. They
+        contain an overview of Regions and an introduction to its main
+        concepts.
 
-.. plot::
+    .. grid-item-card:: User Guide
+        :link: user_guide/index
+        :link-type: doc
+        :text-align: center
 
-    from astropy.io import fits
-    from astropy.utils.data import get_pkg_data_filename
-    from matplotlib import pyplot as plt
-    from regions import Regions
+        The user guide provides in-depth information on the key concepts
+        of Regions with useful background information and explanation.
 
-    image_file = get_pkg_data_filename('tutorials/FITS-images/HorseHead.fits')
-    data = fits.getdata(image_file, ext=0, memmap=False)
-    data = np.rot90(data, k=-1)
+    .. grid-item-card:: API Reference Guide
+        :link: reference/index
+        :link-type: doc
+        :text-align: center
 
-    fig, ax = plt.subplots(figsize=(8, 8))
-    ax.imshow(data, cmap='gray', origin='lower')
-
-    region_file = get_pkg_data_filename('data/plot_image.reg',
-                                        package='regions.io.ds9.tests')
-    regions = Regions.read(region_file, format='ds9')
-    for i, region in enumerate(regions):
-        region.plot(ax=ax)
-
-The next example demonstrates how to plot spherical regions (e.g., a
-circle and a longitude/latitude "range") on a full sky image (seen in
-the `visualization demo here`_) using Matplotlib.
-
-.. plot::
-
-    import astropy.units as u
-    import matplotlib.pyplot as plt
-    from astropy.coordinates import SkyCoord
-    from astropy.io import fits
-    from astropy.utils.data import get_pkg_data_filename
-    from astropy.visualization.wcsaxes.frame import EllipticalFrame
-    from astropy.wcs import WCS
-    from matplotlib import patheffects
-    from regions import CircleSphericalSkyRegion, RangeSphericalSkyRegion
-
-    image_file = get_pkg_data_filename('allsky/allsky_rosat.fits')
-    image_data = fits.getdata(image_file, ext=0, memmap=False)
-    image_hdr = fits.getheader(image_file)
-    wcs = WCS(image_hdr)
-
-    fig = plt.figure(figsize=(8, 8))
-    ax = fig.add_subplot(projection=wcs, frame_class=EllipticalFrame)
-
-    path_effects = [patheffects.withStroke(linewidth=3, foreground='black')]
-    ax.coords.grid(color='white')
-    ax.coords['glon'].set_ticklabel(color='white', path_effects=path_effects)
-    ax.set_axisbelow(True)
-    ax.set_xlabel(r'Galactic $\ell$', labelpad=10)
-    ax.set_ylabel(r'Galactic $b$')
-    im = ax.imshow(image_data, vmin=0., vmax=300., cmap='gray',
-                   origin='lower')
-
-    # Clip the image to the frame
-    im.set_clip_path(ax.coords.frame.patch)
-
-    # Image is in galactic coordinates
-    circ = CircleSphericalSkyRegion(
-        SkyCoord(80, 45, unit=u.deg, frame='galactic'),
-        25 * u.deg)
-    circ.to_pixel(
-        wcs=wcs,
-        include_boundary_distortions=True,
-        n_points=1000,
-    ).plot(ax=ax, edgecolor='red',
-           facecolor='none', lw=2)
-
-    lon_lat_range = RangeSphericalSkyRegion(
-        frame='galactic',
-        longitude_range=[210, 330] * u.deg,
-        latitude_range=[-55, -15] * u.deg,
-    )
-    lon_lat_range.to_pixel(
-        wcs=wcs,
-        include_boundary_distortions=True,
-        n_points=250,
-    ).plot(ax=ax, edgecolor='blue',
-           facecolor='none', lw=2)
+        The reference guide contains a detailed description of the
+        functions, modules, and objects included in Regions. It assumes
+        that you have an understanding of the key concepts.
