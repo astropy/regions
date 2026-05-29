@@ -83,9 +83,6 @@ namespaces = false
 '*' = [
     'data/*',
 ]
-'regions' = [
-    'CITATION.rst',
-]
 'regions.shapes.tests' = [
     'reference/*.txt',
     'data/*.fits',

@@ -1,0 +1,101 @@
+cff-version: 1.2.0
+title: Regions
+message: 'If you use this software, please cite it as below.'
+type: software
+authors:
+  - family-names: Bradley
+    given-names: Larry
+    orcid: 'https://orcid.org/0000-0002-7908-9284'
+    affiliation: >-
+      Space Telescope Science Institute, 3700 San Martin
+      Drive, Baltimore, MD 21218, USA
+  - family-names: Deil
+    given-names: Christoph
+    orcid: 'https://orcid.org/0000-0002-4198-4005'
+  - family-names: Ginsburg
+    given-names: Adam
+    orcid: 'https://orcid.org/0000-0001-6431-9633'
+  - family-names: Patra
+    given-names: Sushobhana
+  - family-names: Robitaille
+    given-names: T. P.
+    orcid: 'https://orcid.org/0000-0002-8642-1329'
+    affiliation: >-
+      Aperio Software Ltd., Headingley Enterprise and Arts
+      Centre, Bennett Road, Leeds, LS6 3HN, United Kingdom
+  - family-names: Sipőcz
+    given-names: Brigitta M.
+    orcid: 'https://orcid.org/0000-0002-3713-6337'
+    affiliation: >-
+      IPAC, MC 100-22, Caltech, 1200E. California Blvd.
+      Pasadena, CA 91125
+  - family-names: King
+    given-names: Johannes
+  - family-names: Lim
+    given-names: P. L.
+    orcid: 'https://orcid.org/0000-0003-0079-4114'
+    affiliation: >-
+      Space Telescope Science Institute, 3700 San Martin
+      Dr., Baltimore, MD 21218, USA
+  - family-names: Homeier
+    given-names: Derek
+    orcid: https://orcid.org/0000-0002-8546-9128
+    affiliation: Aperio Software Ltd., Insight House, Riverside Business Park, Stoney Common Road, Stansted, Essex, CM24 8PL, UK
+  - family-names: Jenness
+    given-names: Tim
+    orcid: https://orcid.org/0000-0001-5982-167X
+    affiliation: Vera C. Rubin Observatory, 950 N. Cherry Ave, Tucson, AZ 85719
+  - family-names: Val-Borro
+    given-names: Miguel de
+    orcid: https://orcid.org/0000-0002-0455-9384
+    affiliation: Planetary Science Institute, 1700 East Fort Lowell, Tucson, AZ 85719
+  - family-names: Singer
+    given-names: Leo
+    orcid: https://orcid.org/0000-0001-9898-5597
+    affiliation: Astroparticle Physics Laboratory, NASA Goddard Space Flight Center, 8800 Greenbelt Road, Greenbelt, MD 20771, USA
+  - family-names: Baumann
+    given-names: Matthieu
+  - family-names: O'Steen
+    given-names: Richard
+    orcid: https://orcid.org/0000-0002-2432-8946
+    affiliation: Space Telescope Science Institute, 3700 San Martin Drive, Baltimore, MD 21218, USA
+  - family-names: Gondhalekar
+    given-names: Yash
+    orcid: https://orcid.org/0000-0002-6646-4225
+    affiliation: BITS Pilani/Computer Science, Sancoale, Goa 403726, India
+  - family-names: Donath
+    given-names: Axel
+    orcid: 'https://orcid.org/0000-0003-4568-7005'
+    affiliation: >-
+      Harvard-Smithsonian Center for Astrophysics, 60 Garden
+      St., Cambridge, MA, 02138, USA
+  - family-names: Robert
+    given-names: Clément
+  - family-names: Tollerud
+    given-names: E. J.
+    orcid: 'https://orcid.org/0000-0002-9599-310X'
+    affiliation: >-
+      Space Telescope Science Institute, 3700 San Martin
+      Dr., Baltimore, MD 21218, USA
+  - family-names: Lee
+    given-names: Jae-Joon
+  - family-names: Leinweber
+    given-names: Katrin
+  - family-names: Vinícius
+    given-names: Zé
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.5826358
+    description: Zenodo - all versions
+repository-code: 'https://github.com/astropy/regions'
+url: 'https://astropy-regions.readthedocs.io/en/latest/'
+abstract: Astropy package for region handling
+keywords:
+  - Astronomy software
+  - Astronomy data analysis
+  - Photometry
+  - Image Data Analysis
+  - Open source software
+license: BSD-3-Clause
+version: 0.11
+date-released: '2025-11-05'

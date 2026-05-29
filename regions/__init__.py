@@ -13,20 +13,3 @@ try:
     from .version import version as __version__
 except ImportError:
     __version__ = ''
-
-
-# Set the bibtex entry to the article referenced in CITATION.rst.
-def _get_bibtex():
-    import os
-    citation_file = os.path.join(os.path.dirname(__file__), 'CITATION.rst')
-
-    with open(citation_file, encoding='utf-8') as citation:
-        refs = citation.read().split('@software')[1:]
-        if len(refs) == 0:
-            return ''
-        return f'@software{refs[0]}'
-
-
-__citation__ = __bibtex__ = _get_bibtex()
-
-del _get_bibtex
