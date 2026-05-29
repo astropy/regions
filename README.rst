@@ -25,14 +25,12 @@ directly or as a dependency of another package, please include the
 following acknowledgment::
 
     This research made use of Regions, an Astropy package for region
-    handling (Bradley et al. 202X).
+    handling (Bradley et al. <YEAR>).
 
-where (Bradley et al. 202X) is a citation to the `Zenodo
+where (Bradley et al. <YEAR>) is a citation to the `Zenodo
 record <https://doi.org/10.5281/zenodo.5826358>`_ of the
 Regions version that was used. We also encourage citations in
-the main text wherever appropriate. Please see the `CITATION
-<https://github.com/astropy/regions/blob/main/regions/CITATION.rst>`_
-file for details and an example BibTeX entry.
+the main text wherever appropriate.
 
 
 License
