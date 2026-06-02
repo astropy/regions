@@ -54,6 +54,11 @@ New Features
 Bug Fixes
 ---------
 
+- Fixed reading FITS region files whose ``SHAPE`` column values contain
+  leading or trailing whitespace (e.g. from fixed-width character-column
+  padding or cross-platform encoding quirks), which previously raised a
+  spurious ``FITSParserError``. [#674]
+
 API Changes
 -----------
 
