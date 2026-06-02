@@ -76,8 +76,15 @@ def get_shape(region_row):
         shape = 'point'
         return shape, include
 
-    shape = region_row[shape_key].lower()
-    if shape[0] == '!':
+    # Strip surrounding whitespace before matching the shape name. FITS
+    # character columns are fixed-width and space-padded, and some writers
+    # (or cross-platform/encoding quirks) leave trailing whitespace on the
+    # SHAPE value, which would otherwise fail the ``valid_shapes`` check
+    # below and raise a spurious FITSParserError (see GH #637). Using
+    # ``startswith`` instead of indexing also avoids an IndexError when the
+    # value is empty after stripping.
+    shape = region_row[shape_key].strip().lower()
+    if shape.startswith('!'):
         include = 0
         shape = shape[1:]
 

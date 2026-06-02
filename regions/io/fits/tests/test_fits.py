@@ -104,6 +104,31 @@ def test_valid_row():
         Regions.parse(tbl3, format='fits')
 
 
+def test_shape_with_whitespace():
+    # FITS character columns are fixed-width and space-padded; some writers
+    # (e.g. CSCView output, or cross-platform/encoding quirks) leave trailing
+    # whitespace on the SHAPE value. Such a value must still be recognized
+    # instead of raising a spurious FITSParserError (see GH #637).
+    x = [1] * u.pix
+    y = [2] * u.pix
+    r = [3] * u.pix
+
+    tbl = QTable([x, y, r, ['circle  ']],
+                 names=('X', 'Y', 'R', 'SHAPE'))
+    regions = Regions.parse(tbl, format='fits')
+    assert len(regions) == 1
+    assert isinstance(regions[0], CirclePixelRegion)
+    assert_equal(regions[0].center.x, 1)
+    assert_equal(regions[0].radius, 3)
+
+    # The exclude prefix ('!') must still be honored after stripping.
+    tbl_excl = QTable([x, y, r, [' !circle ']],
+                      names=('X', 'Y', 'R', 'SHAPE'))
+    regions = Regions.parse(tbl_excl, format='fits')
+    assert len(regions) == 1
+    assert regions[0].meta.get('include') == 0
+
+
 def test_components():
     center = PixCoord(10, 10)
     regions = Regions((CirclePixelRegion(center, 3),
