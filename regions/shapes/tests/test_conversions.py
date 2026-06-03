@@ -7,8 +7,11 @@ Automatic dispatch uses the Jacobian method for distorted WCS
 """
 
 import astropy.units as u
+import numpy as np
 import pytest
+from astropy.coordinates import SkyCoord
 from astropy.tests.helper import assert_quantity_allclose
+from astropy.wcs import WCS
 from numpy.testing import assert_allclose
 
 from regions._utils.optional_deps import HAS_GWCS
@@ -392,3 +395,222 @@ class TestDistortionDetection:
     @pytest.mark.skipif(not HAS_GWCS, reason='gwcs is required')
     def test_gwcs_has_distortion(self, gwcs_obj):
         assert getattr(gwcs_obj, 'has_distortion', True)
+
+
+# ---------------------------------------------------------------------
+# Pole and RA-wrap regression tests
+# ---------------------------------------------------------------------
+
+def _make_sip_wcs_at(ra_deg, dec_deg):
+    """
+    Build a small TAN-SIP WCS centered at the given (RA, Dec).
+
+    The SIP terms are tiny but nonzero, which forces the Jacobian
+    (distortion) code path to be exercised by ``to_pixel``/``to_sky``.
+    """
+    from astropy.io.fits import Header
+
+    header = Header()
+    header['NAXIS'] = 2
+    header['NAXIS1'] = 20
+    header['NAXIS2'] = 20
+    header['CRPIX1'] = 10.5
+    header['CRPIX2'] = 10.5
+    header['CRVAL1'] = ra_deg
+    header['CRVAL2'] = dec_deg
+    header['CTYPE1'] = 'RA---TAN-SIP'
+    header['CTYPE2'] = 'DEC--TAN-SIP'
+    cdelt = 0.1 / 3600.0
+    header['CD1_1'] = -cdelt
+    header['CD1_2'] = 0.0
+    header['CD2_1'] = 0.0
+    header['CD2_2'] = cdelt
+    header['A_ORDER'] = 2
+    header['A_2_0'] = 1e-6
+    header['B_ORDER'] = 2
+    header['B_0_2'] = 1e-6
+    return WCS(header)
+
+
+class TestPoleAndRAWrapSafe:
+    """
+    Regression tests at troublesome WCS centers.
+
+    Tests for `compute_local_wcs_jacobian` at WCS centers where the
+    previous (flat-Earth) finite-difference formula failed:
+
+    * RA = 0 (any of the three sample points crosses the 0 / 360 cut)
+    * High |declination| (small ``cos(dec)`` makes the small-angle
+      ``xi = cos(dec) * dRA`` approximation fail)
+
+    These tests use a SIP WCS so the Jacobian (distortion) code path is
+    actually exercised. With the buggy code, the Jacobian becomes
+    near-singular and downstream sky <-> pixel conversions silently
+    return wildly wrong widths, heights, and angles.
+    """
+
+    POLE_DEC_LIST = [80.0, 89.0, 89.99, -80.0, -89.99]
+    RA_WRAP_LIST = [0.0, 0.001, 359.999]
+
+    @pytest.mark.parametrize('center_dec', POLE_DEC_LIST)
+    def test_jacobian_well_conditioned_at_pole(self, center_dec):
+        from regions._utils.wcs_helpers import compute_local_wcs_jacobian
+
+        wcs = _make_sip_wcs_at(0.0, center_dec)
+        sc = SkyCoord(0 * u.deg, center_dec * u.deg)
+        jac = compute_local_wcs_jacobian(sc, wcs)
+        # Singular values should be ~ 1/CDELT_arcsec = 1/0.1 = 10.
+        sv = np.linalg.svd(jac, compute_uv=False)
+        assert_allclose(sv, 10.0, rtol=1e-3)
+
+    @pytest.mark.parametrize('center_ra', RA_WRAP_LIST)
+    def test_jacobian_well_conditioned_at_ra_wrap(self, center_ra):
+        from regions._utils.wcs_helpers import compute_local_wcs_jacobian
+
+        wcs = _make_sip_wcs_at(center_ra, 30.0)
+        sc = SkyCoord(center_ra * u.deg, 30 * u.deg)
+        jac = compute_local_wcs_jacobian(sc, wcs)
+        sv = np.linalg.svd(jac, compute_uv=False)
+        assert_allclose(sv, 10.0, rtol=1e-3)
+
+    @pytest.mark.parametrize('center_dec', POLE_DEC_LIST)
+    def test_ellipse_roundtrip_at_pole(self, center_dec):
+        wcs = _make_sip_wcs_at(0.0, center_dec)
+        center = SkyCoord(0 * u.deg, center_dec * u.deg)
+        sky_reg = EllipseSkyRegion(center=center, width=2 * u.arcsec,
+                                   height=1 * u.arcsec, angle=30 * u.deg)
+        rt = sky_reg.to_pixel(wcs).to_sky(wcs)
+        assert_quantity_allclose(rt.width, sky_reg.width, rtol=1e-3)
+        assert_quantity_allclose(rt.height, sky_reg.height, rtol=1e-3)
+
+    @pytest.mark.parametrize('center_ra', RA_WRAP_LIST)
+    def test_ellipse_roundtrip_at_ra_wrap(self, center_ra):
+        wcs = _make_sip_wcs_at(center_ra, 30.0)
+        center = SkyCoord(center_ra * u.deg, 30 * u.deg)
+        sky_reg = EllipseSkyRegion(center=center, width=2 * u.arcsec,
+                                   height=1 * u.arcsec, angle=30 * u.deg)
+        rt = sky_reg.to_pixel(wcs).to_sky(wcs)
+        assert_quantity_allclose(rt.width, sky_reg.width, rtol=1e-3)
+        assert_quantity_allclose(rt.height, sky_reg.height, rtol=1e-3)
+
+    @pytest.mark.parametrize('center_dec', POLE_DEC_LIST)
+    def test_directed_pixel_size_nonzero_at_pole(self, center_dec):
+        """
+        With the previous bug, the sky ellipse at high |dec| collapsed
+        to a near-zero pixel ``height`` (the Jacobian became singular).
+        Check that both pixel dimensions are now finite and positive.
+        """
+        wcs = _make_sip_wcs_at(0.0, center_dec)
+        center = SkyCoord(0 * u.deg, center_dec * u.deg)
+        sky_reg = EllipseSkyRegion(center=center, width=2 * u.arcsec,
+                                   height=1 * u.arcsec, angle=30 * u.deg)
+        pix = sky_reg.to_pixel(wcs)
+        assert pix.width > 1.0
+        assert pix.height > 1.0
+
+
+def _make_sheared_wcs(shear_deg):
+    """
+    Build a TAN WCS where the pixel x and y axes are at ``shear_deg``
+    apart on the sky (90 deg = no shear).
+    """
+    cdelt = 0.1 / 3600.0
+    a = np.deg2rad(shear_deg)
+    wcs = WCS(naxis=2)
+    wcs.wcs.crpix = [10.5, 10.5]
+    wcs.wcs.crval = [100.0, 30.0]
+    wcs.wcs.cd = [[-cdelt, cdelt * np.cos(a)],
+                  [0.0, cdelt * np.sin(a)]]
+    wcs.wcs.ctype = ['RA---TAN', 'DEC--TAN']
+    return wcs
+
+
+SHEAR_DEG_LIST = [89.0, 80.0, 70.0]
+
+
+class TestShearedWCSRectangle:
+    """
+    Verify that ``RectangleSkyRegion`` and ``RectangleAnnulusSkyRegion``
+    (and inverses) round-trip exactly through a sheared WCS, where the
+    pixel x and y axes are not perpendicular on the sky.
+
+    The non-SVD ``*_scales`` path used previously fitted an
+    axis-aligned rectangle to the sheared parallelogram and produced
+    shape errors of several percent at modest shears. The SVD-based
+    helpers handle this correctly.
+    """
+
+    @pytest.mark.parametrize('shear_deg', SHEAR_DEG_LIST)
+    def test_rectangle_sky_pixel_sky_roundtrip(self, shear_deg):
+        wcs = _make_sheared_wcs(shear_deg)
+        sky = RectangleSkyRegion(
+            center=SkyCoord(100 * u.deg, 30 * u.deg),
+            width=2 * u.arcsec, height=1 * u.arcsec,
+            angle=30 * u.deg)
+        rt = sky.to_pixel(wcs).to_sky(wcs)
+        assert_quantity_allclose(rt.width, sky.width, rtol=1e-6)
+        assert_quantity_allclose(rt.height, sky.height, rtol=1e-6)
+        assert_quantity_allclose(rt.angle, sky.angle, atol=1e-6 * u.deg)
+
+    @pytest.mark.parametrize('shear_deg', SHEAR_DEG_LIST)
+    def test_rectangle_pixel_sky_pixel_roundtrip(self, shear_deg):
+        wcs = _make_sheared_wcs(shear_deg)
+        pix = RectanglePixelRegion(
+            center=PixCoord(10, 10), width=4, height=2, angle=30 * u.deg)
+        rt = pix.to_sky(wcs).to_pixel(wcs)
+        assert_allclose(rt.width, pix.width, rtol=1e-6)
+        assert_allclose(rt.height, pix.height, rtol=1e-6)
+        assert_quantity_allclose(rt.angle, pix.angle, atol=1e-6 * u.deg)
+
+    @pytest.mark.parametrize('shear_deg', SHEAR_DEG_LIST)
+    def test_rectangle_annulus_sky_pixel_sky_roundtrip(self, shear_deg):
+        wcs = _make_sheared_wcs(shear_deg)
+        sky = RectangleAnnulusSkyRegion(
+            center=SkyCoord(100 * u.deg, 30 * u.deg),
+            inner_width=1 * u.arcsec, outer_width=2 * u.arcsec,
+            inner_height=0.5 * u.arcsec, outer_height=1 * u.arcsec,
+            angle=30 * u.deg)
+        rt = sky.to_pixel(wcs).to_sky(wcs)
+        assert_quantity_allclose(rt.inner_width, sky.inner_width, rtol=1e-6)
+        assert_quantity_allclose(rt.outer_width, sky.outer_width, rtol=1e-6)
+        assert_quantity_allclose(rt.inner_height, sky.inner_height, rtol=1e-6)
+        assert_quantity_allclose(rt.outer_height, sky.outer_height, rtol=1e-6)
+        assert_quantity_allclose(rt.angle, sky.angle, atol=1e-6 * u.deg)
+
+
+class TestShearedWCSText:
+    """
+    Verify that text region rotation round-trips through a sheared WCS.
+
+    ``TextSkyRegion`` and ``TextPixelRegion`` carry a ``visual.rotation``
+    angle (with no width/height); the SVD path handles the shear
+    correctly via the degenerate-singular-value fallback in
+    ``_svd_ellipse_from_composite``, which preserves the input theta
+    direction when the input ellipse is circular.
+    """
+
+    @pytest.mark.parametrize('shear_deg', SHEAR_DEG_LIST)
+    def test_text_sky_pixel_sky_rotation(self, shear_deg):
+        from regions.core.metadata import RegionVisual
+        from regions.shapes.text import TextSkyRegion
+
+        wcs = _make_sheared_wcs(shear_deg)
+        sky = TextSkyRegion(
+            SkyCoord(100 * u.deg, 30 * u.deg), 'foo',
+            visual=RegionVisual(rotation=30.0))
+        rt = sky.to_pixel(wcs).to_sky(wcs)
+        diff = ((rt.visual['rotation'] - 30.0 + 180) % 360) - 180
+        assert abs(diff) < 1e-6
+
+    @pytest.mark.parametrize('shear_deg', SHEAR_DEG_LIST)
+    def test_text_pixel_sky_pixel_rotation(self, shear_deg):
+        from regions.core.metadata import RegionVisual
+        from regions.shapes.text import TextPixelRegion
+
+        wcs = _make_sheared_wcs(shear_deg)
+        pix = TextPixelRegion(
+            PixCoord(10, 10), 'foo',
+            visual=RegionVisual(rotation=30.0))
+        rt = pix.to_sky(wcs).to_pixel(wcs)
+        diff = ((rt.visual['rotation'] - 30.0 + 180) % 360) - 180
+        assert abs(diff) < 1e-6

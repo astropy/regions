@@ -430,17 +430,6 @@ class EllipseSkyRegion(SkyRegion):
         """
         return self.to_pixel(wcs).to_polygon(n_points=n_points).to_sky(wcs)
 
-    def to_pixel(self, wcs):
-        center, pix_width, pix_height, angle = sky_ellipse_to_pixel_svd(
-            self.center, wcs,
-            self.width.to(u.arcsec).value,
-            self.height.to(u.arcsec).value,
-            self.angle.to(u.rad).value)
-        return EllipsePixelRegion(center, pix_width, pix_height,
-                                  angle=angle,
-                                  meta=self.meta.copy(),
-                                  visual=self.visual.copy())
-
     def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
                          n_points=None):
         raise NotImplementedError

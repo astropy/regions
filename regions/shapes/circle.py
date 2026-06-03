@@ -282,12 +282,6 @@ class CircleSkyRegion(SkyRegion):
         """
         return self.to_pixel(wcs).to_polygon(n_points=n_points).to_sky(wcs)
 
-    def to_pixel(self, wcs):
-        center, mean_scale = sky_to_pixel_mean_scale(self.center, wcs)
-        radius = self.radius.to(u.arcsec).value * mean_scale
-        return CirclePixelRegion(center, radius, meta=self.meta.copy(),
-                                 visual=self.visual.copy())
-
     def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
                          n_points=None):
         self._validate_planar_spherical_transform(wcs, include_boundary_distortions)

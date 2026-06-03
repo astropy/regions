@@ -9,7 +9,8 @@ import numpy as np
 from astropy.coordinates import Angle
 
 from regions._geometry import rectangular_overlap_grid
-from regions._utils.wcs_helpers import pixel_to_sky_scales, sky_to_pixel_scales
+from regions._utils.wcs_helpers import (pixel_ellipse_to_sky_svd,
+                                        sky_ellipse_to_pixel_svd)
 from regions.core.attributes import (PositiveScalar, PositiveScalarAngle,
                                      RegionMetaDescr, RegionVisualDescr,
                                      ScalarAngle, ScalarPixCoord,
@@ -108,15 +109,15 @@ class RectanglePixelRegion(PixelRegion):
             return np.logical_not(in_rect)
 
     def to_sky(self, wcs):
-        # The photutils helpers measure the sky rotation as a position
-        # angle (PA) from North; regions measures it from the RA axis.
-        # Convert between them with a 90 deg offset.
-        center, scale_w, scale_h, angle = pixel_to_sky_scales(
-            (self.center.x, self.center.y), wcs,
+        # The photutils SVD helpers measure the sky rotation as a
+        # position angle (PA) from North; regions measures it from the
+        # RA axis. Convert between them with a 90 deg offset.
+        center, sky_width, sky_height, angle = pixel_ellipse_to_sky_svd(
+            (self.center.x, self.center.y), wcs, self.width, self.height,
             self.angle.to(u.rad).value)
         angle = (angle + 90 * u.deg).wrap_at(360 * u.deg)
-        width = Angle(self.width * scale_w, 'arcsec')
-        height = Angle(self.height * scale_h, 'arcsec')
+        width = Angle(sky_width, 'arcsec')
+        height = Angle(sky_height, 'arcsec')
         return RectangleSkyRegion(center, width, height, angle=angle,
                                   meta=self.meta.copy(),
                                   visual=self.visual.copy())
@@ -415,12 +416,12 @@ class RectangleSkyRegion(SkyRegion):
     def to_pixel(self, wcs):
         # Convert regions sky angle (from RA axis) to photutils PA
         # (from North) by subtracting 90 deg.
-        center, scale_w, scale_h, angle = sky_to_pixel_scales(
+        center, pix_width, pix_height, angle = sky_ellipse_to_pixel_svd(
             self.center, wcs,
+            self.width.to(u.arcsec).value,
+            self.height.to(u.arcsec).value,
             self.angle.to(u.rad).value - np.pi / 2)
-        width = self.width.to(u.arcsec).value * scale_w
-        height = self.height.to(u.arcsec).value * scale_h
-        return RectanglePixelRegion(PixCoord(*center), width, height,
+        return RectanglePixelRegion(PixCoord(*center), pix_width, pix_height,
                                     angle=angle,
                                     meta=self.meta.copy(),
                                     visual=self.visual.copy())
@@ -441,16 +442,6 @@ class RectangleSkyRegion(SkyRegion):
             A polygon region equivalent to the rectangle.
         """
         return self.to_pixel(wcs).to_polygon().to_sky(wcs)
-
-    def to_pixel(self, wcs):
-        center, scale_w, scale_h, angle = sky_to_pixel_scales(
-            self.center, wcs, self.angle.to(u.rad).value)
-        width = self.width.to(u.arcsec).value * scale_w
-        height = self.height.to(u.arcsec).value * scale_h
-        return RectanglePixelRegion(center, width, height,
-                                    angle=angle,
-                                    meta=self.meta.copy(),
-                                    visual=self.visual.copy())
 
     def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
                          n_points=None):
