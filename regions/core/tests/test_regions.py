@@ -4,10 +4,12 @@ Tests for the regions module.
 """
 
 import pytest
+from astropy.coordinates import SkyCoord
 from astropy.table import Table
+from astropy import units as u
 
 from regions.core import PixCoord, Regions
-from regions.shapes import CirclePixelRegion
+from regions.shapes import CirclePixelRegion, CircleSkyRegion
 
 
 def test_regions_inputs():
@@ -111,3 +113,24 @@ def test_regions_repr():
     regions_repr = f'<Regions([\n  {reg_repr}\n])>'
     assert str(regions) == regions_str
     assert repr(regions) == regions_repr
+
+
+def test_region_equivalency():
+    reg1 = CirclePixelRegion(PixCoord(0, 0), radius=1)
+    reg2 = CirclePixelRegion(PixCoord(0, 0), radius=1)
+    assert reg1 == reg2
+
+    # __eq__ uses np.allclose for comparing regions, so this should be True
+    reg3 = CirclePixelRegion(PixCoord(0, 0), radius=1 + 1e-10)
+    assert reg1 == reg3
+
+    # do the same for a SkyRegion
+    reg4 = CircleSkyRegion(SkyCoord(ra=0 * u.deg, dec=0 * u.deg),
+                           radius=1 * u.arcsec)
+    reg5 = CircleSkyRegion(SkyCoord(ra=0 * u.deg, dec=0 * u.deg),
+                           radius=1 * u.arcsec)
+    assert reg4 == reg5
+
+    reg6 = CircleSkyRegion(SkyCoord(ra=0 * u.deg, dec=0 * u.deg),
+                           radius=1 * u.arcsec + 1e-10 * u.arcsec)
+    assert reg4 == reg6

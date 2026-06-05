@@ -81,6 +81,9 @@ Bug Fixes
   and ``to_pixel`` conversions so that they round-trip correctly with a
   sheared WCS. [#676]
 
+- Region equivalency operator now uses 'all_close' rather than checking for an
+  exact match when comparing regions, for behavior in line with PixCoord. [#677]
+
 API Changes
 -----------
 

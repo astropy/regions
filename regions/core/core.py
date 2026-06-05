@@ -185,17 +185,27 @@ class Region(abc.ABC):
         # now check the parameter values
         # Note that Quantity comparisons allow for different units
         # if they directly convertible (e.g., 1. * u.deg == 60. * u.arcmin)
-        try:
-            for param in self_params:
-                # np.any is used for SkyCoord array comparisons
-                if np.any(getattr(self, param) != getattr(other, param)):
-                    return False
-        except TypeError:
-            # TypeError is raised from SkyCoord comparison when they do
-            # not have equivalent frames. Here return False instead of
-            # the TypeError.
-            return False
 
+        for param in self_params:
+            self_val = getattr(self, param)
+            other_val = getattr(other, param)
+            # compare PixCoord directly, the PixCoord __eq__ method also uses
+            # np.allclose with the default tolerances
+            if isinstance(self_val, PixCoord) and self_val != other_val:
+                return False
+            else:
+                try:
+                    if not u.allclose(self_val, other_val):
+                        return False
+                except TypeError:
+                    # fallback direct comparison for empty dicts, or for
+                    # SkyCoord comparisons which return false when frames
+                    # are not equivalent
+                    try:
+                        if np.any(self_val != other_val):
+                            return False
+                    except TypeError:
+                        return False
         return True
 
     def __ne__(self, other):
