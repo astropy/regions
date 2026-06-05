@@ -3,7 +3,6 @@
 import astropy.units as u
 import numpy as np
 from astropy.coordinates import SkyCoord
-from astropy.io.fits import Header
 from astropy.modeling import models
 from astropy.tests.helper import assert_quantity_allclose
 from astropy.wcs import WCS
@@ -59,37 +58,6 @@ def make_simple_wcs(skycoord, resolution, size, *, rotation_deg=0):
                       [cdelt * sin_t, cdelt * cos_t]]
 
     return wcs
-
-
-def make_sip_wcs():
-    """
-    Create a simple TAN WCS with small SIP distortion terms.
-
-    Returns
-    -------
-    wcs : `~astropy.wcs.WCS`
-        A WCS object with SIP distortion.
-    """
-    header = Header()
-    header['NAXIS'] = 2
-    header['NAXIS1'] = 20
-    header['NAXIS2'] = 20
-    header['CRPIX1'] = 10.5
-    header['CRPIX2'] = 10.5
-    header['CRVAL1'] = 100.0
-    header['CRVAL2'] = 30.0
-    header['CTYPE1'] = 'RA---TAN-SIP'
-    header['CTYPE2'] = 'DEC--TAN-SIP'
-    cdelt_deg = WCS_CDELT_ARCSEC / 3600.0
-    header['CD1_1'] = -cdelt_deg
-    header['CD1_2'] = 0.0
-    header['CD2_1'] = 0.0
-    header['CD2_2'] = cdelt_deg
-    header['A_ORDER'] = 2
-    header['A_2_0'] = 1e-6
-    header['B_ORDER'] = 2
-    header['B_0_2'] = 1e-6
-    return WCS(header)
 
 
 def make_gwcs():

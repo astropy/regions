@@ -59,6 +59,20 @@ Bug Fixes
   padding or cross-platform encoding quirks), which previously raised a
   spurious ``FITSParserError``. [#674]
 
+- Fixed the ``to_sky`` and ``to_pixel`` conversions for
+  elliptical and rectangular regions (and their annulus variants)
+  so that the orientation is correct for a WCS with a flipped parity
+  (e.g., North down, East left). Previously, such regions were
+  mirrored about the x-axis. [#676]
+
+- Fixed the local WCS Jacobian computation used by the ``to_sky`` and
+  ``to_pixel`` methods so that it is well-conditioned at the celestial
+  poles and across the RA = 0/360 degree wraparound. [#676]
+
+- Fixed rectangular regions to use the SVD-based ellipse ``to_sky``
+  and ``to_pixel`` conversions so that they round-trip correctly with a
+  sheared WCS. [#676]
+
 API Changes
 -----------
 

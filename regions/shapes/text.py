@@ -5,9 +5,13 @@ This module defines text regions in both pixel and sky coordinates.
 
 import math
 
-from regions._utils.wcs_helpers import pixel_to_sky_scales, sky_to_pixel_scales
+import astropy.units as u
+
+from regions._utils.wcs_helpers import (pixel_shape_to_sky_svd,
+                                        sky_shape_to_pixel_svd)
 from regions.core.attributes import (RegionMetaDescr, RegionVisualDescr,
                                      ScalarPixCoord, ScalarSkyCoord)
+from regions.core.pixcoord import PixCoord
 from regions.shapes.point import PointPixelRegion, PointSkyRegion
 
 __all__ = ['TextSkyRegion', 'TextPixelRegion']
@@ -63,8 +67,14 @@ class TextPixelRegion(PointPixelRegion):
 
     def to_sky(self, wcs):
         rotation_rad = math.radians(self.visual.get('rotation', 0.0))
-        center, _, _, sky_angle = pixel_to_sky_scales(
-            self.center, wcs, rotation_rad)
+        # Extract the sky rotation angle of the text via a unit-size SVD
+        # ellipse so the conversion correctly handles WCS shear. The
+        # photutils SVD helpers measure the sky rotation as a position
+        # angle (PA) from North; regions measures it from the RA axis.
+        # Convert between them with a 90 deg offset.
+        center, _, _, sky_angle = pixel_shape_to_sky_svd(
+            (self.center.x, self.center.y), wcs, 1.0, 1.0, rotation_rad)
+        sky_angle = (sky_angle + 90 * u.deg).wrap_at(360 * u.deg)
 
         # Rotation value is relative to the coordinate system axes;
         # convert from counterclockwise angle from the positive x axis
@@ -140,8 +150,12 @@ class TextSkyRegion(PointSkyRegion):
 
     def to_pixel(self, wcs):
         rotation_rad = math.radians(self.visual.get('rotation', 0.0))
-        center, _, _, pixel_angle = sky_to_pixel_scales(
-            self.center, wcs, rotation_rad)
+        # Extract the pixel rotation angle of the text via a unit-size
+        # SVD ellipse so the conversion correctly handles WCS shear.
+        # Convert regions sky angle (from RA axis) to photutils PA (from
+        # North) by subtracting 90 deg.
+        center, _, _, pixel_angle = sky_shape_to_pixel_svd(
+            self.center, wcs, 1.0, 1.0, rotation_rad - math.pi / 2)
 
         # Rotation value is relative to the WCS longitude axis;
         # convert to counterclockwise angle from the positive x axis.
@@ -150,7 +164,8 @@ class TextSkyRegion(PointSkyRegion):
             visual = visual.copy()
             visual['rotation'] = pixel_angle.to('deg').value
 
-        return TextPixelRegion(center, self.text, meta=self.meta.copy(),
+        return TextPixelRegion(PixCoord(*center), self.text,
+                               meta=self.meta.copy(),
                                visual=visual.copy())
 
     def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,

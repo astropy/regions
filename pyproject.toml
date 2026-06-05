@@ -244,6 +244,7 @@ ignore = [
     'D200',
     'D205',
     'D212',
+    'D401',
     'D404',
     'I001',
     'PLC0415',  # import-outside-top-level

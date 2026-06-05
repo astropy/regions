@@ -89,7 +89,8 @@ class CirclePixelRegion(PixelRegion):
             return np.logical_not(in_circle)
 
     def to_sky(self, wcs):
-        center, mean_scale = pixel_to_sky_mean_scale(self.center, wcs)
+        center, mean_scale = pixel_to_sky_mean_scale(
+            (self.center.x, self.center.y), wcs)
         radius = Angle(self.radius * mean_scale, 'arcsec')
         return CircleSkyRegion(center, radius, meta=self.meta.copy(),
                                visual=self.visual.copy())
@@ -255,6 +256,13 @@ class CircleSkyRegion(SkyRegion):
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
 
+    def to_pixel(self, wcs):
+        center, mean_scale = sky_to_pixel_mean_scale(self.center, wcs)
+        radius = self.radius.to(u.arcsec).value * mean_scale
+        return CirclePixelRegion(PixCoord(*center), radius,
+                                 meta=self.meta.copy(),
+                                 visual=self.visual.copy())
+
     def to_polygon(self, wcs, n_points=100):
         """
         Return a `~regions.PolygonSkyRegion` that approximates this
@@ -273,12 +281,6 @@ class CircleSkyRegion(SkyRegion):
             A polygon region approximating the circle.
         """
         return self.to_pixel(wcs).to_polygon(n_points=n_points).to_sky(wcs)
-
-    def to_pixel(self, wcs):
-        center, mean_scale = sky_to_pixel_mean_scale(self.center, wcs)
-        radius = self.radius.to(u.arcsec).value * mean_scale
-        return CirclePixelRegion(center, radius, meta=self.meta.copy(),
-                                 visual=self.visual.copy())
 
     def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
                          n_points=None):
