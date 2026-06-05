@@ -296,7 +296,7 @@ class TestCircleAnnulusSphericalSkyRegion(BaseTestSphericalSkyRegion):
 
 class TestCircleAnnulusPixelRegionToSkyEllipse:
     """
-    Tests for CircleAnnulusPixelRegion.to_sky with use_ellipse=True.
+    Tests for CircleAnnulusPixelRegion.to_sky with as_ellipse=True.
     """
 
     def setup_method(self):
@@ -311,14 +311,14 @@ class TestCircleAnnulusPixelRegionToSkyEllipse:
         self.wcs = make_simple_wcs(SkyCoord(2 * u.deg, 3 * u.deg),
                                    0.1 * u.deg, 20)
 
-    def test_to_sky_use_ellipse(self):
-        result = self.reg.to_sky(self.wcs, use_ellipse=True)
+    def test_to_sky_as_ellipse(self):
+        result = self.reg.to_sky(self.wcs, as_ellipse=True)
         assert isinstance(result, EllipseAnnulusSkyRegion)
         assert result.meta == self.meta
         assert result.visual == self.visual
 
     def test_to_sky_ellipse_roundtrip(self):
-        sky_ellipse = self.reg.to_sky(self.wcs, use_ellipse=True)
+        sky_ellipse = self.reg.to_sky(self.wcs, as_ellipse=True)
         pix_ellipse = sky_ellipse.to_pixel(self.wcs)
         assert_allclose(pix_ellipse.center.x, self.center.x, rtol=1e-5)
         assert_allclose(pix_ellipse.center.y, self.center.y, rtol=1e-5)
@@ -331,8 +331,8 @@ class TestCircleAnnulusPixelRegionToSkyEllipse:
         assert_allclose(pix_ellipse.outer_height,
                         2 * self.outer_radius, rtol=1e-4)
 
-    def test_to_sky_use_ellipse_meta_copies(self):
-        result = self.reg.to_sky(self.wcs, use_ellipse=True)
+    def test_to_sky_as_ellipse_meta_copies(self):
+        result = self.reg.to_sky(self.wcs, as_ellipse=True)
         result.meta['text'] = 'new'
         result.visual['color'] = 'green'
         assert result.meta['text'] != self.reg.meta['text']
@@ -341,7 +341,7 @@ class TestCircleAnnulusPixelRegionToSkyEllipse:
 
 class TestCircleAnnulusSkyRegionToPixelEllipse:
     """
-    Tests for CircleAnnulusSkyRegion.to_pixel with use_ellipse=True.
+    Tests for CircleAnnulusSkyRegion.to_pixel with as_ellipse=True.
     """
 
     def setup_method(self):
@@ -356,14 +356,14 @@ class TestCircleAnnulusSkyRegionToPixelEllipse:
         self.wcs = make_simple_wcs(SkyCoord(3 * u.deg, 4 * u.deg),
                                    5 * u.arcsec, 20)
 
-    def test_to_pixel_use_ellipse(self):
-        result = self.reg.to_pixel(self.wcs, use_ellipse=True)
+    def test_to_pixel_as_ellipse(self):
+        result = self.reg.to_pixel(self.wcs, as_ellipse=True)
         assert isinstance(result, EllipseAnnulusPixelRegion)
         assert result.meta == self.meta
         assert result.visual == self.visual
 
     def test_to_pixel_ellipse_roundtrip(self):
-        pix_ellipse = self.reg.to_pixel(self.wcs, use_ellipse=True)
+        pix_ellipse = self.reg.to_pixel(self.wcs, as_ellipse=True)
         sky_ellipse = pix_ellipse.to_sky(self.wcs)
         assert_quantity_allclose(sky_ellipse.inner_width,
                                  2 * self.inner_radius, rtol=1e-4)
@@ -374,8 +374,8 @@ class TestCircleAnnulusSkyRegionToPixelEllipse:
         assert_quantity_allclose(sky_ellipse.outer_height,
                                  2 * self.outer_radius, rtol=1e-4)
 
-    def test_to_pixel_use_ellipse_meta_copies(self):
-        result = self.reg.to_pixel(self.wcs, use_ellipse=True)
+    def test_to_pixel_as_ellipse_meta_copies(self):
+        result = self.reg.to_pixel(self.wcs, as_ellipse=True)
         result.meta['text'] = 'new'
         result.visual['color'] = 'green'
         assert result.meta['text'] != self.reg.meta['text']

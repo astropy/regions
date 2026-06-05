@@ -91,7 +91,7 @@ class CirclePixelRegion(PixelRegion):
         else:
             return np.logical_not(in_circle)
 
-    def to_sky(self, wcs, *, use_ellipse=False):
+    def to_sky(self, wcs, *, as_ellipse=False):
         """
         Return a sky region from this pixel region.
 
@@ -103,7 +103,7 @@ class CirclePixelRegion(PixelRegion):
             <https://docs.astropy.org/en/stable/wcs/wcsapi.html>`_
             (e.g., `astropy.wcs.WCS`).
 
-        use_ellipse : bool, optional
+        as_ellipse : bool, optional
             If `True`, return an `~regions.EllipseSkyRegion` instead
             of a `~regions.CircleSkyRegion`. An ellipse is generally
             a better approximation when the WCS has distortions or
@@ -113,10 +113,10 @@ class CirclePixelRegion(PixelRegion):
         Returns
         -------
         region : `~regions.CircleSkyRegion` or `~regions.EllipseSkyRegion`
-            The sky region. An ellipse is returned if ``use_ellipse``
+            The sky region. An ellipse is returned if ``as_ellipse``
             is `True`.
         """
-        if use_ellipse:
+        if as_ellipse:
             center, scale_major, scale_minor, angle = pixel_to_sky_svd_scales(
                 (self.center.x, self.center.y), wcs)
             width = Angle(2 * self.radius * scale_major, 'arcsec')
@@ -296,7 +296,7 @@ class CircleSkyRegion(SkyRegion):
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
 
-    def to_pixel(self, wcs, *, use_ellipse=False):
+    def to_pixel(self, wcs, *, as_ellipse=False):
         """
         Return a pixel region from this sky region.
 
@@ -308,7 +308,7 @@ class CircleSkyRegion(SkyRegion):
             <https://docs.astropy.org/en/stable/wcs/wcsapi.html>`_
             (e.g., `astropy.wcs.WCS`).
 
-        use_ellipse : bool, optional
+        as_ellipse : bool, optional
             If `True`, return an `~regions.EllipsePixelRegion` instead
             of a `~regions.CirclePixelRegion`. An ellipse is generally
             a better approximation when the WCS has distortions or
@@ -318,10 +318,10 @@ class CircleSkyRegion(SkyRegion):
         Returns
         -------
         region : `~regions.CirclePixelRegion` or `~regions.EllipsePixelRegion`
-            The pixel region. An ellipse is returned if ``use_ellipse``
+            The pixel region. An ellipse is returned if ``as_ellipse``
             is `True`.
         """
-        if use_ellipse:
+        if as_ellipse:
             center, scale_major, scale_minor, angle = sky_to_pixel_svd_scales(
                 self.center, wcs)
             radius_arcsec = self.radius.to(u.arcsec).value

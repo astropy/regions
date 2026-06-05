@@ -280,7 +280,7 @@ class TestCircleSphericalSkyRegion(BaseTestSphericalSkyRegion):
 
 class TestCirclePixelRegionToSkyEllipse:
     """
-    Tests for CirclePixelRegion.to_sky with use_ellipse=True.
+    Tests for CirclePixelRegion.to_sky with as_ellipse=True.
     """
 
     def setup_method(self):
@@ -293,14 +293,14 @@ class TestCirclePixelRegionToSkyEllipse:
         self.wcs = make_simple_wcs(SkyCoord(2 * u.deg, 3 * u.deg),
                                    0.1 * u.deg, 20)
 
-    def test_to_sky_use_ellipse(self):
-        result = self.reg.to_sky(self.wcs, use_ellipse=True)
+    def test_to_sky_as_ellipse(self):
+        result = self.reg.to_sky(self.wcs, as_ellipse=True)
         assert isinstance(result, EllipseSkyRegion)
         assert result.meta == self.meta
         assert result.visual == self.visual
 
     def test_to_sky_ellipse_roundtrip(self):
-        sky_ellipse = self.reg.to_sky(self.wcs, use_ellipse=True)
+        sky_ellipse = self.reg.to_sky(self.wcs, as_ellipse=True)
         pix_ellipse = sky_ellipse.to_pixel(self.wcs)
         # For a simple WCS without distortion, the roundtrip should
         # recover the original diameter as width and height
@@ -311,14 +311,14 @@ class TestCirclePixelRegionToSkyEllipse:
 
     def test_to_sky_ellipse_center_matches_circle(self):
         sky_circle = self.reg.to_sky(self.wcs)
-        sky_ellipse = self.reg.to_sky(self.wcs, use_ellipse=True)
+        sky_ellipse = self.reg.to_sky(self.wcs, as_ellipse=True)
         assert_quantity_allclose(sky_ellipse.center.ra,
                                  sky_circle.center.ra)
         assert_quantity_allclose(sky_ellipse.center.dec,
                                  sky_circle.center.dec)
 
-    def test_to_sky_use_ellipse_meta_copies(self):
-        result = self.reg.to_sky(self.wcs, use_ellipse=True)
+    def test_to_sky_as_ellipse_meta_copies(self):
+        result = self.reg.to_sky(self.wcs, as_ellipse=True)
         result.meta['text'] = 'new'
         result.visual['color'] = 'green'
         assert result.meta['text'] != self.reg.meta['text']
@@ -327,7 +327,7 @@ class TestCirclePixelRegionToSkyEllipse:
 
 class TestCircleSkyRegionToPixelEllipse:
     """
-    Tests for CircleSkyRegion.to_pixel with use_ellipse=True.
+    Tests for CircleSkyRegion.to_pixel with as_ellipse=True.
     """
 
     def setup_method(self):
@@ -340,8 +340,8 @@ class TestCircleSkyRegionToPixelEllipse:
         self.wcs = make_simple_wcs(SkyCoord(3 * u.deg, 4 * u.deg),
                                    5 * u.arcsec, 20)
 
-    def test_to_pixel_use_ellipse(self):
-        result = self.reg.to_pixel(self.wcs, use_ellipse=True)
+    def test_to_pixel_as_ellipse(self):
+        result = self.reg.to_pixel(self.wcs, as_ellipse=True)
         assert isinstance(result, EllipsePixelRegion)
         assert result.meta == self.meta
         assert result.visual == self.visual
@@ -351,7 +351,7 @@ class TestCircleSkyRegionToPixelEllipse:
         assert isinstance(result, CirclePixelRegion)
 
     def test_to_pixel_ellipse_roundtrip(self):
-        pix_ellipse = self.reg.to_pixel(self.wcs, use_ellipse=True)
+        pix_ellipse = self.reg.to_pixel(self.wcs, as_ellipse=True)
         sky_ellipse = pix_ellipse.to_sky(self.wcs)
         # Roundtrip should recover the original diameter
         assert_quantity_allclose(sky_ellipse.width,
@@ -361,12 +361,12 @@ class TestCircleSkyRegionToPixelEllipse:
 
     def test_to_pixel_ellipse_center_matches_circle(self):
         pix_circle = self.reg.to_pixel(self.wcs)
-        pix_ellipse = self.reg.to_pixel(self.wcs, use_ellipse=True)
+        pix_ellipse = self.reg.to_pixel(self.wcs, as_ellipse=True)
         assert_allclose(pix_ellipse.center.x, pix_circle.center.x)
         assert_allclose(pix_ellipse.center.y, pix_circle.center.y)
 
-    def test_to_pixel_use_ellipse_meta_copies(self):
-        result = self.reg.to_pixel(self.wcs, use_ellipse=True)
+    def test_to_pixel_as_ellipse_meta_copies(self):
+        result = self.reg.to_pixel(self.wcs, as_ellipse=True)
         result.meta['text'] = 'new'
         result.visual['color'] = 'green'
         assert result.meta['text'] != self.reg.meta['text']
