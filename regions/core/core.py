@@ -163,6 +163,26 @@ class Region(abc.ABC):
         cls_info = [('Region', self.__class__.__name__)] + self._cls_info()
         return '\n'.join(f'{key}: {val}' for key, val in cls_info)
 
+    @staticmethod
+    def _is_close(val1, val2):
+        """
+        Helper to compare PixCoord, Quantity, SkyCoord, and other parameters.
+        """
+        # PixCoord has its own __eq__ with built-in tolerances
+        if isinstance(val1, PixCoord):
+            return val1 == val2
+
+        try:
+            # np.allclose handles Quantities with convertible units
+            return np.allclose(val1, val2)
+        except (TypeError, ValueError):
+            try:
+                # Fallback for SkyCoord (which may return False if frames differ)
+                # or dicts/objects where np.allclose fails.
+                return not np.any(val1 != val2)
+            except (TypeError, ValueError):
+                return False
+
     def __eq__(self, other):
         """
         Equality operator for Region.
@@ -174,40 +194,16 @@ class Region(abc.ABC):
         if not isinstance(other, self.__class__):
             return False
 
-        meta_params = ['meta', 'visual']
-        self_params = list(self._params) + meta_params
-        other_params = list(other._params) + meta_params
+        # Define the parameters to check
+        params = list(self._params) + ['meta', 'visual']
+        other_params = list(other._params) + ['meta', 'visual']
 
-        # check that both have identical parameters
-        if self_params != other_params:
+        # Check that both have identical parameter sets
+        if params != other_params:
             return False
 
-        # now check the parameter values
-        # Note that Quantity comparisons allow for different units
-        # if they directly convertible (e.g., 1. * u.deg == 60. * u.arcmin)
-
-        for param in self_params:
-            self_val = getattr(self, param)
-            other_val = getattr(other, param)
-
-            # compare PixCoord directly, the PixCoord __eq__ method also uses
-            # np.allclose with the default tolerances
-            if isinstance(self_val, PixCoord) and self_val != other_val:
-                return False
-            else:
-                try:
-                    if not np.allclose(self_val, other_val):  # also handles comparible units
-                        return False
-                except TypeError:
-                    # fallback direct comparison for empty dicts, or for
-                    # SkyCoord comparisons which return false when frames
-                    # are not equivalent
-                    try:
-                        if np.any(self_val != other_val):
-                            return False
-                    except TypeError:
-                        return False
-        return True
+        # Check that all parameter values are close
+        return all(self._is_close(getattr(self, p), getattr(other, p)) for p in params)
 
     def __ne__(self, other):
         """
