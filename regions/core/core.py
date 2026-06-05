@@ -189,13 +189,14 @@ class Region(abc.ABC):
         for param in self_params:
             self_val = getattr(self, param)
             other_val = getattr(other, param)
+
             # compare PixCoord directly, the PixCoord __eq__ method also uses
             # np.allclose with the default tolerances
             if isinstance(self_val, PixCoord) and self_val != other_val:
                 return False
             else:
                 try:
-                    if not u.allclose(self_val, other_val):
+                    if not np.allclose(self_val, other_val):  # also handles comparible units
                         return False
                 except TypeError:
                     # fallback direct comparison for empty dicts, or for
