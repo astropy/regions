@@ -4,10 +4,12 @@ Tests for the regions module.
 """
 
 import pytest
+from astropy import units as u
+from astropy.coordinates import SkyCoord
 from astropy.table import Table
 
-from regions.core import PixCoord, Regions
-from regions.shapes import CirclePixelRegion
+from regions.core import PixCoord, Region, Regions
+from regions.shapes import CirclePixelRegion, CircleSkyRegion
 
 
 def test_regions_inputs():
@@ -111,3 +113,114 @@ def test_regions_repr():
     regions_repr = f'<Regions([\n  {reg_repr}\n])>'
     assert str(regions) == regions_str
     assert repr(regions) == regions_repr
+
+
+def test_region_equivalency():
+    """
+    Test the __eq__ method of Region and its subclasses to ensure that
+    it correctly identifies when two regions are equal, and that it uses
+    np.allclose for comparing parameters that are numerical in nature.
+    """
+    reg1 = CirclePixelRegion(PixCoord(0, 0), radius=1)
+    reg2 = CirclePixelRegion(PixCoord(0, 0), radius=1)
+    assert reg1 == reg2
+
+    # __eq__ uses np.allclose for comparing regions, so this should be True
+    reg3 = CirclePixelRegion(PixCoord(0, 0), radius=1 + 1e-10)
+    assert reg1 == reg3
+
+    # Different radius should not be equal
+    reg_diff = CirclePixelRegion(PixCoord(0, 0), radius=2)
+    assert reg1 != reg_diff
+
+    # Test SkyRegion equality
+    reg4 = CircleSkyRegion(SkyCoord(ra=0 * u.deg, dec=0 * u.deg),
+                           radius=1 * u.arcsec)
+    reg5 = CircleSkyRegion(SkyCoord(ra=0 * u.deg, dec=0 * u.deg),
+                           radius=1 * u.arcsec)
+    assert reg4 == reg5
+
+    reg6 = CircleSkyRegion(SkyCoord(ra=0 * u.deg, dec=0 * u.deg),
+                           radius=1 * u.arcsec + 1e-10 * u.arcsec)
+    assert reg4 == reg6
+
+    # Different classes should not be equal
+    assert reg1 != reg4
+
+    # Test SkyCoord center allclose comparison
+    # Small coordinate differences should be considered equal
+    reg7 = CircleSkyRegion(SkyCoord(ra=0 * u.deg + 1e-10 * u.deg,
+                                    dec=0 * u.deg),
+                           radius=1 * u.arcsec)
+    assert reg4 == reg7
+
+    # Declination offset
+    reg8 = CircleSkyRegion(SkyCoord(ra=0 * u.deg,
+                                    dec=0 * u.deg + 1e-10 * u.deg),
+                           radius=1 * u.arcsec)
+    assert reg4 == reg8
+
+    # Both RA and Dec with small offsets
+    reg9 = CircleSkyRegion(SkyCoord(ra=0 * u.deg + 1e-10 * u.deg,
+                                    dec=0 * u.deg + 1e-10 * u.deg),
+                           radius=1 * u.arcsec)
+    assert reg4 == reg9
+
+    # Significantly different SkyCoord should not be equal
+    reg10 = CircleSkyRegion(SkyCoord(ra=0.01 * u.deg, dec=0 * u.deg),
+                            radius=1 * u.arcsec)
+    assert reg4 != reg10
+
+    # SkyCoord with different frames should not be equal
+    reg_gal = CircleSkyRegion(SkyCoord(l=0 * u.deg, b=0 * u.deg,
+                                       frame='galactic'),
+                              radius=1 * u.arcsec)
+    assert reg4 != reg_gal
+
+
+def test_is_close_skycoord_frame_error(monkeypatch):
+    """
+    Test that if the is_equivalent_frame method of the SkyCoord frame
+    raises a ValueError, then _is_close should catch that and return
+    False rather than propagating the exception.
+
+    This is to ensure that if the frames of the SkyCoords cannot be
+    compared for equivalency, we should not consider the coordinates to
+    be close, but we also should not raise an exception.
+    """
+    def raises_value_error(self, other):
+        raise ValueError
+
+    c1 = SkyCoord(ra=0 * u.deg, dec=0 * u.deg)
+    c2 = SkyCoord(ra=0 * u.deg, dec=0 * u.deg)
+    monkeypatch.setattr(type(c1.frame), 'is_equivalent_frame',
+                        raises_value_error)
+    assert not Region._is_close(c1, c2)
+
+
+def test_is_close_non_comparable():
+    """
+    Test that if the __eq__ method of the objects being compared
+    raises a TypeError, then _is_close should return False rather than
+    propagating the exception.
+    """
+    class BadCompare:
+        def __eq__(self, other):
+            raise TypeError
+
+    b = BadCompare()
+    assert not Region._is_close(b, b)
+
+
+def test_region_eq_param_mismatch():
+    """
+    Test that if two regions are of the same class but have mismatched _params,
+    then they should not be considered equal.
+
+    This is a sanity check to ensure that the __eq__ method is correctly
+    comparing the parameters of the regions.
+    """
+    reg1 = CirclePixelRegion(PixCoord(0, 0), radius=1)
+    reg2 = CirclePixelRegion(PixCoord(0, 0), radius=1)
+    reg2._params = ()  # simulate mismatched parameter set
+    assert reg1 != reg2

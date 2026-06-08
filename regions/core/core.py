@@ -163,40 +163,87 @@ class Region(abc.ABC):
         cls_info = [('Region', self.__class__.__name__)] + self._cls_info()
         return '\n'.join(f'{key}: {val}' for key, val in cls_info)
 
+    @staticmethod
+    def _is_close(val1, val2):
+        """
+        Helper to compare PixCoord, Quantity, SkyCoord, and other
+        parameters.
+
+        For SkyCoord objects, both coordinates are converted to ICRS and
+        their RA/Dec values are compared using `numpy.allclose` with
+        default tolerances, enabling tolerance-based equivalency similar
+        to PixCoord and Quantity parameters.
+
+        SkyCoord objects must have equivalent frames to be considered
+        close.
+
+        Parameters
+        ----------
+        val1, val2 : object
+            Values to compare.
+
+        Returns
+        -------
+        bool
+            True if values are considered close/equal, False otherwise.
+        """
+        # PixCoord has its own __eq__ with built-in tolerances
+        if isinstance(val1, PixCoord):
+            return val1 == val2
+
+        # SkyCoord comparison using RA/DEC allclose
+        if isinstance(val1, SkyCoord) and isinstance(val2, SkyCoord):
+            try:
+                # Frames must be equivalent, convert to ICRS for comparison
+                if val1.frame.is_equivalent_frame(val2.frame):
+                    ra_close = np.allclose(val1.icrs.ra.deg,
+                                           val2.icrs.ra.deg)
+                    dec_close = np.allclose(val1.icrs.dec.deg,
+                                            val2.icrs.dec.deg)
+                    return ra_close and dec_close
+            except (AttributeError, ValueError):
+                pass
+            return False
+
+        # Try np.allclose for Quantities and arrays
+        try:
+            return np.allclose(val1, val2)
+        except (TypeError, ValueError):
+            try:
+                # Fallback for dicts/objects (e.g., empty dicts) where
+                # np.allclose fails.
+                return np.all(val1 == val2)
+            except (TypeError, ValueError):
+                return False
+
     def __eq__(self, other):
         """
         Equality operator for Region.
 
-        All Region properties are compared for strict equality except
-        for Quantity parameters, which allow for different units if they
-        are directly convertible.
+        Regions are considered equal if all their properties are equal
+        or close.
+
+        - PixCoord centers use built-in tolerance (np.allclose with
+          defaults)
+        - Quantity parameters allow different units if directly
+          convertible
+        - SkyCoord centers are compared using allclose on RA/DEC values
+        - Other parameters use strict equality
         """
         if not isinstance(other, self.__class__):
             return False
 
-        meta_params = ['meta', 'visual']
-        self_params = list(self._params) + meta_params
-        other_params = list(other._params) + meta_params
+        # Define the parameters to check
+        self_params = list(self._params) + ['meta', 'visual']
+        other_params = list(other._params) + ['meta', 'visual']
 
-        # check that both have identical parameters
+        # Check that both have identical parameter sets
         if self_params != other_params:
             return False
 
-        # now check the parameter values
-        # Note that Quantity comparisons allow for different units
-        # if they directly convertible (e.g., 1. * u.deg == 60. * u.arcmin)
-        try:
-            for param in self_params:
-                # np.any is used for SkyCoord array comparisons
-                if np.any(getattr(self, param) != getattr(other, param)):
-                    return False
-        except TypeError:
-            # TypeError is raised from SkyCoord comparison when they do
-            # not have equivalent frames. Here return False instead of
-            # the TypeError.
-            return False
-
-        return True
+        # Check that all parameter values are close
+        return all(self._is_close(getattr(self, p), getattr(other, p))
+                   for p in self_params)
 
     def __ne__(self, other):
         """
