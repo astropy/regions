@@ -8,7 +8,7 @@ from astropy.io import fits
 from astropy.tests.helper import assert_quantity_allclose
 from astropy.utils.data import get_pkg_data_filename
 from astropy.wcs import WCS
-from numpy.testing import assert_allclose
+from numpy.testing import assert_allclose, assert_equal
 
 from regions._utils.optional_deps import HAS_MATPLOTLIB
 from regions.core import PixCoord, RegionMeta, RegionVisual
@@ -119,9 +119,15 @@ class TestLineSkyRegion(BaseTestSkyRegion):
 
     def test_contains(self, wcs):
         position = SkyCoord([1, 2] * u.deg, [3, 4] * u.deg)
-        # lines do not contain things
-        assert all(self.reg.contains(position, wcs)
-                   == np.array([False, False], dtype='bool'))
+        # Lines do not contain things
+        result = self.reg.contains(position, wcs)
+        assert isinstance(result, np.ndarray)
+        assert result.shape == (2,)
+        assert_equal(result, [False, False])
+
+        scalar_position = SkyCoord(1 * u.deg, 3 * u.deg)
+        result_scalar = self.reg.contains(scalar_position, wcs)
+        assert result_scalar is False
 
     def test_eq(self):
         reg = self.reg.copy()

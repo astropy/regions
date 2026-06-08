@@ -179,7 +179,8 @@ class LineSkyRegion(SkyRegion):
 
     def contains(self, skycoord, wcs):  # pylint: disable=unused-argument
         # lines never contain anything
-        return not self.meta.get('include', True)
+        return (False if skycoord.isscalar
+                else np.zeros(skycoord.shape, dtype=bool))
 
     def to_pixel(self, wcs):
         start_x, start_y = wcs.world_to_pixel(self.start)
