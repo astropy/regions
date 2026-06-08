@@ -10,7 +10,7 @@ from astropy.tests.helper import assert_quantity_allclose
 from numpy.testing import assert_allclose, assert_equal
 
 from regions._utils.examples import make_example_dataset
-from regions._utils.optional_deps import HAS_MATPLOTLIB
+from regions._utils.optional_deps import HAS_MATPLOTLIB, HAS_SHAPELY
 from regions.core import PixCoord, RegionBoundingBox, RegionMeta, RegionVisual
 from regions.shapes.circle import CircleSphericalSkyRegion
 from regions.shapes.polygon import (PolygonPixelRegion, PolygonSkyRegion,
@@ -150,6 +150,45 @@ class TestPolygonPixelRegion(BaseTestPixelRegion):
         assert reg == self.reg
         reg.vertices = PixCoord([1, 3, 1], [1, 1, 6])
         assert reg != self.reg
+
+    @staticmethod
+    def rect_from_two_points(p1, p2):
+        """
+        Build a |PixCoord| of the four axis-aligned rectangle corners
+        defined by two opposite points.
+        """
+        x1, y1 = p1
+        x2, y2 = p2
+        minx = min(x1, x2)
+        maxx = max(x1, x2)
+        miny = min(y1, y2)
+        maxy = max(y1, y2)
+        corners = np.array([
+            [minx, miny],
+            [minx, maxy],
+            [maxx, maxy],
+            [maxx, miny],
+        ])
+        pc = PixCoord(corners[:, 0], corners[:, 1])
+        return pc
+
+    def test_pix_covers_boundary(self):
+        """
+        Regression test that points coinciding with polygon vertices
+        and edges are covered (boundary included), while ``contains``
+        excludes the boundary points.
+        """
+        verts = np.array([(7, 1), (11, 1), (11, 7), (9, 7), (9, 5),
+                          (2, 5), (2, 3), (7, 3)])
+
+        reg = PolygonPixelRegion(PixCoord(verts[:, 0], verts[:, 1]))
+        rect = self.rect_from_two_points((9, 5), (2, 3))
+
+        # Corners (2, 3), (2, 5), (9, 5) coincide with polygon vertices
+        # (on the boundary); (9, 3) is strictly interior.
+        assert np.all(reg.covers(rect))
+        assert_equal(reg.contains(rect),
+                     np.array([False, False, False, True]))
 
 
 class TestPolygonSkyRegion(BaseTestSkyRegion):
@@ -433,3 +472,72 @@ class TestPolygonSphericalSkyRegion(BaseTestSphericalSkyRegion):
                                                  [3, 4, 5] * u.deg))
 
         assert reg.centroid == reg.centroid_mindist
+
+
+@pytest.mark.skipif(not HAS_SHAPELY, reason='shapely is required')
+class TestPolygonShapelyComparison:
+    """
+    Test that PolygonPixelRegion contains and covers match Shapely's
+    contains and covers functions (DE-9IM semantics).
+    """
+
+    # L-shaped polygon vertices and test points grouped by location.
+    vertex_points = [(7, 1), (11, 1), (11, 7), (9, 7), (9, 5),
+                     (2, 5), (2, 3), (7, 3)]
+    edge_points = [(9, 1), (11, 4), (10, 7), (9, 6),
+                   (5, 5), (2, 4), (5, 3), (7, 2)]
+    interior_points = [(8, 2), (10, 3), (9, 5.5), (5, 4), (3, 4), (10, 6)]
+    exterior_points = [(1, 1), (12, 5), (0, 4), (5, 0), (10, 8),
+                       (3, 2), (5, 2), (6, 4)]
+    all_points = (vertex_points + edge_points + interior_points
+                  + exterior_points)
+
+    @classmethod
+    def setup_polygon(cls):
+        """
+        Create an L-shaped polygon for testing.
+        """
+        verts = np.array(cls.vertex_points)
+        return PolygonPixelRegion(PixCoord(verts[:, 0], verts[:, 1]))
+
+    @classmethod
+    def shapely_polygon(cls):
+        """
+        Create an equivalent Shapely polygon.
+        """
+        from shapely import Polygon
+        return Polygon(cls.vertex_points)
+
+    @pytest.mark.parametrize('method', ['contains', 'covers'])
+    @pytest.mark.parametrize('point', all_points)
+    def test_matches_shapely(self, method, point):
+        """
+        Test that contains/covers match Shapely for points on the
+        vertices, edges, interior, and exterior of the polygon.
+        """
+        from shapely import Point, contains, covers
+
+        shp_func = {'contains': contains, 'covers': covers}[method]
+        x, y = point
+        reg_result = bool(getattr(self.setup_polygon(), method)(PixCoord(x, y)))
+        shp_result = bool(shp_func(self.shapely_polygon(), Point(x, y)))
+        assert reg_result == shp_result
+
+    @pytest.mark.parametrize('method', ['contains', 'covers'])
+    def test_array_matches_shapely(self, method):
+        """
+        Test that contains/covers match Shapely for an array mixing
+        vertex, edge, interior, and exterior points.
+        """
+        from shapely import Point, contains, covers
+
+        shp_func = {'contains': contains, 'covers': covers}[method]
+        points = [(7, 1), (9, 1), (8, 2), (1, 1),
+                  (11, 7), (5, 5), (5, 4), (3, 2)]
+        x = np.array([p[0] for p in points], dtype=float)
+        y = np.array([p[1] for p in points], dtype=float)
+        reg_results = getattr(self.setup_polygon(), method)(PixCoord(x, y))
+        expected = np.array([bool(shp_func(self.shapely_polygon(),
+                                           Point(px, py)))
+                             for px, py in points])
+        assert_equal(reg_results, expected)
