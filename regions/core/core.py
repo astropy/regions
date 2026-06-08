@@ -166,20 +166,53 @@ class Region(abc.ABC):
     @staticmethod
     def _is_close(val1, val2):
         """
-        Helper to compare PixCoord, Quantity, SkyCoord, and other parameters.
+        Helper to compare PixCoord, Quantity, SkyCoord, and other
+        parameters.
+
+        For SkyCoord objects, both coordinates are converted to ICRS and
+        their RA/Dec values are compared using `numpy.allclose` with
+        default tolerances, enabling tolerance-based equivalency similar
+        to PixCoord and Quantity parameters.
+
+        SkyCoord objects must have equivalent frames to be considered
+        close.
+
+        Parameters
+        ----------
+        val1, val2 : object
+            Values to compare.
+
+        Returns
+        -------
+        bool
+            True if values are considered close/equal, False otherwise.
         """
         # PixCoord has its own __eq__ with built-in tolerances
         if isinstance(val1, PixCoord):
             return val1 == val2
 
+        # SkyCoord comparison using RA/DEC allclose
+        if isinstance(val1, SkyCoord) and isinstance(val2, SkyCoord):
+            try:
+                # Frames must be equivalent, convert to ICRS for comparison
+                if val1.frame.is_equivalent_frame(val2.frame):
+                    ra_close = np.allclose(val1.icrs.ra.deg,
+                                           val2.icrs.ra.deg)
+                    dec_close = np.allclose(val1.icrs.dec.deg,
+                                            val2.icrs.dec.deg)
+                    return ra_close and dec_close
+            except (AttributeError, ValueError):
+                pass
+            return False
+
+        # Try np.allclose for Quantities and arrays
         try:
-            # np.allclose handles Quantities with convertible units
             return np.allclose(val1, val2)
         except (TypeError, ValueError):
             try:
-                # Fallback for SkyCoord (which may return False if frames differ)
-                # or dicts/objects where np.allclose fails.
-                return not np.any(val1 != val2)
+                # Fallback for dicts/objects (e.g., empty dicts) where
+                # np.allclose fails.
+                return np.all(val1 == val2)
             except (TypeError, ValueError):
                 return False
 
@@ -187,23 +220,30 @@ class Region(abc.ABC):
         """
         Equality operator for Region.
 
-        All Region properties are compared for strict equality except
-        for Quantity parameters, which allow for different units if they
-        are directly convertible.
+        Regions are considered equal if all their properties are equal
+        or close.
+
+        - PixCoord centers use built-in tolerance (np.allclose with
+          defaults)
+        - Quantity parameters allow different units if directly
+          convertible
+        - SkyCoord centers are compared using allclose on RA/DEC values
+        - Other parameters use strict equality
         """
         if not isinstance(other, self.__class__):
             return False
 
         # Define the parameters to check
-        params = list(self._params) + ['meta', 'visual']
+        self_params = list(self._params) + ['meta', 'visual']
         other_params = list(other._params) + ['meta', 'visual']
 
         # Check that both have identical parameter sets
-        if params != other_params:
+        if self_params != other_params:
             return False
 
         # Check that all parameter values are close
-        return all(self._is_close(getattr(self, p), getattr(other, p)) for p in params)
+        return all(self._is_close(getattr(self, p), getattr(other, p))
+                   for p in self_params)
 
     def __ne__(self, other):
         """

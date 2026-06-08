@@ -81,8 +81,11 @@ Bug Fixes
   and ``to_pixel`` conversions so that they round-trip correctly with a
   sheared WCS. [#676]
 
-- Region equivalency operator now uses 'all_close' rather than checking for an
-  exact match when comparing regions, for behavior in line with PixCoord. [#677]
+- Fixed ``Region`` comparison behavior so that numeric
+  parameters (``PixCoord``, ``astropy.units.Quantity``, and
+  ``astropy.coordinates.SkyCoord``) are compared using ``np.allclose``
+  rather than exact equality, making equality checks more robust to
+  floating-point precision differences. [#677]
 
 API Changes
 -----------
