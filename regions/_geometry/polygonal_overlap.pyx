@@ -3,7 +3,7 @@
 import numpy as np
 cimport numpy as np
 
-from .pnpoly cimport point_in_polygon
+from .pnpoly cimport point_in_polygon_even_odd
 
 __all__ = ['polygonal_overlap_grid']
 
@@ -105,7 +105,7 @@ cdef double polygonal_overlap_single_subpixel(double x0, double y0,
         y = y0 - 0.5 * dy
         for j in range(subpixels):
             y += dy
-            if point_in_polygon(x, y, vx, vy) == 1:
+            if point_in_polygon_even_odd(x, y, vx, vy) == 1:
                 frac += 1.
 
     return frac / (subpixels * subpixels)
