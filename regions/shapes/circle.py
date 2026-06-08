@@ -85,11 +85,7 @@ class CirclePixelRegion(PixelRegion):
 
     def contains(self, pixcoord):
         pixcoord = PixCoord._validate(pixcoord, name='pixcoord')
-        in_circle = self.center.separation(pixcoord) < self.radius
-        if self.meta.get('include', True):
-            return in_circle
-        else:
-            return np.logical_not(in_circle)
+        return self.center.separation(pixcoord) < self.radius
 
     def to_sky(self, wcs, *, as_ellipse=False):
         """
@@ -410,11 +406,7 @@ class CircleSphericalSkyRegion(SphericalSkyRegion):
         self.visual = visual or RegionVisual()
 
     def contains(self, coord):
-        in_circle = self.center.separation(coord) < self.radius
-        if self.meta.get('include', True):
-            return in_circle
-        else:
-            return np.logical_not(in_circle)
+        return self.center.separation(coord) < self.radius
 
     @property
     def bounding_circle(self):

@@ -59,12 +59,8 @@ class CompoundPixelRegion(PixelRegion):
         return self._operator
 
     def contains(self, pixcoord):
-        in_reg = self.operator(self.region1.contains(pixcoord),
-                               self.region2.contains(pixcoord))
-        if self.meta.get('include', True):
-            return in_reg
-        else:
-            return np.logical_not(in_reg)
+        return self.operator(self.region1.contains(pixcoord),
+                             self.region2.contains(pixcoord))
 
     def to_mask(self, mode='center', subpixels=1):
         if mode != 'center':
@@ -261,12 +257,8 @@ class CompoundSkyRegion(SkyRegion):
         return self._operator
 
     def contains(self, skycoord, wcs):
-        in_reg = self.operator(self.region1.contains(skycoord, wcs),
-                               self.region2.contains(skycoord, wcs))
-        if self.meta.get('include', True):
-            return in_reg
-        else:
-            return np.logical_not(in_reg)
+        return self.operator(self.region1.contains(skycoord, wcs),
+                             self.region2.contains(skycoord, wcs))
 
     def to_pixel(self, wcs):
         pixreg1 = self.region1.to_pixel(wcs=wcs)
@@ -446,13 +438,9 @@ class CompoundSphericalSkyRegion(SphericalSkyRegion):
         raise NotImplementedError
 
     def contains(self, coord):
-        in_reg = self.operator(
+        return self.operator(
             self.region1.contains(coord), self.region2.contains(coord),
         )
-        if self.meta.get('include', True):
-            return in_reg
-        else:
-            return np.logical_not(in_reg)
 
     def transform_to(self, frame, merge_attributes=True):
         # Transform the consitituent regions then recompose:

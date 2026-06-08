@@ -762,12 +762,7 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
             else:
                 in_range_lat = np.ones(coord.shape, dtype=bool)
 
-            in_range = in_range_lon & in_range_lat
-
-            if self.meta.get('include', True):
-                return in_range
-            else:
-                return np.logical_not(in_range)
+            return in_range_lon & in_range_lat
 
         # If transformed: must use boundary compound region logic:
         return self._compound_region.contains(coord)

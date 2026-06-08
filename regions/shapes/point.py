@@ -75,14 +75,8 @@ class PointPixelRegion(PixelRegion):
         return 0.0
 
     def contains(self, pixcoord):
-        in_reg = (False if pixcoord.isscalar
-                  else np.zeros(pixcoord.x.shape, dtype=bool))
-
-        if self.meta.get('include', True):
-            # in_reg = False, always.  Points do not include anything.
-            return in_reg
-        else:
-            return np.logical_not(in_reg)
+        return (False if pixcoord.isscalar
+                else np.zeros(pixcoord.x.shape, dtype=bool))
 
     def to_sky(self, wcs):
         center = wcs.pixel_to_world(self.center.x, self.center.y)

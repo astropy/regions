@@ -108,11 +108,7 @@ class PolygonPixelRegion(PixelRegion):
 
         shape = x.shape
         mask = points_in_polygon(x.flatten(), y.flatten(), vx, vy).astype(bool)
-        in_poly = mask.reshape(shape)
-        if self.meta.get('include', True):
-            return in_poly
-        else:
-            return np.logical_not(in_poly)
+        return mask.reshape(shape)
 
     def to_sky(self, wcs):
         vertices_sky = wcs.pixel_to_world(self.vertices.x, self.vertices.y)
