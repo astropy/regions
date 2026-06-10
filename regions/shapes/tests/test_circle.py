@@ -8,7 +8,7 @@ from astropy.io import fits
 from astropy.tests.helper import assert_quantity_allclose
 from astropy.utils.data import get_pkg_data_filename
 from astropy.wcs import WCS
-from numpy.testing import assert_allclose
+from numpy.testing import assert_allclose, assert_equal
 
 from regions._utils.optional_deps import HAS_MATPLOTLIB
 from regions.core import PixCoord, RegionMeta, RegionVisual
@@ -97,6 +97,36 @@ class TestCirclePixelRegion(BaseTestPixelRegion):
     def test_zero_size(self):
         with pytest.raises(ValueError):
             CirclePixelRegion(PixCoord(50, 50), radius=0)
+
+
+def test_contains_covers_ignore_include_metadata():
+    """
+    Test that contains and covers ignore the 'include' metadata key, and
+    depend strictly on the geometric shape.
+    """
+    meta = RegionMeta({'include': False})
+    circle_exclude = CirclePixelRegion(PixCoord(10, 10), radius=5, meta=meta)
+    circle_include = CirclePixelRegion(PixCoord(10, 10), radius=5)
+
+    inside_pt = PixCoord(10, 10)
+    boundary_pt = PixCoord(15, 10)
+    outside_pt = PixCoord(20, 10)
+
+    # Should be completely identical regardless of 'include' metadata
+    assert_equal(circle_exclude.contains(inside_pt),
+                 circle_include.contains(inside_pt))
+    assert_equal(circle_exclude.contains(boundary_pt),
+                 circle_include.contains(boundary_pt))
+    assert_equal(circle_exclude.contains(outside_pt),
+                 circle_include.contains(outside_pt))
+
+    # Should be completely identical regardless of 'include' metadata
+    assert_equal(circle_exclude.covers(inside_pt),
+                 circle_include.covers(inside_pt))
+    assert_equal(circle_exclude.covers(boundary_pt),
+                 circle_include.covers(boundary_pt))
+    assert_equal(circle_exclude.covers(outside_pt),
+                 circle_include.covers(outside_pt))
 
 
 class TestCircleSkyRegion(BaseTestSkyRegion):

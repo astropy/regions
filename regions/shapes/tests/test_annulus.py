@@ -8,7 +8,7 @@ from astropy.io import fits
 from astropy.tests.helper import assert_quantity_allclose
 from astropy.utils.data import get_pkg_data_filename
 from astropy.wcs import WCS
-from numpy.testing import assert_allclose
+from numpy.testing import assert_allclose, assert_equal
 
 from regions.core import PixCoord, RegionMeta, RegionVisual
 from regions.core.compound import CompoundPixelRegion, CompoundSkyRegion
@@ -108,6 +108,22 @@ class TestCircleAnnulusPixelRegion(BaseTestPixelRegion):
         assert reg == self.reg
         reg.inner_radius = 3
         assert reg != self.reg
+
+    def test_covers(self):
+        # Point at center (inside inner)
+        assert not self.reg.covers(PixCoord(3, 4))
+        # Point on inner boundary
+        assert self.reg.covers(PixCoord(3, 2))
+        # Point in body of the annulus
+        assert self.reg.covers(PixCoord(3, 1.5))
+        # Point on outer boundary
+        assert self.reg.covers(PixCoord(3, 7))
+        # Point outside the annulus
+        assert not self.reg.covers(PixCoord(3, 8))
+
+        # Multiple points check together
+        pts = PixCoord([3, 3, 3, 3, 3], [4, 2, 1.5, 7, 8])
+        assert_equal(self.reg.covers(pts), [False, True, True, True, False])
 
 
 class TestCircleAnnulusSkyRegion(BaseTestSkyRegion):
