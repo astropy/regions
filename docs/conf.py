@@ -122,7 +122,7 @@ html_theme_options = {
 
 html_title = f'{project} {release}'
 html_show_sourcelink = False
-# html_favicon = os.path.join('_static', 'regions_logo.ico')
+html_favicon = os.path.join('_static', 'regions_logo.ico')
 html_static_path = ['_static']
 html_css_files = ['custom.css']  # path relative to _static
 
