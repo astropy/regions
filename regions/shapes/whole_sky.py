@@ -30,11 +30,17 @@ class WholeSphericalSkyRegion(SphericalSkyRegion):
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
 
-    def contains(self, coord):
+    def _containment(self, coord):
         if coord.isscalar:
             return True
         else:
             return np.ones(coord.shape, dtype=bool)
+
+    def contains(self, coord):
+        return self._containment(coord)
+
+    def covers(self, coord):
+        return self._containment(coord)
 
     @property
     def bounding_circle(self):

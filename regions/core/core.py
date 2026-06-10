@@ -978,14 +978,44 @@ class SphericalSkyRegion(Region):
     def contains(self, coord):
         """
         Check whether a sky coordinate falls inside the spherical sky
-        region.
+        region, excluding the boundary.
+
+        This method considers points on the boundary as outside the
+        region, consistent with Shapely's ``contains`` function and
+        DE-9IM semantics.
 
         Parameters
         ----------
         coord : `~astropy.coordinates.SkyCoord`
             The position or positions to check.
+
+        See Also
+        --------
+        covers : Check if points are inside or on the boundary.
         """
         raise NotImplementedError
+
+    def covers(self, coord):
+        """
+        Check whether a sky coordinate falls inside the spherical sky
+        region, including the boundary.
+
+        This method considers points on the boundary as inside the
+        region, consistent with Shapely's ``covers`` function and DE-9IM
+        semantics.
+
+        Parameters
+        ----------
+        coord : `~astropy.coordinates.SkyCoord`
+            The position or positions to check.
+
+        See Also
+        --------
+        contains : Check if points are strictly inside (excludes boundary).
+        """
+        msg = ("The 'covers' method is not supported for "
+               f'{self.__class__.__name__}.')
+        raise NotImplementedError(msg)
 
     @abc.abstractmethod
     def transform_to(self, frame, merge_attributes=True):

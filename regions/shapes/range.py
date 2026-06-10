@@ -700,19 +700,20 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
         if bound_nverts == 6:
             raise NotImplementedError
 
-    def contains(self, coord):
+    def _containment(self, coord, covers=False):
         if self._is_original_frame:
-            # Just compute directly from lon/lat ranges:
+            # Just compute directly from lon/lat ranges
 
-            # Ensure coordinate is in same frame:
+            # Ensure coordinate is in same frame
             c_repr = coord.represent_as('spherical')
 
-            # Longitude range constraints:
+            # Longitude range constraints
             if self.longitude_range is not None:
-                # Ensure lon range is wrapped at 360, matching internal SkyCoord convention
-                # To handle possible cases of lon ranges "wrapping around" across
-                # the standard 360->0 wrap, wrap lon ranges + coord values
-                # around the first entry angle
+                # Ensure lon range is wrapped at 360, matching internal
+                # SkyCoord convention. To handle possible cases of lon
+                # ranges "wrapping around" across the standard 360->0
+                # wrap, wrap lon ranges + coord values around the first
+                # entry angle
                 wrap_ang = self.longitude_range[0]
                 coord_lons = c_repr.lon.wrap_at(wrap_ang)
                 in_range_lon = (
@@ -725,12 +726,12 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
             else:
                 in_range_lon = np.ones(coord.shape, dtype=bool)
 
-            # Latitude range constraints:
+            # Latitude range constraints
             if self.latitude_range is not None:
                 coord_lat = c_repr.lat
 
-                # Check if latitude ranges are "simpler":
-                # Equivalent to no constraints, or simpler circles:
+                # Check if latitude ranges are "simpler".
+                # Equivalent to no constraints, or simpler circles.
                 if (
                     (self.latitude_range[1] == Angle(90 * u.deg))
                     & (self.latitude_range[0] == Angle(-90 * u.deg))
@@ -765,7 +766,16 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
             return in_range_lon & in_range_lat
 
         # If transformed: must use boundary compound region logic:
+        if covers:
+            return self._compound_region.covers(coord)
+
         return self._compound_region.contains(coord)
+
+    def contains(self, coord):
+        return self._containment(coord, covers=False)
+
+    def covers(self, coord):
+        return self._containment(coord, covers=True)
 
     def transform_to(self, frame, merge_attributes=True):
         frame = self._validate_frame_transformation(frame)
