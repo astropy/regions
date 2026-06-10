@@ -438,14 +438,31 @@ class PixelRegion(Region):
     @abc.abstractmethod
     def contains(self, pixcoord):
         """
-        Check whether a position or positions fall inside the region.
+        Check whether a position or positions fall inside the region,
+        excluding the boundary.
+
+        This method considers points on the boundary as outside the
+        region, consistent with Shapely's ``contains`` function and
+        DE-9IM semantics.
 
         Parameters
         ----------
         pixcoord : `~regions.PixCoord`
             The position or positions to check.
+
+        Returns
+        -------
+        result : bool or `~numpy.ndarray`
+            A boolean or boolean array indicating whether the position(s)
+            are inside the region.
+
+        See Also
+        --------
+        covers : Check if points are inside or on the boundary.
         """
-        raise NotImplementedError
+        msg = ("The 'contains' method is not supported for "
+               f'{self.__class__.__name__}.')
+        raise NotImplementedError(msg)
 
     def __contains__(self, coord):
         if not coord.isscalar:
@@ -477,7 +494,7 @@ class PixelRegion(Region):
         contains : Check if points are strictly inside (excludes boundary).
         """
         msg = ("The 'covers' method is not supported for "
-               '{self.__class__.__name__}.')
+               f'{self.__class__.__name__}.')
         raise NotImplementedError(msg)
 
     @abc.abstractmethod
