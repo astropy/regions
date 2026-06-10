@@ -156,6 +156,18 @@ class TestRangeSphericalSkyRegion(BaseTestSphericalSkyRegion):
 
         assert reg2.contains(skycoord[0])
 
+    def test_covers(self):
+        reg = RangeSphericalSkyRegion(longitude_range=[0, 10] * u.deg,
+                                      latitude_range=[-4, 4] * u.deg,
+                                      frame='icrs')
+        coords = self.inside + self.outside
+        lon, lat = zip(*coords)
+        skycoord = SkyCoord(list(lon), list(lat))
+        actual = reg.covers(skycoord)
+        assert_equal(actual[:len(self.inside)], True)
+        assert_equal(actual[len(self.inside):], False)
+        assert reg.covers(skycoord[0])
+
     def test_lat_only(self):
         reg = RangeSphericalSkyRegion(latitude_range=[-4, 4] * u.deg,
                                       frame='icrs')

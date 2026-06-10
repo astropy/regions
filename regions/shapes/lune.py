@@ -171,6 +171,9 @@ class LuneSphericalSkyRegion(SphericalSkyRegion):
     def contains(self, coord):
         return self._compound_region.contains(coord)
 
+    def covers(self, coord):
+        return self._compound_region.covers(coord)
+
     def transform_to(self, frame, merge_attributes=True):
         frame = self._validate_frame_transformation(frame)
 

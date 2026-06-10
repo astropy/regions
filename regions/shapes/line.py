@@ -70,13 +70,14 @@ class LinePixelRegion(PixelRegion):
         return 0
 
     def contains(self, pixcoord):
-        in_reg = (False if pixcoord.isscalar
-                  else np.zeros(pixcoord.x.shape, dtype=bool))
+        # Lines never contain anything
+        return (False if pixcoord.isscalar
+                else np.zeros(pixcoord.x.shape, dtype=bool))
 
-        if self.meta.get('include', True):
-            return in_reg
-        else:
-            return np.logical_not(in_reg)
+    def covers(self, pixcoord):
+        # Lines never cover anything
+        return (False if pixcoord.isscalar
+                else np.zeros(pixcoord.x.shape, dtype=bool))
 
     def to_sky(self, wcs):
         start = wcs.pixel_to_world(self.start.x, self.start.y)
@@ -183,8 +184,14 @@ class LineSkyRegion(SkyRegion):
         self.visual = visual or RegionVisual()
 
     def contains(self, skycoord, wcs):  # pylint: disable=unused-argument
-        # lines never contain anything
-        return not self.meta.get('include', True)
+        # Lines never contain anything
+        return (False if skycoord.isscalar
+                else np.zeros(skycoord.shape, dtype=bool))
+
+    def covers(self, skycoord, wcs):  # pylint: disable=unused-argument
+        # Lines never cover anything
+        return (False if skycoord.isscalar
+                else np.zeros(skycoord.shape, dtype=bool))
 
     def to_pixel(self, wcs):
         start_x, start_y = wcs.world_to_pixel(self.start)

@@ -10,7 +10,8 @@ from astropy.coordinates import SkyCoord
 from astropy.stats import circmean
 
 from regions._geometry import polygonal_overlap_grid
-from regions._geometry.pnpoly import points_in_polygon
+from regions._geometry.pnpoly import (points_in_polygon,
+                                      points_in_polygon_covers)
 from regions._utils.spherical_helpers import (
     cross_product_skycoord2skycoord, cross_product_sum_skycoord2skycoord,
     discretize_all_edge_boundaries, get_edge_raw_lonlat_bounds_circ_edges)
@@ -99,20 +100,28 @@ class PolygonPixelRegion(PixelRegion):
         area_last = x_[-1] * y_[0] - y_[-1] * x_[0]
         return 0.5 * np.abs(area_main + area_last)
 
-    def contains(self, pixcoord):
-        pixcoord = PixCoord._validate(pixcoord, 'pixcoord')
+    def _containment(self, pixcoord, covers=False):
+        pixcoord = PixCoord._validate(pixcoord, name='pixcoord')
         x = np.atleast_1d(np.asarray(pixcoord.x, dtype=float))
         y = np.atleast_1d(np.asarray(pixcoord.y, dtype=float))
         vx = np.asarray(self.vertices.x, dtype=float)
         vy = np.asarray(self.vertices.y, dtype=float)
 
         shape = x.shape
-        mask = points_in_polygon(x.flatten(), y.flatten(), vx, vy).astype(bool)
-        in_poly = mask.reshape(shape)
-        if self.meta.get('include', True):
-            return in_poly
+        if covers:
+            mask = points_in_polygon_covers(x.flatten(), y.flatten(),
+                                            vx, vy).astype(bool)
         else:
-            return np.logical_not(in_poly)
+            mask = points_in_polygon(x.flatten(), y.flatten(),
+                                     vx, vy).astype(bool)
+
+        return mask.reshape(shape)
+
+    def contains(self, pixcoord):
+        return self._containment(pixcoord, covers=False)
+
+    def covers(self, pixcoord):
+        return self._containment(pixcoord, covers=True)
 
     def to_sky(self, wcs):
         vertices_sky = wcs.pixel_to_world(self.vertices.x, self.vertices.y)
@@ -489,9 +498,11 @@ class PolygonSphericalSkyRegion(SphericalSkyRegion):
 
     @property
     def _compound_region(self):
-        # Need N great circles to define boundaries for an N-sided polygon.
-        # verts are in CW order: Cross product to get bounding great circle centers
-        # Compute GCs and stack into a compound set:
+        # Need N great circles to define boundaries for an N-sided
+        # polygon.
+        # verts are in CW order: Cross product to get bounding great
+        # circle centers.
+        # Compute GCs and stack into a compound set.
         compreg = None
         gcs = self._edge_circs
         for gc in gcs:
@@ -514,9 +525,8 @@ class PolygonSphericalSkyRegion(SphericalSkyRegion):
         However, if this is not contained within the polygon, instead
         use the average of the vertices' positions.
         """
-        # Calculate from cross products of vertices with cartesian representation
-        # verts are in CW order:
-        # Minimum distance
+        # Calculate from cross products of vertices with cartesian
+        # representation verts are in CW order
         centroid_mindist = self.centroid_mindist
 
         if not self.contains(centroid_mindist):
@@ -530,9 +540,8 @@ class PolygonSphericalSkyRegion(SphericalSkyRegion):
         Region centroid, defined as the point equidistant from all
         vertices (minimum distance).
         """
-        # Calculate from cross products of vertices with cartesian representation
-        # verts are in CW order:
-        # Minimum distance
+        # Calculate from cross products of vertices with cartesian
+        # representation verts are in CW order
         return cross_product_sum_skycoord2skycoord(self.vertices)
 
     @property
@@ -570,11 +579,15 @@ class PolygonSphericalSkyRegion(SphericalSkyRegion):
     def contains(self, coord):
         return self._compound_region.contains(coord)
 
+    def covers(self, coord):
+        return self._compound_region.covers(coord)
+
     def transform_to(self, frame, merge_attributes=True):
         frame = self._validate_frame_transformation(frame)
 
         # Only center transforms, radii preserved
-        verts_transf = self.vertices.transform_to(frame, merge_attributes=merge_attributes)
+        verts_transf = self.vertices.transform_to(
+            frame, merge_attributes=merge_attributes)
 
         return PolygonSphericalSkyRegion(
             verts_transf,

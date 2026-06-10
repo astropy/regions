@@ -1,7 +1,9 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
 import astropy.units as u
+import numpy as np
 import pytest
+from astropy.coordinates import SkyCoord
 from astropy.io import fits
 from astropy.utils.data import get_pkg_data_filename
 from astropy.wcs import WCS
@@ -66,3 +68,13 @@ class TestWholeSphericalSkyRegion(BaseTestSphericalSkyRegion):
     def test_bounding_lonlat(self):
         bounding_lonlat = self.reg.bounding_lonlat
         assert bounding_lonlat is None
+
+    def test_covers(self):
+        """
+        Test that whole sky covers points.
+        """
+        coord = SkyCoord(1 * u.deg, 2 * u.deg)
+        assert self.reg.covers(coord) is True
+
+        coords = SkyCoord([1, 2] * u.deg, [3, 4] * u.deg)
+        assert np.all(self.reg.covers(coords) == [True, True])

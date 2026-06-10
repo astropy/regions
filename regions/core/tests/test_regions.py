@@ -8,8 +8,8 @@ from astropy import units as u
 from astropy.coordinates import SkyCoord
 from astropy.table import Table
 
+from regions import CirclePixelRegion, CircleSkyRegion, RectanglePixelRegion
 from regions.core import PixCoord, Region, Regions
-from regions.shapes import CirclePixelRegion, CircleSkyRegion
 
 
 def test_regions_inputs():
@@ -208,14 +208,14 @@ def test_is_close_non_comparable():
         def __eq__(self, other):
             raise TypeError
 
-    b = BadCompare()
-    assert not Region._is_close(b, b)
+    bad = BadCompare()
+    assert not Region._is_close(bad, bad)
 
 
 def test_region_eq_param_mismatch():
     """
-    Test that if two regions are of the same class but have mismatched _params,
-    then they should not be considered equal.
+    Test that if two regions are of the same class but have mismatched
+    _params, then they should not be considered equal.
 
     This is a sanity check to ensure that the __eq__ method is correctly
     comparing the parameters of the regions.
@@ -224,3 +224,15 @@ def test_region_eq_param_mismatch():
     reg2 = CirclePixelRegion(PixCoord(0, 0), radius=1)
     reg2._params = ()  # simulate mismatched parameter set
     assert reg1 != reg2
+
+
+def test_compound_covers():
+    """
+    Test covers method on compound regions.
+    """
+    rect = RectanglePixelRegion(center=PixCoord(1, 1), width=2, height=2)
+    comp_union = rect.union(rect)
+    assert comp_union.covers(PixCoord(1, 1))
+
+    comp_inter = rect.intersection(rect)
+    assert comp_inter.covers(PixCoord(2, 2))  # on the boundary

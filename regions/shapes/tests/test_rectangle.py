@@ -10,7 +10,7 @@ from astropy.utils.data import get_pkg_data_filename
 from astropy.wcs import WCS
 from numpy.testing import assert_allclose, assert_equal
 
-from regions._utils.optional_deps import HAS_MATPLOTLIB
+from regions._utils.optional_deps import HAS_MATPLOTLIB, HAS_SHAPELY
 from regions.core import PixCoord, RegionMeta, RegionVisual
 from regions.shapes.rectangle import RectanglePixelRegion, RectangleSkyRegion
 from regions.shapes.tests.test_common import (BaseTestPixelRegion,
@@ -361,3 +361,108 @@ class TestRectangleSkyRegion(BaseTestSkyRegion):
         assert reg == self.reg
         reg.angle = 10 * u.deg
         assert reg != self.reg
+
+
+class TestRectangleCovers:
+    """
+    Test RectanglePixelRegion contains and covers boundary semantics
+    using explicit expected values.
+    """
+
+    @staticmethod
+    def setup_rectangle():
+        """
+        Create an axis-aligned rectangle centered at (5, 5).
+        """
+        # width=6, height=4, so corners at (2, 3), (8, 3), (8, 7), (2, 7)
+        return RectanglePixelRegion(PixCoord(5, 5), width=6, height=4,
+                                    angle=0 * u.deg)
+
+    @pytest.mark.parametrize(('method', 'expected'),
+                             [('contains', [True, False, False, False, False]),
+                              ('covers', [True, True, False, True, True])])
+    def test_array(self, method, expected):
+        """
+        Test contains/covers boundary semantics for an array mixing
+        interior, boundary, and exterior points.
+        """
+        reg = self.setup_rectangle()
+        # Center (in), vertex, beyond right (out), bottom edge, right edge
+        x = np.array([5, 2, 9, 5, 8])
+        y = np.array([5, 3, 5, 3, 5])
+        result = getattr(reg, method)(PixCoord(x, y))
+        assert_equal(result, np.array(expected))
+
+    @pytest.mark.parametrize('method', ['contains', 'covers'])
+    def test_rotated_rectangle(self, method):
+        """
+        Test boundary semantics for a rectangle rotated by 45 degrees.
+
+        Exact-boundary comparisons are sensitive to floating-point
+        rounding, so points are nudged just inside and just outside the
+        corner along the center-corner direction.
+        """
+        reg = RectanglePixelRegion(PixCoord(5, 5), width=4, height=2,
+                                   angle=45 * u.deg)
+
+        # Center is always inside; a far point is always outside.
+        assert getattr(reg, method)(PixCoord(5, 5))
+        assert not getattr(reg, method)(PixCoord(10, 10))
+
+        cos45 = np.cos(np.radians(45))
+        sin45 = np.sin(np.radians(45))
+        hw, hh = 2, 1  # half width, half height
+        cx = 5 + cos45 * hw - sin45 * hh
+        cy = 5 + sin45 * hw + cos45 * hh
+
+        inside = PixCoord(5 + 0.99 * (cx - 5), 5 + 0.99 * (cy - 5))
+        outside = PixCoord(5 + 1.01 * (cx - 5), 5 + 1.01 * (cy - 5))
+        assert getattr(reg, method)(inside)
+        assert not getattr(reg, method)(outside)
+
+
+@pytest.mark.skipif(not HAS_SHAPELY, reason='shapely is required')
+class TestRectangleShapelyComparison:
+    """
+    Test that RectanglePixelRegion contains and covers match Shapely's
+    contains and covers functions (DE-9IM semantics).
+    """
+
+    # Test points grouped by location relative to the rectangle
+    vertices = [(2, 3), (8, 3), (8, 7), (2, 7)]
+    edge_points = [(5, 3), (8, 5), (5, 7), (2, 5)]
+    interior_points = [(5, 5), (3, 4), (7, 6), (4, 5)]
+    exterior_points = [(0, 0), (1, 5), (9, 5), (5, 2), (5, 8)]
+    all_points = vertices + edge_points + interior_points + exterior_points
+
+    @staticmethod
+    def setup_rectangle():
+        """
+        Create an axis-aligned rectangle centered at (5, 5).
+        """
+        return RectanglePixelRegion(PixCoord(5, 5), width=6, height=4,
+                                    angle=0 * u.deg)
+
+    @staticmethod
+    def shapely_rectangle():
+        """
+        Create an equivalent Shapely rectangle polygon.
+        """
+        from shapely import Polygon
+        return Polygon([(2, 3), (8, 3), (8, 7), (2, 7)])
+
+    @pytest.mark.parametrize('method', ['contains', 'covers'])
+    @pytest.mark.parametrize('point', all_points)
+    def test_matches_shapely(self, method, point):
+        """
+        Test that contains/covers match Shapely for points on the
+        vertices, edges, interior, and exterior of the rectangle.
+        """
+        from shapely import Point, contains, covers
+
+        shp_func = {'contains': contains, 'covers': covers}[method]
+        x, y = point
+        reg = self.setup_rectangle()
+        reg_result = bool(getattr(reg, method)(PixCoord(x, y)))
+        shp_result = bool(shp_func(self.shapely_rectangle(), Point(x, y)))
+        assert reg_result == shp_result

@@ -106,9 +106,14 @@ class TestLuneSphericalSkyRegion(BaseTestSphericalSkyRegion):
     def test_bounding_circle(self):
         skycoord = SkyCoord(90.5 * u.deg, 0 * u.deg)
         reg = CircleSphericalSkyRegion(skycoord, 90 * u.deg)
+        assert self.reg.bounding_circle == reg
 
-        bc = self.reg.bounding_circle
-        assert bc == reg
+    def test_covers(self):
+        skycoord = SkyCoord([90, 75] * u.deg, [0, 0] * u.deg)
+        actual = self.reg.covers(skycoord)
+        assert actual[0]
+        assert not actual[1]
+        assert self.reg.covers(SkyCoord(90 * u.deg, 0 * u.deg))
 
     def test_bounding_lonlat(self):
         bounding_lonlat = self.reg.bounding_lonlat

@@ -438,19 +438,64 @@ class PixelRegion(Region):
     @abc.abstractmethod
     def contains(self, pixcoord):
         """
-        Check whether a position or positions fall inside the region.
+        Check whether a position or positions fall inside the region,
+        excluding the boundary.
+
+        This method considers points on the boundary as outside the
+        region, consistent with Shapely's ``contains`` function and
+        DE-9IM semantics.
 
         Parameters
         ----------
         pixcoord : `~regions.PixCoord`
             The position or positions to check.
+
+        Returns
+        -------
+        result : bool or `~numpy.ndarray`
+            A boolean or boolean array indicating whether the position(s)
+            are inside the region.
+
+        See Also
+        --------
+        covers : Check if points are inside or on the boundary.
         """
-        raise NotImplementedError
+        msg = ("The 'contains' method is not supported for "
+               f'{self.__class__.__name__}.')
+        raise NotImplementedError(msg)
 
     def __contains__(self, coord):
         if not coord.isscalar:
             raise ValueError(f'coord must be scalar. coord={coord}')
         return self.contains(coord)
+
+    def covers(self, pixcoord):
+        """
+        Check whether a position or positions fall inside the region,
+        including the boundary.
+
+        This method considers points on the boundary as inside the
+        region, consistent with Shapely's ``covers`` function and DE-9IM
+        semantics.
+
+        Parameters
+        ----------
+        pixcoord : `~regions.PixCoord`
+            The position or positions to check.
+
+        Returns
+        -------
+        result : bool or `~numpy.ndarray`
+            A boolean or boolean array indicating whether the position(s)
+            are inside or on the boundary of the region.
+
+        See Also
+        --------
+        contains : Check if points are strictly inside (excludes boundary).
+        """
+        msg = ("The 'covers' method is not supported for "
+               f'{self.__class__.__name__}.')
+        raise NotImplementedError(msg)
 
     @abc.abstractmethod
     def to_sky(self, wcs):
@@ -714,6 +759,38 @@ class SkyRegion(Region):
         pixcoord = PixCoord.from_sky(skycoord, wcs)
         return pixel_region.contains(pixcoord)
 
+    def covers(self, skycoord, wcs):
+        """
+        Check whether a sky coordinate falls inside or on the boundary
+        of the region.
+
+        This method considers points on the boundary as inside the
+        region, consistent with Shapely's ``covers`` function and DE-9IM
+        semantics.
+
+        Parameters
+        ----------
+        skycoord : `~astropy.coordinates.SkyCoord`
+            The position or positions to check.
+        wcs : `~astropy.wcs.WCS`
+            The world coordinate system transformation to use to convert
+            between sky and pixel coordinates.
+
+        See Also
+        --------
+        contains : Check if points are strictly inside (excludes boundary).
+
+        Notes
+        -----
+        This method requires the pixel region returned by ``to_pixel``
+        to implement a ``covers`` method. It is currently available
+        for circle, ellipse, rectangle, and polygon regions; for other
+        regions a `NotImplementedError` is raised.
+        """
+        pixel_region = self.to_pixel(wcs)
+        pixcoord = PixCoord.from_sky(skycoord, wcs)
+        return pixel_region.covers(pixcoord)
+
     @abc.abstractmethod
     def to_pixel(self, wcs):
         """
@@ -918,14 +995,44 @@ class SphericalSkyRegion(Region):
     def contains(self, coord):
         """
         Check whether a sky coordinate falls inside the spherical sky
-        region.
+        region, excluding the boundary.
+
+        This method considers points on the boundary as outside the
+        region, consistent with Shapely's ``contains`` function and
+        DE-9IM semantics.
 
         Parameters
         ----------
         coord : `~astropy.coordinates.SkyCoord`
             The position or positions to check.
+
+        See Also
+        --------
+        covers : Check if points are inside or on the boundary.
         """
         raise NotImplementedError
+
+    def covers(self, coord):
+        """
+        Check whether a sky coordinate falls inside the spherical sky
+        region, including the boundary.
+
+        This method considers points on the boundary as inside the
+        region, consistent with Shapely's ``covers`` function and DE-9IM
+        semantics.
+
+        Parameters
+        ----------
+        coord : `~astropy.coordinates.SkyCoord`
+            The position or positions to check.
+
+        See Also
+        --------
+        contains : Check if points are strictly inside (excludes boundary).
+        """
+        msg = ("The 'covers' method is not supported for "
+               f'{self.__class__.__name__}.')
+        raise NotImplementedError(msg)
 
     @abc.abstractmethod
     def transform_to(self, frame, merge_attributes=True):
