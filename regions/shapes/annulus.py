@@ -8,6 +8,7 @@ import math
 import operator
 
 import astropy.units as u
+import numpy as np
 
 from regions._utils.wcs_helpers import (pixel_shape_to_sky_svd,
                                         pixel_to_sky_mean_scale,
@@ -56,6 +57,11 @@ class AnnulusPixelRegion(PixelRegion, abc.ABC):
 
     def contains(self, pixcoord):
         return self._compound_region.contains(pixcoord)
+
+    def covers(self, pixcoord):
+        outer_cov = self._outer_region.covers(pixcoord)
+        inner_con = self._inner_region.contains(pixcoord)
+        return np.logical_and(outer_cov, np.logical_not(inner_con))
 
     def as_artist(self, origin=(0, 0), **kwargs):
         return self._compound_region.as_artist(origin, **kwargs)
@@ -123,6 +129,9 @@ class AnnulusSphericalSkyRegion(SphericalSkyRegion, abc.ABC):
 
     def contains(self, coord):
         return self._compound_region.contains(coord)
+
+    def covers(self, coord):
+        return self._compound_region.covers(coord)
 
 
 class CircleAnnulusPixelRegion(AnnulusPixelRegion):

@@ -70,6 +70,12 @@ class LinePixelRegion(PixelRegion):
         return 0
 
     def contains(self, pixcoord):
+        # Lines never contain anything
+        return (False if pixcoord.isscalar
+                else np.zeros(pixcoord.x.shape, dtype=bool))
+
+    def covers(self, pixcoord):
+        # Lines never cover anything
         return (False if pixcoord.isscalar
                 else np.zeros(pixcoord.x.shape, dtype=bool))
 
@@ -178,7 +184,12 @@ class LineSkyRegion(SkyRegion):
         self.visual = visual or RegionVisual()
 
     def contains(self, skycoord, wcs):  # pylint: disable=unused-argument
-        # lines never contain anything
+        # Lines never contain anything
+        return (False if skycoord.isscalar
+                else np.zeros(skycoord.shape, dtype=bool))
+
+    def covers(self, skycoord, wcs):  # pylint: disable=unused-argument
+        # Lines never cover anything
         return (False if skycoord.isscalar
                 else np.zeros(skycoord.shape, dtype=bool))
 

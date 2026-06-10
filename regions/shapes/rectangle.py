@@ -94,15 +94,27 @@ class RectanglePixelRegion(PixelRegion):
     def area(self):
         return self.width * self.height
 
-    def contains(self, pixcoord):
+    def _containment(self, pixcoord, covers=False):
+        pixcoord = PixCoord._validate(pixcoord, name='pixcoord')
         cos_angle = np.cos(self.angle)
         sin_angle = np.sin(self.angle)
         dx = pixcoord.x - self.center.x
         dy = pixcoord.y - self.center.y
         dx_rot = cos_angle * dx + sin_angle * dy
         dy_rot = sin_angle * dx - cos_angle * dy
+
+        if covers:
+            return ((np.abs(dx_rot) <= self.width * 0.5)
+                    & (np.abs(dy_rot) <= self.height * 0.5))
+
         return ((np.abs(dx_rot) < self.width * 0.5)
                 & (np.abs(dy_rot) < self.height * 0.5))
+
+    def contains(self, pixcoord):
+        return self._containment(pixcoord, covers=False)
+
+    def covers(self, pixcoord):
+        return self._containment(pixcoord, covers=True)
 
     def to_sky(self, wcs):
         # The photutils SVD helpers measure the sky rotation as a

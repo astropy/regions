@@ -75,6 +75,12 @@ class PointPixelRegion(PixelRegion):
         return 0.0
 
     def contains(self, pixcoord):
+        # Points never contain anything
+        return (False if pixcoord.isscalar
+                else np.zeros(pixcoord.x.shape, dtype=bool))
+
+    def covers(self, pixcoord):
+        # Points never cover anything
         return (False if pixcoord.isscalar
                 else np.zeros(pixcoord.x.shape, dtype=bool))
 
@@ -175,7 +181,12 @@ class PointSkyRegion(SkyRegion):
         self.visual = visual or RegionVisual()
 
     def contains(self, skycoord, wcs):  # pylint: disable=unused-argument
-        # points never include anything
+        # Points never contain anything
+        return (False if skycoord.isscalar
+                else np.zeros(skycoord.shape, dtype=bool))
+
+    def covers(self, skycoord, wcs):  # pylint: disable=unused-argument
+        # Points never cover anything
         return (False if skycoord.isscalar
                 else np.zeros(skycoord.shape, dtype=bool))
 

@@ -62,6 +62,10 @@ class CompoundPixelRegion(PixelRegion):
         return self.operator(self.region1.contains(pixcoord),
                              self.region2.contains(pixcoord))
 
+    def covers(self, pixcoord):
+        return self.operator(self.region1.covers(pixcoord),
+                             self.region2.covers(pixcoord))
+
     def to_mask(self, mode='center', subpixels=1):
         if mode != 'center':
             raise NotImplementedError
@@ -260,6 +264,10 @@ class CompoundSkyRegion(SkyRegion):
         return self.operator(self.region1.contains(skycoord, wcs),
                              self.region2.contains(skycoord, wcs))
 
+    def covers(self, skycoord, wcs):
+        return self.operator(self.region1.covers(skycoord, wcs),
+                             self.region2.covers(skycoord, wcs))
+
     def to_pixel(self, wcs):
         pixreg1 = self.region1.to_pixel(wcs=wcs)
         pixreg2 = self.region2.to_pixel(wcs=wcs)
@@ -440,6 +448,11 @@ class CompoundSphericalSkyRegion(SphericalSkyRegion):
     def contains(self, coord):
         return self.operator(
             self.region1.contains(coord), self.region2.contains(coord),
+        )
+
+    def covers(self, coord):
+        return self.operator(
+            self.region1.covers(coord), self.region2.covers(coord),
         )
 
     def transform_to(self, frame, merge_attributes=True):

@@ -83,9 +83,23 @@ class CirclePixelRegion(PixelRegion):
     def area(self):
         return math.pi * self.radius ** 2
 
-    def contains(self, pixcoord):
+    def _containment(self, pixcoord, covers=False):
+        """
+        Helper method for circle containment checks.
+        """
         pixcoord = PixCoord._validate(pixcoord, name='pixcoord')
-        return self.center.separation(pixcoord) < self.radius
+        sep = self.center.separation(pixcoord)
+
+        if covers:
+            return sep <= self.radius
+
+        return sep < self.radius
+
+    def contains(self, pixcoord):
+        return self._containment(pixcoord, covers=False)
+
+    def covers(self, pixcoord):
+        return self._containment(pixcoord, covers=True)
 
     def to_sky(self, wcs, *, as_ellipse=False):
         """
@@ -405,8 +419,17 @@ class CircleSphericalSkyRegion(SphericalSkyRegion):
         self.meta = meta or RegionMeta()
         self.visual = visual or RegionVisual()
 
+    def _containment(self, coord, covers=False):
+        sep = self.center.separation(coord)
+        if covers:
+            return sep <= self.radius
+        return sep < self.radius
+
     def contains(self, coord):
-        return self.center.separation(coord) < self.radius
+        return self._containment(coord, covers=False)
+
+    def covers(self, coord):
+        return self._containment(coord, covers=True)
 
     @property
     def bounding_circle(self):

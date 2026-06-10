@@ -96,15 +96,25 @@ class EllipsePixelRegion(PixelRegion):
     def area(self):
         return math.pi / 4 * self.width * self.height
 
-    def contains(self, pixcoord):
+    def _containment(self, pixcoord, covers=False):
         pixcoord = PixCoord._validate(pixcoord, name='pixcoord')
         cos_angle = np.cos(self.angle)
         sin_angle = np.sin(self.angle)
         dx = pixcoord.x - self.center.x
         dy = pixcoord.y - self.center.y
-        return ((2 * (cos_angle * dx + sin_angle * dy) / self.width) ** 2
-                + (2 * (sin_angle * dx - cos_angle * dy)
-                   / self.height) ** 2 <= 1.)
+        value = ((2 * (cos_angle * dx + sin_angle * dy) / self.width) ** 2
+                 + (2 * (sin_angle * dx - cos_angle * dy) / self.height) ** 2)
+
+        if covers:
+            return value <= 1.0
+
+        return value < 1.0
+
+    def contains(self, pixcoord):
+        return self._containment(pixcoord, covers=False)
+
+    def covers(self, pixcoord):
+        return self._containment(pixcoord, covers=True)
 
     def to_sky(self, wcs):
         # The photutils helpers measure the sky rotation as a position

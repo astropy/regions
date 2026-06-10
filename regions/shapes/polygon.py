@@ -10,7 +10,8 @@ from astropy.coordinates import SkyCoord
 from astropy.stats import circmean
 
 from regions._geometry import polygonal_overlap_grid
-from regions._geometry.pnpoly import points_in_polygon
+from regions._geometry.pnpoly import (points_in_polygon,
+                                      points_in_polygon_covers)
 from regions._utils.spherical_helpers import (
     cross_product_skycoord2skycoord, cross_product_sum_skycoord2skycoord,
     discretize_all_edge_boundaries, get_edge_raw_lonlat_bounds_circ_edges)
@@ -99,16 +100,28 @@ class PolygonPixelRegion(PixelRegion):
         area_last = x_[-1] * y_[0] - y_[-1] * x_[0]
         return 0.5 * np.abs(area_main + area_last)
 
-    def contains(self, pixcoord):
-        pixcoord = PixCoord._validate(pixcoord, 'pixcoord')
+    def _containment(self, pixcoord, covers=False):
+        pixcoord = PixCoord._validate(pixcoord, name='pixcoord')
         x = np.atleast_1d(np.asarray(pixcoord.x, dtype=float))
         y = np.atleast_1d(np.asarray(pixcoord.y, dtype=float))
         vx = np.asarray(self.vertices.x, dtype=float)
         vy = np.asarray(self.vertices.y, dtype=float)
 
         shape = x.shape
-        mask = points_in_polygon(x.flatten(), y.flatten(), vx, vy).astype(bool)
+        if covers:
+            mask = points_in_polygon_covers(x.flatten(), y.flatten(),
+                                            vx, vy).astype(bool)
+        else:
+            mask = points_in_polygon(x.flatten(), y.flatten(),
+                                     vx, vy).astype(bool)
+
         return mask.reshape(shape)
+
+    def contains(self, pixcoord):
+        return self._containment(pixcoord, covers=False)
+
+    def covers(self, pixcoord):
+        return self._containment(pixcoord, covers=True)
 
     def to_sky(self, wcs):
         vertices_sky = wcs.pixel_to_world(self.vertices.x, self.vertices.y)
