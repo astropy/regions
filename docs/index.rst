@@ -6,13 +6,13 @@
     <div style="min-height:0.1em;"></div>
 
 .. image:: _static/regions_logo_light_path.svg
-    :class: only-light
+    :class: only-light index-logo
     :width: 55%
     :align: center
     :alt: Astropy Regions logo
 
 .. image:: _static/regions_logo_dark_path.svg
-    :class: only-dark
+    :class: only-dark index-logo
     :width: 55%
     :align: center
     :alt: Astropy Regions logo
