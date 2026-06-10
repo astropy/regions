@@ -94,3 +94,46 @@ point(s) lie inside or outside the region::
     >>> skycoord = SkyCoord([50, 50], [10, 60], unit='deg')
     >>> sph_sky_region.contains(skycoord)
     array([False, True])
+
+
+Boundary Behavior: ``contains`` versus ``covers``
+-------------------------------------------------
+
+The ``contains`` method excludes the region boundary: a point that lies
+exactly on an edge or vertex is considered to be *outside* the region.
+This is consistent with `Shapely's
+<https://shapely.readthedocs.io/>`_ ``contains`` predicate and the
+`DE-9IM <https://en.wikipedia.org/wiki/DE-9IM>`_ semantics used by most
+GIS tools.
+
+If you instead want boundary points to be treated as *inside* the
+region, use the ``covers`` method. It is available on pixel regions
+(`regions.PixelRegion.covers`), planar sky regions
+(`regions.SkyRegion.covers`), and spherical sky regions
+(`regions.SphericalSkyRegion.covers`), and takes the same arguments as
+the corresponding ``contains`` method.
+
+For example, the point ``(84, 43)`` lies exactly on the boundary of our
+circular pixel region (centered at ``(42, 43)`` with a radius of
+``42``), so it is excluded by ``contains`` but included by ``covers``::
+
+    >>> boundary_point = PixCoord(84, 43)
+    >>> pixel_region.contains(boundary_point)
+    np.False_
+    >>> pixel_region.covers(boundary_point)
+    np.True_
+
+For points strictly inside or strictly outside the region, the two
+methods return identical results::
+
+    >>> pixel_region.contains(PixCoord(42, 43))
+    np.True_
+    >>> pixel_region.covers(PixCoord(42, 43))
+    np.True_
+
+.. note::
+
+    The ``covers`` method is currently implemented for circle, ellipse,
+    rectangle, polygon, and annulus regions (and their sky and
+    spherical-sky equivalents); calling it on a region type that does
+    not support it raises a `NotImplementedError`.
