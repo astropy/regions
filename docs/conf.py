@@ -107,6 +107,10 @@ dev = 'dev' in release
 html_theme_options = {
     'navigation_with_keys': False,
     'use_edit_page_button': False,
+    'logo': {
+        'image_light': 'regions_logo_light_path.svg',
+        'image_dark': 'regions_logo_dark_path.svg',
+    },
     'icon_links': [
         {'name': 'GitHub',
          'url': 'https://github.com/astropy/regions',

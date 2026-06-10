@@ -5,6 +5,19 @@
 
     <div style="min-height:0.1em;"></div>
 
+.. image:: _static/regions_logo_light_path.svg
+    :class: only-light
+    :width: 55%
+    :align: center
+    :alt: Astropy Regions logo
+
+.. image:: _static/regions_logo_dark_path.svg
+    :class: only-dark
+    :width: 55%
+    :align: center
+    :alt: Astropy Regions logo
+
+
 ***************
 Astropy Regions
 ***************
