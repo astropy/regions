@@ -59,6 +59,19 @@ New Features
   planar <-> spherical transformation (where well defined) may be added
   at a future date. [#618]
 
+- Added a ``covers`` method to all pixel region classes
+  (``CirclePixelRegion``, ``EllipsePixelRegion``,
+  ``RectanglePixelRegion``, ``PolygonPixelRegion``,
+  ``LinePixelRegion``, ``PointPixelRegion``, annulus pixel regions, and
+  ``CompoundPixelRegion``) and to the corresponding sky region classes
+  (``SkyRegion.covers``, ``SphericalSkyRegion.covers``, and all
+  spherical sky region subclasses including ``LuneSphericalSkyRegion``,
+  ``RangeSphericalSkyRegion``, ``WholeSphericalSkyRegion``,
+  ``PolygonSphericalSkyRegion``, and
+  ``CompoundSphericalSkyRegion``). This method checks whether points
+  fall inside or on the boundary of a region, consistent with Shapely's
+  ``covers`` function and DE-9IM semantics. [#680]
+
 Bug Fixes
 ---------
 
@@ -93,6 +106,18 @@ API Changes
 - The ``LinePixelRegion`` ``as_artist`` method now returns a
   ``matplotlib.lines.Line2D`` object instead of a
   ``matplotlib.patches.Arrow`` object. [#668]
+
+- The ``contains`` method now consistently excludes the region boundary
+  for all pixel regions, matching Shapely's ``contains`` function and
+  DE-9IM semantics. Previously, ``EllipsePixelRegion.contains`` included
+  the boundary and ``PolygonPixelRegion.contains`` treated boundary
+  points inconsistently. Use the new ``covers`` method to include the
+  boundary. [#680]
+
+- The ``contains`` methods of all regions now ignore the ``'include'``
+  metadata attribute (which was previously used to invert evaluation
+  results), making containment and covering behavior depend solely on the
+  geometric shape of the region. [#680]
 
 
 0.11 (2025-11-05)
