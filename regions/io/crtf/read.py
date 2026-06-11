@@ -28,7 +28,7 @@ regex_comment = re.compile(r'^#.*$')
 regex_global = re.compile(r'^global\s+(?P<parameters>.*)?')
 
 # Coordinate Format : '[x, y]'
-regex_coordinate = re.compile(r'\[([\w.+-:]*?)\s*[,]\s*([\w.+-:]*?)\]')
+regex_coordinate = re.compile(r'\[([\w.+\-:]*?)\s*[,]\s*([\w.+\-:]*?)\]')
 
 # Single length format, e.g., helps extract the radius of a circle
 regex_length = re.compile(r'(?:\[[^=\]]*\])+[,]\s*([^\[]*)\]')
