@@ -130,20 +130,16 @@ and spherical sky regions, with the same circle centers and radii.
     import matplotlib.pyplot as plt
     import numpy as np
     from astropy.coordinates import Angle, SkyCoord
-    from regions import CircleSkyRegion, make_example_dataset
+    from astropy.wcs import WCS
+    from regions import CircleSkyRegion
 
-    # Load example dataset to get skymap
-    config = {'crval': (0, 0),
-              'crpix': (180, 90),
-              'cdelt': (-1, 1),
-              'shape': (180, 360),
-              }
-
-    dataset = make_example_dataset(data='simulated', config=config)
-    wcs = dataset.wcs
-
-    # Remove sources
-    dataset.image.data = np.zeros_like(dataset.image.data)
+    # Create a full-sky Aitoff WCS
+    wcs = WCS(naxis=2)
+    wcs.wcs.crpix = (180, 90)
+    wcs.wcs.cdelt = (-1, 1)
+    wcs.wcs.crval = (0, 0)
+    wcs.wcs.ctype = ('GLON-AIT', 'GLAT-AIT')
+    shape = (180, 360)
 
     # Define 2 sky circles
     circle1 = CircleSkyRegion(
@@ -188,8 +184,8 @@ and spherical sky regions, with the same circle centers and radii.
 
     ax.legend(loc='lower right')
 
-    ax.set_xlim(-0.5, dataset.config['shape'][1] - 0.5)
-    ax.set_ylim(-0.5, dataset.config['shape'][0] - 0.5)
+    ax.set_xlim(-0.5, shape[1] - 0.5)
+    ax.set_ylim(-0.5, shape[0] - 0.5)
     ax.set_title('Planar SkyRegions')
 
 
@@ -200,20 +196,16 @@ and spherical sky regions, with the same circle centers and radii.
     import matplotlib.pyplot as plt
     import numpy as np
     from astropy.coordinates import Angle, SkyCoord
-    from regions import CircleSphericalSkyRegion, make_example_dataset
+    from astropy.wcs import WCS
+    from regions import CircleSphericalSkyRegion
 
-    # Load example dataset to get skymap
-    config = {'crval': (0, 0),
-              'crpix': (180, 90),
-              'cdelt': (-1, 1),
-              'shape': (180, 360),
-              }
-
-    dataset = make_example_dataset(data='simulated', config=config)
-    wcs = dataset.wcs
-
-    # Remove sources
-    dataset.image.data = np.zeros_like(dataset.image.data)
+    # Create a full-sky Aitoff WCS
+    wcs = WCS(naxis=2)
+    wcs.wcs.crpix = (180, 90)
+    wcs.wcs.cdelt = (-1, 1)
+    wcs.wcs.crval = (0, 0)
+    wcs.wcs.ctype = ('GLON-AIT', 'GLAT-AIT')
+    shape = (180, 360)
 
     # Define 2 spherical sky circles
     sph_circle1 = CircleSphericalSkyRegion(
@@ -262,6 +254,6 @@ and spherical sky regions, with the same circle centers and radii.
 
     ax.legend(loc='lower right')
 
-    ax.set_xlim(-0.5, dataset.config['shape'][1] - 0.5)
-    ax.set_ylim(-0.5, dataset.config['shape'][0] - 0.5)
+    ax.set_xlim(-0.5, shape[1] - 0.5)
+    ax.set_ylim(-0.5, shape[0] - 0.5)
     ax.set_title('Spherical SkyRegions')

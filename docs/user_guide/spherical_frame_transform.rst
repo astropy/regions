@@ -75,21 +75,29 @@ projections for the Galactic and ICRS coordinate reference frames
 
     import warnings
 
+    warnings.filterwarnings('ignore', message='.*unrecognized position.*')
+
     import matplotlib.pyplot as plt
     from astropy import units as u
     from astropy.coordinates import SkyCoord
     from astropy.visualization.wcsaxes.frame import EllipticalFrame
+    from astropy.wcs import WCS
 
     from regions import (CircleSphericalSkyRegion,
-                         RangeSphericalSkyRegion,
-                         make_example_dataset)
+                         RangeSphericalSkyRegion)
 
-    dataset = make_example_dataset(data='simulated')
-    wcs = dataset.wcs
+    # Create full-sky Aitoff WCS objects for Galactic and ICRS frames
+    wcs = WCS(naxis=2)
+    wcs.wcs.crpix = (180, 90)
+    wcs.wcs.cdelt = (-1, 1)
+    wcs.wcs.crval = (0, 0)
+    wcs.wcs.ctype = ('GLON-AIT', 'GLAT-AIT')
 
-    config = {'ctype': ('RA---AIT', 'DEC--AIT')}
-    dataset_icrs = make_example_dataset(data='simulated', config=config)
-    wcs_icrs = dataset_icrs.wcs
+    wcs_icrs = WCS(naxis=2)
+    wcs_icrs.wcs.crpix = (180, 90)
+    wcs_icrs.wcs.cdelt = (-1, 1)
+    wcs_icrs.wcs.crval = (0, 0)
+    wcs_icrs.wcs.ctype = ('RA---AIT', 'DEC--AIT')
 
     sph_circ = CircleSphericalSkyRegion(
         SkyCoord(100, -30, unit=u.deg, frame='galactic'),
