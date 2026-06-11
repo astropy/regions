@@ -515,8 +515,6 @@ Other
 - Change CRTF writer to match CASA implementation [#226]
 - Simplify annulus regions [#279]
 
-See also: `regions v0.4 merged pull requests list on Github <https://github.com/astropy/regions/pulls?q=is%3Apr+milestone%3A0.4+>`__.
-
 
 0.3 (2018-09-09)
 ================
@@ -567,20 +565,18 @@ New Features
 
 - Support for explicit formatting directives in ``DS9``. [#204]
 
-See also: `regions v0.3 merged pull requests list on Github <https://github.com/astropy/regions/pulls?q=is%3Apr+milestone%3A0.3+>`__.
-
 
 0.2 (2017-02-16)
 ================
 
-Changelog wasn't filled.
+The changelog was not populated.
 
-See also: `regions v0.2 merged pull requests list on Github <https://github.com/astropy/regions/pulls?q=is%3Apr+milestone%3A0.2+>`__.
+`Regions v0.2 merged pull requests <https://github.com/astropy/regions/pulls?q=is%3Apr+milestone%3A0.2+>`__.
 
 
 0.1 (2016-07-26)
 ================
 
-Changelog wasn't filled.
+The changelog was not populated.
 
-See also: `regions v0.1 merged pull requests list on Github <https://github.com/astropy/regions/pulls?q=is%3Apr+milestone%3A0.1+>`__.
+`Regions v0.1 merged pull requests <https://github.com/astropy/regions/pulls?q=is%3Apr+milestone%3A0.1+>`__.
