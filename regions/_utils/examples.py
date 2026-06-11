@@ -42,22 +42,6 @@ def make_example_dataset(data='simulated', config=None):
     -------
     dataset : ``ExampleDataset``
         An example dataset object.
-
-    Examples
-    --------
-    Make an example dataset:
-
-    >>> from regions import make_example_dataset
-    >>> config = dict(crpix=(18, 9), cdelt=(-10, 10), shape=(18, 36))
-    >>> dataset = make_example_dataset(data='simulated', config=config)
-
-    Access properties of the ``dataset`` object:
-
-    >>> dataset.source_table   # doctest: +IGNORE_OUTPUT
-    >>> dataset.event_table   # doctest: +IGNORE_OUTPUT
-    >>> dataset.wcs   # doctest: +IGNORE_OUTPUT
-    >>> dataset.image   # doctest: +IGNORE_OUTPUT
-    >>> dataset.hdu_list   # doctest: +IGNORE_OUTPUT
     """
     return _make_example_dataset(data=data, config=config)
 
@@ -93,9 +77,9 @@ def _make_example_dataset(data='simulated', config=None):
     --------
     Make an example dataset:
 
-    >>> from regions import make_example_dataset
+    >>> from regions._utils.examples import _make_example_dataset
     >>> config = dict(crpix=(18, 9), cdelt=(-10, 10), shape=(18, 36))
-    >>> dataset = make_example_dataset(data='simulated', config=config)
+    >>> dataset = _make_example_dataset(data='simulated', config=config)
 
     Access properties of the ``dataset`` object:
 
