@@ -10,3 +10,4 @@ understanding of the key concepts presented in the :ref:`user_guide`.
 
 .. automodapi:: regions
    :no-heading:
+   :no-main-docstr:

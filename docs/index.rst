@@ -24,7 +24,8 @@ Astropy Regions
 
 | **Version**: |release|
 | **Date**: |today|
-| **Useful links**: :doc:`getting_started/install` | :doc:`release_notes/index`
+| **Useful links**: :doc:`getting_started/install`
+    | :ref:`Release Notes <changelog>`
 
 **regions** is an in-development `coordinated package
 <https://www.astropy.org/affiliated/index.html#coordinated-packages>`_
