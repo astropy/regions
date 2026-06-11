@@ -1,19 +1,68 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 
+__all__ = ['make_example_dataset']
+
 import numpy as np
 from astropy.coordinates import SkyCoord
 from astropy.io import fits
 from astropy.table import Table
 from astropy.table import vstack as table_vstack
 from astropy.utils import lazyproperty
+from astropy.utils.decorators import deprecated
 from astropy.wcs import WCS
 
 from regions.core.pixcoord import PixCoord
 
-__all__ = ['make_example_dataset']
 
-
+@deprecated('0.12', message=('The make_example_dataset function is deprecated '
+                             'and will be removed in a future version.'))
 def make_example_dataset(data='simulated', config=None):
+    """
+    Make an example dataset.
+
+    This is a factory function for ``ExampleDataset`` objects.
+
+    The following config options are available (default values shown):
+
+    * ``crval = 0, 0``
+    * ``crpix = 180, 90``
+    * ``cdelt = -1, 1``
+    * ``shape = 180, 360``
+    * ``ctype = 'GLON-AIT', 'GLAT-AIT'``
+
+    Parameters
+    ----------
+    data : {'simulated', 'fermi'}
+        The dataset to use.
+
+    config : dict or None
+        Configuration options.
+
+    Returns
+    -------
+    dataset : ``ExampleDataset``
+        An example dataset object.
+
+    Examples
+    --------
+    Make an example dataset:
+
+    >>> from regions import make_example_dataset
+    >>> config = dict(crpix=(18, 9), cdelt=(-10, 10), shape=(18, 36))
+    >>> dataset = make_example_dataset(data='simulated', config=config)
+
+    Access properties of the ``dataset`` object:
+
+    >>> dataset.source_table   # doctest: +IGNORE_OUTPUT
+    >>> dataset.event_table   # doctest: +IGNORE_OUTPUT
+    >>> dataset.wcs   # doctest: +IGNORE_OUTPUT
+    >>> dataset.image   # doctest: +IGNORE_OUTPUT
+    >>> dataset.hdu_list   # doctest: +IGNORE_OUTPUT
+    """
+    return _make_example_dataset(data=data, config=config)
+
+
+def _make_example_dataset(data='simulated', config=None):
     """
     Make an example dataset.
 
