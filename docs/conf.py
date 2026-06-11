@@ -107,6 +107,10 @@ dev = 'dev' in release
 html_theme_options = {
     'navigation_with_keys': False,
     'use_edit_page_button': False,
+    'logo': {
+        'image_light': 'regions_logo_light_path.svg',
+        'image_dark': 'regions_logo_dark_path.svg',
+    },
     'icon_links': [
         {'name': 'GitHub',
          'url': 'https://github.com/astropy/regions',
@@ -118,7 +122,7 @@ html_theme_options = {
 
 html_title = f'{project} {release}'
 html_show_sourcelink = False
-# html_favicon = os.path.join('_static', 'regions_logo.ico')
+html_favicon = os.path.join('_static', 'regions_logo.ico')
 html_static_path = ['_static']
 html_css_files = ['custom.css']  # path relative to _static
 
