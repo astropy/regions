@@ -1,8 +1,11 @@
 
 .. testsetup::
-    >>> from regions import make_example_dataset
-    >>> dataset = make_example_dataset(data='simulated')
-    >>> wcs = dataset.wcs
+    >>> from astropy.wcs import WCS
+    >>> wcs = WCS(naxis=2)
+    >>> wcs.wcs.crpix = (50, 50)
+    >>> wcs.wcs.crval = (50, 10)
+    >>> wcs.wcs.cdelt = (-0.1 / 3600, 0.1 / 3600)
+    >>> wcs.wcs.ctype = ('RA---TAN', 'DEC--TAN')
 
 
 .. _shapes:
@@ -316,8 +319,8 @@ To convert it to a pixel circle region (i.e.,
     >>> pix_reg = sky_reg.to_pixel(wcs)
     >>> print(pix_reg)  # doctest: +FLOAT_CMP
     Region: CirclePixelRegion
-    center: PixCoord(x=55.3521, y=40.0958)
-    radius: 0.0060
+    center: PixCoord(x=49.0, y=49.0)
+    radius: 300.0
 
 Also to convert a :class:`~regions.PixelRegion`
 to a :class:`~regions.SkyRegion`, call the
@@ -328,9 +331,9 @@ to a :class:`~regions.SkyRegion`, call the
     >>> sky_reg = pix_reg.to_sky(wcs)
     >>> print(sky_reg)  # doctest: +FLOAT_CMP
     Region: CircleSkyRegion
-    center: <SkyCoord (Galactic): (l, b) in deg
-        (172.17231545, -38.27972337)>
-    radius: 29.999999999999996 arcsec
+    center: <SkyCoord (ICRS): (ra, dec) in deg
+        (50., 10.)>
+    radius: 30.0 arcsec
 
 The conversion automatically selects the best method based on the WCS.
 For WCS with distortions (e.g., SIP) or non-astropy WCS objects (e.g.,
@@ -398,10 +401,10 @@ to the `~regions.SphericalSkyRegion.discretize_boundary()` method.
     ...                              n_points=10)
     >>> print(sky_reg)  # doctest: +FLOAT_CMP
     Region: PolygonSkyRegion
-    vertices: <SkyCoord (Galactic): (l, b) in deg
-        [(172.161888  , -38.27816116), (172.16270941, -38.28327092),
-        (172.16720048, -38.2870257 ), (172.1736458 , -38.28799101),
-        (172.17958283, -38.28579805)], ...]>
+    vertices: <SkyCoord (ICRS): (ra, dec) in deg
+        [(49.99502612, 10.00674177), (49.9919522 , 10.00257504),
+         (49.99195233,  9.99742476), (49.99502633,  9.99325815),
+         (50.        ,  9.99166667)], ...]>
 
 
 Similarly, spherical sky regions can be converted to pixel regions
@@ -415,16 +418,16 @@ respectively).
     ...                                include_boundary_distortions=False)
     >>> print(pix_reg)  # doctest: +FLOAT_CMP
     Region: CirclePixelRegion
-    center: PixCoord(x=55.3521, y=40.0958)
-    radius: 0.006
+    center: PixCoord(x=49.0, y=49.0)
+    radius: 300.0
 
     >>> pix_reg2 = sph_sky_reg.to_pixel(wcs=wcs,
     ...                                 include_boundary_distortions=True,
     ...                                 n_points=10)
     >>> print(pix_reg2)  # doctest: +FLOAT_CMP
     Region: PolygonPixelRegion
-    vertices: PixCoord(x=[55.3544 55.3625 55.3666 55.3651 55.3587 ...],
-    y=[40.0992 40.0935 40.0886 40.0865 40.088 ...])
+    vertices: PixCoord(x=[225.3356 334.317 334.317 225.3356 49.0 ...],
+    y=[291.7051 141.7051 -43.7051 -193.7051 -251.0 ...])
 
 
 Planar regions can also be transformed to spherical regions, with the

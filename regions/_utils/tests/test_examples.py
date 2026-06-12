@@ -3,12 +3,12 @@
 import numpy as np
 from numpy.testing import assert_allclose
 
-from regions._utils.examples import make_example_dataset
+from regions._utils.examples import _make_example_dataset
 
 
 class TestExampleSimulatedDataset:
     def setup_method(self):
-        self.dataset = make_example_dataset(data='simulated')
+        self.dataset = _make_example_dataset(data='simulated')
 
     def test_source_table(self):
         source_table = self.dataset.source_table

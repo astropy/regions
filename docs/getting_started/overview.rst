@@ -133,9 +133,12 @@ system <https://docs.astropy.org/en/stable/wcs/wcsapi.html>`_ object
 
 Let's start by creating a WCS object::
 
-    >>> from regions import make_example_dataset
-    >>> dataset = make_example_dataset(data='simulated')
-    >>> wcs = dataset.wcs
+    >>> from astropy.wcs import WCS
+    >>> wcs = WCS(naxis=2)
+    >>> wcs.wcs.crpix = (180, 90)
+    >>> wcs.wcs.cdelt = (-1, 1)
+    >>> wcs.wcs.crval = (0, 0)
+    >>> wcs.wcs.ctype = ('GLON-AIT', 'GLAT-AIT')
 
 Now let's use this WCS to convert between sky and pixel coordinates::
 
@@ -298,22 +301,16 @@ spherical circle falling outside of the planar circle and vice versa.
     import matplotlib.pyplot as plt
     import numpy as np
     from astropy.coordinates import Angle, SkyCoord
-    from regions import (CircleSkyRegion, CircleSphericalSkyRegion,
-                         PixCoord, make_example_dataset)
+    from astropy.wcs import WCS
+    from regions import CircleSkyRegion, CircleSphericalSkyRegion, PixCoord
 
-    # Load example dataset to get skymap
-    config = {
-              'crval': (0, 0),
-              'crpix': (180, 90),
-              'cdelt': (-1, 1),
-              'shape': (180, 360),
-              }
-
-    dataset = make_example_dataset(data='simulated', config=config)
-    wcs = dataset.wcs
-
-    # Remove sources
-    dataset.image.data = np.zeros_like(dataset.image.data)
+    # Create a full-sky Aitoff WCS
+    wcs = WCS(naxis=2)
+    wcs.wcs.crpix = (180, 90)
+    wcs.wcs.cdelt = (-1, 1)
+    wcs.wcs.crval = (0, 0)
+    wcs.wcs.ctype = ('GLON-AIT', 'GLAT-AIT')
+    shape = (180, 360)
 
     # Define skycoords, pixcoords grids
     lon = np.arange(-180, 181, 10)
@@ -371,7 +368,7 @@ spherical circle falling outside of the planar circle and vice versa.
 
     ax.legend(loc='lower right')
 
-    ax.set_xlim(-0.5, dataset.config['shape'][1] - 0.5)
-    ax.set_ylim(-0.5, dataset.config['shape'][0] - 0.5)
+    ax.set_xlim(-0.5, shape[1] - 0.5)
+    ax.set_ylim(-0.5, shape[0] - 0.5)
     ax.set_title('Spherical vs. Planar circle: '
                  'Center=(50°, 45°), radius=30°')

@@ -92,8 +92,8 @@ have an ``as_artist()`` or ``plot()`` method. To plot a
 it to a pixel region (using a WCS object). Boundary distortions
 can also be included in this conversion (by setting the
 ``include_boundary_distortions`` keyword), to capture the effects of
-the WCS projection from spherical to a planar geometry. (See the second
-example in :ref:`examples`.)
+the WCS projection from spherical to a planar geometry. See the second
+example in :ref:`examples`.
 
 It is also possible to use the coordinates of a discretized
 `~regions.SphericalSkyRegion` to show the region's boundary in a figure.
@@ -103,10 +103,14 @@ It is also possible to use the coordinates of a discretized
 
     import matplotlib.pyplot as plt
     from astropy.coordinates import Angle, SkyCoord
-    from regions import CircleSphericalSkyRegion, make_example_dataset
+    from astropy.wcs import WCS
+    from regions import CircleSphericalSkyRegion
 
-    dataset = make_example_dataset(data='simulated')
-    wcs = dataset.wcs
+    wcs = WCS(naxis=2)
+    wcs.wcs.crpix = (180, 90)
+    wcs.wcs.cdelt = (-1, 1)
+    wcs.wcs.crval = (0, 0)
+    wcs.wcs.ctype = ('GLON-AIT', 'GLAT-AIT')
 
     sph_sky_center = SkyCoord(42, 30, unit='deg', frame='galactic')
     sph_sky_radius = Angle(12, 'deg')

@@ -11,7 +11,7 @@ import pytest
 from astropy.coordinates import Latitude, Longitude, SkyCoord
 from numpy.testing import assert_allclose
 
-from regions._utils.examples import make_example_dataset
+from regions._utils.examples import _make_example_dataset
 from regions.core import (CompoundPixelRegion, CompoundSkyRegion,
                           CompoundSphericalSkyRegion, PixCoord,
                           RegionBoundingBox)
@@ -23,7 +23,7 @@ from regions.tests.helpers import make_simple_wcs
 @pytest.fixture(scope='session', name='wcs')
 def fixture_wcs():
     config = dict(crpix=(18, 9), cdelt=(-10, 10), shape=(18, 36))
-    dataset = make_example_dataset(config=config)
+    dataset = _make_example_dataset(config=config)
     return dataset.wcs
 
 

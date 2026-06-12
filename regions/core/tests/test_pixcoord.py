@@ -8,14 +8,14 @@ import numpy as np
 import pytest
 from numpy.testing import assert_allclose, assert_equal
 
-from regions._utils.examples import make_example_dataset
+from regions._utils.examples import _make_example_dataset
 from regions.core.pixcoord import PixCoord
 
 
 @pytest.fixture(scope='session', name='wcs')
 def fixture_wcs():
     config = dict(crpix=(18, 9), cdelt=(-10, 10), shape=(18, 36))
-    dataset = make_example_dataset(config=config)
+    dataset = _make_example_dataset(config=config)
     return dataset.wcs
 
 

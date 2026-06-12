@@ -119,6 +119,9 @@ API Changes
   results), making containment and covering behavior depend solely on the
   geometric shape of the region. [#680]
 
+- The ``make_example_dataset`` function is deprecated and will be
+  removed in a future release. [#682]
+
 
 0.11 (2025-11-05)
 =================

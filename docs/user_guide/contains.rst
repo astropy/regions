@@ -26,11 +26,14 @@ Let's start by defining both a planar sky and pixel region::
     center: PixCoord(x=42, y=43)
     radius: 42
 
-Let's also define a WCS object using our example dataset::
+Let's also define a WCS object::
 
-    >>> from regions import make_example_dataset
-    >>> dataset = make_example_dataset(data='simulated')
-    >>> wcs = dataset.wcs
+    >>> from astropy.wcs import WCS
+    >>> wcs = WCS(naxis=2)
+    >>> wcs.wcs.crpix = (180, 90)
+    >>> wcs.wcs.cdelt = (-1, 1)
+    >>> wcs.wcs.crval = (0, 0)
+    >>> wcs.wcs.ctype = ('GLON-AIT', 'GLAT-AIT')
 
 To test if a given point is inside or outside the region, the Python
 ``in`` operator can be called::

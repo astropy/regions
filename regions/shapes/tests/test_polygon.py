@@ -9,7 +9,7 @@ from astropy.coordinates import Latitude, Longitude, SkyCoord
 from astropy.tests.helper import assert_quantity_allclose
 from numpy.testing import assert_allclose, assert_equal
 
-from regions._utils.examples import make_example_dataset
+from regions._utils.examples import _make_example_dataset
 from regions._utils.optional_deps import HAS_MATPLOTLIB, HAS_SHAPELY
 from regions.core import PixCoord, RegionBoundingBox, RegionMeta, RegionVisual
 from regions.shapes.circle import CircleSphericalSkyRegion
@@ -25,7 +25,7 @@ from regions.tests.helpers import assert_skycoord_allclose, make_simple_wcs
 @pytest.fixture(scope='session', name='wcs')
 def wcs_fixture():
     config = dict(crpix=(18, 9), cdelt=(-10, 10), shape=(18, 36))
-    dataset = make_example_dataset(config=config)
+    dataset = _make_example_dataset(config=config)
     return dataset.wcs
 
 
