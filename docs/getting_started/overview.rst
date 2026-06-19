@@ -332,7 +332,7 @@ spherical circle falling outside of the planar circle and vice versa.
     # Define transformed-to pixel regions
     pix_circ_distort = sph_circle.to_pixel(wcs=wcs,
                                            include_boundary_distortions=True,
-                                           n_points=1000)
+                                           n_vertices=1000)
     pix_circ_nodistort = circle.to_pixel(wcs=wcs)
 
     # Get contained points

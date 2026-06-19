@@ -125,13 +125,13 @@ It is also possible to use the coordinates of a discretized
     sph_sky_region.to_pixel(
         wcs=wcs,
         include_boundary_distortions=True,
-        n_points=1000,
+        n_vertices=1000,
     ).plot(ax=ax, color='tab:red', lw=3)
 
     sph_sky_center2 = SkyCoord(42, 43, unit='deg', frame='galactic')
     sph_sky_radius2 = Angle(25, 'deg')
     sph_sky_region2 = CircleSphericalSkyRegion(sph_sky_center2, sph_sky_radius2)
-    poly_sph_sky2 = sph_sky_region2.discretize_boundary(n_points=1000)
+    poly_sph_sky2 = sph_sky_region2.discretize_boundary(n_vertices=1000)
     ax.plot(
         poly_sph_sky2.vertices.l,
         poly_sph_sky2.vertices.b,

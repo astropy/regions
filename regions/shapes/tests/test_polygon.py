@@ -397,13 +397,13 @@ class TestPolygonSphericalSkyRegion(BaseTestSphericalSkyRegion):
 
         polysky3 = self.reg.to_sky(wcs,
                                    include_boundary_distortions=True,
-                                   n_points=10)
+                                   n_vertices=10)
         assert isinstance(polysky3, PolygonSkyRegion)
         assert len(polysky3.vertices) == 10
 
         polypix2 = self.reg.to_pixel(wcs,
                                      include_boundary_distortions=True,
-                                     n_points=10)
+                                     n_vertices=10)
         assert isinstance(polypix2, PolygonPixelRegion)
         assert len(polypix2.vertices) == 10
 
@@ -453,13 +453,13 @@ class TestPolygonSphericalSkyRegion(BaseTestSphericalSkyRegion):
                                            4.00015182 * u.deg]))
 
     def test_discretize_boundary(self):
-        poly = self.reg.discretize_boundary(n_points=100)
+        poly = self.reg.discretize_boundary(n_vertices=100)
         assert isinstance(poly, PolygonSphericalSkyRegion)
         assert len(poly.vertices) == 100
 
         with pytest.raises(ValueError) as excinfo:
-            _ = self.reg.discretize_boundary(n_points=2)
-        estr = 'n_points must be greater than'
+            _ = self.reg.discretize_boundary(n_vertices=2)
+        estr = 'must be greater than'
         assert estr in str(excinfo.value)
 
     def test_centroid(self):

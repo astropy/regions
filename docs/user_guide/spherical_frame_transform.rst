@@ -132,13 +132,13 @@ projections for the Galactic and ICRS coordinate reference frames
     patch = sph_circ.to_pixel(
         wcs=wcs,
         include_boundary_distortions=True,
-        n_points=1000,
+        n_vertices=1000,
     ).plot(ax=ax, color='tab:blue', lw=3)
 
     sph_range.to_pixel(
         wcs=wcs,
         include_boundary_distortions=True,
-        n_points=250,
+        n_vertices=250,
     ).plot(ax=ax, color='tab:red', lw=3)
 
     patch.set_clip_path(ax.coords.frame.patch)
@@ -158,13 +158,13 @@ projections for the Galactic and ICRS coordinate reference frames
     patch = sph_circ_transf.to_pixel(
         wcs=wcs_icrs,
         include_boundary_distortions=True,
-        n_points=1000,
+        n_vertices=1000,
     ).plot(ax=ax, color='tab:blue', lw=3)
 
     sph_range_transf.to_pixel(
         wcs=wcs_icrs,
         include_boundary_distortions=True,
-        n_points=250,
+        n_vertices=250,
     ).plot(ax=ax, color='tab:red', lw=3)
 
     patch.set_clip_path(ax.coords.frame.patch)

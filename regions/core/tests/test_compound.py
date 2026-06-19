@@ -251,7 +251,7 @@ def test_compound_spherical_sky(wcs):
     assert isinstance(union.transform_to('icrs'),
                       CompoundSphericalSkyRegion)
 
-    assert isinstance(union.discretize_boundary(n_points=2),
+    assert isinstance(union.discretize_boundary(n_vertices=2),
                       CompoundSphericalSkyRegion)
 
     skycoord4 = SkyCoord(1 * u.deg, 89 * u.deg, frame='galactic')

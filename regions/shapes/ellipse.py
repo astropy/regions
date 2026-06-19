@@ -131,7 +131,7 @@ class EllipsePixelRegion(PixelRegion):
                                 visual=self.visual.copy())
 
     def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
-                         n_points=None):
+                         n_vertices=None):
         raise NotImplementedError
 
     @property
@@ -333,14 +333,14 @@ class EllipsePixelRegion(PixelRegion):
         angle = self.angle + angle
         return self.copy(center=center, angle=angle)
 
-    def to_polygon(self, n_points=100):
+    def to_polygon(self, n_vertices=100):
         """
         Return a `~regions.PolygonPixelRegion` that approximates this
         ellipse.
 
         Parameters
         ----------
-        n_points : int, optional
+        n_vertices : int, optional
             The number of polygon vertices. Default is 100.
 
         Returns
@@ -348,7 +348,7 @@ class EllipsePixelRegion(PixelRegion):
         polygon : `~regions.PolygonPixelRegion`
             A polygon region approximating the ellipse.
         """
-        theta = np.linspace(0, 2 * np.pi, n_points, endpoint=False)
+        theta = np.linspace(0, 2 * np.pi, n_vertices, endpoint=False)
         x = 0.5 * self.width * np.cos(theta)
         y = 0.5 * self.height * np.sin(theta)
         cos_angle = np.cos(self.angle)
@@ -417,7 +417,7 @@ class EllipseSkyRegion(SkyRegion):
                                   meta=self.meta.copy(),
                                   visual=self.visual.copy())
 
-    def to_polygon(self, wcs, n_points=100):
+    def to_polygon(self, wcs, n_vertices=100):
         """
         Return a `~regions.PolygonSkyRegion` that approximates this
         ellipse.
@@ -426,7 +426,7 @@ class EllipseSkyRegion(SkyRegion):
         ----------
         wcs : `~astropy.wcs.WCS`
             The WCS to use for the sky-to-pixel-to-sky conversion.
-        n_points : int, optional
+        n_vertices : int, optional
             The number of polygon vertices. Default is 100.
 
         Returns
@@ -434,8 +434,8 @@ class EllipseSkyRegion(SkyRegion):
         polygon : `~regions.PolygonSkyRegion`
             A polygon region approximating the ellipse.
         """
-        return self.to_pixel(wcs).to_polygon(n_points=n_points).to_sky(wcs)
+        return self.to_pixel(wcs).to_polygon(n_vertices=n_vertices).to_sky(wcs)
 
     def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
-                         n_points=None):
+                         n_vertices=None):
         raise NotImplementedError

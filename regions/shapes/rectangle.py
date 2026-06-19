@@ -131,7 +131,7 @@ class RectanglePixelRegion(PixelRegion):
                                   visual=self.visual.copy())
 
     def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
-                         n_points=None):
+                         n_vertices=None):
         raise NotImplementedError
 
     @property
@@ -452,5 +452,5 @@ class RectangleSkyRegion(SkyRegion):
         return self.to_pixel(wcs).to_polygon().to_sky(wcs)
 
     def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
-                         n_points=None):
+                         n_vertices=None):
         raise NotImplementedError

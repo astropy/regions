@@ -821,30 +821,30 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
 
         return self.__class__(**transformed)
 
-    def discretize_boundary(self, n_points=100):
+    def discretize_boundary(self, n_vertices=100):
         bound_nverts = self._bound_nverts
 
         if bound_nverts == 0:
-            return self.latitude_bounds.discretize_boundary(n_points=n_points)
+            return self.latitude_bounds.discretize_boundary(n_vertices=n_vertices)
         elif bound_nverts == 2:
-            return self.longitude_bounds.discretize_boundary(n_points=n_points)
+            return self.longitude_bounds.discretize_boundary(n_vertices=n_vertices)
         elif (bound_nverts == 4) | (bound_nverts == 3):
             bound_verts = discretize_all_edge_boundaries(
-                self.vertices, self._edge_circs, n_points,
+                self.vertices, self._edge_circs, n_vertices,
             )
             return PolygonSphericalSkyRegion(bound_verts, meta=self.meta.copy(),
                                              visual=self.visual.copy())
         elif bound_nverts == 6:
             raise NotImplementedError
 
-    def to_polygon(self, n_points=100):
+    def to_polygon(self, n_vertices=100):
         """
         Return a `~regions.PolygonSphericalSkyRegion` that approximates this
         longitude/latitude range.
 
         Parameters
         ----------
-        n_points : int, optional
+        n_vertices : int, optional
             The number of polygon vertices. Default is 100.
 
         Returns
@@ -852,13 +852,13 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
         polygon : `~regions.PolygonSphericalSkyRegion`
             A polygon region approximating the range.
         """
-        return self.discretize_boundary(n_points=n_points)
+        return self.discretize_boundary(n_vertices=n_vertices)
 
     def to_sky(
         self,
         wcs=None,
         include_boundary_distortions=False,
-        n_points=None,
+        n_vertices=None,
     ):
         if not include_boundary_distortions:
             raise ValueError(
@@ -874,13 +874,13 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
         return self.to_pixel(
             include_boundary_distortions=include_boundary_distortions,
             wcs=wcs,
-            n_points=n_points,
+            n_vertices=n_vertices,
         ).to_sky(wcs)
 
     def to_pixel(
         self, wcs,
         include_boundary_distortions=False,
-        n_points=None,
+        n_vertices=None,
     ):
         if not include_boundary_distortions:
             raise ValueError(
@@ -891,7 +891,7 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
 
         self._validate_planar_spherical_transform(wcs, include_boundary_distortions)
 
-        disc_kwargs = {} if n_points is None else {'n_points': n_points}
+        disc_kwargs = {} if n_vertices is None else {'n_vertices': n_vertices}
 
         # Requires spherical to planar projection (from WCS) and discretization
         disc_bound = self.discretize_boundary(**disc_kwargs)

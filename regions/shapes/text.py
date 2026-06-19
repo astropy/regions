@@ -88,7 +88,7 @@ class TextPixelRegion(PointPixelRegion):
                              visual=visual.copy())
 
     def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
-                         n_points=None):
+                         n_vertices=None):
         raise NotImplementedError
 
     def as_artist(self, origin=(0, 0), **kwargs):
@@ -169,5 +169,5 @@ class TextSkyRegion(PointSkyRegion):
                                visual=visual.copy())
 
     def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
-                         n_points=None):
+                         n_vertices=None):
         raise NotImplementedError

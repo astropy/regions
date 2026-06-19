@@ -487,7 +487,7 @@ def get_edge_raw_lonlat_bounds_circ_edges(vertices, centroid, gcs):
     return Longitude(lons_arr).to(u.deg), Latitude(lats_arr).to(u.deg)
 
 
-def _discretize_edge_boundary(vertices, circ, n_points,
+def _discretize_edge_boundary(vertices, circ, n_vertices,
                               circ_center=None, circ_radius=None):
 
     if circ is not None:
@@ -512,7 +512,7 @@ def _discretize_edge_boundary(vertices, circ, n_points,
 
     # Sample angle range over pa_span with Npoints, and offset
     # to start at pas_verts[0]
-    theta = np.linspace(0, 1, num=n_points, endpoint=False) * pa_span + pas_verts[0]
+    theta = np.linspace(0, 1, num=n_vertices, endpoint=False) * pa_span + pas_verts[0]
 
     # Calculate directional offsets to get boundary discretization,
     # with vertices as SkyCoords
@@ -521,7 +521,7 @@ def _discretize_edge_boundary(vertices, circ, n_points,
     return bound_verts
 
 
-def discretize_line_boundary(coords, n_points):
+def discretize_line_boundary(coords, n_vertices):
     """
     Discretize all edge boundaries for spherical sky regions.
 
@@ -530,7 +530,7 @@ def discretize_line_boundary(coords, n_points):
     coords : `~astropy.coordinates.SkyCoord`
         The start, end of the line as a SkyCoord.
 
-    n_points : int
+    n_vertices : int
         The number of points for discretization along each edge.
 
     Returns
@@ -544,7 +544,7 @@ def discretize_line_boundary(coords, n_points):
     gc_center = cross_product_skycoord2skycoord(coords[0], coords[1])
     gc_radius = 90 * u.deg
 
-    bound_verts = _discretize_edge_boundary(coords, None, n_points,
+    bound_verts = _discretize_edge_boundary(coords, None, n_vertices,
                                             circ_center=gc_center, circ_radius=gc_radius)
 
     return SkyCoord(
@@ -556,7 +556,7 @@ def discretize_line_boundary(coords, n_points):
     )
 
 
-def discretize_all_edge_boundaries(vertices, circs, n_points):
+def discretize_all_edge_boundaries(vertices, circs, n_vertices):
     """
     Discretize all edge boundaries for spherical sky regions.
 
@@ -568,7 +568,7 @@ def discretize_all_edge_boundaries(vertices, circs, n_points):
     circs : `~regions.CircleSphericalSkyRegion`
         The circle boundaries as CircleSphericalSkyRegion instances.
 
-    n_points : int
+    n_vertices : int
         The number of points for discretization along the boundary.
 
     Returns
@@ -579,19 +579,19 @@ def discretize_all_edge_boundaries(vertices, circs, n_points):
     # Iterate over full set of vertices & boundary circles for
     # a region (polygon or range)
 
-    # Verify n_points >= the number of vertices:
-    if n_points < len(vertices):
+    # Verify n_vertices >= the number of vertices:
+    if n_vertices < len(vertices):
         raise ValueError(
-            f"n_points must be greater than {len(vertices)} "
+            f"n_vertices must be greater than {len(vertices)} "
             'to discretize/polygonize this region!',
         )
 
-    # Return if n_points = len(vertices)
-    if n_points == len(vertices):
+    # Return if n_vertices = len(vertices)
+    if n_vertices == len(vertices):
         return vertices
 
     # Determine the number of vertices per edge:
-    npt_edge, remainder = np.divmod(n_points, len(vertices))
+    npt_edge, remainder = np.divmod(n_vertices, len(vertices))
 
     all_edge_bound_verts = None
     for i, circ in enumerate(circs):

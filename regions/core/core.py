@@ -531,7 +531,7 @@ class PixelRegion(Region):
 
     @abc.abstractmethod
     def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
-                         n_points=None):
+                         n_vertices=None):
         """
         Convert to an equivalent spherical `~regions.SphericalSkyRegion`
         instance.
@@ -549,7 +549,7 @@ class PixelRegion(Region):
             conversions, by discretizing the boundary and converting the boundary polygon.
             Default is False, which converts to an equivalent idealized shape.
 
-        n_points : int, optional
+        n_vertices : int, optional
             The number of polygon vertices for boundary discretization.
             This keyword will have no effect unless ``include_boundary_distortions=True``.
             Default is 100.
@@ -825,7 +825,7 @@ class SkyRegion(Region):
 
     @abc.abstractmethod
     def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
-                         n_points=None):
+                         n_vertices=None):
         """
         Convert to an equivalent spherical `~regions.SphericalSkyRegion`
         instance.
@@ -843,7 +843,7 @@ class SkyRegion(Region):
             conversions, by discretizing the boundary and converting the boundary polygon.
             Default is False, which converts to an equivalent idealized shape.
 
-        n_points : int, optional
+        n_vertices : int, optional
             The number of polygon vertices for boundary discretization.
             This keyword will have no effect unless ``include_boundary_distortions=True``.
             Default is 100.
@@ -1072,7 +1072,7 @@ class SphericalSkyRegion(Region):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def discretize_boundary(self, n_points=100):
+    def discretize_boundary(self, n_vertices=100):
         """
         Discretize the boundary into a
         `~regions.PolygonSphericalSkyRegion`, as an approximation where
@@ -1080,7 +1080,7 @@ class SphericalSkyRegion(Region):
 
         Parameters
         ----------
-        n_points : int, optional
+        n_vertices : int, optional
             Number of points along the region's boundary. Default is 100.
 
         Returns
@@ -1092,7 +1092,7 @@ class SphericalSkyRegion(Region):
 
     @abc.abstractmethod
     def to_sky(
-        self, wcs=None, include_boundary_distortions=False, n_points=None,
+        self, wcs=None, include_boundary_distortions=False, n_vertices=None,
     ):
         """
         Convert to a planar `~regions.SkyRegion`.
@@ -1110,7 +1110,7 @@ class SphericalSkyRegion(Region):
             conversions, by discretizing the boundary and converting the boundary polygon.
             Default is False, which converts to an equivalent idealized shape.
 
-        n_points : int, optional
+        n_vertices : int, optional
             The number of polygon vertices for boundary discretization.
             This keyword will have no effect unless ``include_boundary_distortions=True``.
             Default is 100.
@@ -1126,7 +1126,7 @@ class SphericalSkyRegion(Region):
 
     @abc.abstractmethod
     def to_pixel(
-        self, wcs, include_boundary_distortions=False, n_points=None,
+        self, wcs, include_boundary_distortions=False, n_vertices=None,
     ):
         """
         Convert to a planar `~regions.PixelRegion`.
@@ -1142,7 +1142,7 @@ class SphericalSkyRegion(Region):
             conversions, by discretizing the boundary and converting the boundary polygon.
             Default is False, which converts to an equivalent idealized shape.
 
-        n_points : int, optional
+        n_vertices : int, optional
             The number of polygon vertices for boundary discretization.
             This keyword will have no effect unless ``include_boundary_distortions=True``.
             Default is 100.

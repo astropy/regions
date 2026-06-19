@@ -80,7 +80,7 @@ full sky image (seen in this `Astropy visualization demo
     circ.to_pixel(
         wcs=wcs,
         include_boundary_distortions=True,
-        n_points=1000,
+        n_vertices=1000,
     ).plot(ax=ax, edgecolor='red',
            facecolor='none', lw=2)
 
@@ -92,6 +92,6 @@ full sky image (seen in this `Astropy visualization demo
     lon_lat_range.to_pixel(
         wcs=wcs,
         include_boundary_distortions=True,
-        n_points=250,
+        n_vertices=250,
     ).plot(ax=ax, edgecolor='blue',
            facecolor='none', lw=2)
