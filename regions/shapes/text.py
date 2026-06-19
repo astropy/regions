@@ -87,7 +87,7 @@ class TextPixelRegion(PointPixelRegion):
         return TextSkyRegion(center, self.text, meta=self.meta.copy(),
                              visual=visual.copy())
 
-    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
+    def to_spherical_sky(self, wcs=None, *, include_boundary_distortions=False,
                          n_vertices=None):
         raise NotImplementedError
 
@@ -168,6 +168,6 @@ class TextSkyRegion(PointSkyRegion):
                                meta=self.meta.copy(),
                                visual=visual.copy())
 
-    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
+    def to_spherical_sky(self, wcs=None, *, include_boundary_distortions=False,
                          n_vertices=None):
         raise NotImplementedError

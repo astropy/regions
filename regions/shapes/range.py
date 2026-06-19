@@ -821,7 +821,7 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
 
         return self.__class__(**transformed)
 
-    def discretize_boundary(self, n_vertices=100):
+    def discretize_boundary(self, *, n_vertices=100):
         bound_nverts = self._bound_nverts
 
         if bound_nverts == 0:
@@ -830,14 +830,14 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
             return self.longitude_bounds.discretize_boundary(n_vertices=n_vertices)
         elif (bound_nverts == 4) | (bound_nverts == 3):
             bound_verts = discretize_all_edge_boundaries(
-                self.vertices, self._edge_circs, n_vertices,
+                self.vertices, self._edge_circs, n_vertices=n_vertices,
             )
             return PolygonSphericalSkyRegion(bound_verts, meta=self.meta.copy(),
                                              visual=self.visual.copy())
         elif bound_nverts == 6:
             raise NotImplementedError
 
-    def to_polygon(self, n_vertices=100):
+    def to_polygon(self, *, n_vertices=100):
         """
         Return a `~regions.PolygonSphericalSkyRegion` that approximates this
         longitude/latitude range.
@@ -856,7 +856,7 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
 
     def to_sky(
         self,
-        wcs=None,
+        wcs=None, *,
         include_boundary_distortions=False,
         n_vertices=None,
     ):
@@ -873,12 +873,11 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
         # Use to_pixel(), then apply "small angle approx" to get planar sky.
         return self.to_pixel(
             include_boundary_distortions=include_boundary_distortions,
-            wcs=wcs,
-            n_vertices=n_vertices,
+            wcs=wcs, n_vertices=n_vertices,
         ).to_sky(wcs)
 
     def to_pixel(
-        self, wcs,
+        self, wcs, *,
         include_boundary_distortions=False,
         n_vertices=None,
     ):

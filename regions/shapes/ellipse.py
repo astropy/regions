@@ -130,7 +130,7 @@ class EllipsePixelRegion(PixelRegion):
                                 meta=self.meta.copy(),
                                 visual=self.visual.copy())
 
-    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
+    def to_spherical_sky(self, wcs=None, *, include_boundary_distortions=False,
                          n_vertices=None):
         raise NotImplementedError
 
@@ -333,7 +333,7 @@ class EllipsePixelRegion(PixelRegion):
         angle = self.angle + angle
         return self.copy(center=center, angle=angle)
 
-    def to_polygon(self, n_vertices=100):
+    def to_polygon(self, *, n_vertices=100):
         """
         Return a `~regions.PolygonPixelRegion` that approximates this
         ellipse.
@@ -417,7 +417,7 @@ class EllipseSkyRegion(SkyRegion):
                                   meta=self.meta.copy(),
                                   visual=self.visual.copy())
 
-    def to_polygon(self, wcs, n_vertices=100):
+    def to_polygon(self, wcs, *, n_vertices=100):
         """
         Return a `~regions.PolygonSkyRegion` that approximates this
         ellipse.
@@ -436,6 +436,6 @@ class EllipseSkyRegion(SkyRegion):
         """
         return self.to_pixel(wcs).to_polygon(n_vertices=n_vertices).to_sky(wcs)
 
-    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
+    def to_spherical_sky(self, wcs=None, *, include_boundary_distortions=False,
                          n_vertices=None):
         raise NotImplementedError

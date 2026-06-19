@@ -530,7 +530,7 @@ class PixelRegion(Region):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
+    def to_spherical_sky(self, wcs=None, *, include_boundary_distortions=False,
                          n_vertices=None):
         """
         Convert to an equivalent spherical `~regions.SphericalSkyRegion`
@@ -824,7 +824,7 @@ class SkyRegion(Region):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
+    def to_spherical_sky(self, wcs=None, *, include_boundary_distortions=False,
                          n_vertices=None):
         """
         Convert to an equivalent spherical `~regions.SphericalSkyRegion`
@@ -1072,7 +1072,7 @@ class SphericalSkyRegion(Region):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def discretize_boundary(self, n_vertices=100):
+    def discretize_boundary(self, *, n_vertices=100):
         """
         Discretize the boundary into a
         `~regions.PolygonSphericalSkyRegion`, as an approximation where
@@ -1092,7 +1092,7 @@ class SphericalSkyRegion(Region):
 
     @abc.abstractmethod
     def to_sky(
-        self, wcs=None, include_boundary_distortions=False, n_vertices=None,
+        self, wcs=None, *, include_boundary_distortions=False, n_vertices=None,
     ):
         """
         Convert to a planar `~regions.SkyRegion`.
@@ -1126,7 +1126,7 @@ class SphericalSkyRegion(Region):
 
     @abc.abstractmethod
     def to_pixel(
-        self, wcs, include_boundary_distortions=False, n_vertices=None,
+        self, wcs, *, include_boundary_distortions=False, n_vertices=None,
     ):
         """
         Convert to a planar `~regions.PixelRegion`.

@@ -128,7 +128,7 @@ class PolygonPixelRegion(PixelRegion):
         return PolygonSkyRegion(vertices=vertices_sky, meta=self.meta.copy(),
                                 visual=self.visual.copy())
 
-    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
+    def to_spherical_sky(self, wcs=None, *, include_boundary_distortions=False,
                          n_vertices=None):
         self._validate_planar_spherical_transform(wcs, include_boundary_distortions)
 
@@ -424,7 +424,7 @@ class PolygonSkyRegion(SkyRegion):
         return PolygonPixelRegion(vertices_pix, meta=self.meta.copy(),
                                   visual=self.visual.copy())
 
-    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
+    def to_spherical_sky(self, wcs=None, *, include_boundary_distortions=False,
                          n_vertices=None):
         self._validate_planar_spherical_transform(wcs, include_boundary_distortions)
 
@@ -595,9 +595,9 @@ class PolygonSphericalSkyRegion(SphericalSkyRegion):
             self.visual.copy(),
         )
 
-    def discretize_boundary(self, n_vertices=100):
+    def discretize_boundary(self, *, n_vertices=100):
         bound_verts = discretize_all_edge_boundaries(
-            self.vertices, self._edge_circs, n_vertices,
+            self.vertices, self._edge_circs, n_vertices=n_vertices,
         )
         return PolygonSphericalSkyRegion(bound_verts, meta=self.meta.copy(),
                                          visual=self.visual.copy())
@@ -605,6 +605,7 @@ class PolygonSphericalSkyRegion(SphericalSkyRegion):
     def to_sky(
         self,
         wcs=None,
+        *,
         include_boundary_distortions=False,
         n_vertices=None,
     ):
@@ -615,8 +616,7 @@ class PolygonSphericalSkyRegion(SphericalSkyRegion):
             # Use to_pixel(), then apply "small angle approx" to get planar sky.
             return self.to_pixel(
                 include_boundary_distortions=include_boundary_distortions,
-                wcs=wcs,
-                n_vertices=n_vertices,
+                wcs=wcs, n_vertices=n_vertices,
             ).to_sky(wcs)
 
         return PolygonSkyRegion(
@@ -626,7 +626,7 @@ class PolygonSphericalSkyRegion(SphericalSkyRegion):
         )
 
     def to_pixel(
-        self, wcs,
+        self, wcs, *,
         include_boundary_distortions=False,
         n_vertices=None,
     ):

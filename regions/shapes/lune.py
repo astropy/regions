@@ -187,15 +187,15 @@ class LuneSphericalSkyRegion(SphericalSkyRegion):
             self.visual.copy(),
         )
 
-    def discretize_boundary(self, n_vertices=100):
+    def discretize_boundary(self, *, n_vertices=100):
         bound_verts = discretize_all_edge_boundaries(
-            self.vertices, self._edge_circs, n_vertices,
+            self.vertices, self._edge_circs, n_vertices=n_vertices,
         )[::-1]  # inverted for lune
         # TODO: properly check for CW order even for a nverts=2 spherical polygon (lune).
         return PolygonSphericalSkyRegion(bound_verts, meta=self.meta.copy(),
                                          visual=self.visual.copy())
 
-    def to_polygon(self, n_vertices=100):
+    def to_polygon(self, *, n_vertices=100):
         """
         Return a `~regions.PolygonSphericalSkyRegion` that approximates this
         lune.
@@ -215,6 +215,7 @@ class LuneSphericalSkyRegion(SphericalSkyRegion):
     def to_sky(
         self,
         wcs=None,
+        *,
         include_boundary_distortions=False,
         n_vertices=None,
     ):
@@ -231,12 +232,11 @@ class LuneSphericalSkyRegion(SphericalSkyRegion):
         # Use to_pixel(), then apply "small angle approx" to get planar sky.
         return self.to_pixel(
             include_boundary_distortions=include_boundary_distortions,
-            wcs=wcs,
-            n_vertices=n_vertices,
+            wcs=wcs, n_vertices=n_vertices,
         ).to_sky(wcs)
 
     def to_pixel(
-        self, wcs,
+        self, wcs, *,
         include_boundary_distortions=False,
         n_vertices=None,
     ):
