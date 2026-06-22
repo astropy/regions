@@ -1067,7 +1067,8 @@ class SphericalSkyRegion(Region):
 
         Parameters
         ----------
-        frame : str, or `~astropy.coordinates.BaseCoordinateFrame` class or instance
+        frame : str, or `~astropy.coordinates.BaseCoordinateFrame` class \
+                or instance
             The frame to transform this coordinate into.
         merge_attributes : bool, optional
             Whether the default attributes in the destination frame are allowed

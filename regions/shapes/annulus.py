@@ -226,7 +226,8 @@ class CircleAnnulusPixelRegion(AnnulusPixelRegion):
 
         Returns
         -------
-        region : `~regions.CircleAnnulusSkyRegion` or `~regions.EllipseAnnulusSkyRegion`
+        region : `~regions.CircleAnnulusSkyRegion` or \
+                `~regions.EllipseAnnulusSkyRegion`
             The sky region. An ellipse annulus is returned if
             ``as_ellipse`` is `True`.
         """
@@ -362,7 +363,8 @@ class CircleAnnulusSkyRegion(SkyRegion):
 
         Returns
         -------
-        region : `~regions.CircleAnnulusPixelRegion` or `~regions.EllipseAnnulusPixelRegion`
+        region : `~regions.CircleAnnulusPixelRegion` or \
+                `~regions.EllipseAnnulusPixelRegion`
             The pixel region. An ellipse annulus is returned if
             ``as_ellipse`` is `True`.
         """
