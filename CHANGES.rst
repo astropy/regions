@@ -72,6 +72,9 @@ New Features
   fall inside or on the boundary of a region, consistent with Shapely's
   ``covers`` function and DE-9IM semantics. [#680]
 
+- The ``'exact'`` masking mode (i.e., the ``to_mask`` method) for
+  rectangular and polygonal regions has been implemented. [#685]
+
 Bug Fixes
 ---------
 
