@@ -14,6 +14,8 @@ from numpy.testing import assert_array_equal
 
 from regions._geometry import (circle_overlap_grid, ellipse_overlap_grid,
                                polygon_overlap_grid, rectangle_overlap_grid)
+from regions._geometry.polygon_contains import (points_in_polygon,
+                                                points_in_polygon_covers)
 
 N_THREADS = 8
 N_CALLS_PER_THREAD = 4
@@ -111,3 +113,21 @@ def test_mixed_functions_concurrent():
         for future in futures:
             tag, result = future.result()
             assert_array_equal(result, expected_map[tag])
+
+
+@pytest.mark.parametrize('func', [points_in_polygon, points_in_polygon_covers])
+def test_points_in_polygon_threadsafe(func):
+    n_vertices = 24
+    angles = np.linspace(0.0, 2.0 * np.pi, n_vertices, endpoint=False)
+    radii = 8.0 + 2.0 * np.sin(5.0 * angles)
+    vx = np.ascontiguousarray(radii * np.cos(angles))
+    vy = np.ascontiguousarray(radii * np.sin(angles))
+
+    grid = np.linspace(-12.0, 12.0, 80)
+    gx, gy = np.meshgrid(grid, grid)
+    x = np.ascontiguousarray(gx.ravel())
+    y = np.ascontiguousarray(gy.ravel())
+
+    def fn():
+        return func(x, y, vx, vy)
+    _run_concurrent(fn)
