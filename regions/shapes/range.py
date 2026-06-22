@@ -881,12 +881,8 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
         """
         return self.discretize_boundary(n_vertices=n_vertices)
 
-    def to_sky(
-        self,
-        wcs=None, *,
-        include_boundary_distortions=False,
-        n_vertices=None,
-    ):
+    def to_sky(self, wcs, *, include_boundary_distortions=False,
+               n_vertices=None):
         if not include_boundary_distortions:
             raise ValueError(
                 'Invalid parameter: `include_boundary_distortions=False`!\n'
@@ -904,11 +900,8 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
             wcs=wcs, n_vertices=n_vertices,
         ).to_sky(wcs)
 
-    def to_pixel(
-        self, wcs, *,
-        include_boundary_distortions=False,
-        n_vertices=None,
-    ):
+    def to_pixel(self, wcs, *, include_boundary_distortions=False,
+                 n_vertices=None):
         if not include_boundary_distortions:
             raise ValueError(
                 'Invalid parameter: `include_boundary_distortions=False`!\n'

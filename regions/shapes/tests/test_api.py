@@ -199,13 +199,13 @@ def test_sky_to_spherical_sky(region, include_dist):
     ):
         with pytest.raises(NotImplementedError):
             sph_sky_region = region.to_spherical_sky(
-                COMMON_WCS,
+                wcs=COMMON_WCS,
                 include_boundary_distortions=include_dist,
             )
             assert isinstance(sph_sky_region, SphericalSkyRegion)
     else:
         sph_sky_region = region.to_spherical_sky(
-            COMMON_WCS,
+            wcs=COMMON_WCS,
             include_boundary_distortions=include_dist,
         )
         assert isinstance(sph_sky_region, SphericalSkyRegion)
@@ -218,25 +218,23 @@ def test_spherical_sky_to_sky(region, include_dist):
     if isinstance(region, WholeSphericalSkyRegion):
         with pytest.raises(ValueError):
             _ = region.to_sky(
-                COMMON_WCS,
+                wcs=COMMON_WCS,
                 include_boundary_distortions=include_dist,
             )
 
     elif (isinstance(region, (LuneSphericalSkyRegion, RangeSphericalSkyRegion))
           & (not include_dist)):
         # No distortions: not defined:
-        with pytest.raises(ValueError) as excinfo:
-            _ = region.to_sky(
+        match = 'Invalid parameter: `include_boundary_distortions=False`!'
+        with pytest.raises(ValueError, match=match):
+            region.to_sky(
                 COMMON_WCS,
                 include_boundary_distortions=include_dist,
             )
 
-        estr = 'Invalid parameter: `include_boundary_distortions=False`!'
-        assert estr in str(excinfo.value)
-
     else:
         sky_region = region.to_sky(
-            COMMON_WCS,
+            wcs=COMMON_WCS,
             include_boundary_distortions=include_dist,
         )
         assert isinstance(sky_region, SkyRegion)
@@ -256,13 +254,12 @@ def test_spherical_sky_to_pix(region, include_dist):
     elif (isinstance(region, (LuneSphericalSkyRegion, RangeSphericalSkyRegion))
           & (not include_dist)):
         # No distortions: not defined:
-        with pytest.raises(ValueError) as excinfo:
-            _ = region.to_pixel(
+        match = 'Invalid parameter: `include_boundary_distortions=False`!'
+        with pytest.raises(ValueError, match=match):
+            region.to_pixel(
                 COMMON_WCS,
                 include_boundary_distortions=include_dist,
             )
-        estr = 'Invalid parameter: `include_boundary_distortions=False`!'
-        assert estr in str(excinfo.value)
 
     else:
         pixel_region = region.to_pixel(
@@ -298,9 +295,9 @@ def test_attribute_validation_pixel_regions(region):
     for attr in invalid_values:
         if hasattr(region, attr):
             for val in invalid_values.get(attr, None):
-                with pytest.raises(ValueError) as excinfo:
+                match = f'{attr!r} must'
+                with pytest.raises(ValueError, match=match):
                     setattr(region, attr, val)
-                assert f'{attr!r} must' in str(excinfo.value)
 
 
 @pytest.mark.parametrize('region', SKY_REGIONS, ids=ids_func)
@@ -334,9 +331,9 @@ def test_attribute_validation_sky_regions(region):
     for attr in invalid_values:
         if hasattr(region, attr):
             for val in invalid_values.get(attr, None):
-                with pytest.raises(ValueError) as excinfo:
+                match = f'{attr!r} must'
+                with pytest.raises(ValueError, match=match):
                     setattr(region, attr, val)
-                assert f'{attr!r} must' in str(excinfo.value)
 
 
 @pytest.mark.parametrize('region', SPHERICAL_SKY_REGIONS, ids=ids_func)
@@ -378,9 +375,9 @@ def test_attribute_validation_spherical_sky_regions(region):
     for attr in invalid_values:
         if hasattr(region, attr) & (attr in region_attrs):
             for val in invalid_values.get(attr, None):
-                with pytest.raises(ValueError) as excinfo:
+                match = f'{attr!r} must'
+                with pytest.raises(ValueError, match=match):
                     setattr(region, attr, val)
-                assert f'{attr!r} must' in str(excinfo.value)
 
 
 @pytest.mark.parametrize('region', PIXEL_REGIONS + SKY_REGIONS, ids=ids_func)

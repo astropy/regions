@@ -61,9 +61,9 @@ class BaseTestPixelRegion(BaseTestRegion):
         assert_equal(actual[:len(self.inside)], True)
         assert_equal(actual[len(self.inside):], False)
 
-        with pytest.raises(ValueError) as excinfo:
+        match = 'coord must be scalar'
+        with pytest.raises(ValueError, match=match):
             assert pixcoord in self.reg
-        assert 'coord must be scalar' in str(excinfo.value)
 
     def test_contains_array_2d(self):
         x, y = zip(*(self.inside + self.outside), strict=True)

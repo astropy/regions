@@ -57,15 +57,13 @@ class TestLuneSphericalSkyRegion(BaseTestSphericalSkyRegion):
 
     def test_transformation(self, wcs):
         # Test error for no boundary distortions:
-        with pytest.raises(ValueError) as excinfo:
-            _ = self.reg.to_pixel(wcs)
-        estr = 'Invalid parameter: `include_boundary_distortions=False`!'
-        assert estr in str(excinfo.value)
+        match = 'Invalid parameter: `include_boundary_distortions=False`!'
+        with pytest.raises(ValueError, match=match):
+            self.reg.to_pixel(wcs)
 
-        with pytest.raises(ValueError) as excinfo:
-            _ = self.reg.to_sky(wcs)
-        estr = 'Invalid parameter: `include_boundary_distortions=False`!'
-        assert estr in str(excinfo.value)
+        match = 'Invalid parameter: `include_boundary_distortions=False`!'
+        with pytest.raises(ValueError, match=match):
+            self.reg.to_sky(wcs)
 
         # Test for transformations with `include_boundary_distortions=True`
         polypix = self.reg.to_pixel(wcs,
@@ -156,7 +154,6 @@ class TestLuneSphericalSkyRegion(BaseTestSphericalSkyRegion):
         polylune_inv = self.reg_inv.discretize_boundary(n_vertices=100)
         assert polylune_inv.contains(self.reg.centroid)
 
-        with pytest.raises(ValueError) as excinfo:
-            _ = self.reg.discretize_boundary(n_vertices=1)
-        estr = 'must be greater than'
-        assert estr in str(excinfo.value)
+        match = 'must be greater than'
+        with pytest.raises(ValueError, match=match):
+            self.reg.discretize_boundary(n_vertices=1)

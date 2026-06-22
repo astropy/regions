@@ -332,10 +332,9 @@ class TestEllipseSkyRegion(BaseTestSkyRegion):
         center = SkyCoord([1, 2] * u.deg, [3, 4] * u.deg)
         width = 2 * u.arcsec
         height = 3 * u.arcsec
-        with pytest.raises(ValueError) as excinfo:
+        match = "'center' must be a scalar SkyCoord"
+        with pytest.raises(ValueError, match=match):
             EllipseSkyRegion(center, width, height)
-        estr = "'center' must be a scalar SkyCoord"
-        assert estr in str(excinfo.value)
 
     def test_contains(self, wcs):
         position = SkyCoord([1, 3] * u.deg, [2, 4] * u.deg)

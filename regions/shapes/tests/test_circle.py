@@ -73,10 +73,9 @@ class TestCirclePixelRegion(BaseTestPixelRegion):
                                           include_boundary_distortions=True)
 
     def test_to_spherical_sky_no_wcs(self):
-        with pytest.raises(ValueError) as excinfo:
-            _ = self.reg.to_spherical_sky(include_boundary_distortions=True)
-        estr = "'wcs' must be set if `include_boundary_distortions=True`"
-        assert estr in str(excinfo.value)
+        match = 'missing 1 required positional argument'
+        with pytest.raises(TypeError, match=match):
+            self.reg.to_spherical_sky()
 
     @pytest.mark.skipif(not HAS_MATPLOTLIB, reason='matplotlib is required')
     def test_as_artist(self):
@@ -167,26 +166,24 @@ class TestCircleSkyRegion(BaseTestSkyRegion):
         assert_quantity_allclose(skycircle2.radius, skycircle.radius)
 
         sphskycircle = self.reg.to_spherical_sky(
-            wcs, include_boundary_distortions=False)
+            wcs=wcs, include_boundary_distortions=False)
         assert isinstance(sphskycircle, CircleSphericalSkyRegion)
 
         with pytest.raises(NotImplementedError):
-            _ = self.reg.to_spherical_sky(wcs,
+            _ = self.reg.to_spherical_sky(wcs=wcs,
                                           include_boundary_distortions=True)
 
     def test_to_spherical_sky_no_wcs(self):
-        with pytest.raises(ValueError) as excinfo:
-            _ = self.reg.to_spherical_sky(include_boundary_distortions=True)
-        estr = "'wcs' must be set if `include_boundary_distortions=True`"
-        assert estr in str(excinfo.value)
+        match = "'wcs' must be set if `include_boundary_distortions=True`"
+        with pytest.raises(ValueError, match=match):
+            self.reg.to_spherical_sky(include_boundary_distortions=True)
 
     def test_dimension_center(self):
         center = SkyCoord([1, 2] * u.deg, [3, 4] * u.deg)
         radius = 2 * u.arcsec
-        with pytest.raises(ValueError) as excinfo:
+        match = "'center' must be a scalar SkyCoord"
+        with pytest.raises(ValueError, match=match):
             CircleSkyRegion(center, radius)
-        estr = "'center' must be a scalar SkyCoord"
-        assert estr in str(excinfo.value)
 
     def test_contains(self, wcs):
         position = SkyCoord([1, 3] * u.deg, [2, 4] * u.deg)
@@ -238,7 +235,7 @@ class TestCircleSphericalSkyRegion(BaseTestSphericalSkyRegion):
         assert_allclose(pixcircle.center.y, 299.5)
         assert_allclose(pixcircle.radius, 0.0278117, rtol=1e-6)
 
-        skycircle = sphskycircle.to_sky(wcs)
+        skycircle = sphskycircle.to_sky(wcs=wcs)
         assert isinstance(skycircle, CircleSkyRegion)
 
         sphskycircle2 = pixcircle.to_spherical_sky(wcs)
@@ -249,17 +246,17 @@ class TestCircleSphericalSkyRegion(BaseTestSphericalSkyRegion):
                                  sphskycircle2.center.data.lat)
         assert_quantity_allclose(sphskycircle2.radius, sphskycircle.radius)
 
-        polysky = sphskycircle.to_sky(wcs, include_boundary_distortions=True)
+        polysky = sphskycircle.to_sky(
+            wcs=wcs, include_boundary_distortions=True)
         assert isinstance(polysky, PolygonSkyRegion)
 
         polypix = sphskycircle.to_pixel(wcs, include_boundary_distortions=True)
         assert isinstance(polypix, PolygonPixelRegion)
 
     def test_transformation_no_wcs(self):
-        with pytest.raises(ValueError) as excinfo:
-            _ = self.reg.to_sky(include_boundary_distortions=True)
-        estr = "'wcs' must be set if `include_boundary_distortions=True`"
-        assert estr in str(excinfo.value)
+        match = "'wcs' must be set if `include_boundary_distortions=True`"
+        with pytest.raises(ValueError, match=match):
+            self.reg.to_sky(include_boundary_distortions=True)
 
     def test_frame_transformation(self):
         skycoord = SkyCoord(3 * u.deg, 4 * u.deg, frame='galactic')
@@ -274,10 +271,9 @@ class TestCircleSphericalSkyRegion(BaseTestSphericalSkyRegion):
     def test_dimension_center(self):
         center = SkyCoord([1, 2] * u.deg, [3, 4] * u.deg)
         radius = 2 * u.arcsec
-        with pytest.raises(ValueError) as excinfo:
+        match = "'center' must be a scalar SkyCoord"
+        with pytest.raises(ValueError, match=match):
             CircleSphericalSkyRegion(center, radius)
-        estr = "'center' must be a scalar SkyCoord"
-        assert estr in str(excinfo.value)
 
     def test_eq(self):
         reg = self.reg.copy()
