@@ -59,10 +59,9 @@ def test_only_pixel_regions():
 
 def test_valid_columns():
     t = QTable([[1, 2, 3]], names=('a'))
-    with pytest.raises(FITSParserError) as excinfo:
+    match = "'a' is not a valid column name"
+    with pytest.raises(FITSParserError, match=match):
         Regions.parse(t, format='fits')
-        estr = "'a' is not a valid column name"
-        assert estr in str(excinfo.value)
 
 
 def test_invalid_regions():
@@ -91,10 +90,9 @@ def test_valid_row():
     # test invalid shape
     shapes = ['INVALID']
     tbl2 = QTable([x, y, shapes], names=('X', 'Y', 'SHAPE'))
-    with pytest.raises(FITSParserError) as excinfo:
+    match = "'invalid' is not a valid FITS region shape"
+    with pytest.raises(FITSParserError, match=match):
         Regions.parse(tbl2, format='fits')
-        estr = "'invalid' is not a valid FITS region shape"
-        assert estr in str(excinfo.value)
 
     shapes = ['PIE']
     rotang = [[20, 30]] * u.deg

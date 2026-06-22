@@ -83,10 +83,9 @@ class TestPolygonPixelRegion(BaseTestPixelRegion):
                                           include_boundary_distortions=True)
 
     def test_to_spherical_sky_no_wcs(self):
-        with pytest.raises(TypeError) as excinfo:
-            _ = self.reg.to_spherical_sky()
-        estr = 'missing 1 required positional argument'
-        assert estr in str(excinfo.value)
+        match = 'missing 1 required positional argument'
+        with pytest.raises(TypeError, match=match):
+            self.reg.to_spherical_sky()
 
     def test_bounding_box(self):
         bbox = self.reg.bounding_box
@@ -239,10 +238,9 @@ class TestPolygonSkyRegion(BaseTestSkyRegion):
                                           include_boundary_distortions=True)
 
     def test_to_spherical_sky_no_wcs(self):
-        with pytest.raises(ValueError) as excinfo:
-            _ = self.reg.to_spherical_sky(include_boundary_distortions=True)
-        estr = "'wcs' must be set if `include_boundary_distortions=True`"
-        assert estr in str(excinfo.value)
+        match = "'wcs' must be set if `include_boundary_distortions=True`"
+        with pytest.raises(ValueError, match=match):
+            self.reg.to_spherical_sky(include_boundary_distortions=True)
 
     def test_contains(self, wcs):
         position = SkyCoord([1, 3.25] * u.deg, [2, 3.75] * u.deg)
@@ -410,10 +408,9 @@ class TestPolygonSphericalSkyRegion(BaseTestSphericalSkyRegion):
         assert len(polypix2.vertices) == 10
 
     def test_transformation_no_wcs(self):
-        with pytest.raises(ValueError) as excinfo:
-            _ = self.reg.to_sky(include_boundary_distortions=True)
-        estr = "'wcs' must be set if `include_boundary_distortions=True`"
-        assert estr in str(excinfo.value)
+        match = "'wcs' must be set if `include_boundary_distortions=True`"
+        with pytest.raises(ValueError, match=match):
+            self.reg.to_sky(include_boundary_distortions=True)
 
     def test_frame_transformation(self):
         reg = self.reg.transform_to('galactic')
@@ -460,10 +457,9 @@ class TestPolygonSphericalSkyRegion(BaseTestSphericalSkyRegion):
         assert isinstance(poly, PolygonSphericalSkyRegion)
         assert len(poly.vertices) == 100
 
-        with pytest.raises(ValueError) as excinfo:
-            _ = self.reg.discretize_boundary(n_vertices=2)
-        estr = 'must be greater than'
-        assert estr in str(excinfo.value)
+        match = 'must be greater than'
+        with pytest.raises(ValueError, match=match):
+            self.reg.discretize_boundary(n_vertices=2)
 
     def test_centroid(self):
         # Test default polygon has mindist centroid outside region,

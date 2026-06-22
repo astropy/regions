@@ -139,10 +139,9 @@ def test_invalid_region_warns():
     ds9_str = ('# Region file format: DS9 astropy/regions\nfk5\n'
                'circle(42.0000,43.0000,3.0000)\ninvalidregion(blah)')
 
-    with pytest.warns(AstropyUserWarning) as warn_results:
-        regions = Regions.parse(ds9_str, format='ds9')
-    assert len(regions) == 1
-    assert len(warn_results) == 1
+    match = 'frame or shape is not a valid frame or region shape'
+    with pytest.warns(AstropyUserWarning, match=match):
+        Regions.parse(ds9_str, format='ds9')
 
 
 def test_global_parser():
@@ -563,7 +562,8 @@ def test_invalid_metadata():
               'image; circle(202.4,47.2,10.9) # color=blue point=junk 10\n'
               'image; circle(302.4,147.2,10.9) # color=cyan point=invalid\n')
 
-    with pytest.warns(AstropyUserWarning) as record:
+    match = 'is invalid and will be ignored'
+    with pytest.warns(AstropyUserWarning, match=match) as record:
         regs = Regions.parse(regstr, format='ds9')
         assert len(record) == 12
         assert 'source=1.1' in record[0].message.args[0]
@@ -579,10 +579,9 @@ def test_invalid_metadata():
 def test_unsupported_metadata():
     regstr = ('image; point(335.5,415.6) # point=diamond 11 color=yellow '
               'width=2 text={example} dash=1 tag={Tag 1} tag={Tag 2}')
-    with pytest.warns(UserWarning) as record:
+    match = 'dashed lines are unsupported'
+    with pytest.warns(AstropyUserWarning, match=match):
         Regions.parse(regstr, format='ds9')
-        assert len(record) == 1
-        assert 'dashed lines are unsupported' in record[0].message.args[0]
 
 
 def test_text_metadata():
@@ -621,12 +620,13 @@ def test_unsupported_marker():
     marker, but unsupported by DS9.
     """
     region = PointPixelRegion(PixCoord(2, 2), visual=RegionVisual(marker='Z'))
-    with pytest.warns(AstropyUserWarning):
+    match = 'Unable to serialize marker'
+    with pytest.warns(AstropyUserWarning, match=match):
         region.serialize(format='ds9')
 
     region = PointPixelRegion(PixCoord(2, 2),
                               visual=RegionVisual(marker='$f_{init}$'))
-    with pytest.warns(AstropyUserWarning):
+    with pytest.warns(AstropyUserWarning, match=match):
         region.serialize(format='ds9')
 
 

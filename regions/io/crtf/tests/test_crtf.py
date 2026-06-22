@@ -3,6 +3,8 @@
 Tests for the crtf subpackage.
 """
 
+import re
+
 import astropy.units as u
 import pytest
 from astropy.coordinates import Angle, SkyCoord
@@ -37,10 +39,9 @@ def test_valid_crtf_line():
     """
     line_str = 'coord=B1950_VLA, frame=BARY, corr=[I, Q], color=blue'
 
-    with pytest.raises(CRTFRegionParserError) as excinfo:
+    match = 'Not a valid CRTF line:'
+    with pytest.raises(CRTFRegionParserError, match=match):
         Regions.parse(line_str, format='crtf')
-
-    assert 'Not a valid CRTF line:' in str(excinfo.value)
 
 
 def test_valid_region_type():
@@ -49,10 +50,9 @@ def test_valid_region_type():
     """
     reg_str = 'hyperbola[[18h12m24s, -23d11m00s], 2.3arcsec]'
 
-    with pytest.raises(CRTFRegionParserError) as excinfo:
+    match = 'Not a valid CRTF Region type: "hyperbola"'
+    with pytest.raises(CRTFRegionParserError, match=match):
         Regions.parse(reg_str, format='crtf')
-
-    assert 'Not a valid CRTF Region type: "hyperbola"' in str(excinfo.value)
 
 
 def test_valid_global_meta_key():
@@ -61,9 +61,9 @@ def test_valid_global_meta_key():
     """
     global_test_str = ('global label=B1950_VLA, frame=BARY, corr=[I, Q], '
                        'color=blue')
-    with pytest.raises(CRTFRegionParserError) as excinfo:
+    match = '"label" is not a valid global meta key'
+    with pytest.raises(CRTFRegionParserError, match=match):
         Regions.parse(global_test_str, format='crtf')
-    assert '"label" is not a valid global meta key' in str(excinfo.value)
 
 
 def test_valid_meta_key():
@@ -72,9 +72,9 @@ def test_valid_meta_key():
     """
     meta_test_str = ('annulus[[17h51m03.2s, -45d17m50s], [0.10deg, 4.12deg]], '
                      'hello="My label here"')
-    with pytest.raises(CRTFRegionParserError) as excinfo:
+    match = '"hello" is not a valid meta key'
+    with pytest.raises(CRTFRegionParserError, match=match):
         Regions.parse(meta_test_str, format='crtf')
-    assert '"hello" is not a valid meta key' in str(excinfo.value)
 
 
 def test_valid_region_syntax():
@@ -82,36 +82,32 @@ def test_valid_region_syntax():
     Checks whether the region has valid parameters.
     """
     reg_str1 = 'circle[[18h12m24s, -23d11m00s], [2.3arcsec,4.5arcsec]'
-    with pytest.raises(CRTFRegionParserError) as excinfo:
+    match = re.escape("Not in proper format: ('2.3arcsec', '4.5arcsec') "
+                      'should be a single length')
+    with pytest.raises(CRTFRegionParserError, match=match):
         Regions.parse(reg_str1, format='crtf')
-
-    estr = ("Not in proper format: ('2.3arcsec', '4.5arcsec') should be "
-            'a single length')
-    assert estr in str(excinfo.value)
 
     reg_str2 = ('symbol[[32.1423deg, 12.1412deg], 12deg], linewidth=2, '
                 'coord=J2000, symsize=2')
-    with pytest.raises(CRTFRegionParserError) as excinfo:
+    match = 'Not in proper format: "12deg" should be a symbol'
+    with pytest.raises(CRTFRegionParserError, match=match):
         Regions.parse(reg_str2, format='crtf')
-    estr = 'Not in proper format: "12deg" should be a symbol'
-    assert estr in str(excinfo.value)
 
     reg_str3 = 'circle[[18h12m24s, -23d11m00s]'
-    with pytest.raises(CRTFRegionParserError) as excinfo:
+    match = ('Does not contain expected number of parameters for the region '
+             '"circle"')
+    with pytest.raises(CRTFRegionParserError, match=match):
         Regions.parse(reg_str3, format='crtf')
-    estr = ('Does not contain expected number of parameters for the region '
-            '"circle"')
-    assert estr in str(excinfo.value)
 
     reg_str4 = 'poly[[1, 2], [4, 5]]'
-    with pytest.raises(CRTFRegionParserError) as excinfo:
+    match = 'polygon should have >= 3 coordinates'
+    with pytest.raises(CRTFRegionParserError, match=match):
         Regions.parse(reg_str4, format='crtf')
-    assert 'polygon should have >= 3 coordinates' in str(excinfo.value)
 
     reg_str6 = 'rotbox[[12h01m34.1s, 12d23m33s], [3arcmin,], 12deg]'
-    with pytest.raises(CRTFRegionParserError) as excinfo:
+    match = re.escape("('3arcmin', '') should be a pair of lengths")
+    with pytest.raises(CRTFRegionParserError, match=match):
         Regions.parse(reg_str6, format='crtf')
-    assert "('3arcmin', '') should be a pair of lengths" in str(excinfo.value)
 
 
 def test_issue_312_regression():

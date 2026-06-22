@@ -39,17 +39,14 @@ def test_valid_shape():
 
     shape = _CRTFParser(reg_str).shapes[0]
 
-    with pytest.raises(ValueError) as excinfo:
+    match = '"box" is not a valid region type'
+    with pytest.raises(ValueError, match=match):
         shape.region_type = 'box'
 
-    assert '"box" is not a valid region type' in str(excinfo.value)
-
     shape = _CRTFParser(reg_str).shapes[0]
-    with pytest.raises(ValueError) as excinfo:
+    match = '"hello" is not a valid coordinate reference frame'
+    with pytest.raises(ValueError, match=match):
         shape.coordsys = 'hello'
-
-    estr = '"hello" is not a valid coordinate reference frame'
-    assert estr in str(excinfo.value)
 
 
 def test_valid_ellipse_crtf():

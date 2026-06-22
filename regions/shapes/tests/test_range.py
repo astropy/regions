@@ -47,95 +47,85 @@ class TestRangeSphericalSkyRegion(BaseTestSphericalSkyRegion):
                     'latitude_range: [-4.  4.] deg')
 
     def test_no_range_set(self):
-        with pytest.raises(ValueError) as excinfo:
-            _ = RangeSphericalSkyRegion(frame='icrs')
-        estr = 'A range for at least one of longitude and latitude must be set'
-        assert estr in str(excinfo.value)
+        match = ('A range for at least one of longitude and latitude must '
+                 'be set')
+        with pytest.raises(ValueError, match=match):
+            RangeSphericalSkyRegion(frame='icrs')
 
     def test_invalid_lon_range(self):
         # Test input types:
         for lon_range in [u.Quantity([0, 10], u.m / u.s),
                           [0 * u.m / u.s, 30 * u.m / u.s]]:
-            with pytest.raises(ValueError) as excinfo:
-                _ = RangeSphericalSkyRegion(
+            match = 'must have angular units'
+            with pytest.raises(ValueError, match=match):
+                RangeSphericalSkyRegion(
                     longitude_range=lon_range, frame='icrs')
-            estr = 'must have angular units'
-            assert estr in str(excinfo.value)
 
         for lon_range in [u.Quantity([0], u.deg), Angle([2 * u.radian])]:
-            with pytest.raises(ValueError) as excinfo:
-                _ = RangeSphericalSkyRegion(
+            match = 'must be length 2'
+            with pytest.raises(ValueError, match=match):
+                RangeSphericalSkyRegion(
                     longitude_range=lon_range, frame='icrs')
-            estr = 'must be length 2'
-            assert estr in str(excinfo.value)
 
         for lon_range in [[0 * u.deg], [0, 10], 'string']:
-            with pytest.raises(ValueError) as excinfo:
-                _ = RangeSphericalSkyRegion(
+            match = 'must be an angle of length 2'
+            with pytest.raises(ValueError, match=match):
+                RangeSphericalSkyRegion(
                     longitude_range=lon_range, frame='icrs')
-            estr = 'must be an angle of length 2'
-            assert estr in str(excinfo.value)
 
         # Test valid boundary values:
         for lon_range in [[-30, 30] * u.deg, [20, 560] * u.deg]:
-            with pytest.raises(ValueError) as excinfo:
-                _ = RangeSphericalSkyRegion(
+            match = (r'Longitude values must be within \[0, 360\] degrees'
+                     r' or equivalent!')
+            with pytest.raises(ValueError, match=match):
+                RangeSphericalSkyRegion(
                     longitude_range=lon_range, frame='icrs')
-            estr = ('Longitude values must be within [0, 360] degrees'
-                    ' or equivalent!')
-            assert estr in str(excinfo.value)
 
     def test_invalid_lat_range(self):
         # Test input types:
         for lat_range in [u.Quantity([0, 10], u.m / u.s),
                           [0 * u.m / u.s, 30 * u.m / u.s]]:
-            with pytest.raises(ValueError) as excinfo:
-                _ = RangeSphericalSkyRegion(
+            match = 'must have angular units'
+            with pytest.raises(ValueError, match=match):
+                RangeSphericalSkyRegion(
                     latitude_range=lat_range, frame='icrs')
-            estr = 'must have angular units'
-            assert estr in str(excinfo.value)
 
         for lat_range in [u.Quantity([0], u.deg), Angle([2 * u.radian])]:
-            with pytest.raises(ValueError) as excinfo:
-                _ = RangeSphericalSkyRegion(
+            match = 'must be length 2'
+            with pytest.raises(ValueError, match=match):
+                RangeSphericalSkyRegion(
                     latitude_range=lat_range, frame='icrs')
-            estr = 'must be length 2'
-            assert estr in str(excinfo.value)
 
         for lat_range in [[0 * u.deg], [0, 10], 'string']:
-            with pytest.raises(ValueError) as excinfo:
-                _ = RangeSphericalSkyRegion(
+            match = 'must be an angle of length 2'
+            with pytest.raises(ValueError, match=match):
+                RangeSphericalSkyRegion(
                     latitude_range=lat_range, frame='icrs')
-            estr = 'must be an angle of length 2'
-            assert estr in str(excinfo.value)
 
         # Test valid boundary values:
         for lat_range in [[-120, -30] * u.deg, [20, 100] * u.deg]:
-            with pytest.raises(ValueError) as excinfo:
-                _ = RangeSphericalSkyRegion(
+            match = (r'Latitude values must be within \[-90, 90\] degrees'
+                     r' or equivalent!')
+            with pytest.raises(ValueError, match=match):
+                RangeSphericalSkyRegion(
                     latitude_range=lat_range, frame='icrs')
-            estr = ('Latitude values must be within [-90, 90] degrees'
-                    ' or equivalent!')
-            assert estr in str(excinfo.value)
 
     def test_invalid_lon_bounds_input(self):
         invalid_bounds = CircleSphericalSkyRegion(
             SkyCoord(5 * u.deg, 0 * u.deg), 0.2 * u.deg)
-        with pytest.raises(ValueError) as excinfo:
-            _ = RangeSphericalSkyRegion(_longitude_bounds=invalid_bounds,
-                                        frame='icrs')
-        estr = 'Invalid direct longitude bounds input!'
-        assert estr in str(excinfo.value)
+        match = 'Invalid direct longitude bounds input!'
+        with pytest.raises(ValueError, match=match):
+            RangeSphericalSkyRegion(_longitude_bounds=invalid_bounds,
+                                    frame='icrs')
 
     def test_invalid_lat_bounds_input(self):
         invalid_bounds = LuneSphericalSkyRegion(
             SkyCoord(3 * u.deg, 0 * u.deg),
             SkyCoord(178 * u.deg, 0 * u.deg))
-        with pytest.raises(ValueError) as excinfo:
-            _ = RangeSphericalSkyRegion(_latitude_bounds=invalid_bounds,
-                                        frame='icrs')
-        estr = 'Invalid direct latitude bounds input!'
-        assert estr in str(excinfo.value)
+        match = 'Invalid direct latitude bounds input!'
+        with pytest.raises(ValueError, match=match):
+            RangeSphericalSkyRegion(_latitude_bounds=invalid_bounds,
+                                    frame='icrs')
 
     def test_lon_only(self):
         reg = RangeSphericalSkyRegion(longitude_range=[0, 10] * u.deg,
@@ -282,15 +272,13 @@ class TestRangeSphericalSkyRegion(BaseTestSphericalSkyRegion):
     def test_transformation(self, wcs):
 
         # Test error for no boundary distortions:
-        with pytest.raises(ValueError) as excinfo:
-            _ = self.reg.to_pixel(wcs)
-        estr = 'Invalid parameter: `include_boundary_distortions=False`!'
-        assert estr in str(excinfo.value)
+        match = 'Invalid parameter: `include_boundary_distortions=False`!'
+        with pytest.raises(ValueError, match=match):
+            self.reg.to_pixel(wcs)
 
-        with pytest.raises(ValueError) as excinfo:
-            _ = self.reg.to_sky(wcs)
-        estr = 'Invalid parameter: `include_boundary_distortions=False`!'
-        assert estr in str(excinfo.value)
+        match = 'Invalid parameter: `include_boundary_distortions=False`!'
+        with pytest.raises(ValueError, match=match):
+            self.reg.to_sky(wcs)
 
         # Test boundary distortion transformations:
         polypix2 = self.reg.to_pixel(wcs,
@@ -340,10 +328,9 @@ class TestRangeSphericalSkyRegion(BaseTestSphericalSkyRegion):
                              n_vertices=10)
 
     def test_transformation_no_wcs(self):
-        with pytest.raises(TypeError) as excinfo:
-            _ = self.reg.to_sky()
-        estr = 'missing 1 required positional argument'
-        assert estr in str(excinfo.value)
+        match = 'missing 1 required positional argument'
+        with pytest.raises(TypeError, match=match):
+            self.reg.to_sky()
 
     def test_frame_transformation(self):
         reg2 = self.reg.transform_to('galactic')
@@ -523,10 +510,9 @@ class TestRangeSphericalSkyRegion(BaseTestSphericalSkyRegion):
         assert len(polyrange3.region1.vertices) == 100
         assert len(polyrange3.region2.vertices) == 100
 
-        with pytest.raises(ValueError) as excinfo:
-            _ = self.reg.discretize_boundary(n_vertices=3)
-        estr = 'must be greater than'
-        assert estr in str(excinfo.value)
+        match = 'must be greater than'
+        with pytest.raises(ValueError, match=match):
+            self.reg.discretize_boundary(n_vertices=3)
 
     def test_discretize_over_poles(self):
         # Wrap over poles:

@@ -94,10 +94,9 @@ class TestCircleAnnulusPixelRegion(BaseTestPixelRegion):
                                           include_boundary_distortions=True)
 
     def test_to_spherical_sky_no_wcs(self):
-        with pytest.raises(TypeError) as excinfo:
-            _ = self.reg.to_spherical_sky()
-        estr = 'missing 1 required positional argument'
-        assert estr in str(excinfo.value)
+        match = 'missing 1 required positional argument'
+        with pytest.raises(TypeError, match=match):
+            self.reg.to_spherical_sky()
 
     def test_rotate(self):
         reg = self.reg.rotate(PixCoord(2, 3), 90 * u.deg)
@@ -174,10 +173,9 @@ class TestCircleAnnulusSkyRegion(BaseTestSkyRegion):
                                           include_boundary_distortions=True)
 
     def test_to_spherical_sky_no_wcs(self):
-        with pytest.raises(ValueError) as excinfo:
-            _ = self.reg.to_spherical_sky(include_boundary_distortions=True)
-        estr = "'wcs' must be set if `include_boundary_distortions=True`"
-        assert estr in str(excinfo.value)
+        match = "'wcs' must be set if `include_boundary_distortions=True`"
+        with pytest.raises(ValueError, match=match):
+            self.reg.to_spherical_sky(include_boundary_distortions=True)
 
     def test_eq(self):
         reg = self.reg.copy()
@@ -212,11 +210,10 @@ class TestCircleAnnulusSphericalSkyRegion(BaseTestSphericalSkyRegion):
         assert_quantity_allclose(self.reg.outer_radius, 30 * u.arcsec)
 
     def test_valid_radii(self):
-        with pytest.raises(ValueError) as excinfo:
-            _ = CircleAnnulusSphericalSkyRegion(SkyCoord(3 * u.deg, 4 * u.deg),
-                                                30 * u.arcsec, 20 * u.arcsec)
-        estr = 'outer_radius must be greater than inner_radius'
-        assert estr in str(excinfo.value)
+        match = 'outer_radius must be greater than inner_radius'
+        with pytest.raises(ValueError, match=match):
+            CircleAnnulusSphericalSkyRegion(SkyCoord(3 * u.deg, 4 * u.deg),
+                                            30 * u.arcsec, 20 * u.arcsec)
 
     def test_copy(self):
         reg = self.reg.copy()
@@ -247,10 +244,9 @@ class TestCircleAnnulusSphericalSkyRegion(BaseTestSphericalSkyRegion):
         assert isinstance(polypix, CompoundPixelRegion)
 
     def test_transformation_no_wcs(self):
-        with pytest.raises(ValueError) as excinfo:
-            _ = self.reg.to_sky(include_boundary_distortions=True)
-        estr = "'wcs' must be set if `include_boundary_distortions=True`"
-        assert estr in str(excinfo.value)
+        match = "'wcs' must be set if `include_boundary_distortions=True`"
+        with pytest.raises(ValueError, match=match):
+            self.reg.to_sky(include_boundary_distortions=True)
 
     def test_frame_transformation(self):
         reg2 = self.reg.transform_to('galactic')
