@@ -334,7 +334,7 @@ class CircleSkyRegion(SkyRegion):
         if as_ellipse:
             center, scale_major, scale_minor, angle = sky_to_pixel_svd_scales(
                 self.center, wcs)
-            radius_arcsec = self.radius.to(u.arcsec).value
+            radius_arcsec = self.radius.to_value(u.arcsec)
             width = 2 * radius_arcsec * scale_major
             height = 2 * radius_arcsec * scale_minor
             return EllipsePixelRegion(PixCoord(*center), width, height,
@@ -342,7 +342,7 @@ class CircleSkyRegion(SkyRegion):
                                       visual=self.visual.copy())
 
         center, mean_scale = sky_to_pixel_mean_scale(self.center, wcs)
-        radius = self.radius.to(u.arcsec).value * mean_scale
+        radius = self.radius.to_value(u.arcsec) * mean_scale
         return CirclePixelRegion(PixCoord(*center), radius,
                                  meta=self.meta.copy(),
                                  visual=self.visual.copy())

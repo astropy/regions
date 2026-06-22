@@ -82,7 +82,7 @@ class TextPixelRegion(PointPixelRegion):
         visual = self.visual
         if 'rotation' in self.visual:
             visual = visual.copy()
-            visual['rotation'] = sky_angle.to('deg').value
+            visual['rotation'] = sky_angle.to_value(u.deg)
 
         return TextSkyRegion(center, self.text, meta=self.meta.copy(),
                              visual=visual.copy())
@@ -162,7 +162,7 @@ class TextSkyRegion(PointSkyRegion):
         visual = self.visual
         if 'rotation' in self.visual:
             visual = visual.copy()
-            visual['rotation'] = pixel_angle.to('deg').value
+            visual['rotation'] = pixel_angle.to_value(u.deg)
 
         return TextPixelRegion(PixCoord(*center), self.text,
                                meta=self.meta.copy(),
