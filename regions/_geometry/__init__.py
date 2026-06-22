@@ -3,7 +3,7 @@
 Geometry subpackage for low-level geometry functions.
 """
 
-from .circular_overlap import *  # noqa: F401, F403
-from .elliptical_overlap import *  # noqa: F401, F403
-from .polygonal_overlap import *  # noqa: F401, F403
-from .rectangular_overlap import *  # noqa: F401, F403
+from .circle_overlap import *  # noqa: F401, F403
+from .ellipse_overlap import *  # noqa: F401, F403
+from .polygon_overlap import *  # noqa: F401, F403
+from .rectangle_overlap import *  # noqa: F401, F403

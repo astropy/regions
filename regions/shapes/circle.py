@@ -9,7 +9,7 @@ import astropy.units as u
 import numpy as np
 from astropy.coordinates import Angle
 
-from regions._geometry import circular_overlap_grid
+from regions._geometry import circle_overlap_grid
 from regions._utils.spherical_helpers import (
     get_circle_latitude_tangent_limits, get_circle_longitude_tangent_limits)
 from regions._utils.wcs_helpers import (pixel_to_sky_mean_scale,
@@ -197,8 +197,8 @@ class CirclePixelRegion(PixelRegion):
 
         use_exact = 0 if mode == 'subpixels' else 1
 
-        fraction = circular_overlap_grid(xmin, xmax, ymin, ymax, nx, ny,
-                                         self.radius, use_exact, subpixels)
+        fraction = circle_overlap_grid(xmin, xmax, ymin, ymax, nx, ny,
+                                       self.radius, use_exact, subpixels)
 
         return RegionMask(fraction, bbox=bbox)
 

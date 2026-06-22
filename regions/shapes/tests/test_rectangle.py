@@ -115,6 +115,23 @@ class TestRectanglePixelRegion(BaseTestPixelRegion):
         reg.angle = 35 * u.deg
         assert reg != self.reg
 
+    def test_to_mask_exact(self):
+        """
+        Test that the 'exact' mode of to_mask recovers the exact area of the
+        rectangle and that all mask weights are valid fractions.
+        """
+        mask = self.reg.to_mask(mode='exact')
+        assert_allclose(np.sum(mask.data), self.expected_area)
+        # all mask weights are valid fractions
+        assert mask.data.min() >= 0.0
+        assert mask.data.max() <= 1.0 + 1e-12
+
+        # The exact area is recovered independent of the rotation angle
+        for angle in (0, 30, 45, 90):
+            reg = self.reg.copy(angle=angle * u.deg)
+            mask = reg.to_mask(mode='exact')
+            assert_allclose(np.sum(mask.data), reg.area)
+
     @pytest.mark.skipif(not HAS_MATPLOTLIB, reason='matplotlib is required')
     @pytest.mark.parametrize('sync', (False, True))
     def test_as_mpl_selector(self, sync):

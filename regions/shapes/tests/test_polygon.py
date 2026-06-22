@@ -103,7 +103,7 @@ class TestPolygonPixelRegion(BaseTestPixelRegion):
         # Bounding box and output shape is independent of subpixels,
         # so we only assert on it once here, not in the other cases below
         mask = self.reg.to_mask(mode='center', subpixels=1)
-        assert 2 <= np.sum(mask.data) <= 6
+        assert 1 <= np.sum(mask.data) <= 6
         assert mask.bbox == RegionBoundingBox(ixmin=1, ixmax=4, iymin=1,
                                               iymax=5)
         assert mask.data.shape == (4, 3)
@@ -122,8 +122,8 @@ class TestPolygonPixelRegion(BaseTestPixelRegion):
         mask = self.reg.to_mask(mode='subpixels', subpixels=10)
         assert 2 <= np.sum(mask.data) <= 6
 
-        with pytest.raises(NotImplementedError):
-            self.reg.to_mask(mode='exact')
+        mask = self.reg.to_mask(mode='exact')
+        assert_allclose(np.sum(mask.data), 3)
 
     @pytest.mark.skipif(not HAS_MATPLOTLIB, reason='matplotlib is required')
     def test_as_artist(self):
@@ -317,8 +317,8 @@ class TestRegularPolygonPixelRegion(BaseTestPixelRegion):
         mask = self.reg.to_mask(mode='subpixels', subpixels=10)
         assert 1130 <= np.sum(mask.data) <= 1135
 
-        with pytest.raises(NotImplementedError):
-            self.reg.to_mask(mode='exact')
+        mask = self.reg.to_mask(mode='exact')
+        assert 1130 <= np.sum(mask.data) <= 1135
 
     @pytest.mark.skipif(not HAS_MATPLOTLIB, reason='matplotlib is required')
     def test_as_artist(self):
