@@ -17,5 +17,5 @@ where (Bradley et al. <YEAR>) is a citation to the `Zenodo record
 that was used. We also encourage citations in the main text wherever
 appropriate.
 
-BibTex files for all Regions versions can be found at
+BibTeX files for all Regions versions can be found at
 https://doi.org/10.5281/zenodo.5826358.
