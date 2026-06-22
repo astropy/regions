@@ -55,7 +55,7 @@ class TestWholeSphericalSkyRegion(BaseTestSphericalSkyRegion):
 
     def test_discretize_boundary(self):
         with pytest.raises(ValueError):
-            _ = self.reg.discretize_boundary(n_points=100)
+            _ = self.reg.discretize_boundary(n_vertices=100)
 
     def test_eq(self):
         reg = self.reg.copy()

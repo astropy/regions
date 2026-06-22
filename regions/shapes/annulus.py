@@ -32,7 +32,8 @@ from regions.shapes.rectangle import RectanglePixelRegion, RectangleSkyRegion
 __all__ = ['AnnulusPixelRegion', 'AnnulusSphericalSkyRegion',
            'AsymmetricAnnulusPixelRegion',
            'AsymmetricAnnulusSkyRegion',
-           'CircleAnnulusPixelRegion', 'CircleAnnulusSkyRegion', 'CircleAnnulusSphericalSkyRegion',
+           'CircleAnnulusPixelRegion', 'CircleAnnulusSkyRegion',
+           'CircleAnnulusSphericalSkyRegion',
            'EllipseAnnulusPixelRegion', 'EllipseAnnulusSkyRegion',
            'RectangleAnnulusPixelRegion', 'RectangleAnnulusSkyRegion']
 
@@ -101,8 +102,9 @@ class AnnulusSphericalSkyRegion(SphericalSkyRegion, abc.ABC):
 
     @property
     def _compound_region(self):
-        return CompoundSphericalSkyRegion(self._inner_region, self._outer_region,
-                                          operator.xor, self.meta, self.visual)
+        return CompoundSphericalSkyRegion(
+            self._inner_region, self._outer_region,
+            operator.xor, self.meta, self.visual)
 
     @property
     def frame(self):
@@ -224,7 +226,8 @@ class CircleAnnulusPixelRegion(AnnulusPixelRegion):
 
         Returns
         -------
-        region : `~regions.CircleAnnulusSkyRegion` or `~regions.EllipseAnnulusSkyRegion`
+        region : `~regions.CircleAnnulusSkyRegion` or \
+                `~regions.EllipseAnnulusSkyRegion`
             The sky region. An ellipse annulus is returned if
             ``as_ellipse`` is `True`.
         """
@@ -251,7 +254,7 @@ class CircleAnnulusPixelRegion(AnnulusPixelRegion):
         return CircleAnnulusSkyRegion(center, inner_radius, outer_radius,
                                       self.meta.copy(), self.visual.copy())
 
-    def to_polygon(self, n_points=100):
+    def to_polygon(self, *, n_vertices=100):
         """
         Return a `~regions.CompoundPixelRegion` of two
         `~regions.PolygonPixelRegion` objects that approximates this
@@ -259,7 +262,7 @@ class CircleAnnulusPixelRegion(AnnulusPixelRegion):
 
         Parameters
         ----------
-        n_points : int, optional
+        n_vertices : int, optional
             The number of polygon vertices for each circle. Default
             is 100.
 
@@ -269,27 +272,31 @@ class CircleAnnulusPixelRegion(AnnulusPixelRegion):
             A compound region of two polygon regions approximating the
             annulus.
         """
-        inner_polygon = self._inner_region.to_polygon(n_points=n_points)
-        outer_polygon = self._outer_region.to_polygon(n_points=n_points)
+        inner_polygon = self._inner_region.to_polygon(n_vertices=n_vertices)
+        outer_polygon = self._outer_region.to_polygon(n_vertices=n_vertices)
         return CompoundPixelRegion(inner_polygon, outer_polygon,
                                    operator.xor, self.meta.copy(),
                                    self.visual.copy())
 
-    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
-                         n_points=None):
-        self._validate_planar_spherical_transform(wcs, include_boundary_distortions)
+    def to_spherical_sky(self, wcs=None, *, include_boundary_distortions=False,
+                         n_vertices=None):
+        self._validate_planar_spherical_transform(
+            wcs, include_boundary_distortions)
 
         if include_boundary_distortions:
-            # Requires planar to spherical projection (using WCS) and discretization
+            # Requires planar to spherical projection (using WCS)
+            # and discretization
             # Will require implementing discretization in pixel space
             # to get correct handling of distortions.
             raise NotImplementedError
 
             # ### Potential solution:
             # # Leverage polygon class to_spherical_sky() functionality without
-            # # distortions, as the distortions were already computed in creating
+            # # distortions, as the distortions were already
+            # # computed in creating
             # # that polygon approximation
-            # return self.discretize_boundary(n_points=n_points).to_spherical_sky(
+            # return self.discretize_boundary(
+            #     n_vertices=n_vertices).to_spherical_sky(
             #     wcs=wcs, include_boundary_distortions=False
             # )
 
@@ -356,7 +363,8 @@ class CircleAnnulusSkyRegion(SkyRegion):
 
         Returns
         -------
-        region : `~regions.CircleAnnulusPixelRegion` or `~regions.EllipseAnnulusPixelRegion`
+        region : `~regions.CircleAnnulusPixelRegion` or \
+                `~regions.EllipseAnnulusPixelRegion`
             The pixel region. An ellipse annulus is returned if
             ``as_ellipse`` is `True`.
         """
@@ -382,7 +390,7 @@ class CircleAnnulusSkyRegion(SkyRegion):
                                         meta=self.meta.copy(),
                                         visual=self.visual.copy())
 
-    def to_polygon(self, wcs, n_points=100):
+    def to_polygon(self, wcs, *, n_vertices=100):
         """
         Return a `~regions.CompoundSkyRegion` of two
         `~regions.PolygonSkyRegion` objects that approximates this
@@ -392,7 +400,7 @@ class CircleAnnulusSkyRegion(SkyRegion):
         ----------
         wcs : `~astropy.wcs.WCS`
             The WCS to use for the sky-to-pixel-to-sky conversion.
-        n_points : int, optional
+        n_vertices : int, optional
             The number of polygon vertices for each circle. Default
             is 100.
 
@@ -402,23 +410,28 @@ class CircleAnnulusSkyRegion(SkyRegion):
             A compound region of two polygon regions approximating the
             annulus.
         """
-        return self.to_pixel(wcs).to_polygon(n_points=n_points).to_sky(wcs)
+        return self.to_pixel(wcs).to_polygon(n_vertices=n_vertices).to_sky(wcs)
 
-    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
-                         n_points=None):
-        self._validate_planar_spherical_transform(wcs, include_boundary_distortions)
+    def to_spherical_sky(self, wcs=None, *, include_boundary_distortions=False,
+                         n_vertices=None):
+        self._validate_planar_spherical_transform(
+            wcs, include_boundary_distortions)
 
         if include_boundary_distortions:
-            # Requires planar to spherical projection (using WCS) and discretization
+            # Requires planar to spherical projection (using WCS)
+            # and discretization
             # Will require implementing discretization in pixel space
             # to get correct handling of distortions.
             raise NotImplementedError
 
             # ### Potential solution:
             # # Leverage polygon class to_spherical_sky() functionality without
-            # # distortions, as the distortions were already computed in creating
+            # # distortions, as the distortions were already
+            # # computed in creating
             # # that polygon approximation
-            # return self.to_pixel(wcs).discretize_boundary(n_points=npoints).to_spherical_sky(
+            # return self.to_pixel(wcs)
+            #     .discretize_boundary(n_vertices=n_vertices)
+            #     .to_spherical_sky(
             #     wcs=wcs, include_boundary_distortions=False
             # )
 
@@ -483,7 +496,8 @@ class CircleAnnulusSphericalSkyRegion(AnnulusSphericalSkyRegion):
         frame = self._validate_frame_transformation(frame)
 
         # Only center transforms, radii preserved
-        center_transf = self.center.transform_to(frame, merge_attributes=merge_attributes)
+        center_transf = self.center.transform_to(
+            frame, merge_attributes=merge_attributes)
 
         return CircleAnnulusSphericalSkyRegion(
             center_transf,
@@ -493,16 +507,16 @@ class CircleAnnulusSphericalSkyRegion(AnnulusSphericalSkyRegion):
             self.visual.copy(),
         )
 
-    def discretize_boundary(self, n_points=100):
+    def discretize_boundary(self, *, n_vertices=100):
         return CompoundSphericalSkyRegion(
-            self._inner_region.discretize_boundary(n_points=n_points),
-            self._outer_region.discretize_boundary(n_points=n_points),
+            self._inner_region.discretize_boundary(n_vertices=n_vertices),
+            self._outer_region.discretize_boundary(n_vertices=n_vertices),
             operator=operator.xor,
             meta=self.meta.copy(),
             visual=self.visual.copy(),
         )
 
-    def to_polygon(self, n_points=100):
+    def to_polygon(self, *, n_vertices=100):
         """
         Return a `~regions.CompoundSphericalSkyRegion` of two
         `~regions.PolygonSphericalSkyRegion` objects that approximates this
@@ -510,7 +524,7 @@ class CircleAnnulusSphericalSkyRegion(AnnulusSphericalSkyRegion):
 
         Parameters
         ----------
-        n_points : int, optional
+        n_vertices : int, optional
             The number of polygon vertices for each circle. Default
             is 100.
 
@@ -520,23 +534,21 @@ class CircleAnnulusSphericalSkyRegion(AnnulusSphericalSkyRegion):
             A compound region of two polygon regions approximating the
             annulus.
         """
-        return self.discretize_boundary(n_points=n_points)
+        return self.discretize_boundary(n_vertices=n_vertices)
 
-    def to_sky(
-        self,
-        wcs=None,
-        include_boundary_distortions=False,
-        n_points=None,
-    ):
-        self._validate_planar_spherical_transform(wcs, include_boundary_distortions)
+    def to_sky(self, wcs=None, *, include_boundary_distortions=False,
+               n_vertices=None):
+        self._validate_planar_spherical_transform(
+            wcs, include_boundary_distortions)
 
         if include_boundary_distortions:
-            # Requires spherical to planar projection (from WCS) and discretization
-            # Use to_pixel(), then apply "small angle approx" to get planar sky.
+            # Requires spherical to planar projection (from WCS)
+            # and discretization
+            # Use to_pixel(), then apply "small angle approx" to get planar
+            # sky.
             return self.to_pixel(
                 include_boundary_distortions=include_boundary_distortions,
-                wcs=wcs,
-                n_points=n_points,
+                wcs=wcs, n_vertices=n_vertices,
             ).to_sky(wcs)
 
         return CircleAnnulusSkyRegion(
@@ -547,18 +559,19 @@ class CircleAnnulusSphericalSkyRegion(AnnulusSphericalSkyRegion):
             visual=self.visual.copy(),
         )
 
-    def to_pixel(
-        self, wcs,
-        include_boundary_distortions=False,
-        n_points=None,
-    ):
-        self._validate_planar_spherical_transform(wcs, include_boundary_distortions)
+    def to_pixel(self, wcs, *, include_boundary_distortions=False,
+                 n_vertices=None):
+        self._validate_planar_spherical_transform(
+            wcs, include_boundary_distortions)
 
         if include_boundary_distortions:
             from .polygon import PolygonPixelRegion
 
-            # Requires spherical to planar projection (from WCS) and discretization
-            disc_kwargs = {} if n_points is None else {'n_points': n_points}
+            # Requires spherical to planar projection (from WCS) and
+            # discretization
+            disc_kwargs = (
+                {} if n_vertices is None
+                else {'n_vertices': n_vertices})
             polygonized = self.discretize_boundary(**disc_kwargs)
 
             inner_vertices = wcs.world_to_pixel(polygonized.region1.vertices)
@@ -822,7 +835,7 @@ class EllipseAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
         super().__init__(center, inner_width, outer_width, inner_height,
                          outer_height, angle, meta, visual)
 
-    def to_polygon(self, n_points=100):
+    def to_polygon(self, *, n_vertices=100):
         """
         Return a `~regions.CompoundPixelRegion` of two
         `~regions.PolygonPixelRegion` objects that approximates this
@@ -830,7 +843,7 @@ class EllipseAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
 
         Parameters
         ----------
-        n_points : int, optional
+        n_vertices : int, optional
             The number of polygon vertices for each ellipse. Default
             is 100.
 
@@ -840,8 +853,8 @@ class EllipseAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
             A compound region of two polygon regions approximating the
             annulus.
         """
-        inner_polygon = self._inner_region.to_polygon(n_points=n_points)
-        outer_polygon = self._outer_region.to_polygon(n_points=n_points)
+        inner_polygon = self._inner_region.to_polygon(n_vertices=n_vertices)
+        outer_polygon = self._outer_region.to_polygon(n_vertices=n_vertices)
         return CompoundPixelRegion(inner_polygon, outer_polygon,
                                    operator.xor, self.meta.copy(),
                                    self.visual.copy())
@@ -851,8 +864,8 @@ class EllipseAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
                                        meta=self.meta.copy(),
                                        visual=self.visual.copy())
 
-    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
-                         n_points=None):
+    def to_spherical_sky(self, wcs=None, *, include_boundary_distortions=False,
+                         n_vertices=None):
         raise NotImplementedError
 
 
@@ -908,7 +921,7 @@ class EllipseAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
         super().__init__(center, inner_width, outer_width, inner_height,
                          outer_height, angle, meta, visual)
 
-    def to_polygon(self, wcs, n_points=100):
+    def to_polygon(self, wcs, *, n_vertices=100):
         """
         Return a `~regions.CompoundSkyRegion` of two
         `~regions.PolygonSkyRegion` objects that approximates this
@@ -918,7 +931,7 @@ class EllipseAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
         ----------
         wcs : `~astropy.wcs.WCS`
             The WCS to use for the sky-to-pixel-to-sky conversion.
-        n_points : int, optional
+        n_vertices : int, optional
             The number of polygon vertices for each ellipse. Default
             is 100.
 
@@ -928,15 +941,15 @@ class EllipseAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
             A compound region of two polygon regions approximating the
             annulus.
         """
-        return self.to_pixel(wcs).to_polygon(n_points=n_points).to_sky(wcs)
+        return self.to_pixel(wcs).to_polygon(n_vertices=n_vertices).to_sky(wcs)
 
     def to_pixel(self, wcs):
         return EllipseAnnulusPixelRegion(*self.to_pixel_args(wcs),
                                          meta=self.meta.copy(),
                                          visual=self.visual.copy())
 
-    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
-                         n_points=None):
+    def to_spherical_sky(self, wcs=None, *, include_boundary_distortions=False,
+                         n_vertices=None):
         raise NotImplementedError
 
 
@@ -1054,8 +1067,8 @@ class RectangleAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
                                          meta=self.meta.copy(),
                                          visual=self.visual.copy())
 
-    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
-                         n_points=None):
+    def to_spherical_sky(self, wcs=None, *, include_boundary_distortions=False,
+                         n_vertices=None):
         raise NotImplementedError
 
 
@@ -1153,6 +1166,6 @@ class RectangleAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
                                            meta=self.meta.copy(),
                                            visual=self.visual.copy())
 
-    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
-                         n_points=None):
+    def to_spherical_sky(self, wcs=None, *, include_boundary_distortions=False,
+                         n_vertices=None):
         raise NotImplementedError

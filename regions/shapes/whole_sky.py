@@ -55,23 +55,13 @@ class WholeSphericalSkyRegion(SphericalSkyRegion):
     def transform_to(self, frame, merge_attributes=True):
         return self.__class__()
 
-    def discretize_boundary(self, n_points=100):
-        # Not defined
+    def discretize_boundary(self, *, n_vertices=100):
         raise ValueError('Not defined.')
 
-    def to_sky(
-        self,
-        wcs=None,
-        include_boundary_distortions=False,
-        n_points=None,
-    ):
-        # Not defined
+    def to_sky(self, wcs=None, *, include_boundary_distortions=False,
+               n_vertices=None):
         raise ValueError('Not defined.')
 
-    def to_pixel(
-        self, wcs,
-        include_boundary_distortions=False,
-        n_points=None,
-    ):
-        # Not defined
+    def to_pixel(self, wcs, *, include_boundary_distortions=False,
+                 n_vertices=None):
         raise ValueError('Not defined.')

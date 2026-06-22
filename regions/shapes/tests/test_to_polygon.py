@@ -40,8 +40,8 @@ class TestCirclePixelRegionToPolygon:
         poly = self.reg.to_polygon()
         assert len(poly.vertices.x) == 100
 
-    def test_to_polygon_n_points(self):
-        poly = self.reg.to_polygon(n_points=50)
+    def test_to_polygon_n_vertices(self):
+        poly = self.reg.to_polygon(n_vertices=50)
         assert len(poly.vertices.x) == 50
 
     def test_to_polygon_meta(self):
@@ -55,13 +55,13 @@ class TestCirclePixelRegionToPolygon:
         assert poly.visual['color'] != self.visual['color']
 
     def test_to_polygon_vertices(self):
-        poly = self.reg.to_polygon(n_points=4)
+        poly = self.reg.to_polygon(n_vertices=4)
         # theta = [0, pi/2, pi, 3*pi/2]
         assert_allclose(poly.vertices.x, [5, 3, 1, 3], atol=1e-10)
         assert_allclose(poly.vertices.y, [4, 6, 4, 2], atol=1e-10)
 
     def test_to_polygon_area(self):
-        poly = self.reg.to_polygon(n_points=1000)
+        poly = self.reg.to_polygon(n_vertices=1000)
         assert_allclose(poly.area, self.reg.area, rtol=1e-4)
 
     def test_to_polygon_contains(self):
@@ -85,8 +85,8 @@ class TestCircleSkyRegionToPolygon:
         poly = self.reg.to_polygon(self.wcs)
         assert len(poly.vertices.ra) == 100
 
-    def test_to_polygon_n_points(self):
-        poly = self.reg.to_polygon(self.wcs, n_points=50)
+    def test_to_polygon_n_vertices(self):
+        poly = self.reg.to_polygon(self.wcs, n_vertices=50)
         assert len(poly.vertices.ra) == 50
 
 
@@ -94,8 +94,9 @@ class TestCircleSphericalSkyRegionToPolygon:
     meta = RegionMeta({'text': 'test'})
     visual = RegionVisual({'color': 'blue'})
 
-    reg = CircleSphericalSkyRegion(SkyCoord(3 * u.deg, 4 * u.deg), 2 * u.arcsec,
-                                   meta=meta, visual=visual)
+    reg = CircleSphericalSkyRegion(
+        SkyCoord(3 * u.deg, 4 * u.deg), 2 * u.arcsec,
+        meta=meta, visual=visual)
 
     def test_to_polygon_type(self):
         poly = self.reg.to_polygon()
@@ -105,8 +106,8 @@ class TestCircleSphericalSkyRegionToPolygon:
         poly = self.reg.to_polygon()
         assert len(poly.vertices.ra) == 100
 
-    def test_to_polygon_n_points(self):
-        poly = self.reg.to_polygon(n_points=50)
+    def test_to_polygon_n_vertices(self):
+        poly = self.reg.to_polygon(n_vertices=50)
         assert len(poly.vertices.ra) == 50
 
     def test_to_polygon_meta(self):
@@ -136,8 +137,8 @@ class TestEllipsePixelRegionToPolygon:
         poly = self.reg.to_polygon()
         assert len(poly.vertices.x) == 100
 
-    def test_to_polygon_n_points(self):
-        poly = self.reg.to_polygon(n_points=50)
+    def test_to_polygon_n_vertices(self):
+        poly = self.reg.to_polygon(n_vertices=50)
         assert len(poly.vertices.x) == 50
 
     def test_to_polygon_meta(self):
@@ -150,7 +151,7 @@ class TestEllipsePixelRegionToPolygon:
         assert poly.visual['color'] != self.visual['color']
 
     def test_to_polygon_vertices_no_rotation(self):
-        poly = self.reg.to_polygon(n_points=4)
+        poly = self.reg.to_polygon(n_vertices=4)
         # Ellipse: width=6, height=4, center=(3,4), angle=0
         # theta = [0, pi/2, pi, 3*pi/2]
         # x = 0.5*6*cos(theta) + 3 = [6, 3, 0, 3]
@@ -161,13 +162,13 @@ class TestEllipsePixelRegionToPolygon:
     def test_to_polygon_vertices_rotated(self):
         reg = EllipsePixelRegion(PixCoord(0, 0), width=4, height=2,
                                  angle=90 * u.deg)
-        poly = reg.to_polygon(n_points=4)
+        poly = reg.to_polygon(n_vertices=4)
         # After 90 deg rotation, width along y and height along x
         assert_allclose(poly.vertices.x, [0, -1, 0, 1], atol=1e-10)
         assert_allclose(poly.vertices.y, [2, 0, -2, 0], atol=1e-10)
 
     def test_to_polygon_area(self):
-        poly = self.reg.to_polygon(n_points=1000)
+        poly = self.reg.to_polygon(n_vertices=1000)
         assert_allclose(poly.area, self.reg.area, rtol=1e-4)
 
     def test_to_polygon_contains(self):
@@ -192,8 +193,8 @@ class TestEllipseSkyRegionToPolygon:
         poly = self.reg.to_polygon(self.wcs)
         assert len(poly.vertices.ra) == 100
 
-    def test_to_polygon_n_points(self):
-        poly = self.reg.to_polygon(self.wcs, n_points=50)
+    def test_to_polygon_n_vertices(self):
+        poly = self.reg.to_polygon(self.wcs, n_vertices=50)
         assert len(poly.vertices.ra) == 50
 
 
@@ -218,8 +219,8 @@ class TestLuneSphericalSkyRegionToPolygon:
         poly = self.reg.to_polygon()
         assert len(poly.vertices.ra) == 100
 
-    def test_to_polygon_n_points(self):
-        poly = self.reg.to_polygon(n_points=50)
+    def test_to_polygon_n_vertices(self):
+        poly = self.reg.to_polygon(n_vertices=50)
         assert len(poly.vertices.ra) == 50
 
     def test_to_polygon_meta(self):
@@ -234,7 +235,7 @@ class TestLuneSphericalSkyRegionToPolygon:
         # Point far away should be outside
         assert not poly.contains(SkyCoord(75 * u.deg, 0 * u.deg))
 
-        polylune_inv = self.reg_inv.discretize_boundary(n_points=100)
+        polylune_inv = self.reg_inv.discretize_boundary(n_vertices=100)
         # Inside point
         assert polylune_inv.contains(SkyCoord(90 * u.deg, 0 * u.deg))
         # Point far away should be outside
@@ -341,8 +342,8 @@ class TestRangeSphericalSkyRegionToPolygon:
         poly = self.reg.to_polygon()
         assert len(poly.vertices.ra) == 100
 
-    def test_to_polygon_n_points(self):
-        poly = self.reg.to_polygon(n_points=50)
+    def test_to_polygon_n_vertices(self):
+        poly = self.reg.to_polygon(n_vertices=50)
         assert len(poly.vertices.ra) == 50
 
     def test_to_polygon_meta(self):
@@ -375,8 +376,8 @@ class TestCircleAnnulusPixelRegionToPolygon:
         assert len(poly.region1.vertices.x) == 100
         assert len(poly.region2.vertices.x) == 100
 
-    def test_to_polygon_n_points(self):
-        poly = self.reg.to_polygon(n_points=50)
+    def test_to_polygon_n_vertices(self):
+        poly = self.reg.to_polygon(n_vertices=50)
         assert len(poly.region1.vertices.x) == 50
         assert len(poly.region2.vertices.x) == 50
 
@@ -407,8 +408,8 @@ class TestCircleAnnulusSkyRegionToPolygon:
         poly = self.reg.to_polygon(self.wcs)
         assert isinstance(poly, CompoundSkyRegion)
 
-    def test_to_polygon_n_points(self):
-        poly = self.reg.to_polygon(self.wcs, n_points=50)
+    def test_to_polygon_n_vertices(self):
+        poly = self.reg.to_polygon(self.wcs, n_vertices=50)
         assert isinstance(poly, CompoundSkyRegion)
 
 
@@ -416,8 +417,8 @@ class TestCircleAnnulusSphericalSkyRegionToPolygon:
     meta = RegionMeta({'text': 'test'})
     visual = RegionVisual({'color': 'blue'})
     reg = CircleAnnulusSphericalSkyRegion(SkyCoord(3 * u.deg, 4 * u.deg),
-                                          20 * u.arcsec, 30 * u.arcsec, meta=meta,
-                                          visual=visual)
+                                          20 * u.arcsec, 30 * u.arcsec,
+                                          meta=meta, visual=visual)
 
     def test_to_polygon_type(self):
         poly = self.reg.to_polygon()
@@ -430,8 +431,8 @@ class TestCircleAnnulusSphericalSkyRegionToPolygon:
         assert len(poly.region1.vertices.ra) == 100
         assert len(poly.region2.vertices.ra) == 100
 
-    def test_to_polygon_n_points(self):
-        poly = self.reg.to_polygon(n_points=50)
+    def test_to_polygon_n_vertices(self):
+        poly = self.reg.to_polygon(n_vertices=50)
         assert len(poly.region1.vertices.ra) == 50
         assert len(poly.region2.vertices.ra) == 50
 
@@ -468,8 +469,8 @@ class TestEllipseAnnulusPixelRegionToPolygon:
         assert len(poly.region1.vertices.x) == 100
         assert len(poly.region2.vertices.x) == 100
 
-    def test_to_polygon_n_points(self):
-        poly = self.reg.to_polygon(n_points=50)
+    def test_to_polygon_n_vertices(self):
+        poly = self.reg.to_polygon(n_vertices=50)
         assert len(poly.region1.vertices.x) == 50
         assert len(poly.region2.vertices.x) == 50
 
@@ -499,8 +500,8 @@ class TestEllipseAnnulusSkyRegionToPolygon:
         poly = self.reg.to_polygon(self.wcs)
         assert isinstance(poly, CompoundSkyRegion)
 
-    def test_to_polygon_n_points(self):
-        poly = self.reg.to_polygon(self.wcs, n_points=50)
+    def test_to_polygon_n_vertices(self):
+        poly = self.reg.to_polygon(self.wcs, n_vertices=50)
         assert isinstance(poly, CompoundSkyRegion)
 
 

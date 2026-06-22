@@ -85,8 +85,8 @@ class LinePixelRegion(PixelRegion):
         return LineSkyRegion(start, end, meta=self.meta.copy(),
                              visual=self.visual.copy())
 
-    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
-                         n_points=None):
+    def to_spherical_sky(self, wcs=None, *, include_boundary_distortions=False,
+                         n_vertices=None):
         raise NotImplementedError
 
     @property
@@ -201,6 +201,6 @@ class LineSkyRegion(SkyRegion):
         return LinePixelRegion(start, end, meta=self.meta.copy(),
                                visual=self.visual.copy())
 
-    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
-                         n_points=None):
+    def to_spherical_sky(self, wcs=None, *, include_boundary_distortions=False,
+                         n_vertices=None):
         raise NotImplementedError

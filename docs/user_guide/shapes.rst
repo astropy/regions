@@ -398,7 +398,7 @@ to the `~regions.SphericalSkyRegion.discretize_boundary()` method.
 
     >>> sky_reg = sph_sky_reg.to_sky(wcs=wcs,
     ...                              include_boundary_distortions=True,
-    ...                              n_points=10)
+    ...                              n_vertices=10)
     >>> print(sky_reg)  # doctest: +FLOAT_CMP
     Region: PolygonSkyRegion
     vertices: <SkyCoord (ICRS): (ra, dec) in deg
@@ -423,7 +423,7 @@ respectively).
 
     >>> pix_reg2 = sph_sky_reg.to_pixel(wcs=wcs,
     ...                                 include_boundary_distortions=True,
-    ...                                 n_points=10)
+    ...                                 n_vertices=10)
     >>> print(pix_reg2)  # doctest: +FLOAT_CMP
     Region: PolygonPixelRegion
     vertices: PixCoord(x=[225.3356 334.317 334.317 225.3356 49.0 ...],

@@ -226,6 +226,12 @@ exclude = [
     '^conftest.*$',  # pytest configuration
 ]
 
+[tool.ruff]
+line-length = 79
+
+[tool.ruff.lint.pylint]
+max-statements = 130
+
 [tool.ruff.lint]
 select = [
     'B', 'COM', 'D', 'E', 'F', 'FLY', 'I', 'INT', 'N', 'NPY', 'PERF', 'PL', 'Q',

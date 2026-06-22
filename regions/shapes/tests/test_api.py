@@ -111,11 +111,13 @@ def test_pix_to_sky(region):
 
 
 @pytest.mark.parametrize('region', PIXEL_REGIONS, ids=ids_func)
-@pytest.mark.parametrize('include_dist', INCLUDE_BOUNDARY_DISTORTIONS, ids=ids_func)
+@pytest.mark.parametrize('include_dist',
+                         INCLUDE_BOUNDARY_DISTORTIONS, ids=ids_func)
 def test_pix_to_spherical_sky(region, include_dist):
     # TODO: remove expected failures when implemented
     # Expected failure:
-    #    No spherical Ellipse, EllipseAnnulus, Point, Rectangle, RectangleAnnulus
+    #    No spherical Ellipse, EllipseAnnulus, Point, Rectangle,
+    #    RectangleAnnulus
     # Also expected failure:
     #    Boundary distortions not yet implemented for
     #    CirclePixelRegion, CircleAnnulusPixelRegion, PolygonPixelRegion
@@ -173,11 +175,13 @@ def test_sky_to_pix(region):
 
 
 @pytest.mark.parametrize('region', SKY_REGIONS, ids=ids_func)
-@pytest.mark.parametrize('include_dist', INCLUDE_BOUNDARY_DISTORTIONS, ids=ids_func)
+@pytest.mark.parametrize('include_dist',
+                         INCLUDE_BOUNDARY_DISTORTIONS, ids=ids_func)
 def test_sky_to_spherical_sky(region, include_dist):
     # TODO: remove expected failures when implemented
     # Expected failure:
-    #    No spherical Ellipse, EllipseAnnulus, Point, Rectangle, RectangleAnnulus
+    #    No spherical Ellipse, EllipseAnnulus, Point, Rectangle,
+    #    RectangleAnnulus
     # Also expected failure:
     #    Boundary distortions not yet implemented for
     #    CircleSkyRegion, CircleAnnulusSkyRegion, PolygonSkyRegion
@@ -208,7 +212,8 @@ def test_sky_to_spherical_sky(region, include_dist):
 
 
 @pytest.mark.parametrize('region', SPHERICAL_SKY_REGIONS, ids=ids_func)
-@pytest.mark.parametrize('include_dist', INCLUDE_BOUNDARY_DISTORTIONS, ids=ids_func)
+@pytest.mark.parametrize('include_dist',
+                         INCLUDE_BOUNDARY_DISTORTIONS, ids=ids_func)
 def test_spherical_sky_to_sky(region, include_dist):
     if isinstance(region, WholeSphericalSkyRegion):
         with pytest.raises(ValueError):
@@ -238,7 +243,8 @@ def test_spherical_sky_to_sky(region, include_dist):
 
 
 @pytest.mark.parametrize('region', SPHERICAL_SKY_REGIONS, ids=ids_func)
-@pytest.mark.parametrize('include_dist', INCLUDE_BOUNDARY_DISTORTIONS, ids=ids_func)
+@pytest.mark.parametrize('include_dist',
+                         INCLUDE_BOUNDARY_DISTORTIONS, ids=ids_func)
 def test_spherical_sky_to_pix(region, include_dist):
     if isinstance(region, WholeSphericalSkyRegion):
         with pytest.raises(ValueError):
@@ -350,7 +356,8 @@ def test_attribute_validation_spherical_sky_regions(region):
                                     3 * u.km, (10, 10),
                                     (10 * u.deg, 10 * u.deg)],
                           longitude_range=[1, [1], [1, 2], [1 * u.deg],
-                                           [3 * u.km, 5 * u.km], u.Quantity([1 * u.deg]),
+                                           [3 * u.km, 5 * u.km],
+                                           u.Quantity([1 * u.deg]),
                                            u.Quantity([3 * u.km, 5 * u.km]),
                                            Angle([1 * u.deg])])
 

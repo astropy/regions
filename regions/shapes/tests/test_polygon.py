@@ -74,8 +74,8 @@ class TestPolygonPixelRegion(BaseTestPixelRegion):
         assert reg_new.visual['color'] != self.reg.visual['color']
 
     def test_to_spherical_sky(self, wcs):
-        polysphsky = self.reg.to_spherical_sky(wcs,
-                                               include_boundary_distortions=False)
+        polysphsky = self.reg.to_spherical_sky(
+            wcs, include_boundary_distortions=False)
         assert isinstance(polysphsky, PolygonSphericalSkyRegion)
 
         with pytest.raises(NotImplementedError):
@@ -230,8 +230,8 @@ class TestPolygonSkyRegion(BaseTestSkyRegion):
         assert_quantity_allclose(poly.vertices.data.lat,
                                  self.reg.vertices.data.lat, atol=1e-3 * u.deg)
 
-        polysphsky = self.reg.to_spherical_sky(wcs,
-                                               include_boundary_distortions=False)
+        polysphsky = self.reg.to_spherical_sky(
+            wcs, include_boundary_distortions=False)
         assert isinstance(polysphsky, PolygonSphericalSkyRegion)
 
         with pytest.raises(NotImplementedError):
@@ -363,10 +363,12 @@ class TestPolygonSphericalSkyRegion(BaseTestSphericalSkyRegion):
                                              [3, 4, 4] * u.deg),
                                     meta=meta, visual=visual)
 
-    expected_repr = ('<PolygonSphericalSkyRegion(vertices=<SkyCoord (ICRS): (ra, '
-                     'dec) in deg\n    [(3., 3.), (4., 4.), (3., 4.)]>)>')
-    expected_str = ('Region: PolygonSphericalSkyRegion\nvertices: <SkyCoord (ICRS):'
-                    ' (ra, dec) in deg\n    [(3., 3.), (4., 4.), (3., 4.)]>')
+    expected_repr = ('<PolygonSphericalSkyRegion(vertices='
+                     '<SkyCoord (ICRS): (ra, dec) in deg\n'
+                     '    [(3., 3.), (4., 4.), (3., 4.)]>)>')
+    expected_str = ('Region: PolygonSphericalSkyRegion\n'
+                    'vertices: <SkyCoord (ICRS): (ra, dec) in deg\n'
+                    '    [(3., 3.), (4., 4.), (3., 4.)]>')
 
     def test_copy(self):
         reg = self.reg.copy()
@@ -397,13 +399,13 @@ class TestPolygonSphericalSkyRegion(BaseTestSphericalSkyRegion):
 
         polysky3 = self.reg.to_sky(wcs,
                                    include_boundary_distortions=True,
-                                   n_points=10)
+                                   n_vertices=10)
         assert isinstance(polysky3, PolygonSkyRegion)
         assert len(polysky3.vertices) == 10
 
         polypix2 = self.reg.to_pixel(wcs,
                                      include_boundary_distortions=True,
-                                     n_points=10)
+                                     n_vertices=10)
         assert isinstance(polypix2, PolygonPixelRegion)
         assert len(polypix2.vertices) == 10
 
@@ -415,8 +417,9 @@ class TestPolygonSphericalSkyRegion(BaseTestSphericalSkyRegion):
 
     def test_frame_transformation(self):
         reg = self.reg.transform_to('galactic')
-        assert_skycoord_allclose(reg.centroid_mindist,
-                                 self.reg.centroid_mindist.transform_to('galactic'))
+        assert_skycoord_allclose(
+            reg.centroid_mindist,
+            self.reg.centroid_mindist.transform_to('galactic'))
         assert_skycoord_allclose(reg.vertices,
                                  self.reg.vertices.transform_to('galactic'))
         assert isinstance(reg, PolygonSphericalSkyRegion)
@@ -453,13 +456,13 @@ class TestPolygonSphericalSkyRegion(BaseTestSphericalSkyRegion):
                                            4.00015182 * u.deg]))
 
     def test_discretize_boundary(self):
-        poly = self.reg.discretize_boundary(n_points=100)
+        poly = self.reg.discretize_boundary(n_vertices=100)
         assert isinstance(poly, PolygonSphericalSkyRegion)
         assert len(poly.vertices) == 100
 
         with pytest.raises(ValueError) as excinfo:
-            _ = self.reg.discretize_boundary(n_points=2)
-        estr = 'n_points must be greater than'
+            _ = self.reg.discretize_boundary(n_vertices=2)
+        estr = 'must be greater than'
         assert estr in str(excinfo.value)
 
     def test_centroid(self):
@@ -519,7 +522,8 @@ class TestPolygonShapelyComparison:
 
         shp_func = {'contains': contains, 'covers': covers}[method]
         x, y = point
-        reg_result = bool(getattr(self.setup_polygon(), method)(PixCoord(x, y)))
+        reg_result = bool(
+            getattr(self.setup_polygon(), method)(PixCoord(x, y)))
         shp_result = bool(shp_func(self.shapely_polygon(), Point(x, y)))
         assert reg_result == shp_result
 

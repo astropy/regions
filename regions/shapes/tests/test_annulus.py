@@ -85,8 +85,8 @@ class TestCircleAnnulusPixelRegion(BaseTestPixelRegion):
         assert isinstance(skyannulus, CircleAnnulusSkyRegion)
 
     def test_to_spherical_sky(self, wcs):
-        sphskyann = self.reg.to_spherical_sky(wcs,
-                                              include_boundary_distortions=False)
+        sphskyann = self.reg.to_spherical_sky(
+            wcs, include_boundary_distortions=False)
         assert isinstance(sphskyann, CircleAnnulusSphericalSkyRegion)
 
         with pytest.raises(NotImplementedError):
@@ -165,8 +165,8 @@ class TestCircleAnnulusSkyRegion(BaseTestSkyRegion):
         assert isinstance(pixannulus, CircleAnnulusPixelRegion)
 
     def test_to_spherical_sky(self, wcs):
-        sphskyann = self.reg.to_spherical_sky(wcs,
-                                              include_boundary_distortions=False)
+        sphskyann = self.reg.to_spherical_sky(
+            wcs, include_boundary_distortions=False)
         assert isinstance(sphskyann, CircleAnnulusSphericalSkyRegion)
 
         with pytest.raises(NotImplementedError):
@@ -192,16 +192,18 @@ class TestCircleAnnulusSphericalSkyRegion(BaseTestSphericalSkyRegion):
     meta = RegionMeta({'text': 'test'})
     visual = RegionVisual({'color': 'blue'})
     reg = CircleAnnulusSphericalSkyRegion(SkyCoord(3 * u.deg, 4 * u.deg),
-                                          20 * u.arcsec, 30 * u.arcsec, meta=meta,
-                                          visual=visual)
+                                          20 * u.arcsec, 30 * u.arcsec,
+                                          meta=meta, visual=visual)
     skycoord = SkyCoord(3 * u.deg, 4 * u.deg, frame='icrs')
     wcs = make_simple_wcs(skycoord, 5 * u.arcsec, 20)
 
-    expected_repr = ('<CircleAnnulusSphericalSkyRegion(center=<SkyCoord (ICRS): '
-                     '(ra, dec) in deg\n    (3., 4.)>, inner_radius=20.0 '
+    expected_repr = ('<CircleAnnulusSphericalSkyRegion(center='
+                     '<SkyCoord (ICRS): (ra, dec) in deg\n'
+                     '    (3., 4.)>, inner_radius=20.0 '
                      'arcsec, outer_radius=30.0 arcsec)>')
-    expected_str = ('Region: CircleAnnulusSphericalSkyRegion\ncenter: <SkyCoord '
-                    '(ICRS): (ra, dec) in deg\n    (3., 4.)>\ninner_radius: '
+    expected_str = ('Region: CircleAnnulusSphericalSkyRegion\n'
+                    'center: <SkyCoord (ICRS): (ra, dec) in deg\n'
+                    '    (3., 4.)>\ninner_radius: '
                     '20.0 arcsec\nouter_radius: 30.0 arcsec')
 
     def test_init(self):
@@ -239,7 +241,8 @@ class TestCircleAnnulusSphericalSkyRegion(BaseTestSphericalSkyRegion):
         polysky = self.reg.to_sky(self.wcs, include_boundary_distortions=True)
         assert isinstance(polysky, CompoundSkyRegion)
 
-        polypix = self.reg.to_pixel(self.wcs, include_boundary_distortions=True)
+        polypix = self.reg.to_pixel(
+            self.wcs, include_boundary_distortions=True)
         assert isinstance(polypix, CompoundPixelRegion)
 
     def test_transformation_no_wcs(self):

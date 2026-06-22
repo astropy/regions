@@ -46,8 +46,10 @@ class LuneSphericalSkyRegion(SphericalSkyRegion):
     """
 
     _params = ('center_gc1', 'center_gc2')
-    center_gc1 = ScalarSkyCoord('The center position of the first great circle as a |SkyCoord|.')
-    center_gc2 = ScalarSkyCoord('The center position of the second great circle as a |SkyCoord|.')
+    center_gc1 = ScalarSkyCoord(
+        'The center position of the first great circle as a |SkyCoord|.')
+    center_gc2 = ScalarSkyCoord(
+        'The center position of the second great circle as a |SkyCoord|.')
 
     meta = RegionMetaDescr('The meta attributes as a |RegionMeta|')
     visual = RegionVisualDescr('The visual attributes as a |RegionVisual|.')
@@ -82,8 +84,9 @@ class LuneSphericalSkyRegion(SphericalSkyRegion):
 
     @property
     def _compound_region(self):
-        return CompoundSphericalSkyRegion(self._circle_1, self._circle_2,
-                                          operator.and_, self.meta, self.visual)
+        return CompoundSphericalSkyRegion(
+            self._circle_1, self._circle_2,
+            operator.and_, self.meta, self.visual)
 
     @property
     def frame(self):
@@ -94,9 +97,11 @@ class LuneSphericalSkyRegion(SphericalSkyRegion):
         """
         Region centroid.
         """
-        # Cross product to get poles:
-        c_pole = cross_product_skycoord2skycoord(self.center_gc2, self.center_gc1)
-        c_pole_a = cross_product_skycoord2skycoord(self.center_gc1, self.center_gc2)
+        # Cross product to get poles
+        c_pole = cross_product_skycoord2skycoord(
+            self.center_gc2, self.center_gc1)
+        c_pole_a = cross_product_skycoord2skycoord(
+            self.center_gc1, self.center_gc2)
 
         # Use centers + poles to get centroid from cross products of vertices
         # with cartesian representation
@@ -107,21 +112,10 @@ class LuneSphericalSkyRegion(SphericalSkyRegion):
         c_p_sph = c_pole.represent_as('spherical')
         c_p_a_sph = c_pole_a.represent_as('spherical')
 
-        verts = SkyCoord(
-            [
-                c_gc2_sph.lon,
-                c_p_a_sph.lon,
-                c_gc1_sph.lon,
-                c_p_sph.lon,
-            ],
-            [
-                c_gc2_sph.lat,
-                c_p_a_sph.lat,
-                c_gc1_sph.lat,
-                c_p_sph.lat,
-            ],
-            frame=self.frame,
-        )
+        verts = SkyCoord([c_gc2_sph.lon, c_p_a_sph.lon, c_gc1_sph.lon,
+                          c_p_sph.lon],
+                         [c_gc2_sph.lat, c_p_a_sph.lat, c_gc1_sph.lat,
+                          c_p_sph.lat], frame=self.frame)
 
         return cross_product_sum_skycoord2skycoord(verts)
 
@@ -133,24 +127,17 @@ class LuneSphericalSkyRegion(SphericalSkyRegion):
         For a lune, these are the intersections of the two bounding
         great circles, and are antipodes.
         """
-        # Cross product to get poles:
-        c_pole = cross_product_skycoord2skycoord(self.center_gc2, self.center_gc1)
-        c_pole_a = cross_product_skycoord2skycoord(self.center_gc1, self.center_gc2)
+        # Cross product to get poles
+        c_pole = cross_product_skycoord2skycoord(
+            self.center_gc2, self.center_gc1)
+        c_pole_a = cross_product_skycoord2skycoord(
+            self.center_gc1, self.center_gc2)
 
         c_p_sph = c_pole.represent_as('spherical')
         c_p_a_sph = c_pole_a.represent_as('spherical')
 
-        verts = SkyCoord(
-            [
-                c_p_sph.lon,
-                c_p_a_sph.lon,
-            ],
-            [
-                c_p_sph.lat,
-                c_p_a_sph.lat,
-            ],
-            frame=self.frame,
-        )
+        verts = SkyCoord([c_p_sph.lon, c_p_a_sph.lon],
+                         [c_p_sph.lat, c_p_a_sph.lat], frame=self.frame)
 
         return verts
 
@@ -177,8 +164,10 @@ class LuneSphericalSkyRegion(SphericalSkyRegion):
     def transform_to(self, frame, merge_attributes=True):
         frame = self._validate_frame_transformation(frame)
 
-        center_gc1_transf = self.center_gc1.transform_to(frame, merge_attributes=merge_attributes)
-        center_gc2_transf = self.center_gc2.transform_to(frame, merge_attributes=merge_attributes)
+        center_gc1_transf = self.center_gc1.transform_to(
+            frame, merge_attributes=merge_attributes)
+        center_gc2_transf = self.center_gc2.transform_to(
+            frame, merge_attributes=merge_attributes)
 
         return LuneSphericalSkyRegion(
             center_gc1_transf,
@@ -187,22 +176,23 @@ class LuneSphericalSkyRegion(SphericalSkyRegion):
             self.visual.copy(),
         )
 
-    def discretize_boundary(self, n_points=100):
+    def discretize_boundary(self, *, n_vertices=100):
         bound_verts = discretize_all_edge_boundaries(
-            self.vertices, self._edge_circs, n_points,
+            self.vertices, self._edge_circs, n_vertices=n_vertices,
         )[::-1]  # inverted for lune
-        # TODO: properly check for CW order even for a nverts=2 spherical polygon (lune).
+        # TODO: properly check for CW order even for a nverts=2 spherical
+        # polygon (lune).
         return PolygonSphericalSkyRegion(bound_verts, meta=self.meta.copy(),
                                          visual=self.visual.copy())
 
-    def to_polygon(self, n_points=100):
+    def to_polygon(self, *, n_vertices=100):
         """
         Return a `~regions.PolygonSphericalSkyRegion` that approximates this
         lune.
 
         Parameters
         ----------
-        n_points : int, optional
+        n_vertices : int, optional
             The number of polygon vertices. Default is 100.
 
         Returns
@@ -210,46 +200,43 @@ class LuneSphericalSkyRegion(SphericalSkyRegion):
         polygon : `~regions.PolygonSphericalSkyRegion`
             A polygon region approximating the lune.
         """
-        return self.discretize_boundary(n_points=n_points)
+        return self.discretize_boundary(n_vertices=n_vertices)
 
-    def to_sky(
-        self,
-        wcs=None,
-        include_boundary_distortions=False,
-        n_points=None,
-    ):
+    def to_sky(self, wcs=None, *, include_boundary_distortions=False,
+               n_vertices=None):
         if not include_boundary_distortions:
             raise ValueError(
                 'Invalid parameter: `include_boundary_distortions=False`!\n'
                 'Transforming lune to planar sky region is only possible by '
-                'including boundary distortions, as there is no analogous sky region.',
+                'including boundary distortions, as there is no '
+                'analogous sky region.',
             )
 
-        self._validate_planar_spherical_transform(wcs, include_boundary_distortions)
+        self._validate_planar_spherical_transform(
+            wcs, include_boundary_distortions)
 
-        # Requires spherical to planar projection (from WCS) and discretization
-        # Use to_pixel(), then apply "small angle approx" to get planar sky.
+        # Requires spherical to planar projection (from WCS) and
+        # discretization. Use to_pixel(), then apply "small angle
+        # approx" to get planar sky.
         return self.to_pixel(
             include_boundary_distortions=include_boundary_distortions,
-            wcs=wcs,
-            n_points=n_points,
+            wcs=wcs, n_vertices=n_vertices,
         ).to_sky(wcs)
 
-    def to_pixel(
-        self, wcs,
-        include_boundary_distortions=False,
-        n_points=None,
-    ):
+    def to_pixel(self, wcs, *, include_boundary_distortions=False,
+                 n_vertices=None):
         if not include_boundary_distortions:
             raise ValueError(
                 'Invalid parameter: `include_boundary_distortions=False`!\n'
                 'Transforming lune to planar pixel region is only possible by '
-                'including boundary distortions, as there is no analogous pixel region.',
+                'including boundary distortions, as there is no '
+                'analogous pixel region.',
             )
 
-        self._validate_planar_spherical_transform(wcs, include_boundary_distortions)
+        self._validate_planar_spherical_transform(
+            wcs, include_boundary_distortions)
 
-        disc_kwargs = {} if n_points is None else {'n_points': n_points}
+        disc_kwargs = {} if n_vertices is None else {'n_vertices': n_vertices}
 
         # Requires spherical to planar projection (from WCS) and discretization
         disc_bound = self.discretize_boundary(**disc_kwargs)

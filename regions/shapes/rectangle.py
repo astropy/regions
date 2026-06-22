@@ -130,8 +130,8 @@ class RectanglePixelRegion(PixelRegion):
                                   meta=self.meta.copy(),
                                   visual=self.visual.copy())
 
-    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
-                         n_points=None):
+    def to_spherical_sky(self, wcs=None, *, include_boundary_distortions=False,
+                         n_vertices=None):
         raise NotImplementedError
 
     @property
@@ -274,7 +274,8 @@ class RectanglePixelRegion(PixelRegion):
         from matplotlib.widgets import RectangleSelector
 
         if hasattr(self, '_mpl_selector'):
-            raise AttributeError('Cannot attach more than one selector to a region.')
+            raise AttributeError(
+                'Cannot attach more than one selector to a region.')
 
         if self.angle.value != 0:
             raise NotImplementedError('Cannot create matplotlib selector for '
@@ -451,6 +452,6 @@ class RectangleSkyRegion(SkyRegion):
         """
         return self.to_pixel(wcs).to_polygon().to_sky(wcs)
 
-    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
-                         n_points=None):
+    def to_spherical_sky(self, wcs=None, *, include_boundary_distortions=False,
+                         n_vertices=None):
         raise NotImplementedError

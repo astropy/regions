@@ -89,8 +89,8 @@ class PointPixelRegion(PixelRegion):
         return PointSkyRegion(center, meta=self.meta.copy(),
                               visual=self.visual.copy())
 
-    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
-                         n_points=None):
+    def to_spherical_sky(self, wcs=None, *, include_boundary_distortions=False,
+                         n_vertices=None):
         raise NotImplementedError
 
     @property
@@ -196,6 +196,6 @@ class PointSkyRegion(SkyRegion):
         return PointPixelRegion(center, meta=self.meta.copy(),
                                 visual=self.visual.copy())
 
-    def to_spherical_sky(self, wcs=None, include_boundary_distortions=False,
-                         n_points=None):
+    def to_spherical_sky(self, wcs=None, *, include_boundary_distortions=False,
+                         n_vertices=None):
         raise NotImplementedError
