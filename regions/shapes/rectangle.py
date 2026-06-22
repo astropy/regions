@@ -122,7 +122,7 @@ class RectanglePixelRegion(PixelRegion):
         # RA axis. Convert between them with a 90 deg offset.
         center, sky_width, sky_height, angle = pixel_shape_to_sky_svd(
             (self.center.x, self.center.y), wcs, self.width, self.height,
-            self.angle.to(u.rad).value)
+            self.angle.to_value(u.radian))
         angle = (angle + 90 * u.deg).wrap_at(360 * u.deg)
         width = Angle(sky_width, 'arcsec')
         height = Angle(sky_height, 'arcsec')
@@ -178,7 +178,7 @@ class RectanglePixelRegion(PixelRegion):
 
         fraction = rectangle_overlap_grid(xmin, xmax, ymin, ymax, nx, ny,
                                           self.width, self.height,
-                                          self.angle.to(u.rad).value,
+                                          self.angle.to_value(u.radian),
                                           use_exact, subpixels)
 
         return RegionMask(fraction, bbox=bbox)
@@ -211,7 +211,7 @@ class RectanglePixelRegion(PixelRegion):
         width = self.width
         height = self.height
         # matplotlib expects rotation in degrees (anti-clockwise)
-        angle = self.angle.to('deg').value
+        angle = self.angle.to_value(u.deg)
 
         mpl_kwargs = self.visual.define_mpl_kwargs(self._mpl_artist)
         mpl_kwargs.update(kwargs)
@@ -426,9 +426,9 @@ class RectangleSkyRegion(SkyRegion):
         # North) by subtracting 90 deg.
         center, pix_width, pix_height, angle = sky_shape_to_pixel_svd(
             self.center, wcs,
-            self.width.to(u.arcsec).value,
-            self.height.to(u.arcsec).value,
-            self.angle.to(u.rad).value - np.pi / 2)
+            self.width.to_value(u.arcsec),
+            self.height.to_value(u.arcsec),
+            self.angle.to_value(u.radian) - np.pi / 2)
         return RectanglePixelRegion(PixCoord(*center), pix_width, pix_height,
                                     angle=angle,
                                     meta=self.meta.copy(),
