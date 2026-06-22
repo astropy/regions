@@ -14,7 +14,7 @@ WCS_CENTER = SkyCoord(100 * u.deg, 30 * u.deg)
 WCS_CDELT_ARCSEC = 0.1
 
 
-def _make_simple_wcs(skycoord, resolution, size, rotation_deg=0.0):
+def _make_simple_wcs(skycoord, resolution, size, *, rotation_deg=0.0):
     """
     Create a simple TAN WCS with optional rotation.
 
@@ -37,7 +37,7 @@ def _make_simple_wcs(skycoord, resolution, size, rotation_deg=0.0):
     wcs : `~astropy.wcs.WCS`
         The WCS object.
     """
-    cdelt_deg = resolution.to(u.deg).value
+    cdelt_deg = resolution.to_value(u.deg)
     wcs = WCS(naxis=2)
     wcs.wcs.crpix = [size / 2 + 0.5, size / 2 + 0.5]
     wcs.wcs.crval = [skycoord.ra.deg, skycoord.dec.deg]

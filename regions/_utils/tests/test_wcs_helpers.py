@@ -604,13 +604,13 @@ class TestSVDShapeConversions:
         assert pw > 1.0
         assert ph > 1.0
         _, sw, sh, _ = pixel_shape_to_sky_svd(
-            center, wcs, pw, ph, pa.to(u.rad).value)
+            center, wcs, pw, ph, pa.to_value(u.radian))
         assert_allclose(sw, 2.0, rtol=1e-3)
         assert_allclose(sh, 1.0, rtol=1e-3)
 
 
-def _project_sky_ellipse_boundary(skycoord, wcs, a_arcsec, b_arcsec,
-                                  pa_rad, npts=720):
+def _project_sky_ellipse_boundary(skycoord, wcs, a_arcsec, b_arcsec, pa_rad, *,
+                                  npts=720):
     """
     Project the boundary of a sky ellipse to pixel coordinates.
 
@@ -738,7 +738,7 @@ def _make_sheared_wcs():
     return wcs
 
 
-def _project_pixel_circle_to_sky_tangent(pixcoord, wcs, radius_pix,
+def _project_pixel_circle_to_sky_tangent(pixcoord, wcs, radius_pix, *,
                                          npts=720):
     """
     Project a pixel circle boundary to tangent-plane sky offsets.
