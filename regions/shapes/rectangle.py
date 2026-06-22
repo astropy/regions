@@ -8,7 +8,7 @@ import astropy.units as u
 import numpy as np
 from astropy.coordinates import Angle
 
-from regions._geometry import rectangular_overlap_grid
+from regions._geometry import rectangle_overlap_grid
 from regions._utils.wcs_helpers import (pixel_shape_to_sky_svd,
                                         sky_shape_to_pixel_svd)
 from regions.core.attributes import (PositiveScalar, PositiveScalarAngle,
@@ -176,10 +176,10 @@ class RectanglePixelRegion(PixelRegion):
 
         use_exact = 0 if mode == 'subpixels' else 1
 
-        fraction = rectangular_overlap_grid(xmin, xmax, ymin, ymax, nx, ny,
-                                            self.width, self.height,
-                                            self.angle.to(u.rad).value,
-                                            use_exact, subpixels)
+        fraction = rectangle_overlap_grid(xmin, xmax, ymin, ymax, nx, ny,
+                                          self.width, self.height,
+                                          self.angle.to(u.rad).value,
+                                          use_exact, subpixels)
 
         return RegionMask(fraction, bbox=bbox)
 

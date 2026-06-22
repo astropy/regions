@@ -9,7 +9,7 @@ import numpy as np
 from astropy.coordinates import SkyCoord
 from astropy.stats import circmean
 
-from regions._geometry import polygonal_overlap_grid
+from regions._geometry import polygon_overlap_grid
 from regions._geometry.pnpoly import (points_in_polygon,
                                       points_in_polygon_covers)
 from regions._utils.spherical_helpers import (
@@ -183,8 +183,8 @@ class PolygonPixelRegion(PixelRegion):
         vx = np.asarray(self.vertices.x, dtype=float)
         vy = np.asarray(self.vertices.y, dtype=float)
 
-        fraction = polygonal_overlap_grid(xmin, xmax, ymin, ymax, nx, ny,
-                                          vx, vy, use_exact, subpixels)
+        fraction = polygon_overlap_grid(xmin, xmax, ymin, ymax, nx, ny,
+                                        vx, vy, use_exact, subpixels)
 
         return RegionMask(fraction, bbox=bbox)
 

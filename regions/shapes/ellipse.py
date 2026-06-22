@@ -10,7 +10,7 @@ import astropy.units as u
 import numpy as np
 from astropy.coordinates import Angle
 
-from regions._geometry import elliptical_overlap_grid
+from regions._geometry import ellipse_overlap_grid
 from regions._utils.wcs_helpers import (pixel_shape_to_sky_svd,
                                         sky_shape_to_pixel_svd)
 from regions.core.attributes import (PositiveScalar, PositiveScalarAngle,
@@ -180,10 +180,10 @@ class EllipsePixelRegion(PixelRegion):
 
         use_exact = 0 if mode == 'subpixels' else 1
 
-        fraction = elliptical_overlap_grid(xmin, xmax, ymin, ymax, nx, ny,
-                                           0.5 * self.width, 0.5 * self.height,
-                                           self.angle.to(u.rad).value,
-                                           use_exact, subpixels)
+        fraction = ellipse_overlap_grid(xmin, xmax, ymin, ymax, nx, ny,
+                                        0.5 * self.width, 0.5 * self.height,
+                                        self.angle.to(u.rad).value,
+                                        use_exact, subpixels)
 
         return RegionMask(fraction, bbox=bbox)
 
