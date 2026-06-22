@@ -83,9 +83,9 @@ class TestPolygonPixelRegion(BaseTestPixelRegion):
                                           include_boundary_distortions=True)
 
     def test_to_spherical_sky_no_wcs(self):
-        with pytest.raises(ValueError) as excinfo:
-            _ = self.reg.to_spherical_sky(include_boundary_distortions=True)
-        estr = "'wcs' must be set if `include_boundary_distortions=True`"
+        with pytest.raises(TypeError) as excinfo:
+            _ = self.reg.to_spherical_sky()
+        estr = 'missing 1 required positional argument'
         assert estr in str(excinfo.value)
 
     def test_bounding_box(self):
@@ -231,11 +231,11 @@ class TestPolygonSkyRegion(BaseTestSkyRegion):
                                  self.reg.vertices.data.lat, atol=1e-3 * u.deg)
 
         polysphsky = self.reg.to_spherical_sky(
-            wcs, include_boundary_distortions=False)
+            wcs=wcs, include_boundary_distortions=False)
         assert isinstance(polysphsky, PolygonSphericalSkyRegion)
 
         with pytest.raises(NotImplementedError):
-            _ = self.reg.to_spherical_sky(wcs,
+            _ = self.reg.to_spherical_sky(wcs=wcs,
                                           include_boundary_distortions=True)
 
     def test_to_spherical_sky_no_wcs(self):
@@ -385,19 +385,19 @@ class TestPolygonSphericalSkyRegion(BaseTestSphericalSkyRegion):
         assert_allclose(polypix.vertices.y,
                         [1.99948607, 2.0390009, 2.07707564])
 
-        polysky = self.reg.to_sky(wcs)
+        polysky = self.reg.to_sky(wcs=wcs)
         assert isinstance(polysky, PolygonSkyRegion)
         assert_allclose(polysky.vertices.ra.deg, [3, 4, 3])
         assert_allclose(polysky.vertices.dec.deg, [3, 4, 4])
 
-        polysky2 = polysky.to_spherical_sky(wcs)
+        polysky2 = polysky.to_spherical_sky(wcs=wcs)
 
         assert_quantity_allclose(self.reg.vertices.ra.deg,
                                  polysky2.vertices.ra.deg)
         assert_quantity_allclose(self.reg.vertices.dec.deg,
                                  polysky2.vertices.dec.deg)
 
-        polysky3 = self.reg.to_sky(wcs,
+        polysky3 = self.reg.to_sky(wcs=wcs,
                                    include_boundary_distortions=True,
                                    n_vertices=10)
         assert isinstance(polysky3, PolygonSkyRegion)

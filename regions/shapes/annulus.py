@@ -278,7 +278,7 @@ class CircleAnnulusPixelRegion(AnnulusPixelRegion):
                                    operator.xor, self.meta.copy(),
                                    self.visual.copy())
 
-    def to_spherical_sky(self, wcs=None, *, include_boundary_distortions=False,
+    def to_spherical_sky(self, wcs, *, include_boundary_distortions=False,
                          n_vertices=None):
         self._validate_planar_spherical_transform(
             wcs, include_boundary_distortions)
@@ -412,7 +412,7 @@ class CircleAnnulusSkyRegion(SkyRegion):
         """
         return self.to_pixel(wcs).to_polygon(n_vertices=n_vertices).to_sky(wcs)
 
-    def to_spherical_sky(self, wcs=None, *, include_boundary_distortions=False,
+    def to_spherical_sky(self, *, wcs=None, include_boundary_distortions=False,
                          n_vertices=None):
         self._validate_planar_spherical_transform(
             wcs, include_boundary_distortions)
@@ -536,7 +536,7 @@ class CircleAnnulusSphericalSkyRegion(AnnulusSphericalSkyRegion):
         """
         return self.discretize_boundary(n_vertices=n_vertices)
 
-    def to_sky(self, wcs=None, *, include_boundary_distortions=False,
+    def to_sky(self, *, wcs=None, include_boundary_distortions=False,
                n_vertices=None):
         self._validate_planar_spherical_transform(
             wcs, include_boundary_distortions)
@@ -864,7 +864,7 @@ class EllipseAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
                                        meta=self.meta.copy(),
                                        visual=self.visual.copy())
 
-    def to_spherical_sky(self, wcs=None, *, include_boundary_distortions=False,
+    def to_spherical_sky(self, wcs, *, include_boundary_distortions=False,
                          n_vertices=None):
         raise NotImplementedError
 
@@ -948,7 +948,7 @@ class EllipseAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
                                          meta=self.meta.copy(),
                                          visual=self.visual.copy())
 
-    def to_spherical_sky(self, wcs=None, *, include_boundary_distortions=False,
+    def to_spherical_sky(self, *, wcs=None, include_boundary_distortions=False,
                          n_vertices=None):
         raise NotImplementedError
 
@@ -1067,7 +1067,7 @@ class RectangleAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
                                          meta=self.meta.copy(),
                                          visual=self.visual.copy())
 
-    def to_spherical_sky(self, wcs=None, *, include_boundary_distortions=False,
+    def to_spherical_sky(self, wcs, *, include_boundary_distortions=False,
                          n_vertices=None):
         raise NotImplementedError
 
@@ -1166,6 +1166,6 @@ class RectangleAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
                                            meta=self.meta.copy(),
                                            visual=self.visual.copy())
 
-    def to_spherical_sky(self, wcs=None, *, include_boundary_distortions=False,
+    def to_spherical_sky(self, *, wcs=None, include_boundary_distortions=False,
                          n_vertices=None):
         raise NotImplementedError

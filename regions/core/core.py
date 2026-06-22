@@ -532,7 +532,7 @@ class PixelRegion(Region):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def to_spherical_sky(self, wcs=None, *, include_boundary_distortions=False,
+    def to_spherical_sky(self, wcs, *, include_boundary_distortions=False,
                          n_vertices=None):
         """
         Convert to an equivalent spherical `~regions.SphericalSkyRegion`
@@ -540,12 +540,9 @@ class PixelRegion(Region):
 
         Parameters
         ----------
-        wcs : `~astropy.wcs.WCS` instance, optional
+        wcs : `~astropy.wcs.WCS` instance
             The world coordinate system transformation to use to convert
-            between sky and pixel coordinates. Required if transforming
-            with boundary distortions (if
-            ``include_boundary_distortions`` is True).
-            Ignored if boundary distortions not included.
+            between pixel and sky coordinates.
 
         include_boundary_distortions : bool, optional
             If True, accounts for boundary distortions in spherical to planar
@@ -830,7 +827,7 @@ class SkyRegion(Region):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def to_spherical_sky(self, wcs=None, *, include_boundary_distortions=False,
+    def to_spherical_sky(self, *, wcs=None, include_boundary_distortions=False,
                          n_vertices=None):
         """
         Convert to an equivalent spherical `~regions.SphericalSkyRegion`
@@ -1102,7 +1099,7 @@ class SphericalSkyRegion(Region):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def to_sky(self, wcs=None, *, include_boundary_distortions=False,
+    def to_sky(self, *, wcs=None, include_boundary_distortions=False,
                n_vertices=None):
         """
         Convert to a planar `~regions.SkyRegion`.

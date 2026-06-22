@@ -340,9 +340,9 @@ class TestRangeSphericalSkyRegion(BaseTestSphericalSkyRegion):
                              n_vertices=10)
 
     def test_transformation_no_wcs(self):
-        with pytest.raises(ValueError) as excinfo:
-            _ = self.reg.to_sky(include_boundary_distortions=True)
-        estr = "'wcs' must be set if `include_boundary_distortions=True`"
+        with pytest.raises(TypeError) as excinfo:
+            _ = self.reg.to_sky()
+        estr = 'missing 1 required positional argument'
         assert estr in str(excinfo.value)
 
     def test_frame_transformation(self):

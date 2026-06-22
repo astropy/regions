@@ -199,13 +199,13 @@ def test_sky_to_spherical_sky(region, include_dist):
     ):
         with pytest.raises(NotImplementedError):
             sph_sky_region = region.to_spherical_sky(
-                COMMON_WCS,
+                wcs=COMMON_WCS,
                 include_boundary_distortions=include_dist,
             )
             assert isinstance(sph_sky_region, SphericalSkyRegion)
     else:
         sph_sky_region = region.to_spherical_sky(
-            COMMON_WCS,
+            wcs=COMMON_WCS,
             include_boundary_distortions=include_dist,
         )
         assert isinstance(sph_sky_region, SphericalSkyRegion)
@@ -218,7 +218,7 @@ def test_spherical_sky_to_sky(region, include_dist):
     if isinstance(region, WholeSphericalSkyRegion):
         with pytest.raises(ValueError):
             _ = region.to_sky(
-                COMMON_WCS,
+                wcs=COMMON_WCS,
                 include_boundary_distortions=include_dist,
             )
 
@@ -236,7 +236,7 @@ def test_spherical_sky_to_sky(region, include_dist):
 
     else:
         sky_region = region.to_sky(
-            COMMON_WCS,
+            wcs=COMMON_WCS,
             include_boundary_distortions=include_dist,
         )
         assert isinstance(sky_region, SkyRegion)

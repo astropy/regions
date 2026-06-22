@@ -73,9 +73,9 @@ class TestCirclePixelRegion(BaseTestPixelRegion):
                                           include_boundary_distortions=True)
 
     def test_to_spherical_sky_no_wcs(self):
-        with pytest.raises(ValueError) as excinfo:
-            _ = self.reg.to_spherical_sky(include_boundary_distortions=True)
-        estr = "'wcs' must be set if `include_boundary_distortions=True`"
+        with pytest.raises(TypeError) as excinfo:
+            _ = self.reg.to_spherical_sky()
+        estr = 'missing 1 required positional argument'
         assert estr in str(excinfo.value)
 
     @pytest.mark.skipif(not HAS_MATPLOTLIB, reason='matplotlib is required')
@@ -167,11 +167,11 @@ class TestCircleSkyRegion(BaseTestSkyRegion):
         assert_quantity_allclose(skycircle2.radius, skycircle.radius)
 
         sphskycircle = self.reg.to_spherical_sky(
-            wcs, include_boundary_distortions=False)
+            wcs=wcs, include_boundary_distortions=False)
         assert isinstance(sphskycircle, CircleSphericalSkyRegion)
 
         with pytest.raises(NotImplementedError):
-            _ = self.reg.to_spherical_sky(wcs,
+            _ = self.reg.to_spherical_sky(wcs=wcs,
                                           include_boundary_distortions=True)
 
     def test_to_spherical_sky_no_wcs(self):
@@ -238,7 +238,7 @@ class TestCircleSphericalSkyRegion(BaseTestSphericalSkyRegion):
         assert_allclose(pixcircle.center.y, 299.5)
         assert_allclose(pixcircle.radius, 0.0278117, rtol=1e-6)
 
-        skycircle = sphskycircle.to_sky(wcs)
+        skycircle = sphskycircle.to_sky(wcs=wcs)
         assert isinstance(skycircle, CircleSkyRegion)
 
         sphskycircle2 = pixcircle.to_spherical_sky(wcs)
@@ -249,7 +249,8 @@ class TestCircleSphericalSkyRegion(BaseTestSphericalSkyRegion):
                                  sphskycircle2.center.data.lat)
         assert_quantity_allclose(sphskycircle2.radius, sphskycircle.radius)
 
-        polysky = sphskycircle.to_sky(wcs, include_boundary_distortions=True)
+        polysky = sphskycircle.to_sky(
+            wcs=wcs, include_boundary_distortions=True)
         assert isinstance(polysky, PolygonSkyRegion)
 
         polypix = sphskycircle.to_pixel(wcs, include_boundary_distortions=True)

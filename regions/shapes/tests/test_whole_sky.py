@@ -44,7 +44,7 @@ class TestWholeSphericalSkyRegion(BaseTestSphericalSkyRegion):
 
     def test_transformation(self, wcs):
         with pytest.raises(ValueError):
-            _ = self.reg.to_sky(wcs)
+            _ = self.reg.to_sky(wcs=wcs)
 
         with pytest.raises(ValueError):
             _ = self.reg.to_pixel(wcs)

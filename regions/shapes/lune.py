@@ -202,7 +202,7 @@ class LuneSphericalSkyRegion(SphericalSkyRegion):
         """
         return self.discretize_boundary(n_vertices=n_vertices)
 
-    def to_sky(self, wcs=None, *, include_boundary_distortions=False,
+    def to_sky(self, wcs, *, include_boundary_distortions=False,
                n_vertices=None):
         if not include_boundary_distortions:
             raise ValueError(
