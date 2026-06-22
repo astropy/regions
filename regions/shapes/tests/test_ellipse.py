@@ -121,19 +121,21 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
         ax.imshow(data)
 
         def update_mask(reg):
-            mask[:] = reg.to_mask(mode='subpixels', subpixels=10).to_image(data.shape)
+            mask[:] = reg.to_mask(
+                mode='subpixels', subpixels=10).to_image(data.shape)
 
         # For now this will only work with unrotated ellipses. Once this
         # works with rotated ellipses, the following exception check can
         # be removed as well as the ``angle=0 * u.deg`` in the call to
         # copy() below.
         with pytest.raises(NotImplementedError,
-                           match=('Cannot create matplotlib selector for rotated ellipse.')):
+                           match=('Cannot create matplotlib selector'
+                                  ' for rotated ellipse.')):
             self.reg.as_mpl_selector(ax)
 
         region = self.reg.copy(angle=0 * u.deg)
 
-        selector = region.as_mpl_selector(ax, callback=update_mask, sync=sync)  # noqa: F841
+        selector = region.as_mpl_selector(ax, callback=update_mask, sync=sync)  # noqa: E501, F841
 
         from matplotlib.backend_bases import MouseEvent
         canvas = ax.figure.canvas
@@ -157,7 +159,8 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
             assert_allclose(region.height, 1)
             assert_quantity_allclose(region.angle, 0 * u.deg)
 
-            assert_equal(mask, region.to_mask(mode='subpixels', subpixels=10).to_image(data.shape))
+            assert_equal(mask, region.to_mask(
+                mode='subpixels', subpixels=10).to_image(data.shape))
 
         else:
 
@@ -169,7 +172,8 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
 
             assert_equal(mask, 0)
 
-        with pytest.raises(AttributeError, match=('Cannot attach more than one selector to a reg')):
+        match = 'Cannot attach more than one selector to a reg'
+        with pytest.raises(AttributeError, match=match):
             region.as_mpl_selector(ax)
 
         plt.close()
@@ -190,7 +194,8 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
         ax.imshow(data)
 
         def update_mask(reg):
-            mask[:] = reg.to_mask(mode='subpixels', subpixels=10).to_image(data.shape)
+            mask[:] = reg.to_mask(
+                mode='subpixels', subpixels=10).to_image(data.shape)
 
         region = self.reg.copy(angle=0 * u.deg)
 
@@ -231,7 +236,8 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
         canvas.callbacks.process(evt.name, evt)
         ax.figure.canvas.draw()
 
-        # For drag_from_anywhere=False this will have created a new 1x1 rectangle.
+        # For drag_from_anywhere=False this will have created a new 1x1
+        # rectangle.
         if anywhere:
             assert_allclose(region.center.x, 4.5)
             assert_allclose(region.center.y, 5.5)
@@ -241,7 +247,8 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
             assert_allclose(region.center.x, 4.5)
             assert_allclose(region.center.y, 5.5)
 
-        assert_equal(mask, region.to_mask(mode='subpixels', subpixels=10).to_image(data.shape))
+        assert_equal(mask, region.to_mask(
+            mode='subpixels', subpixels=10).to_image(data.shape))
 
         plt.close()
 
@@ -265,23 +272,30 @@ class TestEllipsePixelRegion(BaseTestPixelRegion):
         ax.imshow(data)
 
         def update_mask(reg):
-            mask[:] = reg.to_mask(mode='subpixels', subpixels=10).to_image(data.shape)
+            mask[:] = reg.to_mask(
+                mode='subpixels', subpixels=10).to_image(data.shape)
 
         region = self.reg.copy(angle=0 * u.deg)
         region.visual = {'color': 'red'}
 
         if 'twit' in userargs:
-            with pytest.raises(TypeError, match=(r'__init__.. got an unexpected keyword argument')):
-                selector = region.as_mpl_selector(ax, callback=update_mask, **userargs)
+            match = r'__init__.. got an unexpected keyword argument'
+            with pytest.raises(TypeError, match=match):
+                selector = region.as_mpl_selector(
+                    ax, callback=update_mask, **userargs)
         else:
-            selector = region.as_mpl_selector(ax, callback=update_mask, **userargs)
-            assert region._mpl_selector.artists[0].get_edgecolor() == (1, 0, 0, 1)
+            selector = region.as_mpl_selector(
+                ax, callback=update_mask, **userargs)
+            assert region._mpl_selector.artists[0].get_edgecolor() == (
+                1, 0, 0, 1)
 
             if 'props' in userargs:
-                assert region._mpl_selector.artists[0].get_facecolor() == (0, 0, 1, 1)
+                assert region._mpl_selector.artists[0].get_facecolor() == (
+                    0, 0, 1, 1)
                 assert region._mpl_selector.artists[0].get_linewidth() == 2
             else:
-                assert region._mpl_selector.artists[0].get_facecolor() == (0, 0, 0, 0)
+                assert region._mpl_selector.artists[0].get_facecolor() == (
+                    0, 0, 0, 0)
                 assert region._mpl_selector.artists[0].get_linewidth() == 1
 
                 for key, val in userargs.items():
@@ -444,6 +458,7 @@ class TestEllipseShapelyComparison:
 
         shp_func = {'contains': contains, 'covers': covers}[method]
         x, y = point
-        reg_result = bool(getattr(self.setup_ellipse(), method)(PixCoord(x, y)))
+        reg_result = bool(
+            getattr(self.setup_ellipse(), method)(PixCoord(x, y)))
         shp_result = bool(shp_func(self.shapely_ellipse(), Point(x, y)))
         assert reg_result == shp_result

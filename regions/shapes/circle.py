@@ -161,7 +161,8 @@ class CirclePixelRegion(PixelRegion):
             # Leverage polygon class to_spherical_sky() functionality
             # without distortions, as the distortions were already
             # computed in creating that polygon approximation
-            # return self.discretize_boundary(n_vertices=n_vertices).to_spherical_sky(
+            # return self.discretize_boundary(
+            #     n_vertices=n_vertices).to_spherical_sky(
             #     wcs=wcs, include_boundary_distortions=False
             # )
 
@@ -374,16 +375,20 @@ class CircleSkyRegion(SkyRegion):
                                                   include_boundary_distortions)
 
         if include_boundary_distortions:
-            # Requires planar to spherical projection (using WCS) and discretization
+            # Requires planar to spherical projection (using WCS)
+            # and discretization
             # Will require implementing discretization in pixel space
             # to get correct handling of distortions.
             raise NotImplementedError
 
             # ### Potential solution:
             # # Leverage polygon class to_spherical_sky() functionality without
-            # # distortions, as the distortions were already computed in creating
+            # # distortions, as the distortions were already
+            # # computed in creating
             # # that polygon approximation
-            # return self.to_pixel(wcs).discretize_boundary(n_vertices=n_vertices).to_spherical_sky(
+            # return self.to_pixel(wcs)
+            #     .discretize_boundary(n_vertices=n_vertices)
+            #     .to_spherical_sky(
             #     wcs=wcs, include_boundary_distortions=False
             # )
 
@@ -465,6 +470,7 @@ class CircleSphericalSkyRegion(SphericalSkyRegion):
     def discretize_boundary(self, *, n_vertices=100):
         # Avoid circular imports:
         from .polygon import PolygonSphericalSkyRegion
+
         theta = np.linspace(0, 1, num=n_vertices, endpoint=False) * 360 * u.deg
         # Need to invert order because of CW convention:
         bound_verts = self.center.directional_offset_by(theta[::-1],
@@ -495,8 +501,10 @@ class CircleSphericalSkyRegion(SphericalSkyRegion):
                                                   include_boundary_distortions)
 
         if include_boundary_distortions:
-            # Requires spherical to planar projection (from WCS) and discretization
-            # Use to_pixel(), then apply "small angle approx" to get planar sky.
+            # Requires spherical to planar projection (from WCS)
+            # and discretization
+            # Use to_pixel(), then apply "small angle approx" to get planar
+            # sky.
             return self.to_pixel(
                 include_boundary_distortions=include_boundary_distortions,
                 wcs=wcs,

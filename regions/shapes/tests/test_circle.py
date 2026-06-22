@@ -64,8 +64,8 @@ class TestCirclePixelRegion(BaseTestPixelRegion):
         assert reg_new.visual['color'] != self.reg.visual['color']
 
     def test_to_spherical_sky(self, wcs):
-        sphskycircle = self.reg.to_spherical_sky(wcs,
-                                                 include_boundary_distortions=False)
+        sphskycircle = self.reg.to_spherical_sky(
+            wcs, include_boundary_distortions=False)
         assert isinstance(sphskycircle, CircleSphericalSkyRegion)
 
         with pytest.raises(NotImplementedError):
@@ -166,8 +166,8 @@ class TestCircleSkyRegion(BaseTestSkyRegion):
                                  skycircle2.center.data.lat)
         assert_quantity_allclose(skycircle2.radius, skycircle.radius)
 
-        sphskycircle = self.reg.to_spherical_sky(wcs,
-                                                 include_boundary_distortions=False)
+        sphskycircle = self.reg.to_spherical_sky(
+            wcs, include_boundary_distortions=False)
         assert isinstance(sphskycircle, CircleSphericalSkyRegion)
 
         with pytest.raises(NotImplementedError):
@@ -210,14 +210,16 @@ class TestCircleSphericalSkyRegion(BaseTestSphericalSkyRegion):
     outside = [(3 * u.deg, 0 * u.deg)]
     meta = RegionMeta({'text': 'test'})
     visual = RegionVisual({'color': 'blue'})
-    reg = CircleSphericalSkyRegion(SkyCoord(3 * u.deg, 4 * u.deg), 2 * u.arcsec,
-                                   meta=meta, visual=visual)
+    reg = CircleSphericalSkyRegion(
+        SkyCoord(3 * u.deg, 4 * u.deg), 2 * u.arcsec,
+        meta=meta, visual=visual)
 
-    expected_repr = ('<CircleSphericalSkyRegion(center=<SkyCoord (ICRS): (ra, dec) in '
-                     'deg\n    (3., 4.)>, radius=2.0 arcsec)>')
-    expected_str = ('Region: CircleSphericalSkyRegion\ncenter: <SkyCoord (ICRS): '
-                    '(ra, dec) in deg\n    (3., 4.)>\nradius: 2.0 '
-                    'arcsec')
+    expected_repr = ('<CircleSphericalSkyRegion(center='
+                     '<SkyCoord (ICRS): (ra, dec) in deg\n'
+                     '    (3., 4.)>, radius=2.0 arcsec)>')
+    expected_str = ('Region: CircleSphericalSkyRegion\n'
+                    'center: <SkyCoord (ICRS): (ra, dec) in deg\n'
+                    '    (3., 4.)>\nradius: 2.0 arcsec')
 
     def test_copy(self):
         reg = self.reg.copy()

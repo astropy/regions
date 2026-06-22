@@ -38,11 +38,14 @@ class TestLuneSphericalSkyRegion(BaseTestSphericalSkyRegion):
                                      SkyCoord(3 * u.deg, 0 * u.deg),
                                      meta=meta, visual=visual)
 
-    expected_repr = ('<LuneSphericalSkyRegion(center_gc1=<SkyCoord (ICRS): (ra, dec) in '
-                     'deg\n    (3., 0.)>, center_gc2=<SkyCoord (ICRS): (ra, dec) in deg\n'
-                     '    (178., 0.)>)>')
-    expected_str = ('Region: LuneSphericalSkyRegion\ncenter_gc1: <SkyCoord (ICRS): '
-                    '(ra, dec) in deg\n    (3., 0.)>\ncenter_gc2: <SkyCoord (ICRS): '
+    expected_repr = ('<LuneSphericalSkyRegion(center_gc1='
+                     '<SkyCoord (ICRS): (ra, dec) in deg\n'
+                     '    (3., 0.)>, center_gc2=<SkyCoord (ICRS): '
+                     '(ra, dec) in deg\n    (178., 0.)>)>')
+    expected_str = ('Region: LuneSphericalSkyRegion\n'
+                    'center_gc1: <SkyCoord (ICRS): '
+                    '(ra, dec) in deg\n    (3., 0.)>\n'
+                    'center_gc2: <SkyCoord (ICRS): '
                     '(ra, dec) in deg\n    (178., 0.)>')
 
     def test_copy(self):

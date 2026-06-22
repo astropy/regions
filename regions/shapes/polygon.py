@@ -130,19 +130,24 @@ class PolygonPixelRegion(PixelRegion):
 
     def to_spherical_sky(self, wcs=None, *, include_boundary_distortions=False,
                          n_vertices=None):
-        self._validate_planar_spherical_transform(wcs, include_boundary_distortions)
+        self._validate_planar_spherical_transform(
+            wcs, include_boundary_distortions)
 
         if include_boundary_distortions:
-            # Requires planar to spherical projection (using WCS) and discretization
+            # Requires planar to spherical projection (using WCS)
+            # and discretization
             # Will require implementing discretization in pixel space
             # to get correct handling of distortions.
             raise NotImplementedError
 
             # ### Potential solution:
             # # Leverage polygon class to_spherical_sky() functionality without
-            # # distortions, as the distortions were already computed in creating
+            # # distortions, as the distortions were already
+            # # computed in creating
             # # that polygon approximation
-            # return self.to_pixel(wcs).discretize_boundary(n_vertices=n_vertices).to_spherical_sky(
+            # return self.to_pixel(wcs)
+            #     .discretize_boundary(n_vertices=n_vertices)
+            #     .to_spherical_sky(
             #     wcs=wcs, include_boundary_distortions=False
             # )
 
@@ -426,19 +431,24 @@ class PolygonSkyRegion(SkyRegion):
 
     def to_spherical_sky(self, wcs=None, *, include_boundary_distortions=False,
                          n_vertices=None):
-        self._validate_planar_spherical_transform(wcs, include_boundary_distortions)
+        self._validate_planar_spherical_transform(
+            wcs, include_boundary_distortions)
 
         if include_boundary_distortions:
-            # Requires planar to spherical projection (using WCS) and discretization
+            # Requires planar to spherical projection (using WCS)
+            # and discretization
             # Will require implementing discretization in pixel space
             # to get correct handling of distortions.
             raise NotImplementedError
 
             # ### Potential solution:
             # # Leverage polygon class to_spherical_sky() functionality without
-            # # distortions, as the distortions were already computed in creating
+            # # distortions, as the distortions were already
+            # # computed in creating
             # # that polygon approximation
-            # return self.to_pixel(wcs).discretize_boundary(n_vertices=n_vertices).to_spherical_sky(
+            # return self.to_pixel(wcs)
+            #     .discretize_boundary(n_vertices=n_vertices)
+            #     .to_spherical_sky(
             #     wcs=wcs, include_boundary_distortions=False
             # )
 
@@ -490,9 +500,11 @@ class PolygonSphericalSkyRegion(SphericalSkyRegion):
         from .circle import CircleSphericalSkyRegion
         gcs = []
         for i in range(len(self.vertices)):
-            # verts are in CW order: Cross product to get bounding great circle centers
+            # verts are in CW order: Cross product to get bounding
+            # great circle centers
             # Compute GCs and stack into a compound set:
-            c_gc = cross_product_skycoord2skycoord(self.vertices[i - 1], self.vertices[i])
+            c_gc = cross_product_skycoord2skycoord(
+                self.vertices[i - 1], self.vertices[i])
             gcs.append(CircleSphericalSkyRegion(c_gc, 90 * u.deg))
         return gcs
 
@@ -602,18 +614,16 @@ class PolygonSphericalSkyRegion(SphericalSkyRegion):
         return PolygonSphericalSkyRegion(bound_verts, meta=self.meta.copy(),
                                          visual=self.visual.copy())
 
-    def to_sky(
-        self,
-        wcs=None,
-        *,
-        include_boundary_distortions=False,
-        n_vertices=None,
-    ):
-        self._validate_planar_spherical_transform(wcs, include_boundary_distortions)
+    def to_sky(self, wcs=None, *, include_boundary_distortions=False,
+               n_vertices=None):
+        self._validate_planar_spherical_transform(
+            wcs, include_boundary_distortions)
 
         if include_boundary_distortions:
-            # Requires spherical to planar projection (from WCS) and discretization
-            # Use to_pixel(), then apply "small angle approx" to get planar sky.
+            # Requires spherical to planar projection (from WCS)
+            # and discretization
+            # Use to_pixel(), then apply "small angle approx" to get planar
+            # sky.
             return self.to_pixel(
                 include_boundary_distortions=include_boundary_distortions,
                 wcs=wcs, n_vertices=n_vertices,
@@ -625,16 +635,17 @@ class PolygonSphericalSkyRegion(SphericalSkyRegion):
             visual=self.visual,
         )
 
-    def to_pixel(
-        self, wcs, *,
-        include_boundary_distortions=False,
-        n_vertices=None,
-    ):
-        self._validate_planar_spherical_transform(wcs, include_boundary_distortions)
+    def to_pixel(self, wcs, *, include_boundary_distortions=False,
+                 n_vertices=None):
+        self._validate_planar_spherical_transform(
+            wcs, include_boundary_distortions)
 
         if include_boundary_distortions:
-            # Requires spherical to planar projection (from WCS) and discretization
-            disc_kwargs = {} if n_vertices is None else {'n_vertices': n_vertices}
+            # Requires spherical to planar projection (from WCS) and
+            # discretization
+            disc_kwargs = (
+                {} if n_vertices is None
+                else {'n_vertices': n_vertices})
 
             verts = wcs.world_to_pixel(
                 self.discretize_boundary(**disc_kwargs).vertices,

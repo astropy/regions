@@ -274,7 +274,8 @@ class RectanglePixelRegion(PixelRegion):
         from matplotlib.widgets import RectangleSelector
 
         if hasattr(self, '_mpl_selector'):
-            raise AttributeError('Cannot attach more than one selector to a region.')
+            raise AttributeError(
+                'Cannot attach more than one selector to a region.')
 
         if self.angle.value != 0:
             raise NotImplementedError('Cannot create matplotlib selector for '

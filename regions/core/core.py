@@ -377,8 +377,10 @@ class Region(abc.ABC):
                                          **kwargs)
 
     @staticmethod
-    def _validate_planar_spherical_transform(wcs, include_boundary_distortions):
-        # Validate whether inputs are valid for planar <-> spherical transformations
+    def _validate_planar_spherical_transform(
+            wcs, include_boundary_distortions):
+        # Validate whether inputs are valid for planar <-> spherical
+        # transformations
         if include_boundary_distortions and (wcs is None):
             raise ValueError(
                 "'wcs' must be set if `include_boundary_distortions=True`",
@@ -541,25 +543,29 @@ class PixelRegion(Region):
         wcs : `~astropy.wcs.WCS` instance, optional
             The world coordinate system transformation to use to convert
             between sky and pixel coordinates. Required if transforming
-            with boundary distortions (if ``include_boundary_distortions`` is True).
+            with boundary distortions (if
+            ``include_boundary_distortions`` is True).
             Ignored if boundary distortions not included.
 
         include_boundary_distortions : bool, optional
             If True, accounts for boundary distortions in spherical to planar
-            conversions, by discretizing the boundary and converting the boundary polygon.
+            conversions, by discretizing the boundary and
+            converting the boundary polygon.
             Default is False, which converts to an equivalent idealized shape.
 
         n_vertices : int, optional
             The number of polygon vertices for boundary discretization.
-            This keyword will have no effect unless ``include_boundary_distortions=True``.
+            This keyword will have no effect unless
+            ``include_boundary_distortions=True``.
             Default is 100.
 
         Returns
         -------
         spherical_sky_region : `~regions.SphericalSkyRegion`
             A spherical sky region, with an equivalent shape (if
-            ``include_boundary_distortions`` is False), or a discretized polygon of
-            the boundary (if ``include_boundary_distortions`` is True).
+            ``include_boundary_distortions`` is False), or a
+            discretized polygon of the boundary (if
+            ``include_boundary_distortions`` is True).
         """
         raise NotImplementedError
 
@@ -835,25 +841,29 @@ class SkyRegion(Region):
         wcs : `~astropy.wcs.WCS` instance, optional
             The world coordinate system transformation to use to convert
             between sky and pixel coordinates. Required if transforming
-            with boundary distortions (if ``include_boundary_distortions`` is True).
+            with boundary distortions (if
+            ``include_boundary_distortions`` is True).
             Ignored if boundary distortions not included.
 
         include_boundary_distortions : bool, optional
             If True, accounts for boundary distortions in spherical to planar
-            conversions, by discretizing the boundary and converting the boundary polygon.
+            conversions, by discretizing the boundary and
+            converting the boundary polygon.
             Default is False, which converts to an equivalent idealized shape.
 
         n_vertices : int, optional
             The number of polygon vertices for boundary discretization.
-            This keyword will have no effect unless ``include_boundary_distortions=True``.
+            This keyword will have no effect unless
+            ``include_boundary_distortions=True``.
             Default is 100.
 
         Returns
         -------
         spherical_sky_region : `~regions.SphericalSkyRegion`
             A spherical sky region, with an equivalent shape (if
-            ``include_boundary_distortions`` is False), or a discretized polygon of
-            the boundary (if ``include_boundary_distortions`` is True).
+            ``include_boundary_distortions`` is False), or a
+            discretized polygon of the boundary (if
+            ``include_boundary_distortions`` is True).
         """
         raise NotImplementedError
 
@@ -1091,9 +1101,8 @@ class SphericalSkyRegion(Region):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def to_sky(
-        self, wcs=None, *, include_boundary_distortions=False, n_vertices=None,
-    ):
+    def to_sky(self, wcs=None, *, include_boundary_distortions=False,
+               n_vertices=None):
         """
         Convert to a planar `~regions.SkyRegion`.
 
@@ -1102,32 +1111,35 @@ class SphericalSkyRegion(Region):
         wcs : `~astropy.wcs.WCS`, optional
             The world coordinate system transformation to use to convert
             between sky and pixel coordinates. Required if transforming
-            with boundary distortions (if ``include_boundary_distortions`` is True).
+            with boundary distortions (if
+            ``include_boundary_distortions`` is True).
             Ignored if boundary distortions not included.
 
         include_boundary_distortions : bool, optional
             If True, accounts for boundary distortions in spherical to planar
-            conversions, by discretizing the boundary and converting the boundary polygon.
+            conversions, by discretizing the boundary and
+            converting the boundary polygon.
             Default is False, which converts to an equivalent idealized shape.
 
         n_vertices : int, optional
             The number of polygon vertices for boundary discretization.
-            This keyword will have no effect unless ``include_boundary_distortions=True``.
+            This keyword will have no effect unless
+            ``include_boundary_distortions=True``.
             Default is 100.
 
         Returns
         -------
         sky_region : `~regions.SkyRegion`
             A planar sky region, with an equivalent shape (if
-            ``include_boundary_distortions`` is False), or a discretized polygon of
-            the boundary (if ``include_boundary_distortions`` is True).
+            ``include_boundary_distortions`` is False), or a
+            discretized polygon of the boundary (if
+            ``include_boundary_distortions`` is True).
         """
         raise NotImplementedError
 
     @abc.abstractmethod
-    def to_pixel(
-        self, wcs, *, include_boundary_distortions=False, n_vertices=None,
-    ):
+    def to_pixel(self, wcs, *, include_boundary_distortions=False,
+                 n_vertices=None):
         """
         Convert to a planar `~regions.PixelRegion`.
 
@@ -1139,20 +1151,23 @@ class SphericalSkyRegion(Region):
 
         include_boundary_distortions : bool, optional
             If True, accounts for boundary distortions in spherical to planar
-            conversions, by discretizing the boundary and converting the boundary polygon.
+            conversions, by discretizing the boundary and
+            converting the boundary polygon.
             Default is False, which converts to an equivalent idealized shape.
 
         n_vertices : int, optional
             The number of polygon vertices for boundary discretization.
-            This keyword will have no effect unless ``include_boundary_distortions=True``.
+            This keyword will have no effect unless
+            ``include_boundary_distortions=True``.
             Default is 100.
 
         Returns
         -------
         pixel_region : `~regions.PixelRegion`
             A pixel region, with an equivalent shape (if
-            ``include_boundary_distortions`` is False), or a discretized polygon of
-            the boundary (if ``include_boundary_distortions`` is True).
+            ``include_boundary_distortions`` is False), or a
+            discretized polygon of the boundary (if
+            ``include_boundary_distortions`` is True).
         """
         raise NotImplementedError
 
@@ -1181,8 +1196,10 @@ class ComplexSphericalSkyRegion(SphericalSkyRegion):
     # but breaking out these methods/properties to streamline).
 
     # Instead, a variable set _boundaries is used, containing the
-    # subclass boundary properties. These boundary properties are, in order of preference,
-    # (a) accessed from `_[boundname]`, for transformed instances of subclass shapes that
+    # subclass boundary properties. These boundary properties are,
+    # in order of preference,
+    # (a) accessed from `_[boundname]`, for transformed
+    #     instances of subclass shapes that
     #     don't simply map in parameterization from frame to frame (eg, Range)
     # (b) derived on-the-fly
 
@@ -1193,7 +1210,8 @@ class ComplexSphericalSkyRegion(SphericalSkyRegion):
         cls_info = []
 
         _do_params_info = False
-        if (self._params is not None) and ((len(self._params) > 1) | (self._params[0] != 'frame')):
+        if (self._params is not None) and (
+                (len(self._params) > 1) | (self._params[0] != 'frame')):
             # Only do param-based repr if params other than "frame" are set
             # If only param is "frame", make repr with boundary info
             _do_params_info = True
@@ -1235,7 +1253,8 @@ class ComplexSphericalSkyRegion(SphericalSkyRegion):
         cls_info = [('Region', self.__class__.__name__)]
 
         _do_params_info = False
-        if (self._params is not None) and ((len(self._params) > 1) | (self._params[0] != 'frame')):
+        if (self._params is not None) and (
+                (len(self._params) > 1) | (self._params[0] != 'frame')):
             # Only do param-based str if params other than "frame" are set.
             # If only param is "frame", make str with boundary info
             _do_params_info = True

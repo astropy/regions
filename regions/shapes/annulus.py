@@ -32,7 +32,8 @@ from regions.shapes.rectangle import RectanglePixelRegion, RectangleSkyRegion
 __all__ = ['AnnulusPixelRegion', 'AnnulusSphericalSkyRegion',
            'AsymmetricAnnulusPixelRegion',
            'AsymmetricAnnulusSkyRegion',
-           'CircleAnnulusPixelRegion', 'CircleAnnulusSkyRegion', 'CircleAnnulusSphericalSkyRegion',
+           'CircleAnnulusPixelRegion', 'CircleAnnulusSkyRegion',
+           'CircleAnnulusSphericalSkyRegion',
            'EllipseAnnulusPixelRegion', 'EllipseAnnulusSkyRegion',
            'RectangleAnnulusPixelRegion', 'RectangleAnnulusSkyRegion']
 
@@ -101,8 +102,9 @@ class AnnulusSphericalSkyRegion(SphericalSkyRegion, abc.ABC):
 
     @property
     def _compound_region(self):
-        return CompoundSphericalSkyRegion(self._inner_region, self._outer_region,
-                                          operator.xor, self.meta, self.visual)
+        return CompoundSphericalSkyRegion(
+            self._inner_region, self._outer_region,
+            operator.xor, self.meta, self.visual)
 
     @property
     def frame(self):
@@ -277,19 +279,23 @@ class CircleAnnulusPixelRegion(AnnulusPixelRegion):
 
     def to_spherical_sky(self, wcs=None, *, include_boundary_distortions=False,
                          n_vertices=None):
-        self._validate_planar_spherical_transform(wcs, include_boundary_distortions)
+        self._validate_planar_spherical_transform(
+            wcs, include_boundary_distortions)
 
         if include_boundary_distortions:
-            # Requires planar to spherical projection (using WCS) and discretization
+            # Requires planar to spherical projection (using WCS)
+            # and discretization
             # Will require implementing discretization in pixel space
             # to get correct handling of distortions.
             raise NotImplementedError
 
             # ### Potential solution:
             # # Leverage polygon class to_spherical_sky() functionality without
-            # # distortions, as the distortions were already computed in creating
+            # # distortions, as the distortions were already
+            # # computed in creating
             # # that polygon approximation
-            # return self.discretize_boundary(n_vertices=n_vertices).to_spherical_sky(
+            # return self.discretize_boundary(
+            #     n_vertices=n_vertices).to_spherical_sky(
             #     wcs=wcs, include_boundary_distortions=False
             # )
 
@@ -406,19 +412,24 @@ class CircleAnnulusSkyRegion(SkyRegion):
 
     def to_spherical_sky(self, wcs=None, *, include_boundary_distortions=False,
                          n_vertices=None):
-        self._validate_planar_spherical_transform(wcs, include_boundary_distortions)
+        self._validate_planar_spherical_transform(
+            wcs, include_boundary_distortions)
 
         if include_boundary_distortions:
-            # Requires planar to spherical projection (using WCS) and discretization
+            # Requires planar to spherical projection (using WCS)
+            # and discretization
             # Will require implementing discretization in pixel space
             # to get correct handling of distortions.
             raise NotImplementedError
 
             # ### Potential solution:
             # # Leverage polygon class to_spherical_sky() functionality without
-            # # distortions, as the distortions were already computed in creating
+            # # distortions, as the distortions were already
+            # # computed in creating
             # # that polygon approximation
-            # return self.to_pixel(wcs).discretize_boundary(n_vertices=n_vertices).to_spherical_sky(
+            # return self.to_pixel(wcs)
+            #     .discretize_boundary(n_vertices=n_vertices)
+            #     .to_spherical_sky(
             #     wcs=wcs, include_boundary_distortions=False
             # )
 
@@ -483,7 +494,8 @@ class CircleAnnulusSphericalSkyRegion(AnnulusSphericalSkyRegion):
         frame = self._validate_frame_transformation(frame)
 
         # Only center transforms, radii preserved
-        center_transf = self.center.transform_to(frame, merge_attributes=merge_attributes)
+        center_transf = self.center.transform_to(
+            frame, merge_attributes=merge_attributes)
 
         return CircleAnnulusSphericalSkyRegion(
             center_transf,
@@ -522,17 +534,16 @@ class CircleAnnulusSphericalSkyRegion(AnnulusSphericalSkyRegion):
         """
         return self.discretize_boundary(n_vertices=n_vertices)
 
-    def to_sky(
-        self,
-        wcs=None,
-        *, include_boundary_distortions=False,
-        n_vertices=None,
-    ):
-        self._validate_planar_spherical_transform(wcs, include_boundary_distortions)
+    def to_sky(self, wcs=None, *, include_boundary_distortions=False,
+               n_vertices=None):
+        self._validate_planar_spherical_transform(
+            wcs, include_boundary_distortions)
 
         if include_boundary_distortions:
-            # Requires spherical to planar projection (from WCS) and discretization
-            # Use to_pixel(), then apply "small angle approx" to get planar sky.
+            # Requires spherical to planar projection (from WCS)
+            # and discretization
+            # Use to_pixel(), then apply "small angle approx" to get planar
+            # sky.
             return self.to_pixel(
                 include_boundary_distortions=include_boundary_distortions,
                 wcs=wcs, n_vertices=n_vertices,
@@ -546,18 +557,19 @@ class CircleAnnulusSphericalSkyRegion(AnnulusSphericalSkyRegion):
             visual=self.visual.copy(),
         )
 
-    def to_pixel(
-        self, wcs, *,
-        include_boundary_distortions=False,
-        n_vertices=None,
-    ):
-        self._validate_planar_spherical_transform(wcs, include_boundary_distortions)
+    def to_pixel(self, wcs, *, include_boundary_distortions=False,
+                 n_vertices=None):
+        self._validate_planar_spherical_transform(
+            wcs, include_boundary_distortions)
 
         if include_boundary_distortions:
             from .polygon import PolygonPixelRegion
 
-            # Requires spherical to planar projection (from WCS) and discretization
-            disc_kwargs = {} if n_vertices is None else {'n_vertices': n_vertices}
+            # Requires spherical to planar projection (from WCS) and
+            # discretization
+            disc_kwargs = (
+                {} if n_vertices is None
+                else {'n_vertices': n_vertices})
             polygonized = self.discretize_boundary(**disc_kwargs)
 
             inner_vertices = wcs.world_to_pixel(polygonized.region1.vertices)

@@ -94,8 +94,9 @@ class TestCircleSphericalSkyRegionToPolygon:
     meta = RegionMeta({'text': 'test'})
     visual = RegionVisual({'color': 'blue'})
 
-    reg = CircleSphericalSkyRegion(SkyCoord(3 * u.deg, 4 * u.deg), 2 * u.arcsec,
-                                   meta=meta, visual=visual)
+    reg = CircleSphericalSkyRegion(
+        SkyCoord(3 * u.deg, 4 * u.deg), 2 * u.arcsec,
+        meta=meta, visual=visual)
 
     def test_to_polygon_type(self):
         poly = self.reg.to_polygon()
@@ -416,8 +417,8 @@ class TestCircleAnnulusSphericalSkyRegionToPolygon:
     meta = RegionMeta({'text': 'test'})
     visual = RegionVisual({'color': 'blue'})
     reg = CircleAnnulusSphericalSkyRegion(SkyCoord(3 * u.deg, 4 * u.deg),
-                                          20 * u.arcsec, 30 * u.arcsec, meta=meta,
-                                          visual=visual)
+                                          20 * u.arcsec, 30 * u.arcsec,
+                                          meta=meta, visual=visual)
 
     def test_to_polygon_type(self):
         poly = self.reg.to_polygon()
