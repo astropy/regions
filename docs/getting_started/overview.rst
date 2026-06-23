@@ -327,11 +327,11 @@ spherical circle falling outside of the planar circle and vice versa.
         center=SkyCoord(50, 45, unit='deg', frame='galactic'),
         radius=Angle('30 deg'))
     # Note: circle is equivalent to transforming from sph_circle
-    # with sph_circle.to_sky(wcs=wcs, include_boundary_distortions=False)
+    # with sph_circle.to_sky(wcs=wcs, boundary_distortions=False)
 
     # Define transformed-to pixel regions
     pix_circ_distort = sph_circle.to_pixel(wcs=wcs,
-                                           include_boundary_distortions=True,
+                                           boundary_distortions=True,
                                            n_vertices=1000)
     pix_circ_nodistort = circle.to_pixel(wcs=wcs)
 

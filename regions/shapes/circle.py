@@ -145,12 +145,12 @@ class CirclePixelRegion(PixelRegion):
         return CircleSkyRegion(center, radius, meta=self.meta.copy(),
                                visual=self.visual.copy())
 
-    def to_spherical_sky(self, wcs, *, include_boundary_distortions=False,
+    def to_spherical_sky(self, wcs, *, boundary_distortions=False,
                          n_vertices=None):
         self._validate_planar_spherical_transform(wcs,
-                                                  include_boundary_distortions)
+                                                  boundary_distortions)
 
-        if include_boundary_distortions:
+        if boundary_distortions:
             # Requires planar to spherical projection (using WCS) and
             # discretization.
             # Will require implementing discretization in pixel space
@@ -163,7 +163,7 @@ class CirclePixelRegion(PixelRegion):
             # computed in creating that polygon approximation
             # return self.discretize_boundary(
             #     n_vertices=n_vertices).to_spherical_sky(
-            #     wcs=wcs, include_boundary_distortions=False
+            #     wcs=wcs, boundary_distortions=False
             # )
 
         return self.to_sky(wcs).to_spherical_sky()
@@ -369,12 +369,12 @@ class CircleSkyRegion(SkyRegion):
         """
         return self.to_pixel(wcs).to_polygon(n_vertices=n_vertices).to_sky(wcs)
 
-    def to_spherical_sky(self, *, wcs=None, include_boundary_distortions=False,
+    def to_spherical_sky(self, *, wcs=None, boundary_distortions=False,
                          n_vertices=None):
         self._validate_planar_spherical_transform(wcs,
-                                                  include_boundary_distortions)
+                                                  boundary_distortions)
 
-        if include_boundary_distortions:
+        if boundary_distortions:
             # Requires planar to spherical projection (using WCS)
             # and discretization
             # Will require implementing discretization in pixel space
@@ -389,7 +389,7 @@ class CircleSkyRegion(SkyRegion):
             # return self.to_pixel(wcs)
             #     .discretize_boundary(n_vertices=n_vertices)
             #     .to_spherical_sky(
-            #     wcs=wcs, include_boundary_distortions=False
+            #     wcs=wcs, boundary_distortions=False
             # )
 
         return CircleSphericalSkyRegion(
@@ -495,18 +495,18 @@ class CircleSphericalSkyRegion(SphericalSkyRegion):
         """
         return self.discretize_boundary(n_vertices=n_vertices)
 
-    def to_sky(self, *, wcs=None, include_boundary_distortions=False,
+    def to_sky(self, *, wcs=None, boundary_distortions=False,
                n_vertices=None):
         self._validate_planar_spherical_transform(wcs,
-                                                  include_boundary_distortions)
+                                                  boundary_distortions)
 
-        if include_boundary_distortions:
+        if boundary_distortions:
             # Requires spherical to planar projection (from WCS)
             # and discretization
             # Use to_pixel(), then apply "small angle approx" to get planar
             # sky.
             return self.to_pixel(
-                include_boundary_distortions=include_boundary_distortions,
+                boundary_distortions=boundary_distortions,
                 wcs=wcs,
                 n_vertices=n_vertices,
             ).to_sky(wcs)
@@ -515,12 +515,12 @@ class CircleSphericalSkyRegion(SphericalSkyRegion):
             self.center, self.radius, meta=self.meta, visual=self.visual,
         )
 
-    def to_pixel(self, wcs, *, include_boundary_distortions=False,
+    def to_pixel(self, wcs, *, boundary_distortions=False,
                  n_vertices=None):
         self._validate_planar_spherical_transform(wcs,
-                                                  include_boundary_distortions)
+                                                  boundary_distortions)
 
-        if include_boundary_distortions:
+        if boundary_distortions:
             from .polygon import PolygonPixelRegion
 
             disc_kwargs = ({} if n_vertices is None

@@ -57,17 +57,17 @@ class TestLuneSphericalSkyRegion(BaseTestSphericalSkyRegion):
 
     def test_transformation(self, wcs):
         # Test error for no boundary distortions:
-        match = 'Invalid parameter: `include_boundary_distortions=False`!'
+        match = 'Invalid parameter: `boundary_distortions=False`!'
         with pytest.raises(ValueError, match=match):
             self.reg.to_pixel(wcs)
 
-        match = 'Invalid parameter: `include_boundary_distortions=False`!'
+        match = 'Invalid parameter: `boundary_distortions=False`!'
         with pytest.raises(ValueError, match=match):
             self.reg.to_sky(wcs)
 
-        # Test for transformations with `include_boundary_distortions=True`
+        # Test for transformations with `boundary_distortions=True`
         polypix = self.reg.to_pixel(wcs,
-                                    include_boundary_distortions=True,
+                                    boundary_distortions=True,
                                     n_vertices=4)
         assert isinstance(polypix, PolygonPixelRegion)
         assert len(polypix.vertices) == 4
@@ -77,7 +77,7 @@ class TestLuneSphericalSkyRegion(BaseTestSphericalSkyRegion):
                         [-560.164308, -1256.912621, -338.786552, 1455.912621])
 
         polysky = self.reg.to_sky(wcs,
-                                  include_boundary_distortions=True,
+                                  boundary_distortions=True,
                                   n_vertices=4)
         assert isinstance(polysky, PolygonSkyRegion)
         assert len(polysky.vertices) == 4
