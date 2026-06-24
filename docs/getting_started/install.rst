@@ -11,7 +11,7 @@ Regions has the following strict requirements:
 
 * `NumPy <https://numpy.org/>`_ 2.0 or later
 
-* `Astropy`_ 6.1 or later
+* `Astropy`_ 6.1.7 or later
 
 Region also optionally depends on other packages for some features:
 
