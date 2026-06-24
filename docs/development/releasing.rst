@@ -35,15 +35,6 @@ repository is called ``upstream``.
         tox -e build_docs
         tox -e linkcheck
 
-#. Update the current "What's New" page (``docs/whats_new/<X.Y.Z>.rst``)
-   to make sure that all the changes are listed. Update the
-   ``docs/release_notes/index.rst`` file by changing the section header
-   from "Development Version" to "Current Version". Then commit the
-   changes::
-
-        git add docs/whats_new/<X.Y.Z>.rst docs/release_notes/index.rst
-        git commit -m"Finalizing what's new for version <X.Y.Z>"
-
 #. Update the ``CHANGES.rst`` file to make sure that all the changes are
    listed and update the release date from ``unreleased`` to the current
    date in ``yyyy-mm-dd`` format. Then commit the changes::
@@ -94,36 +85,27 @@ repository is called ``upstream``.
    version then close its GitHub Milestone.
 
 #. Go to `Read the Docs
-   <https://app.readthedocs.org/projects/regions/versions/>`_ and
+   <https://app.readthedocs.org/projects/astropy-regions/versions/>`_ and
    check that the "stable" docs correspond to the new released version.
    Hide any older released versions (i.e., check "Hidden").
-
-#. Add a new "What's New" page (``docs/whats_new/<X.Y.Z>.rst``)
-   for the next release. Update the ``docs/release_notes/index.rst``
-   file by changing the section header from "Current Version" to
-   "Development Version" and adding the new "What's New" page for the
-   next release. Then commit the changes::
-
-        git add docs/whats_new/<X.Y.Z>.rst docs/release_notes/index.rst
-        git commit -m"Add what's new for version <X.Y.Z>"
 
 #. Update ``CHANGES.rst``, adding new sections for the next ``x.y.z``
    version, e.g.,::
 
        x.y.z (unreleased)
-       ------------------
+       ==================
 
        General
-       ^^^^^^^
+       -------
 
        New Features
-       ^^^^^^^^^^^^
+       ------------
 
        Bug Fixes
-       ^^^^^^^^^
+       ---------
 
        API Changes
-       ^^^^^^^^^^^
+       -----------
 
    Then commit the changes and push to the upstream repo::
 
