@@ -130,13 +130,13 @@ both the original and transformed coordinate frames.
 
     patch = sph_circ.to_pixel(
         wcs=wcs,
-        include_boundary_distortions=True,
+        boundary_distortions=True,
         n_vertices=1000,
     ).plot(ax=ax, color='tab:blue', lw=3)
 
     sph_range.to_pixel(
         wcs=wcs,
-        include_boundary_distortions=True,
+        boundary_distortions=True,
         n_vertices=250,
     ).plot(ax=ax, color='tab:red', lw=3)
 
@@ -165,7 +165,7 @@ both the original and transformed coordinate frames.
     bound_color = 'tab:red'
     sph_range.bounding_circle.to_pixel(
         wcs=wcs,
-        include_boundary_distortions=True,
+        boundary_distortions=True,
         n_vertices=1000,
     ).plot(ax=ax, color='tab:red', lw=bound_lw, ls='--', zorder=bound_zord)
 
@@ -182,13 +182,13 @@ both the original and transformed coordinate frames.
 
     patch = sph_circ_transf.to_pixel(
         wcs=wcs_icrs,
-        include_boundary_distortions=True,
+        boundary_distortions=True,
         n_vertices=1000,
     ).plot(ax=ax, color='tab:blue', lw=3)
 
     sph_range_transf.to_pixel(
         wcs=wcs_icrs,
-        include_boundary_distortions=True,
+        boundary_distortions=True,
         n_vertices=250,
     ).plot(ax=ax, color='tab:red', lw=3)
 
@@ -235,7 +235,7 @@ both the original and transformed coordinate frames.
         ax.add_artist(l2)
     sph_range_transf.bounding_circle.to_pixel(
         wcs=wcs_icrs,
-        include_boundary_distortions=True,
+        boundary_distortions=True,
         n_vertices=1000,
     ).plot(ax=ax, color='tab:red', lw=bound_lw, ls='--', zorder=bound_zord)
 

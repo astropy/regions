@@ -202,39 +202,39 @@ class LuneSphericalSkyRegion(SphericalSkyRegion):
         """
         return self.discretize_boundary(n_vertices=n_vertices)
 
-    def to_sky(self, wcs, *, include_boundary_distortions=False,
+    def to_sky(self, wcs, *, boundary_distortions=False,
                n_vertices=None):
-        if not include_boundary_distortions:
+        if not boundary_distortions:
             raise ValueError(
-                'Invalid parameter: `include_boundary_distortions=False`!\n'
+                'Invalid parameter: `boundary_distortions=False`!\n'
                 'Transforming lune to planar sky region is only possible by '
                 'including boundary distortions, as there is no '
                 'analogous sky region.',
             )
 
         self._validate_planar_spherical_transform(
-            wcs, include_boundary_distortions)
+            wcs, boundary_distortions)
 
         # Requires spherical to planar projection (from WCS) and
         # discretization. Use to_pixel(), then apply "small angle
         # approx" to get planar sky.
         return self.to_pixel(
-            include_boundary_distortions=include_boundary_distortions,
+            boundary_distortions=boundary_distortions,
             wcs=wcs, n_vertices=n_vertices,
         ).to_sky(wcs)
 
-    def to_pixel(self, wcs, *, include_boundary_distortions=False,
+    def to_pixel(self, wcs, *, boundary_distortions=False,
                  n_vertices=None):
-        if not include_boundary_distortions:
+        if not boundary_distortions:
             raise ValueError(
-                'Invalid parameter: `include_boundary_distortions=False`!\n'
+                'Invalid parameter: `boundary_distortions=False`!\n'
                 'Transforming lune to planar pixel region is only possible by '
                 'including boundary distortions, as there is no '
                 'analogous pixel region.',
             )
 
         self._validate_planar_spherical_transform(
-            wcs, include_boundary_distortions)
+            wcs, boundary_distortions)
 
         disc_kwargs = {} if n_vertices is None else {'n_vertices': n_vertices}
 

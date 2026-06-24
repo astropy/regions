@@ -376,7 +376,7 @@ then a WCS object is not necessary:
 
 .. code-block:: python
 
-    >>> sky_reg = sph_sky_reg.to_sky(include_boundary_distortions=False)
+    >>> sky_reg = sph_sky_reg.to_sky(boundary_distortions=False)
     >>> print(sky_reg)  # doctest: +FLOAT_CMP
     Region: CircleSkyRegion
     center: <SkyCoord (ICRS): (ra, dec) in deg
@@ -397,7 +397,7 @@ to the `~regions.SphericalSkyRegion.discretize_boundary()` method.
 .. code-block:: python
 
     >>> sky_reg = sph_sky_reg.to_sky(wcs=wcs,
-    ...                              include_boundary_distortions=True,
+    ...                              boundary_distortions=True,
     ...                              n_vertices=10)
     >>> print(sky_reg)  # doctest: +FLOAT_CMP
     Region: PolygonSkyRegion
@@ -415,14 +415,14 @@ respectively).
 .. code-block:: python
 
     >>> pix_reg = sph_sky_reg.to_pixel(wcs=wcs,
-    ...                                include_boundary_distortions=False)
+    ...                                boundary_distortions=False)
     >>> print(pix_reg)  # doctest: +FLOAT_CMP
     Region: CirclePixelRegion
     center: PixCoord(x=49.0, y=49.0)
     radius: 300.0
 
     >>> pix_reg2 = sph_sky_reg.to_pixel(wcs=wcs,
-    ...                                 include_boundary_distortions=True,
+    ...                                 boundary_distortions=True,
     ...                                 n_vertices=10)
     >>> print(pix_reg2)  # doctest: +FLOAT_CMP
     Region: PolygonPixelRegion
@@ -439,7 +439,7 @@ methods.
     >>> center = SkyCoord(50, 10, unit='deg')
     >>> radius = Angle(30, 'arcsec')
     >>> sky_reg = CircleSkyRegion(center, radius)
-    >>> sph_sky_reg = sky_reg.to_spherical_sky(include_boundary_distortions=False)
+    >>> sph_sky_reg = sky_reg.to_spherical_sky(boundary_distortions=False)
     >>> print(sph_sky_reg)  # doctest: +FLOAT_CMP
     Region: CircleSphericalSkyRegion
     center: <SkyCoord (ICRS): (ra, dec) in deg

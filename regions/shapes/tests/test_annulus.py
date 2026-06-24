@@ -86,12 +86,12 @@ class TestCircleAnnulusPixelRegion(BaseTestPixelRegion):
 
     def test_to_spherical_sky(self, wcs):
         sphskyann = self.reg.to_spherical_sky(
-            wcs, include_boundary_distortions=False)
+            wcs, boundary_distortions=False)
         assert isinstance(sphskyann, CircleAnnulusSphericalSkyRegion)
 
         with pytest.raises(NotImplementedError):
             _ = self.reg.to_spherical_sky(wcs,
-                                          include_boundary_distortions=True)
+                                          boundary_distortions=True)
 
     def test_to_spherical_sky_no_wcs(self):
         match = 'missing 1 required positional argument'
@@ -165,17 +165,17 @@ class TestCircleAnnulusSkyRegion(BaseTestSkyRegion):
 
     def test_to_spherical_sky(self, wcs):
         sphskyann = self.reg.to_spherical_sky(
-            wcs=wcs, include_boundary_distortions=False)
+            wcs=wcs, boundary_distortions=False)
         assert isinstance(sphskyann, CircleAnnulusSphericalSkyRegion)
 
         with pytest.raises(NotImplementedError):
             _ = self.reg.to_spherical_sky(wcs=wcs,
-                                          include_boundary_distortions=True)
+                                          boundary_distortions=True)
 
     def test_to_spherical_sky_no_wcs(self):
-        match = "'wcs' must be set if `include_boundary_distortions=True`"
+        match = "'wcs' must be set if `boundary_distortions=True`"
         with pytest.raises(ValueError, match=match):
-            self.reg.to_spherical_sky(include_boundary_distortions=True)
+            self.reg.to_spherical_sky(boundary_distortions=True)
 
     def test_eq(self):
         reg = self.reg.copy()
@@ -236,17 +236,17 @@ class TestCircleAnnulusSphericalSkyRegion(BaseTestSphericalSkyRegion):
         assert isinstance(skyannulus, CircleAnnulusSkyRegion)
 
         polysky = self.reg.to_sky(
-            wcs=self.wcs, include_boundary_distortions=True)
+            wcs=self.wcs, boundary_distortions=True)
         assert isinstance(polysky, CompoundSkyRegion)
 
         polypix = self.reg.to_pixel(
-            self.wcs, include_boundary_distortions=True)
+            self.wcs, boundary_distortions=True)
         assert isinstance(polypix, CompoundPixelRegion)
 
     def test_transformation_no_wcs(self):
-        match = "'wcs' must be set if `include_boundary_distortions=True`"
+        match = "'wcs' must be set if `boundary_distortions=True`"
         with pytest.raises(ValueError, match=match):
-            self.reg.to_sky(include_boundary_distortions=True)
+            self.reg.to_sky(boundary_distortions=True)
 
     def test_frame_transformation(self):
         reg2 = self.reg.transform_to('galactic')

@@ -378,12 +378,12 @@ class Region(abc.ABC):
 
     @staticmethod
     def _validate_planar_spherical_transform(
-            wcs, include_boundary_distortions):
+            wcs, boundary_distortions):
         # Validate whether inputs are valid for planar <-> spherical
         # transformations
-        if include_boundary_distortions and (wcs is None):
+        if boundary_distortions and (wcs is None):
             raise ValueError(
-                "'wcs' must be set if `include_boundary_distortions=True`",
+                "'wcs' must be set if `boundary_distortions=True`",
             )
 
 
@@ -532,7 +532,7 @@ class PixelRegion(Region):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def to_spherical_sky(self, wcs, *, include_boundary_distortions=False,
+    def to_spherical_sky(self, wcs, *, boundary_distortions=False,
                          n_vertices=None):
         """
         Convert to an equivalent spherical `~regions.SphericalSkyRegion`
@@ -544,25 +544,25 @@ class PixelRegion(Region):
             The world coordinate system transformation to use to convert
             between pixel and sky coordinates.
 
-        include_boundary_distortions : bool, optional
-            If True, accounts for boundary distortions in spherical to planar
-            conversions, by discretizing the boundary and
-            converting the boundary polygon.
-            Default is False, which converts to an equivalent idealized shape.
+        boundary_distortions : bool, optional
+            If `True`, the projection-induced distortions of the
+            region's boundary are preserved by discretizing the
+            boundary into a polygon and transforming that polygon. If
+            `False` (default), the region is converted to an equivalent
+            idealized shape that ignores these boundary distortions.
 
         n_vertices : int, optional
-            The number of polygon vertices for boundary discretization.
-            This keyword will have no effect unless
-            ``include_boundary_distortions=True``.
-            Default is 100.
+            The number of polygon vertices for boundary
+            discretization. This keyword will have no effect unless
+            ``boundary_distortions=True``. Default is 100.
 
         Returns
         -------
         spherical_sky_region : `~regions.SphericalSkyRegion`
             A spherical sky region, with an equivalent shape (if
-            ``include_boundary_distortions`` is False), or a
+            ``boundary_distortions`` is False), or a
             discretized polygon of the boundary (if
-            ``include_boundary_distortions`` is True).
+            ``boundary_distortions`` is True).
         """
         raise NotImplementedError
 
@@ -827,7 +827,7 @@ class SkyRegion(Region):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def to_spherical_sky(self, *, wcs=None, include_boundary_distortions=False,
+    def to_spherical_sky(self, *, wcs=None, boundary_distortions=False,
                          n_vertices=None):
         """
         Convert to an equivalent spherical `~regions.SphericalSkyRegion`
@@ -839,28 +839,27 @@ class SkyRegion(Region):
             The world coordinate system transformation to use to convert
             between sky and pixel coordinates. Required if transforming
             with boundary distortions (if
-            ``include_boundary_distortions`` is True).
+            ``boundary_distortions`` is True).
             Ignored if boundary distortions not included.
 
-        include_boundary_distortions : bool, optional
-            If True, accounts for boundary distortions in spherical to planar
-            conversions, by discretizing the boundary and
-            converting the boundary polygon.
-            Default is False, which converts to an equivalent idealized shape.
+        boundary_distortions : bool, optional
+            If `True`, the projection-induced distortions of the
+            region's boundary are preserved by discretizing the
+            boundary into a polygon and transforming that polygon. If
+            `False` (default), the region is converted to an equivalent
+            idealized shape that ignores these boundary distortions.
 
         n_vertices : int, optional
-            The number of polygon vertices for boundary discretization.
-            This keyword will have no effect unless
-            ``include_boundary_distortions=True``.
-            Default is 100.
+            The number of polygon vertices for boundary
+            discretization. This keyword will have no effect unless
+            ``boundary_distortions=True``. Default is 100.
 
         Returns
         -------
         spherical_sky_region : `~regions.SphericalSkyRegion`
             A spherical sky region, with an equivalent shape (if
-            ``include_boundary_distortions`` is False), or a
-            discretized polygon of the boundary (if
-            ``include_boundary_distortions`` is True).
+            ``boundary_distortions`` is False), or a discretized polygon
+            of the boundary (if ``boundary_distortions`` is True).
         """
         raise NotImplementedError
 
@@ -1099,7 +1098,7 @@ class SphericalSkyRegion(Region):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def to_sky(self, *, wcs=None, include_boundary_distortions=False,
+    def to_sky(self, *, wcs=None, boundary_distortions=False,
                n_vertices=None):
         """
         Convert to a planar `~regions.SkyRegion`.
@@ -1110,33 +1109,32 @@ class SphericalSkyRegion(Region):
             The world coordinate system transformation to use to convert
             between sky and pixel coordinates. Required if transforming
             with boundary distortions (if
-            ``include_boundary_distortions`` is True).
+            ``boundary_distortions`` is True).
             Ignored if boundary distortions not included.
 
-        include_boundary_distortions : bool, optional
-            If True, accounts for boundary distortions in spherical to planar
-            conversions, by discretizing the boundary and
-            converting the boundary polygon.
-            Default is False, which converts to an equivalent idealized shape.
+        boundary_distortions : bool, optional
+            If `True`, the projection-induced distortions of the
+            region's boundary are preserved by discretizing the
+            boundary into a polygon and transforming that polygon. If
+            `False` (default), the region is converted to an equivalent
+            idealized shape that ignores these boundary distortions.
 
         n_vertices : int, optional
-            The number of polygon vertices for boundary discretization.
-            This keyword will have no effect unless
-            ``include_boundary_distortions=True``.
-            Default is 100.
+            The number of polygon vertices for boundary
+            discretization. This keyword will have no effect unless
+            ``boundary_distortions=True``. Default is 100.
 
         Returns
         -------
         sky_region : `~regions.SkyRegion`
             A planar sky region, with an equivalent shape (if
-            ``include_boundary_distortions`` is False), or a
-            discretized polygon of the boundary (if
-            ``include_boundary_distortions`` is True).
+            ``boundary_distortions`` is False), or a discretized polygon
+            of the boundary (if ``boundary_distortions`` is True).
         """
         raise NotImplementedError
 
     @abc.abstractmethod
-    def to_pixel(self, wcs, *, include_boundary_distortions=False,
+    def to_pixel(self, wcs, *, boundary_distortions=False,
                  n_vertices=None):
         """
         Convert to a planar `~regions.PixelRegion`.
@@ -1147,25 +1145,24 @@ class SphericalSkyRegion(Region):
             The world coordinate system transformation to use to convert
             between sky and pixel coordinates.
 
-        include_boundary_distortions : bool, optional
-            If True, accounts for boundary distortions in spherical to planar
-            conversions, by discretizing the boundary and
-            converting the boundary polygon.
-            Default is False, which converts to an equivalent idealized shape.
+        boundary_distortions : bool, optional
+            If `True`, the projection-induced distortions of the
+            region's boundary are preserved by discretizing the
+            boundary into a polygon and transforming that polygon. If
+            `False` (default), the region is converted to an equivalent
+            idealized shape that ignores these boundary distortions.
 
         n_vertices : int, optional
-            The number of polygon vertices for boundary discretization.
-            This keyword will have no effect unless
-            ``include_boundary_distortions=True``.
-            Default is 100.
+            The number of polygon vertices for boundary
+            discretization. This keyword will have no effect unless
+            ``boundary_distortions=True``. Default is 100.
 
         Returns
         -------
         pixel_region : `~regions.PixelRegion`
             A pixel region, with an equivalent shape (if
-            ``include_boundary_distortions`` is False), or a
-            discretized polygon of the boundary (if
-            ``include_boundary_distortions`` is True).
+            ``boundary_distortions`` is False), or a discretized polygon
+            of the boundary (if ``boundary_distortions`` is True).
         """
         raise NotImplementedError
 
