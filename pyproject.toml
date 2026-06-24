@@ -268,6 +268,7 @@ ignore = [
 [tool.ruff.lint.per-file-ignores]
 '__init__.py' = ['D104', 'I']
 'docs/conf.py' = ['ERA001', 'INP001', 'TRY400']
+'scripts/*.py' = ['INP001']  # not a package
 
 [tool.ruff.lint.pydocstyle]
 convention = 'numpy'
