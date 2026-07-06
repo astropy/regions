@@ -159,7 +159,7 @@ cdef double ellipse_overlap_single_subpixel(double x0, double y0,
     Return the fraction of overlap between an ellipse and a single
     pixel with given extent, using a sub-pixel sampling method.
     """
-    cdef unsigned int i, j
+    cdef unsigned int _i, _j
     cdef double x, y
     cdef double frac = 0.0  # Accumulator.
     cdef double inv_rx_sq, inv_ry_sq
@@ -175,10 +175,10 @@ cdef double ellipse_overlap_single_subpixel(double x0, double y0,
     inv_ry_sq = 1.0 / (ry * ry)
 
     x = x0 - 0.5 * dx
-    for i in range(subpixels):
+    for _i in range(subpixels):
         x += dx
         y = y0 - 0.5 * dy
-        for j in range(subpixels):
+        for _j in range(subpixels):
             y += dy
 
             # Transform into frame of rotated ellipse
