@@ -257,12 +257,12 @@ ignore = [
     'PLR0912',
     'PLR0913',
     'PLR0915',
+    'PLR0917',  # too-many-positional-arguments
     'PLR2004',
     'PLW1641',  # eq-without-hash
     'PLW2901',
     'Q000',
     'SIM910',
-    'UP038',
 ]
 
 [tool.ruff.lint.per-file-ignores]
