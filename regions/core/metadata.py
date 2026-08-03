@@ -252,6 +252,6 @@ class RegionVisual(Meta):
             kwargs.pop(key, None)
 
         if 'fontstyle' in kwargs:
-            kwargs['fontstyle'].replace('roman', 'normal')
+            kwargs['fontstyle'] = kwargs['fontstyle'].replace('roman', 'normal')
 
         return kwargs
