@@ -218,7 +218,7 @@ checks = [
     'SS06',  # single-line summary
 ]
 
-# don't report on objects that match any of these regex;
+# Don't report on objects that match any of these regex;
 # remember to use single quotes for regex in TOML
 exclude = [
     '\._.*',  # private functions/methods
@@ -229,13 +229,10 @@ exclude = [
 [tool.ruff]
 line-length = 79
 
-[tool.ruff.lint.pylint]
-max-statements = 130
-
 [tool.ruff.lint]
 select = [
-    'B', 'COM', 'D', 'E', 'F', 'FLY', 'I', 'INT', 'N', 'NPY', 'PERF', 'PL', 'Q',
-    'RSE', 'SIM', 'UP', 'W'
+    'B', 'COM', 'CPY', 'D', 'E', 'F', 'FLY', 'I', 'INT', 'N', 'NPY', 'PERF',
+    'PL', 'Q', 'RSE', 'SIM', 'UP', 'W'
 ]
 ignore = [
     'E501',
@@ -265,6 +262,10 @@ ignore = [
     'SIM910',
 ]
 
+[tool.ruff.lint.flake8-copyright]
+min-file-size = 1  # skip empty files (< 1 byte), e.g., __init__.py
+notice-rgx = 'Licensed under a 3-clause BSD style license - see LICENSE.rst'
+
 [tool.ruff.lint.per-file-ignores]
 '__init__.py' = ['D104', 'I']
 'docs/conf.py' = ['ERA001', 'INP001', 'TRY400']
@@ -272,6 +273,9 @@ ignore = [
 
 [tool.ruff.lint.pydocstyle]
 convention = 'numpy'
+
+[tool.ruff.lint.pylint]
+max-statements = 130
 
 [tool.distutils.bdist_wheel]
 py-limited-api = "cp311"
