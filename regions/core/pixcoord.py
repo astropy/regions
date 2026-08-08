@@ -247,3 +247,23 @@ class PixCoord:
         vec = np.matmul(rotation_matrix, vec)
 
         return self.__class__(center.x + vec[0], center.y + vec[1])
+
+    def directional_offset_by(self, separation, angle):
+        """
+        Computes coordinates at the given offset from this coordinate.
+
+        Parameters
+        ----------
+        separation : `numpy.array`
+            The separation in pixels.
+        angle : `~astropy.coordinates.Angle`
+            The rotation angle.
+
+        Returns
+        -------
+        coord : `PixCoord`
+            The offseted coordinates.
+        """
+        offset_x = self.x + separation * np.cos(angle)
+        offset_y = self.y + separation * np.sin(angle)
+        return PixCoord(offset_x, offset_y)
