@@ -1,0 +1,10 @@
+id: asdf://astropy.org/regions/manifests/regions-1.0.0
+extension_uri: asdf://astropy.org/regions/extensions/regions-1.0.0
+title: Regions extension 1.0.0
+description: |-
+  A set of tags for serializing astropy regions objects.
+tags:
+  - tag_uri: tag:astropy.org:regions/pixcoord-1.0.0
+    schema_uri: asdf://astropy.org/regions/schemas/pixcoord-1.0.0
+    title: PixCoord schema
+    description: Pixel coordinates for regions.
