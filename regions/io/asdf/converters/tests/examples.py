@@ -1,7 +1,7 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 import numpy as np
-from regions.core import PixCoord
 
+from regions.core import PixCoord
 
 parameters = {
     'PixCoord': ['x', 'y'],
