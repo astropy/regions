@@ -19,4 +19,3 @@ def test_pixcoord_array():
     Test that PixCoord can be serialized and deserialized correctly.
     """
     return examples.pixcoord_array()
-
