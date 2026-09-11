@@ -17,6 +17,7 @@ New Features
   scale is computed in closed form, and the elliptical and rectangular
   annuli convert both of their shapes with one WCS evaluation in each
   direction. [#707]
+- Add serialization of regions to ASDF files. [#702]
 
 Bug Fixes
 ---------
