@@ -16,6 +16,7 @@ def obj(request):
 
 region_params = pytest.mark.parametrize('obj', [
     'test_pixcoord',
+    'test_pixcoord_array',
 ], indirect=True)
 
 
