@@ -445,8 +445,10 @@ class TestEllipseAnnulusPixelRegion(BaseTestPixelRegion):
         assert_allclose(reg_new.outer_width, self.reg.outer_width)
         assert_allclose(reg_new.inner_height, self.reg.inner_height)
         assert_allclose(reg_new.outer_height, self.reg.outer_height)
-        assert_quantity_allclose(reg_new.angle, self.reg.angle,
-                                 atol=1e-10 * u.deg)
+        # Compare the angles modulo 360 deg. The roundtrip of a zero
+        # angle can land a rounding error on either side of the wrap
+        angle_diff = (reg_new.angle - self.reg.angle).wrap_at(180 * u.deg)
+        assert_quantity_allclose(angle_diff, 0 * u.deg, atol=1e-10 * u.deg)
         assert reg_new.meta == self.reg.meta
         assert reg_new.visual == self.reg.visual
 
@@ -570,8 +572,10 @@ class TestRectangleAnnulusPixelRegion(BaseTestPixelRegion):
         assert_allclose(reg_new.outer_width, self.reg.outer_width)
         assert_allclose(reg_new.inner_height, self.reg.inner_height)
         assert_allclose(reg_new.outer_height, self.reg.outer_height)
-        assert_quantity_allclose(reg_new.angle, self.reg.angle,
-                                 atol=1e-10 * u.deg)
+        # Compare the angles modulo 360 deg. The roundtrip of a zero
+        # angle can land a rounding error on either side of the wrap
+        angle_diff = (reg_new.angle - self.reg.angle).wrap_at(180 * u.deg)
+        assert_quantity_allclose(angle_diff, 0 * u.deg, atol=1e-10 * u.deg)
         assert reg_new.meta == self.reg.meta
         assert reg_new.visual == self.reg.visual
 

@@ -11,14 +11,42 @@ General
 New Features
 ------------
 
+- Improved the performance of the region ``to_sky`` and ``to_pixel``
+  conversions. The local WCS Jacobian now evaluates the WCS once for
+  all positions, the mean pixel scale is computed in closed form, and
+  the pixel-to-sky conversions take the sky center from the same WCS
+  call as the Jacobian. [#XXX]
+
 Bug Fixes
 ---------
 
 - Fixed a doubled comma in the serialized CRTF output when ``range`` or
   ``corr`` is the only metadata of a region. [#700]
 
+- The local WCS Jacobians and pixel scales used by the region
+  ``to_sky`` and ``to_pixel`` methods are now computed with central
+  finite differences (half a pixel either side of the position) instead
+  of one-sided 1-pixel differences. The one-sided differences were
+  biased by half the curvature of the distortion field. [#XXX]
+
+- The WCS helper functions now evaluate a ``gwcs`` transform with its
+  bounding box disabled. Previously, regions within half a pixel of the
+  array edge received NaN pixel scales because the finite-difference
+  offsets fell outside the bounding box. [#XXX]
+
 API Changes
 -----------
+
+- The ``to_pixel`` and ``to_sky`` methods of the circular regions now
+  use the geometric mean of the two singular values of the local WCS
+  Jacobian (the square root of its absolute determinant) as the
+  isotropic pixel scale for every WCS. The scale preserves the area of
+  the mapped circle and inverts exactly, so a conversion to pixels and
+  back returns the original radius. Previously, a distorted WCS or a
+  ``gwcs`` used the arithmetic mean of the singular values, and an
+  undistorted ``astropy.wcs.WCS`` used the geometric mean of the x and
+  y pixel scales. The radii are unchanged for undistorted WCS with
+  orthogonal pixel axes. [#XXX]
 
 
 0.12 (2026-06-24)
