@@ -657,8 +657,8 @@ class TestRectangleAnnulusSkyRegion(BaseTestSkyRegion):
                                         RectangleAnnulusSkyRegion])
 def test_annulus_to_pixel_single_evaluation(region_cls, wcs):
     """
-    Both shapes are converted with one WCS inversion and one forward
-    evaluation of the local Jacobian.
+    Both shapes are converted with one WCS inversion and one low-level
+    forward evaluation of the local Jacobian.
     """
     skycoord = wcs.pixel_to_world(30.0, 40.0)
     region = region_cls(skycoord, 20 * u.arcsec, 50 * u.arcsec,
@@ -667,7 +667,8 @@ def test_annulus_to_pixel_single_evaluation(region_cls, wcs):
     counting_wcs = CountingWCS(wcs)
     result = region.to_pixel(counting_wcs)
     assert counting_wcs.n_world_to_pixel == 1
-    assert counting_wcs.n_pixel_to_world == 1
+    assert counting_wcs.n_pixel_to_world_values == 1
+    assert counting_wcs.n_pixel_to_world == 0
     assert_allclose(result.center.xy, expected.center.xy)
     assert_allclose(result.inner_width, expected.inner_width)
     assert_allclose(result.inner_height, expected.inner_height)
@@ -677,8 +678,9 @@ def test_annulus_to_pixel_single_evaluation(region_cls, wcs):
                                         RectangleAnnulusPixelRegion])
 def test_annulus_to_sky_single_evaluation(region_cls, wcs):
     """
-    Both shapes are converted with one forward WCS evaluation, which
-    also gives the sky center.
+    Both shapes are converted with one high-level forward WCS
+    evaluation for the sky center and one low-level evaluation for the
+    local Jacobian.
     """
     region = region_cls(PixCoord(30.0, 40.0), 4.0, 10.0, 6.0, 16.0,
                         angle=30 * u.deg)
@@ -687,6 +689,7 @@ def test_annulus_to_sky_single_evaluation(region_cls, wcs):
     result = region.to_sky(counting_wcs)
     assert counting_wcs.n_world_to_pixel == 0
     assert counting_wcs.n_pixel_to_world == 1
+    assert counting_wcs.n_pixel_to_world_values == 1
     assert result.center.separation(expected.center).arcsec < 1e-9
     assert_quantity_allclose(result.inner_width, expected.inner_width)
     assert_quantity_allclose(result.outer_height, expected.outer_height)

@@ -5,14 +5,25 @@ Tools for WCS helpers.
 
 import astropy.units as u
 import numpy as np
-from astropy.coordinates import Angle, UnitSphericalRepresentation
-from astropy.wcs.wcsapi import (high_level_objects_to_values,
-                                values_to_high_level_objects)
+from astropy.coordinates import Angle
+from astropy.wcs.wcsapi import high_level_objects_to_values
+
+
+def _low_level_wcs(wcs):
+    """
+    Return the low-level WCS behind a high-level WCS object.
+
+    Objects that implement the astropy high-level WCS interface expose
+    their low-level counterpart as ``low_level_wcs`` (for
+    `astropy.wcs.WCS` and `gwcs.wcs.WCS` that is the object itself).
+    An object without the attribute is used as is.
+    """
+    return getattr(wcs, 'low_level_wcs', wcs)
 
 
 def _is_gwcs(wcs):
     """
-    Return True if the WCS looks like a gwcs object.
+    Return True if the low-level WCS looks like a gwcs object.
 
     A gwcs object is callable and carries a bounding box. Neither is
     true of `astropy.wcs.WCS`, which has no bounding box to bypass.
@@ -20,16 +31,30 @@ def _is_gwcs(wcs):
     return callable(wcs) and hasattr(wcs, 'bounding_box')
 
 
-def _pixel_to_world(wcs, x, y):
+def _to_radians(values, unit):
     """
-    Convert pixel coordinates to a sky coordinate, ignoring any gwcs
-    bounding box.
+    Convert world coordinate values from the given unit to radians.
+    """
+    if unit == 'deg':
+        return np.deg2rad(values)
+    return np.asarray(values, dtype=float) * u.Unit(unit).to(u.rad)
+
+
+def _pixel_to_world_radians(wcs, x, y):
+    """
+    Convert pixel coordinates to world longitude and latitude in
+    radians, ignoring any gwcs bounding box.
 
     The finite differences used here step half a pixel beyond the source
     position. For a source in the outermost pixel of the array those
-    steps fall outside a gwcs bounding box, where the gwcs high-level
-    API returns NaN. The forward transform is well defined there, so it
-    is evaluated with the bounding box disabled.
+    steps fall outside a gwcs bounding box, where gwcs returns NaN. The
+    forward transform is well defined there, so it is evaluated with
+    the bounding box disabled.
+
+    The low-level WCS interface is used because it returns plain
+    arrays. The high-level interface builds a
+    `~astropy.coordinates.SkyCoord`, which costs far more than the
+    transform itself for a handful of positions.
 
     Parameters
     ----------
@@ -39,18 +64,21 @@ def _pixel_to_world(wcs, x, y):
         <https://docs.astropy.org/en/stable/wcs/wcsapi.html>`_ (e.g.,
         `astropy.wcs.WCS`, `gwcs.wcs.WCS`).
 
-    x, y : float or `~numpy.ndarray`
+    x, y : `~numpy.ndarray`
         The pixel coordinates.
 
     Returns
     -------
-    skycoord : `~astropy.coordinates.SkyCoord`
-        The sky coordinate(s).
+    lon, lat : `~numpy.ndarray`
+        The world longitude and latitude in radians.
     """
-    if _is_gwcs(wcs):
-        values = wcs(x, y, with_bounding_box=False)
-        return values_to_high_level_objects(*values, low_level_wcs=wcs)[0]
-    return wcs.pixel_to_world(x, y)
+    low_level_wcs = _low_level_wcs(wcs)
+    if _is_gwcs(low_level_wcs):
+        lon, lat = low_level_wcs(x, y, with_bounding_box=False)
+    else:
+        lon, lat = low_level_wcs.pixel_to_world_values(x, y)
+    lon_unit, lat_unit = low_level_wcs.world_axis_units
+    return _to_radians(lon, lon_unit), _to_radians(lat, lat_unit)
 
 
 def _world_to_pixel(wcs, skycoord):
@@ -78,27 +106,29 @@ def _world_to_pixel(wcs, skycoord):
     x, y : float or `~numpy.ndarray`
         The pixel coordinates.
     """
-    if _is_gwcs(wcs):
-        values = high_level_objects_to_values(skycoord, low_level_wcs=wcs)
-        return wcs.invert(*values, with_bounding_box=False)
+    low_level_wcs = _low_level_wcs(wcs)
+    if _is_gwcs(low_level_wcs):
+        values = high_level_objects_to_values(skycoord,
+                                              low_level_wcs=low_level_wcs)
+        return low_level_wcs.invert(*values, with_bounding_box=False)
     return wcs.world_to_pixel(skycoord)
 
 
-def _sky_to_pixel_jacobian(skycoord, wcs, *, pixcoord=None):
+def _sky_to_pixel_jacobian(wcs, skycoord, *, pixcoord=None):
     """
     Compute the pixel center and the local Jacobian for a sky-to-pixel
     conversion.
 
     Parameters
     ----------
-    skycoord : `~astropy.coordinates.SkyCoord`
-        The sky coordinate of the region center.
-
     wcs : WCS object
         A world coordinate system (WCS) transformation that
         supports the `astropy shared interface for WCS
         <https://docs.astropy.org/en/stable/wcs/wcsapi.html>`_ (e.g.,
         `astropy.wcs.WCS`, `gwcs.wcs.WCS`).
+
+    skycoord : `~astropy.coordinates.SkyCoord`
+        The sky coordinate of the region center.
 
     pixcoord : tuple of float, optional
         The ``(x, y)`` pixel position of ``skycoord``, if already known.
@@ -117,7 +147,7 @@ def _sky_to_pixel_jacobian(skycoord, wcs, *, pixcoord=None):
     else:
         x0, y0 = pixcoord
     center = (float(x0), float(y0))
-    forward = compute_pixel_to_sky_jacobians(x0, y0, wcs)[0]
+    forward = compute_pixel_to_sky_jacobians(wcs, x0, y0)[0]
     return center, np.linalg.inv(forward)
 
 
@@ -246,7 +276,7 @@ def _geometric_mean_singular_values(matrices):
     return np.sqrt(np.abs(np.linalg.det(matrices)))
 
 
-def compute_local_wcs_jacobian(skycoord, wcs):
+def compute_local_wcs_jacobian(wcs, skycoord):
     """
     Compute the local 2x2 Jacobian matrix d(pixel)/d(tangent-plane) at
     the given sky coordinate using central finite differences.
@@ -268,18 +298,18 @@ def compute_local_wcs_jacobian(skycoord, wcs):
 
     The Jacobian is computed by offsetting half a pixel either side of
     the position in x and y, converting the resulting pixel positions to
-    sky coordinates, and differencing the tangent-plane displacements
-    in arcsec. The (xi, eta) offsets are computed from the great-circle
-    separation and position angle between the center and each offset
-    point, so the formula is well-defined at the celestial poles and
-    across the longitude wraparound (RA = 0 / 360). This gives the
-    forward Jacobian ``F = d(sky_arcsec)/d(pixel)``, which is then
-    inverted to obtain ``J = F^{-1} = d(pixel)/d(sky_arcsec)``. The
-    central difference over one pixel is exact for a distortion that is
-    locally quadratic, unlike a one-sided difference, which is biased by
-    half the curvature. The half-pixel steps either side of the position
-    span one pixel, which keeps the differences well conditioned at any
-    pixel scale.
+    sky coordinates, and differencing them in the tangent plane. The
+    sky positions are handled as unit vectors and the differences are
+    projected onto the local East and North directions (see
+    `compute_pixel_to_sky_jacobians`), so the formula is well-defined
+    at the celestial poles and across the longitude wraparound (RA =
+    0 / 360). This gives the forward Jacobian ``F =
+    d(sky_arcsec)/d(pixel)``, which is then inverted to obtain ``J =
+    F^{-1} = d(pixel)/d(sky_arcsec)``. The central difference over one
+    pixel is exact for a distortion that is locally quadratic, unlike a
+    one-sided difference, which is biased by half the curvature. The
+    half-pixel steps either side of the position span one pixel, which
+    keeps the differences well conditioned at any pixel scale.
 
     This function works with any WCS that supports
     the `astropy shared interface for WCS
@@ -291,14 +321,14 @@ def compute_local_wcs_jacobian(skycoord, wcs):
 
     Parameters
     ----------
-    skycoord : `~astropy.coordinates.SkyCoord`
-        The sky coordinate at which to evaluate the Jacobian.
-
     wcs : WCS object
         A world coordinate system (WCS) transformation that
         supports the `astropy shared interface for WCS
         <https://docs.astropy.org/en/stable/wcs/wcsapi.html>`_ (e.g.,
         `astropy.wcs.WCS`, `gwcs.wcs.WCS`).
+
+    skycoord : `~astropy.coordinates.SkyCoord`
+        The sky coordinate at which to evaluate the Jacobian.
 
     Returns
     -------
@@ -311,13 +341,13 @@ def compute_local_wcs_jacobian(skycoord, wcs):
 
     # Forward Jacobian F = d(sky_arcsec)/d(pixel), shape (2, 2).
     # Rows are (xi, eta), columns are (px_x, px_y).
-    forward = compute_pixel_to_sky_jacobians(x0, y0, wcs)[0]
+    forward = compute_pixel_to_sky_jacobians(wcs, x0, y0)[0]
 
     # Invert to get J = d(pixel)/d(sky_arcsec)
     return np.linalg.inv(forward)
 
 
-def compute_pixel_to_sky_jacobians(x, y, wcs):
+def compute_pixel_to_sky_jacobians(wcs, x, y):
     """
     Compute local forward WCS Jacobians for an array of pixel positions
     using central finite differences.
@@ -340,55 +370,23 @@ def compute_pixel_to_sky_jacobians(x, y, wcs):
     relative error of about ``h**2 / 24`` for a pixel that subtends an
     angle ``h`` in radians. That is 1e-7 at 0.1 deg per pixel and 1e-5
     at 1 deg per pixel. All five positions per pixel are evaluated in a
-    single WCS call.
+    single low-level WCS call, which returns plain arrays instead of a
+    `~astropy.coordinates.SkyCoord`.
 
     Parameters
     ----------
+    wcs : WCS object
+        A world coordinate system (WCS) transformation that
+        supports the `astropy shared interface for WCS
+        <https://docs.astropy.org/en/stable/wcs/wcsapi.html>`_ (e.g.,
+        `astropy.wcs.WCS`, `gwcs.wcs.WCS`).
+
     x, y : float or array_like
         The pixel coordinates. Arrays are flattened, so the Jacobians
         are returned in the flattened order.
 
-    wcs : WCS object
-        A world coordinate system (WCS) transformation that
-        supports the `astropy shared interface for WCS
-        <https://docs.astropy.org/en/stable/wcs/wcsapi.html>`_ (e.g.,
-        `astropy.wcs.WCS`, `gwcs.wcs.WCS`).
-
     Returns
     -------
-    jacobians : `~numpy.ndarray`
-        The (N, 2, 2) array of forward Jacobians in arcsec / pixel, with
-        rows ``(xi, eta)`` and columns ``(x, y)``.
-    """
-    return _pixel_to_sky_jacobians(x, y, wcs)[1]
-
-
-def _pixel_to_sky_jacobians(x, y, wcs):
-    """
-    Compute the sky positions and the local forward WCS Jacobians at an
-    array of pixel positions.
-
-    This is the implementation of `compute_pixel_to_sky_jacobians`. It
-    also returns the sky positions of the pixel centers, which the
-    single WCS call evaluates anyway, so callers that need both avoid a
-    second forward transform.
-
-    Parameters
-    ----------
-    x, y : float or array_like
-        The pixel coordinates. Arrays are flattened.
-
-    wcs : WCS object
-        A world coordinate system (WCS) transformation that
-        supports the `astropy shared interface for WCS
-        <https://docs.astropy.org/en/stable/wcs/wcsapi.html>`_ (e.g.,
-        `astropy.wcs.WCS`, `gwcs.wcs.WCS`).
-
-    Returns
-    -------
-    centers : `~astropy.coordinates.SkyCoord`
-        The 1D array of sky positions of the pixel centers.
-
     jacobians : `~numpy.ndarray`
         The (N, 2, 2) array of forward Jacobians in arcsec / pixel, with
         rows ``(xi, eta)`` and columns ``(x, y)``.
@@ -405,10 +403,7 @@ def _pixel_to_sky_jacobians(x, y, wcs):
     # ordered center, -x, +x, -y, +y.
     xx = np.concatenate((x, x - 0.5, x + 0.5, x, x))
     yy = np.concatenate((y, y, y, y - 0.5, y + 0.5))
-    skycoords = _pixel_to_world(wcs, xx, yy)
-    sky = skycoords.represent_as(UnitSphericalRepresentation)
-    lon = sky.lon.rad
-    lat = sky.lat.rad
+    lon, lat = _pixel_to_world_radians(wcs, xx, yy)
 
     # Unit vectors pointing at each position
     cos_lat = np.cos(lat)
@@ -437,10 +432,10 @@ def _pixel_to_sky_jacobians(x, y, wcs):
         step = xyz[hi] - xyz[lo]
         jacobians[:, 0, col] = np.einsum('ij,ij->i', step, east)
         jacobians[:, 1, col] = np.einsum('ij,ij->i', step, north)
-    return skycoords[:n], jacobians * arcsec_per_rad
+    return jacobians * arcsec_per_rad
 
 
-def compute_pixel_to_sky_mean_scales(x, y, wcs):
+def compute_pixel_to_sky_mean_scales(wcs, x, y):
     """
     Compute the isotropic (mean) pixel scale at an array of pixel
     positions.
@@ -454,25 +449,25 @@ def compute_pixel_to_sky_mean_scales(x, y, wcs):
 
     Parameters
     ----------
-    x, y : float or array_like
-        The pixel coordinates. Arrays are flattened.
-
     wcs : WCS object
         A world coordinate system (WCS) transformation that
         supports the `astropy shared interface for WCS
         <https://docs.astropy.org/en/stable/wcs/wcsapi.html>`_ (e.g.,
         `astropy.wcs.WCS`, `gwcs.wcs.WCS`).
 
+    x, y : float or array_like
+        The pixel coordinates. Arrays are flattened.
+
     Returns
     -------
     mean_scales : `~numpy.ndarray`
         The 1D array of mean scale factors (arcsec per pixel).
     """
-    jacobians = compute_pixel_to_sky_jacobians(x, y, wcs)
+    jacobians = compute_pixel_to_sky_jacobians(wcs, x, y)
     return _geometric_mean_singular_values(jacobians)
 
 
-def sky_to_pixel_mean_scale(skycoord, wcs, *, pixcoord=None):
+def sky_to_pixel_mean_scale(wcs, skycoord, *, pixcoord=None):
     """
     Compute the pixel center and isotropic (mean) scale factor for a
     sky-to-pixel conversion.
@@ -496,14 +491,14 @@ def sky_to_pixel_mean_scale(skycoord, wcs, *, pixcoord=None):
 
     Parameters
     ----------
-    skycoord : `~astropy.coordinates.SkyCoord`
-        The sky coordinate of the region center.
-
     wcs : WCS object
         A world coordinate system (WCS) transformation that
         supports the `astropy shared interface for WCS
         <https://docs.astropy.org/en/stable/wcs/wcsapi.html>`_ (e.g.,
         `astropy.wcs.WCS`, `gwcs.wcs.WCS`).
+
+    skycoord : `~astropy.coordinates.SkyCoord`
+        The sky coordinate of the region center.
 
     pixcoord : tuple of float, optional
         The ``(x, y)`` pixel position of ``skycoord``, if already known.
@@ -517,15 +512,15 @@ def sky_to_pixel_mean_scale(skycoord, wcs, *, pixcoord=None):
     mean_scale : float
         The mean scale factor (pixels per arcsec).
     """
-    center, jacobian = _sky_to_pixel_jacobian(skycoord, wcs,
+    center, jacobian = _sky_to_pixel_jacobian(wcs, skycoord,
                                               pixcoord=pixcoord)
     return center, float(_geometric_mean_singular_values(jacobian))
 
 
-def pixel_to_sky_mean_scale(pixcoord, wcs):
+def pixel_to_sky_mean_scale(wcs, pixcoord):
     """
-    Compute the sky center and isotropic (mean) scale factor for a
-    pixel-to-sky conversion.
+    Compute the isotropic (mean) scale factor for a pixel-to-sky
+    conversion.
 
     This is the inverse of `sky_to_pixel_mean_scale`. It is used for
     circular pixel regions (circles and circle annuli) where a single
@@ -537,29 +532,25 @@ def pixel_to_sky_mean_scale(pixcoord, wcs):
 
     Parameters
     ----------
-    pixcoord : tuple of float
-        The ``(x, y)`` pixel coordinate of the region center.
-
     wcs : WCS object
         A world coordinate system (WCS) transformation that
         supports the `astropy shared interface for WCS
         <https://docs.astropy.org/en/stable/wcs/wcsapi.html>`_ (e.g.,
         `astropy.wcs.WCS`, `gwcs.wcs.WCS`).
 
+    pixcoord : tuple of float
+        The ``(x, y)`` pixel coordinate of the region center.
+
     Returns
     -------
-    center : `~astropy.coordinates.SkyCoord`
-        The sky center position.
-
     mean_scale : float
         The mean scale factor (arcsec per pixel).
     """
-    centers, jacobians = _pixel_to_sky_jacobians(pixcoord[0], pixcoord[1],
-                                                 wcs)
-    return centers[0], float(_geometric_mean_singular_values(jacobians)[0])
+    jacobians = compute_pixel_to_sky_jacobians(wcs, pixcoord[0], pixcoord[1])
+    return float(_geometric_mean_singular_values(jacobians)[0])
 
 
-def pixel_shape_to_sky_svd(pixcoord, wcs, width, height, pixel_angle_rad):
+def pixel_shape_to_sky_svd(wcs, pixcoord, width, height, pixel_angle_rad):
     """
     Convert a pixel ellipse to a sky ellipse using SVD.
 
@@ -575,14 +566,14 @@ def pixel_shape_to_sky_svd(pixcoord, wcs, width, height, pixel_angle_rad):
 
     Parameters
     ----------
-    pixcoord : tuple of float
-        The ``(x, y)`` pixel coordinate of the ellipse center.
-
     wcs : WCS object
         A world coordinate system (WCS) transformation that
         supports the `astropy shared interface for WCS
         <https://docs.astropy.org/en/stable/wcs/wcsapi.html>`_ (e.g.,
         `astropy.wcs.WCS`, `gwcs.wcs.WCS`).
+
+    pixcoord : tuple of float
+        The ``(x, y)`` pixel coordinate of the ellipse center.
 
     width : float or array_like
         The full width of the pixel ellipse (before rotation) in pixels.
@@ -601,9 +592,6 @@ def pixel_shape_to_sky_svd(pixcoord, wcs, width, height, pixel_angle_rad):
 
     Returns
     -------
-    center : `~astropy.coordinates.SkyCoord`
-        The sky center position.
-
     sky_width : float or `~numpy.ndarray`
         The full width of the sky ellipse in arcsec, with the broadcast
         shape of ``width`` and ``height``.
@@ -618,10 +606,8 @@ def pixel_shape_to_sky_svd(pixcoord, wcs, width, height, pixel_angle_rad):
         [0, 360) degrees, with the broadcast shape of ``width`` and
         ``height``.
     """
-    centers, jacobians = _pixel_to_sky_jacobians(pixcoord[0], pixcoord[1],
-                                                 wcs)
-    center = centers[0]
-    jacobian_inv = jacobians[0]
+    jacobian_inv = compute_pixel_to_sky_jacobians(wcs, pixcoord[0],
+                                                  pixcoord[1])[0]
 
     # Build M_pix: columns are pixel semi-axis vectors, one matrix per
     # broadcast width and height
@@ -646,11 +632,11 @@ def pixel_shape_to_sky_svd(pixcoord, wcs, width, height, pixel_angle_rad):
         input_circular=np.isclose(width, height))
 
     if not shape:
-        return center, float(sky_width), float(sky_height), sky_angle
-    return center, sky_width, sky_height, sky_angle
+        return float(sky_width), float(sky_height), sky_angle
+    return sky_width, sky_height, sky_angle
 
 
-def sky_shape_to_pixel_svd(skycoord, wcs, width_arcsec, height_arcsec,
+def sky_shape_to_pixel_svd(wcs, skycoord, width_arcsec, height_arcsec,
                            sky_angle_rad, *, pixcoord=None):
     """
     Convert a sky ellipse to a pixel ellipse using SVD.
@@ -667,14 +653,14 @@ def sky_shape_to_pixel_svd(skycoord, wcs, width_arcsec, height_arcsec,
 
     Parameters
     ----------
-    skycoord : `~astropy.coordinates.SkyCoord`
-        The sky coordinate of the ellipse center.
-
     wcs : WCS object
         A world coordinate system (WCS) transformation that
         supports the `astropy shared interface for WCS
         <https://docs.astropy.org/en/stable/wcs/wcsapi.html>`_ (e.g.,
         `astropy.wcs.WCS`, `gwcs.wcs.WCS`).
+
+    skycoord : `~astropy.coordinates.SkyCoord`
+        The sky coordinate of the ellipse center.
 
     width_arcsec : float or array_like
         The full width of the sky ellipse in arcsec. Arrays convert
@@ -714,7 +700,7 @@ def sky_shape_to_pixel_svd(skycoord, wcs, width_arcsec, height_arcsec,
         degrees, with the broadcast shape of ``width_arcsec`` and
         ``height_arcsec``.
     """
-    center, jacobian = _sky_to_pixel_jacobian(skycoord, wcs,
+    center, jacobian = _sky_to_pixel_jacobian(wcs, skycoord,
                                               pixcoord=pixcoord)
 
     # Build M_sky: columns are sky semi-axis vectors in tangent-plane
@@ -747,7 +733,7 @@ def sky_shape_to_pixel_svd(skycoord, wcs, width_arcsec, height_arcsec,
     return center, pixel_width, pixel_height, pixel_angle
 
 
-def sky_to_pixel_svd_scales(skycoord, wcs, *, pixcoord=None):
+def sky_to_pixel_svd_scales(wcs, skycoord, *, pixcoord=None):
     """
     Compute the pixel center, principal-axis scale factors, and pixel
     angle for a sky-to-pixel conversion using SVD of the local Jacobian.
@@ -767,14 +753,14 @@ def sky_to_pixel_svd_scales(skycoord, wcs, *, pixcoord=None):
 
     Parameters
     ----------
-    skycoord : `~astropy.coordinates.SkyCoord`
-        The sky coordinate of the region center.
-
     wcs : WCS object
         A world coordinate system (WCS) transformation that
         supports the `astropy shared interface for WCS
         <https://docs.astropy.org/en/stable/wcs/wcsapi.html>`_ (e.g.,
         `astropy.wcs.WCS`, `gwcs.wcs.WCS`).
+
+    skycoord : `~astropy.coordinates.SkyCoord`
+        The sky coordinate of the region center.
 
     pixcoord : tuple of float, optional
         The ``(x, y)`` pixel position of ``skycoord``, if already known.
@@ -798,7 +784,7 @@ def sky_to_pixel_svd_scales(skycoord, wcs, *, pixcoord=None):
         counterclockwise from the positive x-axis, wrapped to
         [0, 360) degrees.
     """
-    center, jacobian = _sky_to_pixel_jacobian(skycoord, wcs,
+    center, jacobian = _sky_to_pixel_jacobian(wcs, skycoord,
                                               pixcoord=pixcoord)
     u_mat, s_vals, _vt = np.linalg.svd(jacobian)
 
@@ -812,10 +798,10 @@ def sky_to_pixel_svd_scales(skycoord, wcs, *, pixcoord=None):
     return center, s_vals[0], s_vals[1], pixel_angle
 
 
-def pixel_to_sky_svd_scales(pixcoord, wcs):
+def pixel_to_sky_svd_scales(wcs, pixcoord):
     """
-    Compute the sky center, principal-axis scale factors, and sky angle
-    for a pixel-to-sky conversion using SVD of the inverse Jacobian.
+    Compute the principal-axis scale factors and sky angle for a
+    pixel-to-sky conversion using SVD of the inverse Jacobian.
 
     Uses the singular value decomposition (SVD) of the local inverse
     Jacobian ``J^{-1} = d(sky)/d(pixel)`` to find the natural principal
@@ -832,20 +818,17 @@ def pixel_to_sky_svd_scales(pixcoord, wcs):
 
     Parameters
     ----------
-    pixcoord : tuple of float
-        The ``(x, y)`` pixel coordinate of the region center.
-
     wcs : WCS object
         A world coordinate system (WCS) transformation that
         supports the `astropy shared interface for WCS
         <https://docs.astropy.org/en/stable/wcs/wcsapi.html>`_ (e.g.,
         `astropy.wcs.WCS`, `gwcs.wcs.WCS`).
 
+    pixcoord : tuple of float
+        The ``(x, y)`` pixel coordinate of the region center.
+
     Returns
     -------
-    center : `~astropy.coordinates.SkyCoord`
-        The sky center position.
-
     scale_major : float
         The scale factor along the major (maximum-stretch) axis
         (arcsec per pixel).
@@ -859,10 +842,8 @@ def pixel_to_sky_svd_scales(pixcoord, wcs):
         counterclockwise from North (the latitude/Dec axis), wrapped to
         [0, 360) degrees.
     """
-    centers, jacobians = _pixel_to_sky_jacobians(pixcoord[0], pixcoord[1],
-                                                 wcs)
-    center = centers[0]
-    jacobian_inv = jacobians[0]
+    jacobian_inv = compute_pixel_to_sky_jacobians(wcs, pixcoord[0],
+                                                  pixcoord[1])[0]
     u_mat, s_vals, _vt = np.linalg.svd(jacobian_inv)
 
     # Sky position angle (PA) of the major axis, measured from North
@@ -874,4 +855,4 @@ def pixel_to_sky_svd_scales(pixcoord, wcs):
         np.rad2deg(np.arctan2(u_mat[0, 0], u_mat[1, 0])) * u.deg,
     ).wrap_at(360 * u.deg)
 
-    return center, s_vals[0], s_vals[1], sky_angle
+    return s_vals[0], s_vals[1], sky_angle

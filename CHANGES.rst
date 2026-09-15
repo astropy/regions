@@ -13,11 +13,10 @@ New Features
 
 - Improved the performance of the region ``to_sky`` and ``to_pixel``
   conversions. The local WCS Jacobian now evaluates the WCS once for
-  all positions, the mean pixel scale is computed in closed form, the
-  pixel-to-sky conversions take the sky center from the same WCS call
-  as the Jacobian, and the elliptical and rectangular annuli convert
-  both of their shapes with one WCS evaluation in each direction.
-  [#XXX]
+  all positions through the low-level WCS interface, the mean pixel
+  scale is computed in closed form, and the elliptical and rectangular
+  annuli convert both of their shapes with one WCS evaluation in each
+  direction. [#XXX]
 
 Bug Fixes
 ---------

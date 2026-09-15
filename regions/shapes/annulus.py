@@ -231,9 +231,10 @@ class CircleAnnulusPixelRegion(AnnulusPixelRegion):
             The sky region. An ellipse annulus is returned if
             ``as_ellipse`` is `True`.
         """
+        center = wcs.pixel_to_world(self.center.x, self.center.y)
         if as_ellipse:
-            center, scale_major, scale_minor, angle = pixel_to_sky_svd_scales(
-                (self.center.x, self.center.y), wcs)
+            scale_major, scale_minor, angle = pixel_to_sky_svd_scales(
+                wcs, (self.center.x, self.center.y))
             inner_width = 2 * self.inner_radius * scale_major * u.arcsec
             outer_width = 2 * self.outer_radius * scale_major * u.arcsec
             inner_height = 2 * self.inner_radius * scale_minor * u.arcsec
@@ -247,8 +248,8 @@ class CircleAnnulusPixelRegion(AnnulusPixelRegion):
                 inner_height, outer_height, angle=angle,
                 meta=self.meta.copy(), visual=self.visual.copy())
 
-        center, mean_scale = pixel_to_sky_mean_scale(
-            (self.center.x, self.center.y), wcs)
+        mean_scale = pixel_to_sky_mean_scale(
+            wcs, (self.center.x, self.center.y))
         inner_radius = self.inner_radius * mean_scale * u.arcsec
         outer_radius = self.outer_radius * mean_scale * u.arcsec
         return CircleAnnulusSkyRegion(center, inner_radius, outer_radius,
@@ -370,7 +371,7 @@ class CircleAnnulusSkyRegion(SkyRegion):
         """
         if as_ellipse:
             center, scale_major, scale_minor, angle = sky_to_pixel_svd_scales(
-                self.center, wcs)
+                wcs, self.center)
             inner_radius_arcsec = self.inner_radius.to_value(u.arcsec)
             outer_radius_arcsec = self.outer_radius.to_value(u.arcsec)
             inner_width = 2 * inner_radius_arcsec * scale_major
@@ -382,7 +383,7 @@ class CircleAnnulusSkyRegion(SkyRegion):
                 inner_height, outer_height, angle=angle,
                 meta=self.meta.copy(), visual=self.visual.copy())
 
-        center, mean_scale = sky_to_pixel_mean_scale(self.center, wcs)
+        center, mean_scale = sky_to_pixel_mean_scale(wcs, self.center)
         inner_radius = self.inner_radius.to_value(u.arcsec) * mean_scale
         outer_radius = self.outer_radius.to_value(u.arcsec) * mean_scale
         return CircleAnnulusPixelRegion(PixCoord(*center), inner_radius,
@@ -670,8 +671,9 @@ class AsymmetricAnnulusPixelRegion(AnnulusPixelRegion):
         # Both shapes share the center and rotation, so they are
         # converted with one WCS evaluation. The rotation angle is that
         # of the outer shape.
-        center, widths, heights, angles = pixel_shape_to_sky_svd(
-            (self.center.x, self.center.y), wcs,
+        center = wcs.pixel_to_world(self.center.x, self.center.y)
+        widths, heights, angles = pixel_shape_to_sky_svd(
+            wcs, (self.center.x, self.center.y),
             [self.outer_width, self.inner_width],
             [self.outer_height, self.inner_height],
             self.angle.to_value(u.radian))
@@ -750,7 +752,7 @@ class AsymmetricAnnulusSkyRegion(SkyRegion):
         # converted with one WCS inversion and one evaluation. The
         # rotation angle is that of the outer shape.
         center, widths, heights, angles = sky_shape_to_pixel_svd(
-            self.center, wcs,
+            wcs, self.center,
             [self.outer_width.to_value(u.arcsec),
              self.inner_width.to_value(u.arcsec)],
             [self.outer_height.to_value(u.arcsec),
@@ -1039,8 +1041,9 @@ class RectangleAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
         # Both shapes share the center and rotation, so they are
         # converted with one WCS evaluation. The rotation angle is that
         # of the outer shape.
-        center, widths, heights, angles = pixel_shape_to_sky_svd(
-            (self.center.x, self.center.y), wcs,
+        center = wcs.pixel_to_world(self.center.x, self.center.y)
+        widths, heights, angles = pixel_shape_to_sky_svd(
+            wcs, (self.center.x, self.center.y),
             [self.outer_width, self.inner_width],
             [self.outer_height, self.inner_height],
             self.angle.to_value(u.radian))
@@ -1137,7 +1140,7 @@ class RectangleAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
         # converted with one WCS inversion and one evaluation. The
         # rotation angle is that of the outer shape.
         center, widths, heights, angles = sky_shape_to_pixel_svd(
-            self.center, wcs,
+            wcs, self.center,
             [self.outer_width.to_value(u.arcsec),
              self.inner_width.to_value(u.arcsec)],
             [self.outer_height.to_value(u.arcsec),
