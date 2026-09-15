@@ -709,3 +709,111 @@ class TestFlippedParityWCS:
         sky, _ = _build_pair(case, angle_deg * u.deg)
         sky_rt = sky.to_pixel(flipped_wcs).to_sky(flipped_wcs)
         assert abs(_angle_diff_deg(sky_rt.angle, angle_deg * u.deg)) < 2e-5
+
+
+class TestAnnulusIndependentInnerShape:
+    """
+    Tests that an annulus whose inner shape has a different aspect
+    ratio from the outer one converts each shape independently.
+
+    The annuli convert both shapes in one WCS evaluation. Each size must
+    match the conversion of the matching simple region, and the angle
+    is that of the outer shape.
+    """
+
+    @pytest.mark.parametrize('wcs_name', ['sheared_wcs', 'sip_wcs'])
+    def test_elliptical_pixel_to_sky(self, wcs_name, request):
+        wcs = request.getfixturevalue(wcs_name)
+        angle = 45 * u.deg
+        center = PixCoord(*PIX_CENTER)
+        annulus = EllipseAnnulusPixelRegion(center, inner_width=3,
+                                            outer_width=6, inner_height=2.5,
+                                            outer_height=4, angle=angle)
+        outer = EllipsePixelRegion(center, width=6, height=4, angle=angle)
+        inner = EllipsePixelRegion(center, width=3, height=2.5, angle=angle)
+        sky = annulus.to_sky(wcs)
+        sky_outer = outer.to_sky(wcs)
+        sky_inner = inner.to_sky(wcs)
+        assert_quantity_allclose(sky.outer_width, sky_outer.width,
+                                 rtol=1e-12)
+        assert_quantity_allclose(sky.outer_height, sky_outer.height,
+                                 rtol=1e-12)
+        assert_quantity_allclose(sky.inner_width, sky_inner.width,
+                                 rtol=1e-12)
+        assert_quantity_allclose(sky.inner_height, sky_inner.height,
+                                 rtol=1e-12)
+        assert_quantity_allclose(sky.angle, sky_outer.angle,
+                                 atol=1e-10 * u.deg)
+
+    @pytest.mark.parametrize('wcs_name', ['sheared_wcs', 'sip_wcs'])
+    def test_elliptical_sky_to_pixel(self, wcs_name, request):
+        wcs = request.getfixturevalue(wcs_name)
+        angle = 30 * u.deg
+        annulus = EllipseAnnulusSkyRegion(CENTER, inner_width=100 * u.arcsec,
+                                          outer_width=200 * u.arcsec,
+                                          inner_height=75 * u.arcsec,
+                                          outer_height=100 * u.arcsec,
+                                          angle=angle)
+        outer = EllipseSkyRegion(CENTER, width=200 * u.arcsec,
+                                 height=100 * u.arcsec, angle=angle)
+        inner = EllipseSkyRegion(CENTER, width=100 * u.arcsec,
+                                 height=75 * u.arcsec, angle=angle)
+        pix = annulus.to_pixel(wcs)
+        pix_outer = outer.to_pixel(wcs)
+        pix_inner = inner.to_pixel(wcs)
+        assert_allclose(pix.outer_width, pix_outer.width, rtol=1e-12)
+        assert_allclose(pix.outer_height, pix_outer.height, rtol=1e-12)
+        assert_allclose(pix.inner_width, pix_inner.width, rtol=1e-12)
+        assert_allclose(pix.inner_height, pix_inner.height, rtol=1e-12)
+        assert_quantity_allclose(pix.angle, pix_outer.angle,
+                                 atol=1e-10 * u.deg)
+
+    @pytest.mark.parametrize('wcs_name', ['sheared_wcs', 'sip_wcs'])
+    def test_rectangular_pixel_to_sky(self, wcs_name, request):
+        wcs = request.getfixturevalue(wcs_name)
+        angle = 45 * u.deg
+        center = PixCoord(*PIX_CENTER)
+        annulus = RectangleAnnulusPixelRegion(center, inner_width=3,
+                                              outer_width=6,
+                                              inner_height=2.5,
+                                              outer_height=4, angle=angle)
+        outer = RectanglePixelRegion(center, width=6, height=4, angle=angle)
+        inner = RectanglePixelRegion(center, width=3, height=2.5,
+                                     angle=angle)
+        sky = annulus.to_sky(wcs)
+        sky_outer = outer.to_sky(wcs)
+        sky_inner = inner.to_sky(wcs)
+        assert_quantity_allclose(sky.outer_width, sky_outer.width,
+                                 rtol=1e-12)
+        assert_quantity_allclose(sky.outer_height, sky_outer.height,
+                                 rtol=1e-12)
+        assert_quantity_allclose(sky.inner_width, sky_inner.width,
+                                 rtol=1e-12)
+        assert_quantity_allclose(sky.inner_height, sky_inner.height,
+                                 rtol=1e-12)
+        assert_quantity_allclose(sky.angle, sky_outer.angle,
+                                 atol=1e-10 * u.deg)
+
+    @pytest.mark.parametrize('wcs_name', ['sheared_wcs', 'sip_wcs'])
+    def test_rectangular_sky_to_pixel(self, wcs_name, request):
+        wcs = request.getfixturevalue(wcs_name)
+        angle = 30 * u.deg
+        annulus = RectangleAnnulusSkyRegion(CENTER,
+                                            inner_width=100 * u.arcsec,
+                                            outer_width=200 * u.arcsec,
+                                            inner_height=75 * u.arcsec,
+                                            outer_height=100 * u.arcsec,
+                                            angle=angle)
+        outer = RectangleSkyRegion(CENTER, width=200 * u.arcsec,
+                                   height=100 * u.arcsec, angle=angle)
+        inner = RectangleSkyRegion(CENTER, width=100 * u.arcsec,
+                                   height=75 * u.arcsec, angle=angle)
+        pix = annulus.to_pixel(wcs)
+        pix_outer = outer.to_pixel(wcs)
+        pix_inner = inner.to_pixel(wcs)
+        assert_allclose(pix.outer_width, pix_outer.width, rtol=1e-12)
+        assert_allclose(pix.outer_height, pix_outer.height, rtol=1e-12)
+        assert_allclose(pix.inner_width, pix_inner.width, rtol=1e-12)
+        assert_allclose(pix.inner_height, pix_inner.height, rtol=1e-12)
+        assert_quantity_allclose(pix.angle, pix_outer.angle,
+                                 atol=1e-10 * u.deg)
