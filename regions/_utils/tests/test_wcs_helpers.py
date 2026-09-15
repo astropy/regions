@@ -12,8 +12,9 @@ from astropy.wcs.wcsapi import HighLevelWCSWrapper
 from numpy.testing import assert_allclose
 
 from regions._utils.optional_deps import HAS_GWCS
-from regions._utils.tests.conftest import (WCS_CDELT_ARCSEC, WCS_CENTER,
-                                           CountingWCS, make_sip_wcs)
+from regions._utils.tests.wcs_test_helpers import (WCS_CDELT_ARCSEC,
+                                                   WCS_CENTER, CountingWCS,
+                                                   make_sip_wcs)
 from regions._utils.wcs_helpers import (compute_local_wcs_jacobian,
                                         compute_pixel_to_sky_jacobians,
                                         compute_pixel_to_sky_mean_scales,

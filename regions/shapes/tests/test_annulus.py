@@ -10,7 +10,7 @@ from astropy.utils.data import get_pkg_data_filename
 from astropy.wcs import WCS
 from numpy.testing import assert_allclose, assert_equal
 
-from regions._utils.tests.conftest import CountingWCS
+from regions._utils.tests.wcs_test_helpers import CountingWCS
 from regions.core import PixCoord, RegionMeta, RegionVisual
 from regions.core.compound import CompoundPixelRegion, CompoundSkyRegion
 from regions.shapes.annulus import (CircleAnnulusPixelRegion,
