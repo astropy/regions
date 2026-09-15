@@ -10,6 +10,7 @@ from astropy.utils.data import get_pkg_data_filename
 from astropy.wcs import WCS
 from numpy.testing import assert_allclose, assert_equal
 
+from regions._utils.tests.conftest import CountingWCS
 from regions.core import PixCoord, RegionMeta, RegionVisual
 from regions.core.compound import CompoundPixelRegion, CompoundSkyRegion
 from regions.shapes.annulus import (CircleAnnulusPixelRegion,
@@ -650,3 +651,42 @@ class TestRectangleAnnulusSkyRegion(BaseTestSkyRegion):
         assert reg == self.reg
         reg.outer_height = 85 * u.arcsec
         assert reg != self.reg
+
+
+@pytest.mark.parametrize('region_cls', [EllipseAnnulusSkyRegion,
+                                        RectangleAnnulusSkyRegion])
+def test_annulus_to_pixel_single_evaluation(region_cls, wcs):
+    """
+    Both shapes are converted with one WCS inversion and one forward
+    evaluation of the local Jacobian.
+    """
+    skycoord = wcs.pixel_to_world(30.0, 40.0)
+    region = region_cls(skycoord, 20 * u.arcsec, 50 * u.arcsec,
+                        50 * u.arcsec, 80 * u.arcsec, angle=30 * u.deg)
+    expected = region.to_pixel(wcs)
+    counting_wcs = CountingWCS(wcs)
+    result = region.to_pixel(counting_wcs)
+    assert counting_wcs.n_world_to_pixel == 1
+    assert counting_wcs.n_pixel_to_world == 1
+    assert_allclose(result.center.xy, expected.center.xy)
+    assert_allclose(result.inner_width, expected.inner_width)
+    assert_allclose(result.inner_height, expected.inner_height)
+
+
+@pytest.mark.parametrize('region_cls', [EllipseAnnulusPixelRegion,
+                                        RectangleAnnulusPixelRegion])
+def test_annulus_to_sky_single_evaluation(region_cls, wcs):
+    """
+    Both shapes are converted with one forward WCS evaluation, which
+    also gives the sky center.
+    """
+    region = region_cls(PixCoord(30.0, 40.0), 4.0, 10.0, 6.0, 16.0,
+                        angle=30 * u.deg)
+    expected = region.to_sky(wcs)
+    counting_wcs = CountingWCS(wcs)
+    result = region.to_sky(counting_wcs)
+    assert counting_wcs.n_world_to_pixel == 0
+    assert counting_wcs.n_pixel_to_world == 1
+    assert result.center.separation(expected.center).arcsec < 1e-9
+    assert_quantity_allclose(result.inner_width, expected.inner_width)
+    assert_quantity_allclose(result.outer_height, expected.outer_height)

@@ -667,15 +667,17 @@ class AsymmetricAnnulusPixelRegion(AnnulusPixelRegion):
         # The photutils helpers measure the sky rotation as a position
         # angle (PA) from North; regions measures it from the RA axis.
         # Convert between them with a 90 deg offset.
-        center, outer_width, outer_height, angle = pixel_shape_to_sky_svd(
-            (self.center.x, self.center.y), wcs, self.outer_width,
-            self.outer_height, self.angle.to_value(u.radian))
-        _, inner_width, inner_height, _ = pixel_shape_to_sky_svd(
-            (self.center.x, self.center.y), wcs, self.inner_width,
-            self.inner_height, self.angle.to_value(u.radian))
-        angle = (angle + 90 * u.deg).wrap_at(360 * u.deg)
-        return (center, inner_width * u.arcsec, outer_width * u.arcsec,
-                inner_height * u.arcsec, outer_height * u.arcsec, angle)
+        # Both shapes share the center and rotation, so they are
+        # converted with one WCS evaluation. The rotation angle is that
+        # of the outer shape.
+        center, widths, heights, angles = pixel_shape_to_sky_svd(
+            (self.center.x, self.center.y), wcs,
+            [self.outer_width, self.inner_width],
+            [self.outer_height, self.inner_height],
+            self.angle.to_value(u.radian))
+        angle = (angles[0] + 90 * u.deg).wrap_at(360 * u.deg)
+        return (center, widths[1] * u.arcsec, widths[0] * u.arcsec,
+                heights[1] * u.arcsec, heights[0] * u.arcsec, angle)
 
 
 class AsymmetricAnnulusSkyRegion(SkyRegion):
@@ -744,18 +746,18 @@ class AsymmetricAnnulusSkyRegion(SkyRegion):
         # Convert regions sky angle (from RA axis) to photutils PA (from
         # North) by subtracting 90 deg.
         sky_angle_rad = self.angle.to_value(u.radian) - math.pi / 2
-        center, outer_width, outer_height, angle = sky_shape_to_pixel_svd(
+        # Both shapes share the center and rotation, so they are
+        # converted with one WCS inversion and one evaluation. The
+        # rotation angle is that of the outer shape.
+        center, widths, heights, angles = sky_shape_to_pixel_svd(
             self.center, wcs,
-            self.outer_width.to_value(u.arcsec),
-            self.outer_height.to_value(u.arcsec),
+            [self.outer_width.to_value(u.arcsec),
+             self.inner_width.to_value(u.arcsec)],
+            [self.outer_height.to_value(u.arcsec),
+             self.inner_height.to_value(u.arcsec)],
             sky_angle_rad)
-        _, inner_width, inner_height, _ = sky_shape_to_pixel_svd(
-            self.center, wcs,
-            self.inner_width.to_value(u.arcsec),
-            self.inner_height.to_value(u.arcsec),
-            sky_angle_rad)
-        return (PixCoord(*center), inner_width, outer_width, inner_height,
-                outer_height, angle)
+        return (PixCoord(*center), widths[1], widths[0], heights[1],
+                heights[0], angles[0])
 
 
 class EllipseAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
@@ -1034,15 +1036,17 @@ class RectangleAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
         # The photutils SVD helpers measure the sky rotation as a
         # position angle (PA) from North; regions measures it from the
         # RA axis. Convert between them with a 90 deg offset.
-        center, outer_width, outer_height, angle = pixel_shape_to_sky_svd(
-            (self.center.x, self.center.y), wcs, self.outer_width,
-            self.outer_height, self.angle.to_value(u.radian))
-        _, inner_width, inner_height, _ = pixel_shape_to_sky_svd(
-            (self.center.x, self.center.y), wcs, self.inner_width,
-            self.inner_height, self.angle.to_value(u.radian))
-        angle = (angle + 90 * u.deg).wrap_at(360 * u.deg)
-        return (center, inner_width * u.arcsec, outer_width * u.arcsec,
-                inner_height * u.arcsec, outer_height * u.arcsec, angle)
+        # Both shapes share the center and rotation, so they are
+        # converted with one WCS evaluation. The rotation angle is that
+        # of the outer shape.
+        center, widths, heights, angles = pixel_shape_to_sky_svd(
+            (self.center.x, self.center.y), wcs,
+            [self.outer_width, self.inner_width],
+            [self.outer_height, self.inner_height],
+            self.angle.to_value(u.radian))
+        angle = (angles[0] + 90 * u.deg).wrap_at(360 * u.deg)
+        return (center, widths[1] * u.arcsec, widths[0] * u.arcsec,
+                heights[1] * u.arcsec, heights[0] * u.arcsec, angle)
 
     def to_polygon(self):
         """
@@ -1129,18 +1133,18 @@ class RectangleAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
         # Convert regions sky angle (from RA axis) to photutils PA (from
         # North) by subtracting 90 deg.
         sky_angle_rad = self.angle.to_value(u.radian) - math.pi / 2
-        center, outer_width, outer_height, angle = sky_shape_to_pixel_svd(
+        # Both shapes share the center and rotation, so they are
+        # converted with one WCS inversion and one evaluation. The
+        # rotation angle is that of the outer shape.
+        center, widths, heights, angles = sky_shape_to_pixel_svd(
             self.center, wcs,
-            self.outer_width.to_value(u.arcsec),
-            self.outer_height.to_value(u.arcsec),
+            [self.outer_width.to_value(u.arcsec),
+             self.inner_width.to_value(u.arcsec)],
+            [self.outer_height.to_value(u.arcsec),
+             self.inner_height.to_value(u.arcsec)],
             sky_angle_rad)
-        _, inner_width, inner_height, _ = sky_shape_to_pixel_svd(
-            self.center, wcs,
-            self.inner_width.to_value(u.arcsec),
-            self.inner_height.to_value(u.arcsec),
-            sky_angle_rad)
-        return (PixCoord(*center), inner_width, outer_width, inner_height,
-                outer_height, angle)
+        return (PixCoord(*center), widths[1], widths[0], heights[1],
+                heights[0], angles[0])
 
     def to_polygon(self, wcs):
         """
