@@ -14,7 +14,7 @@ from numpy.testing import assert_allclose
 from regions._utils.optional_deps import HAS_GWCS
 from regions._utils.tests.wcs_test_helpers import (WCS_CDELT_ARCSEC,
                                                    WCS_CENTER, CountingWCS,
-                                                   make_sip_wcs)
+                                                   make_gwcs, make_sip_wcs)
 from regions._utils.wcs_helpers import (compute_local_wcs_jacobian,
                                         compute_pixel_to_sky_jacobians,
                                         compute_pixel_to_sky_mean_scales,
@@ -24,7 +24,6 @@ from regions._utils.wcs_helpers import (compute_local_wcs_jacobian,
                                         sky_shape_to_pixel_svd,
                                         sky_to_pixel_mean_scale,
                                         sky_to_pixel_svd_scales)
-from regions.tests.helpers import make_gwcs
 
 # WCS centers that historically broke the flat-sky finite-difference
 # Jacobian and SVD shape conversions:
@@ -107,8 +106,8 @@ class TestComputeLocalWCSJacobian:
     def test_inverse_of_forward(self, simple_wcs):
         """
         The Jacobian should be the inverse of the forward
-        d(sky)/d(pixel) matrix derived from central differences over
-        one pixel.
+        d(sky)/d(pixel) matrix derived from central differences over one
+        pixel.
         """
         jac = compute_local_wcs_jacobian(simple_wcs, WCS_CENTER)
         # A 1-pixel step should map to ~CDELT arcsec in sky
@@ -909,39 +908,42 @@ class TestGWCSBoundingBox:
 
     @pytest.fixture
     def bounded_gwcs(self):
-        gwcs = make_gwcs()
-        gwcs.bounding_box = ((-0.5, 19.5), (-0.5, 19.5))
+        shape = (50, 60)
+        gwcs = make_gwcs(shape)
+        gwcs.bounding_box = ((-0.5, shape[1] - 0.5), (-0.5, shape[0] - 0.5))
         return gwcs
 
     def test_pixel_to_sky_jacobians_finite_at_edge(self, bounded_gwcs):
-        x = np.array([19.4, 0.0, 10.0])
-        y = np.array([10.0, 19.4, -0.4])
+        x = np.array([59.4, 0.0, 30.0])
+        y = np.array([10.0, 49.4, -0.4])
         jacs = compute_pixel_to_sky_jacobians(bounded_gwcs, x, y)
         assert np.all(np.isfinite(jacs))
 
     def test_edge_jacobian_matches_interior(self, bounded_gwcs):
         # The gwcs has no distortion, so the Jacobian is the same
-        # everywhere up to the slight rotation of North between the
-        # two positions, which is below 1e-6 arcsec/pixel here
+        # everywhere
         jacs = compute_pixel_to_sky_jacobians(bounded_gwcs,
-                                              np.array([19.4, 10.0]),
-                                              np.array([10.0, 10.0]))
-        assert_allclose(jacs[0], jacs[1], rtol=1e-6, atol=1e-6)
+                                              np.array([59.4, 30.0]),
+                                              np.array([10.0, 25.0]))
+        assert_allclose(jacs[0], jacs[1], rtol=1e-6)
 
     def test_local_wcs_jacobian_finite_at_edge(self, bounded_gwcs):
-        skycoord = bounded_gwcs.pixel_to_world(19.4, 10.0)
+        skycoord = bounded_gwcs.pixel_to_world(59.4, 10.0)
         jac = compute_local_wcs_jacobian(bounded_gwcs, skycoord)
         assert np.all(np.isfinite(jac))
 
     def test_wrapped_gwcs_finite_at_edge(self, bounded_gwcs):
-        # A high-level wrapper around a gwcs must get the same bypass
-        # as the bare gwcs object
+        """
+        Test that a high-level wrapper around a gwcs object does not
+        break the finite-difference Jacobian evaluation at the edge of
+        the bounding box.
+        """
         wrapped = HighLevelWCSWrapper(bounded_gwcs)
-        jacs = compute_pixel_to_sky_jacobians(wrapped, 19.4, 10.0)
-        expected = compute_pixel_to_sky_jacobians(bounded_gwcs, 19.4, 10.0)
+        jacs = compute_pixel_to_sky_jacobians(wrapped, 59.4, 10.0)
+        expected = compute_pixel_to_sky_jacobians(bounded_gwcs, 59.4, 10.0)
         assert np.all(np.isfinite(jacs))
         assert_allclose(jacs, expected, rtol=1e-12)
-        skycoord = bounded_gwcs.pixel_to_world(19.4, 10.0)
+        skycoord = bounded_gwcs.pixel_to_world(59.4, 10.0)
         jac = compute_local_wcs_jacobian(wrapped, skycoord)
         assert np.all(np.isfinite(jac))
 
@@ -1013,8 +1015,12 @@ class TestJacobianEvaluation:
             compute_pixel_to_sky_jacobians(sip_wcs, [1.0, 2.0], [1.0])
 
     def test_single_low_level_wcs_call(self, sip_wcs):
+        """
+        Test that the vectorized Jacobian evaluation calls the WCS only
+        once for all positions, rather than once per position.
+        """
         # The Jacobian needs only world coordinate values, so the
-        # high-level API (which builds SkyCoord objects) is not used
+        # high-level API (which builds SkyCoord objects) is not used.
         wcs = CountingWCS(sip_wcs)
         compute_pixel_to_sky_jacobians(wcs, np.array([5.0, 12.0]),
                                        np.array([7.0, 3.0]))
@@ -1046,8 +1052,12 @@ class TestJacobianEvaluation:
                 assert_allclose(value, expected_value, rtol=1e-12)
 
     def test_world_axis_units(self, sip_wcs):
+        """
+        Test that the vectorized Jacobian evaluation respects the
+        ``world_axis_units`` of the WCS, rather than assuming degrees.
+        """
         # The low-level API returns values in the WCS world axis units,
-        # which must be converted rather than assumed to be degrees
+        # which must be converted rather than assumed to be degrees.
         class RadianWCS(CountingWCS):
             world_axis_units = ('rad', 'rad')
 
@@ -1123,11 +1133,11 @@ class TestCovarianceTransport:
     """
     Monte Carlo tests of the pixel-to-sky error covariance transport.
 
-    A pixel error covariance is mapped to the local tangent plane as
-    ``F @ cov @ F.T`` with the forward Jacobian ``F``. Pixel positions
-    drawn from that covariance and converted with the high-level WCS
-    interface must scatter on the sky by the transported amount, along
-    East and North and in their correlation.
+    A pixel error covariance is mapped to the local tangent plane as ``F
+    @ cov @ F.T`` with the forward Jacobian ``F``. Pixel positions drawn
+    from that covariance and converted with the high-level WCS interface
+    must scatter on the sky by the transported amount, along East and
+    North and in their correlation.
     """
 
     PIX_COV = np.array([[0.04, 0.01], [0.01, 0.09]])
@@ -1156,8 +1166,8 @@ class TestCovarianceTransport:
         north = sep * np.cos(pa) * arcsec_per_rad
         mc_cov = np.cov(east, north)
 
-        # The Monte Carlo precision of a standard deviation is
-        # 1 / sqrt(2 N) = 0.3%, so the tolerances are several sigma.
+        # The Monte Carlo precision of a standard deviation is 1 /
+        # sqrt(2 N) = 0.3%, so the tolerances are several sigma.
         assert_allclose(np.sqrt(np.diag(mc_cov)), np.sqrt(np.diag(sky_cov)),
                         rtol=0.02)
         mc_corr = mc_cov[0, 1] / np.sqrt(mc_cov[0, 0] * mc_cov[1, 1])

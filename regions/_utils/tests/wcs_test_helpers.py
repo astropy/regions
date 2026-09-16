@@ -10,8 +10,10 @@ plugin.
 
 import astropy.units as u
 import numpy as np
+from astropy import coordinates as coord
 from astropy.coordinates import SkyCoord
 from astropy.io.fits import Header
+from astropy.modeling import models
 from astropy.wcs import WCS
 
 # WCS test constants
@@ -106,6 +108,57 @@ def make_sip_wcs(shape=(20, 20), *, center=WCS_CENTER, coeffs=None):
         header[key] = value
 
     return WCS(header)
+
+
+def make_gwcs(shape):
+    """
+    Create a simple celestial gWCS object in the ICRS frame.
+
+    This mirrors ``photutils.datasets.make_gwcs`` so that the WCS
+    helper tests can be shared with photutils.
+
+    Parameters
+    ----------
+    shape : 2-tuple of int
+        The shape of the 2D array to be used with the output
+        `~gwcs.wcs.WCS` object.
+
+    Returns
+    -------
+    wcs : `gwcs.wcs.WCS` object
+        The generalized world coordinate system (WCS) transformation.
+    """
+    from gwcs import coordinate_frames as cf
+    from gwcs import wcs as gwcs_wcs
+
+    rho = np.pi / 3.0
+    scale = 0.1 / 3600.0  # 0.1 arcsec/pixel in deg/pix
+
+    shift_by_crpix = (models.Shift((-shape[1] / 2) + 1)
+                      & models.Shift((-shape[0] / 2) + 1))
+
+    cd_matrix = np.array([[-scale * np.cos(rho), scale * np.sin(rho)],
+                          [scale * np.sin(rho), scale * np.cos(rho)]])
+
+    rotation = models.AffineTransformation2D(cd_matrix, translation=[0, 0])
+    rotation.inverse = models.AffineTransformation2D(
+        np.linalg.inv(cd_matrix), translation=[0, 0])
+
+    tan = models.Pix2Sky_TAN()
+    celestial_rotation = models.RotateNative2Celestial(197.8925, -1.36555556,
+                                                       180.0)
+
+    det2sky = shift_by_crpix | rotation | tan | celestial_rotation
+    det2sky.name = 'linear_transform'
+
+    detector_frame = cf.Frame2D(name='detector', axes_names=('x', 'y'),
+                                unit=(u.pix, u.pix))
+    sky_frame = cf.CelestialFrame(reference_frame=coord.ICRS(),
+                                  name='icrs', unit=(u.deg, u.deg))
+
+    pipeline = [(detector_frame, det2sky), (sky_frame, None)]
+
+    return gwcs_wcs.WCS(pipeline)
 
 
 class CountingWCS:
