@@ -23,6 +23,8 @@ Bug Fixes
 
 - Fixed a doubled comma in the serialized CRTF output when ``range`` or
   ``corr`` is the only metadata of a region. [#700]
+- Fixed an issue with frame standardization impacting creating
+  compound regions with ``RangeSphericalSkyRegion`` instances. [#704]
 
 - The local WCS Jacobians and pixel scales used by the region
   ``to_sky`` and ``to_pixel`` methods are now computed with central

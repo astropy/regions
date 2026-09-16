@@ -920,8 +920,15 @@ class SphericalSkyRegion(Region):
 
     @staticmethod
     def _standardize_frame(frame):
-        # Standardize frame format: get as an astropy coordinate frame class
-        frame = get_astropy_frame_class(frame)
+        # Standardize frame format:
+        if isinstance(frame, BaseCoordinateFrame):
+            # Strip any attached data, keeping the frame attributes
+            return frame.replicate_without_data()
+
+        # Otherwise, get an astropy coordinate frame class,
+        # and create an instance without data:
+        frame_cls = get_astropy_frame_class(frame)
+        frame = frame_cls()
         return frame
 
     def _validate_frame_transformation(self, frame):

@@ -52,6 +52,20 @@ class TestRangeSphericalSkyRegion(BaseTestSphericalSkyRegion):
         with pytest.raises(ValueError, match=match):
             RangeSphericalSkyRegion(frame='icrs')
 
+    def test_frame_instance_with_data(self):
+        """
+        Test that a frame instance with attached data does not raise an
+        error when comparing to a frame name string.
+        """
+        frame = SkyCoord(1 * u.deg, 2 * u.deg, frame='icrs').frame
+        reg1 = RangeSphericalSkyRegion(longitude_range=[0, 10] * u.deg,
+                                       frame=frame)
+        reg2 = RangeSphericalSkyRegion(longitude_range=[0, 10] * u.deg,
+                                       frame='icrs')
+        assert not reg1._frame.has_data
+        assert reg1 == reg2
+        assert reg2 == reg1
+
     def test_invalid_lon_range(self):
         # Test input types:
         for lon_range in [u.Quantity([0, 10], u.m / u.s),
