@@ -25,7 +25,7 @@ classifiers = [
 dynamic = ['version']
 requires-python = '>=3.11'
 dependencies = [
-    'astropy >= 6.1.7',
+    'astropy >= 7.0',
     'numpy >= 2.0',
 ]
 
@@ -35,21 +35,21 @@ Documentation = 'https://astropy-regions.readthedocs.io/en/stable/'
 
 [project.optional-dependencies]
 all = [
-    'matplotlib >= 3.9',
+    'matplotlib >= 3.10',
     'shapely >= 2.1',
 ]
 test = [
     'gwcs >= 0.22',
     'pytest-arraydiff >= 0.6.1',
-    'pytest-astropy >= 0.11',
+    'pytest-astropy >= 0.12',
     'pytest-xdist >= 3.7',
-    'tox >= 4.16',
+    'tox >= 4.18',
 ]
 docs = [
     'regions[all]',
     'sphinx >= 8.2',  # keep in sync with docs/conf.py
     'sphinx-astropy[confv3] >= 1.11',
-    'sphinx_design >= 0.6',
+    'sphinx_design >= 0.7',
 ]
 dev = [
     'pre-commit >= 4.0',
