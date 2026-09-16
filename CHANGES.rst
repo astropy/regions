@@ -16,7 +16,7 @@ New Features
   all positions through the low-level WCS interface, the mean pixel
   scale is computed in closed form, and the elliptical and rectangular
   annuli convert both of their shapes with one WCS evaluation in each
-  direction. [#XXX]
+  direction. [#707]
 
 Bug Fixes
 ---------
@@ -28,12 +28,12 @@ Bug Fixes
   ``to_sky`` and ``to_pixel`` methods are now computed with central
   finite differences (half a pixel either side of the position) instead
   of one-sided 1-pixel differences. The one-sided differences were
-  biased by half the curvature of the distortion field. [#XXX]
+  biased by half the curvature of the distortion field. [#707]
 
 - The WCS helper functions now evaluate a ``gwcs`` transform with its
   bounding box disabled. Previously, regions within half a pixel of the
   array edge received NaN pixel scales because the finite-difference
-  offsets fell outside the bounding box. [#XXX]
+  offsets fell outside the bounding box. [#707]
 
 API Changes
 -----------
@@ -47,7 +47,7 @@ API Changes
   ``gwcs`` used the arithmetic mean of the singular values, and an
   undistorted ``astropy.wcs.WCS`` used the geometric mean of the x and
   y pixel scales. The radii are unchanged for undistorted WCS with
-  orthogonal pixel axes. [#XXX]
+  orthogonal pixel axes. [#707]
 
 
 0.12 (2026-06-24)
