@@ -126,9 +126,10 @@ class CirclePixelRegion(PixelRegion):
             The sky region. An ellipse is returned if ``as_ellipse``
             is `True`.
         """
+        center = wcs.pixel_to_world(self.center.x, self.center.y)
         if as_ellipse:
-            center, scale_major, scale_minor, angle = pixel_to_sky_svd_scales(
-                (self.center.x, self.center.y), wcs)
+            scale_major, scale_minor, angle = pixel_to_sky_svd_scales(
+                wcs, (self.center.x, self.center.y))
             width = Angle(2 * self.radius * scale_major, 'arcsec')
             height = Angle(2 * self.radius * scale_minor, 'arcsec')
             # The helper returns a position angle (PA) from North;
@@ -139,8 +140,8 @@ class CirclePixelRegion(PixelRegion):
                                     meta=self.meta.copy(),
                                     visual=self.visual.copy())
 
-        center, mean_scale = pixel_to_sky_mean_scale(
-            (self.center.x, self.center.y), wcs)
+        mean_scale = pixel_to_sky_mean_scale(
+            wcs, (self.center.x, self.center.y))
         radius = Angle(self.radius * mean_scale, 'arcsec')
         return CircleSkyRegion(center, radius, meta=self.meta.copy(),
                                visual=self.visual.copy())
@@ -336,7 +337,7 @@ class CircleSkyRegion(SkyRegion):
         """
         if as_ellipse:
             center, scale_major, scale_minor, angle = sky_to_pixel_svd_scales(
-                self.center, wcs)
+                wcs, self.center)
             radius_arcsec = self.radius.to_value(u.arcsec)
             width = 2 * radius_arcsec * scale_major
             height = 2 * radius_arcsec * scale_minor
@@ -344,7 +345,7 @@ class CircleSkyRegion(SkyRegion):
                                       angle=angle, meta=self.meta.copy(),
                                       visual=self.visual.copy())
 
-        center, mean_scale = sky_to_pixel_mean_scale(self.center, wcs)
+        center, mean_scale = sky_to_pixel_mean_scale(wcs, self.center)
         radius = self.radius.to_value(u.arcsec) * mean_scale
         return CirclePixelRegion(PixCoord(*center), radius,
                                  meta=self.meta.copy(),

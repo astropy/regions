@@ -120,8 +120,9 @@ class EllipsePixelRegion(PixelRegion):
         # The photutils helpers measure the sky rotation as a position
         # angle (PA) from North; regions measures it from the RA axis.
         # Convert between them with a 90 deg offset.
-        center, sky_width, sky_height, angle = pixel_shape_to_sky_svd(
-            (self.center.x, self.center.y), wcs, self.width, self.height,
+        center = wcs.pixel_to_world(self.center.x, self.center.y)
+        sky_width, sky_height, angle = pixel_shape_to_sky_svd(
+            wcs, (self.center.x, self.center.y), self.width, self.height,
             self.angle.to_value(u.radian))
         angle = (angle + 90 * u.deg).wrap_at(360 * u.deg)
         width = Angle(sky_width, 'arcsec')
@@ -410,7 +411,7 @@ class EllipseSkyRegion(SkyRegion):
         # Convert regions sky angle (from RA axis) to photutils PA (from
         # North) by subtracting 90 deg.
         center, pix_width, pix_height, angle = sky_shape_to_pixel_svd(
-            self.center, wcs,
+            wcs, self.center,
             self.width.to_value(u.arcsec),
             self.height.to_value(u.arcsec),
             self.angle.to_value(u.radian) - math.pi / 2)
