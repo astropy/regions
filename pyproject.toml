@@ -27,6 +27,7 @@ requires-python = '>=3.11'
 dependencies = [
     'astropy >= 7.0',
     'numpy >= 2.0',
+    'asdf',
 ]
 
 [project.urls]
@@ -39,6 +40,7 @@ all = [
     'shapely >= 2.1',
 ]
 test = [
+    'pytest-asdf-plugin',
     'gwcs >= 0.22',
     'pytest-arraydiff >= 0.6.1',
     'pytest-astropy >= 0.12',
@@ -80,9 +82,13 @@ include-package-data = false
 namespaces = false
 
 [tool.setuptools.package-data]
+'regions.io.asdf.resources' = [
+    '**/*.yaml'
+]
 '*' = [
     'data/*',
 ]
+
 'regions.shapes.tests' = [
     'reference/*.txt',
     'data/*.fits',
@@ -96,6 +102,11 @@ namespaces = false
 'regions.io.fits.tests' = [
     'data/*.fits',
 ]
+
+
+[project.entry-points]
+'asdf.extensions' = {regions = 'regions.io.asdf.extension:get_extensions'}
+'asdf.resource_mappings' = {regions = 'regions.io.asdf.extension:get_resource_mappings'}
 
 [tool.pytest.ini_options]
 minversion = "8.0"
@@ -117,6 +128,9 @@ addopts = [
     '--strict-config',
     '--strict-markers',
 ]
+asdf_schema_root = 'regions/io/asdf/resources/schemas'
+asdf_schema_tests_enabled = true
+
 log_level = 'INFO'
 log_cli_level = 'INFO'
 xfail_strict = true
@@ -142,6 +156,7 @@ omit = [
     '*/regions/*/tests/*',
     '*/regions/extern/*',
     '*/regions/version*',
+    'regions/io/asdf/converters/tests/*',
 ]
 
 [tool.coverage.report]
@@ -224,6 +239,8 @@ exclude = [
     '\._.*',  # private functions/methods
     '^test_*',  # test code
     '^conftest.*$',  # pytest configuration
+    'to_yaml_tree',  # ASDF converter
+    'from_yaml_tree',  # ASDF converter
 ]
 
 [tool.ruff]
