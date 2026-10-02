@@ -36,6 +36,35 @@ def test_pixcoord_copy_array():
     assert_equal(pc2.y, [3, 4])
 
 
+@pytest.mark.parametrize(('x', 'y'),
+                         [([1, 2, 3], 4),
+                          (1, [2, 3, 4]),
+                          (np.array([1, 2, 3]), np.array([4])),
+                          ([[1], [2]], [3, 4, 5])])
+def test_pixcoord_broadcast_writeable(x, y):
+    """
+    Test that broadcast inputs give writeable arrays that do not share
+    memory with each other or with the inputs.
+    """
+    x_orig = np.array(x)
+    y_orig = np.array(y)
+    pc = PixCoord(x=x, y=y)
+    assert pc.x.shape == pc.y.shape
+    assert pc.x.flags.writeable
+    assert pc.y.flags.writeable
+
+    x_expected = np.broadcast_to(x_orig, pc.x.shape).copy()
+    y_expected = np.broadcast_to(y_orig, pc.y.shape).copy()
+    x_expected.flat[0] = 99
+    y_expected.flat[0] = -99
+    pc.x.flat[0] = 99
+    pc.y.flat[0] = -99
+    assert_equal(pc.x, x_expected)
+    assert_equal(pc.y, y_expected)
+    assert_equal(x, x_orig)
+    assert_equal(y, y_orig)
+
+
 def test_pixcoord_basic_dimension():
     with pytest.raises(ValueError):
         PixCoord(np.array([1, 2]), [3, 4, 5, 6])

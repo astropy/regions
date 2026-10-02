@@ -45,9 +45,10 @@ class PixCoord:
         y = np.asarray(y)
 
         # Broadcast only when needed because np.broadcast_arrays returns
-        # read-only views in numpy >= 2.6.
+        # read-only views in numpy >= 2.6. The broadcast views are
+        # copied so that the arrays are writeable.
         if x.shape != y.shape:
-            x, y = np.broadcast_arrays(x, y)
+            x, y = (arr.copy() for arr in np.broadcast_arrays(x, y))
 
         if x.shape == ():
             self.x, self.y = x.item(), y.item()

@@ -26,6 +26,10 @@ Bug Fixes
 - Fixed an issue with frame standardization impacting creating
   compound regions with ``RangeSphericalSkyRegion`` instances. [#704]
 
+- Fixed ``PixCoord`` to always store writeable ``x`` and ``y`` arrays
+  when its inputs are broadcast against each other. With NumPy 2.6 the
+  arrays were read-only. [#710]
+
 - The local WCS Jacobians and pixel scales used by the region
   ``to_sky`` and ``to_pixel`` methods are now computed with central
   finite differences (half a pixel either side of the position) instead
