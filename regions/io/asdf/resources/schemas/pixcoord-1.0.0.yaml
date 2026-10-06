@@ -1,0 +1,33 @@
+%YAML 1.1
+---
+$schema: 'http://stsci.edu/schemas/yaml-schema/draft-01'
+id: 'asdf://astropy.org/regions/schemas/pixcoord-1.0.0'
+title: Pixel coordinates
+description: |
+  ASDF schema for serializing a pixel coordinate.
+
+examples:
+  - - A 'PixCoord' object with x=1.0 and y=2.0
+    - |
+      !<tag:astropy.org:regions/pixcoord-1.0.0%22> {x: 1, y: 2}
+
+type: object
+properties:
+  x:
+    title: X coordinate.
+    anyOf:
+      - type: number
+      - type: array
+      - tag: 'tag:stsci.edu:asdf/core/ndarray-1.*'
+    description: |
+      The x coordinate of the pixel.
+  y:
+    title: Y coordinate.
+    anyOf:
+      - type: number
+      - type: array
+      - tag: 'tag:stsci.edu:asdf/core/ndarray-1.*'
+    description: |
+      The y coordinate of the pixel.
+required: [x, y]
+...
