@@ -30,6 +30,13 @@ Bug Fixes
   when its inputs are broadcast against each other. With NumPy 2.6 the
   arrays were read-only. [#710]
 
+- Fixed the ``to_pixel`` methods of the rotated sky regions
+  (``EllipseSkyRegion``, ``RectangleSkyRegion``,
+  ``EllipseAnnulusSkyRegion``, ``RectangleAnnulusSkyRegion``, and the
+  ``TextSkyRegion`` rotation) for a region whose center frame differs
+  from the WCS celestial frame. The rotation angle is again measured in
+  the frame of the region center, as in version 0.11. [#713]
+
 - The local WCS Jacobians and pixel scales used by the region
   ``to_sky`` and ``to_pixel`` methods are now computed with central
   finite differences (half a pixel either side of the position) instead
