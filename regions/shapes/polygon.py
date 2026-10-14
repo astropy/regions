@@ -228,7 +228,7 @@ class PolygonPixelRegion(PixelRegion):
         """
         Rotate the region.
 
-        Positive ``angle`` corresponds to counter-clockwise rotation.
+        Positive ``angle`` corresponds to counterclockwise rotation.
 
         Parameters
         ----------
@@ -267,7 +267,7 @@ class RegularPolygonPixelRegion(PolygonPixelRegion):
         The distance from the center to any vertex. This is also known
         as the circumradius.
     angle : `~astropy.units.Quantity`, optional
-        The rotation angle of the polygon, measured anti-clockwise. If
+        The rotation angle of the polygon, measured counterclockwise. If
         set to zero (the default), the polygon will point "up" following
         the `matplotlib.patches.RegularPolygon` convention.
     meta : `~regions.RegionMeta` or `dict`, optional
@@ -334,7 +334,7 @@ class RegularPolygonPixelRegion(PolygonPixelRegion):
     nvertices = PositiveScalar('The number of polygon vertices.')
     radius = PositiveScalar('The distance from the center to any vertex in '
                             'pixels as a float.')
-    angle = ScalarAngle('The rotation angle measured anti-clockwise as a '
+    angle = ScalarAngle('The rotation angle measured counterclockwise as a '
                         '|Quantity| angle.')
     meta = RegionMetaDescr('The meta attributes as a |RegionMeta|')
     visual = RegionVisualDescr('The visual attributes as a |RegionVisual|.')
@@ -370,7 +370,7 @@ class RegularPolygonPixelRegion(PolygonPixelRegion):
         """
         Rotate the region.
 
-        Positive ``angle`` corresponds to counter-clockwise rotation.
+        Positive ``angle`` corresponds to counterclockwise rotation.
 
         Parameters
         ----------
@@ -468,7 +468,7 @@ class PolygonSphericalSkyRegion(SphericalSkyRegion):
     A spherical polygon defined using vertices in sky coordinates.
 
     Currently, this class only supports convex spherical polygons.
-    (Note that non-convex polygons will have incorrect "contains" logic.)
+    (Note that nonconvex polygons will have incorrect "contains" logic.)
 
     Parameters
     ----------

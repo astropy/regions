@@ -26,7 +26,7 @@ Bug Fixes
 - Fixed an issue with frame standardization impacting creating
   compound regions with ``RangeSphericalSkyRegion`` instances. [#704]
 
-- Fixed ``PixCoord`` to always store writeable ``x`` and ``y`` arrays
+- Fixed ``PixCoord`` to always store writable ``x`` and ``y`` arrays
   when its inputs are broadcast against each other. With NumPy 2.6 the
   arrays were read-only. [#710]
 
@@ -82,7 +82,7 @@ New Features
   ``PolygonPixelRegion`` or ``PolygonSkyRegion`` approximation of the
   region. [#649]
 
-- Improved pixel–sky coordinate conversions for non-distorted WCS
+- Improved pixel–sky coordinate conversions for nondistorted WCS
   objects, providing more accurate local pixel scales and North angle
   estimates. [#650, #651]
 
@@ -144,9 +144,9 @@ Bug Fixes
 ---------
 
 - Fixed reading FITS region files whose ``SHAPE`` column values contain
-  leading or trailing whitespace (e.g. from fixed-width character-column
-  padding or cross-platform encoding quirks), which previously raised a
-  spurious ``FITSParserError``. [#674]
+  leading or trailing whitespace (e.g., from fixed-width
+  character-column padding or cross-platform encoding quirks), which
+  previously raised a spurious ``FITSParserError``. [#674]
 
 - Fixed the ``to_sky`` and ``to_pixel`` conversions for
   elliptical and rectangular regions (and their annulus variants)
@@ -337,7 +337,7 @@ New Features
 - Added a ``copy`` method to ``RegionMeta`` and ``RegionVisual``. [#424]
 
 - Added the ability to handle DS9 elliptical and rectangular annuli and
-  multi-annuli regions. [#436]
+  multiannuli regions. [#436]
 
 - Added the ability to handle DS9 composite regions. [#436]
 
@@ -593,7 +593,7 @@ Other
 New Features
 ------------
 
-- Changed ``as_patch`` to ``as_artist`` to accommodate non-patch artists [#218]
+- Changed ``as_patch`` to ``as_artist`` to accommodate nonpatch artists [#218]
 
 - Implemented ``to_pixel`` for ``regions.CompoundSkyRegions``,
   ``to_mask`` for ``regions.CompoundPixelRegion`` and ``to_pixel`` for

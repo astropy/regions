@@ -43,7 +43,7 @@ def test_pixcoord_copy_array():
                           ([[1], [2]], [3, 4, 5])])
 def test_pixcoord_broadcast_writeable(x, y):
     """
-    Test that broadcast inputs give writeable arrays that do not share
+    Test that broadcast inputs give writable arrays that do not share
     memory with each other or with the inputs.
     """
     x_orig = np.array(x)

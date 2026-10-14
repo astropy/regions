@@ -74,7 +74,7 @@ class AnnulusPixelRegion(PixelRegion, abc.ABC):
         """
         Rotate the region.
 
-        Positive ``angle`` corresponds to counter-clockwise rotation.
+        Positive ``angle`` corresponds to counterclockwise rotation.
 
         Parameters
         ----------
@@ -610,9 +610,9 @@ class AsymmetricAnnulusPixelRegion(AnnulusPixelRegion):
     outer_height : float
         The outer height of the annulus (before rotation) in pixels.
     angle : `~astropy.units.Quantity`, optional
-        The rotation angle of the annulus, measured anti-clockwise. If
-        set to zero (the default), the width axis is lined up with the x
-        axis.
+        The rotation angle of the annulus, measured counterclockwise. If
+        set to zero (the default), the width axis is lined up with the
+        x-axis.
     meta : `~regions.RegionMeta` or `dict`, optional
         A dictionary that stores the meta attributes of the region.
     visual : `~regions.RegionVisual` or `dict`, optional
@@ -631,7 +631,7 @@ class AsymmetricAnnulusPixelRegion(AnnulusPixelRegion):
                                   'pixels as a float.')
     outer_height = PositiveScalar('The outer height (before rotation) in '
                                   'pixels as a float.')
-    angle = ScalarAngle('The rotation angle measured anti-clockwise as a '
+    angle = ScalarAngle('The rotation angle measured counterclockwise as a '
                         '|Quantity| angle.')
     meta = RegionMetaDescr('The meta attributes as a |RegionMeta|')
     visual = RegionVisualDescr('The visual attributes as a |RegionVisual|.')
@@ -727,7 +727,7 @@ class AsymmetricAnnulusSkyRegion(SkyRegion):
                                        'as a |Quantity| angle.')
     outer_height = PositiveScalarAngle('The outer height (before rotation) '
                                        'as a |Quantity| angle.')
-    angle = ScalarAngle('The rotation angle measured anti-clockwise as a'
+    angle = ScalarAngle('The rotation angle measured counterclockwise as a'
                         '|Quantity| angle.')
     meta = RegionMetaDescr('The meta attributes as a |RegionMeta|')
     visual = RegionVisualDescr('The visual attributes as a |RegionVisual|.')
@@ -788,8 +788,8 @@ class EllipseAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
         pixels.
     angle : `~astropy.units.Quantity`, optional
         The rotation angle of the elliptical annulus, measured
-        anti-clockwise. If set to zero (the default), the width axis is
-        lined up with the x axis.
+        counterclockwise. If set to zero (the default), the width axis
+        is lined up with the x-axis.
     meta : `~regions.RegionMeta` or `dict`, optional
         A dictionary that stores the meta attributes of the region.
     visual : `~regions.RegionVisual` or `dict`, optional
@@ -833,7 +833,7 @@ class EllipseAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
                                   'pixels as a float.')
     outer_height = PositiveScalar('The outer height (before rotation) in '
                                   'pixels as a float.')
-    angle = ScalarAngle('The rotation angle measured anti-clockwise as a '
+    angle = ScalarAngle('The rotation angle measured counterclockwise as a '
                         '|Quantity| angle.')
 
     _component_class = EllipsePixelRegion
@@ -923,7 +923,7 @@ class EllipseAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
                                        'as a |Quantity| angle.')
     outer_height = PositiveScalarAngle('The outer height (before rotation) '
                                        'as a |Quantity| angle.')
-    angle = ScalarAngle('The rotation angle measured anti-clockwise as a '
+    angle = ScalarAngle('The rotation angle measured counterclockwise as a '
                         '|Quantity| angle.')
 
     _component_class = EllipseSkyRegion
@@ -987,8 +987,8 @@ class RectangleAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
         pixels.
     angle : `~astropy.units.Quantity`, optional
         The rotation angle of the rectangular annulus, measured
-        anti-clockwise. If set to zero (the default), the width axis is
-        lined up with the x axis.
+        counterclockwise. If set to zero (the default), the width axis
+        is lined up with the x-axis.
     meta : `~regions.RegionMeta` or `dict`, optional
         A dictionary that stores the meta attributes of the region.
     visual : `~regions.RegionVisual` or `dict`, optional
@@ -1032,7 +1032,7 @@ class RectangleAnnulusPixelRegion(AsymmetricAnnulusPixelRegion):
                                   'pixels as a float.')
     outer_height = PositiveScalar('The outer height (before rotation) in '
                                   'pixels as a float.')
-    angle = ScalarAngle('The rotation angle measured anti-clockwise as a '
+    angle = ScalarAngle('The rotation angle measured counterclockwise as a '
                         '|Quantity| angle.')
 
     _component_class = RectanglePixelRegion
@@ -1134,7 +1134,7 @@ class RectangleAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
                                        'as a |Quantity| angle.')
     outer_height = PositiveScalarAngle('The outer height (before rotation) '
                                        'as a |Quantity| angle.')
-    angle = ScalarAngle('The rotation angle measured anti-clockwise as a '
+    angle = ScalarAngle('The rotation angle measured counterclockwise as a '
                         '|Quantity| angle.')
 
     _component_class = RectangleSkyRegion

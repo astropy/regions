@@ -33,7 +33,7 @@ dependencies, you can instead do::
 
     python -m pip install "regions[all]"
 
-In most cases, this will install a pre-compiled version (called a
+In most cases, this will install a precompiled version (called a
 wheel) of Regions, but if you are using a very recent version of Python
 or if you are installing Regions on a platform that is not common,
 Regions will be installed from a source file. In this case you will

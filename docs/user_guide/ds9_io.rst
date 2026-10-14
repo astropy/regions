@@ -49,7 +49,7 @@ Other Limitations
   identical file to the original, but the encoded regions are identical.
   Therefore, it will produce identical `~regions.Region` objects
   when read back in again. In other words, read/write/read (or
-  parse/serialize/parse) will exactly roundtrip `~regions.Region`
+  parse/serialize/parse) will exactly round-trip `~regions.Region`
   objects.
 
 * DS9 composite regions are parsed into separate, independent

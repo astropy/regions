@@ -360,7 +360,7 @@ class TestEllipseCovers:
         """
         Create an axis-aligned ellipse centered at (5, 5).
         """
-        # width=6 (semi-major=3 along x), height=4 (semi-minor=2 along y)
+        # width=6 (semimajor=3 along x), height=4 (semiminor=2 along y)
         return EllipsePixelRegion(PixCoord(5, 5), width=6, height=4,
                                   angle=0 * u.deg)
 
@@ -386,10 +386,10 @@ class TestEllipseCovers:
     def test_rotated_ellipse(self, method):
         """
         Test boundary semantics for an ellipse rotated by 90 degrees,
-        which swaps the effect of the semi-major and semi-minor axes.
+        which swaps the effect of the semimajor and semiminor axes.
         """
-        # After 90 deg rotation, the semi-major axis (3) is vertical and
-        # the semi-minor axis (2) is horizontal, so the boundary points
+        # After 90 deg rotation, the semimajor axis (3) is vertical and
+        # the semiminor axis (2) is horizontal, so the boundary points
         # are (5, 8), (5, 2) (top/bottom) and (7, 5), (3, 5) (left/right).
         reg = EllipsePixelRegion(PixCoord(5, 5), width=6, height=4,
                                  angle=90 * u.deg)
@@ -416,7 +416,7 @@ class TestEllipseShapelyComparison:
 
     # Test points grouped by location relative to the ellipse.
     # Shapely approximates the ellipse with a scaled polygonal
-    # ``buffer``, whose vertices land on the semi-major/semi-minor axes.
+    # ``buffer``, whose vertices land on the semimajor/semiminor axes.
     # The boundary points below are therefore restricted to those axes
     # so that they lie on both the true ellipse and Shapely's polygonal
     # approximation; off-axis boundary points would fall slightly inside
@@ -442,7 +442,7 @@ class TestEllipseShapelyComparison:
         from shapely import affinity
         from shapely.geometry import Point as ShapelyPoint
 
-        # width=6 -> semi-major a=3, height=4 -> semi-minor b=2
+        # width=6 -> semimajor a=3, height=4 -> semiminor b=2
         circle = ShapelyPoint(5, 5).buffer(1)
         return affinity.scale(circle, xfact=3, yfact=2)
 

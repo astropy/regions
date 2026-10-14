@@ -38,9 +38,9 @@ class RectanglePixelRegion(PixelRegion):
     height : float
         The height of the rectangle (before rotation) in pixels.
     angle : `~astropy.units.Quantity`, optional
-        The rotation angle of the rectangle, measured anti-clockwise. If
-        set to zero (the default), the width axis is lined up with the x
-        axis.
+        The rotation angle of the rectangle, measured counterclockwise.
+        If set to zero (the default), the width axis is lined up with
+        the x-axis.
     meta : `~regions.RegionMeta` or `dict`, optional
         A dictionary that stores the meta attributes of the region.
     visual : `~regions.RegionVisual` or `dict`, optional
@@ -76,7 +76,7 @@ class RectanglePixelRegion(PixelRegion):
                            'pixels as a float.')
     height = PositiveScalar('The height of the rectangle (before rotation) '
                             'in pixels as a float.')
-    angle = ScalarAngle('The rotation angle measured anti-clockwise as a '
+    angle = ScalarAngle('The rotation angle measured counterclockwise as a '
                         '|Quantity| angle.')
     meta = RegionMetaDescr('The meta attributes as a |RegionMeta|')
     visual = RegionVisualDescr('The visual attributes as a |RegionVisual|.')
@@ -211,7 +211,7 @@ class RectanglePixelRegion(PixelRegion):
         xy = xy[0] - origin[0], xy[1] - origin[1]
         width = self.width
         height = self.height
-        # matplotlib expects rotation in degrees (anti-clockwise)
+        # matplotlib expects rotation in degrees (counterclockwise)
         angle = self.angle.to_value(u.deg)
 
         mpl_kwargs = self.visual.define_mpl_kwargs(self._mpl_artist)
@@ -361,7 +361,7 @@ class RectanglePixelRegion(PixelRegion):
         """
         Rotate the region.
 
-        Positive ``angle`` corresponds to counter-clockwise rotation.
+        Positive ``angle`` corresponds to counterclockwise rotation.
 
         Parameters
         ----------
@@ -413,7 +413,7 @@ class RectangleSkyRegion(SkyRegion):
                                 'as a |Quantity| angle.')
     height = PositiveScalarAngle('The height of the rectangle (before '
                                  'rotation) as a |Quantity| angle.')
-    angle = ScalarAngle('The rotation angle measured anti-clockwise as a '
+    angle = ScalarAngle('The rotation angle measured counterclockwise as a '
                         '|Quantity| angle.')
     meta = RegionMetaDescr('The meta attributes as a |RegionMeta|')
     visual = RegionVisualDescr('The visual attributes as a |RegionVisual|.')

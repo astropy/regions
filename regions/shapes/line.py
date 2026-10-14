@@ -135,7 +135,7 @@ class LinePixelRegion(PixelRegion):
         """
         Rotate the region.
 
-        Positive ``angle`` corresponds to counter-clockwise rotation.
+        Positive ``angle`` corresponds to counterclockwise rotation.
 
         Parameters
         ----------

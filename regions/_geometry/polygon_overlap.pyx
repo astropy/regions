@@ -50,8 +50,8 @@ def polygon_overlap_grid(double xmin, double xmax, double ymin, double ymax,
     pixel grid.
 
     The polygon vertices must define a simple polygon (no
-    self-intersections). The polygon may be convex or non-convex. The
-    vertex order may be either clockwise or counter-clockwise; clockwise
+    self-intersections). The polygon may be convex or nonconvex. The
+    vertex order may be either clockwise or counterclockwise; clockwise
     input is reversed internally.
 
     Parameters
@@ -75,14 +75,14 @@ def polygon_overlap_grid(double xmin, double xmax, double ymin, double ymax,
     use_exact : 0 or 1
         Set to ``1`` to use an exact method to calculate the overlap
         between the polygon and each pixel. Set to ``0`` to use a
-        sub-pixel sampling method to calculate the overlap, where each
+        subpixel sampling method to calculate the overlap, where each
         pixel is divided into ``subpixels ** 2`` subpixels and the
         fraction of subpixels that are within the polygon is used to
         estimate the overlap.
 
     subpixels : int
         The number of subpixels to use in each dimension when using
-        the sub-pixel sampling method. Each pixel is resampled by this
+        the subpixel sampling method. Each pixel is resampled by this
         factor in each dimension; thus, each pixel is divided into
         ``subpixels ** 2`` subpixels.
 
@@ -120,7 +120,7 @@ def polygon_overlap_grid(double xmin, double xmax, double ymin, double ymax,
 
     # Working buffers, allocated once per call (not per pixel) as a
     # single block. Each Sutherland-Hodgman clip can at most double the
-    # vertex count of a non-convex polygon, so after the four half-plane
+    # vertex count of a nonconvex polygon, so after the four half-plane
     # clips the vertex count is bounded by 16 * n_poly.
     cdef int buf_size = 16 * n_poly
     cdef double[::1] work = np.empty(2 * n_poly + 4 * buf_size, dtype=DTYPE)
@@ -202,18 +202,18 @@ cdef double polygon_pixel_overlap(double pxmin, double pymin,
     """
     Exact area of overlap between the axis-aligned pixel rectangle
     [pxmin, pxmax] x [pymin, pymax] and a simple polygon supplied as
-    counter-clockwise vertices.
+    counterclockwise vertices.
 
     The polygon (subject) is clipped against the four edges of the pixel
     rectangle (clip) using the Sutherland-Hodgman algorithm, followed
     by the shoelace area formula. Because the clip polygon is convex,
-    the subject polygon may be either convex or non-convex (it must,
+    the subject polygon may be either convex or nonconvex (it must,
     however, be simple, i.e., non-self-intersecting).
 
     The four ``buf_*`` parameters are caller-allocated working buffers;
     each must hold at least ``buf_size`` doubles. The caller is
     responsible for ensuring ``buf_size`` is large enough; each clip can
-    roughly double the vertex count of a non-convex polygon, so 16 times
+    roughly double the vertex count of a nonconvex polygon, so 16 times
     the maximum input polygon size is a safe choice. For convex input
     polygons, each clip adds at most one vertex, so input size plus four
     suffices.
@@ -272,7 +272,7 @@ cdef int point_in_polygon(double x, double y, double *poly_x,
     poly_y)``, 0 otherwise.
 
     Uses the standard ray-casting algorithm so the polygon may be convex
-    or non-convex.
+    or nonconvex.
 
     Boundary convention
     -------------------
@@ -338,11 +338,11 @@ cdef double polygon_overlap_single_subpixel(double x0, double y0,
                                             double *hxmax_buf) noexcept nogil:
     """
     Return the fraction of overlap between a simple polygon and a single
-    pixel with the given extent, using a sub-pixel sampling method.
+    pixel with the given extent, using a subpixel sampling method.
 
     The pixel ``[x0, x1] x [y0, y1]`` is divided into ``subpixels ** 2``
     subpixels and the fraction of subpixel centers that fall inside the
-    polygon is returned. The polygon may be convex or non-convex.
+    polygon is returned. The polygon may be convex or nonconvex.
 
     For ``subpixels == 1`` (the ``center`` method) the single
     pixel-center sample is classified with the full `point_in_polygon`
@@ -356,7 +356,7 @@ cdef double polygon_overlap_single_subpixel(double x0, double y0,
     vertical edges) plus a set of closed x-intervals (from any
     horizontal edges lying exactly on that line). The crossings are
     sorted and the row's samples are then classified by a single
-    monotonic sweep instead of re-testing every edge for every sample.
+    monotonic sweep instead of retesting every edge for every sample.
     This reduces the per-pixel cost from ``O(subpixels ** 2 * n_poly)``
     to roughly ``O(subpixels * n_poly + subpixels ** 2)`` while matching
     the classification of `point_in_polygon`: interior samples are
@@ -377,7 +377,7 @@ cdef double polygon_overlap_single_subpixel(double x0, double y0,
     doubles. ``xint_buf`` stores the per-row edge crossings, while
     ``hxmin_buf`` and ``hxmax_buf`` store the endpoints of the per-row
     horizontal-edge intervals. They are written only within this call,
-    so the function remains thread safe.
+    so the function remains thread-safe.
 
     This is a pure C math function declared ``noexcept nogil`` so it can
     be called without the GIL (e.g., from the batch aperture photometry
@@ -476,9 +476,9 @@ cdef inline double _polygon_signed_area(const double *xs, const double *ys,
     """
     Signed area of a polygon via the shoelace formula.
 
-    Positive for counter-clockwise vertices, negative for clockwise
+    Positive for counterclockwise vertices, negative for clockwise
     vertices. For a Sutherland-Hodgman-clipped polygon the magnitude is
-    the area of the intersection even when the subject was non-convex
+    the area of the intersection even when the subject was nonconvex
     (any spurious "bridge" edges traverse zero area in pairs).
     """
     cdef double area = 0.0
@@ -566,7 +566,7 @@ cdef inline int _clip_against_axis(double *xs_in, double *ys_in, int n_in,
 cdef void _ensure_ccw(const double[::1] xs, const double[::1] ys, int n,
                       double *out_x, double *out_y) noexcept nogil:
     """
-    Copy ``(xs, ys)`` into ``(out_x, out_y)`` ensuring counter-clockwise
+    Copy ``(xs, ys)`` into ``(out_x, out_y)`` ensuring counterclockwise
     order via the sign of the signed area.
     """
     cdef double area = _polygon_signed_area(&xs[0], &ys[0], n)

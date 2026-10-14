@@ -45,7 +45,7 @@ To test if a given point is inside or outside the region, the Python
     False
 
 The ``in`` operator works only for scalar coordinates and pixel regions.
-If you try to use ``in`` for non-scalar coordinates, you'll get a
+If you try to use ``in`` for nonscalar coordinates, you'll get a
 `ValueError`::
 
     >>> pixcoord = PixCoord([50, 50], [10, 60])

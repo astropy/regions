@@ -79,7 +79,7 @@ class _RegionData:
     """
     Class to hold data used to initialize a Region object.
 
-    Data for multi-annulus regions is stored in a single object.
+    Data for multiannulus regions is stored in a single object.
     """
 
     frame: str
@@ -122,7 +122,7 @@ def _parse_raw_data(region_str):
     -------
     lines : list of `_RegionData`
         A list of `_RegionData` objects. Note that at this stage, region
-        data for multi-annulus regions is stored in a single object.
+        data for multiannulus regions is stored in a single object.
     """
     global_meta = {}
     composite_meta = ''
@@ -506,7 +506,7 @@ def _parse_shape_params(region_data):
     ----------
     region_data : `_RegionData` instance
         A `_RegionData` instance containing the data for a region line.
-        Data for multi-annulus regions is stored in a single object.
+        Data for multiannulus regions is stored in a single object.
 
     Returns
     -------
@@ -640,7 +640,7 @@ def _make_region(region_data):
 
     # define the parameters to initialize a Region
     # NOTE: region_params can be longer than region_data for
-    # multi-annulus regions
+    # multiannulus regions
     region_type = region_data.region_type
     region_params = []
     for shape_params in shape_params_list:

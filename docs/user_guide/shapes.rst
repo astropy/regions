@@ -174,7 +174,7 @@ Polygon
 .. approximated as a polygon.
 ..
 .. TODO: explain how polygons are implemented and special polygon
-.. methods, e.g. how to obtain a polygon approximation for any shape.
+.. methods, e.g., how to obtain a polygon approximation for any shape.
 .. This is not available yet, for now see `spherical_geometry`_ for
 .. spherical polygons and `Shapely`_ for pixel polygons.
 .. TODO: after spherical polygons are generalized, remove note

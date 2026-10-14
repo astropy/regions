@@ -47,8 +47,8 @@ The other mask modes that are available are:
   treated correctly. The mask data values will be between 0 and 1 for
   partial-pixel overlap.
 
-* ``mode='subpixels'``: the overlap is determined by sub-sampling the
-  pixel using a grid of sub-pixels. The number of sub-pixels to use in
+* ``mode='subpixels'``: the overlap is determined by subsampling the
+  pixel using a grid of subpixels. The number of subpixels to use in
   this mode should be given using the ``subpixels`` argument. The mask
   data values will be between 0 and 1 for partial-pixel overlap.
 

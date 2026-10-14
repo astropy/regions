@@ -330,7 +330,7 @@ class TestCirclePixelRegionToSkyEllipse:
     def test_to_sky_ellipse_roundtrip(self):
         sky_ellipse = self.reg.to_sky(self.wcs, as_ellipse=True)
         pix_ellipse = sky_ellipse.to_pixel(self.wcs)
-        # For a simple WCS without distortion, the roundtrip should
+        # For a simple WCS without distortion, the round-trip should
         # recover the original diameter as width and height
         assert_allclose(pix_ellipse.width, 2 * self.radius, rtol=1e-4)
         assert_allclose(pix_ellipse.height, 2 * self.radius, rtol=1e-4)
@@ -381,7 +381,7 @@ class TestCircleSkyRegionToPixelEllipse:
     def test_to_pixel_ellipse_roundtrip(self):
         pix_ellipse = self.reg.to_pixel(self.wcs, as_ellipse=True)
         sky_ellipse = pix_ellipse.to_sky(self.wcs)
-        # Roundtrip should recover the original diameter
+        # Round-trip should recover the original diameter
         assert_quantity_allclose(sky_ellipse.width,
                                  2 * self.radius, rtol=1e-4)
         assert_quantity_allclose(sky_ellipse.height,

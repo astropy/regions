@@ -365,7 +365,7 @@ class TestRangeSphericalSkyRegion(BaseTestSphericalSkyRegion):
                                        frame='icrs').transform_to('galactic')
         assert reg3 != reg2
 
-        # Formally won't round trip, because the original lon/lat range info
+        # Formally won't round-trip, because the original lon/lat range info
         # is not stored:
         reg = reg2.transform_to('icrs')
         assert reg != self.reg

@@ -59,14 +59,14 @@ def circle_overlap_grid(double xmin, double xmax, double ymin, double ymax,
     use_exact : 0 or 1
         Set to ``1`` to use an exact method to calculate the overlap
         between the circle and each pixel. Set to ``0`` to use a
-        sub-pixel sampling method to calculate the overlap, where each
+        subpixel sampling method to calculate the overlap, where each
         pixel is divided into ``subpixels ** 2`` subpixels and the
         fraction of subpixels that are within the circle is used to
         estimate the overlap.
 
     subpixels : int
         The number of subpixels to use in each dimension when using
-        the sub-pixel sampling method. Each pixel is resampled by this
+        the subpixel sampling method. Each pixel is resampled by this
         factor in each dimension; thus, each pixel is divided into
         ``subpixels ** 2`` subpixels.
 
@@ -153,7 +153,7 @@ cdef double circle_overlap_single_subpixel(double x0, double y0,
                                            int subpixels) noexcept nogil:
     """
     Return the fraction of overlap between a circle and a single pixel
-    with given extent, using a sub-pixel sampling method.
+    with given extent, using a subpixel sampling method.
     """
     cdef unsigned int _i, _j
     cdef double x, y, dx, dy, r_squared

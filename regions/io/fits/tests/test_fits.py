@@ -104,7 +104,7 @@ def test_valid_row():
 
 def test_shape_with_whitespace():
     # FITS character columns are fixed-width and space-padded; some writers
-    # (e.g. CSCView output, or cross-platform/encoding quirks) leave trailing
+    # (e.g., CSCView output, or cross-platform/encoding quirks) leave trailing
     # whitespace on the SHAPE value. Such a value must still be recognized
     # instead of raising a spurious FITSParserError (see GH #637).
     x = [1] * u.pix

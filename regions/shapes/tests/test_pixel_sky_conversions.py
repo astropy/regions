@@ -4,7 +4,7 @@ Tests for region pixel-to-sky and sky-to-pixel coordinate conversions.
 
 This module covers:
 
-* roundtrip conversions for all pixel and sky region classes through
+* round-trip conversions for all pixel and sky region classes through
   simple, rotated, distorted (SIP), sheared, flipped-parity, and
   generalized (`gwcs.wcs.WCS`) WCS objects, exercising the SVD/Jacobian
   shape conversion (the SIP and gWCS cases in particular force the
@@ -14,11 +14,11 @@ This module covers:
   rectangular) regions
 
 Automatic dispatch uses the Jacobian method for distorted WCS (e.g.,
-SIP) and the offset-based method for non-distorted WCS.
+SIP) and the offset-based method for nondistorted WCS.
 
 The regions rotation-angle convention measures the angle of the
 region's width axis from the longitude (RA) axis (sky regions) or the
-positive ``x`` axis (pixel regions), counterclockwise. This differs
+positive x-axis (pixel regions), counterclockwise. This differs
 from the photutils convention (position angle from North), so for an
 axis-aligned, isotropic WCS the regions sky angle and pixel angle are
 numerically *equal* after conversion (no 90 deg offset).
@@ -56,12 +56,12 @@ PIX_CENTER = (10, 10)
 ANGLES_DEG = [0, 30, 60, 135, 200, 315]
 
 # Rotation angles (deg) used for the sheared-WCS and degenerate-shape
-# roundtrip tests.
+# round-trip tests.
 SHEAR_ANGLES_DEG = [0.0, 30.0, 75.0]
 
 # Each case bundles a matching (sky, pixel) region class pair with their
 # construction kwargs. ``size_attrs`` lists the shape attributes
-# compared in roundtrip assertions and ``has_angle`` flags whether the
+# compared in round-trip assertions and ``has_angle`` flags whether the
 # region carries an ``angle`` rotation.
 _REGION_CASES = [
     {'id': 'ellipse',
@@ -215,7 +215,7 @@ def rotated_wcs():
 @pytest.fixture
 def sheared_wcs():
     """
-    A sheared TAN WCS where the pixel x and y axes are 80 deg apart on
+    A sheared TAN WCS where the pixel x- and y-axes are 80 deg apart on
     the sky (10 deg of shear from a perpendicular axis-aligned grid).
     """
     cdelt = 0.1 / 3600
@@ -346,9 +346,9 @@ class TestPixelToSky:
             assert getattr(sky, attr) > 0 * u.arcsec
 
 
-class TestRoundtripSkyPixelSky:
+class TestRoundTripSkyPixelSky:
     """
-    A sky -> pixel -> sky roundtrip must recover the original shape
+    A sky -> pixel -> sky round-trip must recover the original shape
     parameters and rotation angle.
     """
 
@@ -378,8 +378,8 @@ class TestRoundtripSkyPixelSky:
     @pytest.mark.parametrize('case', REGION_CASES)
     def test_sip_wcs(self, sip_wcs, case):
         """
-        Roundtrip through a distorted (SIP) WCS, exercising the Jacobian
-        code path.
+        Round-trip through a distorted (SIP) WCS, exercising the
+        Jacobian code path.
         """
         sky = case['sky_cls'](CENTER, **case['sky_kw'])
         sky_rt = sky.to_pixel(sip_wcs).to_sky(sip_wcs)
@@ -391,9 +391,9 @@ class TestRoundtripSkyPixelSky:
                                      atol=1e-3 * u.deg)
 
 
-class TestRoundtripPixelSkyPixel:
+class TestRoundTripPixelSkyPixel:
     """
-    A pixel -> sky -> pixel roundtrip must recover the original center,
+    A pixel -> sky -> pixel round-trip must recover the original center,
     shape parameters, and rotation angle.
     """
 
@@ -440,7 +440,7 @@ class TestSwappedAxisWCS:
     A WCS with the latitude axis first must give the same regions as
     the equivalent WCS with the longitude axis first.
 
-    A roundtrip alone would not catch a Jacobian built from swapped
+    A round-trip alone would not catch a Jacobian built from swapped
     longitude and latitude, because the forward and inverse conversions
     would share the same error.
     """
@@ -473,9 +473,9 @@ class TestSwappedAxisWCS:
 
 
 @pytest.mark.skipif(not HAS_GWCS, reason='gwcs is required')
-class TestGWCSRoundtrip:
+class TestGWCSRoundTrip:
     """
-    Roundtrip conversions through a generalized WCS (`gwcs.wcs.WCS`).
+    Round-trip conversions through a generalized WCS (`gwcs.wcs.WCS`).
 
     A gWCS has no ``has_distortion`` attribute, so the Jacobian path is
     always used.
@@ -515,7 +515,7 @@ class TestSkyPixelAngleConvention:
 
     The regions convention measures the rotation angle of the region's
     width axis from the longitude (RA) axis (sky regions) or the
-    positive ``x`` axis (pixel regions), counterclockwise. Internally
+    positive x-axis (pixel regions), counterclockwise. Internally
     the WCS helpers use the position-angle (from North) convention; the
     regions shape methods apply a 90 deg offset to bridge the two.
 
@@ -523,8 +523,8 @@ class TestSkyPixelAngleConvention:
     isotropic pixel scale, North = +y), the regions sky angle and pixel
     angle must be numerically equal after conversion. These tests pin
     that convention down so that any future refactor of the internal
-    ``_wcs_helpers`` cannot silently re-introduce a symmetric 90 deg
-    offset bug, which is invisible to roundtrip-only tests because the
+    ``_wcs_helpers`` cannot silently reintroduce a symmetric 90 deg
+    offset bug, which is invisible to round-trip-only tests because the
     offset cancels in sky -> pixel -> sky (and vice versa).
     """
 
@@ -572,10 +572,10 @@ class TestSkyPixelAngleConvention:
         assert abs(diff) < 1e-3
 
 
-class TestShearedWCSRoundtrip:
+class TestShearedWCSRoundTrip:
     """
     Verify that directed regions round-trip exactly through a sheared
-    WCS, where the pixel x and y axes are not perpendicular on the sky.
+    WCS, where the pixel x- and y-axes are not perpendicular on the sky.
     """
 
     @pytest.mark.parametrize('case', DIRECTED_CASES)
@@ -661,7 +661,7 @@ class TestFlippedParityWCS:
     rotation angles are related by a mirror, ``pixel.angle == 360 deg -
     sky.angle`` (mod 360), rather than the identity relation that holds
     for a standard-parity axis-aligned WCS. (Regions measures the angle
-    from the longitude/x axis, so there is no 90 deg offset as in the
+    from the longitude/x-axis, so there is no 90 deg offset as in the
     photutils position-angle convention.)
     """
 
@@ -675,8 +675,8 @@ class TestFlippedParityWCS:
     def test_north_is_minus_y(self, flipped_wcs):
         """
         A sky region whose width axis points North (regions sky angle =
-        90 deg, i.e. along the Dec axis) maps to a pixel region pointing
-        along -y (down), i.e., pixel angle = 270 deg.
+        90 deg, i.e., along the Dec axis) maps to a pixel region
+        pointing along -y (down), i.e., pixel angle = 270 deg.
         """
         sky = EllipseSkyRegion(CENTER, width=200 * u.arcsec,
                                height=100 * u.arcsec, angle=90 * u.deg)

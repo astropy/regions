@@ -13,7 +13,7 @@ General Metadata
 
 The :class:`~regions.Region` ``meta`` attribute stores additional
 metadata about the region such as labels, tags, comments, name, etc.
-that are used for non-display tasks. It can also store the spectral
+that are used for nondisplay tasks. It can also store the spectral
 dimensions of the region.
 
 The valid keys in the :class:`~regions.RegionMeta` object are:

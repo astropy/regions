@@ -173,7 +173,7 @@ def _translate_ds9_to_visual(shape, visual_meta):
 
 
 def _remove_invalid_keys(region_meta, valid_keys):
-    # TODO: instead of new dict, del region_meta in-place?
+    # TODO: instead of new dict, del region_meta in place?
     meta = {}
     for key in region_meta:
         if key in valid_keys:

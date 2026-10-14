@@ -1059,7 +1059,7 @@ class SphericalSkyRegion(Region):
         transform an ICRS coordinate that has an obstime attribute to FK4; in
         this case, one likely would want to use this information. Thus, the
         default for ``merge_attributes`` is `True`, in which the precedence is
-        as follows: (1) explicitly set (i.e., non-default) values in the
+        as follows: (1) explicitly set (i.e., nondefault) values in the
         destination frame; (2) explicitly set values in the source; (3) default
         value in the destination frame.
 

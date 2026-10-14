@@ -78,7 +78,7 @@ class TextPixelRegion(PointPixelRegion):
         sky_angle = (sky_angle + 90 * u.deg).wrap_at(360 * u.deg)
 
         # Rotation value is relative to the coordinate system axes;
-        # convert from counterclockwise angle from the positive x axis
+        # convert from counterclockwise angle from the positive x-axis
         # to angle relative to WCS longitude axis.
         visual = self.visual
         if 'rotation' in self.visual:
@@ -159,7 +159,7 @@ class TextSkyRegion(PointSkyRegion):
             wcs, self.center, 1.0, 1.0, rotation_rad - math.pi / 2)
 
         # Rotation value is relative to the WCS longitude axis;
-        # convert to counterclockwise angle from the positive x axis.
+        # convert to counterclockwise angle from the positive x-axis.
         visual = self.visual
         if 'rotation' in self.visual:
             visual = visual.copy()

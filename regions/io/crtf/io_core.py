@@ -82,7 +82,7 @@ class _ShapeList(list):
         """
         regions = []
         for shape in self:
-            # Skip elliptical multi-annulus for now
+            # Skip elliptical multiannulus for now
             if shape.region_type == 'ellipse' and len(shape.coord) > 5:
                 msg = f'Skipping elliptical annulus {shape}'
                 warn(msg, AstropyUserWarning)

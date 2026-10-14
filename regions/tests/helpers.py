@@ -30,7 +30,7 @@ def make_simple_wcs(skycoord, resolution, size, *, rotation_deg=0):
         The size of the WCS in pixels (assumed square).
 
     rotation_deg : float, optional
-        Counter-clockwise rotation angle in degrees. Default is 0
+        Counterclockwise rotation angle in degrees. Default is 0
         (axis-aligned).
 
     Returns

@@ -32,7 +32,7 @@ cdef double floor_sqrt(double x) noexcept nogil:
     """
     In some of the geometrical functions, we have to take the sqrt of a
     number and we know that the number should be >= 0. However, in some
-    cases the value is e.g. -1e-10, but we want to treat it as zero,
+    cases the value is e.g., -1e-10, but we want to treat it as zero,
     which is what this function does.
 
     Note that this does **not** check whether negative values are close
