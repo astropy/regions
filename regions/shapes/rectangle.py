@@ -393,9 +393,9 @@ class RectangleSkyRegion(SkyRegion):
     height : `~astropy.units.Quantity`
         The height of the rectangle (before rotation) as an angle.
     angle : `~astropy.units.Quantity`, optional
-        The rotation angle of the rectangle, measured anti-clockwise. If
-        set to zero (the default), the width axis is lined up with the
-        longitude axis of the celestial coordinates.
+        The rotation angle of the rectangle, measured counterclockwise.
+        If set to zero (the default), the width axis is lined up with
+        the longitude axis of the ``center`` coordinate frame.
     meta : `~regions.RegionMeta` or `dict`, optional
         A dictionary that stores the meta attributes of the region.
     visual : `~regions.RegionVisual` or `dict`, optional

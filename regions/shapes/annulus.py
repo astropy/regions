@@ -701,9 +701,9 @@ class AsymmetricAnnulusSkyRegion(SkyRegion):
     outer_height : `~astropy.units.Quantity`
         The outer height of the annulus (before rotation) as an angle.
     angle : `~astropy.units.Quantity`, optional
-        The rotation angle of the annulus, measured anti-clockwise. If
+        The rotation angle of the annulus, measured counterclockwise. If
         set to zero (the default), the width axis is lined up with the
-        longitude axis of the celestial coordinates.
+        longitude axis of the ``center`` coordinate frame.
     meta : `~regions.RegionMeta` or `dict`, optional
         A dictionary that stores the meta attributes of the region.
     visual : `~regions.RegionVisual` or `dict`, optional
@@ -895,8 +895,9 @@ class EllipseAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
         an angle.
     angle : `~astropy.units.Quantity`, optional
         The rotation angle of the elliptical annulus, measured
-        anti-clockwise. If set to zero (the default), the width axis is
-        lined up with the longitude axis of the celestial coordinates.
+        counterclockwise. If set to zero (the default), the width axis
+        is lined up with the longitude axis of the ``center`` coordinate
+        frame.
     meta : `~regions.RegionMeta` or `dict`, optional
         A dictionary that stores the meta attributes of the region.
     visual : `~regions.RegionVisual` or `dict`, optional
@@ -1102,8 +1103,9 @@ class RectangleAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
         an angle.
     angle : `~astropy.units.Quantity`, optional
         The rotation angle of the rectangular annulus, measured
-        anti-clockwise. If set to zero (the default), the width axis is
-        lined up with the longitude axis of the celestial coordinates.
+        counterclockwise. If set to zero (the default), the width axis
+        is lined up with the longitude axis of the ``center`` coordinate
+        frame.
     meta : `~regions.RegionMeta` or `dict`, optional
         A dictionary that stores the meta attributes of the region.
     visual : `~regions.RegionVisual` or `dict`, optional

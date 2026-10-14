@@ -27,6 +27,7 @@ numerically *equal* after conversion (no 90 deg offset).
 import astropy.units as u
 import numpy as np
 import pytest
+from astropy.coordinates import SkyCoord
 from astropy.io.fits import Header
 from astropy.tests.helper import assert_quantity_allclose
 from astropy.wcs import WCS
@@ -252,6 +253,22 @@ def flipped_wcs():
     wcs.wcs.crval = [CENTER.ra.deg, CENTER.dec.deg]
     wcs.wcs.cdelt = [-0.1 / 3600, -0.1 / 3600]
     wcs.wcs.ctype = ['RA---TAN', 'DEC--TAN']
+
+    return wcs
+
+
+@pytest.fixture
+def galactic_wcs():
+    """
+    A simple axis-aligned TAN WCS in Galactic coordinates centered on
+    CENTER.
+    """
+    center = CENTER.galactic
+    wcs = WCS(naxis=2)
+    wcs.wcs.crpix = [10.5, 10.5]
+    wcs.wcs.crval = [center.l.deg, center.b.deg]
+    wcs.wcs.cdelt = [-0.1 / 3600, 0.1 / 3600]
+    wcs.wcs.ctype = ['GLON-TAN', 'GLAT-TAN']
 
     return wcs
 
@@ -817,3 +834,87 @@ class TestAnnulusIndependentInnerShape:
         assert_allclose(pix.inner_height, pix_inner.height, rtol=1e-12)
         assert_quantity_allclose(pix.angle, pix_outer.angle,
                                  atol=1e-10 * u.deg)
+
+
+def _expected_pixel_angle(wcs, center, angle):
+    """
+    Return the pixel angle (deg, modulo 180) of the width axis of a sky
+    region, found by projecting a point on that axis through the WCS.
+
+    The regions sky angle of the width axis is measured from the
+    longitude axis of the ``center`` frame, so the axis lies at position
+    angle ``angle + 90 deg`` in that frame. A point offset along it is
+    projected with the WCS, which transforms it to the WCS frame.
+    """
+    tip = center.directional_offset_by(angle + 90 * u.deg, 1 * u.arcsec)
+    x0, y0 = wcs.world_to_pixel(center)
+    x1, y1 = wcs.world_to_pixel(tip)
+    return np.rad2deg(np.arctan2(y1 - y0, x1 - x0)) % 180
+
+
+def _frame_mismatch_params():
+    """
+    Return (center, wcs fixture name) pairs whose center frame differs
+    from the WCS celestial frame.
+    """
+    return [pytest.param(CENTER, 'galactic_wcs', id='icrs_on_galactic'),
+            pytest.param(CENTER.galactic, 'simple_wcs',
+                         id='galactic_on_icrs')]
+
+
+class TestRegionFrameDiffersFromWCSFrame:
+    """
+    Regression tests for a sky region whose center frame differs from
+    the WCS celestial frame (issue #712).
+
+    The sky angle is measured in the frame of the region center, so
+    converting to pixels must include the rotation between that frame
+    and the WCS frame.
+    """
+
+    @pytest.mark.parametrize(('center', 'wcs_name'), _frame_mismatch_params())
+    @pytest.mark.parametrize('case', DIRECTED_CASES)
+    @pytest.mark.parametrize('angle_deg', ANGLES_DEG)
+    def test_sky_to_pixel_angle(self, center, wcs_name, case, angle_deg,
+                                request):
+        wcs = request.getfixturevalue(wcs_name)
+        angle = angle_deg * u.deg
+        sky = case['sky_cls'](center, **{**case['sky_kw'], 'angle': angle})
+        pix = sky.to_pixel(wcs)
+        expected = _expected_pixel_angle(wcs, center, angle)
+        diff = (pix.angle.to_value(u.deg) - expected + 90) % 180 - 90
+        assert abs(diff) < 1e-4
+
+    @pytest.mark.parametrize(('center', 'wcs_name'), _frame_mismatch_params())
+    @pytest.mark.parametrize('angle_deg', ANGLES_DEG)
+    def test_text_sky_to_pixel_rotation(self, center, wcs_name, angle_deg,
+                                        request):
+        wcs = request.getfixturevalue(wcs_name)
+        sky = TextSkyRegion(center, 'foo',
+                            visual=RegionVisual(rotation=angle_deg))
+        pix = sky.to_pixel(wcs)
+        expected = _expected_pixel_angle(wcs, center, angle_deg * u.deg)
+        diff = (pix.visual['rotation'] - expected + 90) % 180 - 90
+        assert abs(diff) < 1e-4
+
+    def test_issue_712(self):
+        """
+        An ICRS ellipse projected onto a Galactic WCS centered on it is
+        rotated by the position angle of ICRS North in Galactic
+        coordinates.
+        """
+        center = SkyCoord(0, 0, unit='deg', frame='icrs')
+        region = EllipseSkyRegion(center, width=1 * u.deg,
+                                  height=0.5 * u.deg, angle=0 * u.deg)
+        wcs = WCS(naxis=2)
+        wcs.wcs.crval = [center.galactic.l.deg, center.galactic.b.deg]
+        wcs.wcs.ctype = ['GLON-TAN', 'GLAT-TAN']
+        wcs.wcs.cdelt = [-0.1, 0.1]
+        wcs.wcs.crpix = [25.5, 25.5]
+        wcs.wcs.cunit = ['deg', 'deg']
+        pix = region.to_pixel(wcs)
+        assert_allclose(pix.center.xy, (24.5, 24.5))
+        assert_allclose(pix.width, 10.0, rtol=1e-6)
+        assert_allclose(pix.height, 5.0, rtol=1e-6)
+        assert_quantity_allclose(pix.angle, 23.47980599 * u.deg,
+                                 atol=1e-6 * u.deg)
