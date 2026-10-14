@@ -703,7 +703,11 @@ class AsymmetricAnnulusSkyRegion(SkyRegion):
     angle : `~astropy.units.Quantity`, optional
         The rotation angle of the annulus, measured counterclockwise. If
         set to zero (the default), the width axis is lined up with the
-        longitude axis of the ``center`` coordinate frame.
+        longitude axis of the ``center`` coordinate frame (e.g., ICRS or
+        Galactic). When the region is converted to pixels with a WCS
+        whose celestial frame differs from that frame, the angle is
+        converted to the equivalent angle in the WCS frame, so the
+        region keeps the same orientation on the sky.
     meta : `~regions.RegionMeta` or `dict`, optional
         A dictionary that stores the meta attributes of the region.
     visual : `~regions.RegionVisual` or `dict`, optional
@@ -897,7 +901,10 @@ class EllipseAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
         The rotation angle of the elliptical annulus, measured
         counterclockwise. If set to zero (the default), the width axis
         is lined up with the longitude axis of the ``center`` coordinate
-        frame.
+        frame (e.g., ICRS or Galactic). When the region is converted to
+        pixels with a WCS whose celestial frame differs from that frame,
+        the angle is converted to the equivalent angle in the WCS frame,
+        so the region keeps the same orientation on the sky.
     meta : `~regions.RegionMeta` or `dict`, optional
         A dictionary that stores the meta attributes of the region.
     visual : `~regions.RegionVisual` or `dict`, optional
@@ -1105,7 +1112,10 @@ class RectangleAnnulusSkyRegion(AsymmetricAnnulusSkyRegion):
         The rotation angle of the rectangular annulus, measured
         counterclockwise. If set to zero (the default), the width axis
         is lined up with the longitude axis of the ``center`` coordinate
-        frame.
+        frame (e.g., ICRS or Galactic). When the region is converted to
+        pixels with a WCS whose celestial frame differs from that frame,
+        the angle is converted to the equivalent angle in the WCS frame,
+        so the region keeps the same orientation on the sky.
     meta : `~regions.RegionMeta` or `dict`, optional
         A dictionary that stores the meta attributes of the region.
     visual : `~regions.RegionVisual` or `dict`, optional
