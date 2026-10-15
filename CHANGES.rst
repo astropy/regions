@@ -4,9 +4,15 @@
 General
 -------
 
+- The minimum required Python is now 3.12. [#714]
+
 - The minimum required Astropy is now 7.0. [#708]
 
 - The minimum required Matplotlib is now 3.10. [#708]
+
+- The ``pytest-astropy`` package is no longer required to run the test
+  suite. The ``test`` extra now lists the individual pytest plugins.
+  [#714]
 
 New Features
 ------------

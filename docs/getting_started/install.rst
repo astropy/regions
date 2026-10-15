@@ -7,7 +7,7 @@ Requirements
 
 Regions has the following strict requirements:
 
-* `Python <https://www.python.org/>`_ 3.11 or later
+* `Python <https://www.python.org/>`_ 3.12 or later
 
 * `NumPy <https://numpy.org/>`_ 2.0 or later
 
@@ -105,8 +105,9 @@ Testing an installed Regions
 
 To test your installed version of Regions, you can run the test suite
 using the `pytest`_ command. Running the test suite requires installing
-the `pytest-astropy <https://github.com/astropy/pytest-astropy>`_ (0.11
-or later) package.
+the test dependencies::
+
+    python -m pip install "regions[test]"
 
 To run the test suite, use the following command::
 

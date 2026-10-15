@@ -23,7 +23,7 @@ classifiers = [
     'Topic :: Scientific/Engineering :: Astronomy',
 ]
 dynamic = ['version']
-requires-python = '>=3.11'
+requires-python = '>=3.12'
 dependencies = [
     'astropy >= 7.0',
     'numpy >= 2.0',
@@ -40,8 +40,12 @@ all = [
 ]
 test = [
     'gwcs >= 0.22',
+    'pytest >= 8.0',
     'pytest-arraydiff >= 0.6.1',
-    'pytest-astropy >= 0.12',
+    'pytest-astropy-header >= 0.2.2',
+    'pytest-doctestplus >= 1.4',
+    'pytest-filter-subpackage >= 0.2',
+    'pytest-remotedata >= 0.4.1',
     'pytest-xdist >= 3.7',
     'tox >= 4.18',
 ]
@@ -278,4 +282,4 @@ convention = 'numpy'
 max-statements = 130
 
 [tool.distutils.bdist_wheel]
-py-limited-api = "cp311"
+py-limited-api = "cp312"
