@@ -23,7 +23,7 @@ classifiers = [
     'Topic :: Scientific/Engineering :: Astronomy',
 ]
 dynamic = ['version']
-requires-python = '>=3.11'
+requires-python = '>=3.12'
 dependencies = [
     'astropy >= 7.0',
     'numpy >= 2.0',
@@ -278,4 +278,4 @@ convention = 'numpy'
 max-statements = 130
 
 [tool.distutils.bdist_wheel]
-py-limited-api = "cp311"
+py-limited-api = "cp312"

@@ -7,7 +7,7 @@ Requirements
 
 Regions has the following strict requirements:
 
-* `Python <https://www.python.org/>`_ 3.11 or later
+* `Python <https://www.python.org/>`_ 3.12 or later
 
 * `NumPy <https://numpy.org/>`_ 2.0 or later
 

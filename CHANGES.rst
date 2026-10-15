@@ -4,6 +4,8 @@
 General
 -------
 
+- The minimum required Python is now 3.12. [#]
+
 - The minimum required Astropy is now 7.0. [#708]
 
 - The minimum required Matplotlib is now 3.10. [#708]
