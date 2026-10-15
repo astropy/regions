@@ -105,8 +105,9 @@ Testing an installed Regions
 
 To test your installed version of Regions, you can run the test suite
 using the `pytest`_ command. Running the test suite requires installing
-the `pytest-astropy <https://github.com/astropy/pytest-astropy>`_ (0.11
-or later) package.
+the test dependencies::
+
+    python -m pip install "regions[test]"
 
 To run the test suite, use the following command::
 
