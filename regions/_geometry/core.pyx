@@ -8,14 +8,12 @@ pixel grid.
 The cdef functions are not intended to be called from Python code. They
 are pure C math functions declared ``noexcept nogil`` so they can be
 called without the GIL, including from multiple threads on free-threaded
-Python builds. Their signatures are exported via core.pxd.
+Python builds. The signatures of the functions used by other modules
+are exported via core.pxd.
 """
 
+# The math functions used here are declared in core.pxd.
 cdef extern from "math.h" nogil:
-    double asin(double x)
-    double sin(double x)
-    double sqrt(double x)
-    double fabs(double x)
     double M_PI
     double NAN
 
@@ -28,89 +26,59 @@ ctypedef struct intersections:
     point p2
 
 
-cdef double floor_sqrt(double x) noexcept nogil:
-    """
-    In some of the geometrical functions, we have to take the sqrt of a
-    number and we know that the number should be >= 0. However, in some
-    cases the value is e.g., -1e-10, but we want to treat it as zero,
-    which is what this function does.
-
-    Note that this does **not** check whether negative values are close
-    or not to zero, so this should be used only in cases where the value
-    is expected to be positive.
-    """
-    if x > 0:
-        return sqrt(x)
-    else:
-        return 0
-
-
-cdef double distance(double x1, double y1, double x2,
-                     double y2) noexcept nogil:
-    """
-    Distance between two points in two dimensions.
-
-    Parameters
-    ----------
-    x1, y1 : float
-        The coordinates of the first point.
-    x2, y2 : float
-        The coordinates of the second point.
-
-    Returns
-    -------
-    d : float
-        The Euclidean distance between the two points.
-    """
-    return sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
-
-
-cdef double area_arc(double x1, double y1, double x2, double y2,
-                     double r) noexcept nogil:
-    """
-    Area of a circle arc with radius r between points (x1, y1) and (x2,
-    y2).
-
-    References
-    ----------
-    http://mathworld.wolfram.com/CircularSegment.html
-    """
-    cdef double a, theta
-
-    a = distance(x1, y1, x2, y2)
-    theta = 2.0 * asin(0.5 * a / r)
-    return 0.5 * r * r * (theta - sin(theta))
-
-
-cdef double area_triangle(double x1, double y1, double x2, double y2,
-                          double x3, double y3) noexcept nogil:
-    """
-    Area of a triangle defined by three vertices.
-    """
-    return 0.5 * fabs(x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2))
-
-
 cdef double area_arc_unit(double x1, double y1, double x2,
                           double y2) noexcept nogil:
     """
-    Area of a unit circle arc (radius of 1) between points (x1, y1) and
-    (x2, y2).
+    Area of a circular segment of the unit circle (radius 1), the
+    region between the chord connecting (x1, y1) and (x2, y2) and the
+    circular arc spanning the same two points.
+
+    Both points are assumed to lie on the unit circle centered on the
+    origin. This is equivalent to ``area_arc`` with ``r = 1``.
+
+    Parameters
+    ----------
+    x1, y1, x2, y2 : double
+        The coordinates of the two points defining the chord.
+
+    Returns
+    -------
+    area : double
+        The area of the circular segment.
 
     References
     ----------
     http://mathworld.wolfram.com/CircularSegment.html
     """
-    cdef double a, theta
+    cdef double chord
 
-    a = distance(x1, y1, x2, y2)
-    theta = 2.0 * asin(0.5 * a)
-    return 0.5 * (theta - sin(theta))
+    # The chord length is twice the sine of half the angle that the
+    # chord subtends, but recovering the angle from it with an arcsine
+    # loses half of the precision when the chord is nearly a diameter.
+    # The sine and cosine of the full angle are the cross and dot
+    # products of the two points, which atan2 handles accurately for
+    # any chord.
+    chord = fabs(x1 * y2 - y1 * x2)
+    return 0.5 * (atan2(chord, x1 * x2 + y1 * y2) - chord)
 
 
 cdef int in_triangle(double x, double y, double x1, double y1, double x2,
                      double y2, double x3, double y3) noexcept nogil:
     """
-    Check if a point (x,y) is inside a triangle.
+    Test whether a point lies inside a triangle.
+
+    Parameters
+    ----------
+    x, y : double
+        The coordinates of the point to test.
+
+    x1, y1, x2, y2, x3, y3 : double
+        The coordinates of the triangle's three vertices.
+
+    Returns
+    -------
+    result : int
+        1 if the point lies inside the triangle, 0 otherwise.
     """
     cdef int c = 0
 
@@ -124,10 +92,19 @@ cdef int in_triangle(double x, double y, double x1, double y1, double x2,
 cdef intersections circle_line(double x1, double y1, double x2,
                                double y2) noexcept nogil:
     """
-    Intersection of a line defined by two points with a unit circle.
+    Intersection of the infinite line through two points with the unit
+    circle.
 
-    Coordinates > 1 in the result indicate that there is no
-    intersection.
+    Parameters
+    ----------
+    x1, y1, x2, y2 : double
+        The coordinates of two distinct points defining the line.
+
+    Returns
+    -------
+    result : intersections
+        The two intersection points, ``p1`` and ``p2``. Coordinates
+        greater than 1 indicate that there is no intersection.
     """
     cdef double a, b, delta, dx, dy
     cdef double tolerance = 1.e-10
@@ -150,7 +127,7 @@ cdef intersections circle_line(double x1, double y1, double x2,
         a = dy / dx
         b = y1 - a * x1
 
-        # Find the determinant of the quadratic equation
+        # Find the (reduced) discriminant of the quadratic equation
         delta = 1. + a * a - b * b
         if delta > 0.:  # solutions exist
             delta = sqrt(delta)
@@ -164,7 +141,7 @@ cdef intersections circle_line(double x1, double y1, double x2,
         a = dx / dy
         b = x1 - a * y1
 
-        # Find the determinant of the quadratic equation
+        # Find the (reduced) discriminant of the quadratic equation
         delta = 1. + a * a - b * b
         if delta > 0.:  # solutions exist
             delta = sqrt(delta)
@@ -180,9 +157,18 @@ cdef intersections circle_line(double x1, double y1, double x2,
 cdef point circle_segment_single2(double x1, double y1, double x2,
                                   double y2) noexcept nogil:
     """
-    The intersection of a line with the unit circle.
+    Intersection of the infinite line through two points with the unit
+    circle, choosing the intersection closest to the second point.
 
-    The intersection closest to (x2, y2) is chosen.
+    Parameters
+    ----------
+    x1, y1, x2, y2 : double
+        The coordinates of two distinct points defining the line.
+
+    Returns
+    -------
+    result : point
+        The intersection point closest to ``(x2, y2)``.
     """
     cdef double dx1, dy1, dx2, dy2
     cdef intersections inter
@@ -216,9 +202,19 @@ cdef point circle_segment_single2(double x1, double y1, double x2,
 cdef intersections circle_segment(double x1, double y1, double x2,
                                   double y2) noexcept nogil:
     """
-    Intersection(s) of a segment with the unit circle.
+    Intersection(s) of a line segment with the unit circle.
 
-    Discard any solution not on the segment.
+    Parameters
+    ----------
+    x1, y1, x2, y2 : double
+        The coordinates of the segment's two endpoints.
+
+    Returns
+    -------
+    result : intersections
+        The two intersection points, ``p1`` and ``p2``. Any solution
+        that does not lie on the segment is discarded (coordinates set
+        to 2, which is outside the unit circle).
     """
     cdef intersections inter, inter_new
     cdef point pt1, pt2
@@ -237,6 +233,12 @@ cdef intersections circle_segment(double x1, double y1, double x2,
             or (pt2.y < y1 and pt2.y < y2)):
         pt2.x, pt2.y = 2., 2.
 
+    # Order the output so that p1 is invalid (coordinates > 1) whenever
+    # fewer than two intersections lie on the segment. Callers pass
+    # segments whose endpoints are both outside the circle and test p1
+    # alone to decide whether a full chord exists. For such segments a
+    # single on-segment intersection is a degenerate grazing case and
+    # is treated as no intersection.
     if pt1.x > 1. and pt2.x < 2.:
         inter_new.p1 = pt1
         inter_new.p2 = pt2
@@ -247,23 +249,164 @@ cdef intersections circle_segment(double x1, double y1, double x2,
     return inter_new
 
 
+cdef point chord_end(double x1, double y1, double x2,
+                     double y2) noexcept nogil:
+    """
+    End point of the chord of the unit circle that starts at a point
+    on the circle and is directed toward a second point.
+
+    Because the first point is on the circle, the other intersection
+    of the line with the circle has a closed form that needs no square
+    root. It therefore stays well defined when the line is tangent to
+    the circle, where the general line intersection can lose its
+    solutions to floating-point roundoff.
+
+    Parameters
+    ----------
+    x1, y1 : double
+        The coordinates of the point on the unit circle.
+
+    x2, y2 : double
+        The coordinates of the point that defines the direction.
+
+    Returns
+    -------
+    result : point
+        The other end of the chord. This is ``(x1, y1)`` itself if the
+        direction is tangent to the circle or points away from it.
+    """
+    cdef double dx, dy, t
+    cdef point pt
+
+    dx = x2 - x1
+    dy = y2 - y1
+    pt.x = x1
+    pt.y = y1
+
+    t = -2.0 * (x1 * dx + y1 * dy)
+    if t > 0.0:
+        t /= dx * dx + dy * dy
+        pt.x += t * dx
+        pt.y += t * dy
+
+    return pt
+
+
+cdef double overlap_area_vertex_on_unit_circle(double x1, double y1,
+                                               double x2, double y2,
+                                               double x3,
+                                               double y3) noexcept nogil:
+    """
+    Area of overlap between a triangle and the unit circle when the
+    first vertex lies on the circle and the other two lie outside it.
+
+    The two edges that meet at the first vertex bound a wedge. Each
+    edge that points into the circle is a chord, described by the
+    angle ``phi`` between the edge and the tangent to the circle at
+    the vertex. That chord cuts off a circular segment of area ``phi
+    - sin(phi) * cos(phi)``, so the area of the circle inside the
+    wedge is the difference of the two segment areas. An edge that
+    points away from the circle is replaced by the tangent direction
+    that the wedge sweeps across. The part of the circle beyond the
+    opposite edge, if any, is then removed.
+
+    Parameters
+    ----------
+    x1, y1 : double
+        The coordinates of the vertex on the unit circle.
+
+    x2, y2, x3, y3 : double
+        The coordinates of the two vertices outside the unit circle.
+
+    Returns
+    -------
+    area : double
+        The area of overlap between the triangle and the unit circle.
+    """
+    cdef double dx2, dy2, dx3, dy3
+    cdef double n2, n3, c2, c3, cross
+    cdef double f2, f3, area, cap, side0, side1
+    cdef intersections inter
+
+    dx2 = x2 - x1
+    dy2 = y2 - y1
+    dx3 = x3 - x1
+    dy3 = y3 - y1
+
+    # Components of each edge along the inward normal of the circle
+    n2 = -(x1 * dx2 + y1 * dy2)
+    n3 = -(x1 * dx3 + y1 * dy3)
+    if n2 <= 0.0 and n3 <= 0.0:
+        # Neither edge enters the circle, so the triangle lies on the
+        # outer side of the tangent line.
+        return 0.0
+
+    # Components of each edge along the tangent of the circle
+    c2 = x1 * dy2 - y1 * dx2
+    c3 = x1 * dy3 - y1 * dx3
+
+    # Orientation of the wedge, which determines the tangent direction
+    # it sweeps across when only one edge enters the circle
+    cross = dx3 * dy2 - dy3 * dx2
+
+    if n2 > 0.0:
+        f2 = atan2(n2, c2) - n2 * c2 / (dx2 * dx2 + dy2 * dy2)
+    elif cross < 0.0:
+        f2 = 0.0
+    else:
+        f2 = M_PI
+
+    if n3 > 0.0:
+        f3 = atan2(n3, c3) - n3 * c3 / (dx3 * dx3 + dy3 * dy3)
+    elif cross > 0.0:
+        f3 = 0.0
+    else:
+        f3 = M_PI
+
+    area = fabs(f2 - f3)
+
+    # Remove the circular segment beyond the opposite edge
+    inter = circle_segment(x2, y2, x3, y3)
+    if inter.p1.x <= 1.:
+        cap = area_arc_unit(inter.p1.x, inter.p1.y, inter.p2.x, inter.p2.y)
+        # The segment is the larger of the two cut by the chord when
+        # the opposite edge separates the first vertex from the circle
+        # center.
+        side0 = (y3 - y2) * x2 - (x3 - x2) * y2
+        side1 = (x3 - x2) * (y1 - y2) - (y3 - y2) * (x1 - x2)
+        if (side0 > 0.0) != (side1 > 0.0):
+            cap = M_PI - cap
+        area -= cap
+
+    return area
+
+
 cdef double overlap_area_triangle_unit_circle(double x1, double y1, double x2,
                                               double y2, double x3,
                                               double y3) noexcept nogil:
     """
-    Given a triangle defined by three points (x1, y1), (x2, y2), and
-    (x3, y3), find the area of overlap with the unit circle.
+    Area of overlap between a triangle and the unit circle centered on
+    the origin.
+
+    Parameters
+    ----------
+    x1, y1, x2, y2, x3, y3 : double
+        The coordinates of the triangle's three vertices.
+
+    Returns
+    -------
+    area : double
+        The area of overlap between the triangle and the unit circle.
     """
     cdef double d1, d2, d3
     cdef bint in1, in2, in3
     cdef bint on1, on2, on3
-    cdef bint intersect13, intersect23
     cdef bint cond1, cond2
     cdef double area, xp, yp
     cdef intersections inter
     cdef point pt1, pt2, pt3, pt4, pt5, pt6
 
-    # Find distance of all vertices to circle center
+    # Find the squared distance of each vertex from the circle center
     d1 = x1 * x1 + y1 * y1
     d2 = x2 * x2 + y2 * y2
     d3 = x3 * x3 + y3 * y3
@@ -289,11 +432,11 @@ cdef double overlap_area_triangle_unit_circle(double x1, double y1, double x2,
                 x3, y3, d3, x2, y2, d2, x1, y1, d1)
 
     if d1 > d2 or d2 > d3 or d1 > d3:
-        # This should never happen; return NaN to signal an internal
+        # This should never happen. Return NaN to signal an internal
         # logic error without requiring the GIL to raise an exception.
         return NAN
 
-    # Determine number of vertices inside circle
+    # Determine which vertices are inside the circle
     in1 = d1 < 1
     in2 = d2 < 1
     in3 = d3 < 1
@@ -307,31 +450,26 @@ cdef double overlap_area_triangle_unit_circle(double x1, double y1, double x2,
         area = area_triangle(x1, y1, x2, y2, x3, y3)
 
     elif in2 or on2:
-        # If vertex 1 or 2 are on the edge of the circle, then we
-        # use the dot product to vertex 3 to determine whether an
-        # intersection takes place.
-        intersect13 = not on1 or x1 * (x3 - x1) + y1 * (y3 - y1) < 0.
-        intersect23 = not on2 or x2 * (x3 - x2) + y2 * (y3 - y2) < 0.
-        if intersect13 and intersect23 and not on2:
-            pt1 = circle_segment_single2(x1, y1, x3, y3)
-            pt2 = circle_segment_single2(x2, y2, x3, y3)
-            area = (area_triangle(x1, y1, x2, y2, pt1.x, pt1.y)
-                    + area_triangle(x2, y2, pt1.x, pt1.y, pt2.x, pt2.y)
-                    + area_arc_unit(pt1.x, pt1.y, pt2.x, pt2.y))
-        elif intersect13:
-            pt1 = circle_segment_single2(x1, y1, x3, y3)
-            area = (area_triangle(x1, y1, x2, y2, pt1.x, pt1.y)
-                    + area_arc_unit(x2, y2, pt1.x, pt1.y))
-        elif intersect23:
-            pt2 = circle_segment_single2(x2, y2, x3, y3)
-            area = (area_triangle(x1, y1, x2, y2, pt2.x, pt2.y)
-                    + area_arc_unit(x1, y1, pt2.x, pt2.y))
+        # Vertex 3 is outside the circle. Find the point where each
+        # edge to vertex 3 leaves the circle. For a vertex on the
+        # circle this is the end of the chord along that edge, which is
+        # the vertex itself if the edge does not enter the circle.
+        if on1:
+            pt1 = chord_end(x1, y1, x3, y3)
         else:
-            area = area_arc_unit(x1, y1, x2, y2)
+            pt1 = circle_segment_single2(x1, y1, x3, y3)
+        if on2:
+            pt2 = chord_end(x2, y2, x3, y3)
+        else:
+            pt2 = circle_segment_single2(x2, y2, x3, y3)
+        area = (area_triangle(x1, y1, x2, y2, pt1.x, pt1.y)
+                + area_triangle(x2, y2, pt1.x, pt1.y, pt2.x, pt2.y)
+                + area_arc_unit(pt1.x, pt1.y, pt2.x, pt2.y))
 
     elif on1:
-        # The triangle is outside the circle
-        area = 0.0
+        # Vertices 2 and 3 are outside the circle, but the triangle
+        # can still cross it.
+        area = overlap_area_vertex_on_unit_circle(x1, y1, x2, y2, x3, y3)
 
     elif in1:
         # Check for intersections of far side with circle

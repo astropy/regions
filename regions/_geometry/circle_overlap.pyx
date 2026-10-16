@@ -7,9 +7,9 @@ grid.
 
 The cdef functions are not intended to be called from Python code.
 They are pure C math functions declared ``noexcept nogil`` so they can
-be called without the GIL (e.g., from the batch aperture photometry
-driver), including from multiple threads on free-threaded Python builds.
-Their signatures are exported via circle_overlap.pxd.
+be called without the GIL, including from multiple threads on
+free-threaded Python builds. The signatures of the single-pixel
+functions are exported via circle_overlap.pxd for reuse elsewhere.
 """
 
 import numpy as np
@@ -33,9 +33,6 @@ def circle_overlap_grid(double xmin, double xmax, double ymin, double ymax,
                         int nx, int ny, double r, int use_exact,
                         int subpixels):
     """
-    circle_overlap_grid(xmin, xmax, ymin, ymax, nx, ny, r, use_exact,
-                        subpixels)
-
     Calculate the fractional overlap between a circle and a pixel grid.
 
     The circle is centered on the origin.
@@ -66,12 +63,13 @@ def circle_overlap_grid(double xmin, double xmax, double ymin, double ymax,
 
     subpixels : int
         The number of subpixels to use in each dimension when using
-        the subpixel sampling method. Each pixel is resampled by this
-        factor in each dimension; thus, each pixel is divided into
-        ``subpixels ** 2`` subpixels.
+        the subpixel sampling method (``use_exact=0``). It must be at
+        least 1 in that case. It is ignored when ``use_exact=1``. Each
+        pixel is resampled by this factor in each dimension, so each
+        pixel is divided into ``subpixels ** 2`` subpixels.
 
         A subpixel is included only if its center lies strictly inside
-        the circle; subpixel centers lying exactly on the circle
+        the circle. Subpixel centers lying exactly on the circle
         boundary are excluded (weight 0).
 
     Returns
@@ -83,12 +81,24 @@ def circle_overlap_grid(double xmin, double xmax, double ymin, double ymax,
         corners at (xmin + i * dx, ymin + j * dy) and (xmin + (i + 1)
         * dx, ymin + (j + 1) * dy), where dx and dy are the width of
         each pixel in the x and y direction, respectively.
+
+    Raises
+    ------
+    ValueError
+        If ``use_exact`` is not 0 or 1, or if ``subpixels`` is less
+        than 1 when ``use_exact=0``.
     """
+    if use_exact != 0 and use_exact != 1:
+        msg = 'use_exact must be 0 or 1'
+        raise ValueError(msg)
+    if use_exact == 0 and subpixels < 1:
+        msg = 'subpixels must be a strictly positive integer'
+        raise ValueError(msg)
+
     cdef unsigned int i, j
-    cdef double dx, dy, d, pixel_radius
+    cdef double dx, dy, d2, pixel_radius
     cdef double bxmin, bxmax, bymin, bymax
     cdef double pxmin, pxcen, pxmax, pymin, pycen, pymax
-
     # Define output array
     cdef np.ndarray[DTYPE_t, ndim=2] frac = np.zeros([ny, nx], dtype=DTYPE)
     cdef double[:, ::1] frac_view = frac
@@ -117,32 +127,17 @@ def circle_overlap_grid(double xmin, double xmax, double ymin, double ymax,
                     pycen = pymin + dy * 0.5
                     pymax = pymin + dy
                     if pymax > bymin and pymin < bymax:
-                        # Distance from circle center to pixel center.
-                        d = sqrt(pxcen * pxcen + pycen * pycen)
+                        # Squared distance from circle center to pixel
+                        # center (avoids a per-pixel sqrt).
+                        d2 = pxcen * pxcen + pycen * pycen
 
-                        # If pixel center is "well within" circle,
-                        # count full pixel.
-                        if d < r - pixel_radius:
-                            frac_view[j, i] = 1.0
-
-                        # If pixel center is "close" to circle border,
-                        # find overlap.
-                        elif d < r + pixel_radius:
-                            # Either do exact calculation or use
-                            # subpixel sampling:
-                            if use_exact:
-                                frac_view[j, i] = (
-                                    circle_overlap_single_exact(
-                                        pxmin, pymin, pxmax, pymax, r)
-                                    / (dx * dy))
-                            else:
-                                frac_view[j, i] = (
-                                    circle_overlap_single_subpixel(
-                                        pxmin, pymin, pxmax, pymax, r,
-                                        subpixels))
-
-                        # Otherwise, it is fully outside circle.
-                        # No action needed.
+                        # Per-pixel decision core (interior/exterior
+                        # fast path and exact/subpixel dispatch),
+                        # factored out into ``circle_frac_from_d2``
+                        # in circle_overlap.pxd.
+                        frac_view[j, i] = circle_frac_from_d2(
+                            pxmin, pymin, pxmax, pymax, dx, dy,
+                            pixel_radius, d2, r, use_exact, subpixels)
 
     return frac
 
@@ -152,8 +147,25 @@ cdef double circle_overlap_single_subpixel(double x0, double y0,
                                            double r,
                                            int subpixels) noexcept nogil:
     """
-    Return the fraction of overlap between a circle and a single pixel
-    with given extent, using a subpixel sampling method.
+    Fraction of overlap between a circle of radius ``r`` centered on
+    the origin and a single pixel, using subpixel sampling.
+
+    Parameters
+    ----------
+    x0, y0, x1, y1 : double
+        The lower and upper edges of the pixel.
+
+    r : double
+        The radius of the circle.
+
+    subpixels : int
+        The number of subpixels to sample in each dimension.
+
+    Returns
+    -------
+    frac : double
+        The fraction (0 to 1) of the pixel's area that overlaps the
+        circle.
     """
     cdef unsigned int _i, _j
     cdef double x, y, dx, dy, r_squared
@@ -179,10 +191,25 @@ cdef double circle_overlap_single_exact(double xmin, double ymin,
                                         double xmax, double ymax,
                                         double r) noexcept nogil:
     """
-    Calculate the area of overlap between a circle and a single pixel
-    with given extent, using an exact method.
+    Exact area of overlap between a circle centered on the origin and a
+    single pixel.
 
-    The circle is centered on the origin.
+    The pixel is split at the x- and y-axes as needed so that
+    ``circle_overlap_core`` can be applied to a quadrant-aligned
+    rectangle, and the partial areas are summed.
+
+    Parameters
+    ----------
+    xmin, ymin, xmax, ymax : double
+        The lower and upper edges of the pixel.
+
+    r : double
+        The radius of the circle.
+
+    Returns
+    -------
+    area : double
+        The area of overlap between the circle and the pixel.
     """
     if 0.0 <= xmin:
         if 0.0 <= ymin:
@@ -214,44 +241,67 @@ cdef double circle_overlap_single_exact(double xmin, double ymin,
 cdef double circle_overlap_core(double xmin, double ymin, double xmax,
                                 double ymax, double r) noexcept nogil:
     """
-    Calculate the area of overlap between a circle and a rectangle,
-    where the rectangle is in the first quadrant and the circle is
-    centered on the origin.
+    Exact area of overlap between a circle centered on the origin and a
+    rectangle confined to the first quadrant.
 
-    Assumes that the center of the circle is <= xmin, ymin (can always
-    modify input to conform to this).
+    This assumes ``0 <= xmin`` and ``0 <= ymin`` (the caller is
+    responsible for splitting a pixel that straddles either axis, as
+    done by ``circle_overlap_single_exact``).
+
+    Parameters
+    ----------
+    xmin, ymin, xmax, ymax : double
+        The lower and upper edges of the rectangle, with
+        ``0 <= xmin <= xmax`` and ``0 <= ymin <= ymax``.
+
+    r : double
+        The radius of the circle.
+
+    Returns
+    -------
+    area : double
+        The area of overlap between the circle and the rectangle.
     """
-    cdef double area, d1, d2, x1, x2, y1, y2
+    cdef double area, x1, x2, y1, y2
+    cdef double r2 = r * r
+    cdef double xmin2 = xmin * xmin
+    cdef double ymin2 = ymin * ymin
+    cdef double xmax2 = xmax * xmax
+    cdef double ymax2 = ymax * ymax
+    cdef double d1, d2
 
-    if xmin * xmin + ymin * ymin > r * r:
+    if xmin2 + ymin2 > r2:
         area = 0.0
-    elif xmax * xmax + ymax * ymax < r * r:
+    elif xmax2 + ymax2 < r2:
         area = (xmax - xmin) * (ymax - ymin)
     else:
         area = 0.0
-        d1 = floor_sqrt(xmax * xmax + ymin * ymin)
-        d2 = floor_sqrt(xmin * xmin + ymax * ymax)
-        if d1 < r and d2 < r:
-            x1, y1 = floor_sqrt(r * r - ymax * ymax), ymax
-            x2, y2 = xmax, floor_sqrt(r * r - xmax * xmax)
+        # Squared distances of the other two corners, compared with the
+        # squared radius so that no square root is needed to classify
+        # the pixel
+        d1 = xmax2 + ymin2
+        d2 = xmin2 + ymax2
+        if d1 < r2 and d2 < r2:
+            x1, y1 = floor_sqrt(r2 - ymax2), ymax
+            x2, y2 = xmax, floor_sqrt(r2 - xmax2)
             area = ((xmax - xmin) * (ymax - ymin) -
                     area_triangle(x1, y1, x2, y2, xmax, ymax) +
                     area_arc(x1, y1, x2, y2, r))
-        elif d1 < r:
-            x1, y1 = xmin, floor_sqrt(r * r - xmin * xmin)
-            x2, y2 = xmax, floor_sqrt(r * r - xmax * xmax)
+        elif d1 < r2:
+            x1, y1 = xmin, floor_sqrt(r2 - xmin2)
+            x2, y2 = xmax, floor_sqrt(r2 - xmax2)
             area = (area_arc(x1, y1, x2, y2, r) +
                     area_triangle(x1, y1, x1, ymin, xmax, ymin) +
                     area_triangle(x1, y1, x2, ymin, x2, y2))
-        elif d2 < r:
-            x1, y1 = floor_sqrt(r * r - ymin * ymin), ymin
-            x2, y2 = floor_sqrt(r * r - ymax * ymax), ymax
+        elif d2 < r2:
+            x1, y1 = floor_sqrt(r2 - ymin2), ymin
+            x2, y2 = floor_sqrt(r2 - ymax2), ymax
             area = (area_arc(x1, y1, x2, y2, r) +
                     area_triangle(x1, y1, xmin, y1, xmin, ymax) +
                     area_triangle(x1, y1, xmin, y2, x2, y2))
         else:
-            x1, y1 = floor_sqrt(r * r - ymin * ymin), ymin
-            x2, y2 = xmin, floor_sqrt(r * r - xmin * xmin)
+            x1, y1 = floor_sqrt(r2 - ymin2), ymin
+            x2, y2 = xmin, floor_sqrt(r2 - xmin2)
             area = (area_arc(x1, y1, x2, y2, r) +
                     area_triangle(x1, y1, x2, y2, xmin, ymin))
 

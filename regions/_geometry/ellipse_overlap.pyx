@@ -12,9 +12,9 @@ unit circle.
 
 The cdef functions are not intended to be called from Python code.
 They are pure C math functions declared ``noexcept nogil`` so they can
-be called without the GIL (e.g., from the batch aperture photometry
-driver), including from multiple threads on free-threaded Python builds.
-Their signatures are exported via ellipse_overlap.pxd.
+be called without the GIL, including from multiple threads on
+free-threaded Python builds. Their signatures are exported via
+ellipse_overlap.pxd for reuse elsewhere.
 """
 
 import numpy as np
@@ -29,7 +29,6 @@ __all__ = ['ellipse_overlap_grid']
 cdef extern from "math.h" nogil:
     double sin(double x)
     double cos(double x)
-    double fmax(double x, double y)
 
 DTYPE = np.float64
 ctypedef np.float64_t DTYPE_t
@@ -39,9 +38,6 @@ def ellipse_overlap_grid(double xmin, double xmax, double ymin, double ymax,
                          int nx, int ny, double rx, double ry, double theta,
                          int use_exact, int subpixels):
     """
-    ellipse_overlap_grid(xmin, xmax, ymin, ymax, nx, ny, rx, ry,
-                         theta, use_exact, subpixels)
-
     Calculate the fractional overlap between an ellipse and a pixel
     grid.
 
@@ -61,14 +57,17 @@ def ellipse_overlap_grid(double xmin, double xmax, double ymin, double ymax,
         direction, respectively.
 
     rx : float
-        The semimajor axis of the ellipse.
+        The length of the semiaxis of the ellipse along the direction
+        given by ``theta``. This is the semimajor axis when ``rx >=
+        ry``.
 
     ry : float
-        The semiminor axis of the ellipse.
+        The length of the semiaxis of the ellipse perpendicular to the
+        direction given by ``theta``.
 
     theta : float
-        The position angle of the semimajor axis in radians
-        (counterclockwise).
+        The rotation angle of the ``rx`` axis in radians, measured
+        counterclockwise from the positive x-axis.
 
     use_exact : 0 or 1
         Set to ``1`` to use an exact method to calculate the overlap
@@ -80,12 +79,13 @@ def ellipse_overlap_grid(double xmin, double xmax, double ymin, double ymax,
 
     subpixels : int
         The number of subpixels to use in each dimension when using
-        the subpixel sampling method. Each pixel is resampled by this
-        factor in each dimension; thus, each pixel is divided into
-        ``subpixels ** 2`` subpixels.
+        the subpixel sampling method (``use_exact=0``). It must be at
+        least 1 in that case. It is ignored when ``use_exact=1``. Each
+        pixel is resampled by this factor in each dimension, so each
+        pixel is divided into ``subpixels ** 2`` subpixels.
 
         A subpixel is included only if its center lies strictly inside
-        the ellipse; subpixel centers lying exactly on the ellipse
+        the ellipse. Subpixel centers lying exactly on the ellipse
         boundary are excluded (weight 0).
 
     Returns
@@ -97,12 +97,28 @@ def ellipse_overlap_grid(double xmin, double xmax, double ymin, double ymax,
         corners at (xmin + i * dx, ymin + j * dy) and (xmin + (i + 1)
         * dx, ymin + (j + 1) * dy), where dx and dy are the width of
         each pixel in the x and y direction, respectively.
+
+    Raises
+    ------
+    ValueError
+        If ``use_exact`` is not 0 or 1, or if ``subpixels`` is less
+        than 1 when ``use_exact=0``.
     """
+    if use_exact != 0 and use_exact != 1:
+        msg = 'use_exact must be 0 or 1'
+        raise ValueError(msg)
+    if use_exact == 0 and subpixels < 1:
+        msg = 'subpixels must be a strictly positive integer'
+        raise ValueError(msg)
+
     cdef unsigned int i, j
     cdef double dx, dy
-    cdef double r
+    cdef double bx, by
     cdef double bxmin, bxmax, bymin, bymax
     cdef double pxmin, pxmax, pymin, pymax
+    cdef double pxcen, pycen, rpix2
+    cdef double cos_theta, sin_theta
+    cdef double cxx, cyy, cxy, f_in, f_out
     cdef double norm
 
     # Define output array
@@ -115,56 +131,85 @@ def ellipse_overlap_grid(double xmin, double xmax, double ymin, double ymax,
 
     norm = 1.0 / (dx * dy)
 
-    # For now we use a bounding circle and then use that to find a
-    # bounding box but of course this is inefficient and could be done
-    # better.
+    # Quadratic-form coefficients and interior/exterior fast-path
+    # thresholds, computed once here via ``ellipse_quadratic_coeffs``.
+    cos_theta = cos(theta)
+    sin_theta = sin(theta)
+    ellipse_quadratic_coeffs(rx, ry, cos_theta, sin_theta, dx, dy,
+                             &cxx, &cyy, &cxy, &f_in, &f_out)
 
-    # Find bounding circle radius
-    r = fmax(rx, ry)
+    # Tight axis-aligned bounding box of the rotated ellipse. The
+    # half-extents are the maxima of |x| and |y| over the ellipse.
+    bx = sqrt(rx * rx * cos_theta * cos_theta
+              + ry * ry * sin_theta * sin_theta)
+    by = sqrt(rx * rx * sin_theta * sin_theta
+              + ry * ry * cos_theta * cos_theta)
 
     # Define bounding box
-    bxmin = -r - 0.5 * dx
-    bxmax = +r + 0.5 * dx
-    bymin = -r - 0.5 * dy
-    bymax = +r + 0.5 * dy
+    bxmin = -bx - 0.5 * dx
+    bxmax = +bx + 0.5 * dx
+    bymin = -by - 0.5 * dy
+    bymax = +by + 0.5 * dy
 
     with nogil:
         for i in range(nx):
             pxmin = xmin + i * dx  # lower end of pixel
             pxmax = pxmin + dx  # upper end of pixel
+            pxcen = pxmin + 0.5 * dx
             if pxmax > bxmin and pxmin < bxmax:
                 for j in range(ny):
                     pymin = ymin + j * dy
                     pymax = pymin + dy
                     if pymax > bymin and pymin < bymax:
-                        if use_exact:
-                            frac_view[j, i] = (
-                                ellipse_overlap_single_exact(
-                                    pxmin, pymin, pxmax, pymax, rx, ry,
-                                    theta) * norm)
-                        else:
-                            frac_view[j, i] = (
-                                ellipse_overlap_single_subpixel(
-                                    pxmin, pymin, pxmax, pymax, rx, ry,
-                                    theta, subpixels))
+                        pycen = pymin + 0.5 * dy
+                        rpix2 = (cxx * pxcen * pxcen
+                                 + cyy * pycen * pycen
+                                 + cxy * pxcen * pycen)
+                        # Per-pixel decision core, factored out into
+                        # ``ellipse_frac_from_rpix2`` in
+                        # ellipse_overlap.pxd.
+                        frac_view[j, i] = ellipse_frac_from_rpix2(
+                            pxmin, pymin, pxmax, pymax, norm, rx, ry,
+                            cos_theta, sin_theta, rpix2, f_in, f_out,
+                            use_exact, subpixels)
     return frac
 
 
 cdef double ellipse_overlap_single_subpixel(double x0, double y0,
                                             double x1, double y1,
                                             double rx, double ry,
-                                            double theta,
+                                            double cos_theta,
+                                            double sin_theta,
                                             int subpixels) noexcept nogil:
     """
-    Return the fraction of overlap between an ellipse and a single
-    pixel with given extent, using a subpixel sampling method.
+    Fraction of overlap between an ellipse centered on the origin and a
+    single pixel, using subpixel sampling.
+
+    Parameters
+    ----------
+    x0, y0, x1, y1 : double
+        The lower and upper edges of the pixel.
+
+    rx, ry : double
+        The semimajor and semiminor axes of the ellipse.
+
+    cos_theta, sin_theta : double
+        The cosine and sine of the ellipse's position angle,
+        precomputed by the caller.
+
+    subpixels : int
+        The number of subpixels to sample in each dimension.
+
+    Returns
+    -------
+    frac : double
+        The fraction (0 to 1) of the pixel's area that overlaps the
+        ellipse.
     """
     cdef unsigned int _i, _j
     cdef double x, y
     cdef double frac = 0.0  # Accumulator.
     cdef double inv_rx_sq, inv_ry_sq
-    cdef double cos_theta = cos(theta)
-    cdef double sin_theta = sin(theta)
     cdef double dx, dy
     cdef double x_tr, y_tr
 
@@ -194,21 +239,39 @@ cdef double ellipse_overlap_single_subpixel(double x0, double y0,
 cdef double ellipse_overlap_single_exact(double xmin, double ymin,
                                          double xmax, double ymax,
                                          double rx, double ry,
-                                         double theta) noexcept nogil:
+                                         double cos_theta,
+                                         double sin_theta) noexcept nogil:
     """
-    Return the area of overlap between a rectangle and an ellipse.
+    Exact area of overlap between an ellipse centered on the origin and
+    a rectangle.
 
-    The rectangle is defined by (``xmin``, ``ymin``, ``xmax``, ``ymax``)
-    and the ellipse has major and minor axes ``rx`` and ``ry``,
-    respectively, position angle ``theta``, and is centered at the
-    origin. The method divides the pixel rectangle into two triangles
-    and reprojects them into a coordinate system where the ellipse
-    becomes the unit circle. It then computes the intersection area
-    between each triangle and the unit circle, and sums them to get the
-    total area of overlap.
+    The method divides the pixel rectangle into two triangles and
+    reprojects them into a coordinate system where the ellipse becomes
+    the unit circle. It then computes the intersection area between
+    each triangle and the unit circle, and sums the two areas to get
+    the total area of overlap.
+
+    Parameters
+    ----------
+    xmin, ymin, xmax, ymax : double
+        The lower and upper edges of the rectangle.
+
+    rx, ry : double
+        The semimajor and semiminor axes of the ellipse.
+
+    cos_theta, sin_theta : double
+        The cosine and sine of the ellipse's position angle,
+        precomputed by the caller.
+
+    Returns
+    -------
+    area : double
+        The area of overlap between the ellipse and the rectangle.
     """
-    cdef double cos_m_theta = cos(-theta)
-    cdef double sin_m_theta = sin(-theta)
+    # The reprojection uses the -theta rotation, for which
+    # cos(-theta) = cos(theta) and sin(-theta) = -sin(theta).
+    cdef double cos_m_theta = cos_theta
+    cdef double sin_m_theta = -sin_theta
     cdef double scale
     cdef double x1, y1, x2, y2, x3, y3, x4, y4
 
