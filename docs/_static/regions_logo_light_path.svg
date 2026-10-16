@@ -36,16 +36,16 @@
             </g>
             <g id="Shapes">
                 <g id="Circle" transform="matrix(0.9,0,0,0.9,14.671832,31.960789)">
-                    <circle cx="127.968" cy="244.608" r="98.438" style="fill:rgb(103,164,221);fill-opacity:0.95;"/>
+                    <circle cx="127.968" cy="244.608" r="98.438" style="fill:rgb(117,191,252);"/>
                 </g>
                 <g id="Rectangle" transform="matrix(0.83615,-0.333816,0.316751,0.793406,39.969728,37.511596)">
-                    <rect x="231.829" y="204.934" width="71.974" height="221.566" style="fill:rgb(250,129,117);fill-opacity:0.95;"/>
+                    <rect x="231.829" y="204.934" width="71.974" height="221.566" style="fill:rgb(254,139,131);"/>
                 </g>
                 <g id="Ellipse" transform="matrix(0.81002,-0.392637,0.664765,0.607242,16.763552,22.176604)">
-                    <ellipse cx="119.316" cy="184.117" rx="113.089" ry="40.53" style="fill:rgb(254,180,100);fill-opacity:0.95;"/>
+                    <ellipse cx="119.316" cy="184.117" rx="113.089" ry="40.53" style="fill:rgb(254,182,106);"/>
                 </g>
                 <g id="Hexagon" transform="matrix(0,-1.144068,1.377551,0,-289.109817,946.990616)">
-                    <path d="M532,364L583.095,388.5L583.095,437.5L532,462L480.905,437.5L480.905,388.5L532,364Z" style="fill:rgb(232,209,79);"/>
+                    <path d="M532,364L583.095,388.5L583.095,437.5L532,462L480.905,437.5L480.905,388.5L532,364Z" style="fill:rgb(226,165,32);"/>
                 </g>
             </g>
             <g id="Large-Stars" serif:id="Large Stars" transform="matrix(1,0,0,1,0,9.375005)">
