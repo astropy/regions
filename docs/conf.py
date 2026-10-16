@@ -118,12 +118,17 @@ html_theme_options = {
          'type': 'fontawesome',
          },
     ],
+    # The theme counts page views only on astropy.org hosts, so the
+    # GoatCounter script would load on every page but never count.
+    'goatcounter_analytics_url': False,
+    'pygments_dark_style': 'nord',
 }
 
 html_title = f'{project} {release}'
 html_show_sourcelink = False
 html_favicon = os.path.join('_static', 'regions_logo.ico')
 html_static_path = ['_static']
+templates_path = ['_templates']
 html_css_files = ['custom.css']  # path relative to _static
 
 # Output file base name for HTML help builder.
