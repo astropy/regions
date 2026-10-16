@@ -1,11 +1,11 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """
-Tests for the polygon_overlap_grid module.
+Tests for the polygon_overlap module.
 """
 
 import numpy as np
 import pytest
-from numpy.testing import assert_allclose
+from numpy.testing import assert_allclose, assert_array_equal
 
 from regions._geometry.polygon_overlap import polygon_overlap_grid
 
@@ -102,6 +102,31 @@ def test_polygon_overlap_subpixel_mode(half_side, subpix, atol):
     assert grid.min() >= 0.0
     assert grid.max() <= 1.0
     assert_allclose(grid.sum() * pixel_area, (2.0 * s) ** 2, atol=atol)
+
+
+@pytest.mark.parametrize('subpix', [1, 3, 5])
+def test_polygon_overlap_subpixel_convex_fast_path(subpix):
+    """
+    Test that the convex interior/exterior fast path of the subpixel
+    mode returns results identical to sampling every pixel.
+
+    The same hexagon with a duplicated vertex is geometrically
+    identical but is reported as nonconvex (the zero-length edge fails
+    ``convex_edge_normals``), which disables the fast path and forces
+    the full scanline sampling for every pixel.
+    """
+    angles = np.pi / 6.0 + np.arange(6) * np.pi / 3.0
+    vx = np.ascontiguousarray(4.0 * np.cos(angles))
+    vy = np.ascontiguousarray(4.0 * np.sin(angles))
+    vx_dup = np.append(vx, vx[0])
+    vy_dup = np.append(vy, vy[0])
+    fast = polygon_overlap_grid(-5.0, 5.0, -5.0, 5.0, 40, 40,
+                                vx, vy, 0, subpix)
+    slow = polygon_overlap_grid(-5.0, 5.0, -5.0, 5.0, 40, 40,
+                                vx_dup, vy_dup, 0, subpix)
+    assert_array_equal(fast, slow)
+    # Sanity check that interior pixels exist and are exactly 1
+    assert fast.max() == 1.0
 
 
 def test_polygon_overlap_no_intersection():
@@ -211,6 +236,44 @@ def test_polygon_overlap_validation():
     with pytest.raises(ValueError, match=match):
         polygon_overlap_grid(-1.0, 1.0, -1.0, 1.0, 4, 4, vx, vy, 1, 1)
 
+    vx = np.array([0.0, 1.0, 0.0])
+    vy = np.array([0.0, 0.0, 1.0])
+    match = 'use_exact must be 0 or 1'
+    with pytest.raises(ValueError, match=match):
+        polygon_overlap_grid(-1.0, 1.0, -1.0, 1.0, 4, 4, vx, vy, 2, 1)
+
+    match = 'subpixels must be a strictly positive integer'
+    for subpixels in (0, -1):
+        with pytest.raises(ValueError, match=match):
+            polygon_overlap_grid(-1.0, 1.0, -1.0, 1.0, 4, 4, vx, vy, 0,
+                                 subpixels)
+
+
+def test_polygon_overlap_vertices_input_types():
+    """
+    Test that integer arrays and Python lists are accepted for the
+    vertex coordinates and give the same result as float64 arrays,
+    and that non-1D vertex arrays raise an error.
+    """
+    vx = np.array([0.0, 4.0, 0.0])
+    vy = np.array([0.0, 0.0, 4.0])
+    expected = polygon_overlap_grid(-1.0, 5.0, -1.0, 5.0, 12, 12,
+                                    vx, vy, 1, 1)
+
+    result = polygon_overlap_grid(-1.0, 5.0, -1.0, 5.0, 12, 12,
+                                  np.array([0, 4, 0]),
+                                  np.array([0, 0, 4]), 1, 1)
+    assert_allclose(result, expected)
+
+    result = polygon_overlap_grid(-1.0, 5.0, -1.0, 5.0, 12, 12,
+                                  [0.0, 4.0, 0.0], [0.0, 0.0, 4.0], 1, 1)
+    assert_allclose(result, expected)
+
+    match = 'must be 1D arrays'
+    with pytest.raises(ValueError, match=match):
+        polygon_overlap_grid(-1.0, 1.0, -1.0, 1.0, 4, 4,
+                             np.zeros((3, 2)), np.zeros((3, 2)), 1, 1)
+
 
 def test_polygon_overlap_many_vertices():
     """
@@ -276,7 +339,7 @@ def test_polygon_overlap_subpixel_on_all_boundaries():
     A unit square spanning [-1, 1] in both axes is sampled by a single
     pixel with ``subpixels=3``, so the 9 subpixel centers fall at every
     combination of (-1, 0, +1). Of these, only the central center
-    (0, 0) is strictly interior; the four edge-midpoint centers (two
+    (0, 0) is strictly interior. The four edge-midpoint centers (two
     horizontal, two vertical) and the four corner centers all lie on the
     boundary and are excluded, giving 1/9.
     """
@@ -284,3 +347,48 @@ def test_polygon_overlap_subpixel_on_all_boundaries():
     vy = np.array([-1.0, -1.0, 1.0, 1.0])
     grid = polygon_overlap_grid(-1.5, 1.5, -1.5, 1.5, 1, 1, vx, vy, 0, 3)
     assert_allclose(grid[0, 0], 1.0 / 9.0)
+
+
+def test_polygon_overlap_subpixel_on_reflex_vertex():
+    """
+    Test that a subpixel center landing exactly on a vertex that is a
+    local maximum in y, with the polygon interior above it, is
+    excluded.
+
+    Neither edge at such a vertex straddles the sample row, so the
+    vertex produces no crossing. The notch vertex at (1, 1) is sampled
+    by a single pixel with ``subpixels=3``, so the 9 subpixel centers
+    fall at every combination of (0.5, 1, 1.5). The three centers in
+    the bottom row are below the notch edges and the vertex sample is on
+    the boundary, leaving 5 of 9.
+    """
+    vx = np.array([0.0, 1.0, 2.0, 2.0, 0.0])
+    vy = np.array([0.0, 1.0, 0.0, 3.0, 3.0])
+    for sign in (1, -1):
+        grid = polygon_overlap_grid(0.25, 1.75, 0.25, 1.75, 1, 1,
+                                    vx[::sign], vy[::sign], 0, 3)
+        assert_allclose(grid[0, 0], 5.0 / 9.0)
+
+
+def test_polygon_overlap_subpixel_on_vertex_matches_center():
+    """
+    Test that a subpixel center landing exactly on a vertex whose
+    neighbors lie on opposite sides of the sample row is excluded.
+
+    The subpixel fraction of a single pixel must equal the mean of the
+    ``center`` method evaluated on the same sample points.
+    """
+    rng = np.random.default_rng(0)
+    for _ in range(500):
+        # A triangle with a vertex on the middle sample at (1, 1), one
+        # vertex below the sample row, and one vertex above it
+        vx = np.array([1.0, rng.uniform(-3, 0), rng.uniform(-3, 0)])
+        vy = np.array([1.0, rng.uniform(-3, 0.9), rng.uniform(1.1, 4)])
+        for sign in (1, -1):
+            args = (vx[::sign], vy[::sign], 0)
+            subpix = polygon_overlap_grid(0.25, 1.75, 0.25, 1.75, 1, 1,
+                                          *args, 3)
+            center = polygon_overlap_grid(0.25, 1.75, 0.25, 1.75, 3, 3,
+                                          *args, 1)
+            assert center[1, 1] == 0.0
+            assert_allclose(subpix[0, 0], center.mean())
