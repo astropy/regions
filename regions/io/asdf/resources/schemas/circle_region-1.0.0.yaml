@@ -1,0 +1,32 @@
+%YAML 1.1
+---
+$schema: "http://stsci.edu/schemas/yaml-schema/draft-01"
+id: "asdf://astropy.org/regions/schemas/circle_region-1.0.0"
+title: Circle Region in different coordinates
+description: |
+  ASDF schema for serializing a circle region in pixel, sky
+  and spherical coordinates. It applies to CirclePixelRegion,
+  CircleSkyRegion and CircleSphericalSkyRegion.
+examples:
+  -
+    - A 
+    - |
+      
+type: object
+properties:
+  center:
+    anyOf:
+      - tag: "tag:astropy.org:astropy/coordinates/skycoord-1.0.0"
+      - tag: "tag:astropy.org:regions/pixcoord-1.0.0"
+  radius:
+    anyOf:
+      - tag: "tag:stsci.edu:asdf/unit/quantity-1.*"
+      - number
+  spherical:
+    type: boolean
+  meta:
+    $ref: "../common-1.0.0#/definitions/meta"
+  visual:
+    $ref: "../common-1.0.0#/definitions/visual_meta"
+  required: [center, radius, spherical]
+...

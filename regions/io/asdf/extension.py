@@ -7,13 +7,21 @@ import importlib.resources as importlib_resources
 from asdf.extension import ManifestExtension
 from asdf.resource import DirectoryResourceMapping
 
-from regions.io.asdf.converters.pixel_coords import PixCoordConverter
+from regions.io.asdf.converters import circle_region
+from regions.io.asdf.converters import pixel_coords
+from regions.shapes.circle import CircleSphericalSkyRegion
 
-__all__ = ['PixCoordConverter']
+
+#__all__ = ['PixCoordConverter']
 
 
 REGIONS_CONVERTERS = [
-    PixCoordConverter(),
+    pixel_coords.PixCoordConverter(),
+    circle_region.CircleConverter(),
+    # circle.CircleAnnulusPixelRegion(),
+    # circle.CircleAnnulusSkyRegion(),
+    # circle.CircleAnnulusSphericalSkyRegion(),
+    
 ]
 
 # The order here is important; asdf will prefer to use extensions
