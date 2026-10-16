@@ -8,14 +8,14 @@ pixel grid.
 The functions here are written so that they can be reused by any
 aperture whose footprint is a simple polygon (e.g., rotated rectangles,
 regular polygons, or arbitrary user-supplied polygons). Convexity is not
-required: the subject is the aperture polygon and the clip polygon is
+required. The subject is the aperture polygon and the clip polygon is
 the (always-convex, axis-aligned) pixel rectangle.
 
 The cdef functions are not intended to be called from Python code.
 They are pure C math functions declared ``noexcept nogil`` so they can
-be called without the GIL (e.g., from the batch aperture photometry
-driver), including from multiple threads on free-threaded Python builds.
-Their signatures are exported via polygon_overlap.pxd.
+be called without the GIL, including from multiple threads on
+free-threaded Python builds. The signatures of the functions used by
+other modules are exported via polygon_overlap.pxd for reuse elsewhere.
 """
 
 import numpy as np
@@ -26,6 +26,7 @@ __all__ = ['polygon_overlap_grid']
 
 
 cdef extern from "math.h" nogil:
+    double sqrt(double x)
     double fabs(double x)
     double fmax(double x, double y)
     double fmin(double x, double y)
@@ -38,20 +39,15 @@ ctypedef np.float64_t DTYPE_t
 
 
 def polygon_overlap_grid(double xmin, double xmax, double ymin, double ymax,
-                         int nx, int ny,
-                         np.ndarray[DTYPE_t, ndim=1] vertices_x,
-                         np.ndarray[DTYPE_t, ndim=1] vertices_y,
+                         int nx, int ny, vertices_x, vertices_y,
                          int use_exact, int subpixels):
     """
-    polygon_overlap_grid(xmin, xmax, ymin, ymax, nx, ny, vertices_x,
-                         vertices_y, use_exact, subpixels)
-
     Calculate the fractional overlap between a simple polygon and a
     pixel grid.
 
     The polygon vertices must define a simple polygon (no
     self-intersections). The polygon may be convex or nonconvex. The
-    vertex order may be either clockwise or counterclockwise; clockwise
+    vertex order may be either clockwise or counterclockwise. Clockwise
     input is reversed internally.
 
     Parameters
@@ -67,10 +63,11 @@ def polygon_overlap_grid(double xmin, double xmax, double ymin, double ymax,
         ymax) and is divided into nx and ny pixels in the x and y
         direction, respectively.
 
-    vertices_x, vertices_y : 1D `~numpy.ndarray`
+    vertices_x, vertices_y : 1D array_like
         The x and y coordinates of the polygon vertices (in the same
-        coordinate frame as the grid extents). The polygon must have at
-        least 3 vertices.
+        coordinate frame as the grid extents). The inputs are converted
+        to contiguous float64 arrays. The polygon must have at least 3
+        vertices.
 
     use_exact : 0 or 1
         Set to ``1`` to use an exact method to calculate the overlap
@@ -83,7 +80,7 @@ def polygon_overlap_grid(double xmin, double xmax, double ymin, double ymax,
     subpixels : int
         The number of subpixels to use in each dimension when using
         the subpixel sampling method. Each pixel is resampled by this
-        factor in each dimension; thus, each pixel is divided into
+        factor in each dimension, so each pixel is divided into
         ``subpixels ** 2`` subpixels.
 
         With ``subpixels == 1`` (the ``center`` method) a pixel is
@@ -92,10 +89,12 @@ def polygon_overlap_grid(double xmin, double xmax, double ymin, double ymax,
         as outside, consistent with the circular, elliptical, and
         rectangular apertures (see ``point_in_polygon``).
 
-        For ``subpixels > 1`` the same convention applies to each
-        subpixel: a subpixel is included only if its center lies
-        strictly inside the polygon; subpixel centers lying exactly on a
-        polygon edge are excluded (weight 0).
+        For ``subpixels > 1`` the same convention is applied to each
+        subpixel center. The on-edge test uses exact floating-point
+        comparisons with the computed sample coordinates. A sample
+        that is nominally on an edge can therefore be classified on
+        either side because of rounding, either in the accumulated
+        sample coordinates or in the crossing of a sloped edge.
 
     Returns
     -------
@@ -107,6 +106,11 @@ def polygon_overlap_grid(double xmin, double xmax, double ymin, double ymax,
         * dx, ymin + (j + 1) * dy), where dx and dy are the width of
         each pixel in the x and y direction, respectively.
     """
+    vertices_x = np.ascontiguousarray(vertices_x, dtype=DTYPE)
+    vertices_y = np.ascontiguousarray(vertices_y, dtype=DTYPE)
+    if vertices_x.ndim != 1 or vertices_y.ndim != 1:
+        msg = 'vertices_x and vertices_y must be 1D arrays'
+        raise ValueError(msg)
     cdef int n_poly = vertices_x.shape[0]
     if vertices_y.shape[0] != n_poly:
         msg = 'vertices_x and vertices_y must have the same length'
@@ -114,25 +118,36 @@ def polygon_overlap_grid(double xmin, double xmax, double ymin, double ymax,
     if n_poly < 3:
         msg = 'polygon must have at least 3 vertices'
         raise ValueError(msg)
-    if use_exact != 1 and subpixels < 1:
+    if use_exact != 0 and use_exact != 1:
+        msg = 'use_exact must be 0 or 1'
+        raise ValueError(msg)
+    if use_exact == 0 and subpixels < 1:
         msg = 'subpixels must be a strictly positive integer'
         raise ValueError(msg)
 
     # Working buffers, allocated once per call (not per pixel) as a
-    # single block. Each Sutherland-Hodgman clip can at most double the
-    # vertex count of a nonconvex polygon, so after the four half-plane
-    # clips the vertex count is bounded by 16 * n_poly.
-    cdef int buf_size = 16 * n_poly
-    cdef double[::1] work = np.empty(2 * n_poly + 4 * buf_size, dtype=DTYPE)
-    cdef double *poly_x = &work[0]
-    cdef double *poly_y = &work[n_poly]
-    cdef double *buf_a_x = &work[2 * n_poly]
-    cdef double *buf_a_y = &work[2 * n_poly + buf_size]
-    cdef double *buf_b_x = &work[2 * n_poly + 2 * buf_size]
-    cdef double *buf_b_y = &work[2 * n_poly + 3 * buf_size]
-    cdef const double[::1] vx_view = np.ascontiguousarray(vertices_x)
-    cdef const double[::1] vy_view = np.ascontiguousarray(vertices_y)
+    # single block whose sizing and layout are centralized in
+    # ``polygon_work_size``/``polygon_work_partition``.
+    cdef int buf_size = 0
+    cdef double[::1] work = np.empty(polygon_work_size(n_poly, &buf_size),
+                                     dtype=DTYPE)
+    cdef double *poly_x = NULL
+    cdef double *poly_y = NULL
+    cdef double *buf_a_x = NULL
+    cdef double *buf_a_y = NULL
+    cdef double *buf_b_x = NULL
+    cdef double *buf_b_y = NULL
+    cdef double *edge_nx = NULL
+    cdef double *edge_ny = NULL
+    cdef double *edge_c = NULL
+    polygon_work_partition(&work[0], n_poly, buf_size, &poly_x, &poly_y,
+                           &buf_a_x, &buf_a_y, &buf_b_x, &buf_b_y,
+                           &edge_nx, &edge_ny, &edge_c)
+    cdef const double[::1] vx_view = vertices_x
+    cdef const double[::1] vy_view = vertices_y
     _ensure_ccw(vx_view, vy_view, n_poly, poly_x, poly_y)
+    cdef int is_convex = convex_edge_normals(poly_x, poly_y, n_poly,
+                                             edge_nx, edge_ny, edge_c)
 
     cdef np.ndarray[DTYPE_t, ndim=2] frac = np.zeros([ny, nx], dtype=DTYPE)
     cdef double[:, ::1] frac_view = frac
@@ -141,6 +156,7 @@ def polygon_overlap_grid(double xmin, double xmax, double ymin, double ymax,
     cdef double pxmin, pxmax, pymin, pymax
     cdef double bbox_xmin, bbox_xmax, bbox_ymin, bbox_ymax
     cdef double pixel_area = dx * dy
+    cdef double margin = 0.5 * sqrt(dx * dx + dy * dy)
     cdef int i, j, k
     cdef int i_min, i_max, j_min, j_max
 
@@ -173,10 +189,11 @@ def polygon_overlap_grid(double xmin, double xmax, double ymin, double ymax,
                     pymin = ymin + j * dy
                     pymax = pymin + dy
                     frac_view[j, i] = (
-                        polygon_pixel_overlap(pxmin, pymin, pxmax, pymax,
-                                              poly_x, poly_y, n_poly,
-                                              buf_a_x, buf_a_y,
-                                              buf_b_x, buf_b_y, buf_size)
+                        convex_polygon_pixel_overlap(
+                            pxmin, pymin, pxmax, pymax,
+                            poly_x, poly_y, n_poly,
+                            edge_nx, edge_ny, edge_c, is_convex, margin,
+                            buf_a_x, buf_a_y, buf_b_x, buf_b_y, buf_size)
                         / pixel_area)
     else:
         with nogil:
@@ -184,10 +201,10 @@ def polygon_overlap_grid(double xmin, double xmax, double ymin, double ymax,
                 pxmin = xmin + i * dx
                 for j in range(j_min, j_max):
                     pymin = ymin + j * dy
-                    frac_view[j, i] = polygon_overlap_single_subpixel(
-                        pxmin, pymin, pxmin + dx, pymin + dy,
-                        poly_x, poly_y, n_poly, subpixels,
-                        buf_a_x, buf_a_y, buf_b_x)
+                    frac_view[j, i] = convex_polygon_pixel_subpixel(
+                        pxmin, pymin, pxmin + dx, pymin + dy, poly_x, poly_y,
+                        n_poly, edge_nx, edge_ny, edge_c, is_convex, margin,
+                        subpixels, buf_a_x, buf_a_y, buf_b_x)
 
     return frac
 
@@ -204,19 +221,40 @@ cdef double polygon_pixel_overlap(double pxmin, double pymin,
     [pxmin, pxmax] x [pymin, pymax] and a simple polygon supplied as
     counterclockwise vertices.
 
-    The polygon (subject) is clipped against the four edges of the pixel
-    rectangle (clip) using the Sutherland-Hodgman algorithm, followed
-    by the shoelace area formula. Because the clip polygon is convex,
-    the subject polygon may be either convex or nonconvex (it must,
-    however, be simple, i.e., non-self-intersecting).
+    The polygon (subject) is clipped against the four edges of the
+    pixel rectangle (clip) using the Sutherland-Hodgman algorithm,
+    followed by the shoelace area formula. Because the clip polygon is
+    convex, the subject polygon may be either convex or nonconvex (it
+    must, however, be simple, i.e., non-self-intersecting).
 
-    The four ``buf_*`` parameters are caller-allocated working buffers;
-    each must hold at least ``buf_size`` doubles. The caller is
-    responsible for ensuring ``buf_size`` is large enough; each clip can
-    roughly double the vertex count of a nonconvex polygon, so 16 times
-    the maximum input polygon size is a safe choice. For convex input
-    polygons, each clip adds at most one vertex, so input size plus four
-    suffices.
+    Parameters
+    ----------
+    pxmin, pymin, pxmax, pymax : double
+        The pixel edges.
+
+    poly_x, poly_y : double *
+        The x and y coordinates of the polygon vertices, in
+        counterclockwise order.
+
+    n_poly : int
+        The number of polygon vertices.
+
+    buf_a_x, buf_a_y, buf_b_x, buf_b_y : double *
+        Caller-allocated scratch buffers, each holding at least
+        ``buf_size`` doubles. The caller is responsible for ensuring
+        ``buf_size`` is large enough. Each clip can roughly double the
+        vertex count of a nonconvex polygon, so 16 times the maximum
+        input polygon size is a safe choice, while for convex input
+        polygons each clip adds at most one vertex, so input size plus
+        four suffices.
+
+    buf_size : int
+        The size of the scratch buffers.
+
+    Returns
+    -------
+    area : double
+        The area of overlap between the pixel and the polygon.
     """
     cdef double *cur_x = buf_a_x
     cdef double *cur_y = buf_a_y
@@ -265,36 +303,325 @@ cdef double polygon_pixel_overlap(double pxmin, double pymin,
     return fabs(_polygon_signed_area(nxt_x, nxt_y, n))
 
 
+cdef int convex_edge_normals(double *poly_x, double *poly_y, int n_poly,
+                             double *edge_nx, double *edge_ny,
+                             double *edge_c) noexcept nogil:
+    """
+    Test whether a counterclockwise simple polygon is convex and, if
+    so, fill the per-edge unit inward normals and offsets.
+
+    For edge ``k`` (from vertex ``k`` to vertex ``k + 1``) of a
+    counterclockwise convex polygon, the inward unit normal is
+    ``(-edge_y, edge_x)`` normalized, and the signed distance of a point
+    ``(x, y)`` from the edge line is ``edge_nx[k] * x + edge_ny[k] * y -
+    edge_c[k]``, positive on the interior side.
+
+    Parameters
+    ----------
+    poly_x, poly_y : double *
+        The x and y coordinates of the polygon vertices, in
+        counterclockwise order.
+
+    n_poly : int
+        The number of polygon vertices.
+
+    edge_nx, edge_ny, edge_c : double *
+        Output. The per-edge unit inward normals and offsets, each of
+        length ``n_poly``. Valid only if the polygon is convex (the
+        arrays may be partially written otherwise).
+
+    Returns
+    -------
+    is_convex : int
+        1 if the polygon is convex, 0 otherwise. A clockwise polygon,
+        or one with a zero-length edge (repeated consecutive
+        vertices), also returns 0, in which case the caller
+        should fall back to the general Sutherland-Hodgman clip.
+    """
+    cdef int k, k1, k2
+    cdef double ex, ey, ex2, ey2, cross, length
+
+    if n_poly < 3:
+        return 0
+
+    for k in range(n_poly):
+        k1 = k + 1
+        if k1 == n_poly:
+            k1 = 0
+        k2 = k1 + 1
+        if k2 == n_poly:
+            k2 = 0
+        ex = poly_x[k1] - poly_x[k]
+        ey = poly_y[k1] - poly_y[k]
+        ex2 = poly_x[k2] - poly_x[k1]
+        ey2 = poly_y[k2] - poly_y[k1]
+
+        # Cross product of consecutive edges. For a counterclockwise
+        # convex polygon every turn is a left turn (cross >= 0). A
+        # negative value marks a reflex vertex (nonconvex), and a
+        # uniformly negative sign marks a clockwise polygon.
+        cross = ex * ey2 - ey * ex2
+        if cross < 0.0:
+            return 0
+        length = sqrt(ex * ex + ey * ey)
+        if length == 0.0:
+            return 0
+        edge_nx[k] = -ey / length
+        edge_ny[k] = ex / length
+        edge_c[k] = edge_nx[k] * poly_x[k] + edge_ny[k] * poly_y[k]
+
+    return 1
+
+
+cdef int convex_pixel_position(double pxmin, double pymin, double pxmax,
+                               double pymax, double *edge_nx,
+                               double *edge_ny, double *edge_c,
+                               int n_poly, double margin) noexcept nogil:
+    """
+    Classify a pixel against a convex polygon using the precomputed
+    per-edge normals from ``convex_edge_normals``.
+
+    Every point of the pixel lies within ``margin`` (half the pixel
+    diagonal) of the pixel center, so the pixel is wholly inside the
+    polygon when the pixel center's smallest signed edge distance
+    exceeds ``margin``, and wholly outside when it is below ``-margin``.
+
+    Parameters
+    ----------
+    pxmin, pymin, pxmax, pymax : double
+        The pixel edges.
+
+    edge_nx, edge_ny, edge_c : double *
+        The per-edge unit inward normals and offsets from
+        ``convex_edge_normals``.
+
+    n_poly : int
+        The number of polygon vertices.
+
+    margin : double
+        Half the pixel diagonal.
+
+    Returns
+    -------
+    result : int
+        1 if the pixel is wholly inside the polygon, -1 if it is
+        wholly outside, and 0 if it is in the boundary band.
+    """
+    cdef double pxcen, pycen, min_dist, d
+    cdef int k
+
+    pxcen = 0.5 * (pxmin + pxmax)
+    pycen = 0.5 * (pymin + pymax)
+    min_dist = edge_nx[0] * pxcen + edge_ny[0] * pycen - edge_c[0]
+    for k in range(1, n_poly):
+        d = edge_nx[k] * pxcen + edge_ny[k] * pycen - edge_c[k]
+        if d < min_dist:
+            min_dist = d
+    if min_dist > margin:
+        return 1
+    if min_dist < -margin:
+        return -1
+    return 0
+
+
+cdef double convex_polygon_pixel_overlap(double pxmin, double pymin,
+                                         double pxmax, double pymax,
+                                         double *poly_x, double *poly_y,
+                                         int n_poly,
+                                         double *edge_nx, double *edge_ny,
+                                         double *edge_c, int is_convex,
+                                         double margin,
+                                         double *buf_a_x, double *buf_a_y,
+                                         double *buf_b_x, double *buf_b_y,
+                                         int buf_size) noexcept nogil:
+    """
+    Exact area of overlap between the pixel rectangle and a simple
+    polygon, with an interior/exterior fast path for convex polygons.
+
+    When ``is_convex`` is 1, a pixel is wholly inside the polygon when
+    the pixel center's smallest signed edge distance exceeds ``margin``
+    (overlap = pixel area), and wholly outside when it is below
+    ``-margin`` (overlap = 0), because every point of the pixel lies
+    within ``margin`` of the pixel center. Pixels in the boundary band,
+    and all pixels of nonconvex polygons, fall back to the exact
+    Sutherland-Hodgman clip (``polygon_pixel_overlap``).
+
+    Parameters
+    ----------
+    pxmin, pymin, pxmax, pymax : double
+        The pixel edges.
+
+    poly_x, poly_y : double *
+        The x and y coordinates of the polygon vertices, in
+        counterclockwise order.
+
+    n_poly : int
+        The number of polygon vertices.
+
+    edge_nx, edge_ny, edge_c : double *
+        The per-edge unit inward normals and offsets from
+        ``convex_edge_normals``. Used only when ``is_convex`` is 1.
+
+    is_convex : int
+        Whether the polygon is convex (see ``convex_edge_normals``).
+
+    margin : double
+        Half the pixel diagonal.
+
+    buf_a_x, buf_a_y, buf_b_x, buf_b_y : double *
+        Caller-allocated scratch buffers passed through to
+        ``polygon_pixel_overlap`` (see that function for sizing).
+
+    buf_size : int
+        The size of the scratch buffers.
+
+    Returns
+    -------
+    area : double
+        The area of overlap between the pixel and the polygon.
+    """
+    cdef int position
+
+    if is_convex:
+        position = convex_pixel_position(pxmin, pymin, pxmax, pymax,
+                                         edge_nx, edge_ny, edge_c,
+                                         n_poly, margin)
+        if position > 0:
+            return (pxmax - pxmin) * (pymax - pymin)
+        if position < 0:
+            return 0.0
+
+    return polygon_pixel_overlap(pxmin, pymin, pxmax, pymax,
+                                 poly_x, poly_y, n_poly,
+                                 buf_a_x, buf_a_y, buf_b_x, buf_b_y,
+                                 buf_size)
+
+
+cdef double convex_polygon_pixel_subpixel(double pxmin, double pymin,
+                                          double pxmax, double pymax,
+                                          double *poly_x, double *poly_y,
+                                          int n_poly,
+                                          double *edge_nx, double *edge_ny,
+                                          double *edge_c, int is_convex,
+                                          double margin, int subpixels,
+                                          double *xint_buf,
+                                          double *hxmin_buf,
+                                          double *hxmax_buf) noexcept nogil:
+    """
+    Fraction of overlap between a simple polygon and a single pixel
+    using subpixel sampling, with an interior/exterior fast path for
+    convex polygons.
+
+    The fast path is exact for the sampled fraction, not an
+    approximation. Every subpixel center lies strictly within ``margin``
+    of the pixel center, so a pixel that is wholly inside the polygon
+    (see ``convex_pixel_position``) has every subpixel center strictly
+    inside (sampled fraction exactly 1), and a wholly outside pixel has
+    none (sampled fraction exactly 0). Pixels in the boundary band,
+    and all pixels of nonconvex polygons, fall back to the scanline
+    sampling (``polygon_overlap_single_subpixel``), so the result is
+    identical to sampling every pixel.
+
+    Parameters
+    ----------
+    pxmin, pymin, pxmax, pymax : double
+        The pixel edges.
+
+    poly_x, poly_y : double *
+        The x and y coordinates of the polygon vertices, in
+        counterclockwise order.
+
+    n_poly : int
+        The number of polygon vertices.
+
+    edge_nx, edge_ny, edge_c : double *
+        The per-edge unit inward normals and offsets from
+        ``convex_edge_normals``. Used only when ``is_convex`` is 1.
+
+    is_convex : int
+        Whether the polygon is convex (see ``convex_edge_normals``).
+
+    margin : double
+        Half the pixel diagonal.
+
+    subpixels : int
+        The number of subpixels to sample in each dimension.
+
+    xint_buf, hxmin_buf, hxmax_buf : double *
+        Caller-supplied scratch buffers passed through to
+        ``polygon_overlap_single_subpixel`` (see that function for
+        sizing).
+
+    Returns
+    -------
+    frac : double
+        The fraction (0 to 1) of the pixel's area that overlaps the
+        polygon.
+    """
+    cdef int position
+
+    if is_convex:
+        position = convex_pixel_position(pxmin, pymin, pxmax, pymax,
+                                         edge_nx, edge_ny, edge_c,
+                                         n_poly, margin)
+        if position > 0:
+            return 1.0
+        if position < 0:
+            return 0.0
+
+    return polygon_overlap_single_subpixel(pxmin, pymin, pxmax, pymax,
+                                           poly_x, poly_y, n_poly,
+                                           subpixels, xint_buf,
+                                           hxmin_buf, hxmax_buf)
+
+
 cdef int point_in_polygon(double x, double y, double *poly_x,
                           double *poly_y, int n_poly) noexcept nogil:
     """
-    Return 1 if ``(x, y)`` lies inside the simple polygon ``(poly_x,
-    poly_y)``, 0 otherwise.
+    Test whether a point lies inside a simple polygon, using the
+    standard ray-casting algorithm.
 
-    Uses the standard ray-casting algorithm so the polygon may be convex
-    or nonconvex.
+    The polygon may be convex or nonconvex. The on-edge test is
+    performed first. If ``(x, y)`` lies on any edge (within the closed
+    bounding box of that edge and collinear with it), the point is
+    reported as outside. Otherwise the standard ray-casting parity test
+    is applied for strictly interior/exterior points.
 
-    Boundary convention
-    -------------------
     Points lying exactly on a polygon edge are classified as
-    *outside* (return 0). This matches the ``center`` method
-    of the circular, elliptical, and rectangular apertures,
-    which use a strict inequality (``< r**2``, ``< 1``, and ``<
-    half_width/half_height``, respectively) and therefore also exclude
-    every on-boundary point. In particular, because a rectangle is
-    itself a polygon, a `~photutils.aperture.RectangularAperture` and
-    a `~photutils.aperture.PolygonAperture` with the same four corners
-    produce identical ``center`` masks.
+    *outside*. This matches the ``center`` method of the circular,
+    elliptical, and rectangular apertures, which use a strict
+    inequality (``< r**2``, ``< 1``, and ``< half_width/half_height``,
+    respectively) and therefore also exclude every on-boundary point.
+    In particular, an unrotated
+    `~photutils.aperture.RectangularAperture` and a
+    `~photutils.aperture.PolygonAperture` with the same four corners
+    produce identical ``center`` masks. For a rotated rectangle the
+    masks can differ at pixel centers that lie on an edge, because the
+    two tests round differently.
 
-    The on-edge test is performed first: if ``(x, y)`` lies on any edge
-    (within the closed bounding box of that edge and collinear with it),
-    the point is reported as outside. Otherwise the standard ray-casting
-    parity test is applied for strictly interior/exterior points.
+    This boundary handling matters when sample points commonly fall
+    exactly on an edge (e.g., pixel centers for integer-coordinate
+    polygons). That is the case for the ``center`` method (``subpixels
+    == 1``) and for subpixel sampling with an odd ``subpixels``, where
+    the middle row and column of samples pass through the pixel center.
 
-    This boundary handling matters mainly for the ``center`` method
-    (``subpixels == 1``), where pixel centers commonly fall exactly
-    on an edge (e.g., for integer-coordinate polygons). For subpixel
-    sampling (``subpixels > 1``) on-edge samples are rare.
+    Parameters
+    ----------
+    x, y : double
+        The coordinates of the point to test.
+
+    poly_x, poly_y : double *
+        The x and y coordinates of the polygon vertices, in
+        counterclockwise order.
+
+    n_poly : int
+        The number of polygon vertices.
+
+    Returns
+    -------
+    result : int
+        1 if the point lies inside the polygon, 0 otherwise (including
+        points exactly on the boundary).
     """
     cdef int i, j, inside = 0
     cdef double xi, yi, xj, yj
@@ -337,20 +664,20 @@ cdef double polygon_overlap_single_subpixel(double x0, double y0,
                                             double *hxmin_buf,
                                             double *hxmax_buf) noexcept nogil:
     """
-    Return the fraction of overlap between a simple polygon and a single
-    pixel with the given extent, using a subpixel sampling method.
+    Fraction of overlap between a simple polygon and a single pixel,
+    using subpixel sampling.
 
     The pixel ``[x0, x1] x [y0, y1]`` is divided into ``subpixels ** 2``
     subpixels and the fraction of subpixel centers that fall inside the
     polygon is returned. The polygon may be convex or nonconvex.
 
     For ``subpixels == 1`` (the ``center`` method) the single
-    pixel-center sample is classified with the full `point_in_polygon`
+    pixel-center sample is classified with the full ``point_in_polygon``
     test, so that samples lying exactly on a polygon edge are excluded,
     consistent with the circular, elliptical, and rectangular apertures.
 
     For ``subpixels > 1`` the samples are classified with a scanline
-    parity fill: for each subpixel row, the polygon boundary restricted
+    parity fill. For each subpixel row, the polygon boundary restricted
     to the horizontal line at ``y`` is fully characterized once
     (``O(n_poly)``) as a set of crossing points (from sloped and
     vertical edges) plus a set of closed x-intervals (from any
@@ -359,35 +686,51 @@ cdef double polygon_overlap_single_subpixel(double x0, double y0,
     monotonic sweep instead of retesting every edge for every sample.
     This reduces the per-pixel cost from ``O(subpixels ** 2 * n_poly)``
     to roughly ``O(subpixels * n_poly + subpixels ** 2)`` while matching
-    the classification of `point_in_polygon`: interior samples are
-    classified by the identical ``x < xint`` parity rule, and every
-    on-boundary sample is excluded (classified as outside). A sample
-    is on the boundary when its x coincides exactly with a crossing (a
-    sloped or vertical edge, including vertices, whose crossing x is
-    computed exactly because the ``y - yi`` term vanishes) or when it
-    lies within the closed x-span of a horizontal edge at that ``y``.
-    This makes the on-boundary exclusion bit-exact for the axis-aligned
-    and integer-coordinate polygons where on-boundary samples actually
-    occur. For samples on the interior of a sloped edge (a rare event
-    for subpixel sampling) the recomputed crossing may differ from the
-    sample x by rounding and the exclusion is not guaranteed.
+    the classification of ``point_in_polygon``. Interior samples are
+    classified by the identical ``x < xint`` parity rule, and
+    on-boundary samples are excluded (classified as outside). A sample
+    is on the boundary when its x coincides exactly with a crossing of
+    a sloped or vertical edge, when it lies within the closed x-span of
+    a horizontal edge at that ``y``, or when it coincides with a vertex.
+    The exclusion applies only to samples whose computed coordinates
+    match exactly. Sample coordinates are accumulated in floating point
+    and the crossing of a sloped edge is subject to rounding, so a
+    sample that is nominally on an edge can land one rounding step to
+    either side and is then classified by the parity rule.
 
-    ``xint_buf``, ``hxmin_buf``, and ``hxmax_buf`` are caller-supplied
-    scratch buffers, each of which must hold at least ``n_poly``
-    doubles. ``xint_buf`` stores the per-row edge crossings, while
-    ``hxmin_buf`` and ``hxmax_buf`` store the endpoints of the per-row
-    horizontal-edge intervals. They are written only within this call,
-    so the function remains thread-safe.
+    Parameters
+    ----------
+    x0, y0, x1, y1 : double
+        The lower and upper edges of the pixel.
 
-    This is a pure C math function declared ``noexcept nogil`` so it can
-    be called without the GIL (e.g., from the batch aperture photometry
-    driver), including from multiple threads on free-threaded Python
-    builds.
+    poly_x, poly_y : double *
+        The x and y coordinates of the polygon vertices, in
+        counterclockwise order.
+
+    n_poly : int
+        The number of polygon vertices.
+
+    subpixels : int
+        The number of subpixels to sample in each dimension.
+
+    xint_buf, hxmin_buf, hxmax_buf : double *
+        Caller-supplied scratch buffers, each holding at least
+        ``n_poly`` doubles. ``xint_buf`` stores the per-row edge
+        crossings, while ``hxmin_buf`` and ``hxmax_buf`` store the
+        endpoints of the per-row horizontal-edge and on-line vertex
+        intervals. The function keeps no other state, so it is
+        thread-safe as long as each thread supplies its own buffers.
+
+    Returns
+    -------
+    frac : double
+        The fraction (0 to 1) of the pixel's area that overlaps the
+        polygon.
     """
     cdef int _i, _j, e, prev, m, a, b, ptr, h, hh
     cdef double x, y, dx, dy, hits
     cdef double xi, yi, xj, yj, tmp
-    cdef bint inside
+    cdef bint inside, has_vertex
 
     dx = (x1 - x0) / subpixels
     dy = (y1 - y0) / subpixels
@@ -402,6 +745,15 @@ cdef double polygon_overlap_single_subpixel(double x0, double y0,
             hits = 1.0
         return hits
 
+    # A sample can land exactly on a vertex only if the vertex is
+    # inside the pixel. This is rare, so it is checked once per pixel
+    # to keep the per-row vertex pass out of the common path.
+    has_vertex = False
+    for e in range(n_poly):
+        if y0 < poly_y[e] < y1 and x0 < poly_x[e] < x1:
+            has_vertex = True
+            break
+
     # Subpixel sampling (subpixels > 1): scanline parity fill.
     y = y0 + 0.5 * dy
     for _i in range(subpixels):
@@ -412,9 +764,9 @@ cdef double polygon_overlap_single_subpixel(double x0, double y0,
         # as the parity step of ``point_in_polygon``. Horizontal
         # edges lying exactly on the line cannot straddle it,
         # so they are recorded separately as closed x-intervals
-        # (``hxmin_buf``/``hxmax_buf``). Together these two sets fully
-        # describe the boundary on the line and let every on-boundary
-        # sample be excluded.
+        # (``hxmin_buf``/``hxmax_buf``). Together with the on-line
+        # vertices recorded below, these sets describe the boundary on
+        # the line and let on-boundary samples be excluded.
         m = 0
         h = 0
         prev = n_poly - 1
@@ -434,6 +786,22 @@ cdef double polygon_overlap_single_subpixel(double x0, double y0,
                 m += 1
             prev = e
 
+        # Record each vertex lying exactly on the line as a zero-width
+        # interval so that a sample on it is excluded. The edges at
+        # such a vertex may not straddle the line (a local maximum in
+        # y) or may give a crossing that differs from the vertex x by
+        # rounding. A vertex that ends a horizontal edge is already
+        # covered, so each edge adds at most one interval and
+        # ``n_poly`` entries suffice.
+        if has_vertex:
+            prev = n_poly - 1
+            for e in range(n_poly):
+                if poly_y[e] == y and poly_y[prev] != y:
+                    hxmin_buf[h] = poly_x[e]
+                    hxmax_buf[h] = poly_x[e]
+                    h += 1
+                prev = e
+
         # Insertion sort the (typically few) crossings in ascending x.
         for a in range(1, m):
             tmp = xint_buf[a]
@@ -447,7 +815,7 @@ cdef double polygon_overlap_single_subpixel(double x0, double y0,
         # sample is inside when an odd number of crossings lie strictly
         # to its right (the ``x < xint`` parity rule), unless it lies
         # on the boundary. On-boundary samples are excluded (classified
-        # as outside), consistent with ``point_in_polygon``: a sample
+        # as outside), consistent with ``point_in_polygon``. A sample
         # whose x coincides exactly with a crossing lies on a sloped or
         # vertical edge, and a sample within a horizontal edge's closed
         # x-span lies on that edge.
@@ -480,6 +848,19 @@ cdef inline double _polygon_signed_area(const double *xs, const double *ys,
     vertices. For a Sutherland-Hodgman-clipped polygon the magnitude is
     the area of the intersection even when the subject was nonconvex
     (any spurious "bridge" edges traverse zero area in pairs).
+
+    Parameters
+    ----------
+    xs, ys : double *
+        The x and y coordinates of the polygon vertices.
+
+    n : int
+        The number of polygon vertices.
+
+    Returns
+    -------
+    area : double
+        The signed area of the polygon.
     """
     cdef double area = 0.0
     cdef int i, j
@@ -501,18 +882,40 @@ cdef inline int _clip_against_axis(double *xs_in, double *ys_in, int n_in,
                                    double *xs_out,
                                    double *ys_out) noexcept nogil:
     """
-    Sutherland-Hodgman clip of a polygon (xs_in, ys_in) against an
-    axis-aligned half-plane.
+    Sutherland-Hodgman clip of a polygon against an axis-aligned
+    half-plane.
 
     Parameters
     ----------
+    xs_in, ys_in : double *
+        The x and y coordinates of the input polygon vertices.
+
+    n_in : int
+        The number of input polygon vertices.
+
     axis : int
-        0 for an x-aligned bound, 1 for a y-aligned bound.
+        0 to clip on the x coordinate (the line ``x = bound``), 1 to
+        clip on the y coordinate (the line ``y = bound``).
+
     bound : double
         The coordinate value of the clipping line.
+
     keep_greater : int
         1 to keep points with coordinate >= bound, 0 to keep points
         with coordinate <= bound.
+
+    xs_out, ys_out : double *
+        Output. The x and y coordinates of the clipped polygon vertices.
+        Each must point to a buffer large enough to hold the result.
+        There are at most ``n_in + 1`` vertices for a convex input
+        polygon. For a nonconvex one, ``2 * n_in`` is a safe upper
+        bound (an entering transition emits two vertices and every
+        other vertex emits at most one).
+
+    Returns
+    -------
+    n_out : int
+        The number of vertices in the clipped polygon.
     """
     cdef int i, n_out = 0
     cdef double sx, sy, px, py, sc, pc, t
@@ -566,8 +969,25 @@ cdef inline int _clip_against_axis(double *xs_in, double *ys_in, int n_in,
 cdef void _ensure_ccw(const double[::1] xs, const double[::1] ys, int n,
                       double *out_x, double *out_y) noexcept nogil:
     """
-    Copy ``(xs, ys)`` into ``(out_x, out_y)`` ensuring counterclockwise
-    order via the sign of the signed area.
+    Copy polygon vertices, reversing their order if necessary to ensure
+    counterclockwise orientation.
+
+    The orientation is determined from the sign of the signed area (see
+    ``_polygon_signed_area``).
+
+    Parameters
+    ----------
+    xs, ys : double[::1]
+        The x and y coordinates of the input polygon vertices, in
+        either clockwise or counterclockwise order.
+
+    n : int
+        The number of polygon vertices.
+
+    out_x, out_y : double *
+        Output. The x and y coordinates of the polygon vertices, in
+        counterclockwise order. Each must point to a buffer of at
+        least ``n`` doubles.
     """
     cdef double area = _polygon_signed_area(&xs[0], &ys[0], n)
     cdef int i, k
