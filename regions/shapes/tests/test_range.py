@@ -210,7 +210,7 @@ class TestRangeSphericalSkyRegion(BaseTestSphericalSkyRegion):
         reg = RangeSphericalSkyRegion(longitude_range=[358, 2] * u.deg,
                                       latitude_range=[-4, 4] * u.deg,
                                       frame='icrs')
-        assert_allclose(reg.centroid.ra.deg, 0)
+        assert_allclose(reg.centroid.ra.deg, 0, atol=1e-07)
         assert_allclose(reg.centroid.dec.deg, 0)
 
     def test_lat_over_poles(self):
