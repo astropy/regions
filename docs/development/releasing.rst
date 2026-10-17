@@ -25,7 +25,7 @@ repository is called ``upstream``.
 #. Ensure that `CI tests <https://github.com/astropy/regions/actions>`_
    are passing for the branch you are going to
    release. Also, ensure that `Read the Docs builds
-   <https://app.readthedocs.org/projects/regions/builds/>`_ are
+   <https://app.readthedocs.org/projects/astropy-regions/builds/>`_ are
    passing.
 
 #. As an extra check, run the tests locally using ``tox`` to thoroughly
