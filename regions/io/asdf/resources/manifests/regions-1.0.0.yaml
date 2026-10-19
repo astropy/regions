@@ -10,5 +10,5 @@ tags:
     description: Pixel coordinates for regions.
   - tag_uri: tag:astropy.org:regions/circle_region-1.0.0
     schema_uri: asdf://astropy.org/regions/schemas/circle_region-1.0.0
-    title: Circle Region schema
+    title: Circle Region in different coordinates
     description: Circle regions in different coordinates.

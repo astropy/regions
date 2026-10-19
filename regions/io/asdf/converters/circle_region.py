@@ -17,15 +17,15 @@ class CircleConverter(Converter):
     tags = ('tag:astropy.org:regions/circle_region-*',)
     types = ('regions.shapes.circle.CirclePixelRegion',
              'regions.shapes.circle.CircleSkyRegion',
-             'regions.shapes.circle.CircleSphericalSkyRegion')
+             'regions.shapes.circle.CircleSphericalSkyRegion',)
 
 
     def to_yaml_tree(self, obj, tag, ctx):  # noqa: ARG002
         from regions.shapes.circle import CircleSphericalSkyRegion
+        spherical = False
         if isinstance (obj, CircleSphericalSkyRegion):
             spherical = True
-        else:
-            spherical = False
+
         return {
             'center': obj.center,
             'radius': obj.radius,

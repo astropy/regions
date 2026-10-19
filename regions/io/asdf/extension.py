@@ -12,7 +12,7 @@ from regions.io.asdf.converters import pixel_coords
 from regions.shapes.circle import CircleSphericalSkyRegion
 
 
-#__all__ = ['PixCoordConverter']
+__all__ = ['REGIONS_CONVERTERS']
 
 
 REGIONS_CONVERTERS = [
