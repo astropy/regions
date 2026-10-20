@@ -12,9 +12,8 @@ from regions.shapes.ellipse import EllipseSkyRegion
 
 try:
     from casatasks import tclean
-    from casatools import image
+    from casatools import image, simulator
     from casatools import measures as me
-    from casatools import simulator
     HAS_CASATOOLS = True
 except ImportError:
     HAS_CASATOOLS = False

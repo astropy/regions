@@ -66,7 +66,7 @@ repos:
       - id: sp-repo-review
 
   - repo: https://github.com/pycqa/isort
-    rev: 9.0.2
+    rev: 10.0.0b1
     hooks:
       - id: isort
         name: isort (python)
@@ -88,7 +88,7 @@ repos:
       - id: cython-lint
 
   - repo: https://github.com/zizmorcore/zizmor-pre-commit
-    rev: v1.31.0
+    rev: v1.31.1
     hooks:
       - id: zizmor
 
