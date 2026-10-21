@@ -18,10 +18,14 @@ properties:
   radius:
     title: Radius of the circle region.
     anyOf:
-      - number
+      - type: number
       - tag: 'tag:stsci.edu:asdf/unit/quantity-1.*'
   spherical:
     type: boolean
+  meta:
+    $ref: "../common-1.0.0#/definitions/meta"
+  visual:
+    $ref: "../common-1.0.0#/definitions/visual_meta"
   
 required: [center, radius, spherical]
 ...
