@@ -10,6 +10,10 @@ New Features
 Bug Fixes
 ---------
 
+- ``PolygonPixelRegion.contains`` and ``covers`` now return a scalar
+  for a scalar ``PixCoord``, like the other pixel regions, instead of
+  a one-element array. [#722]
+
 API Changes
 -----------
 
