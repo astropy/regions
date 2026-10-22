@@ -48,11 +48,13 @@ class BaseTestPixelRegion(BaseTestRegion):
         if len(self.inside) > 0:
             pixcoord = PixCoord(*self.inside[0])
             assert self.reg.contains(pixcoord)
+            assert np.ndim(self.reg.contains(pixcoord)) == 0
             assert pixcoord in self.reg
 
         if len(self.outside) > 0:
             pixcoord = PixCoord(*self.outside[0])
             assert not self.reg.contains(pixcoord)
+            assert np.ndim(self.reg.contains(pixcoord)) == 0
             assert pixcoord not in self.reg
 
     def test_contains_array_1d(self):

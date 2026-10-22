@@ -102,20 +102,22 @@ class PolygonPixelRegion(PixelRegion):
 
     def _containment(self, pixcoord, covers=False):
         pixcoord = PixCoord._validate(pixcoord, name='pixcoord')
-        x = np.atleast_1d(np.asarray(pixcoord.x, dtype=float))
-        y = np.atleast_1d(np.asarray(pixcoord.y, dtype=float))
+        x = np.asarray(pixcoord.x, dtype=float)
+        y = np.asarray(pixcoord.y, dtype=float)
         vx = np.asarray(self.vertices.x, dtype=float)
         vy = np.asarray(self.vertices.y, dtype=float)
 
         shape = x.shape
         if covers:
-            mask = points_in_polygon_covers(x.flatten(), y.flatten(),
+            mask = points_in_polygon_covers(x.ravel(), y.ravel(),
                                             vx, vy).astype(bool)
         else:
-            mask = points_in_polygon(x.flatten(), y.flatten(),
+            mask = points_in_polygon(x.ravel(), y.ravel(),
                                      vx, vy).astype(bool)
 
-        return mask.reshape(shape)
+        # ``[()]`` returns a scalar for a scalar input, like the other
+        # shapes, and leaves array results unchanged
+        return mask.reshape(shape)[()]
 
     def contains(self, pixcoord):
         return self._containment(pixcoord, covers=False)
