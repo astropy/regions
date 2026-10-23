@@ -1,0 +1,192 @@
+%YAML 1.1
+---
+$schema: "http://stsci.edu/schemas/yaml-schema/draft-01"
+id: "asdf://astropy.org/regions/schemas/visual-1.0.0"
+title: Visual metadata for regions
+description: |
+  ASDF schema for serializing region definitions.
+
+visual_meta:
+    type: object
+    title: Metadata for plotting.
+    properties:
+      color:
+        type: string
+        title: Region, symbol and text color (CRTF, DS9)
+        description: |
+          Any color recognized by matplotlib.
+          The color may be specified as a named color, hex value, or RGB tuple.
+          Ex: visual['color'] = 'red'
+      dash:
+        type: boolean
+        title: Dashed line for plotting the region.
+        description: |
+          Render region using dashed lines using current dashlist value.
+      dashlist:
+        type: array
+        items:
+          type: string
+        title: Dash pattern for plotting the region.
+        description: |
+          Sets dashed line parameters.
+          This does not render the region in dashed lines.
+      default_style:
+        type: string
+        title: Use default style for plotting the region.
+        description: |
+          Use the default style for the region, ignoring any other visual
+          properties.
+      edgecolor:
+        type: string
+        title: Edge color for plotting the region.
+        description: |
+          Any color recognized by matplotlib.
+          The color may be specified as a named color, hex value, or RGB tuple.
+          Ex: visual['edgecolor'] = 'blue'
+      facecolor:
+        type: string
+        title: Face color for plotting the region.
+        description: |
+          Any color recognized by matplotlib.
+          The color may be specified as a named color, hex value, or RGB tuple.
+          Ex: visual['facecolor'] = 'blue'
+      fill:
+        type: boolean
+        title: Fill the region for plotting.
+        description: |
+          Boolean value whether the region is filled.
+      font:
+        type: string
+        title: Font for plotting the region.
+        description: |
+          The name of the font.
+          Ex: visual['font'] = 'Times New Roman'
+      fontname:
+        type: string
+        title: Font name for plotting the region.
+        description: |
+          The name of the font.
+          Ex: visual['fontname'] = 'Times New Roman'
+      fontsize:
+        type: number
+        title: Font size for plotting the region.
+        description: |
+          The font size is specified in points.
+          Ex: visual['fontsize'] = 12.0
+      fontstyle:
+        type: string
+        title: Font style for plotting the region.
+        description: |
+          The font style may be specified as a named style or a dash sequence.
+          Ex: visual['fontstyle'] = 'italic'
+      fontweight:
+        anyOf:
+          - type: string
+          - type: integer
+        title: Font weight for plotting the region.
+        description: |
+          The font weight may be specified as a named weight or a numeric value.
+          Ex: visual['fontweight'] = 'light'
+      labelcolor:
+        type: string
+        title: Label color for plotting the region.
+        description: |
+          Any color recognized by matplotlib.
+          The color may be specified as a named color, hex value, or RGB tuple.
+          Ex: visual['labelcolor'] = 'blue'
+      labeloff:
+        type: array
+        items:
+          type: number
+        title: Label offset for plotting the region.
+        description: |
+          The label offset is specified in points.
+          Ex: visual['labeloff'] = [5.0, 5.0]
+      labelpos:
+        type: string
+        title: Label position for plotting the region.
+        description: |
+          The label position may be specified as a named position
+          or a coordinate.
+          Ex: visual['labelpos'] = 'top'
+      line:
+        type: array
+        items:
+          type: integer
+        title: Line Region (DS9)
+        description: |
+          DS9 supports a line region rendered with arrows, one at each end.
+          To indicate arrows, use the line property. A '1'indicates an arrow,
+          '0' indicates no arrow.)
+      linestyle:
+        type: string
+        title: Line style for plotting the region.
+        description: |
+          The line style may be specified as a named style or a dash sequence.
+          Ex: visual['linestyle'] = 'dashed'
+      linewidth:
+        type: number
+        title: Line width for plotting the region.
+        description: |
+          The line width is specified in points.
+          Ex: visual['linewidth'] = 2.0
+      marker:
+        type: string
+        title: Marker for plotting the region.
+        description: |
+          The marker may be specified as a named marker or a character.
+          Ex: visual['marker'] = 'point marker'
+      markeredgewidth:
+        type: number
+        title: Marker edge width for plotting the region.
+        description: |
+          The marker edge width is specified in points.
+          Ex: visual['markeredgewidth'] = 2.0
+      markersize:
+        type: number
+        title: Marker size for plotting the region.
+        description: |
+          The marker size is specified in points.
+          Ex: visual['markersize'] = 5.0
+      rotation:
+        type: number
+        title: Rotation for plotting the region.
+        description: |
+          The rotation is specified in degrees.
+          Ex: visual['rotation'] = 45.0
+      symbol:
+        type: string
+        title: Symbol for plotting the region.
+        description: |
+          The symbol may be specified as a named symbol or a character.
+          Ex: visual['symbol'] = 'point marker'
+      symsize:
+        type: number
+        title: Symbol size for plotting the region.
+        description: |
+          The symbol size is specified in points.
+          Ex: visual['symsize'] = 5.0
+      symthick:
+        type: number
+        title: Symbol thickness for plotting the region.
+        description: |
+          The symbol thickness is specified in points.
+          Ex: visual['symthick'] = 2.0
+      textangle:
+        type: number
+        title: Text angle for plotting the region.
+        description: |
+          The text angle is specified in degrees.
+          Ex: visual['textangle'] = 45.0
+      textrotate:
+        type: number
+        title: Text rotation for plotting the region.
+        description: |
+          The text rotation is specified in degrees.
+          Ex: visual['textrotate'] = 45.0
+      usetex:
+        type: boolean
+        title: Use TeX for plotting the region.
+        description: |
+          Render text using TeX.
+...

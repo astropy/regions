@@ -1,0 +1,147 @@
+%YAML 1.1
+---
+$schema: "http://stsci.edu/schemas/yaml-schema/draft-01"
+id: "asdf://astropy.org/regions/schemas/meta-1.0.0"
+title: Metadata for regions
+description: |
+  ASDF schema for serializing region definitions.
+
+meta:
+  type: object
+  title: Metadata associated with the region
+  properties:
+    background:
+      type: float
+      title: Background value for the region. (CRTF, DS9)
+      description: |
+        CRTF, DS9, and other region formats support a background value for the region. 
+        This is a float value that can be used to specify the background 
+        level of the region.
+    comment:
+      type: string
+      title: Comment for the region. (CRTF, DS9)
+      description: |
+        CRTF, DS9, and other region formats support a comment for the region.
+        Ex: meta['comment'] = 'This is a comment.'
+    component:
+    composite:
+    type: boolean
+      title: ???
+    corr:
+      anyOf:
+        - type: array
+          items:
+            type: string
+        - type: string
+      title: Correlation Axis (CRTF)
+      description: |
+        Possible values: 'I', 'Q', 'U', 'V', 'RR', 'LL', 'RL', 'LR',
+        'XX', 'YY', 'XY', 'YX', 'RX', 'RY', 'LX', 'LY', "XR', 'XL', 'YR',
+        'YL', 'PP', 'QQ'. 'PQ', 'QP', RCircular', LCircular', 'Liear',
+        'Ptotal', 'Plinear', 'Pangle', 'PFtotal', 'PFlinear'
+        Default: all planes present in image
+        Ex: meta['corr'] = ['X', 'Y']
+    delete:
+      type: boolean
+      title: Delete the region in the DS9 GUI. (DS9)
+      description: |
+        DS9 supports a boolean flag to indicate whether the region should be
+        deleted in the DS9 GUI.
+        Ex: meta['delete'] = 1
+    edit:
+      type: boolean
+      title: Edit the region in the DS9 GUI. (DS9)
+      description: |
+        DS9 supports a boolean flag to indicate whether the region should be
+        editable in the DS9 GUI.
+        Ex: meta['edit'] = 1
+    fixed:
+    frame:
+      type: string
+      title: Frequency / Velocity Axis (CRTF)
+      description: |
+        Possible values: 'REST', "LSRK', 'LSRD', 'BARY', 'GEO', 'TOPO',
+        'GALACTO', 'LGROUP', 'CMB'
+        Default: Image value
+        Ex: meta['frame'] = 'TOPO'
+    highlite:
+    include:
+      type: boolean
+      title: Include the region in a plot.
+      description: |
+        CRTF, DS9, and other region formats support a boolean flag to indicate
+        whether the region should be included in a plot.
+    label:
+      type: string
+      title: Text label for the region.
+      description: |
+        CRTF, DS9, and other region formats support a text label for the region.
+        This is a string that can be used to identify the region in a plot or in
+        a list of regions.  
+    line:
+      type: array
+      items:
+        type: integer
+      title: Line Region (DS9)
+      description: |
+        DS9 supports a line region rendered with arrows, one at each end.
+        To indicate arrows, use the line property. A '1'indicates an arrow,
+        '0' indicates no arrow.)
+        Ex: meta['line'] = [1, 1]
+    move:
+      type: boolean
+      title: Move the region in the DS9 GUI. (DS9)
+      description: |
+        DS9 supports a boolean flag to indicate whether the region should be
+        movable in the DS9 GUI.
+        Ex: meta['move'] = 1
+    name:
+      type: string
+    range:
+      type: array
+      items:
+        tag: "tag:stsci.edu:asdf/unit/quantity-1.*"
+      title: Frequency / Velocity Range (CRTF)
+      description: |
+        Possible units: 'Hz', 'kHz', 'MHz', 'GHz', 'THz', 'm/s', 'km/s',
+        'channel', chan' (=channel)
+        Default: Image range
+        Format: [min, max]
+        Ex: meta['range'] = [-320 * u.m/u.s, -330 * u.m/u.s]
+    restfreq:
+      tag: "tag:stsci.edu:asdf/unit/quantity-1.*"
+      title: Rest Frequency (CRTF)
+      description: |
+        Possible units: 'Hz', 'kHz', 'MHz', 'GHz', 'THz'
+        Default: Image value
+        Ex: meta['restfreq'] = 1.420405751786 * u.GHz
+    rotate:
+      type: boolean
+      title: Rotate the region in the DS9 GUI. (DS9)
+      description: |
+        DS9 supports a boolean flag to indicate whether the region should be
+        rotatable in the DS9 GUI.
+        Ex: meta['rotate'] = 1
+    select:
+    source:
+      type: string
+      title: Source name
+    tags:
+      type: array
+      items:
+        type: string
+      title: Tags for the region. (DS9)
+      description: |
+        A region may have zero or more tags associated with it, which may be used
+        for grouping and searching.
+        Ex: meta['tags'] = ['{Group 1}', '{Group 2}']}
+    text:
+    textrotate:
+    type:
+    veltype:
+      type: string
+      title: Velocity Calculation Type (CRTF)
+      description: |
+        Possible values: 'RADIO', 'OPTICAL', 'Z', "BETA', 'GAMMA'
+        Ex: meta['veltype'] = 'RADIO'
+...
