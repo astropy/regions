@@ -26,24 +26,29 @@ class CircleConverter(Converter):
         if isinstance (obj, CircleSphericalSkyRegion):
             spherical = True
 
-        return {
+        node= {
             'center': obj.center,
             'radius': obj.radius,
-            'spherical': spherical
-        }
+            'spherical': spherical,
+            'meta': obj.meta,
+            'visual': obj.visual,}
+        print(node)
+        return node
 
     def from_yaml_tree(self, node, tag, ctx):  # noqa: ARG002
         from regions.core.pixcoord import PixCoord
-
-        center=node['center'],
-        radius=node['radius'],
+        print(node)
+        center=node['center']
+        radius=node['radius']
         spherical=node['spherical']
+        meta = node['meta']
+        visual = node['visual']
         if isinstance(center, PixCoord):
             from regions.shapes.circle import CirclePixelRegion
-            return CirclePixelRegion(center=center, radius=radius)
+            return CirclePixelRegion(center=center, radius=radius, meta=meta, visual=visual)
         if spherical:
             from regions.shapes.circle import CircleSphericalSkyRegion
-            return CircleSphericalSkyRegion(center=center, radius=radius)
+            return CircleSphericalSkyRegion(center=center, radius=radius, meta=meta, visual=visual)
         else:
             from regions.shapes.circle import CircleSkyRegion
-            return CircleSkyRegion(center=center, radius=radius)
+            return CircleSkyRegion(center=center, radius=radius, meta=meta, visual=visual)

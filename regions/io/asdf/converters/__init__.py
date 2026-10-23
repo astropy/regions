@@ -5,8 +5,11 @@ ASDF converters.
 
 from .pixel_coords import PixCoordConverter
 from .circle_region import CircleConverter
+from .metadata import RegionMetaConverter, RegionVisualConverter
 
 __all__ = [
     'PixCoordConverter',
     'CircleConverter',
+    'RegionMetaConverter',
+    'RegionVisualConverter',
 ]

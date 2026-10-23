@@ -17,7 +17,6 @@ properties:
     title: X coordinate.
     anyOf:
       - type: number
-      - type: array
       - tag: 'tag:stsci.edu:asdf/core/ndarray-1.*'
     description: |
       The x coordinate of the pixel.
@@ -25,7 +24,6 @@ properties:
     title: Y coordinate.
     anyOf:
       - type: number
-      - type: array
       - tag: 'tag:stsci.edu:asdf/core/ndarray-1.*'
     description: |
       The y coordinate of the pixel.

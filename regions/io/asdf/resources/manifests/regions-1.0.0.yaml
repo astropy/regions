@@ -12,3 +12,12 @@ tags:
     schema_uri: asdf://astropy.org/regions/schemas/circle_region-1.0.0
     title: Circle Region in different coordinates
     description: Circle regions in different coordinates.
+  - tag_uri: tag:astropy.org:regions/meta-1.0.0
+    schema_uri: asdf://astropy.org/regions/schemas/meta-1.0.0
+    title: Metadata for regions
+    description: Metadata for regions.
+  - tag_uri: tag:astropy.org:regions/visual-1.0.0
+    schema_uri: asdf://astropy.org/regions/schemas/visual-1.0.0
+    title: Visual metadata for regions
+    description: Visual metadata for regions. 
+    

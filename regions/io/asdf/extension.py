@@ -8,6 +8,7 @@ from asdf.extension import ManifestExtension
 from asdf.resource import DirectoryResourceMapping
 
 from regions.io.asdf.converters import circle_region
+from regions.io.asdf.converters import metadata
 from regions.io.asdf.converters import pixel_coords
 from regions.shapes.circle import CircleSphericalSkyRegion
 
@@ -21,7 +22,8 @@ REGIONS_CONVERTERS = [
     # circle.CircleAnnulusPixelRegion(),
     # circle.CircleAnnulusSkyRegion(),
     # circle.CircleAnnulusSphericalSkyRegion(),
-    
+    metadata.RegionMetaConverter(),
+    metadata.RegionVisualConverter(),
 ]
 
 # The order here is important; asdf will prefer to use extensions
