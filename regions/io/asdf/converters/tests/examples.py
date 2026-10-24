@@ -1,6 +1,7 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 import numpy as np
 
+from astropy import units as u
 from regions.core import PixCoord
 
 parameters = {
@@ -8,7 +9,10 @@ parameters = {
     'CirclePixelRegion': ['center', 'radius', 'meta', 'visual'],
     'CircleSkyRegion': ['center', 'radius', 'meta', 'visual'],
     'CircleSphericalSkyRegion': ['center', 'radius', 'meta', 'visual'],
-    'RegionMeta': ['a', 'b'],
+    'RegionMeta': ['background', 'comment', 'component', 'composite', 'corr',
+                   'delete', 'edit', 'fixed', 'frame', 'highlite', 'include',
+                   'label', 'line', 'move', 'name', 'range', 'restfreq', 'rotate',
+                   'select', 'source', 'tag', 'text', 'textrotate', 'type', 'veltype'],
 }
 
 
@@ -26,4 +30,25 @@ def circle_pixel_region():
 
 def meta():
     from regions.core.metadata import RegionMeta
-    return RegionMeta(a=1, b=2), parameters['RegionMeta']
+    meta = {
+        'background': True,
+        'comment': 'This is a test',
+        'corr': 'LL',
+        'delete': True,
+        'edit': True,
+        'fixed': True,
+        'frame': 'LSRD',
+        'include': True,
+        'label': 'Test',
+        'line': [1, 1],
+        'move': True,
+        'name': 'Test',
+        'range': [-320 * u.m/u.s, -330 * u.m/u.s],
+        'restfreq': 1.42 * u.GHz,
+        'rotate': True,
+        'select': True,
+        'source': False,
+        'tags': '',
+        'veltype': 'RADIO'
+    }
+    return RegionMeta(**meta), parameters['RegionMeta']
