@@ -96,11 +96,11 @@ The valid keys in the :class:`~regions.RegionMeta` object are:
 
 * ``highlite``:
 
-  - DS9, CRTF (Determines whether the edit handles (or anchor points) become 
-    visible when a specific region is selected in the GUI. 
-    highlite=1 (True): When you click on the region in the DS9 interface, 
-    the resize and manipulation handles appear around its perimeter. 
-    highlite=0 (False): The region can still be selected (if select=1), but 
+  - DS9, CRTF (Determines whether the edit handles (or anchor points) become
+    visible when a specific region is selected in the GUI.
+    highlite=1 (True): When you click on the region in the DS9 interface,
+    the resize and manipulation handles appear around its perimeter.
+    highlite=0 (False): The region can still be selected (if select=1), but
     it will not display the visible edit boxes/handles.)
   - Ex: meta['highlite'] = 1
 
