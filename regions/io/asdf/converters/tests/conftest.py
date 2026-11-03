@@ -19,3 +19,19 @@ def test_pixcoord_array():
     Test that PixCoord can be serialized and deserialized correctly.
     """
     return examples.pixcoord_array()
+
+
+@pytest.fixture
+def test_meta():
+    """
+    Test that RegionMeta can be serialized and deserialized correctly.
+    """
+    return examples.meta()
+
+
+@pytest.fixture
+def test_visual_meta():
+    """
+    Test that RegionVisual can be serialized and deserialized correctly.
+    """
+    return examples.visual_meta()

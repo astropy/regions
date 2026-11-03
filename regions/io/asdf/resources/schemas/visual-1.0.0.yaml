@@ -2,9 +2,9 @@
 ---
 $schema: "http://stsci.edu/schemas/yaml-schema/draft-01"
 id: "asdf://astropy.org/regions/schemas/visual-1.0.0"
-title: Visual metadata for regions
+title: Metadata for plotting regions
 description: |
-  ASDF schema for serializing region definitions.
+  ASDF schema for serializing region visualization metadata.
 
 visual_meta:
     type: object
@@ -19,16 +19,20 @@ visual_meta:
           Ex: visual['color'] = 'red'
       dash:
         type: boolean
-        title: Dashed line for plotting the region.
+        title: Use dashed line for plotting the region.
         description: |
           Render region using dashed lines using current dashlist value.
       dashlist:
         type: array
         items:
-          type: string
+          type: integer
+        minItems: 2
+        maxItems: 2
         title: Dash pattern for plotting the region.
         description: |
-          Sets dashed line parameters.
+          Sets dashed line parameters. The first number is the 
+          length of the dash, the second number is the length of the space.
+          Ex: visual['dashlist'] = [5, 2]
           This does not render the region in dashed lines.
       default_style:
         type: string
@@ -61,12 +65,6 @@ visual_meta:
         description: |
           The name of the font.
           Ex: visual['font'] = 'Times New Roman'
-      fontname:
-        type: string
-        title: Font name for plotting the region.
-        description: |
-          The name of the font.
-          Ex: visual['fontname'] = 'Times New Roman'
       fontsize:
         type: number
         title: Font size for plotting the region.

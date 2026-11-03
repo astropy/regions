@@ -8,15 +8,14 @@ description: |
 
 meta:
   type: object
-  title: Metadata associated with the region
+  title: Metadata associated with the region.
   properties:
     background:
-      type: float
-      title: Background value for the region. (CRTF, DS9)
+      type: boolean
+      title: Indicates whether the region is a background region. (DS9)
       description: |
-        CRTF, DS9, and other region formats support a background value for the region. 
-        This is a float value that can be used to specify the background 
-        level of the region.
+        A flag to indicate whether the region includes background only.
+        Ex: meta['background'] = 1
     comment:
       type: string
       title: Comment for the region. (CRTF, DS9)
@@ -24,9 +23,17 @@ meta:
         CRTF, DS9, and other region formats support a comment for the region.
         Ex: meta['comment'] = 'This is a comment.'
     component:
+      type: boolean
+      title: Indicates whether the region is a component region. (DS9)
+      description: |
+        A flag to indicate whether the region is a component region.
+        Ex: meta['component'] = 1
     composite:
-    type: boolean
-      title: ???
+      type: boolean
+      title: Indicates whether the region is a composite region. (DS9)
+      description: |
+        A flag to indicate whether the region is a composite region.
+        Ex: meta['composite'] = 1
     corr:
       anyOf:
         - type: array
@@ -55,11 +62,12 @@ meta:
         DS9 supports a boolean flag to indicate whether the region should be
         editable in the DS9 GUI.
         Ex: meta['edit'] = 1
-    fixed: boolean
+    fixed: 
+      type: boolean
       title: Fixed region in the DS9 GUI. (DS9)
       description: |
-        DS9 supports a boolean flag to indicate whether the region should be
-        fixed in the DS9 GUI.
+        DS9 supports a boolean flag to indicate whether the region can be
+        fixed via the DS9 GUI.
         Ex: meta['fixed'] = 1
     frame:
       type: string
@@ -70,6 +78,16 @@ meta:
         Default: Image value
         Ex: meta['frame'] = 'TOPO'
     highlite:
+      type: boolean
+      title: Highlight the region in the GUI. (DS9, CRTF)
+      description: |
+        Determines whether the edit handles (or anchor points) become
+        visible when a specific region is selected in the GUI.
+        highlite=1 (True): When you click on the region in the DS9 interface,
+        the resize and manipulation handles appear around its perimeter.
+        highlite=0 (False): The region can still be selected (if select=1), but
+        it will not display the visible edit boxes/handles.
+        Ex: meta['highlite'] = 1
     include:
       type: boolean
       title: Include the region in a plot.
@@ -100,8 +118,6 @@ meta:
         DS9 supports a boolean flag to indicate whether the region should be
         movable in the DS9 GUI.
         Ex: meta['move'] = 1
-    name:
-      type: string
     range:
       type: array
       items:
@@ -128,11 +144,17 @@ meta:
         rotatable in the DS9 GUI.
         Ex: meta['rotate'] = 1
     select:
+      type: boolean
+      title: Select the region in the DS9 GUI. (DS9)
+      description: |
+        DS9 supports a boolean flag to indicate whether the region should be
+        selectable in the DS9 GUI.
+        Ex: meta['select'] = 1
     source:
       type: boolean
       title: Source or background
       description: |
-        A boolean flag to indicate whether the region is a source or background.
+        A boolean flag to indicate whether the region includes a source or is background.
         Ex: meta['source'] = False
     tags:
       type: array
@@ -144,8 +166,19 @@ meta:
         for grouping and searching.
         Ex: meta['tags'] = ['{Group 1}', '{Group 2}']}
     text:
+      type: string
+      title: Text for the region. (DS9)
+      description: |
+        A region may have a text label associated with it, which may be used
+        for identification and display.
+        Ex: meta['text'] = 'My Region'
     textrotate:
-    type:
+      type: number
+      title: Text Rotation (DS9)
+      description: |
+        A region may have a text rotation associated with it, which may be used
+        for display.
+        Ex: meta['textrotate'] = 45
     veltype:
       type: string
       title: Velocity Calculation Type (CRTF)

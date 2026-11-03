@@ -13,6 +13,14 @@ parameters = {
                    'delete', 'edit', 'fixed', 'frame', 'highlite', 'include',
                    'label', 'line', 'move', 'name', 'range', 'restfreq', 'rotate',
                    'select', 'source', 'tag', 'text', 'textrotate', 'type', 'veltype'],
+    'RegionVisual': ['color', 'dash', 'dashlist', 'default_style', 'edgecolor',
+                     'facecolor', 'fill', 'font', 'fontname', 'fontsize',
+                     'fontstyle', 'fontweight', 'labelcolor', 'labeloff',
+                     'labelpos', 'line', 'linestyle', 'linewidth', 'marker',
+                     'markeredgewidth', 'markersize', 'rotation', 'symbol', 'symsize',
+                     'symthick', 'textangle', 'textrotate', 'usetex',
+                     
+                     ],
 }
 
 
@@ -28,6 +36,7 @@ def circle_pixel_region():
     from regions.shapes.circle import CirclePixelRegion
     return CirclePixelRegion(PixCoord(1, 2), 3), parameters['PixCoord']
 
+
 def meta():
     from regions.core.metadata import RegionMeta
     meta = {
@@ -42,7 +51,6 @@ def meta():
         'label': 'Test',
         'line': [1, 1],
         'move': True,
-        'name': 'Test',
         'range': [-320 * u.m/u.s, -330 * u.m/u.s],
         'restfreq': 1.42 * u.GHz,
         'rotate': True,
@@ -52,3 +60,14 @@ def meta():
         'veltype': 'RADIO'
     }
     return RegionMeta(**meta), parameters['RegionMeta']
+
+
+def visual_meta():
+    from regions.core.metadata import RegionVisual
+    visual_meta = {
+        'color': 'red',
+        'linestyle': '-',
+        'linewidth': 1.0,
+        'fill': True,
+    }
+    return RegionVisual(**visual_meta), parameters['RegionVisual']
