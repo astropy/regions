@@ -1,7 +1,7 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 import numpy as np
-
 from astropy import units as u
+
 from regions.core import PixCoord
 
 parameters = {
@@ -19,7 +19,7 @@ parameters = {
                      'labelpos', 'line', 'linestyle', 'linewidth', 'marker',
                      'markeredgewidth', 'markersize', 'rotation', 'symbol', 'symsize',
                      'symthick', 'textangle', 'textrotate', 'usetex',
-                     
+
                      ],
 }
 
@@ -51,13 +51,13 @@ def meta():
         'label': 'Test',
         'line': [1, 1],
         'move': True,
-        'range': [-320 * u.m/u.s, -330 * u.m/u.s],
+        'range': [-320 * u.m / u.s, -330 * u.m / u.s],
         'restfreq': 1.42 * u.GHz,
         'rotate': True,
         'select': True,
         'source': False,
         'tags': '',
-        'veltype': 'RADIO'
+        'veltype': 'RADIO',
     }
     return RegionMeta(**meta), parameters['RegionMeta']
 

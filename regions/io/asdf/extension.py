@@ -7,11 +7,7 @@ import importlib.resources as importlib_resources
 from asdf.extension import ManifestExtension
 from asdf.resource import DirectoryResourceMapping
 
-from regions.io.asdf.converters import circle_region
-from regions.io.asdf.converters import metadata
-from regions.io.asdf.converters import pixel_coords
-from regions.shapes.circle import CircleSphericalSkyRegion
-
+from regions.io.asdf.converters import circle_region, metadata, pixel_coords
 
 __all__ = ['REGIONS_CONVERTERS']
 

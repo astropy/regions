@@ -1,9 +1,8 @@
+# Licensed under a 3-clause BSD style license - see LICENSE.rst
 """
 ASDF converter for RegionMeta and RegionVisual.
 """
 from asdf.extension import Converter
-from regions.io.asdf.converters.tests.test import obj
-
 
 __all__ = [
     'RegionMetaConverter',
@@ -18,7 +17,6 @@ class RegionMetaConverter(Converter):
 
     tags = ('tag:astropy.org:regions/meta-*',)
     types = ('regions.core.metadata.RegionMeta',)
-
 
     def to_yaml_tree(self, obj, tag, ctx):  # noqa: ARG002
 
@@ -37,11 +35,9 @@ class RegionVisualConverter(Converter):
     tags = ('tag:astropy.org:regions/visual-*',)
     types = ('regions.core.metadata.RegionVisual',)
 
-
     def to_yaml_tree(self, obj, tag, ctx):  # noqa: ARG002
         return {'visual_meta': dict(obj.items())}
 
     def from_yaml_tree(self, node, tag, ctx):  # noqa: ARG002
         from regions.core.metadata import RegionVisual
         return RegionVisual(**node['visual_meta'])
-    

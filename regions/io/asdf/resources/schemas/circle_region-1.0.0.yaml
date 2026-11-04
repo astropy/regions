@@ -23,9 +23,9 @@ properties:
   spherical:
     type: boolean
   meta:
-    $ref: "../common-1.0.0#/definitions/meta"
+    tag: 'tag:astropy.org:regions/meta-1.0.0'
   visual:
-    $ref: "../common-1.0.0#/definitions/visual_meta"
-  
+    tag: 'tag:astropy.org:regions/visual-1.0.0'
+
 required: [center, radius, spherical]
 ...

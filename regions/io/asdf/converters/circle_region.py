@@ -1,7 +1,9 @@
+# Licensed under a 3-clause BSD style license - see LICENSE.rst
 """
 ASDF converter for Circle regions in pixel coordinates.
 """
 from asdf.extension import Converter
+
 from regions.shapes.circle import CircleSphericalSkyRegion
 
 __all__ = [
@@ -17,30 +19,26 @@ class CircleConverter(Converter):
     tags = ('tag:astropy.org:regions/circle_region-*',)
     types = ('regions.shapes.circle.CirclePixelRegion',
              'regions.shapes.circle.CircleSkyRegion',
-             'regions.shapes.circle.CircleSphericalSkyRegion',)
-
+             'regions.shapes.circle.CircleSphericalSkyRegion')
 
     def to_yaml_tree(self, obj, tag, ctx):  # noqa: ARG002
-        from regions.shapes.circle import CircleSphericalSkyRegion
         spherical = False
-        if isinstance (obj, CircleSphericalSkyRegion):
+        if isinstance(obj, CircleSphericalSkyRegion):
             spherical = True
 
-        node= {
+        node = {
             'center': obj.center,
             'radius': obj.radius,
             'spherical': spherical,
             'meta': obj.meta,
-            'visual': obj.visual,}
-        print(node)
+            'visual': obj.visual}
         return node
 
     def from_yaml_tree(self, node, tag, ctx):  # noqa: ARG002
         from regions.core.pixcoord import PixCoord
-        print(node)
-        center=node['center']
-        radius=node['radius']
-        spherical=node['spherical']
+        center = node['center']
+        radius = node['radius']
+        spherical = node['spherical']
         meta = node['meta']
         visual = node['visual']
         if isinstance(center, PixCoord):

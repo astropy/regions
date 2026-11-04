@@ -2,7 +2,7 @@
 
 import asdf
 import pytest
-from numpy.testing import assert_array_equal
+from numpy.testing import assert_array_equal, assert_equal
 
 
 @pytest.fixture
@@ -17,6 +17,12 @@ def obj(request):
 region_params = pytest.mark.parametrize('obj', [
     'test_pixcoord',
     'test_pixcoord_array',
+], indirect=True)
+
+
+region_meta = pytest.mark.parametrize('obj', [
+    'test_meta',
+    'test_visual_meta',
 ], indirect=True)
 
 
@@ -35,3 +41,21 @@ def test_region_converters(tmp_path, obj):
             for parameter in pars:
                 assert_array_equal(getattr(region, parameter),
                                    getattr(region2, parameter))
+
+
+@region_meta
+def test_meta(tmp_path, obj):
+    """
+    Test metadata can be serialized and deserialized correctly.
+    """
+    metadata, params = obj
+    with asdf.AsdfFile() as af:
+        af['meta'] = metadata
+        af.write_to(tmp_path / 'meta.asdf')
+
+        with asdf.open(tmp_path / 'meta.asdf') as af:
+            metadata2 = af['meta']
+            for parameter in metadata2:
+                assert parameter in params
+                assert_equal(metadata[parameter],
+                             metadata2[parameter])
