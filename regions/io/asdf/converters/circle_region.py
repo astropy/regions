@@ -1,6 +1,6 @@
 # Licensed under a 3-clause BSD style license - see LICENSE.rst
 """
-ASDF converter for Circle regions in pixel coordinates.
+ASDF converter for Circle regions in pixel, sky and spherical coordinates.
 """
 from asdf.extension import Converter
 
