@@ -38,12 +38,12 @@ class RectangleConverter(Converter):
         if isinstance(center, PixCoord):
             from regions.shapes.rectangle import RectanglePixelRegion
             return RectanglePixelRegion(center=center,
-                                         width=width,
-                                         height=height,
-                                         meta=meta, visual=visual)
+                                        width=width,
+                                        height=height,
+                                        meta=meta, visual=visual)
         else:
             from regions.shapes.rectangle import RectangleSkyRegion
             return RectangleSkyRegion(center=center,
-                                       width=width,
-                                       height=height,
-                                       meta=meta, visual=visual)
+                                      width=width,
+                                      height=height,
+                                      meta=meta, visual=visual)
