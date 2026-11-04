@@ -1,7 +1,7 @@
 %YAML 1.1
 ---
-$schema: "http://stsci.edu/schemas/yaml-schema/draft-01"
-id: "asdf://astropy.org/regions/schemas/meta-1.0.0"
+$schema: 'http://stsci.edu/schemas/yaml-schema/draft-01'
+id: 'asdf://astropy.org/regions/schemas/meta-1.0.0'
 title: Metadata for regions
 description: |
   ASDF schema for serializing region definitions.
@@ -62,7 +62,7 @@ meta:
         DS9 supports a boolean flag to indicate whether the region should be
         editable in the DS9 GUI.
         Ex: meta['edit'] = 1
-    fixed: 
+    fixed:
       type: boolean
       title: Fixed region in the DS9 GUI. (DS9)
       description: |
@@ -100,7 +100,7 @@ meta:
       description: |
         CRTF, DS9, and other region formats support a text label for the region.
         This is a string that can be used to identify the region in a plot or in
-        a list of regions.  
+        a list of regions.
     line:
       type: array
       items:
@@ -121,7 +121,7 @@ meta:
     range:
       type: array
       items:
-        tag: "tag:stsci.edu:asdf/unit/quantity-1.*"
+        tag: 'tag:stsci.edu:asdf/unit/quantity-1.*'
       title: Frequency / Velocity Range (CRTF)
       description: |
         Possible units: 'Hz', 'kHz', 'MHz', 'GHz', 'THz', 'm/s', 'km/s',
@@ -130,7 +130,7 @@ meta:
         Format: [min, max]
         Ex: meta['range'] = [-320 * u.m/u.s, -330 * u.m/u.s]
     restfreq:
-      tag: "tag:stsci.edu:asdf/unit/quantity-1.*"
+      tag: 'tag:stsci.edu:asdf/unit/quantity-1.*'
       title: Rest Frequency (CRTF)
       description: |
         Possible units: 'Hz', 'kHz', 'MHz', 'GHz', 'THz'

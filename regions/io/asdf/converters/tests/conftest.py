@@ -20,12 +20,14 @@ def test_pixcoord_array():
     """
     return examples.pixcoord_array()
 
+
 @pytest.fixture
 def test_circle_pixel_region():
     """
     Test that CirclePixelRegion can be serialized and deserialized correctly.
     """
     return examples.circle_pixel_region()
+
 
 @pytest.fixture
 def test_circle_sky_region():
@@ -34,10 +36,11 @@ def test_circle_sky_region():
     """
     return examples.circle_sky_region()
 
+
 @pytest.fixture
 def test_circle_spherical_sky_region():
     """
-    Test that CircleSphericalSkyRegion can be serialized and deserialized correctly.
+    Test 'CircleSphericalSkyRegion' can be serialized and deserialized.
     """
     return examples.circle_spherical_sky_region()
 
@@ -64,6 +67,7 @@ def test_ellipse_pixel_region():
     Test that EllipsePixelRegion can be serialized and deserialized correctly.
     """
     return examples.ellipse_pixel_region()
+
 
 @pytest.fixture
 def test_ellipse_sky_region():

@@ -7,9 +7,8 @@ import importlib.resources as importlib_resources
 from asdf.extension import ManifestExtension
 from asdf.resource import DirectoryResourceMapping
 
-from regions.io.asdf.converters import (
-    circle_region, ellipse_region, metadata, pixel_coords
-)
+from regions.io.asdf.converters import (circle_region, ellipse_region,
+                                        metadata, pixel_coords)
 
 __all__ = ['REGIONS_CONVERTERS']
 

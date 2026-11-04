@@ -7,7 +7,7 @@ description: |
   ASDF schema for serializing a circle region in pixel, sky
   and spherical coordinates. It applies to CirclePixelRegion,
   CircleSkyRegion and CircleSphericalSkyRegion.
-      
+
 type: object
 properties:
   center:
