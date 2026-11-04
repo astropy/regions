@@ -25,6 +25,8 @@ parameters = {
                      ],
     'EllipsePixelRegion': ['center', 'width', 'height', 'meta', 'visual'],
     'EllipseSkyRegion': ['center', 'width', 'height', 'meta', 'visual'],
+    'RectanglePixelRegion': ['center', 'width', 'height', 'meta', 'visual'],
+    'RectangleSkyRegion': ['center', 'width', 'height', 'meta', 'visual'],
 }
 
 
@@ -103,3 +105,16 @@ def ellipse_sky_region():
     center = SkyCoord(ra=1 * u.deg, dec=2 * u.deg, frame='icrs')
     return (EllipseSkyRegion(center, 3 * u.arcsec, 4 * u.arcsec),
             parameters['EllipseSkyRegion'])
+
+
+def rectangle_pixel_region():
+    from regions.shapes.rectangle import RectanglePixelRegion
+    return (RectanglePixelRegion(PixCoord(1, 2), 3, 4),
+            parameters['RectanglePixelRegion'])
+
+
+def rectangle_sky_region():
+    from regions.shapes.rectangle import RectangleSkyRegion
+    center = SkyCoord(ra=1 * u.deg, dec=2 * u.deg, frame='icrs')
+    return (RectangleSkyRegion(center, 3 * u.arcsec, 4 * u.arcsec),
+            parameters['RectangleSkyRegion'])

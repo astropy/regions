@@ -75,3 +75,19 @@ def test_ellipse_sky_region():
     Test that EllipseSkyRegion can be serialized and deserialized correctly.
     """
     return examples.ellipse_sky_region()
+
+
+@pytest.fixture
+def test_rectangle_pixel_region():
+    """
+    Test that RectanglePixelRegion can be serialized and deserialized to ASDF.
+    """
+    return examples.rectangle_pixel_region()
+
+
+@pytest.fixture
+def test_rectangle_sky_region():
+    """
+    Test that RectangleSkyRegion can be serialized and deserialized correctly.
+    """
+    return examples.rectangle_sky_region()
