@@ -43,10 +43,13 @@ class CircleConverter(Converter):
         visual = node['visual']
         if isinstance(center, PixCoord):
             from regions.shapes.circle import CirclePixelRegion
-            return CirclePixelRegion(center=center, radius=radius, meta=meta, visual=visual)
+            return CirclePixelRegion(center=center, radius=radius,
+                                     meta=meta, visual=visual)
         if spherical:
             from regions.shapes.circle import CircleSphericalSkyRegion
-            return CircleSphericalSkyRegion(center=center, radius=radius, meta=meta, visual=visual)
+            return CircleSphericalSkyRegion(center=center, radius=radius,
+                                            meta=meta, visual=visual)
         else:
             from regions.shapes.circle import CircleSkyRegion
-            return CircleSkyRegion(center=center, radius=radius, meta=meta, visual=visual)
+            return CircleSkyRegion(center=center, radius=radius,
+                                   meta=meta, visual=visual)

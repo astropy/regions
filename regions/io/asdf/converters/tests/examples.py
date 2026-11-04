@@ -11,15 +11,16 @@ parameters = {
     'CircleSphericalSkyRegion': ['center', 'radius', 'meta', 'visual'],
     'RegionMeta': ['background', 'comment', 'component', 'composite', 'corr',
                    'delete', 'edit', 'fixed', 'frame', 'highlite', 'include',
-                   'label', 'line', 'move', 'name', 'range', 'restfreq', 'rotate',
-                   'select', 'source', 'tag', 'text', 'textrotate', 'type', 'veltype'],
+                   'label', 'line', 'move', 'name', 'range', 'restfreq',
+                   'rotate', 'select', 'source', 'tag', 'text', 'textrotate',
+                   'type', 'veltype'],
     'RegionVisual': ['color', 'dash', 'dashlist', 'default_style', 'edgecolor',
                      'facecolor', 'fill', 'font', 'fontname', 'fontsize',
                      'fontstyle', 'fontweight', 'labelcolor', 'labeloff',
                      'labelpos', 'line', 'linestyle', 'linewidth', 'marker',
-                     'markeredgewidth', 'markersize', 'rotation', 'symbol', 'symsize',
-                     'symthick', 'textangle', 'textrotate', 'usetex',
-
+                     'markeredgewidth', 'markersize', 'rotation', 'symbol',
+                     'symsize', 'symthick', 'textangle', 'textrotate',
+                     'usetex',
                      ],
 }
 

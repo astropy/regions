@@ -114,8 +114,8 @@ visual_meta:
         title: Line Region (DS9)
         description: |
           DS9 supports a line region rendered with arrows, one at each end.
-          To indicate arrows, use the line property. A '1'indicates an arrow,
-          '0' indicates no arrow.)
+          To indicate arrows, use the line property. A '1' indicates an arrow,
+          '0' indicates no arrow.
       linestyle:
         type: string
         title: Line style for plotting the region.
