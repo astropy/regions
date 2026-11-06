@@ -16,7 +16,8 @@ from regions.core import (CompoundPixelRegion, CompoundSkyRegion,
                           CompoundSphericalSkyRegion, PixCoord,
                           RegionBoundingBox)
 from regions.shapes import (CirclePixelRegion, CircleSkyRegion,
-                            CircleSphericalSkyRegion, RangeSphericalSkyRegion)
+                            CircleSphericalSkyRegion, PolygonPixelRegion,
+                            RangeSphericalSkyRegion)
 from regions.tests.helpers import make_simple_wcs
 
 
@@ -128,6 +129,18 @@ class TestCompoundPixel:
     def test_bounding_box(self):
         bbox = (self.c1 | self.c2).bounding_box
         assert bbox == RegionBoundingBox(1, 16, 1, 10)
+
+    @pytest.mark.parametrize('method', ['contains', 'covers'])
+    def test_contains_scalar_polygon(self, method):
+        """
+        Test that a compound region with a polygon component returns a
+        scalar for a scalar position.
+        """
+        poly = PolygonPixelRegion(PixCoord([8, 14, 14, 8], [2, 2, 8, 8]))
+        reg = self.c1 | poly
+        result = getattr(reg, method)(PixCoord(12, 5))
+        assert np.ndim(result) == 0
+        assert result
 
     def test_invalid(self):
         with pytest.raises(ValueError):

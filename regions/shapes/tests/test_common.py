@@ -55,6 +55,17 @@ class BaseTestPixelRegion(BaseTestRegion):
             assert not self.reg.contains(pixcoord)
             assert pixcoord not in self.reg
 
+    def test_contains_scalar_ndim(self):
+        """
+        Test that ``contains`` and ``covers`` return a scalar for a
+        scalar position.
+        """
+        for pixcoords in (self.inside, self.outside):
+            if len(pixcoords) > 0:
+                pixcoord = PixCoord(*pixcoords[0])
+                assert np.ndim(self.reg.contains(pixcoord)) == 0
+                assert np.ndim(self.reg.covers(pixcoord)) == 0
+
     def test_contains_array_1d(self):
         pixcoord = PixCoord(*zip(*(self.inside + self.outside), strict=True))
         actual = self.reg.contains(pixcoord)
