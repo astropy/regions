@@ -10,6 +10,10 @@ New Features
 Bug Fixes
 ---------
 
+- Fixed the ``contains`` and ``covers`` methods of
+  ``PolygonPixelRegion`` and ``RegularPolygonPixelRegion`` to return a
+  scalar instead of a shape ``(1,)`` array for a scalar position. [#729]
+
 API Changes
 -----------
 
