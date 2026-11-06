@@ -4,6 +4,8 @@
 General
 -------
 
+- Add missing metadata definitions to the documentation. [#726]
+
 New Features
 ------------
 
