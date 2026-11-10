@@ -14,6 +14,11 @@ Bug Fixes
   ``PolygonPixelRegion`` and ``RegularPolygonPixelRegion`` to return a
   scalar instead of a shape ``(1,)`` array for a scalar position. [#729]
 
+- Fixed an occasional spurious ``RuntimeWarning`` from the
+  ``discretize_boundary`` and ``to_polygon`` methods of the spherical
+  sky regions, which wrapped uninitialized longitudes while
+  concatenating the boundary edges. [#730]
+
 API Changes
 -----------
 

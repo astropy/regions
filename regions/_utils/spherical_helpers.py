@@ -604,26 +604,30 @@ def discretize_all_edge_boundaries(vertices, circs, n_vertices):
     # Determine the number of vertices per edge:
     npt_edge, remainder = np.divmod(n_vertices, len(vertices))
 
-    all_edge_bound_verts = None
+    edge_bound_verts = []
     for i, circ in enumerate(circs):
         npt = npt_edge + 1 if i < remainder else npt_edge
 
         # PAs from gc center to vertices:
         verts = SkyCoord(np.concatenate([[vertices[i - 1]], [vertices[i]]]))
 
-        bound_verts = _discretize_edge_boundary(verts, circ, npt)
+        edge_bound_verts.append(_discretize_edge_boundary(verts, circ, npt))
 
-        if all_edge_bound_verts is None:
-            all_edge_bound_verts = bound_verts
-        else:
-            # Specify representation type, as in some cases
-            # concatenate introduces distances/non unit spherical
-            # representation
-            all_edge_bound_verts = SkyCoord(
-                np.concatenate(
-                    [all_edge_bound_verts.copy(), bound_verts],
-                ),
-                representation_type=UnitSphericalRepresentation,
-            )
+    if len(edge_bound_verts) == 1:
+        return edge_bound_verts[0]
 
-    return all_edge_bound_verts
+    # Concatenate the representation components instead of the SkyCoord
+    # objects. Calling np.concatenate on SkyCoord objects fills an
+    # uninitialized output, and each assignment wraps all of its
+    # longitudes, including the uninitialized ones. That can emit a
+    # RuntimeWarning when the uninitialized memory holds an infinity.
+    rep_cls = type(edge_bound_verts[0].data)
+    reps = [bound_verts.data.represent_as(rep_cls)
+            for bound_verts in edge_bound_verts]
+    components = [np.concatenate([getattr(rep, component) for rep in reps])
+                  for component in rep_cls.attr_classes]
+    frame = edge_bound_verts[0].frame.realize_frame(rep_cls(*components))
+
+    # Specify the representation type, as in some cases the boundary
+    # vertices have distances or a non-unit spherical representation
+    return SkyCoord(frame, representation_type=UnitSphericalRepresentation)
