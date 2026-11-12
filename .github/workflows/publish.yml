@@ -21,8 +21,8 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 permissions:
   contents: read
@@ -46,7 +46,7 @@ jobs:
       upload_to_pypi: false
       save_artifacts: true
 
-      test_extras: test
+      test_extras: test,all
       test_command: pytest -p no:warnings --pyargs regions
       targets: |
         # Linux wheels
@@ -82,7 +82,7 @@ jobs:
       id-token: write
     environment:
       name: pypi
-      url: https://pypi.org/project/regions
+      url: https://pypi.org/project/regions/
     # We upload to PyPI for all tag pushes, except tags ending in .dev
     if: |
       needs.build_and_publish.result == 'success' &&
@@ -94,6 +94,7 @@ jobs:
       )
     name: Upload release to PyPI
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     needs: [build_and_publish]
     steps:
       - name: Download artifacts
