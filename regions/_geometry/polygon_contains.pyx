@@ -120,8 +120,8 @@ def points_in_polygon_covers(np.ndarray[DTYPE_t, ndim=1] x,
         vy_ptr = &vy_view[0]
         with nogil:
             for i in range(n):
-                result_view[i] = point_in_polygon_covers(x_view[i], y_view[i],
-                                                         vx_ptr, vy_ptr, n_poly)
+                result_view[i] = point_in_polygon_covers(
+                    x_view[i], y_view[i], vx_ptr, vy_ptr, n_poly)
 
     return result.astype(bool)
 

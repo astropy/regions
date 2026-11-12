@@ -37,7 +37,7 @@ def get_astropy_frame_class(frame):
         if frame not in frame_names:
             raise ValueError(
                 f'Coordinate frame name "{frame}" is not a known '
-                f"coordinate frame ({sorted(frame_names)})",
+                f'coordinate frame ({sorted(frame_names)})',
             )
         frame_cls = frame_transform_graph.lookup_name(frame)
 
@@ -593,7 +593,7 @@ def discretize_all_edge_boundaries(vertices, circs, n_vertices):
     # Verify n_vertices >= the number of vertices:
     if n_vertices < len(vertices):
         raise ValueError(
-            f"n_vertices must be greater than {len(vertices)} "
+            f'n_vertices must be greater than {len(vertices)} '
             'to discretize/polygonize this region!',
         )
 

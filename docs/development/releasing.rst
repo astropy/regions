@@ -43,10 +43,11 @@ repository is called ``upstream``.
         git commit -m'Finalizing changelog for version <X.Y.Z>'
 
 #. Create an annotated git tag (optionally signing with the ``-s``
-   option) for the version number you are about to release::
+   option) for the version number you are about to release. The tag
+   name is the version number with a ``v`` prefix::
 
-        git tag -a <X.Y.Z> -m'<X.Y.Z>'
-        git show <X.Y.Z>  # show the tag
+        git tag -a v<X.Y.Z> -m'v<X.Y.Z>'
+        git show v<X.Y.Z>  # show the tag
         git tag  # show all tags
 
    .. _resume_release:
@@ -55,7 +56,7 @@ repository is called ``upstream``.
 
 #. Push this new tag to the upstream repo::
 
-        git push upstream <X.Y.Z>
+        git push upstream v<X.Y.Z>
 
    The new tag will trigger the automated `Publish workflow
    <https://github.com/astropy/regions/actions/workflows/publish.yml>`_
@@ -138,7 +139,7 @@ to the upstream repository.
 
 #. Check out the release tag::
 
-        git checkout <X.Y.Z>
+        git checkout v<X.Y.Z>
 
 #. Ensure the `build <https://pypi.org/project/build/>`_ and `twine
    <https://pypi.org/project/twine/>`_ packages are installed and up to

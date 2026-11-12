@@ -1,0 +1,133 @@
+# Labels applied to pull requests by .github/workflows/labeler.yml
+# https://github.com/actions/labeler
+#
+# Each subpackage label also matches its user guide pages. The workflow
+# only adds labels, so labels set by hand are kept.
+
+# The ASDF converters, schemas, and manifests are added by #702 and #723
+asdf_serialization:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'regions/io/asdf/**'
+
+core:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'regions/core/**'
+          - 'docs/user_guide/compound.rst'
+          - 'docs/user_guide/masks.rst'
+
+geometry:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'regions/_geometry/**'
+
+# Files shared by all the file formats
+io:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'regions/io/*.py'
+          - 'regions/core/registry.py'
+          - 'docs/user_guide/region_io.rst'
+
+io.crtf:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'regions/io/crtf/**'
+
+io.ds9:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'regions/io/ds9/**'
+          - 'docs/user_guide/ds9_io.rst'
+
+io.fits:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'regions/io/fits/**'
+          - 'docs/user_guide/fits_io.rst'
+
+metadata:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'regions/core/metadata.py'
+          - 'regions/core/tests/test_metadata.py'
+          - 'regions/io/ds9/meta.py'
+          - 'docs/user_guide/metadata.rst'
+
+shapes:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'regions/shapes/**'
+          - 'docs/user_guide/contains.rst'
+          - 'docs/user_guide/shapely.rst'
+          - 'docs/user_guide/shapes.rst'
+
+spherical_regions:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'regions/_utils/spherical_helpers.py'
+          - 'regions/shapes/lune.py'
+          - 'regions/shapes/range.py'
+          - 'regions/shapes/whole_sky.py'
+          - 'regions/shapes/tests/test_lune.py'
+          - 'regions/shapes/tests/test_range.py'
+          - 'regions/shapes/tests/test_whole_sky.py'
+          - 'docs/user_guide/spherical_bounding_regions.rst'
+          - 'docs/user_guide/spherical_frame_transform.rst'
+
+utils:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'regions/_utils/**'
+
+dev-automation:
+  - changed-files:
+      - any-glob-to-any-file:
+          - '.github/**'
+          - '.flake8'
+          - '.pre-commit-config.yaml'
+          - '.readthedocs.yaml'
+          - 'codecov.yml'
+          - 'tox.ini'
+
+docs:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'docs/**'
+          - 'README.rst'
+
+infrastructure:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'scripts/**'
+          - '.gitattributes'
+          - '.gitignore'
+          - 'CITATION.cff'
+          - 'regions/__init__.py'
+          - 'pyproject.toml'
+
+# The pre-commit.ci autoupdate pull requests always use this branch name.
+# pre-commit.ci has no option to set labels itself.
+no-changelog-entry-needed:
+  - head-branch: '^pre-commit-ci-update-config$'
+
+releases:
+  - changed-files:
+      - any-glob-to-any-file:
+          - '.github/workflows/publish.yml'
+          - 'docs/development/releasing.rst'
+
+# Applied when the test configuration changes or when every changed file
+# is a test file. Almost every pull request touches the tests, so matching
+# any test file would label nearly all of them. The two rules are combined
+# with OR because they are options of the same changed-files entry.
+testing:
+  - changed-files:
+      - any-glob-to-any-file:
+          - '.github/workflows/ci_*.yml'
+          - '**/conftest.py'
+          - 'codecov.yml'
+          - 'tox.ini'
+      - any-glob-to-all-files:
+          - '**/tests/**'

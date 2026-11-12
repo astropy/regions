@@ -3,25 +3,47 @@
 Configuration file for the pytest test suite.
 """
 
-try:
-    from pytest_astropy_header.display import (PYTEST_HEADER_MODULES,
-                                               TESTED_VERSIONS)
-    ASTROPY_HEADER = True
-except ImportError:
-    ASTROPY_HEADER = False
+import pytest
+from astropy.wcs.wcsapi import BaseLowLevelWCS
 
 
-def pytest_configure(config):
-    if ASTROPY_HEADER:
-        config.option.astropy_header = True
+def _shares_wcs(item):
+    """
+    Return whether a test uses a WCS object that is shared between the
+    threads of pytest-run-parallel.
 
-        # Customize the following lines to add/remove entries from the
-        # list of packages for which version numbers are displayed when
-        # running the tests.
-        PYTEST_HEADER_MODULES.clear()
-        deps = ['NumPy', 'Matplotlib', 'Astropy', 'Shapely']
-        for dep in deps:
-            PYTEST_HEADER_MODULES[dep] = dep.lower()
+    A WCS is shared when it comes from a fixture, whose value all
+    threads receive, or from a class attribute.
+    """
+    if any(name.endswith('wcs') for name in getattr(item, 'fixturenames', ())):
+        return True
+    cls = getattr(item, 'cls', None)
+    return cls is not None and any(isinstance(value, BaseLowLevelWCS)
+                                   for value in vars(cls).values())
 
-        from regions import __version__
-        TESTED_VERSIONS['regions'] = __version__
+
+def pytest_collection_modifyitems(items):
+    """
+    Run the tests that are not thread-safe in a single thread with
+    pytest-run-parallel.
+
+    Matplotlib is not thread-safe, and every test that uses it is
+    skipped without it, so the skip reason identifies these tests.
+    Every test that requests the ``request`` fixture uses it to call
+    ``request.getfixturevalue``, which is not thread-safe. An astropy
+    WCS object can return wrong results when several threads use it at
+    once on a free-threaded build, so tests that share one between
+    threads are also run in a single thread.
+    """
+    for item in items:
+        reasons = [marker.kwargs.get('reason', '')
+                   for marker in item.iter_markers('skipif')]
+        if any('matplotlib' in reason for reason in reasons):
+            reason = 'matplotlib is not thread-safe'
+        elif 'request' in getattr(item, 'fixturenames', ()):
+            reason = 'request.getfixturevalue is not thread-safe'
+        elif _shares_wcs(item):
+            reason = 'a shared astropy WCS object is not thread-safe'
+        else:
+            continue
+        item.add_marker(pytest.mark.thread_unsafe(reason=reason))

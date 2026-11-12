@@ -61,7 +61,6 @@ needs_sphinx = '8.2'  # keep in sync with pyproject.toml
 # Extend astropy intersphinx_mapping with packages we use here
 intersphinx_mapping.update(  # noqa: F405
     {'photutils': ('https://photutils.readthedocs.io/en/stable/', None),
-     # 'shapely': ('https://shapely.readthedocs.io/en/stable/', None),
      })
 
 # Exclude astropy intersphinx_mapping for unused packages
@@ -75,11 +74,7 @@ del intersphinx_mapping['h5py']  # noqa: F405
 
 extensions += [
     'sphinx_design',
-    # 'sphinx_reredirects',
 ]
-
-redirects = {
-}
 
 # This is added to the end of RST files - a good place to put
 # substitutions to be used globally.
@@ -176,7 +171,7 @@ nitpicky = True
 #
 # <type> <class>
 #
-# for example:
+# For example:
 #
 # py:class astropy.io.votable.tree.Element
 # py:class astropy.io.votable.tree.SimpleElement

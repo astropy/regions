@@ -9,8 +9,7 @@ Regions
 Regions is an `Astropy`_ package for region handling.
 
 Please see the `online documentation
-<https://astropy-regions.readthedocs.io>`_ for `installation
-instructions
+<https://astropy-regions.readthedocs.io>`_ for `installation instructions
 <https://astropy-regions.readthedocs.io/en/stable/install.html>`_
 and usage information.
 
@@ -36,7 +35,7 @@ the main text wherever appropriate.
 License
 -------
 
-Regions is licensed under a BSD 3-clause license.  Please see the
+Regions is licensed under a 3-clause BSD license.  Please see the
 `LICENSE
 <https://github.com/astropy/regions/blob/main/LICENSE.rst>`_ file
 for details.
@@ -46,7 +45,7 @@ for details.
     :target: https://pypi.org/project/regions/
     :alt: PyPI Latest Release
 
-.. |Conda Version| image:: https://img.shields.io/conda/vn/conda-forge/regions?label=conda%20package
+.. |Conda Version| image:: https://img.shields.io/conda/vn/conda-forge/regions
     :target: https://anaconda.org/conda-forge/regions
     :alt: Conda Latest Release
 
@@ -55,7 +54,8 @@ for details.
     :alt: Powered by Astropy
 
 .. |Zenodo| image:: https://zenodo.org/badge/35690635.svg
-    :target: https://zenodo.org/badge/latestdoi/35690635
+    :target: https://zenodo.org/doi/10.5281/zenodo.5826358
+    :alt: Zenodo Latest DOI
 
 .. |CI Status| image:: https://github.com/astropy/regions/workflows/CI%20Tests/badge.svg#
     :target: https://github.com/astropy/regions/actions
@@ -64,10 +64,6 @@ for details.
 .. |Codecov Status| image:: https://img.shields.io/codecov/c/github/astropy/regions?logo=codecov
     :target: https://codecov.io/gh/astropy/regions
     :alt: Coverage Status
-
-.. |Stable RTD Status| image:: https://img.shields.io/readthedocs/astropy-regions/latest.svg?logo=read%20the%20docs&logoColor=white&label=Docs&version=stable
-    :target: https://astropy-regions.readthedocs.io/en/stable/
-    :alt: Stable Documentation Status
 
 .. |Latest RTD Status| image:: https://img.shields.io/readthedocs/astropy-regions/latest.svg?logo=read%20the%20docs&logoColor=white&label=Docs&version=latest
     :target: https://astropy-regions.readthedocs.io/en/latest/

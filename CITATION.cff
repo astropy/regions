@@ -93,9 +93,10 @@ abstract: Astropy package for region handling
 keywords:
   - Astronomy software
   - Astronomy data analysis
-  - Photometry
-  - Image Data Analysis
+  - Regions of interest
+  - Region files
+  - Sky regions
   - Open source software
 license: BSD-3-Clause
-version: 0.11
-date-released: '2025-11-05'
+version: 0.13
+date-released: '2026-10-16'

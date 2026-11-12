@@ -4,10 +4,10 @@ Regions is an Astropy coordinated package to provide tools for region
 handling.
 """
 
-from ._utils.examples import *  # noqa: F401, F403
-from .core import *  # noqa: F401, F403
-from .io import *  # noqa: F401, F403
-from .shapes import *  # noqa: F401, F403
+from ._utils.examples import *  # noqa: F403
+from .core import *  # noqa: F403
+from .io import *  # noqa: F403
+from .shapes import *  # noqa: F403
 
 try:
     from .version import version as __version__
