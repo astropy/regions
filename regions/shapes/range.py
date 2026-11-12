@@ -173,7 +173,7 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
         intern_params = ['_frame', '_vertices',
                          '_is_original_frame', '_params']
         params_list = (
-            list(self._params) + [f"_{bn}" for bn in list(self._boundaries)]
+            list(self._params) + [f'_{bn}' for bn in list(self._boundaries)]
             + intern_params + meta_params
         )
 
@@ -820,11 +820,11 @@ class RangeSphericalSkyRegion(ComplexSphericalSkyRegion):
             # _longitude_bounds, _latitude_bounds
             bound_orig = getattr(self, bound)
             if bound_orig is not None:
-                transformed[f"_{bound}"] = bound_orig.transform_to(
+                transformed[f'_{bound}'] = bound_orig.transform_to(
                     frame, merge_attributes=merge_attributes,
                 )
             else:
-                transformed[f"_{bound}"] = bound_orig
+                transformed[f'_{bound}'] = bound_orig
 
         # Also transform vertices
         for field in ['_vertices']:

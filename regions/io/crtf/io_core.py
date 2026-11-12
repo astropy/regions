@@ -133,7 +133,7 @@ class _ShapeList(list):
             'polygon': '{0}poly[{1}]',
             'point': '{0}point[[{1:FMT}deg, {2:FMT}deg]]',
             'symbol': '{0}symbol[[{1:FMT}deg, {2:FMT}deg], {symbol}]',
-            'text': '{0}text[[{1:FMT}deg, {2:FMT}deg], \'{text}\']',
+            'text': "{0}text[[{1:FMT}deg, {2:FMT}deg], '{text}']",
             'line': ('{0}line[[{1:FMT}deg, {2:FMT}deg], [{3:FMT}deg, '
                      '{4:FMT}deg]]')}
 

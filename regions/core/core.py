@@ -947,7 +947,7 @@ class SphericalSkyRegion(Region):
             self_frame = self.frame
 
         if not self_frame.is_transformable_to(frame):
-            raise ValueError(f"Cannot transform from {self.frame} to {frame}!")
+            raise ValueError(f'Cannot transform from {self.frame} to {frame}!')
 
         # TODO: check for offset origin transformations
         return frame
@@ -1301,7 +1301,7 @@ class ComplexSphericalSkyRegion(SphericalSkyRegion):
     def copy(self, **changes):
         # Boundaries: only copy stashed internal attributes "_{bound name}",
         # as otherwise these are derived on-the-fly.
-        boundaries_interalattr = [f"_{bn}" for bn in list(self._boundaries)]
+        boundaries_interalattr = [f'_{bn}' for bn in list(self._boundaries)]
         fields = boundaries_interalattr + [
             '_frame', '_vertices',
             '_is_original_frame', '_params',
