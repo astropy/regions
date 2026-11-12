@@ -93,7 +93,7 @@ class RegionMeta(Meta):
                   'rotate', 'select', 'source', 'tag', 'text', 'textrotate',
                   'type', 'veltype']
 
-    key_mapping = {}
+    key_mapping = {'tags': 'tag'}
 
 
 class RegionVisual(Meta):
