@@ -42,8 +42,8 @@ def label(value):
 
 
 @pytest.mark.array_compare(file_format='text', write_kwargs={'fmt': '%12.8e'})
-@pytest.mark.parametrize('region', REGIONS, ids=label)
 @pytest.mark.parametrize('mode', MODES, ids=label)
+@pytest.mark.parametrize('region', REGIONS, ids=label)
 def test_to_mask(region, mode):
     try:
         mask = region.to_mask(**mode)
