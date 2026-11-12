@@ -140,7 +140,6 @@ jobs:
                                   python3-extension-helpers \
                                   python3-numpy \
                                   python3-pytest \
-                                  python3-pytest-arraydiff \
                                   python3-pytest-astropy-header \
                                   python3-pytest-doctestplus \
                                   python3-pytest-remotedata \

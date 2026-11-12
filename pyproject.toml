@@ -41,7 +41,6 @@ all = [
 test = [
     'gwcs>=0.22',
     'pytest>=9.0',
-    'pytest-arraydiff>=0.6.1',
     'pytest-astropy-header>=0.2.2',
     'pytest-cov>=7.0',
     'pytest-doctestplus>=1.4',
@@ -90,7 +89,6 @@ namespaces = false
     'data/*',
 ]
 'regions.shapes.tests' = [
-    'reference/*.txt',
     'data/*.fits',
 ]
 'regions.io.crtf.tests' = [
@@ -126,7 +124,6 @@ doctest_plus = 'enabled'
 text_file_format = 'rst'
 addopts = [
     '-ra',
-    '--arraydiff',
     '--color=yes',
     '--doctest-rst',
     '--strict-config',
@@ -139,7 +136,6 @@ filterwarnings = [
     'error',  # turn warnings into exceptions
 ]
 markers = [
-    'array_compare',
     # Registered here so that the markers work without pytest-run-parallel
     'thread_unsafe: run the test in a single thread with pytest-run-parallel',
     'iterations(n): run the test n times per thread with pytest-run-parallel',
