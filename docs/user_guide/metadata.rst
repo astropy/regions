@@ -88,13 +88,27 @@ The valid keys in the :class:`~regions.RegionMeta` object are:
     '0' indicates no arrow.)
   - Ex: meta['line'] = [1, 1]
 
-* ``name``
+* ``select``:
 
-* ``select``
+  - DS9 (The select property specifies if the user is allowed to select the
+    region via the GUI.)
+  - Ex: meta['select'] = 1
 
-* ``highlite``
+* ``highlite``:
 
-* ``fixed``
+  - DS9, CRTF (Determines whether the edit handles (or anchor points) become
+    visible when a specific region is selected in the GUI.
+    highlite=1 (True): When you click on the region in the DS9 interface,
+    the resize and manipulation handles appear around its perimeter.
+    highlite=0 (False): The region can still be selected (if select=1), but
+    it will not display the visible edit boxes/handles.)
+  - Ex: meta['highlite'] = 1
+
+* ``fixed``:
+
+  - DS9 (The Fixed property specifies if the user is allowed to
+    fix the region via the GUI.)
+  - Ex: meta['fixed'] = 1
 
 * ``edit``:
 
@@ -120,9 +134,26 @@ The valid keys in the :class:`~regions.RegionMeta` object are:
     the region via the GUI. )
   - Ex: meta['delete'] = 1
 
-* ``source``
+* ``source``:
 
-* ``background``
+  - DS9 (The Source property specifies if the region includes a source. )
+  - Ex: meta['source'] = 1
+
+* ``background``:
+
+  - DS9 (The Background property specifies if the region represents
+    background.)
+  - Ex: meta['background'] = 1
+
+* ``component``:
+
+  - DS9 (The Component property specifies if the region is a component.)
+  - Ex: meta['component'] = 1
+
+* ``composite``:
+
+  - DS9 (The Composite property specifies if the region is composite.)
+  - Ex: meta['composite'] = 1
 
 
 Visual Metadata
