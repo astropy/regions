@@ -1,28 +1,28 @@
 0.14 (unreleased)
-=================
+-----------------
 
 General
--------
+^^^^^^^
 
 New Features
-------------
+^^^^^^^^^^^^
 
 Bug Fixes
----------
+^^^^^^^^^
 
 - Fixed the ``contains`` and ``covers`` methods of
   ``PolygonPixelRegion`` and ``RegularPolygonPixelRegion`` to return a
   scalar instead of a shape ``(1,)`` array for a scalar position. [#729]
 
 API Changes
------------
+^^^^^^^^^^^
 
 
 0.13 (2026-10-16)
-=================
+-----------------
 
 General
--------
+^^^^^^^
 
 - The minimum required Python is now 3.12. [#714]
 
@@ -35,7 +35,7 @@ General
   [#714]
 
 New Features
-------------
+^^^^^^^^^^^^
 
 - Improved the performance of the region ``to_sky`` and ``to_pixel``
   conversions. The local WCS Jacobian now evaluates the WCS once for
@@ -45,7 +45,7 @@ New Features
   direction. [#707]
 
 Bug Fixes
----------
+^^^^^^^^^
 
 - Fixed a doubled comma in the serialized CRTF output when ``range`` or
   ``corr`` is the only metadata of a region. [#700]
@@ -75,7 +75,7 @@ Bug Fixes
   offsets fell outside the bounding box. [#707]
 
 API Changes
------------
+^^^^^^^^^^^
 
 - The ``to_pixel`` and ``to_sky`` methods of the circular regions now
   use the geometric mean of the two singular values of the local WCS
@@ -90,10 +90,10 @@ API Changes
 
 
 0.12 (2026-06-24)
-=================
+-----------------
 
 General
--------
+^^^^^^^
 
 - The minimum required NumPy is now 2.0. [#654]
 
@@ -102,7 +102,7 @@ General
 - The minimum required Matplotlib is now 3.9. [#654]
 
 New Features
-------------
+^^^^^^^^^^^^
 
 - Added a ``to_polygon`` method to all region classes that returns a
   ``PolygonPixelRegion`` or ``PolygonSkyRegion`` approximation of the
@@ -167,7 +167,7 @@ New Features
   rectangular and polygonal regions has been implemented. [#685]
 
 Bug Fixes
----------
+^^^^^^^^^
 
 - Fixed reading FITS region files whose ``SHAPE`` column values contain
   leading or trailing whitespace (e.g., from fixed-width
@@ -195,7 +195,7 @@ Bug Fixes
   floating-point precision differences. [#677]
 
 API Changes
------------
+^^^^^^^^^^^
 
 - The ``LinePixelRegion`` ``as_artist`` method now returns a
   ``matplotlib.lines.Line2D`` object instead of a
@@ -218,10 +218,10 @@ API Changes
 
 
 0.11 (2025-11-05)
-=================
+-----------------
 
 General
--------
+^^^^^^^
 
 - The minimum required Python is now 3.11. [#598]
 
@@ -234,32 +234,32 @@ General
 - The minimum required Shapely is now 2.0. [#601]
 
 Bug Fixes
----------
+^^^^^^^^^
 
 - No longer overwrites input ``meta`` and ``visible`` values when
   initializing a ``CompoundSkyRegion``. [#628]
 
 
 0.10 (2024-09-27)
-=================
+-----------------
 
 General
--------
+^^^^^^^
 
 - Added support for NumPy 2.1.
 
 API Changes
------------
+^^^^^^^^^^^
 
 - The ``regions.test`` function has been removed. Instead use the
   ``pytest --pyarg regions`` command. [#549]
 
 
 0.9 (2024-04-12)
-================
+----------------
 
 General
--------
+^^^^^^^
 
 - Added support for NumPy 2.0.
 
@@ -274,7 +274,7 @@ General
 - The minimum required sphinx-astropy is now 1.9. [#547]
 
 Bug Fixes
----------
+^^^^^^^^^
 
 - Fixed a bug where the text string of ``TextPixelRegion`` and
   ``TextSkyRegion`` was dropped when serializing or writing
@@ -282,10 +282,10 @@ Bug Fixes
 
 
 0.8 (2023-11-16)
-================
+----------------
 
 General
--------
+^^^^^^^
 
 - The minimum required Python is now 3.9. [#517]
 
@@ -294,7 +294,7 @@ General
 - The minimum required Matplotlib is now 3.5. [#517]
 
 New Features
-------------
+^^^^^^^^^^^^
 
 - The ``Regions`` class can now be initialized without any arguments.
   [#527]
@@ -303,25 +303,25 @@ New Features
   object as input. [#527]
 
 Bug Fixes
----------
+^^^^^^^^^
 
 API Changes
------------
+^^^^^^^^^^^
 
 - The ``Regions`` class and its ``append`` and ``extend`` methods now
   raise a ``TypeError`` for invalid inputs. [#527]
 
 
 0.7 (2022-10-27)
-================
+----------------
 
 New Features
-------------
+^^^^^^^^^^^^
 
 - Region meta and visual metadata can be now input as a ``dict``. [#462]
 
 Bug Fixes
----------
+^^^^^^^^^
 
 - Fixed an issue with the CRTF for certain malformed input. [#448]
 
@@ -337,17 +337,17 @@ Bug Fixes
   [#407]
 
 API Changes
------------
+^^^^^^^^^^^
 
 - Removed the deprecated ``BoundingBox`` class. Use
   ``RegionBoundingBox`` instead. [#456]
 
 
 0.6 (2022-03-21)
-================
+----------------
 
 New Features
-------------
+^^^^^^^^^^^^
 
 - Added the DS9 'boxcircle' point symbol. [#387]
 
@@ -377,7 +377,7 @@ New Features
   ``rotrectangle`` shapes. [#444]
 
 Bug Fixes
----------
+^^^^^^^^^
 
 - Fixed the DS9 default point symbol to use 'boxcircle'. [#387]
 
@@ -415,7 +415,7 @@ Bug Fixes
   [#444]
 
 API Changes
------------
+^^^^^^^^^^^
 
 - Removed the following deprecated I/O classes and functions:
   ``crtf_objects_to_string``, ``ds9_objects_to_string``,
@@ -459,10 +459,10 @@ API Changes
 
 
 0.5 (2021-07-20)
-================
+----------------
 
 General
--------
+^^^^^^^
 
 - The infrastructure of the package has been updated in line with the
   APE 17 guidelines. The main changes are that the ``python setup.py
@@ -477,7 +477,7 @@ General
 - Bump the minimum required version of Astropy to 3.2.
 
 New Features
-------------
+^^^^^^^^^^^^
 
 - Added a ``as_mpl_selector`` method to the rectangular and ellipse
   pixel-based regions. This method returns an interactive Matplotlib
@@ -498,7 +498,7 @@ New Features
   subclasses. [#378]
 
 Bug Fixes
----------
+^^^^^^^^^
 
 - Fixed an issue where ``RegionMask.multiply`` ``fill_value`` was not
   applied to pixels outside of the mask, but within the region bounding
@@ -552,7 +552,7 @@ Bug Fixes
 - Fixed an issue parsing spaces in DS9 region metadata. [#384]
 
 API Changes
------------
+^^^^^^^^^^^
 
 - Deprecated the ``BoundingBox`` ``slices`` attribute. [#348]
 
@@ -584,10 +584,10 @@ API Changes
 
 
 0.4 (2019-06-17)
-================
+----------------
 
 New Features
-------------
+^^^^^^^^^^^^
 
 - Add region copy methods [#269]
 - Add pixel region rotate method [#265]
@@ -597,15 +597,15 @@ New Features
 - Add PixCoord.xy [#247]
 
 Bug Fixes
----------
+^^^^^^^^^
 
 - Fixed a corner-case issue where ``RegionMask.multiply()`` would not set
   non-finite data values outside of the mask but within the bounding box
   to zero. [#278]
 - Fix 'text' renamed to 'label' [#234]
 
-Other
------
+Other Changes and Additions
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 - Remove astropy-healpix dependency [#258]
 - Use standalone six to avoid deprecation warnings [#235]
@@ -614,10 +614,10 @@ Other
 
 
 0.3 (2018-09-09)
-================
+----------------
 
 New Features
-------------
+^^^^^^^^^^^^
 
 - Changed ``as_patch`` to ``as_artist`` to accommodate nonpatch artists [#218]
 
@@ -664,7 +664,7 @@ New Features
 
 
 0.2 (2017-02-16)
-================
+----------------
 
 The changelog was not populated.
 
@@ -672,7 +672,7 @@ The changelog was not populated.
 
 
 0.1 (2016-07-26)
-================
+----------------
 
 The changelog was not populated.
 
