@@ -88,13 +88,32 @@ The valid keys in the :class:`~regions.RegionMeta` object are:
     '0' indicates no arrow.)
   - Ex: meta['line'] = [1, 1]
 
-* ``name``
+* ``name``:
 
-* ``select``
+  - The name of the region.
+  - Ex: meta['name'] = 'Region 1'
 
-* ``highlite``
+* ``select``:
 
-* ``fixed``
+  - DS9 (The select property specifies if the user is allowed to select the
+    region via the GUI.)
+  - Ex: meta['select'] = 1
+
+* ``highlite``:
+
+  - DS9 (Determines whether the edit handles (or anchor points) become
+    visible when a specific region is selected in the GUI.
+    highlite=1 (True): When you click on the region in the DS9 interface,
+    the resize and manipulation handles appear around its perimeter.
+    highlite=0 (False): The region can still be selected (if select=1), but
+    it will not display the visible edit boxes/handles.)
+  - Ex: meta['highlite'] = 1
+
+* ``fixed``:
+
+  - DS9 (The Fixed in Size property specifies that the region does not
+    change in size as the image magnification factor changes.)
+  - Ex: meta['fixed'] = 1
 
 * ``edit``:
 
@@ -120,9 +139,27 @@ The valid keys in the :class:`~regions.RegionMeta` object are:
     the region via the GUI. )
   - Ex: meta['delete'] = 1
 
-* ``source``
+* ``source``:
 
-* ``background``
+  - DS9 (The Source property flags the region as a source region
+    for analysis (the opposite of background, and the default).)
+  - Ex: meta['source'] = 1
+
+* ``background``:
+
+  - DS9 (The Background property flags the region as a background region
+    for analysis (the opposite of source.))
+  - Ex: meta['background'] = 1
+
+* ``component``:
+
+  - DS9 (The Component property specifies if the region is a component.)
+  - Ex: meta['component'] = 1
+
+* ``composite``:
+
+  - DS9 (The Composite property specifies if the region is composite.)
+  - Ex: meta['composite'] = 1
 
 
 Visual Metadata
