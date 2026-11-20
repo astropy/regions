@@ -470,7 +470,8 @@ connected to its parent region.
     fig, ax = plt.subplots()
     img = ax.imshow(z, origin='lower')
 
-    rectangle = RectanglePixelRegion(center=PixCoord(x=12, y=15), width=14, height=10)
+    rectangle = RectanglePixelRegion(center=PixCoord(x=12, y=15),
+                                     width=14, height=10)
     selector = rectangle.as_mpl_selector(ax)
 
 The ``selector`` creates and establishes a link to a matplotlib ``Selector``

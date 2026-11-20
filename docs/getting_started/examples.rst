@@ -28,7 +28,7 @@ regions on an image using Matplotlib.
     region_file = get_pkg_data_filename('data/plot_image.reg',
                                         package='regions.io.ds9.tests')
     regions = Regions.read(region_file, format='ds9')
-    for i, region in enumerate(regions):
+    for region in regions:
         region.plot(ax=ax)
 
 

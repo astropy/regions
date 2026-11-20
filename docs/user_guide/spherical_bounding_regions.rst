@@ -84,9 +84,7 @@ both the original and transformed coordinate frames.
     from astropy.visualization.wcsaxes.frame import EllipticalFrame
     from astropy.wcs import WCS
     from matplotlib.lines import Line2D
-
-    from regions import (CircleSphericalSkyRegion,
-                         RangeSphericalSkyRegion)
+    from regions import CircleSphericalSkyRegion, RangeSphericalSkyRegion
 
     # Create full-sky Aitoff WCS objects for Galactic and ICRS frames
     wcs = WCS(naxis=2)
