@@ -7,6 +7,9 @@ General
 New Features
 ^^^^^^^^^^^^
 
+- Add an ASDF extension and implement serialization of
+  ``PixCoord`` objects. [#702]
+
 Bug Fixes
 ^^^^^^^^^
 
